@@ -3,4 +3,6 @@
     <string name="home">Home</string>
     <string name="settings">Settings</string>
     <string name="about_app">About App</string>
+    <string name="playlists">Playlists</string>
+    <string name="favourites">Favourites</string>
 </resources>
