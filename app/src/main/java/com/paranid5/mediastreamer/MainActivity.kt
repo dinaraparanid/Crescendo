@@ -5,6 +5,9 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.navigation.compose.rememberNavController
+import com.paranid5.mediastreamer.composition_locals.LocalStreamState
+import com.paranid5.mediastreamer.composition_locals.StreamState
+import com.paranid5.mediastreamer.composition_locals.StreamStates
 import com.paranid5.mediastreamer.ui.App
 import com.paranid5.mediastreamer.ui.screens.LocalNavController
 import com.paranid5.mediastreamer.ui.screens.NavHostController
@@ -18,10 +21,13 @@ class MainActivity : ComponentActivity() {
             MediaStreamerTheme {
                 val mainNavController = NavHostController(
                     value = rememberNavController(),
-                    currentRouteState = Screens.Home.title
+                    currentRouteState = Screens.StreamScreen.Searching.title
                 )
 
-                CompositionLocalProvider(LocalNavController provides mainNavController) {
+                CompositionLocalProvider(
+                    LocalNavController provides mainNavController,
+                    LocalStreamState provides StreamState(StreamStates.SEARCHING)
+                ) {
                     App()
                 }
             }

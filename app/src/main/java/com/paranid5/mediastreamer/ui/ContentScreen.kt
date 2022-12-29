@@ -6,37 +6,45 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
-import com.paranid5.mediastreamer.ui.screens.LocalNavController
-import com.paranid5.mediastreamer.ui.screens.Screens
+import com.paranid5.mediastreamer.composition_locals.LocalStreamState
+import com.paranid5.mediastreamer.composition_locals.screen
+import com.paranid5.mediastreamer.ui.screens.*
+import com.paranid5.mediastreamer.view_models.SearchStreamViewModel
+import org.koin.androidx.compose.koinViewModel
 
 @Composable
-fun ContentScreen(padding: PaddingValues) {
+fun ContentScreen(
+    padding: PaddingValues,
+    viewModel: SearchStreamViewModel = koinViewModel()
+) {
+    val streamingScreen = LocalStreamState.current.screen
+
     NavHost(
         navController = LocalNavController.current.value!!,
-        startDestination = Screens.Home.title,
+        startDestination = Screens.StreamScreen.Searching.title,
         modifier = Modifier.padding(
             top = padding.calculateTopPadding(),
             bottom = padding.calculateBottomPadding()
         )
     ) {
         composable(
-            route = Screens.Home.title,
-            content = Screens.Home.content
+            route = streamingScreen.title,
+            content = { SearchStreamScreen(viewModel = viewModel) }
         )
 
         composable(
             route = Screens.AboutApp.title,
-            content = Screens.AboutApp.content
+            content = { AboutApp() }
         )
 
         composable(
             route = Screens.Favourite.title,
-            content = Screens.Favourite.content
+            content = { FavouritesScreen() }
         )
 
         composable(
             route = Screens.Settings.title,
-            content = Screens.Settings.content
+            content = { SettingsScreen() }
         )
     }
 }

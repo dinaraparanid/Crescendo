@@ -5,7 +5,7 @@ import androidx.navigation.NavHostController
 
 data class NavHostController(
     @JvmField val value: NavHostController? = null,
-    @JvmField var currentRouteState: String = Screens.Home.title
+    @JvmField var currentRouteState: String = Screens.StreamScreen.Searching.title
 ) {
     fun navigateIfNotSame(screens: Screens) {
         val route = screens.title

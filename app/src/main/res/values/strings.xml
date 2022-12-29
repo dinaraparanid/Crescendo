@@ -5,4 +5,7 @@
     <string name="about_app">About App</string>
     <string name="playlists">Playlists</string>
     <string name="favourites">Favourites</string>
+    <string name="enter_stream_url">Enter URL to start streaming</string>
+    <string name="your_url">Your URL link to video/stream</string>
+    <string name="confirm">Confirm</string>
 </resources>
