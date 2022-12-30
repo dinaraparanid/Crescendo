@@ -13,6 +13,9 @@ import com.paranid5.mediastreamer.ui.screens.LocalNavController
 import com.paranid5.mediastreamer.ui.screens.NavHostController
 import com.paranid5.mediastreamer.ui.screens.Screens
 import com.paranid5.mediastreamer.ui.theme.MediaStreamerTheme
+import java.util.concurrent.locks.ReentrantLock
+import kotlin.concurrent.thread
+import kotlin.concurrent.withLock
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
