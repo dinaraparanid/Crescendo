@@ -1,10 +1,9 @@
 package com.paranid5.mediastreamer.ui.appbar
 
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Home
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import com.paranid5.mediastreamer.R
 import com.paranid5.mediastreamer.composition_locals.LocalStreamState
@@ -19,7 +18,7 @@ fun StreamButton() {
 
     FloatingActionButton(onClick = { navHostController.navigateIfNotSame(streamingScreen) }) {
         Icon(
-            imageVector = Icons.Filled.Home,
+            painter = painterResource(R.drawable.stream),
             contentDescription = stringResource(id = R.string.home),
             tint = LocalAppColors.current.value.background
         )

@@ -8,4 +8,6 @@
     <string name="enter_stream_url">Enter URL to start streaming</string>
     <string name="your_url">Your URL link to video/stream</string>
     <string name="confirm">Confirm</string>
+    <string name="stream_no_name">Stream / Video with no name</string>
+    <string name="unknown_streamer">Unknown streamer</string>
 </resources>
