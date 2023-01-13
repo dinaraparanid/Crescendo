@@ -15,7 +15,6 @@ import com.paranid5.mediastreamer.R
 import com.paranid5.mediastreamer.StateChangedCallback
 import com.paranid5.mediastreamer.ui.OnUIStateChanged
 import com.paranid5.mediastreamer.view_models.SearchStreamViewModel
-import org.koin.androidx.compose.koinViewModel
 
 @Composable
 private fun Label(modifier: Modifier = Modifier) =
@@ -70,7 +69,7 @@ fun SearchStreamScreen(
 
     OnUIStateChanged(
         lifecycleOwner = lifecycleOwnerState.value,
-        callback = StateChangedCallback(
+        StateChangedCallback(
             uiHandler = viewModel.handler,
             state = viewModel.isConfirmButtonPressedState,
             onDispose = { viewModel.finishUrlSetting() }

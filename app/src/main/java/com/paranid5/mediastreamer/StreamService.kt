@@ -22,9 +22,11 @@ import androidx.media3.common.C.*
 import androidx.media3.exoplayer.ExoPlayer
 import com.paranid5.mediastreamer.utils.extensions.toBitmap
 import kotlinx.coroutines.*
+import org.koin.core.component.KoinComponent
+import org.koin.core.component.inject
 import java.util.concurrent.atomic.AtomicLong
 
-class StreamService : Service(), CoroutineScope by MainScope() {
+class StreamService : Service(), CoroutineScope by MainScope(), KoinComponent {
     companion object {
         private const val NOTIFICATION_ID = 101
         private const val STREAM_CHANNEL_ID = "stream_channel"
@@ -88,6 +90,8 @@ class StreamService : Service(), CoroutineScope by MainScope() {
         }
 
     private val binder = object : Binder() {}
+    private val storageHandler by inject<StorageHandler>()
+
     private var url = ""
     private val currentPlaybackPosition = AtomicLong(0L)
     private lateinit var playbackMonitorTask: Job
@@ -113,56 +117,57 @@ class StreamService : Service(), CoroutineScope by MainScope() {
         .setHandleAudioBecomingNoisy(true)
         .setWakeMode(WAKE_MODE_NETWORK)
         .build()
-        .apply { addListener(playerStateChangedListener) }
+        .apply { addListener(mPlayerStateChangedListener) }
 
-    private inline val isPlaying
+    internal inline val mIsPlaying
         get() = player.isPlaying
 
-    private val playerStateChangedListener: Player.Listener = object : Player.Listener {
+    private val mPlayerStateChangedListener: Player.Listener = object : Player.Listener {
         override fun onPlaybackStateChanged(playbackState: Int) {
             super.onPlaybackStateChanged(playbackState)
             if (playbackState == Player.STATE_IDLE)
-                restartPlayer()
+                mRestartPlayer()
         }
 
         override fun onIsPlayingChanged(isPlaying: Boolean) {
             super.onIsPlayingChanged(isPlaying)
 
             when {
-                isPlaying -> startPlaybackMonitoring()
-                else -> stopPlaybackMonitoring()
+                isPlaying -> mStartPlaybackMonitoring()
+                else -> mStopPlaybackMonitoring()
             }
 
-            showNotification(isPlaying)
+            mShowNotification(isPlaying)
         }
 
         override fun onMediaMetadataChanged(mediaMetadata: MediaMetadata) {
             super.onMediaMetadataChanged(mediaMetadata)
-            showNotification(isPlaying)
+            mShowNotification(mIsPlaying)
         }
 
         override fun onPlayerError(error: PlaybackException) {
             super.onPlayerError(error)
-            showNotification(isPlaying = false)
+            mShowNotification(isPlaying = false)
             Log.e("StreamService", "onPlayerError", error)
         }
     }
 
     private val pauseReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context?, intent: Intent?) {
-            pausePlayback()
+            mPausePlayback()
         }
     }
 
     private val resumeReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context?, intent: Intent?) {
-            resumePlayback()
+            mResumePlayback()
         }
     }
 
     private val switchReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context?, intent: Intent) {
-            playNewStream(intent)
+            launch { mStoreCurrentUrl(url) }
+            mPlayNewStream(intent)
         }
     }
 
@@ -180,7 +185,18 @@ class StreamService : Service(), CoroutineScope by MainScope() {
             createChannel()
 
         initMediaSession()
-        playNewStream(intent)
+
+        intent.urlArgOrNull?.let { url ->
+            // New stream
+            launch { mStoreCurrentUrl(url) }
+            playNewStream(url)
+        } ?: launch {
+            // Continue previous stream
+            storageHandler.currentUrl.collect { url ->
+                playNewStream(url!!)
+            }
+        }
+
         return START_NOT_STICKY
     }
 
@@ -209,14 +225,17 @@ class StreamService : Service(), CoroutineScope by MainScope() {
                 }
             )
 
-    private fun pausePlayback() {
+    internal fun mPausePlayback() {
         currentPlaybackPosition.set(player.currentPosition)
         player.pause()
     }
 
-    private fun resumePlayback() {
+    internal fun mResumePlayback() {
         player.playWhenReady = true
     }
+
+    internal suspend inline fun mStoreCurrentUrl(url: String) =
+        storageHandler.storeCurrentUrl(url)
 
     private fun playNewStream(newUrl: String) {
         url = newUrl
@@ -229,10 +248,17 @@ class StreamService : Service(), CoroutineScope by MainScope() {
         }
     }
 
-    private fun playNewStream(intent: Intent) =
-        playNewStream(intent.getStringExtra(URL_ARG)!!)
+    private inline val Intent.urlArgOrNull
+        get() = getStringExtra(URL_ARG)
 
-    private fun restartPlayer() = playNewStream(url)
+    private inline val Intent.urlArg
+        get() = getStringExtra(URL_ARG)!!
+
+    internal fun mPlayNewStream(intent: Intent) =
+        playNewStream(newUrl = intent.urlArg)
+
+    internal fun mRestartPlayer() =
+        playNewStream(newUrl = url)
 
     private fun releaseMedia() {
         player.stop()
@@ -245,12 +271,12 @@ class StreamService : Service(), CoroutineScope by MainScope() {
         get() = object : MediaSession.Callback() {
             override fun onPlay() {
                 super.onPlay()
-                resumePlayback()
+                mResumePlayback()
             }
 
             override fun onPause() {
                 super.onPause()
-                pausePlayback()
+                mPausePlayback()
             }
         }
 
@@ -384,7 +410,10 @@ class StreamService : Service(), CoroutineScope by MainScope() {
                 applicationContext,
                 0,
                 Intent(applicationContext, MainActivity::class.java),
-                PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+                if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M)
+                    PendingIntent.FLAG_UPDATE_CURRENT
+                else
+                    PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
             )
         )
 
@@ -424,10 +453,10 @@ class StreamService : Service(), CoroutineScope by MainScope() {
             .Builder(applicationContext, STREAM_CHANNEL_ID)
             .setContent()
             .setActions(isPlaying)
-    
+
     // --------------------------- Handle Notification ---------------------------
 
-    private fun showNotification(isPlaying: Boolean) = startForeground(
+    internal fun mShowNotification(isPlaying: Boolean) = startForeground(
         NOTIFICATION_ID,
         when {
             Build.VERSION.SDK_INT >= Build.VERSION_CODES.O ->
@@ -443,15 +472,17 @@ class StreamService : Service(), CoroutineScope by MainScope() {
 
     // --------------------------- Playback Monitoring ---------------------------
 
-    private fun startPlaybackMonitoring() {
-        playbackMonitorTask = launch { 
+    internal fun mStartPlaybackMonitoring() {
+        playbackMonitorTask = launch {
             while (true) {
                 delay(PLAYBACK_UPDATE_COOLDOWN)
-                currentPlaybackPosition.set(player.currentPosition)
-                // TODO: save position
+
+                val currentPosition = player.currentPosition
+                currentPlaybackPosition.set(currentPosition)
+                storageHandler.storePlaybackPosition(currentPosition)
             }
         }
     }
 
-    private fun stopPlaybackMonitoring() = playbackMonitorTask.cancel()
+    internal fun mStopPlaybackMonitoring() = playbackMonitorTask.cancel()
 }

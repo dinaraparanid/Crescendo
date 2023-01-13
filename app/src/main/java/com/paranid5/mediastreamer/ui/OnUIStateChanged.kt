@@ -13,11 +13,17 @@ import kotlinx.coroutines.launch
 @Composable
 fun <H : UIHandler> OnUIStateChanged(
     lifecycleOwner: LifecycleOwner,
-    callback: StateChangedCallback<H>
+    vararg callbacks: StateChangedCallback<H>
 ) = DisposableEffect(lifecycleOwner) {
     lifecycleOwner.lifecycleScope.launch {
-        lifecycleOwner.lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) { callback() }
+        lifecycleOwner.lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
+            callbacks.forEach { it() }
+        }
     }
 
-    onDispose { callback.onDispose?.invoke(callback.uiHandler) }
+    onDispose {
+        callbacks.forEach { (uiHandler, _, onDispose, _) ->
+            onDispose?.invoke(uiHandler)
+        }
+    }
 }

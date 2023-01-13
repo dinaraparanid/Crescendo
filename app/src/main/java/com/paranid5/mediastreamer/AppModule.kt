@@ -7,8 +7,20 @@ import org.koin.androidx.viewmodel.dsl.viewModelOf
 import org.koin.core.module.dsl.singleOf
 import org.koin.dsl.module
 
-val appModule = module {
+val paramsModule = module {
+    singleOf(::StorageHandler)
+}
+
+val searchStreamModule = module {
     singleOf(::SearchStreamUIHandler)
     factory { (currentText: String?) -> SearchStreamPresenter(currentText) }
     viewModelOf(::SearchStreamViewModel)
+}
+
+val uiModule = module {
+    includes(searchStreamModule)
+}
+
+val appModule = module {
+    includes(paramsModule, uiModule)
 }
