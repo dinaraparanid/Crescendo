@@ -106,18 +106,20 @@ class StreamService : Service(), CoroutineScope by MainScope(), KoinComponent {
     private lateinit var mediaSession: MediaSession
     private lateinit var transportControls: MediaController.TransportControls
 
-    private val player = ExoPlayer.Builder(applicationContext)
-        .setAudioAttributes(
-            AudioAttributes.Builder()
-                .setContentType(AUDIO_CONTENT_TYPE_MOVIE)
-                .setUsage(USAGE_MEDIA)
-                .build(),
-            true
-        )
-        .setHandleAudioBecomingNoisy(true)
-        .setWakeMode(WAKE_MODE_NETWORK)
-        .build()
-        .apply { addListener(mPlayerStateChangedListener) }
+    private val player by lazy {
+        ExoPlayer.Builder(applicationContext)
+            .setAudioAttributes(
+                AudioAttributes.Builder()
+                    .setContentType(AUDIO_CONTENT_TYPE_MOVIE)
+                    .setUsage(USAGE_MEDIA)
+                    .build(),
+                true
+            )
+            .setHandleAudioBecomingNoisy(true)
+            .setWakeMode(WAKE_MODE_NETWORK)
+            .build()
+            .apply { addListener(mPlayerStateChangedListener) }
+    }
 
     internal inline val mIsPlaying
         get() = player.isPlaying
@@ -166,8 +168,9 @@ class StreamService : Service(), CoroutineScope by MainScope(), KoinComponent {
 
     private val switchReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context?, intent: Intent) {
+            val url = intent.mUrlArg
             launch { mStoreCurrentUrl(url) }
-            mPlayNewStream(intent)
+            mPlayNewStream(url)
         }
     }
 
@@ -189,11 +192,11 @@ class StreamService : Service(), CoroutineScope by MainScope(), KoinComponent {
         intent.urlArgOrNull?.let { url ->
             // New stream
             launch { mStoreCurrentUrl(url) }
-            playNewStream(url)
+            mPlayNewStream(url)
         } ?: launch {
             // Continue previous stream
             storageHandler.currentUrl.collect { url ->
-                playNewStream(url!!)
+                mPlayNewStream(url!!)
             }
         }
 
@@ -237,7 +240,7 @@ class StreamService : Service(), CoroutineScope by MainScope(), KoinComponent {
     internal suspend inline fun mStoreCurrentUrl(url: String) =
         storageHandler.storeCurrentUrl(url)
 
-    private fun playNewStream(newUrl: String) {
+    internal fun mPlayNewStream(newUrl: String) {
         url = newUrl
         currentMediaItem = MediaItem.fromUri(url)
 
@@ -251,14 +254,11 @@ class StreamService : Service(), CoroutineScope by MainScope(), KoinComponent {
     private inline val Intent.urlArgOrNull
         get() = getStringExtra(URL_ARG)
 
-    private inline val Intent.urlArg
+    internal inline val Intent.mUrlArg
         get() = getStringExtra(URL_ARG)!!
 
-    internal fun mPlayNewStream(intent: Intent) =
-        playNewStream(newUrl = intent.urlArg)
-
     internal fun mRestartPlayer() =
-        playNewStream(newUrl = url)
+        mPlayNewStream(newUrl = url)
 
     private fun releaseMedia() {
         player.stop()
