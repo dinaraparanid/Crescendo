@@ -20,6 +20,7 @@ import androidx.core.graphics.drawable.IconCompat
 import androidx.media3.common.*
 import androidx.media3.common.C.*
 import androidx.media3.exoplayer.ExoPlayer
+import com.paranid5.mediastreamer.presentation.MainActivity
 import com.paranid5.mediastreamer.utils.extensions.toBitmap
 import kotlinx.coroutines.*
 import org.koin.core.component.KoinComponent
@@ -242,6 +243,7 @@ class StreamService : Service(), CoroutineScope by MainScope(), KoinComponent {
 
     internal fun mPlayNewStream(newUrl: String) {
         url = newUrl
+        // TODO: Extract youtube url
         currentMediaItem = MediaItem.fromUri(url)
 
         player.run {
