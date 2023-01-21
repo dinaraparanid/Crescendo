@@ -9,7 +9,6 @@ import androidx.navigation.compose.composable
 import com.paranid5.mediastreamer.presentation.composition_locals.LocalStreamState
 import com.paranid5.mediastreamer.presentation.composition_locals.screen
 import com.paranid5.mediastreamer.presentation.ui.screens.*
-import com.paranid5.mediastreamer.ui.screens.*
 import com.paranid5.mediastreamer.presentation.view_models.SearchStreamViewModel
 import org.koin.androidx.compose.koinViewModel
 
