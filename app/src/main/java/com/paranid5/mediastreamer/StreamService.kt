@@ -35,6 +35,7 @@ class StreamService : Service(), CoroutineScope by MainScope(), KoinComponent {
         private const val NOTIFICATION_ID = 101
         private const val STREAM_CHANNEL_ID = "stream_channel"
         private const val PLAYBACK_UPDATE_COOLDOWN = 5000L
+        private const val TEN_SECS_AS_MILLIS = 10000
 
         private const val SERVICE_LOCATION = "com.paranid5.mediastreamer.StreamService"
         const val Broadcast_PAUSE = "$SERVICE_LOCATION.PAUSE"
@@ -56,6 +57,7 @@ class StreamService : Service(), CoroutineScope by MainScope(), KoinComponent {
 
         const val URL_ARG = "url"
         private const val ADJUST_PERIOD_TIME_OFFSETS = true
+        private val TAG = StreamService::class.simpleName!!
     }
 
     sealed class Actions(val requestCode: Int) {
@@ -97,6 +99,9 @@ class StreamService : Service(), CoroutineScope by MainScope(), KoinComponent {
     private var currentMetadata: VideoMeta? = null
     private val currentPlaybackPosition = AtomicLong(0L)
     private lateinit var playbackMonitorTask: Job
+
+    private inline val videoLength
+        get() = currentMetadata!!.videoLength * 1000
 
     // ----------------------- Media session management -----------------------
 
@@ -148,20 +153,20 @@ class StreamService : Service(), CoroutineScope by MainScope(), KoinComponent {
         override fun onPlayerError(error: PlaybackException) {
             super.onPlayerError(error)
             launch { mShowNotification(isPlaying = false) }
-            Log.e("StreamService", "onPlayerError", error)
+            Log.e(TAG, "onPlayerError", error)
         }
     }
 
     private val pauseReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context?, intent: Intent?) {
-            Log.d("SERVICE", "SERVICE paused")
+            Log.d(TAG, "playback paused")
             mPausePlayback()
         }
     }
 
     private val resumeReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context?, intent: Intent?) {
-            Log.d("SERVICE", "SERVICE resumed")
+            Log.d(TAG, "playback resumed")
             mResumePlayback()
         }
     }
@@ -176,13 +181,16 @@ class StreamService : Service(), CoroutineScope by MainScope(), KoinComponent {
 
     private val tenSecsBackReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context?, intent: Intent?) {
-            // TODO: 10 secs back
+            Log.d(TAG, "10 secs back")
+            currentPlaybackPosition
+            mSeekTo10SecsBack()
         }
     }
 
     private val tenSecsForwardReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context?, intent: Intent?) {
-            // TODO: 10 secs forward
+            Log.d(TAG, "10 secs forward")
+            mSeekTo10SecsForward()
         }
     }
 
@@ -200,7 +208,7 @@ class StreamService : Service(), CoroutineScope by MainScope(), KoinComponent {
 
     private val dismissNotificationReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context?, intent: Intent?) {
-            removeNotification()
+            mRemoveNotification()
         }
     }
 
@@ -256,7 +264,7 @@ class StreamService : Service(), CoroutineScope by MainScope(), KoinComponent {
     override fun onDestroy() {
         super.onDestroy()
         releaseMedia()
-        removeNotification()
+        mRemoveNotification()
         unregisterReceivers()
     }
 
@@ -275,8 +283,10 @@ class StreamService : Service(), CoroutineScope by MainScope(), KoinComponent {
                 }
             )
 
+    private fun updatePlaybackPosition() = currentPlaybackPosition.set(player.currentPosition)
+
     internal fun mPausePlayback() {
-        currentPlaybackPosition.set(player.currentPosition)
+        updatePlaybackPosition()
         player.pause()
     }
 
@@ -327,6 +337,16 @@ class StreamService : Service(), CoroutineScope by MainScope(), KoinComponent {
         get() = getStringExtra(URL_ARG)!!
 
     internal fun mRestartPlayer() = playStream(url)
+
+    internal fun mSeekTo10SecsBack() {
+        updatePlaybackPosition()
+        player.seekTo(maxOf(currentPlaybackPosition.get() - TEN_SECS_AS_MILLIS, 0))
+    }
+
+    internal fun mSeekTo10SecsForward() {
+        updatePlaybackPosition()
+        player.seekTo(minOf(currentPlaybackPosition.get() + TEN_SECS_AS_MILLIS, videoLength))
+    }
 
     private fun releaseMedia() {
         player.stop()
@@ -549,7 +569,7 @@ class StreamService : Service(), CoroutineScope by MainScope(), KoinComponent {
         }
     )
 
-    private fun removeNotification() = when {
+    internal fun mRemoveNotification() = when {
         Build.VERSION.SDK_INT >= Build.VERSION_CODES.N -> stopForeground(STOP_FOREGROUND_REMOVE)
         else -> stopForeground(true)
     }
