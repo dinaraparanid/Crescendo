@@ -43,8 +43,5 @@ class SearchStreamUIHandler : UIHandler, KoinComponent {
         else -> switchToNextStream(url)
     }
 
-    fun startStreaming(url: String?) {
-        // TODO: streaming screen
-        launchStreamService(url)
-    }
+    fun startStreaming(url: String?) = launchStreamService(url)
 }
