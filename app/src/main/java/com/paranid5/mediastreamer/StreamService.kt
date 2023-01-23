@@ -108,10 +108,7 @@ class StreamService : Service(), CoroutineScope by MainScope(), KoinComponent {
     private lateinit var playbackMonitorTask: Job
 
     private val videoLength = currentMetadata
-        .map { meta ->
-            Log.d(TAG, "Updating video len")
-            meta?.let { it.videoLength * 1000 } ?: 0
-        }
+        .map { meta -> meta?.let { it.videoLength * 1000 } ?: 0 }
         .stateIn(this, SharingStarted.Eagerly, 0)
 
     private inline val currentPlaybackPosition
@@ -371,7 +368,7 @@ class StreamService : Service(), CoroutineScope by MainScope(), KoinComponent {
     internal inline val Intent.mUrlArg
         get() = getStringExtra(URL_ARG)!!
 
-    internal suspend inline fun mRestartPlayer() = storageHandler.currentUrl.collect { url ->
+    internal suspend inline fun mRestartPlayer(): Unit = storageHandler.currentUrl.collect { url ->
         playStream(url)
     }
 

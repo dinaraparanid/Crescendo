@@ -45,7 +45,9 @@ private fun ColumnScope.ConfirmButton(
     Button(
         enabled = isConfirmButtonActive,
         onClick = viewModel::onConfirmUrlButtonPressed,
-        modifier = Modifier.wrapContentWidth().align(Alignment.CenterHorizontally)
+        modifier = Modifier
+            .wrapContentWidth()
+            .align(Alignment.CenterHorizontally)
     ) {
         Text(stringResource(R.string.confirm))
     }

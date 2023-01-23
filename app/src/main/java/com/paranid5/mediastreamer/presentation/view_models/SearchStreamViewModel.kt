@@ -1,6 +1,7 @@
 package com.paranid5.mediastreamer.presentation.view_models
 
 import androidx.lifecycle.SavedStateHandle
+import com.paranid5.mediastreamer.StorageHandler
 import com.paranid5.mediastreamer.presentation.presenters.SearchStreamPresenter
 import com.paranid5.mediastreamer.presentation.ui_handlers.SearchStreamUIHandler
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -14,8 +15,15 @@ class SearchStreamViewModel(savedStateHandle: SavedStateHandle) :
         private const val CURRENT_TEXT = "current_text"
     }
 
+    private val storageHandler by inject<StorageHandler>()
+
     override val presenter by inject<SearchStreamPresenter> {
-        parametersOf(savedStateHandle.getStateFlow<String?>(CURRENT_TEXT, null).value)
+        val savedByStateHandle = savedStateHandle
+            .getStateFlow<String?>(CURRENT_TEXT, null)
+            .value
+
+        val savedByStorageHandler = storageHandler.currentUrl.value
+        parametersOf(savedByStateHandle ?: savedByStorageHandler)
     }
 
     override val handler by inject<SearchStreamUIHandler>()
