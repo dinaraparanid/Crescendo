@@ -28,6 +28,7 @@ import androidx.media3.exoplayer.source.ProgressiveMediaSource
 import arrow.core.Either
 import at.huber.youtubeExtractor.VideoMeta
 import com.bumptech.glide.Glide
+import com.paranid5.mediastreamer.data.VideoMetadata
 import com.paranid5.mediastreamer.presentation.MainActivity
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
@@ -144,13 +145,13 @@ class StreamService : Service(), CoroutineScope by MainScope(), KoinComponent {
             .setHandleAudioBecomingNoisy(true)
             .setWakeMode(WAKE_MODE_NETWORK)
             .build()
-            .apply { addListener(mPlayerStateChangedListener) }
+            .apply { addListener(playerStateChangedListener) }
     }
 
     internal inline val mIsPlaying
         get() = player.isPlaying
 
-    private val mPlayerStateChangedListener: Player.Listener = object : Player.Listener {
+    private val playerStateChangedListener: Player.Listener = object : Player.Listener {
         override fun onPlaybackStateChanged(playbackState: Int) {
             super.onPlaybackStateChanged(playbackState)
             if (playbackState == Player.STATE_IDLE)
@@ -326,6 +327,9 @@ class StreamService : Service(), CoroutineScope by MainScope(), KoinComponent {
     internal suspend inline fun mStoreCurrentUrl(url: String) =
         storageHandler.storeCurrentUrl(url)
 
+    private suspend inline fun storeMetadata(videoMeta: VideoMeta?) =
+        storageHandler.storeCurrentMetadata(videoMeta?.let(::VideoMetadata))
+
     @OptIn(UnstableApi::class)
     private fun playStream(url: String) =
         YoutubeAudioUrlExtractor(context = this) { audioUrl, videoUrl, videoMeta ->
@@ -340,6 +344,7 @@ class StreamService : Service(), CoroutineScope by MainScope(), KoinComponent {
                 .createMediaSource(MediaItem.fromUri(videoUrl))*/
 
             currentMetadata.update { videoMeta }
+            launch { storeMetadata(videoMeta) }
 
             player.run {
                 setMediaSource(

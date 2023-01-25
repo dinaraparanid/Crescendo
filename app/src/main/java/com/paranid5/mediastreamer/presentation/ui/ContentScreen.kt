@@ -15,7 +15,7 @@ import org.koin.androidx.compose.koinViewModel
 @Composable
 fun ContentScreen(
     padding: PaddingValues,
-    viewModel: SearchStreamViewModel = koinViewModel()
+    searchStreamViewModel: SearchStreamViewModel = koinViewModel()
 ) {
     val streamingScreen = LocalStreamState.current.screen
 
@@ -27,8 +27,12 @@ fun ContentScreen(
             bottom = padding.calculateBottomPadding()
         )
     ) {
-        composable(route = streamingScreen.title) {
-            SearchStreamScreen(viewModel = viewModel)
+        composable(route = Screens.StreamScreen.Searching.title) {
+            SearchStreamScreen(viewModel = searchStreamViewModel)
+        }
+
+        composable(route = Screens.StreamScreen.Streaming.title) {
+            StreamingScreen()
         }
 
         composable(route = Screens.AboutApp.title) {

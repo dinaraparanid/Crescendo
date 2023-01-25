@@ -5,6 +5,8 @@ import android.content.Intent
 import android.os.Build
 import com.paranid5.mediastreamer.MainApplication
 import com.paranid5.mediastreamer.StreamService
+import com.paranid5.mediastreamer.presentation.ui.screens.LocalNavController
+import com.paranid5.mediastreamer.presentation.ui.screens.Screens
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 

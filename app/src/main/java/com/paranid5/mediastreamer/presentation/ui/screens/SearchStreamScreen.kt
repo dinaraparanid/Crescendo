@@ -42,9 +42,14 @@ private fun ColumnScope.ConfirmButton(
     isConfirmButtonActive: Boolean,
     viewModel: SearchStreamViewModel
 ) {
+    val navHostController = LocalNavController.current
+
     Button(
         enabled = isConfirmButtonActive,
-        onClick = viewModel::onConfirmUrlButtonPressed,
+        onClick = {
+            viewModel.onConfirmUrlButtonPressed()
+            navHostController.navigateIfNotSame(Screens.StreamScreen.Streaming)
+        },
         modifier = Modifier
             .wrapContentWidth()
             .align(Alignment.CenterHorizontally)

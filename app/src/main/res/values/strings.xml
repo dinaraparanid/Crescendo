@@ -10,4 +10,9 @@
     <string name="confirm">Confirm</string>
     <string name="stream_no_name">Stream / Video with no name</string>
     <string name="unknown_streamer">Unknown streamer</string>
+    <string name="video_cover">Video cover</string>
+    <string name="ten_secs_back">10 seconds back</string>
+    <string name="play">Play</string>
+    <string name="pause">Pause</string>
+    <string name="ten_secs_forward">10 seconds forward</string>
 </resources>
