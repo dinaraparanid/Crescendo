@@ -11,7 +11,6 @@ import android.media.session.MediaController
 import android.media.session.MediaSession
 import android.media.session.MediaSessionManager
 import android.media.session.PlaybackState
-import android.os.Binder
 import android.os.Build
 import android.os.SystemClock
 import android.util.Log
@@ -30,6 +29,8 @@ import at.huber.youtubeExtractor.VideoMeta
 import com.bumptech.glide.Glide
 import com.paranid5.mediastreamer.data.VideoMetadata
 import com.paranid5.mediastreamer.presentation.MainActivity
+import com.paranid5.mediastreamer.presentation.ui.screens.Broadcast_IS_PLAYING_CHANGED
+import com.paranid5.mediastreamer.presentation.ui.screens.IS_PLAYING_ARG
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
 import org.koin.core.component.KoinComponent
@@ -46,12 +47,13 @@ class StreamService : Service(), CoroutineScope by MainScope(), KoinComponent {
         private const val SERVICE_LOCATION = "com.paranid5.mediastreamer.StreamService"
         const val Broadcast_PAUSE = "$SERVICE_LOCATION.PAUSE"
         const val Broadcast_RESUME = "$SERVICE_LOCATION.RESUME"
-        const val Broadcast_SWITCH = "$SERVICE_LOCATION.SWITCH"
+        const val Broadcast_SWITCH_VIDEO = "$SERVICE_LOCATION.SWITCH_VIDEO"
         const val Broadcast_10_SECS_BACK = "$SERVICE_LOCATION.10_SECS_BACK"
         const val Broadcast_10_SECS_FORWARD = "$SERVICE_LOCATION.10_SECS_FORWARD"
+        const val Broadcast_SEEK_TO = "$SERVICE_LOCATION.SEEK_TO"
         const val Broadcast_ADD_TO_FAVOURITE = "$SERVICE_LOCATION.ADD_TO_FAVOURITE"
         const val Broadcast_REMOVE_FROM_FAVOURITE = "$SERVICE_LOCATION.REMOVE_FROM_FAVOURITE"
-        const val Broadcast_REPEAT = "$SERVICE_LOCATION.REPEAT"
+        const val Broadcast_CHANGE_REPEAT = "$SERVICE_LOCATION.CHANGE_REPEAT"
         const val Broadcast_DISMISS_NOTIFICATION = "$SERVICE_LOCATION.DISMISS_NOTIFICATION"
 
         private const val ACTION_PAUSE = "pause"
@@ -60,10 +62,12 @@ class StreamService : Service(), CoroutineScope by MainScope(), KoinComponent {
         private const val ACTION_10_SECS_FORWARD = "forward"
         private const val ACTION_ADD_TO_FAVOURITE = "add_to_favourite"
         private const val ACTION_REMOVE_FROM_FAVOURITE = "remove_from_favourite"
-        private const val ACTION_REPEAT = "repeat"
+        private const val ACTION_CHANGE_REPEAT = "change_repeat"
         private const val ACTION_DISMISS = "dismiss"
 
         const val URL_ARG = "url"
+        const val POSITION_ARG = "position"
+
         private const val ADJUST_PERIOD_TIME_OFFSETS = true
         private val TAG = StreamService::class.simpleName!!
     }
@@ -89,7 +93,7 @@ class StreamService : Service(), CoroutineScope by MainScope(), KoinComponent {
                     Actions.TenSecsForward -> Broadcast_10_SECS_FORWARD
                     Actions.AddToFavourite -> Broadcast_ADD_TO_FAVOURITE
                     Actions.RemoveFromFavourite -> Broadcast_REMOVE_FROM_FAVOURITE
-                    Actions.Repeat -> Broadcast_REPEAT
+                    Actions.Repeat -> Broadcast_CHANGE_REPEAT
                     Actions.Dismiss -> Broadcast_DISMISS_NOTIFICATION
                 }
             )
@@ -102,18 +106,19 @@ class StreamService : Service(), CoroutineScope by MainScope(), KoinComponent {
             )
         }
 
-    private val binder = object : Binder() {}
     private val storageHandler by inject<StorageHandler>()
-
     private val currentMetadata = MutableStateFlow<VideoMeta?>(null)
     private lateinit var playbackMonitorTask: Job
 
     private val videoLength = currentMetadata
-        .map { meta -> meta?.let { it.videoLength * 1000 } ?: 0 }
+        .map { it?.run { videoLength * 1000 } ?: 0 }
         .stateIn(this, SharingStarted.Eagerly, 0)
 
     private inline val currentPlaybackPosition
         get() = player.currentPosition
+
+    @Volatile
+    private var isRepeating = false
 
     @Volatile
     private var isNotificationShown = false
@@ -154,12 +159,26 @@ class StreamService : Service(), CoroutineScope by MainScope(), KoinComponent {
     private val playerStateChangedListener: Player.Listener = object : Player.Listener {
         override fun onPlaybackStateChanged(playbackState: Int) {
             super.onPlaybackStateChanged(playbackState)
-            if (playbackState == Player.STATE_IDLE)
-                launch { mRestartPlayer() }
+
+            when (playbackState) {
+                Player.STATE_IDLE -> launch { mRestartPlayer() }
+
+                Player.STATE_ENDED -> when {
+                    isRepeating -> launch { mRestartPlayer() }
+                    else -> stopSelf()
+                }
+
+                else -> Unit
+            }
         }
 
         override fun onIsPlayingChanged(isPlaying: Boolean) {
             super.onIsPlayingChanged(isPlaying)
+
+            sendBroadcast(
+                Intent(Broadcast_IS_PLAYING_CHANGED)
+                    .putExtra(IS_PLAYING_ARG, isPlaying)
+            )
 
             when {
                 isPlaying -> mStartPlaybackMonitoring()
@@ -195,7 +214,7 @@ class StreamService : Service(), CoroutineScope by MainScope(), KoinComponent {
         }
     }
 
-    private val switchReceiver = object : BroadcastReceiver() {
+    private val switchVideoReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context?, intent: Intent) {
             val url = intent.mUrlArg
             launch { mStoreCurrentUrl(url) }
@@ -217,6 +236,14 @@ class StreamService : Service(), CoroutineScope by MainScope(), KoinComponent {
         }
     }
 
+    private val seekToReceiver = object : BroadcastReceiver() {
+        override fun onReceive(context: Context, intent: Intent) {
+            val position = intent.getLongExtra(POSITION_ARG, 0)
+            Log.d(TAG, "seek to $position")
+            mSeekTo(position)
+        }
+    }
+
     private val addToFavouriteReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context?, intent: Intent?) {
             // TODO: add to favourite
@@ -229,6 +256,12 @@ class StreamService : Service(), CoroutineScope by MainScope(), KoinComponent {
         }
     }
 
+    private val repeatReceiver = object : BroadcastReceiver() {
+        override fun onReceive(context: Context?, intent: Intent?) {
+            isRepeating = !isRepeating
+        }
+    }
+
     private val dismissNotificationReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context?, intent: Intent?) {
             mRemoveNotification()
@@ -238,11 +271,13 @@ class StreamService : Service(), CoroutineScope by MainScope(), KoinComponent {
     private fun registerReceivers() {
         registerReceiver(pauseReceiver, IntentFilter(Broadcast_PAUSE))
         registerReceiver(resumeReceiver, IntentFilter(Broadcast_RESUME))
-        registerReceiver(switchReceiver, IntentFilter(Broadcast_SWITCH))
+        registerReceiver(switchVideoReceiver, IntentFilter(Broadcast_SWITCH_VIDEO))
         registerReceiver(tenSecsBackReceiver, IntentFilter(Broadcast_10_SECS_BACK))
         registerReceiver(tenSecsForwardReceiver, IntentFilter(Broadcast_10_SECS_FORWARD))
+        registerReceiver(seekToReceiver, IntentFilter(Broadcast_SEEK_TO))
         registerReceiver(addToFavouriteReceiver, IntentFilter(Broadcast_ADD_TO_FAVOURITE))
         registerReceiver(removeFromFavouriteReceiver, IntentFilter(Broadcast_REMOVE_FROM_FAVOURITE))
+        registerReceiver(repeatReceiver, IntentFilter(Broadcast_CHANGE_REPEAT))
         registerReceiver(dismissNotificationReceiver, IntentFilter(Broadcast_DISMISS_NOTIFICATION))
     }
 
@@ -251,7 +286,7 @@ class StreamService : Service(), CoroutineScope by MainScope(), KoinComponent {
         registerReceivers()
     }
 
-    override fun onBind(intent: Intent?) = binder
+    override fun onBind(intent: Intent?) = null
 
     private suspend fun startNotificationObserving(): Unit = currentMetadata.collect {
         Log.d(TAG, "Metadata update, show new notification")
@@ -276,15 +311,16 @@ class StreamService : Service(), CoroutineScope by MainScope(), KoinComponent {
             }
         }
 
-        return START_NOT_STICKY
+        return START_REDELIVER_INTENT
     }
 
     private fun unregisterReceivers() {
         unregisterReceiver(pauseReceiver)
         unregisterReceiver(resumeReceiver)
-        unregisterReceiver(switchReceiver)
+        unregisterReceiver(switchVideoReceiver)
         unregisterReceiver(tenSecsBackReceiver)
         unregisterReceiver(tenSecsForwardReceiver)
+        unregisterReceiver(seekToReceiver)
         unregisterReceiver(addToFavouriteReceiver)
         unregisterReceiver(removeFromFavouriteReceiver)
         unregisterReceiver(dismissNotificationReceiver)
@@ -376,6 +412,9 @@ class StreamService : Service(), CoroutineScope by MainScope(), KoinComponent {
     internal suspend inline fun mRestartPlayer(): Unit = storageHandler.currentUrl.collect { url ->
         playStream(url)
     }
+
+    internal fun mSeekTo(position: Long) =
+        player.seekTo(position)
 
     internal fun mSeekTo10SecsBack() =
         player.seekTo(maxOf(currentPlaybackPosition - TEN_SECS_AS_MILLIS, 0))
