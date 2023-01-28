@@ -6,9 +6,10 @@ import androidx.datastore.preferences.core.*
 import androidx.datastore.preferences.preferencesDataStore
 import com.paranid5.mediastreamer.data.VideoMetadata
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.flow.SharingStarted
-import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.mapLatest
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
@@ -23,18 +24,20 @@ class StorageHandler(private val context: Context) : CoroutineScope by MainScope
 
     private val Context.dataStore: DataStore<Preferences> by preferencesDataStore(name = "params")
 
+    @OptIn(ExperimentalCoroutinesApi::class)
     val currentUrl = context.dataStore.data
-        .map { preferences -> preferences[CURRENT_URL] }
-        .map { it ?: "" }
+        .mapLatest { preferences -> preferences[CURRENT_URL] }
+        .mapLatest { it ?: "" }
         .stateIn(this, SharingStarted.Eagerly, "")
 
     internal suspend inline fun storeCurrentUrl(url: String) {
         context.dataStore.edit { preferences -> preferences[CURRENT_URL] = url }
     }
 
+    @OptIn(ExperimentalCoroutinesApi::class)
     val currentMetadata = context.dataStore.data
-        .map { preferences -> preferences[CURRENT_METADATA] }
-        .map { metaString -> metaString?.let { Json.decodeFromString<VideoMetadata>(it) } }
+        .mapLatest { preferences -> preferences[CURRENT_METADATA] }
+        .mapLatest { metaString -> metaString?.let { Json.decodeFromString<VideoMetadata>(it) } }
         .stateIn(this, SharingStarted.Eagerly, null)
 
     internal suspend inline fun storeCurrentMetadata(metadata: VideoMetadata?) {
@@ -45,9 +48,10 @@ class StorageHandler(private val context: Context) : CoroutineScope by MainScope
             }
     }
 
+    @OptIn(ExperimentalCoroutinesApi::class)
     val playbackPosition = context.dataStore.data
-        .map { preferences -> preferences[PLAYBACK_POSITION] }
-        .map { it ?: 0 }
+        .mapLatest { preferences -> preferences[PLAYBACK_POSITION] }
+        .mapLatest { it ?: 0 }
         .stateIn(this, SharingStarted.Eagerly, 0)
 
     internal suspend inline fun storePlaybackPosition(position: Long) {

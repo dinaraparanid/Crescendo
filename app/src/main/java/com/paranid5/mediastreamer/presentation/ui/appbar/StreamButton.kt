@@ -16,15 +16,18 @@ import com.paranid5.mediastreamer.presentation.ui.screens.LocalNavController
 import com.paranid5.mediastreamer.presentation.ui.theme.LocalAppColors
 
 @Composable
-fun StreamButton() {
+fun StreamButton(modifier: Modifier = Modifier) {
     val navHostController = LocalNavController.current
     val streamingScreen = LocalStreamState.current.screen
 
-    FloatingActionButton(onClick = { navHostController.navigateIfNotSame(streamingScreen) }) {
+    FloatingActionButton(
+        modifier = modifier,
+        onClick = { navHostController.navigateIfNotSame(streamingScreen) }
+    ) {
         Icon(
             painter = painterResource(R.drawable.stream),
             contentDescription = stringResource(id = R.string.home),
-            tint = LocalAppColors.current.value.background,
+            tint = LocalAppColors.current.value.primary,
             modifier = Modifier.width(30.dp).height(30.dp)
         )
     }

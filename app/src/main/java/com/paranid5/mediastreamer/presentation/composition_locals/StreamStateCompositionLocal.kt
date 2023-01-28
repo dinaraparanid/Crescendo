@@ -5,8 +5,7 @@ import com.paranid5.mediastreamer.presentation.ui.screens.Screens
 
 enum class StreamStates { SEARCHING, STREAMING }
 
-@JvmInline
-value class StreamState(val value: StreamStates = StreamStates.SEARCHING)
+data class StreamState(var value: StreamStates = StreamStates.SEARCHING)
 
 @JvmField
 val LocalStreamState = staticCompositionLocalOf { StreamState() }

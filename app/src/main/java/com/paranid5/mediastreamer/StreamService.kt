@@ -29,7 +29,9 @@ import at.huber.youtubeExtractor.VideoMeta
 import com.bumptech.glide.Glide
 import com.paranid5.mediastreamer.data.VideoMetadata
 import com.paranid5.mediastreamer.presentation.MainActivity
+import com.paranid5.mediastreamer.presentation.ui.screens.Broadcast_CUR_POSITION_CHANGED
 import com.paranid5.mediastreamer.presentation.ui.screens.Broadcast_IS_PLAYING_CHANGED
+import com.paranid5.mediastreamer.presentation.ui.screens.CUR_POSITION_ARG
 import com.paranid5.mediastreamer.presentation.ui.screens.IS_PLAYING_ARG
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
@@ -41,7 +43,7 @@ class StreamService : Service(), CoroutineScope by MainScope(), KoinComponent {
     companion object {
         private const val NOTIFICATION_ID = 101
         private const val STREAM_CHANNEL_ID = "stream_channel"
-        private const val PLAYBACK_UPDATE_COOLDOWN = 5000L
+        private const val PLAYBACK_UPDATE_COOLDOWN = 500L
         private const val TEN_SECS_AS_MILLIS = 10000
 
         private const val SERVICE_LOCATION = "com.paranid5.mediastreamer.StreamService"
@@ -110,8 +112,9 @@ class StreamService : Service(), CoroutineScope by MainScope(), KoinComponent {
     private val currentMetadata = MutableStateFlow<VideoMeta?>(null)
     private lateinit var playbackMonitorTask: Job
 
+    @kotlin.OptIn(ExperimentalCoroutinesApi::class)
     private val videoLength = currentMetadata
-        .map { it?.run { videoLength * 1000 } ?: 0 }
+        .mapLatest { it?.run { videoLength * 1000 } ?: 0 }
         .stateIn(this, SharingStarted.Eagerly, 0)
 
     private inline val currentPlaybackPosition
@@ -348,11 +351,17 @@ class StreamService : Service(), CoroutineScope by MainScope(), KoinComponent {
                 }
             )
 
-    private suspend inline fun updatePlaybackPosition() =
+    private suspend inline fun updateAndSendPlaybackPosition() {
+        sendBroadcast(
+            Intent(Broadcast_CUR_POSITION_CHANGED)
+                .putExtra(CUR_POSITION_ARG, currentPlaybackPosition)
+        )
+
         storageHandler.storePlaybackPosition(currentPlaybackPosition)
+    }
 
     internal fun mPausePlayback() {
-        launch { updatePlaybackPosition() }
+        launch { updateAndSendPlaybackPosition() }
         player.pause()
     }
 
@@ -419,9 +428,8 @@ class StreamService : Service(), CoroutineScope by MainScope(), KoinComponent {
     internal fun mSeekTo10SecsBack() =
         player.seekTo(maxOf(currentPlaybackPosition - TEN_SECS_AS_MILLIS, 0))
 
-    internal fun mSeekTo10SecsForward() {
+    internal fun mSeekTo10SecsForward() =
         player.seekTo(minOf(currentPlaybackPosition + TEN_SECS_AS_MILLIS, videoLength.value))
-    }
 
     private fun releaseMedia() {
         player.stop()
@@ -713,7 +721,7 @@ class StreamService : Service(), CoroutineScope by MainScope(), KoinComponent {
     internal fun mStartPlaybackMonitoring() {
         playbackMonitorTask = launch {
             while (true) {
-                updatePlaybackPosition()
+                updateAndSendPlaybackPosition()
                 delay(PLAYBACK_UPDATE_COOLDOWN)
             }
         }

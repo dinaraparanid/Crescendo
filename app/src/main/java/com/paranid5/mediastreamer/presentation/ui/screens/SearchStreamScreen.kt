@@ -13,6 +13,8 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.paranid5.mediastreamer.R
 import com.paranid5.mediastreamer.presentation.StateChangedCallback
+import com.paranid5.mediastreamer.presentation.composition_locals.LocalStreamState
+import com.paranid5.mediastreamer.presentation.composition_locals.StreamStates
 import com.paranid5.mediastreamer.presentation.ui.OnUIStateChanged
 import com.paranid5.mediastreamer.presentation.view_models.SearchStreamViewModel
 
@@ -43,12 +45,14 @@ private fun ColumnScope.ConfirmButton(
     viewModel: SearchStreamViewModel
 ) {
     val navHostController = LocalNavController.current
+    val streamState = LocalStreamState.current
 
     Button(
         enabled = isConfirmButtonActive,
         onClick = {
             viewModel.onConfirmUrlButtonPressed()
             navHostController.navigateIfNotSame(Screens.StreamScreen.Streaming)
+            streamState.value = StreamStates.STREAMING
         },
         modifier = Modifier
             .wrapContentWidth()

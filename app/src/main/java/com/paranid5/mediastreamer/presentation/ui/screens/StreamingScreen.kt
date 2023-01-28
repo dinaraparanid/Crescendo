@@ -1,12 +1,14 @@
 package com.paranid5.mediastreamer.presentation.ui.screens
 
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
@@ -14,6 +16,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
 import com.bumptech.glide.integration.compose.GlideImage
+import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
 import com.paranid5.mediastreamer.R
 import com.paranid5.mediastreamer.StorageHandler
 import com.paranid5.mediastreamer.data.VideoMetadata
@@ -21,14 +24,14 @@ import com.paranid5.mediastreamer.presentation.BroadcastReceiver
 import com.paranid5.mediastreamer.presentation.ui.theme.LocalAppColors
 import com.paranid5.mediastreamer.presentation.ui_handlers.StreamingUIHandler
 import com.paranid5.mediastreamer.utils.extensions.timeString
-import com.paranid5.mediastreamer.utils.extensions.toPlaybackPosition
-import kotlinx.coroutines.flow.MutableStateFlow
 import org.koin.androidx.compose.get
 
-const val Broadcast_IS_PLAYING_CHANGED =
-    "com.paranid5.mediastreamer.presentation.ui.screens.IS_PLAYING_CHANGED"
+private const val BROADCAST_LOCATION = "com.paranid5.mediastreamer.presentation.ui.screens"
+const val Broadcast_IS_PLAYING_CHANGED = "$BROADCAST_LOCATION.IS_PLAYING_CHANGED"
+const val Broadcast_CUR_POSITION_CHANGED = "$BROADCAST_LOCATION.CUR_POSITION_CHANGED"
 
 const val IS_PLAYING_ARG = "is_playing"
+const val CUR_POSITION_ARG = "cur_position"
 
 @Composable
 fun StreamingScreen(
@@ -52,39 +55,54 @@ fun StreamingScreen(
 
 @OptIn(ExperimentalGlideComposeApi::class)
 @Composable
-private fun VideoCover(metadata: VideoMetadata?, modifier: Modifier = Modifier) = GlideImage(
-    modifier = modifier.padding(horizontal = 10.dp),
-    model = metadata?.cover ?: painterResource(R.drawable.cover_thumbnail),
-    contentDescription = stringResource(R.string.video_cover),
-)
+private fun VideoCover(metadata: VideoMetadata?, modifier: Modifier = Modifier) {
+    val colors = LocalAppColors.current.value
+
+    GlideImage(
+        modifier = modifier
+            .padding(horizontal = 20.dp)
+            .border(width = 5.dp, color = Color.Transparent, shape = RoundedCornerShape(5.dp))
+            .shadow(
+                elevation = 10.dp,
+                shape = RoundedCornerShape(5.dp),
+                ambientColor = colors.primary,
+                spotColor = colors.primary
+            ),
+        model = metadata?.cover ?: painterResource(R.drawable.cover_thumbnail),
+        contentDescription = stringResource(R.string.video_cover),
+    ) { requestBuilder ->
+        requestBuilder
+            .error(R.drawable.cover_thumbnail)
+            .fallback(R.drawable.cover_thumbnail)
+            .transition(DrawableTransitionOptions.withCrossFade())
+    }
+}
 
 @Composable
 private fun PlaybackSlider(
     metadata: VideoMetadata?,
     modifier: Modifier = Modifier,
-    storageHandler: StorageHandler = get(),
     streamingUIHandler: StreamingUIHandler = get()
 ) {
     val colors = LocalAppColors.current.value
-
     val videoLength = metadata?.lenInMillis ?: 0
-    val millisInPercentage = videoLength / 100F
+    var curPosition by remember { mutableStateOf(0L) }
 
-    val curPosition by storageHandler.playbackPosition.collectAsState()
-    val curPositionPercentage = curPosition / millisInPercentage
+    BroadcastReceiver(action = Broadcast_CUR_POSITION_CHANGED) { _, intent ->
+        curPosition = intent!!.getLongExtra(CUR_POSITION_ARG, 0)
+    }
 
     Column(modifier.padding(horizontal = 10.dp)) {
         Slider(
-            value = curPositionPercentage,
-            valueRange = 0F..100F,
+            value = curPosition.toFloat(),
+            valueRange = 0F..videoLength.toFloat(),
             colors = SliderDefaults.colors(
                 thumbColor = colors.primary,
                 activeTrackColor = colors.primary
             ),
-            onValueChange = { percentages ->
-                streamingUIHandler.sendSeekToBroadcast(
-                    percentages.toPlaybackPosition(millisInPercentage)
-                )
+            onValueChange = { curPosition = it.toLong() },
+            onValueChangeFinished = {
+                streamingUIHandler.sendSeekToBroadcast(curPosition)
             }
         )
 
@@ -132,11 +150,11 @@ private fun PlayButton(
     modifier: Modifier = Modifier,
     streamingUIHandler: StreamingUIHandler = get()
 ) {
-    val isPlayingState = MutableStateFlow(true)
-    val isPlaying by isPlayingState.collectAsState()
+    val colors = LocalAppColors.current.value
+    var isPlaying by remember { mutableStateOf(true) }
 
     BroadcastReceiver(action = Broadcast_IS_PLAYING_CHANGED) { _, intent ->
-        isPlayingState.value = intent!!.getBooleanExtra(IS_PLAYING_ARG, !isPlaying)
+        isPlaying = intent!!.getBooleanExtra(IS_PLAYING_ARG, !isPlaying)
     }
 
     when {
@@ -145,8 +163,10 @@ private fun PlayButton(
             onClick = { streamingUIHandler.sendPauseBroadcast() }
         ) {
             Icon(
+                modifier = Modifier.width(50.dp).height(50.dp),
                 painter = painterResource(R.drawable.pause),
-                contentDescription = stringResource(R.string.pause)
+                contentDescription = stringResource(R.string.pause),
+                tint = colors.primary
             )
         }
 
@@ -155,8 +175,10 @@ private fun PlayButton(
             onClick = { streamingUIHandler.sendResumeBroadcast() }
         ) {
             Icon(
+                modifier = Modifier.width(50.dp).height(50.dp),
                 painter = painterResource(R.drawable.play),
-                contentDescription = stringResource(R.string.play)
+                contentDescription = stringResource(R.string.play),
+                tint = colors.primary
             )
         }
     }
@@ -170,9 +192,13 @@ private fun SeekTo10SecsBackButton(
     modifier = modifier,
     onClick = { streamingUIHandler.sendSeekTo10SecsBackBroadcast() }
 ) {
+    val colors = LocalAppColors.current.value
+
     Icon(
+        modifier = Modifier.width(100.dp).height(50.dp),
         painter = painterResource(R.drawable.prev_track),
-        contentDescription = stringResource(R.string.ten_secs_back)
+        contentDescription = stringResource(R.string.ten_secs_back),
+        tint = colors.primary
     )
 }
 
@@ -184,17 +210,21 @@ private fun SeekTo10SecsForwardButton(
     modifier = modifier,
     onClick = { streamingUIHandler.sendSeekTo10SecsForwardBroadcast() }
 ) {
+    val colors = LocalAppColors.current.value
+
     Icon(
+        modifier = Modifier.width(100.dp).height(50.dp),
         painter = painterResource(R.drawable.next_track),
-        contentDescription = stringResource(R.string.ten_secs_forward)
+        contentDescription = stringResource(R.string.ten_secs_forward),
+        tint = colors.primary
     )
 }
 
 @Composable
 private fun PlaybackButtons(modifier: Modifier = Modifier) {
     Row(modifier.fillMaxWidth()) {
-        SeekTo10SecsBackButton()
-        PlayButton()
-        SeekTo10SecsForwardButton()
+        SeekTo10SecsBackButton(Modifier.weight(1F))
+        PlayButton(Modifier.weight(1F))
+        SeekTo10SecsForwardButton(Modifier.weight(1F))
     }
 }
