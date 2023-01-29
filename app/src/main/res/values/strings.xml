@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">MediaStreamer</string>
+    <string name="app_name">Media Streamer</string>
     <string name="home">Home</string>
     <string name="settings">Settings</string>
     <string name="about_app">About App</string>
@@ -15,4 +15,7 @@
     <string name="play">Play</string>
     <string name="pause">Pause</string>
     <string name="ten_secs_forward">10 seconds forward</string>
+    <string name="equalizer">Equalizer</string>
+    <string name="change_repeat">Change repeat</string>
+    <string name="download_as_mp3">Download as MP3</string>
 </resources>

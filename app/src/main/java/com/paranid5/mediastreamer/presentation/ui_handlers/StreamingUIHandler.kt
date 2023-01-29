@@ -25,10 +25,5 @@ class StreamingUIHandler : UIHandler, KoinComponent {
 
     fun sendResumeBroadcast() = sendBroadcast(StreamService.Broadcast_RESUME)
 
-    fun sendSwitchVideoBroadcast(newUrl: String) = sendBroadcast(
-        Intent(StreamService.Broadcast_SWITCH_VIDEO)
-            .putExtra(StreamService.URL_ARG, newUrl)
-    )
-
-    fun sendRepeatBroadcast() = sendBroadcast(StreamService.Broadcast_CHANGE_REPEAT)
+    fun sendChangeRepeatBroadcast() = sendBroadcast(StreamService.Broadcast_CHANGE_REPEAT)
 }

@@ -22,7 +22,7 @@ class SearchStreamViewModel(savedStateHandle: SavedStateHandle) :
             .getStateFlow<String?>(CURRENT_TEXT, null)
             .value
 
-        val savedByStorageHandler = storageHandler.currentUrl.value
+        val savedByStorageHandler = storageHandler.currentUrlState.value
         parametersOf(savedByStateHandle ?: savedByStorageHandler)
     }
 

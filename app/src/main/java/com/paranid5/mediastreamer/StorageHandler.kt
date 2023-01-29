@@ -20,12 +20,13 @@ class StorageHandler(private val context: Context) : CoroutineScope by MainScope
         private val CURRENT_URL = stringPreferencesKey("current_url")
         private val CURRENT_METADATA = stringPreferencesKey("current_metadata")
         private val PLAYBACK_POSITION = longPreferencesKey("playback_position")
+        private val IS_REPEATING = booleanPreferencesKey("is_repeating")
     }
 
     private val Context.dataStore: DataStore<Preferences> by preferencesDataStore(name = "params")
 
     @OptIn(ExperimentalCoroutinesApi::class)
-    val currentUrl = context.dataStore.data
+    val currentUrlState = context.dataStore.data
         .mapLatest { preferences -> preferences[CURRENT_URL] }
         .mapLatest { it ?: "" }
         .stateIn(this, SharingStarted.Eagerly, "")
@@ -35,7 +36,7 @@ class StorageHandler(private val context: Context) : CoroutineScope by MainScope
     }
 
     @OptIn(ExperimentalCoroutinesApi::class)
-    val currentMetadata = context.dataStore.data
+    val currentMetadataState = context.dataStore.data
         .mapLatest { preferences -> preferences[CURRENT_METADATA] }
         .mapLatest { metaString -> metaString?.let { Json.decodeFromString<VideoMetadata>(it) } }
         .stateIn(this, SharingStarted.Eagerly, null)
@@ -49,12 +50,22 @@ class StorageHandler(private val context: Context) : CoroutineScope by MainScope
     }
 
     @OptIn(ExperimentalCoroutinesApi::class)
-    val playbackPosition = context.dataStore.data
+    val playbackPositionState = context.dataStore.data
         .mapLatest { preferences -> preferences[PLAYBACK_POSITION] }
         .mapLatest { it ?: 0 }
         .stateIn(this, SharingStarted.Eagerly, 0)
 
     internal suspend inline fun storePlaybackPosition(position: Long) {
         context.dataStore.edit { preferences -> preferences[PLAYBACK_POSITION] = position }
+    }
+
+    @OptIn(ExperimentalCoroutinesApi::class)
+    val isRepeatingState = context.dataStore.data
+        .mapLatest { preferences -> preferences[IS_REPEATING] }
+        .mapLatest { it ?: false }
+        .stateIn(this, SharingStarted.Eagerly, false)
+
+    internal suspend inline fun storeIsRepeating(isRepeating: Boolean) {
+        context.dataStore.edit { preferences -> preferences[IS_REPEATING] = isRepeating }
     }
 }
