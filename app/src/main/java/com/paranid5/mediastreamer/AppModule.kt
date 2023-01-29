@@ -3,6 +3,7 @@ package com.paranid5.mediastreamer
 import com.paranid5.mediastreamer.presentation.presenters.SearchStreamPresenter
 import com.paranid5.mediastreamer.presentation.presenters.StreamingPresenter
 import com.paranid5.mediastreamer.presentation.ui_handlers.SearchStreamUIHandler
+import com.paranid5.mediastreamer.presentation.ui_handlers.StreamButtonUIHandler
 import com.paranid5.mediastreamer.presentation.ui_handlers.StreamingUIHandler
 import com.paranid5.mediastreamer.presentation.view_models.SearchStreamViewModel
 import com.paranid5.mediastreamer.presentation.view_models.StreamingViewModel
@@ -49,6 +50,7 @@ val streamingModule = module {
 
 val uiModule = module {
     includes(searchStreamModule, streamingModule)
+    singleOf(::StreamButtonUIHandler)
 }
 
 val appModule = module {

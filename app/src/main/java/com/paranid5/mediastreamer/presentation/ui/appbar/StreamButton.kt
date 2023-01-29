@@ -1,34 +1,44 @@
 package com.paranid5.mediastreamer.presentation.ui.appbar
 
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.size
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.paranid5.mediastreamer.R
-import com.paranid5.mediastreamer.presentation.composition_locals.LocalStreamState
-import com.paranid5.mediastreamer.presentation.composition_locals.screen
 import com.paranid5.mediastreamer.presentation.ui.screens.LocalNavController
+import com.paranid5.mediastreamer.presentation.ui.screens.Screens
 import com.paranid5.mediastreamer.presentation.ui.theme.LocalAppColors
+import com.paranid5.mediastreamer.presentation.ui_handlers.StreamButtonUIHandler
+import org.koin.androidx.compose.get
 
 @Composable
-fun StreamButton(modifier: Modifier = Modifier) {
+fun StreamButton(
+    modifier: Modifier = Modifier,
+    streamButtonUIHandler: StreamButtonUIHandler = get()
+) {
     val navHostController = LocalNavController.current
-    val streamingScreen = LocalStreamState.current.screen
+    val currentScreenTitle by navHostController.currentRouteState.collectAsState()
 
     FloatingActionButton(
         modifier = modifier,
-        onClick = { navHostController.navigateIfNotSame(streamingScreen) }
+        onClick = { streamButtonUIHandler.navigateToStream(navHostController, currentScreenTitle) }
     ) {
         Icon(
-            painter = painterResource(R.drawable.stream),
+            painter = painterResource(
+                id = when (currentScreenTitle) {
+                    Screens.StreamScreen.Streaming.title -> R.drawable.search_icon
+                    else -> R.drawable.stream_icon
+                }
+            ),
             contentDescription = stringResource(id = R.string.home),
             tint = LocalAppColors.current.value.primary,
-            modifier = Modifier.width(30.dp).height(30.dp)
+            modifier = Modifier.size(30.dp)
         )
     }
 }

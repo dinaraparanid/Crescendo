@@ -21,7 +21,7 @@ class MainActivity : ComponentActivity() {
             MediaStreamerTheme {
                 val mainNavController = NavHostController(
                     value = rememberNavController(),
-                    currentRouteState = Screens.StreamScreen.Searching.title
+                    initialRoute = Screens.StreamScreen.Searching.title
                 )
 
                 CompositionLocalProvider(

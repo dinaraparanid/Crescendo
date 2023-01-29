@@ -2,16 +2,21 @@ package com.paranid5.mediastreamer.presentation.ui.screens
 
 import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.navigation.NavHostController
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.update
 
-data class NavHostController(
+class NavHostController(
     @JvmField val value: NavHostController? = null,
-    @JvmField var currentRouteState: String = Screens.StreamScreen.Searching.title
+    initialRoute: String = Screens.StreamScreen.Searching.title
 ) {
-    fun navigateIfNotSame(screens: Screens) {
-        val route = screens.title
+    @JvmField
+    val currentRouteState = MutableStateFlow(initialRoute)
 
-        if (currentRouteState != route) {
-            currentRouteState = route
+    fun navigateIfNotSame(screen: Screens) {
+        val route = screen.title
+
+        if (currentRouteState.value != route) {
+            currentRouteState.update { route }
             value!!.navigate(route)
         }
     }
