@@ -1,8 +1,6 @@
-package com.paranid5.mediastreamer.presentation.view_models
+package com.paranid5.mediastreamer.presentation
 
 import androidx.lifecycle.ViewModel
-import com.paranid5.mediastreamer.presentation.presenters.BasePresenter
-import com.paranid5.mediastreamer.presentation.ui_handlers.UIHandler
 import org.koin.core.component.KoinComponent
 
 abstract class ObservableViewModel<P : BasePresenter, H : UIHandler> : ViewModel(), KoinComponent {

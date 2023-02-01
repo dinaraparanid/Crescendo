@@ -1,4 +1,4 @@
-package com.paranid5.mediastreamer.presentation.ui.appbar
+package com.paranid5.mediastreamer.presentation.appbar
 
 import androidx.annotation.StringRes
 import androidx.compose.material3.Icon
@@ -7,8 +7,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
-import com.paranid5.mediastreamer.presentation.ui.screens.LocalNavController
-import com.paranid5.mediastreamer.presentation.ui.screens.Screens
+import com.paranid5.mediastreamer.presentation.LocalNavController
+import com.paranid5.mediastreamer.presentation.Screens
 import com.paranid5.mediastreamer.presentation.ui.theme.LocalAppColors
 
 @Composable

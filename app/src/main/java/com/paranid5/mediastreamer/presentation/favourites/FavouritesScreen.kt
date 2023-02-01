@@ -1,4 +1,4 @@
-package com.paranid5.mediastreamer.presentation.ui.screens
+package com.paranid5.mediastreamer.presentation.favourites
 
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable

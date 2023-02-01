@@ -7,7 +7,7 @@ import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import com.paranid5.mediastreamer.presentation.StateChangedCallback
-import com.paranid5.mediastreamer.presentation.ui_handlers.UIHandler
+import com.paranid5.mediastreamer.presentation.UIHandler
 import kotlinx.coroutines.launch
 
 @Composable

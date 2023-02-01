@@ -1,4 +1,4 @@
-package com.paranid5.mediastreamer.presentation.ui.appbar
+package com.paranid5.mediastreamer.presentation.appbar
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -13,7 +13,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
 import com.paranid5.mediastreamer.R
-import com.paranid5.mediastreamer.presentation.ui.screens.Screens
+import com.paranid5.mediastreamer.presentation.Screens
 import com.paranid5.mediastreamer.presentation.ui.theme.LocalAppColors
 
 @Composable

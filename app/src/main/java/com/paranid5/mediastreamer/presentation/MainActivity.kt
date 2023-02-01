@@ -9,9 +9,6 @@ import com.paranid5.mediastreamer.presentation.composition_locals.LocalStreamSta
 import com.paranid5.mediastreamer.presentation.composition_locals.StreamState
 import com.paranid5.mediastreamer.presentation.composition_locals.StreamStates
 import com.paranid5.mediastreamer.presentation.ui.App
-import com.paranid5.mediastreamer.presentation.ui.screens.LocalNavController
-import com.paranid5.mediastreamer.presentation.ui.screens.NavHostController
-import com.paranid5.mediastreamer.presentation.ui.screens.Screens
 import com.paranid5.mediastreamer.presentation.ui.theme.MediaStreamerTheme
 
 class MainActivity : ComponentActivity() {

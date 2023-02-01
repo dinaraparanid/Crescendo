@@ -10,7 +10,7 @@ import org.koin.core.context.startKoin
 
 class MainApplication : Application() {
     companion object {
-        private const val STREAM_SERVICE_NAME = ".StreamService"
+        private const val STREAM_SERVICE_NAME = ".stream_service.StreamService"
     }
 
     var isStreamServiceConnected = false

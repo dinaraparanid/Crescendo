@@ -6,8 +6,14 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import com.paranid5.mediastreamer.presentation.LocalNavController
+import com.paranid5.mediastreamer.presentation.Screens
+import com.paranid5.mediastreamer.presentation.about_app.AboutApp
+import com.paranid5.mediastreamer.presentation.favourites.FavouritesScreen
+import com.paranid5.mediastreamer.presentation.search_stream.SearchStreamScreen
 import com.paranid5.mediastreamer.presentation.ui.screens.*
-import com.paranid5.mediastreamer.presentation.view_models.SearchStreamViewModel
+import com.paranid5.mediastreamer.presentation.search_stream.SearchStreamViewModel
+import com.paranid5.mediastreamer.presentation.streaming.StreamingScreen
 import org.koin.androidx.compose.koinViewModel
 
 @Composable

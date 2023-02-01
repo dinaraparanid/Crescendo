@@ -1,4 +1,4 @@
-package com.paranid5.mediastreamer.presentation.ui.screens
+package com.paranid5.mediastreamer.presentation.search_stream
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.Button
@@ -12,11 +12,12 @@ import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.paranid5.mediastreamer.R
+import com.paranid5.mediastreamer.presentation.LocalNavController
+import com.paranid5.mediastreamer.presentation.Screens
 import com.paranid5.mediastreamer.presentation.StateChangedCallback
 import com.paranid5.mediastreamer.presentation.composition_locals.LocalStreamState
 import com.paranid5.mediastreamer.presentation.composition_locals.StreamStates
 import com.paranid5.mediastreamer.presentation.ui.OnUIStateChanged
-import com.paranid5.mediastreamer.presentation.view_models.SearchStreamViewModel
 
 @Composable
 private fun Label(modifier: Modifier = Modifier) =

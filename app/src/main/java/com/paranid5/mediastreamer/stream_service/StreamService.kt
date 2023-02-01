@@ -1,4 +1,4 @@
-package com.paranid5.mediastreamer
+package com.paranid5.mediastreamer.stream_service
 
 import android.annotation.SuppressLint
 import android.app.*
@@ -11,6 +11,7 @@ import android.media.session.MediaController
 import android.media.session.MediaSession
 import android.media.session.MediaSessionManager
 import android.media.session.PlaybackState
+import android.os.Binder
 import android.os.Build
 import android.os.SystemClock
 import android.util.Log
@@ -27,8 +28,12 @@ import androidx.media3.exoplayer.source.ProgressiveMediaSource
 import arrow.core.Either
 import at.huber.youtubeExtractor.VideoMeta
 import com.bumptech.glide.Glide
+import com.paranid5.mediastreamer.R
+import com.paranid5.mediastreamer.StorageHandler
+import com.paranid5.mediastreamer.YoutubeAudioUrlExtractor
 import com.paranid5.mediastreamer.data.VideoMetadata
 import com.paranid5.mediastreamer.presentation.MainActivity
+import com.paranid5.mediastreamer.presentation.streaming.*
 import com.paranid5.mediastreamer.presentation.ui.screens.*
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
@@ -43,7 +48,7 @@ class StreamService : Service(), CoroutineScope by MainScope(), KoinComponent {
         private const val PLAYBACK_UPDATE_COOLDOWN = 500L
         private const val TEN_SECS_AS_MILLIS = 10000
 
-        private const val SERVICE_LOCATION = "com.paranid5.mediastreamer.StreamService"
+        private const val SERVICE_LOCATION = "com.paranid5.mediastreamer.stream_service.StreamService"
         const val Broadcast_PAUSE = "$SERVICE_LOCATION.PAUSE"
         const val Broadcast_RESUME = "$SERVICE_LOCATION.RESUME"
         const val Broadcast_SWITCH_VIDEO = "$SERVICE_LOCATION.SWITCH_VIDEO"
@@ -105,6 +110,7 @@ class StreamService : Service(), CoroutineScope by MainScope(), KoinComponent {
             )
         }
 
+    private val binder = object : Binder() {}
     private val storageHandler by inject<StorageHandler>()
     private val currentMetadata = MutableStateFlow<VideoMeta?>(null)
     private lateinit var playbackMonitorTask: Job
@@ -314,7 +320,7 @@ class StreamService : Service(), CoroutineScope by MainScope(), KoinComponent {
         registerReceivers()
     }
 
-    override fun onBind(intent: Intent?) = null
+    override fun onBind(intent: Intent?) = binder
 
     private suspend fun startNotificationObserving(): Unit = currentMetadata.collectLatest {
         Log.d(TAG, "Metadata update, show new notification")
@@ -338,6 +344,7 @@ class StreamService : Service(), CoroutineScope by MainScope(), KoinComponent {
         } ?: launch {
             // Continue with previous stream
             storageHandler.currentUrlState.collectLatest { url ->
+                Log.d(TAG, "Resuming with previous one $url")
                 mPlayNewStream(url)
             }
         }
@@ -535,18 +542,30 @@ class StreamService : Service(), CoroutineScope by MainScope(), KoinComponent {
         }
     }
 
+    private inline val bitmapGlideBuilder
+        get() = Glide.with(this).asBitmap()
+
+    private fun getBitmapFromUrlOrDefault(url: String) =
+        try {
+            bitmapGlideBuilder
+                .load(url)
+                .error(R.drawable.cover_thumbnail)
+                .fallback(R.drawable.cover_thumbnail)
+                .submit()
+                .get()
+        } catch (e: Exception) {
+            bitmapGlideBuilder
+                .load(R.drawable.cover_thumbnail)
+                .submit()
+                .get()
+        }
+
     private suspend inline fun getVideoCoverAsync() = coroutineScope {
         async(Dispatchers.IO) {
             currentMetadata
                 .value
                 ?.maxResImageUrl
-                ?.let { url ->
-                    Glide.with(this@StreamService)
-                        .asBitmap()
-                        .load(url)
-                        .submit()
-                        .get()
-                }
+                ?.let(::getBitmapFromUrlOrDefault)
         }
     }
 

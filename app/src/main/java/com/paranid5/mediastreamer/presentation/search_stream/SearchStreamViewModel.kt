@@ -1,9 +1,8 @@
-package com.paranid5.mediastreamer.presentation.view_models
+package com.paranid5.mediastreamer.presentation.search_stream
 
 import androidx.lifecycle.SavedStateHandle
 import com.paranid5.mediastreamer.StorageHandler
-import com.paranid5.mediastreamer.presentation.presenters.SearchStreamPresenter
-import com.paranid5.mediastreamer.presentation.ui_handlers.SearchStreamUIHandler
+import com.paranid5.mediastreamer.presentation.ObservableViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import org.koin.core.component.inject

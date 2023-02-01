@@ -1,8 +1,7 @@
-package com.paranid5.mediastreamer.presentation.view_models
+package com.paranid5.mediastreamer.presentation.streaming
 
 import androidx.lifecycle.SavedStateHandle
-import com.paranid5.mediastreamer.presentation.presenters.StreamingPresenter
-import com.paranid5.mediastreamer.presentation.ui_handlers.StreamingUIHandler
+import com.paranid5.mediastreamer.presentation.ObservableViewModel
 import org.koin.core.component.inject
 
 class StreamingViewModel(savedStateHandle: SavedStateHandle) :

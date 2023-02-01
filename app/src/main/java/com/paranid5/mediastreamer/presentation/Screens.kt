@@ -1,4 +1,4 @@
-package com.paranid5.mediastreamer.presentation.ui.screens
+package com.paranid5.mediastreamer.presentation
 
 sealed class Screens(@JvmField val title: String) {
     sealed class StreamScreen(title: String) : Screens("stream/$title") {

@@ -1,4 +1,4 @@
-package com.paranid5.mediastreamer.presentation.ui.screens
+package com.paranid5.mediastreamer.presentation.streaming
 
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
@@ -22,7 +22,6 @@ import com.paranid5.mediastreamer.StorageHandler
 import com.paranid5.mediastreamer.data.VideoMetadata
 import com.paranid5.mediastreamer.presentation.BroadcastReceiver
 import com.paranid5.mediastreamer.presentation.ui.theme.LocalAppColors
-import com.paranid5.mediastreamer.presentation.ui_handlers.StreamingUIHandler
 import com.paranid5.mediastreamer.utils.extensions.timeString
 import org.koin.androidx.compose.get
 
@@ -44,7 +43,11 @@ fun StreamingScreen(
 
     Box(modifier.fillMaxSize()) {
         Column(Modifier.align(Alignment.Center)) {
-            VideoCover(metadata)
+            VideoCover(
+                metadata = metadata,
+                modifier = Modifier.align(Alignment.CenterHorizontally)
+            )
+
             Spacer(Modifier.height(10.dp))
             PlaybackSlider(metadata)
             Spacer(Modifier.height(15.dp))
@@ -64,8 +67,9 @@ private fun VideoCover(metadata: VideoMetadata?, modifier: Modifier = Modifier) 
 
     GlideImage(
         modifier = modifier
-            .padding(horizontal = 20.dp)
+            .padding(start = 20.dp, end = 20.dp, top = 20.dp)
             .border(width = 5.dp, color = Color.Transparent, shape = RoundedCornerShape(5.dp))
+            .sizeIn(maxHeight = 300.dp)
             .shadow(
                 elevation = 10.dp,
                 shape = RoundedCornerShape(5.dp),
@@ -77,6 +81,7 @@ private fun VideoCover(metadata: VideoMetadata?, modifier: Modifier = Modifier) 
     ) { requestBuilder ->
         requestBuilder
             .error(R.drawable.cover_thumbnail)
+            .placeholder(R.drawable.cover_thumbnail)
             .fallback(R.drawable.cover_thumbnail)
             .transition(DrawableTransitionOptions.withCrossFade())
     }
@@ -185,7 +190,7 @@ private fun PlayButton(
     streamingUIHandler: StreamingUIHandler = get()
 ) {
     val colors = LocalAppColors.current.value
-    var isPlaying by remember { mutableStateOf(true) }
+    var isPlaying by remember { mutableStateOf(false) }
 
     BroadcastReceiver(action = Broadcast_IS_PLAYING_CHANGED) { _, intent ->
         isPlaying = intent!!.getBooleanExtra(IS_PLAYING_ARG, !isPlaying)
@@ -206,7 +211,7 @@ private fun PlayButton(
 
         else -> IconButton(
             modifier = modifier,
-            onClick = { streamingUIHandler.sendResumeBroadcast() }
+            onClick = { streamingUIHandler.startStreamingOrSendResumeBroadcast() }
         ) {
             Icon(
                 modifier = Modifier.size(50.dp),

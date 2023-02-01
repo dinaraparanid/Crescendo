@@ -1,4 +1,4 @@
-package com.paranid5.mediastreamer.presentation.ui.appbar
+package com.paranid5.mediastreamer.presentation.appbar.stream_button
 
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.FloatingActionButton
@@ -11,10 +11,9 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.paranid5.mediastreamer.R
-import com.paranid5.mediastreamer.presentation.ui.screens.LocalNavController
-import com.paranid5.mediastreamer.presentation.ui.screens.Screens
+import com.paranid5.mediastreamer.presentation.LocalNavController
+import com.paranid5.mediastreamer.presentation.Screens
 import com.paranid5.mediastreamer.presentation.ui.theme.LocalAppColors
-import com.paranid5.mediastreamer.presentation.ui_handlers.StreamButtonUIHandler
 import org.koin.androidx.compose.get
 
 @Composable

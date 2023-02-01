@@ -1,15 +1,15 @@
 package com.paranid5.mediastreamer
 
-import com.paranid5.mediastreamer.presentation.presenters.SearchStreamPresenter
-import com.paranid5.mediastreamer.presentation.presenters.StreamingPresenter
-import com.paranid5.mediastreamer.presentation.ui_handlers.SearchStreamUIHandler
-import com.paranid5.mediastreamer.presentation.ui_handlers.StreamButtonUIHandler
-import com.paranid5.mediastreamer.presentation.ui_handlers.StreamingUIHandler
-import com.paranid5.mediastreamer.presentation.view_models.SearchStreamViewModel
-import com.paranid5.mediastreamer.presentation.view_models.StreamingViewModel
+import com.paranid5.mediastreamer.presentation.search_stream.SearchStreamPresenter
+import com.paranid5.mediastreamer.presentation.streaming.StreamingPresenter
+import com.paranid5.mediastreamer.presentation.search_stream.SearchStreamUIHandler
+import com.paranid5.mediastreamer.presentation.appbar.stream_button.StreamButtonUIHandler
+import com.paranid5.mediastreamer.presentation.streaming.StreamingUIHandler
+import com.paranid5.mediastreamer.presentation.search_stream.SearchStreamViewModel
+import com.paranid5.mediastreamer.presentation.streaming.StreamingViewModel
+import com.paranid5.mediastreamer.stream_service.StreamServiceAccessor
 import org.koin.android.ext.koin.androidApplication
 import org.koin.android.ext.koin.androidContext
-import org.koin.androidx.viewmodel.dsl.viewModel
 import org.koin.androidx.viewmodel.dsl.viewModelOf
 import org.koin.core.module.dsl.factoryOf
 import org.koin.core.module.dsl.singleOf
@@ -34,6 +34,7 @@ val globalsModule = module {
 
     singleOf(::StorageHandler)
     single { androidApplication() as MainApplication }
+    singleOf(::StreamServiceAccessor)
 }
 
 val searchStreamModule = module {

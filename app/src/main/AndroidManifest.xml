@@ -34,7 +34,7 @@
                 android:value="" />
         </activity>
         <service
-            android:name=".StreamService"
+            android:name=".stream_service.StreamService"
             android:foregroundServiceType="mediaPlayback" />
     </application>
 

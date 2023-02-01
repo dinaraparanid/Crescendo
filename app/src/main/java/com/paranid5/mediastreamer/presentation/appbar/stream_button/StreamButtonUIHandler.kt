@@ -1,7 +1,8 @@
-package com.paranid5.mediastreamer.presentation.ui_handlers
+package com.paranid5.mediastreamer.presentation.appbar.stream_button
 
-import com.paranid5.mediastreamer.presentation.ui.screens.NavHostController
-import com.paranid5.mediastreamer.presentation.ui.screens.Screens
+import com.paranid5.mediastreamer.presentation.NavHostController
+import com.paranid5.mediastreamer.presentation.Screens
+import com.paranid5.mediastreamer.presentation.UIHandler
 
 class StreamButtonUIHandler : UIHandler {
     fun navigateToStream(navHostController: NavHostController, currentScreenTitle: String) =

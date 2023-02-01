@@ -1,7 +1,8 @@
-package com.paranid5.mediastreamer.presentation.ui.screens
+package com.paranid5.mediastreamer.presentation
 
 import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.navigation.NavHostController
+import com.paranid5.mediastreamer.presentation.Screens
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.update
 

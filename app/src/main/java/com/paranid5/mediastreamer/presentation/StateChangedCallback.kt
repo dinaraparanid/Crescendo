@@ -1,6 +1,5 @@
 package com.paranid5.mediastreamer.presentation
 
-import com.paranid5.mediastreamer.presentation.ui_handlers.UIHandler
 import kotlinx.coroutines.flow.StateFlow
 
 data class StateChangedCallback<H : UIHandler>(
