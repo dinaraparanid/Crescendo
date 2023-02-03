@@ -12,15 +12,17 @@ import org.koin.core.qualifier.named
 data class VideoMetadata(
     @JvmField val title: String = get(named(STREAM_WITH_NO_NAME)),
     @JvmField val author: String = get(named(UNKNOWN_STREAMER)),
-    @JvmField val cover: String? = null,
+    @JvmField val covers: List<String> = listOf(),
     @JvmField val lenInMillis: Long = 0
 ) {
     private companion object : KoinComponent
 
     constructor(youtubeMeta: VideoMeta) : this(
-        youtubeMeta.title,
-        youtubeMeta.author,
-        youtubeMeta.maxResImageUrl,
-        youtubeMeta.videoLength * 1000
+        title = youtubeMeta.title,
+        author = youtubeMeta.author,
+        lenInMillis = youtubeMeta.videoLength * 1000,
+        covers = youtubeMeta.run {
+            listOf(maxResImageUrl, hqImageUrl, mqImageUrl, sdImageUrl, thumbUrl)
+        }
     )
 }

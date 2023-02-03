@@ -27,7 +27,6 @@ import androidx.media3.exoplayer.ExoPlayer
 import androidx.media3.exoplayer.source.ProgressiveMediaSource
 import arrow.core.Either
 import at.huber.youtubeExtractor.VideoMeta
-import com.bumptech.glide.Glide
 import com.paranid5.mediastreamer.R
 import com.paranid5.mediastreamer.StorageHandler
 import com.paranid5.mediastreamer.YoutubeAudioUrlExtractor
@@ -35,10 +34,12 @@ import com.paranid5.mediastreamer.data.VideoMetadata
 import com.paranid5.mediastreamer.presentation.MainActivity
 import com.paranid5.mediastreamer.presentation.streaming.*
 import com.paranid5.mediastreamer.presentation.ui.screens.*
+import com.paranid5.mediastreamer.utils.GlideUtils
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
+import org.koin.core.parameter.parametersOf
 
 @OptIn(androidx.media3.common.util.UnstableApi::class)
 class StreamService : Service(), CoroutineScope by MainScope(), KoinComponent {
@@ -112,12 +113,13 @@ class StreamService : Service(), CoroutineScope by MainScope(), KoinComponent {
 
     private val binder = object : Binder() {}
     private val storageHandler by inject<StorageHandler>()
-    private val currentMetadata = MutableStateFlow<VideoMeta?>(null)
+    private val glideUtils by inject<GlideUtils> { parametersOf(this) }
+    private val currentMetadata = MutableStateFlow<VideoMetadata?>(null)
     private lateinit var playbackMonitorTask: Job
 
     @kotlin.OptIn(ExperimentalCoroutinesApi::class)
     private val videoLength = currentMetadata
-        .mapLatest { it?.run { videoLength * 1000 } ?: 0 }
+        .mapLatest { it?.lenInMillis ?: 0 }
         .stateIn(this, SharingStarted.Eagerly, 0)
 
     private inline val currentPlaybackPosition
@@ -343,10 +345,11 @@ class StreamService : Service(), CoroutineScope by MainScope(), KoinComponent {
             mPlayNewStream(url)
         } ?: launch {
             // Continue with previous stream
-            storageHandler.currentUrlState.collectLatest { url ->
-                Log.d(TAG, "Resuming with previous one $url")
-                mPlayNewStream(url)
-            }
+
+            mPlayNewStream(
+                url = storageHandler.currentUrlState.value,
+                initialPosition = storageHandler.playbackPositionState.value
+            )
         }
 
         return START_REDELIVER_INTENT
@@ -428,7 +431,7 @@ class StreamService : Service(), CoroutineScope by MainScope(), KoinComponent {
         storageHandler.storeCurrentUrl(newUrl)
 
     @OptIn(UnstableApi::class)
-    private fun playStream(url: String) =
+    private fun playStream(url: String, initialPosition: Long = 0) =
         YoutubeAudioUrlExtractor(context = this) { audioUrl, videoUrl, videoMeta ->
             val audioSource = ProgressiveMediaSource
                 .Factory(DefaultHttpDataSource.Factory())
@@ -440,7 +443,7 @@ class StreamService : Service(), CoroutineScope by MainScope(), KoinComponent {
                 .Factory(DefaultHttpDataSource.Factory())
                 .createMediaSource(MediaItem.fromUri(videoUrl))*/
 
-            currentMetadata.update { videoMeta }
+            currentMetadata.update { videoMeta?.let(::VideoMetadata) }
             launch { storeMetadata(videoMeta) }
 
             player.run {
@@ -453,12 +456,13 @@ class StreamService : Service(), CoroutineScope by MainScope(), KoinComponent {
                 )
                 playWhenReady = true
                 prepare()
+                seekTo(initialPosition)
             }
         }.extract(url)
 
-    internal fun mPlayNewStream(newUrl: String) {
-        launch { storeCurrentUrl(newUrl) }
-        playStream(newUrl)
+    internal fun mPlayNewStream(url: String, initialPosition: Long = 0) {
+        launch { storeCurrentUrl(url) }
+        playStream(url, initialPosition)
     }
 
     private inline val Intent.urlArgOrNull
@@ -542,37 +546,16 @@ class StreamService : Service(), CoroutineScope by MainScope(), KoinComponent {
         }
     }
 
-    private inline val bitmapGlideBuilder
-        get() = Glide.with(this).asBitmap()
-
-    private fun getBitmapFromUrlOrDefault(url: String) =
-        try {
-            bitmapGlideBuilder
-                .load(url)
-                .error(R.drawable.cover_thumbnail)
-                .fallback(R.drawable.cover_thumbnail)
-                .submit()
-                .get()
-        } catch (e: Exception) {
-            bitmapGlideBuilder
-                .load(R.drawable.cover_thumbnail)
-                .submit()
-                .get()
-        }
-
-    private suspend inline fun getVideoCoverAsync() = coroutineScope {
-        async(Dispatchers.IO) {
-            currentMetadata
-                .value
-                ?.maxResImageUrl
-                ?.let(::getBitmapFromUrlOrDefault)
-        }
-    }
+    private suspend inline fun getVideoCoverAsync() =
+        currentMetadata
+            .value
+            ?.let { glideUtils.getVideoCoverAsync(it) }
+            ?: coroutineScope { async(Dispatchers.IO) { glideUtils.thumbnailBitmap } }
 
     // --------------------------- Notification for Oreo+ ---------------------------
 
     @RequiresApi(Build.VERSION_CODES.O)
-    private fun Notification.Builder.setContent(currentMetadata: VideoMeta?) = this
+    private fun Notification.Builder.setContent(currentMetadata: VideoMetadata?) = this
         .setShowWhen(false)
         .setSmallIcon(R.drawable.stream_icon)
         .setContentTitle(
@@ -681,7 +664,7 @@ class StreamService : Service(), CoroutineScope by MainScope(), KoinComponent {
 
     // --------------------------- Notification Compat ---------------------------
 
-    private fun NotificationCompat.Builder.setContent(currentMetadata: VideoMeta?) = this
+    private fun NotificationCompat.Builder.setContent(currentMetadata: VideoMetadata?) = this
         .setShowWhen(false)
         .setSmallIcon(R.drawable.stream_icon)
         .setContentTitle(

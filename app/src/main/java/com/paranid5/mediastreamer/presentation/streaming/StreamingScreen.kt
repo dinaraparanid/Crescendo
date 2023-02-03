@@ -1,27 +1,34 @@
 package com.paranid5.mediastreamer.presentation.streaming
 
+import android.graphics.Bitmap
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.onSizeChanged
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.constraintlayout.compose.ConstraintLayout
+import androidx.constraintlayout.compose.Dimension
 import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
 import com.bumptech.glide.integration.compose.GlideImage
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
+import com.bumptech.glide.request.RequestOptions
 import com.paranid5.mediastreamer.R
 import com.paranid5.mediastreamer.StorageHandler
 import com.paranid5.mediastreamer.data.VideoMetadata
 import com.paranid5.mediastreamer.presentation.BroadcastReceiver
 import com.paranid5.mediastreamer.presentation.ui.theme.LocalAppColors
+import com.paranid5.mediastreamer.utils.GlideUtils
 import com.paranid5.mediastreamer.utils.extensions.timeString
 import org.koin.androidx.compose.get
 
@@ -41,22 +48,60 @@ fun StreamingScreen(
 ) {
     val metadata by storageHandler.currentMetadataState.collectAsState()
 
-    Box(modifier.fillMaxSize()) {
-        Column(Modifier.align(Alignment.Center)) {
-            VideoCover(
-                metadata = metadata,
-                modifier = Modifier.align(Alignment.CenterHorizontally)
-            )
+    ConstraintLayout(modifier.fillMaxSize()) {
+        val (
+            cover,
+            slider,
+            titleAndPropertiesButton,
+            playbackButtons,
+            utilsButtons
+        ) = createRefs()
 
-            Spacer(Modifier.height(10.dp))
-            PlaybackSlider(metadata)
-            Spacer(Modifier.height(15.dp))
-            TitleAndSettings(metadata)
-            Spacer(Modifier.height(15.dp))
-            PlaybackButtons()
-            Spacer(Modifier.height(5.dp))
-            UtilsButtons()
-        }
+        VideoCover(
+            metadata = metadata,
+            modifier = Modifier.constrainAs(cover) {
+                top.linkTo(parent.top, margin = 20.dp)
+                start.linkTo(parent.start, margin = 20.dp)
+                end.linkTo(parent.end, margin = 20.dp)
+                bottom.linkTo(slider.top, margin = 10.dp)
+                height = Dimension.fillToConstraints
+                width = Dimension.fillToConstraints
+            }
+        )
+
+        PlaybackSlider(
+            metadata = metadata,
+            modifier = Modifier.constrainAs(slider) {
+                centerVerticallyTo(parent)
+                start.linkTo(parent.start, margin = 20.dp)
+                end.linkTo(parent.end, margin = 20.dp)
+            }
+        )
+
+        TitleAndPropertiesButton(
+            metadata = metadata,
+            modifier = Modifier.constrainAs(titleAndPropertiesButton) {
+                top.linkTo(slider.bottom, margin = 15.dp)
+                start.linkTo(parent.start, margin = 20.dp)
+                end.linkTo(parent.end, margin = 20.dp)
+            }
+        )
+
+        PlaybackButtons(
+            Modifier.constrainAs(playbackButtons) {
+                top.linkTo(titleAndPropertiesButton.bottom, margin = 15.dp)
+                start.linkTo(parent.start, margin = 20.dp)
+                end.linkTo(parent.end, margin = 20.dp)
+            }
+        )
+
+        UtilsButtons(
+            Modifier.constrainAs(utilsButtons) {
+                top.linkTo(playbackButtons.bottom, margin = 5.dp)
+                start.linkTo(parent.start, margin = 20.dp)
+                end.linkTo(parent.end, margin = 20.dp)
+            }
+        )
     }
 }
 
@@ -64,26 +109,34 @@ fun StreamingScreen(
 @Composable
 private fun VideoCover(metadata: VideoMetadata?, modifier: Modifier = Modifier) {
     val colors = LocalAppColors.current.value
+    val glideUtils = GlideUtils(LocalContext.current)
+    var coverModel by remember { mutableStateOf<Bitmap?>(null) }
+
+    LaunchedEffect(key1 = metadata) {
+        coverModel = metadata?.let { glideUtils.getVideoCoverAsync(it).await() }
+    }
 
     GlideImage(
         modifier = modifier
-            .padding(start = 20.dp, end = 20.dp, top = 20.dp)
-            .border(width = 5.dp, color = Color.Transparent, shape = RoundedCornerShape(5.dp))
-            .sizeIn(maxHeight = 300.dp)
             .shadow(
-                elevation = 10.dp,
+                elevation = 80.dp,
                 shape = RoundedCornerShape(5.dp),
                 ambientColor = colors.primary,
                 spotColor = colors.primary
+            )
+            .border(
+                width = 30.dp,
+                color = Color.Transparent,
+                shape = RoundedCornerShape(30.dp)
             ),
-        model = metadata?.cover ?: painterResource(R.drawable.cover_thumbnail),
+        model = coverModel ?: painterResource(R.drawable.cover_thumbnail),
         contentDescription = stringResource(R.string.video_cover),
     ) { requestBuilder ->
         requestBuilder
+            .centerCrop()
             .error(R.drawable.cover_thumbnail)
-            .placeholder(R.drawable.cover_thumbnail)
             .fallback(R.drawable.cover_thumbnail)
-            .transition(DrawableTransitionOptions.withCrossFade())
+            .transition(DrawableTransitionOptions.withCrossFade(1000))
     }
 }
 
@@ -91,11 +144,16 @@ private fun VideoCover(metadata: VideoMetadata?, modifier: Modifier = Modifier) 
 private fun PlaybackSlider(
     metadata: VideoMetadata?,
     modifier: Modifier = Modifier,
-    streamingUIHandler: StreamingUIHandler = get()
+    streamingUIHandler: StreamingUIHandler = get(),
+    storageHandler: StorageHandler = get()
 ) {
     val colors = LocalAppColors.current.value
     val videoLength = metadata?.lenInMillis ?: 0
     var curPosition by remember { mutableStateOf(0L) }
+
+    LaunchedEffect(key1 = true) {
+        curPosition = storageHandler.playbackPositionState.value
+    }
 
     BroadcastReceiver(action = Broadcast_CUR_POSITION_CHANGED) { _, intent ->
         curPosition = intent!!.getLongExtra(CUR_POSITION_ARG, 0)
@@ -151,7 +209,7 @@ private fun TitleAndAuthor(metadata: VideoMetadata?, modifier: Modifier = Modifi
 }
 
 @Composable
-private fun SettingsButton(modifier: Modifier = Modifier) {
+private fun PropertiesButton(modifier: Modifier = Modifier) {
     val colors = LocalAppColors.current.value
 
     IconButton(modifier = modifier, onClick = { /*TODO*/ }) {
@@ -167,7 +225,7 @@ private fun SettingsButton(modifier: Modifier = Modifier) {
 }
 
 @Composable
-private fun TitleAndSettings(metadata: VideoMetadata?, modifier: Modifier = Modifier) =
+private fun TitleAndPropertiesButton(metadata: VideoMetadata?, modifier: Modifier = Modifier) =
     Row(
         modifier
             .fillMaxWidth()
@@ -179,7 +237,7 @@ private fun TitleAndSettings(metadata: VideoMetadata?, modifier: Modifier = Modi
         )
 
         Spacer(Modifier.width(10.dp))
-        SettingsButton()
+        PropertiesButton()
     }
 
 // ----------------------------------- Playback Buttons -----------------------------------
