@@ -15,6 +15,7 @@ import android.os.Binder
 import android.os.Build
 import android.os.SystemClock
 import android.util.Log
+import android.widget.Toast
 import androidx.annotation.OptIn
 import androidx.annotation.RequiresApi
 import androidx.core.app.NotificationCompat
@@ -27,6 +28,9 @@ import androidx.media3.exoplayer.ExoPlayer
 import androidx.media3.exoplayer.source.ProgressiveMediaSource
 import arrow.core.Either
 import at.huber.youtubeExtractor.VideoMeta
+import com.dinaraparanid.ytdlp_kt.YtDlp
+import com.dinaraparanid.ytdlp_kt.YtDlpRequest
+import com.dinaraparanid.ytdlp_kt.YtDlpRequestStatus
 import com.paranid5.mediastreamer.R
 import com.paranid5.mediastreamer.StorageHandler
 import com.paranid5.mediastreamer.YoutubeAudioUrlExtractor
@@ -59,6 +63,7 @@ class StreamService : Service(), CoroutineScope by MainScope(), KoinComponent {
         const val Broadcast_ADD_TO_FAVOURITE = "$SERVICE_LOCATION.ADD_TO_FAVOURITE"
         const val Broadcast_REMOVE_FROM_FAVOURITE = "$SERVICE_LOCATION.REMOVE_FROM_FAVOURITE"
         const val Broadcast_CHANGE_REPEAT = "$SERVICE_LOCATION.CHANGE_REPEAT"
+        const val Broadcast_CASH_VIDEO = "$SERVICE_LOCATION.CASH_VIDEO"
         const val Broadcast_DISMISS_NOTIFICATION = "$SERVICE_LOCATION.DISMISS_NOTIFICATION"
 
         private const val ACTION_PAUSE = "pause"
@@ -72,6 +77,7 @@ class StreamService : Service(), CoroutineScope by MainScope(), KoinComponent {
 
         const val URL_ARG = "url"
         const val POSITION_ARG = "position"
+        const val SAVE_AS_VIDEO_ARG = "save_as_video"
 
         private const val ADJUST_PERIOD_TIME_OFFSETS = true
         private val TAG = StreamService::class.simpleName!!
@@ -133,6 +139,9 @@ class StreamService : Service(), CoroutineScope by MainScope(), KoinComponent {
 
     internal inline val mIsRepeating
         get() = storageHandler.isRepeatingState.value
+
+    internal inline val mCurrentUrl
+        get() = storageHandler.currentUrlState.value
 
     @Volatile
     private var isNotificationShown = false
@@ -297,6 +306,52 @@ class StreamService : Service(), CoroutineScope by MainScope(), KoinComponent {
         }
     }
 
+    internal fun YtDlpRequestStatus.mRespondToUser() = Toast.makeText(
+        applicationContext,
+        when (this) {
+            is YtDlpRequestStatus.Error.GeoRestricted -> R.string.geo_restricted
+
+            is YtDlpRequestStatus.Error.IncorrectUrl -> {
+                Log.e(TAG, "Incorrect url while cashing")
+                R.string.something_went_wrong
+            }
+
+            is YtDlpRequestStatus.Error.NoInternet -> R.string.no_internet
+
+            is YtDlpRequestStatus.Error.StreamConversion -> {
+                Log.e(TAG, "Stream conversion error")
+                R.string.something_went_wrong
+            }
+
+            is YtDlpRequestStatus.Error.UnknownError -> {
+                Log.e(TAG, "Unknown error")
+                R.string.something_went_wrong
+            }
+
+            is YtDlpRequestStatus.Success<*> -> R.string.video_cashed
+        },
+        Toast.LENGTH_LONG
+    ).show()
+
+    private val cashVideoReceiver = object : BroadcastReceiver() {
+        override fun onReceive(context: Context?, intent: Intent) {
+            val isSaveAsVideo = intent.getBooleanExtra(SAVE_AS_VIDEO_ARG, false)
+
+            YtDlp.execute(
+                request = YtDlpRequest(mCurrentUrl).apply {
+                    if (isSaveAsVideo) setOption("--recode-video", "mp4")
+                    if (!isSaveAsVideo) setOption("--audio-format", "mp3")
+                    if (!isSaveAsVideo) setOption("--extract-audio")
+                    setOption("--socket-timeout", "1")
+                    setOption("--retries", "infinite")
+                    setOption("--audio-quality", "10")
+                    setOption("--format", "best")
+                },
+                isPythonExecutable = false
+            ).mRespondToUser()
+        }
+    }
+
     private val dismissNotificationReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context?, intent: Intent?) {
             Log.d(TAG, "Notification removed")
@@ -314,12 +369,14 @@ class StreamService : Service(), CoroutineScope by MainScope(), KoinComponent {
         registerReceiver(addToFavouriteReceiver, IntentFilter(Broadcast_ADD_TO_FAVOURITE))
         registerReceiver(removeFromFavouriteReceiver, IntentFilter(Broadcast_REMOVE_FROM_FAVOURITE))
         registerReceiver(repeatChangedReceiver, IntentFilter(Broadcast_CHANGE_REPEAT))
+        registerReceiver(cashVideoReceiver, IntentFilter(Broadcast_CASH_VIDEO))
         registerReceiver(dismissNotificationReceiver, IntentFilter(Broadcast_DISMISS_NOTIFICATION))
     }
 
     override fun onCreate() {
         super.onCreate()
         registerReceivers()
+        YtDlp.updateAsync(isPythonExecutable = false)
     }
 
     override fun onBind(intent: Intent?) = binder
@@ -364,6 +421,8 @@ class StreamService : Service(), CoroutineScope by MainScope(), KoinComponent {
         unregisterReceiver(seekToReceiver)
         unregisterReceiver(addToFavouriteReceiver)
         unregisterReceiver(removeFromFavouriteReceiver)
+        unregisterReceiver(repeatChangedReceiver)
+        unregisterReceiver(cashVideoReceiver)
         unregisterReceiver(dismissNotificationReceiver)
     }
 

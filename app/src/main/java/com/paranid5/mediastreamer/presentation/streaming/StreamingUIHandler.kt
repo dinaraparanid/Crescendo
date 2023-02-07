@@ -16,4 +16,6 @@ class StreamingUIHandler(private val serviceAccessor: StreamServiceAccessor) : U
         serviceAccessor.startStreamingOrSendResumeBroadcast()
 
     fun sendChangeRepeatBroadcast() = serviceAccessor.sendChangeRepeatBroadcast()
+
+    fun sendCashBroadcast(isSaveAsVideo: Boolean) = serviceAccessor.sendCashBroadcast(isSaveAsVideo)
 }

@@ -9,12 +9,10 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.constraintlayout.compose.ConstraintLayout
@@ -22,12 +20,13 @@ import androidx.constraintlayout.compose.Dimension
 import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
 import com.bumptech.glide.integration.compose.GlideImage
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
-import com.bumptech.glide.request.RequestOptions
 import com.paranid5.mediastreamer.R
 import com.paranid5.mediastreamer.StorageHandler
 import com.paranid5.mediastreamer.data.VideoMetadata
 import com.paranid5.mediastreamer.presentation.BroadcastReceiver
 import com.paranid5.mediastreamer.presentation.ui.theme.LocalAppColors
+import com.paranid5.mediastreamer.stream_service.StreamService
+import com.paranid5.mediastreamer.stream_service.StreamServiceAccessor
 import com.paranid5.mediastreamer.utils.GlideUtils
 import com.paranid5.mediastreamer.utils.extensions.timeString
 import org.koin.androidx.compose.get
@@ -392,10 +391,16 @@ private fun LikeButton(modifier: Modifier = Modifier) {
 }
 
 @Composable
-private fun DownloadButton(modifier: Modifier = Modifier) {
+private fun DownloadButton(
+    modifier: Modifier = Modifier,
+    serviceAccessor: StreamServiceAccessor = get()
+) {
     val colors = LocalAppColors.current.value
 
-    IconButton(modifier = modifier, onClick = { /** TODO: download as mp3 */ }) {
+    IconButton(
+        modifier = modifier, // TODO: save as video dialog; start with cash intent
+        onClick = { serviceAccessor.sendCashBroadcast(isSaveAsVideo = false) }
+    ) {
         Icon(
             modifier = Modifier.size(30.dp),
             painter = painterResource(R.drawable.save_icon),

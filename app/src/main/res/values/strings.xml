@@ -18,4 +18,8 @@
     <string name="equalizer">Equalizer</string>
     <string name="change_repeat">Change repeat</string>
     <string name="download_as_mp3">Download as MP3</string>
+    <string name="geo_restricted">Sorry, this video is geo-restricted :(</string>
+    <string name="something_went_wrong">Something went wrong</string>
+    <string name="no_internet">Check your internet connection</string>
+    <string name="video_cashed">Video is successfully cashed!</string>
 </resources>
