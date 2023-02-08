@@ -25,8 +25,6 @@ import com.paranid5.mediastreamer.StorageHandler
 import com.paranid5.mediastreamer.data.VideoMetadata
 import com.paranid5.mediastreamer.presentation.BroadcastReceiver
 import com.paranid5.mediastreamer.presentation.ui.theme.LocalAppColors
-import com.paranid5.mediastreamer.stream_service.StreamService
-import com.paranid5.mediastreamer.stream_service.StreamServiceAccessor
 import com.paranid5.mediastreamer.utils.GlideUtils
 import com.paranid5.mediastreamer.utils.extensions.timeString
 import org.koin.androidx.compose.get
@@ -393,13 +391,13 @@ private fun LikeButton(modifier: Modifier = Modifier) {
 @Composable
 private fun DownloadButton(
     modifier: Modifier = Modifier,
-    serviceAccessor: StreamServiceAccessor = get()
+    streamingUIHandler: StreamingUIHandler = get()
 ) {
     val colors = LocalAppColors.current.value
 
     IconButton(
-        modifier = modifier, // TODO: save as video dialog; start with cash intent
-        onClick = { serviceAccessor.sendCashBroadcast(isSaveAsVideo = false) }
+        modifier = modifier, // TODO: save as video dialog
+        onClick = { streamingUIHandler.launchVideoCashWorker(isSaveAsVideo = false) }
     ) {
         Icon(
             modifier = Modifier.size(30.dp),

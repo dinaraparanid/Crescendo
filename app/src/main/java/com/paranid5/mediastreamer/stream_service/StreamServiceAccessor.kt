@@ -62,9 +62,4 @@ class StreamServiceAccessor(private val application: MainApplication) {
     }
 
     fun sendChangeRepeatBroadcast() = sendBroadcast(StreamService.Broadcast_CHANGE_REPEAT)
-
-    fun sendCashBroadcast(isSaveAsVideo: Boolean) = sendBroadcast(
-        Intent(StreamService.Broadcast_CASH_VIDEO)
-            .putExtra(StreamService.SAVE_AS_VIDEO_ARG, isSaveAsVideo)
-    )
 }

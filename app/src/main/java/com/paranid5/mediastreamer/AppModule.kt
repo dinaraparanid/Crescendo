@@ -1,12 +1,12 @@
 package com.paranid5.mediastreamer
 
 import android.content.Context
-import com.paranid5.mediastreamer.presentation.search_stream.SearchStreamPresenter
-import com.paranid5.mediastreamer.presentation.streaming.StreamingPresenter
-import com.paranid5.mediastreamer.presentation.search_stream.SearchStreamUIHandler
 import com.paranid5.mediastreamer.presentation.appbar.stream_button.StreamButtonUIHandler
-import com.paranid5.mediastreamer.presentation.streaming.StreamingUIHandler
+import com.paranid5.mediastreamer.presentation.search_stream.SearchStreamPresenter
+import com.paranid5.mediastreamer.presentation.search_stream.SearchStreamUIHandler
 import com.paranid5.mediastreamer.presentation.search_stream.SearchStreamViewModel
+import com.paranid5.mediastreamer.presentation.streaming.StreamingPresenter
+import com.paranid5.mediastreamer.presentation.streaming.StreamingUIHandler
 import com.paranid5.mediastreamer.presentation.streaming.StreamingViewModel
 import com.paranid5.mediastreamer.stream_service.StreamServiceAccessor
 import com.paranid5.mediastreamer.utils.GlideUtils

@@ -22,4 +22,5 @@
     <string name="something_went_wrong">Something went wrong</string>
     <string name="no_internet">Check your internet connection</string>
     <string name="video_cashed">Video is successfully cashed!</string>
+    <string name="downloading">Downloading</string>
 </resources>
