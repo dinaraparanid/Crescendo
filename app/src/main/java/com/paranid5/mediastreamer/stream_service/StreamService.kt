@@ -27,7 +27,6 @@ import androidx.media3.exoplayer.ExoPlayer
 import androidx.media3.exoplayer.source.ProgressiveMediaSource
 import arrow.core.Either
 import at.huber.youtubeExtractor.VideoMeta
-import com.dinaraparanid.ytdlp_kt.YtDlp
 import com.paranid5.mediastreamer.R
 import com.paranid5.mediastreamer.StorageHandler
 import com.paranid5.mediastreamer.YoutubeAudioUrlExtractor
@@ -325,7 +324,6 @@ class StreamService : Service(), CoroutineScope by MainScope(), KoinComponent {
     override fun onCreate() {
         super.onCreate()
         registerReceivers()
-        YtDlp.updateAsync(isPythonExecutable = false)
     }
 
     override fun onBind(intent: Intent?) = binder
@@ -383,16 +381,17 @@ class StreamService : Service(), CoroutineScope by MainScope(), KoinComponent {
 
     @RequiresApi(Build.VERSION_CODES.O)
     private fun createChannel() =
-        (getSystemService(NOTIFICATION_SERVICE)!! as NotificationManager)
+        notificationManager
             .createNotificationChannel(
                 NotificationChannel(
                     STREAM_CHANNEL_ID,
                     "Stream",
                     NotificationManager.IMPORTANCE_DEFAULT
                 ).apply {
-                    setShowBadge(true)
                     lockscreenVisibility = Notification.VISIBILITY_PUBLIC
                     setSound(null, null)
+                    enableVibration(false)
+                    enableLights(false)
                 }
             )
 
@@ -561,10 +560,20 @@ class StreamService : Service(), CoroutineScope by MainScope(), KoinComponent {
 
     // --------------------------- Notification for Oreo+ ---------------------------
 
+    @kotlin.OptIn(ExperimentalCoroutinesApi::class)
+    @RequiresApi(Build.VERSION_CODES.O)
+    private val notificationBuilderOreo = currentMetadata.mapLatest {
+        Notification
+            .Builder(applicationContext, STREAM_CHANNEL_ID)
+            .setContent(currentMetadata = it)
+    }
+
     @RequiresApi(Build.VERSION_CODES.O)
     private fun Notification.Builder.setContent(currentMetadata: VideoMetadata?) = this
         .setShowWhen(false)
         .setSmallIcon(R.drawable.stream_icon)
+        .setAutoCancel(false)
+        .setOngoing(true)
         .setContentTitle(
             currentMetadata?.title
                 ?: resources.getString(R.string.stream_no_name)
@@ -581,6 +590,18 @@ class StreamService : Service(), CoroutineScope by MainScope(), KoinComponent {
                 Intent(applicationContext, MainActivity::class.java),
                 PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
             )
+        )
+
+    @RequiresApi(Build.VERSION_CODES.N)
+    private fun Notification.Builder.setActions(isPlaying: Boolean, isLiked: Boolean) = this
+        .setActions(
+            *arrayOf(
+                repeatActionOreo,
+                tenSecsBackActionIfSeekableOreo,
+                getPlayPauseActionOreo(isPlaying),
+                tenSecsForwardActionIfSeekableOreo,
+                getLikeActionOreo(isLiked)
+            ).filterNotNull().toTypedArray()
         )
 
     private inline val repeatActionOreo
@@ -649,31 +670,20 @@ class StreamService : Service(), CoroutineScope by MainScope(), KoinComponent {
         )
     }.build()
 
-    @RequiresApi(Build.VERSION_CODES.O)
-    private fun Notification.Builder.setActions(isPlaying: Boolean, isLiked: Boolean) = this
-        .setActions(
-            *arrayOf(
-                repeatActionOreo,
-                tenSecsBackActionIfSeekableOreo,
-                getPlayPauseActionOreo(isPlaying),
-                tenSecsForwardActionIfSeekableOreo,
-                getLikeActionOreo(isLiked)
-            ).filterNotNull().toTypedArray()
-        )
+    // --------------------------- Notification Compat ---------------------------
 
     @kotlin.OptIn(ExperimentalCoroutinesApi::class)
-    @RequiresApi(Build.VERSION_CODES.O)
-    private val notificationBuilderOreo = currentMetadata.mapLatest {
-        Notification
+    private val notificationBuilderCompat = currentMetadata.mapLatest {
+        NotificationCompat
             .Builder(applicationContext, STREAM_CHANNEL_ID)
             .setContent(currentMetadata = it)
     }
 
-    // --------------------------- Notification Compat ---------------------------
-
     private fun NotificationCompat.Builder.setContent(currentMetadata: VideoMetadata?) = this
         .setShowWhen(false)
         .setSmallIcon(R.drawable.stream_icon)
+        .setAutoCancel(false)
+        .setOngoing(true)
         .setContentTitle(
             currentMetadata?.title
                 ?: resources.getString(R.string.stream_no_name)
@@ -693,6 +703,14 @@ class StreamService : Service(), CoroutineScope by MainScope(), KoinComponent {
                     PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
             )
         )
+
+    private fun NotificationCompat.Builder.setActions(isPlaying: Boolean, isLiked: Boolean) = this
+        .clearActions()
+        .addAction(repeatActionCompat)
+        .also { tenSecsBackActionIfSeekableCompat?.let(it::addAction) }
+        .addAction(getPlayPauseActionCompat(isPlaying))
+        .also { tenSecsForwardActionIfSeekableCompat?.let(it::addAction) }
+        .addAction(getLikeActionCompat(isLiked))
 
     private inline val repeatActionCompat
         get() = NotificationCompat.Action.Builder(
@@ -754,21 +772,6 @@ class StreamService : Service(), CoroutineScope by MainScope(), KoinComponent {
             Actions.AddToFavourite.playbackIntent
         )
     }.build()
-
-    private fun NotificationCompat.Builder.setActions(isPlaying: Boolean, isLiked: Boolean) = this
-        .clearActions()
-        .addAction(repeatActionCompat)
-        .also { tenSecsBackActionIfSeekableCompat?.let(it::addAction) }
-        .addAction(getPlayPauseActionCompat(isPlaying))
-        .also { tenSecsForwardActionIfSeekableCompat?.let(it::addAction) }
-        .addAction(getLikeActionCompat(isLiked))
-
-    @kotlin.OptIn(ExperimentalCoroutinesApi::class)
-    private val notificationBuilderCompat = currentMetadata.mapLatest {
-        NotificationCompat
-            .Builder(applicationContext, STREAM_CHANNEL_ID)
-            .setContent(currentMetadata = it)
-    }
 
     // --------------------------- Handle Notification ---------------------------
 

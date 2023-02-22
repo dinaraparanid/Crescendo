@@ -5,15 +5,20 @@ import android.util.SparseArray
 import at.huber.youtubeExtractor.VideoMeta
 import at.huber.youtubeExtractor.YouTubeExtractor
 import at.huber.youtubeExtractor.YtFile
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlin.coroutines.CoroutineContext
 
 class YoutubeAudioUrlExtractor(
     context: Context,
-    private val onExtractionComplete: (
+    coroutineContext: CoroutineContext = Dispatchers.IO,
+    private val onExtractionComplete: suspend (
         audioUrl: String,
         videoUrl: String,
-        videoMeta: VideoMeta?
+        videoMeta: VideoMeta?,
     ) -> Unit
-) : YouTubeExtractor(context) {
+) : YouTubeExtractor(context), CoroutineScope by CoroutineScope(coroutineContext) {
     override fun onExtractionComplete(ytFiles: SparseArray<YtFile>?, videoMeta: VideoMeta?) {
         ytFiles?.let { youtubeFiles ->
             val audioTag = 140
@@ -27,7 +32,7 @@ class YoutubeAudioUrlExtractor(
                 .filter(String::isNotEmpty)
                 .first()
 
-            onExtractionComplete(audioUrl, videoUrl, videoMeta)
+            launch { onExtractionComplete(audioUrl, videoUrl, videoMeta) }
         }
     }
 }

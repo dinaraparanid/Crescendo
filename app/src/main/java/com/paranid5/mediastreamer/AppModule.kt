@@ -38,6 +38,7 @@ val globalsModule = module {
     single { androidApplication() as MainApplication }
     singleOf(::StreamServiceAccessor)
     factory { (context: Context) -> GlideUtils(context) }
+    singleOf(::KtorClient)
 }
 
 val searchStreamModule = module {
