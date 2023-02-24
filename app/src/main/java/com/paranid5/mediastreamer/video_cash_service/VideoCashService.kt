@@ -23,6 +23,9 @@ import io.ktor.client.HttpClient
 import io.ktor.http.*
 import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.flow.updateAndGet
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import java.io.File
@@ -79,6 +82,8 @@ class VideoCashService : Service(), CoroutineScope by MainScope(), KoinComponent
     private val videoCashQueue: Queue<Pair<String, Boolean>> = ConcurrentLinkedQueue()
     private val videoCashCompletionChannel = Channel<HttpStatusCode>()
     private val videoCashCondVar = AsyncCondVar()
+    private val curVideoCashJobState = MutableStateFlow<Deferred<HttpStatusCode>?>(null)
+    private val curVideoCashFileState = MutableStateFlow<File?>(null)
 
     private val notificationManager by lazy {
         getSystemService(NOTIFICATION_SERVICE) as NotificationManager
@@ -94,14 +99,14 @@ class VideoCashService : Service(), CoroutineScope by MainScope(), KoinComponent
     private val cancelCurVideoReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context?, intent: Intent?) {
             Log.d(TAG, "Canceling video cashing")
-            // TODO: Cancel video cashing
+            mCancelCurVideoCashing()
         }
     }
 
     private val cancelAllReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context?, intent: Intent?) {
             Log.d(TAG, "Canceling all videos cashing")
-            // TODO: Cancel all videos cashing
+            mCancelAllVideosCashing()
         }
     }
 
@@ -222,9 +227,18 @@ class VideoCashService : Service(), CoroutineScope by MainScope(), KoinComponent
         return videoCashCompletionChannel.receive()
     }
 
-    private fun onVideoCashStatusReceived(statusCode: HttpStatusCode) = when {
-        statusCode.isSuccess() -> onVideoCashStatusSuccessful()
-        else -> onVideoCashStatusError(statusCode.value, statusCode.description)
+    private fun clearVideoCashStates() {
+        curVideoCashJobState.update { null }
+        curVideoCashFileState.update { null }
+    }
+
+    private fun onVideoCashStatusReceived(statusCode: HttpStatusCode) {
+        clearVideoCashStates()
+
+        when {
+            statusCode.isSuccess() -> onVideoCashStatusSuccessful()
+            else -> onVideoCashStatusError(statusCode.value, statusCode.description)
+        }
     }
 
     private fun onVideoCashStatusSuccessful() {
@@ -243,12 +257,29 @@ class VideoCashService : Service(), CoroutineScope by MainScope(), KoinComponent
 
             videoCashQueue.poll()?.let { (url, isSaveAsVideo) ->
                 onVideoCashStatusReceived(
-                    statusCode = launchExtractionAndCashingFile(url, isSaveAsVideo)
+                    statusCode = curVideoCashJobState.updateAndGet {
+                        coroutineScope {
+                            async {
+                                launchExtractionAndCashingFile(url, isSaveAsVideo)
+                            }
+                        }
+                    }!!.await()
                 )
             }
         }
 
         stopSelf()
+    }
+
+    internal fun mCancelCurVideoCashing() {
+        curVideoCashJobState.value?.cancel()
+        curVideoCashFileState.value?.delete() // TODO: Delete Permission
+        clearVideoCashStates()
+    }
+
+    internal fun mCancelAllVideosCashing() {
+        videoCashQueue.clear()
+        mCancelCurVideoCashing()
     }
 
     private fun unregisterReceivers() {

@@ -16,22 +16,6 @@ import java.io.File
 
 fun Context.registerReceiverCompat(
     receiver: BroadcastReceiver,
-    vararg actions: String,
-) = when {
-    Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU -> registerReceiver(
-        receiver,
-        IntentFilter().also { actions.forEach(it::addAction) },
-        Context.RECEIVER_NOT_EXPORTED
-    )
-
-    else -> registerReceiver(
-        receiver,
-        IntentFilter().also { actions.forEach(it::addAction) },
-    )
-}
-
-fun Context.registerReceiverCompat(
-    receiver: BroadcastReceiver,
     filter: IntentFilter,
 ) = when {
     Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU -> registerReceiver(
@@ -42,6 +26,14 @@ fun Context.registerReceiverCompat(
 
     else -> registerReceiver(receiver, filter)
 }
+
+fun Context.registerReceiverCompat(
+    receiver: BroadcastReceiver,
+    vararg actions: String,
+) = registerReceiverCompat(
+    receiver = receiver,
+    filter = IntentFilter().also { actions.forEach(it::addAction) }
+)
 
 fun Context.getImageBinaryData(url: String) =
     Glide.with(applicationContext)
@@ -55,8 +47,8 @@ fun Context.getImageBinaryDataCatching(url: String) =
     kotlin.runCatching { getImageBinaryData(url) }
 
 fun Context.setAudioTagsToFile(file: File, videoMetadata: VideoMetadata) =
-    AudioFileIO.read(file).apply {
-        tagOrCreateAndSetDefault.apply {
+    AudioFileIO.read(file).run {
+        tagOrCreateAndSetDefault.run {
             setField(FieldKey.TITLE, videoMetadata.title)
             setField(FieldKey.ARTIST, videoMetadata.author)
 
