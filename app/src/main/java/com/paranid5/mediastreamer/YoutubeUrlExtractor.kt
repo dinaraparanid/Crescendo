@@ -7,17 +7,19 @@ import at.huber.youtubeExtractor.YouTubeExtractor
 import at.huber.youtubeExtractor.YtFile
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.launch
 import kotlin.coroutines.CoroutineContext
 
-class YoutubeAudioUrlExtractor(
+class YoutubeUrlExtractor<T>(
     context: Context,
     coroutineContext: CoroutineContext = Dispatchers.IO,
+    private val videoExtractionChannel: Channel<T>? = null,
     private val onExtractionComplete: suspend (
         audioUrl: String,
         videoUrl: String,
         videoMeta: VideoMeta?,
-    ) -> Unit
+    ) -> T
 ) : YouTubeExtractor(context), CoroutineScope by CoroutineScope(coroutineContext) {
     override fun onExtractionComplete(ytFiles: SparseArray<YtFile>?, videoMeta: VideoMeta?) {
         ytFiles?.let { youtubeFiles ->
@@ -32,7 +34,9 @@ class YoutubeAudioUrlExtractor(
                 .filter(String::isNotEmpty)
                 .first()
 
-            launch { onExtractionComplete(audioUrl, videoUrl, videoMeta) }
+            launch {
+                videoExtractionChannel?.send(onExtractionComplete(audioUrl, videoUrl, videoMeta))
+            }
         }
     }
 }

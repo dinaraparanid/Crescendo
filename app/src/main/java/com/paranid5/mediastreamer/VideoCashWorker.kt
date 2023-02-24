@@ -27,8 +27,7 @@ import org.koin.core.component.inject
 import java.io.File
 import java.net.URI
 
-// TODO: Change to service and store in video queue
-
+@Deprecated("Use VideoCashService instead")
 class VideoCashWorker(appContext: Context, workerParams: WorkerParameters) :
     CoroutineWorker(appContext, workerParams), KoinComponent {
     companion object : KoinComponent {
@@ -192,12 +191,12 @@ class VideoCashWorker(appContext: Context, workerParams: WorkerParameters) :
     }
 
     private fun cashFile(isSaveAsVideo: Boolean) =
-        YoutubeAudioUrlExtractor(context = applicationContext) { audioUrl, videoUrl, videoMeta ->
+        YoutubeUrlExtractor(context = applicationContext) { audioUrl, videoUrl, videoMeta ->
             val videoMetadata = videoMeta?.let(::VideoMetadata) ?: VideoMetadata()
 
             when {
                 isSaveAsVideo -> ktorClient.downloadFile(
-                    url = videoUrl,
+                    fileUrl = videoUrl,
                     storeFile = createVideoFile(
                         url = audioUrl,
                         videoMetadata = videoMetadata
@@ -205,7 +204,7 @@ class VideoCashWorker(appContext: Context, workerParams: WorkerParameters) :
                 )
 
                 else -> ktorClient.downloadFile(
-                    url = audioUrl,
+                    fileUrl = audioUrl,
                     storeFile = createAudioFile(
                         url = audioUrl,
                         videoMetadata = videoMetadata

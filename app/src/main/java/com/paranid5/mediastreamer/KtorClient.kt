@@ -18,10 +18,10 @@ fun KtorClient() = HttpClient(Android) {
 }
 
 suspend inline fun HttpClient.downloadFile(
-    url: String,
+    fileUrl: String,
     storeFile: File
 ): HttpStatusCode {
-    val response = get(url)
+    val response = get(fileUrl)
     val status = response.status
 
     if (status.isSuccess()) {

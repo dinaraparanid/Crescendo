@@ -8,7 +8,8 @@
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
-    <uses-permission android:name="android.permission.MANAGE_EXTERNAL_STORAGE"/>
+    <uses-permission android:name="android.permission.MANAGE_EXTERNAL_STORAGE"
+        tools:ignore="ScopedStorage" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"
         android:maxSdkVersion="29"/>
 
@@ -45,6 +46,9 @@
         <service
             android:name=".stream_service.StreamService"
             android:foregroundServiceType="mediaPlayback" />
+        <service
+            android:name=".video_cash_service.VideoCashService"
+            android:foregroundServiceType="dataSync" />
     </application>
 
 </manifest>

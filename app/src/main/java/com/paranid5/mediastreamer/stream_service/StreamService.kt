@@ -5,7 +5,6 @@ import android.app.*
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
-import android.content.IntentFilter
 import android.graphics.drawable.Icon
 import android.media.session.MediaController
 import android.media.session.MediaSession
@@ -29,12 +28,13 @@ import arrow.core.Either
 import at.huber.youtubeExtractor.VideoMeta
 import com.paranid5.mediastreamer.R
 import com.paranid5.mediastreamer.StorageHandler
-import com.paranid5.mediastreamer.YoutubeAudioUrlExtractor
+import com.paranid5.mediastreamer.YoutubeUrlExtractor
 import com.paranid5.mediastreamer.data.VideoMetadata
 import com.paranid5.mediastreamer.presentation.MainActivity
 import com.paranid5.mediastreamer.presentation.streaming.*
 import com.paranid5.mediastreamer.presentation.ui.screens.*
 import com.paranid5.mediastreamer.utils.GlideUtils
+import com.paranid5.mediastreamer.utils.extensions.registerReceiverCompat
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
 import org.koin.core.component.KoinComponent
@@ -49,7 +49,7 @@ class StreamService : Service(), CoroutineScope by MainScope(), KoinComponent {
         private const val PLAYBACK_UPDATE_COOLDOWN = 500L
         private const val TEN_SECS_AS_MILLIS = 10000
 
-        private const val SERVICE_LOCATION = "com.paranid5.mediastreamer.stream_service.StreamService"
+        private const val SERVICE_LOCATION = "com.paranid5.mediastreamer.stream_service"
         const val Broadcast_PAUSE = "$SERVICE_LOCATION.PAUSE"
         const val Broadcast_RESUME = "$SERVICE_LOCATION.RESUME"
         const val Broadcast_SWITCH_VIDEO = "$SERVICE_LOCATION.SWITCH_VIDEO"
@@ -72,45 +72,66 @@ class StreamService : Service(), CoroutineScope by MainScope(), KoinComponent {
 
         const val URL_ARG = "url"
         const val POSITION_ARG = "position"
-        const val SAVE_AS_VIDEO_ARG = "save_as_video"
 
         private const val ADJUST_PERIOD_TIME_OFFSETS = true
         private val TAG = StreamService::class.simpleName!!
+
+        internal inline val Intent.mUrlArgOrNull
+            get() = getStringExtra(URL_ARG)
+
+        internal inline val Intent.mUrlArg
+            get() = mUrlArgOrNull!!
     }
 
-    sealed class Actions(val requestCode: Int) {
-        object Pause : Actions(NOTIFICATION_ID + 1)
-        object Resume : Actions(NOTIFICATION_ID + 2)
-        object TenSecsBack : Actions(NOTIFICATION_ID + 3)
-        object TenSecsForward : Actions(NOTIFICATION_ID + 4)
-        object AddToFavourite : Actions(NOTIFICATION_ID + 5)
-        object RemoveFromFavourite : Actions(NOTIFICATION_ID + 6)
-        object ChangeRepeat : Actions(NOTIFICATION_ID + 7)
-        object Dismiss : Actions(NOTIFICATION_ID + 8)
+    sealed class Actions(val requestCode: Int, val playbackAction: String) {
+        object Pause : Actions(
+            requestCode = NOTIFICATION_ID + 1,
+            playbackAction = Broadcast_PAUSE
+        )
+
+        object Resume : Actions(
+            requestCode = NOTIFICATION_ID + 2,
+            playbackAction = Broadcast_RESUME
+        )
+
+        object TenSecsBack : Actions(
+            requestCode = NOTIFICATION_ID + 3,
+            playbackAction = Broadcast_10_SECS_BACK
+        )
+
+        object TenSecsForward : Actions(
+            requestCode = NOTIFICATION_ID + 4,
+            playbackAction = Broadcast_10_SECS_FORWARD
+        )
+
+        object AddToFavourite : Actions(
+            requestCode = NOTIFICATION_ID + 5,
+            playbackAction = Broadcast_ADD_TO_FAVOURITE
+        )
+
+        object RemoveFromFavourite : Actions(
+            requestCode = NOTIFICATION_ID + 6,
+            playbackAction = Broadcast_REMOVE_FROM_FAVOURITE
+        )
+
+        object ChangeRepeat : Actions(
+            requestCode = NOTIFICATION_ID + 7,
+            playbackAction = Broadcast_CHANGE_REPEAT
+        )
+
+        object Dismiss : Actions(
+            requestCode = NOTIFICATION_ID + 8,
+            playbackAction = Broadcast_DISMISS_NOTIFICATION
+        )
     }
 
     private inline val Actions.playbackIntent: PendingIntent
-        get() {
-            val playbackAction = Intent(
-                when (this) {
-                    Actions.Resume -> Broadcast_RESUME
-                    Actions.Pause -> Broadcast_PAUSE
-                    Actions.TenSecsBack -> Broadcast_10_SECS_BACK
-                    Actions.TenSecsForward -> Broadcast_10_SECS_FORWARD
-                    Actions.AddToFavourite -> Broadcast_ADD_TO_FAVOURITE
-                    Actions.RemoveFromFavourite -> Broadcast_REMOVE_FROM_FAVOURITE
-                    Actions.ChangeRepeat -> Broadcast_CHANGE_REPEAT
-                    Actions.Dismiss -> Broadcast_DISMISS_NOTIFICATION
-                }
-            )
-
-            return PendingIntent.getBroadcast(
-                this@StreamService,
-                requestCode,
-                playbackAction,
-                PendingIntent.FLAG_MUTABLE
-            )
-        }
+        get() = PendingIntent.getBroadcast(
+            this@StreamService,
+            requestCode,
+            Intent(playbackAction),
+            PendingIntent.FLAG_MUTABLE
+        )
 
     private val binder = object : Binder() {}
     private val storageHandler by inject<StorageHandler>()
@@ -309,16 +330,16 @@ class StreamService : Service(), CoroutineScope by MainScope(), KoinComponent {
     }
 
     private fun registerReceivers() {
-        registerReceiver(pauseReceiver, IntentFilter(Broadcast_PAUSE))
-        registerReceiver(resumeReceiver, IntentFilter(Broadcast_RESUME))
-        registerReceiver(switchVideoReceiver, IntentFilter(Broadcast_SWITCH_VIDEO))
-        registerReceiver(tenSecsBackReceiver, IntentFilter(Broadcast_10_SECS_BACK))
-        registerReceiver(tenSecsForwardReceiver, IntentFilter(Broadcast_10_SECS_FORWARD))
-        registerReceiver(seekToReceiver, IntentFilter(Broadcast_SEEK_TO))
-        registerReceiver(addToFavouriteReceiver, IntentFilter(Broadcast_ADD_TO_FAVOURITE))
-        registerReceiver(removeFromFavouriteReceiver, IntentFilter(Broadcast_REMOVE_FROM_FAVOURITE))
-        registerReceiver(repeatChangedReceiver, IntentFilter(Broadcast_CHANGE_REPEAT))
-        registerReceiver(dismissNotificationReceiver, IntentFilter(Broadcast_DISMISS_NOTIFICATION))
+        registerReceiverCompat(pauseReceiver, Broadcast_PAUSE)
+        registerReceiverCompat(resumeReceiver, Broadcast_RESUME)
+        registerReceiverCompat(switchVideoReceiver, Broadcast_SWITCH_VIDEO)
+        registerReceiverCompat(tenSecsBackReceiver, Broadcast_10_SECS_BACK)
+        registerReceiverCompat(tenSecsForwardReceiver, Broadcast_10_SECS_FORWARD)
+        registerReceiverCompat(seekToReceiver, Broadcast_SEEK_TO)
+        registerReceiverCompat(addToFavouriteReceiver, Broadcast_ADD_TO_FAVOURITE)
+        registerReceiverCompat(removeFromFavouriteReceiver, Broadcast_REMOVE_FROM_FAVOURITE)
+        registerReceiverCompat(repeatChangedReceiver, Broadcast_CHANGE_REPEAT)
+        registerReceiverCompat(dismissNotificationReceiver, Broadcast_DISMISS_NOTIFICATION)
     }
 
     override fun onCreate() {
@@ -343,7 +364,7 @@ class StreamService : Service(), CoroutineScope by MainScope(), KoinComponent {
         initMediaSession()
         launch { startNotificationObserving() }
 
-        intent.urlArgOrNull?.let { url ->
+        intent.mUrlArgOrNull?.let { url ->
             // New stream
             launch { mStoreCurrentUrl(url) }
             mPlayNewStream(url)
@@ -380,20 +401,18 @@ class StreamService : Service(), CoroutineScope by MainScope(), KoinComponent {
     }
 
     @RequiresApi(Build.VERSION_CODES.O)
-    private fun createChannel() =
-        notificationManager
-            .createNotificationChannel(
-                NotificationChannel(
-                    STREAM_CHANNEL_ID,
-                    "Stream",
-                    NotificationManager.IMPORTANCE_DEFAULT
-                ).apply {
-                    lockscreenVisibility = Notification.VISIBILITY_PUBLIC
-                    setSound(null, null)
-                    enableVibration(false)
-                    enableLights(false)
-                }
-            )
+    private fun createChannel() = notificationManager.createNotificationChannel(
+        NotificationChannel(
+            STREAM_CHANNEL_ID,
+            "Stream",
+            NotificationManager.IMPORTANCE_DEFAULT
+        ).apply {
+            lockscreenVisibility = Notification.VISIBILITY_PUBLIC
+            setSound(null, null)
+            enableVibration(false)
+            enableLights(false)
+        }
+    )
 
     private suspend inline fun updateAndSendPlaybackPosition() {
         sendBroadcast(
@@ -438,7 +457,7 @@ class StreamService : Service(), CoroutineScope by MainScope(), KoinComponent {
 
     @OptIn(UnstableApi::class)
     private fun playStream(url: String, initialPosition: Long = 0) =
-        YoutubeAudioUrlExtractor(context = this) { audioUrl, videoUrl, videoMeta ->
+        YoutubeUrlExtractor(context = this) { audioUrl, videoUrl, videoMeta ->
             val audioSource = ProgressiveMediaSource
                 .Factory(DefaultHttpDataSource.Factory())
                 .createMediaSource(MediaItem.fromUri(audioUrl))
@@ -470,12 +489,6 @@ class StreamService : Service(), CoroutineScope by MainScope(), KoinComponent {
         launch { storeCurrentUrl(url) }
         playStream(url, initialPosition)
     }
-
-    private inline val Intent.urlArgOrNull
-        get() = getStringExtra(URL_ARG)
-
-    internal inline val Intent.mUrlArg
-        get() = getStringExtra(URL_ARG)!!
 
     internal suspend inline fun mRestartPlayer(): Unit =
         storageHandler.currentUrlState.collectLatest { url -> playStream(url) }
