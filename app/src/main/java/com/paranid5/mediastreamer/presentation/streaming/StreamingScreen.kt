@@ -1,6 +1,8 @@
 package com.paranid5.mediastreamer.presentation.streaming
 
 import android.graphics.Bitmap
+import android.os.Build
+import android.widget.Toast
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -27,16 +29,19 @@ import com.paranid5.mediastreamer.presentation.BroadcastReceiver
 import com.paranid5.mediastreamer.presentation.ui.theme.LocalAppColors
 import com.paranid5.mediastreamer.utils.GlideUtils
 import com.paranid5.mediastreamer.utils.extensions.timeString
+import com.paranid5.mediastreamer.video_cash_service.VideoCashResponse
 import org.koin.androidx.compose.get
 
 private const val BROADCAST_LOCATION = "com.paranid5.mediastreamer.presentation.ui.screens"
 const val Broadcast_IS_PLAYING_CHANGED = "$BROADCAST_LOCATION.IS_PLAYING_CHANGED"
 const val Broadcast_CUR_POSITION_CHANGED = "$BROADCAST_LOCATION.CUR_POSITION_CHANGED"
 const val Broadcast_IS_REPEATING_CHANGED = "$BROADCAST_LOCATION.IS_REPEATING_CHANGED"
+const val Broadcast_VIDEO_CASH_COMPLETED = "$BROADCAST_LOCATION.VIDEO_CASH_COMPLETED"
 
 const val IS_PLAYING_ARG = "is_playing"
 const val CUR_POSITION_ARG = "cur_position"
 const val IS_REPEATING_ARG = "is_repeating"
+const val VIDEO_CASH_STATUS = "video_cash_status"
 
 @Composable
 fun StreamingScreen(
@@ -394,10 +399,33 @@ private fun DownloadButton(
     streamingUIHandler: StreamingUIHandler = get()
 ) {
     val colors = LocalAppColors.current.value
+    val context = LocalContext.current
+
+    val errorStringRes = stringResource(R.string.error)
+    val successfulCashingStringRes = stringResource(R.string.video_cashed)
+
+    BroadcastReceiver(action = Broadcast_VIDEO_CASH_COMPLETED) { ctx, intent ->
+        val status = intent!!.getSerializableExtra(VIDEO_CASH_STATUS)!! as VideoCashResponse
+
+        Toast
+            .makeText(
+                context,
+                when (status) {
+                    is VideoCashResponse.Error -> {
+                        val (httpCode, description) = status
+                        "$errorStringRes $httpCode: $description"
+                    }
+
+                    VideoCashResponse.Success -> successfulCashingStringRes
+                },
+                Toast.LENGTH_LONG
+            )
+            .show()
+    }
 
     IconButton(
         modifier = modifier, // TODO: save as video dialog
-        onClick = { streamingUIHandler.launchVideoCashWorker(isSaveAsVideo = false) }
+        onClick = { streamingUIHandler.launchVideoCashService(isSaveAsVideo = false) }
     ) {
         Icon(
             modifier = Modifier.size(30.dp),

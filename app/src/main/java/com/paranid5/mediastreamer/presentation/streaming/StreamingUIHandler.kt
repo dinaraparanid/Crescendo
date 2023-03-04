@@ -1,16 +1,16 @@
 package com.paranid5.mediastreamer.presentation.streaming
 
-import com.paranid5.mediastreamer.*
+import com.paranid5.mediastreamer.StorageHandler
 import com.paranid5.mediastreamer.presentation.UIHandler
 import com.paranid5.mediastreamer.stream_service.StreamServiceAccessor
+import com.paranid5.mediastreamer.video_cash_service.VideoCashServiceAccessor
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
-import org.koin.core.qualifier.named
 
 class StreamingUIHandler(private val serviceAccessor: StreamServiceAccessor) :
     UIHandler, KoinComponent {
     private val storageHandler by inject<StorageHandler>()
-    private val titlePlaceholder by inject<String>(named(STREAM_WITH_NO_NAME))
+    private val videoCashServiceAccessor by inject<VideoCashServiceAccessor>()
 
     fun sendSeekTo10SecsBackBroadcast() = serviceAccessor.sendSeekTo10SecsBackBroadcast()
 
@@ -25,9 +25,9 @@ class StreamingUIHandler(private val serviceAccessor: StreamServiceAccessor) :
 
     fun sendChangeRepeatBroadcast() = serviceAccessor.sendChangeRepeatBroadcast()
 
-    fun launchVideoCashWorker(isSaveAsVideo: Boolean) = VideoCashWorker.launch(
-        url = storageHandler.currentUrlState.value,
-        videoTitle = storageHandler.currentMetadataState.value?.title ?: titlePlaceholder,
-        saveAsVideo = isSaveAsVideo
-    )
+    fun launchVideoCashService(isSaveAsVideo: Boolean) =
+        videoCashServiceAccessor.startCashingOrAddToQueue(
+            videoUrl = storageHandler.currentUrlState.value,
+            isSaveAsVideo = isSaveAsVideo
+        )
 }

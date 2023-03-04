@@ -4,11 +4,9 @@ import android.app.Service
 import android.content.Intent
 import android.os.Build
 import com.paranid5.mediastreamer.MainApplication
+import com.paranid5.mediastreamer.ServiceAccessor
 
-class StreamServiceAccessor(private val application: MainApplication) {
-    private inline val appContext
-        get() = application.applicationContext
-
+class StreamServiceAccessor(application: MainApplication) : ServiceAccessor(application) {
     private fun Intent.putStreamUrlIfNotNull(url: String?) = apply {
         if (url != null) putExtra(StreamService.URL_ARG, url)
     }
@@ -28,9 +26,6 @@ class StreamServiceAccessor(private val application: MainApplication) {
             Service.BIND_AUTO_CREATE
         )
     }
-
-    private fun sendBroadcast(intent: Intent) = application.sendBroadcast(intent)
-    private fun sendBroadcast(action: String) = sendBroadcast(Intent(action))
 
     private fun switchToNextStream(url: String?) = sendBroadcast(
         Intent(StreamService.Broadcast_SWITCH_VIDEO).putStreamUrlIfNotNull(url)

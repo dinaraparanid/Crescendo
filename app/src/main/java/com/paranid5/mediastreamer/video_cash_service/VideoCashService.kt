@@ -12,9 +12,13 @@ import android.provider.MediaStore
 import android.util.Log
 import androidx.annotation.RequiresApi
 import arrow.core.Either
+import com.paranid5.mediastreamer.R
 import com.paranid5.mediastreamer.YoutubeUrlExtractor
 import com.paranid5.mediastreamer.data.VideoMetadata
 import com.paranid5.mediastreamer.downloadFile
+import com.paranid5.mediastreamer.presentation.MainActivity
+import com.paranid5.mediastreamer.presentation.streaming.Broadcast_VIDEO_CASH_COMPLETED
+import com.paranid5.mediastreamer.presentation.streaming.VIDEO_CASH_STATUS
 import com.paranid5.mediastreamer.utils.AsyncCondVar
 import com.paranid5.mediastreamer.utils.extensions.insertMediaFileToMediaStore
 import com.paranid5.mediastreamer.utils.extensions.registerReceiverCompat
@@ -23,9 +27,7 @@ import io.ktor.client.HttpClient
 import io.ktor.http.*
 import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.Channel
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.update
-import kotlinx.coroutines.flow.updateAndGet
+import kotlinx.coroutines.flow.*
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import java.io.File
@@ -42,9 +44,6 @@ class VideoCashService : Service(), CoroutineScope by MainScope(), KoinComponent
         const val Broadcast_CASH_NEXT_VIDEO = "$SERVICE_LOCATION.CASH_NEXT_VIDEO"
         const val Broadcast_CANCEL_CUR_VIDEO = "$SERVICE_LOCATION.CANCEL_CUR_VIDEO"
         const val Broadcast_CANCEL_ALL = "$SERVICE_LOCATION.CANCEL_ALL"
-
-        private const val ACTION_CANCEL_CUR_VIDEO = "cancel_cur_video"
-        private const val ACTION_CANCEL_ALL = "cancel_all"
 
         const val URL_ARG = "url"
         const val SAVE_AS_VIDEO_ARG = "save_as_video"
@@ -80,19 +79,29 @@ class VideoCashService : Service(), CoroutineScope by MainScope(), KoinComponent
     private val ktorClient by inject<HttpClient>()
 
     private val videoCashQueue: Queue<Pair<String, Boolean>> = ConcurrentLinkedQueue()
+    private val videoCashQueueLenState = MutableStateFlow(0)
+
     private val videoCashCompletionChannel = Channel<HttpStatusCode>()
     private val videoCashCondVar = AsyncCondVar()
+
     private val curVideoCashJobState = MutableStateFlow<Deferred<HttpStatusCode>?>(null)
     private val curVideoCashFileState = MutableStateFlow<File?>(null)
+    private val curVideoMetadataState = MutableStateFlow<VideoMetadata?>(null)
+
+    @Volatile
+    private var isCashingNotificationShown = false
 
     private val notificationManager by lazy {
         getSystemService(NOTIFICATION_SERVICE) as NotificationManager
     }
 
+    private inline val resources
+        get() = applicationContext.resources
+
     private val cashNextVideoReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context?, intent: Intent) {
             Log.d(TAG, "New video added to queue")
-            videoCashQueue.offer(intent.mUrlAndSaveAsVideoArgs)
+            mOfferVideoToQueue(titleToSaveAsVideo = intent.mUrlAndSaveAsVideoArgs)
         }
     }
 
@@ -123,12 +132,38 @@ class VideoCashService : Service(), CoroutineScope by MainScope(), KoinComponent
 
     override fun onBind(intent: Intent?) = binder
 
+    internal fun mOfferVideoToQueue(titleToSaveAsVideo: Pair<String, Boolean>) {
+        videoCashQueue.offer(titleToSaveAsVideo)
+        videoCashQueueLenState.update { videoCashQueue.size }
+    }
+
+    private fun pollVideoFromQueue(): Pair<String, Boolean>? {
+        videoCashQueueLenState.update { videoCashQueue.size - 1 }
+        return videoCashQueue.poll()
+    }
+
+    private suspend inline fun startNotificationObserving(): Unit = combine(
+        curVideoMetadataState,
+        videoCashQueueLenState
+    ) { videoMetadata, videoCashQueueLen ->
+        videoMetadata to videoCashQueueLen
+    }.collectLatest { (videoMetadataOrNull, videoCashQueueLen) ->
+        val videoMetadata = videoMetadataOrNull ?: VideoMetadata()
+
+        when (videoCashQueueLen) {
+            0 -> updateNotification(isCashing = false, videoMetadata, videoCashQueueLen)
+            else -> updateNotification(isCashing = true, videoMetadata, videoCashQueueLen)
+        }
+    }
+
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
             createChannel()
 
-        videoCashQueue.offer(intent!!.mUrlAndSaveAsVideoArgs)
+        mOfferVideoToQueue(titleToSaveAsVideo = intent!!.mUrlAndSaveAsVideoArgs)
+
         launch { launchCashing() }
+        launch { startNotificationObserving() }
         return START_REDELIVER_INTENT
     }
 
@@ -143,7 +178,7 @@ class VideoCashService : Service(), CoroutineScope by MainScope(), KoinComponent
         val relativePath = URI(url).path
 
         File("$mediaDirectory/$relativePath").also { file ->
-            file.createNewFile()
+            file.createNewFile() // TODO: Create file permission
 
             withContext(Dispatchers.IO) {
                 setAudioTagsToFile(file, videoMetadata)
@@ -181,7 +216,7 @@ class VideoCashService : Service(), CoroutineScope by MainScope(), KoinComponent
     private suspend inline fun cashAudioFile(audioUrl: String, videoMetadata: VideoMetadata) =
         ktorClient.downloadFile(
             fileUrl = audioUrl,
-            storeFile = createVideoFile(
+            storeFile = createAudioFile(
                 url = audioUrl,
                 videoMetadata = videoMetadata
             )
@@ -216,6 +251,7 @@ class VideoCashService : Service(), CoroutineScope by MainScope(), KoinComponent
                 else -> Either.Right(videoUrl)
             }
 
+            curVideoMetadataState.update { videoMetadata }
             cashFile(audioOrVideoUrl, videoMetadata)
         }
 
@@ -241,13 +277,15 @@ class VideoCashService : Service(), CoroutineScope by MainScope(), KoinComponent
         }
     }
 
-    private fun onVideoCashStatusSuccessful() {
-        // TODO: Reply about success
-    }
+    private fun onVideoCashStatusSuccessful() = sendBroadcast(
+        Intent(Broadcast_VIDEO_CASH_COMPLETED)
+            .putExtra(VIDEO_CASH_STATUS, VideoCashResponse.Success)
+    )
 
-    private fun onVideoCashStatusError(code: Int, description: String) {
-        // TODO: Reply about error
-    }
+    private fun onVideoCashStatusError(code: Int, description: String) = sendBroadcast(
+        Intent(Broadcast_VIDEO_CASH_COMPLETED)
+            .putExtra(VIDEO_CASH_STATUS, VideoCashResponse.Error(code, description))
+    )
 
     private suspend inline fun launchCashing() {
         while (true) {
@@ -255,7 +293,7 @@ class VideoCashService : Service(), CoroutineScope by MainScope(), KoinComponent
                 if (videoCashCondVar.wait(NEXT_VIDEO_AWAIT_TIMEOUT_MS).isFailure)
                     break
 
-            videoCashQueue.poll()?.let { (url, isSaveAsVideo) ->
+            pollVideoFromQueue()?.let { (url, isSaveAsVideo) ->
                 onVideoCashStatusReceived(
                     statusCode = curVideoCashJobState.updateAndGet {
                         coroutineScope {
@@ -279,6 +317,7 @@ class VideoCashService : Service(), CoroutineScope by MainScope(), KoinComponent
 
     internal fun mCancelAllVideosCashing() {
         videoCashQueue.clear()
+        videoCashQueueLenState.update { 0 }
         mCancelCurVideoCashing()
     }
 
@@ -308,4 +347,96 @@ class VideoCashService : Service(), CoroutineScope by MainScope(), KoinComponent
             enableLights(false)
         }
     )
+
+    private inline val notificationBuilder
+        get() = when {
+            Build.VERSION.SDK_INT >= Build.VERSION_CODES.O ->
+                Notification.Builder(applicationContext, VIDEO_CASH_CHANNEL_ID)
+            else ->
+                Notification.Builder(applicationContext)
+        }
+            .setSmallIcon(R.drawable.save_icon)
+            .setAutoCancel(false)
+            .setContentIntent(
+                PendingIntent.getActivity(
+                    applicationContext,
+                    0,
+                    Intent(applicationContext, MainActivity::class.java),
+                    PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+                )
+            )
+
+    private fun getCashingNotificationBuilder(
+        videoMetadata: VideoMetadata,
+        videoCashQueueLen: Int
+    ) = notificationBuilder
+        .setContentTitle("${resources.getString(R.string.downloading)}: $videoMetadata")
+        .setContentText("${resources.getString(R.string.tracks_in_queue)}: $videoCashQueueLen")
+        .setOngoing(true)
+        .addAction(cancelCurVideoAction)
+        .addAction(cancelAllAction)
+
+    private inline val cancelCurVideoAction
+        get() = when {
+            Build.VERSION.SDK_INT >= Build.VERSION_CODES.M -> Notification.Action.Builder(
+                null,
+                resources.getString(R.string.cancel),
+                Actions.CancelCurVideo.playbackIntent
+            )
+
+            else -> Notification.Action.Builder(
+                0,
+                resources.getString(R.string.cancel),
+                Actions.CancelCurVideo.playbackIntent
+            )
+        }.build()
+
+    private inline val cancelAllAction
+        get() = when {
+            Build.VERSION.SDK_INT >= Build.VERSION_CODES.M -> Notification.Action.Builder(
+                null,
+                resources.getString(R.string.cancel_all),
+                Actions.CancelAll.playbackIntent
+            )
+
+            else -> Notification.Action.Builder(
+                0,
+                resources.getString(R.string.cancel_all),
+                Actions.CancelAll.playbackIntent
+            )
+        }.build()
+
+    private inline val finishedNotificationBuilder
+        get() = notificationBuilder
+            .setContentTitle(resources.getString(R.string.video_cashed))
+            .setOngoing(false)
+
+    private fun buildNotification(
+        isCashing: Boolean,
+        videoMetadata: VideoMetadata,
+        videoCashQueueLen: Int
+    ) = when {
+        isCashing -> getCashingNotificationBuilder(videoMetadata, videoCashQueueLen)
+        else -> finishedNotificationBuilder
+    }.build()
+
+    private fun showCashingNotification(videoMetadata: VideoMetadata, videoCashQueueLen: Int) {
+        isCashingNotificationShown = true
+        startForeground(
+            NOTIFICATION_ID,
+            buildNotification(isCashing = true, videoMetadata, videoCashQueueLen)
+        )
+    }
+
+    private fun updateNotification(
+        isCashing: Boolean,
+        videoMetadata: VideoMetadata,
+        videoCashQueueLen: Int
+    ) {
+        isCashingNotificationShown = isCashing
+        notificationManager.notify(
+            NOTIFICATION_ID,
+            buildNotification(isCashing, videoMetadata, videoCashQueueLen)
+        )
+    }
 }

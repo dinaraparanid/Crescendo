@@ -10,6 +10,7 @@ import com.paranid5.mediastreamer.presentation.streaming.StreamingUIHandler
 import com.paranid5.mediastreamer.presentation.streaming.StreamingViewModel
 import com.paranid5.mediastreamer.stream_service.StreamServiceAccessor
 import com.paranid5.mediastreamer.utils.GlideUtils
+import com.paranid5.mediastreamer.video_cash_service.VideoCashServiceAccessor
 import org.koin.android.ext.koin.androidApplication
 import org.koin.android.ext.koin.androidContext
 import org.koin.androidx.viewmodel.dsl.viewModelOf
@@ -21,7 +22,7 @@ import org.koin.dsl.module
 const val STREAM_WITH_NO_NAME = "stream_no_name"
 const val UNKNOWN_STREAMER = "unknown_streamer"
 
-val resourcesModule = module {
+private val resourcesModule = module {
     factory(named(STREAM_WITH_NO_NAME)) {
         androidContext().resources.getString(R.string.stream_no_name)
     }
@@ -31,29 +32,33 @@ val resourcesModule = module {
     }
 }
 
-val globalsModule = module {
-    includes(resourcesModule)
+private val serviceAccessors = module {
+    singleOf(::StreamServiceAccessor)
+    singleOf(::VideoCashServiceAccessor)
+}
+
+private val globalsModule = module {
+    includes(resourcesModule, serviceAccessors)
 
     singleOf(::StorageHandler)
     single { androidApplication() as MainApplication }
-    singleOf(::StreamServiceAccessor)
     factory { (context: Context) -> GlideUtils(context) }
     singleOf(::KtorClient)
 }
 
-val searchStreamModule = module {
+private val searchStreamModule = module {
     singleOf(::SearchStreamUIHandler)
     factory { (currentText: String?) -> SearchStreamPresenter(currentText) }
     viewModelOf(::SearchStreamViewModel)
 }
 
-val streamingModule = module {
+private val streamingModule = module {
     singleOf(::StreamingUIHandler)
     factoryOf(::StreamingPresenter)
     viewModelOf(::StreamingViewModel)
 }
 
-val uiModule = module {
+private val uiModule = module {
     includes(searchStreamModule, streamingModule)
     singleOf(::StreamButtonUIHandler)
 }
