@@ -7,14 +7,23 @@ import com.paranid5.mediastreamer.MainApplication
 import com.paranid5.mediastreamer.ServiceAccessor
 
 class VideoCashServiceAccessor(application: MainApplication) : ServiceAccessor(application) {
-    private fun Intent.putUrlAndSaveAsVideo(videoUrl: String, isSaveAsVideo: Boolean) = apply {
+    private fun Intent.putVideoCashDataArgs(
+        videoUrl: String,
+        desiredFilename: String,
+        isSaveAsVideo: Boolean
+    ) = apply {
         putExtra(VideoCashService.URL_ARG, videoUrl)
+        putExtra(VideoCashService.FILENAME_ARG, desiredFilename)
         putExtra(VideoCashService.SAVE_AS_VIDEO_ARG, isSaveAsVideo)
     }
 
-    private fun startVideoCashService(videoUrl: String, isSaveAsVideo: Boolean) {
+    private fun startVideoCashService(
+        videoUrl: String,
+        desiredFilename: String,
+        isSaveAsVideo: Boolean
+    ) {
         val serviceIntent = Intent(appContext, VideoCashService::class.java)
-            .putUrlAndSaveAsVideo(videoUrl, isSaveAsVideo)
+            .putVideoCashDataArgs(videoUrl, desiredFilename, isSaveAsVideo)
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
             appContext.startForegroundService(serviceIntent)
@@ -28,19 +37,29 @@ class VideoCashServiceAccessor(application: MainApplication) : ServiceAccessor(a
         )
     }
 
-    fun cashNextVideo(videoUrl: String, isSaveAsVideo: Boolean) = sendBroadcast(
+    private fun cashNextVideo(
+        videoUrl: String,
+        desiredFilename: String,
+        isSaveAsVideo: Boolean
+    ) = sendBroadcast(
         Intent(VideoCashService.Broadcast_CASH_NEXT_VIDEO)
-            .putUrlAndSaveAsVideo(videoUrl, isSaveAsVideo)
+            .putVideoCashDataArgs(videoUrl, desiredFilename, isSaveAsVideo)
     )
 
-    fun cancelCurVideo() = sendBroadcast(VideoCashService.Broadcast_CANCEL_CUR_VIDEO)
-    fun cancelAll() = sendBroadcast(VideoCashService.Broadcast_CANCEL_ALL)
+    private fun startCashing(videoUrl: String, desiredFilename: String, isSaveAsVideo: Boolean) =
+        startVideoCashService(videoUrl, desiredFilename, isSaveAsVideo)
 
-    private fun startCashing(videoUrl: String, isSaveAsVideo: Boolean) =
-        startVideoCashService(videoUrl, isSaveAsVideo)
+    fun startCashingOrAddToQueue(
+        videoUrl: String,
+        desiredFilename: String,
+        isSaveAsVideo: Boolean
+    ) = when {
+        application.isVideoCashServiceConnected -> cashNextVideo(
+            videoUrl,
+            desiredFilename,
+            isSaveAsVideo
+        )
 
-    fun startCashingOrAddToQueue(videoUrl: String, isSaveAsVideo: Boolean) = when {
-        application.isVideoCashServiceConnected -> cashNextVideo(videoUrl, isSaveAsVideo)
-        else -> startCashing(videoUrl, isSaveAsVideo)
+        else -> startCashing(videoUrl, desiredFilename, isSaveAsVideo)
     }
 }

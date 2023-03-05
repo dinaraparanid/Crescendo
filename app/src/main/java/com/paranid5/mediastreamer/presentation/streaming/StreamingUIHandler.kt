@@ -25,9 +25,10 @@ class StreamingUIHandler(private val serviceAccessor: StreamServiceAccessor) :
 
     fun sendChangeRepeatBroadcast() = serviceAccessor.sendChangeRepeatBroadcast()
 
-    fun launchVideoCashService(isSaveAsVideo: Boolean) =
+    fun launchVideoCashService(desiredFilename: String, isSaveAsVideo: Boolean) =
         videoCashServiceAccessor.startCashingOrAddToQueue(
             videoUrl = storageHandler.currentUrlState.value,
+            desiredFilename = desiredFilename,
             isSaveAsVideo = isSaveAsVideo
         )
 }

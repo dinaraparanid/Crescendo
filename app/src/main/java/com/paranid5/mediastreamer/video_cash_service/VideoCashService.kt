@@ -25,6 +25,10 @@ import com.paranid5.mediastreamer.utils.extensions.registerReceiverCompat
 import com.paranid5.mediastreamer.utils.extensions.setAudioTagsToFile
 import io.ktor.client.HttpClient
 import io.ktor.http.*
+import it.sauronsoftware.jave.AudioAttributes
+import it.sauronsoftware.jave.Encoder
+import it.sauronsoftware.jave.EncodingAttributes
+import it.sauronsoftware.jave.VideoAttributes
 import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.*
@@ -46,13 +50,18 @@ class VideoCashService : Service(), CoroutineScope by MainScope(), KoinComponent
         const val Broadcast_CANCEL_ALL = "$SERVICE_LOCATION.CANCEL_ALL"
 
         const val URL_ARG = "url"
+        const val FILENAME_ARG = "filename"
         const val SAVE_AS_VIDEO_ARG = "save_as_video"
 
         private val TAG = VideoCashService::class.simpleName!!
         private const val NEXT_VIDEO_AWAIT_TIMEOUT_MS = 15000L
 
-        internal inline val Intent.mUrlAndSaveAsVideoArgs
-            get() = getStringExtra(URL_ARG)!! to getBooleanExtra(SAVE_AS_VIDEO_ARG, true)
+        internal inline val Intent.mVideoCashDataArg
+            get() = VideoCashData(
+                url = getStringExtra(URL_ARG)!!,
+                desiredFilename = getStringExtra(FILENAME_ARG)!!,
+                isSaveAsVideo = getBooleanExtra(SAVE_AS_VIDEO_ARG, true)
+            )
     }
 
     sealed class Actions(val requestCode: Int, val playbackAction: String) {
@@ -75,10 +84,17 @@ class VideoCashService : Service(), CoroutineScope by MainScope(), KoinComponent
             PendingIntent.FLAG_MUTABLE
         )
 
+    internal data class VideoCashData(
+        val url: String,
+        val desiredFilename: String,
+        val isSaveAsVideo: Boolean
+    )
+
     private val binder = object : Binder() {}
     private val ktorClient by inject<HttpClient>()
+    private val encoder = Encoder()
 
-    private val videoCashQueue: Queue<Pair<String, Boolean>> = ConcurrentLinkedQueue()
+    private val videoCashQueue: Queue<VideoCashData> = ConcurrentLinkedQueue()
     private val videoCashQueueLenState = MutableStateFlow(0)
 
     private val videoCashCompletionChannel = Channel<HttpStatusCode>()
@@ -101,7 +117,7 @@ class VideoCashService : Service(), CoroutineScope by MainScope(), KoinComponent
     private val cashNextVideoReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context?, intent: Intent) {
             Log.d(TAG, "New video added to queue")
-            mOfferVideoToQueue(titleToSaveAsVideo = intent.mUrlAndSaveAsVideoArgs)
+            mOfferVideoToQueue(videoCashData = intent.mVideoCashDataArg)
         }
     }
 
@@ -132,12 +148,12 @@ class VideoCashService : Service(), CoroutineScope by MainScope(), KoinComponent
 
     override fun onBind(intent: Intent?) = binder
 
-    internal fun mOfferVideoToQueue(titleToSaveAsVideo: Pair<String, Boolean>) {
-        videoCashQueue.offer(titleToSaveAsVideo)
+    internal fun mOfferVideoToQueue(videoCashData: VideoCashData) {
+        videoCashQueue.offer(videoCashData)
         videoCashQueueLenState.update { videoCashQueue.size }
     }
 
-    private fun pollVideoFromQueue(): Pair<String, Boolean>? {
+    private fun pollVideoFromQueue(): VideoCashData? {
         videoCashQueueLenState.update { videoCashQueue.size - 1 }
         return videoCashQueue.poll()
     }
@@ -160,7 +176,7 @@ class VideoCashService : Service(), CoroutineScope by MainScope(), KoinComponent
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
             createChannel()
 
-        mOfferVideoToQueue(titleToSaveAsVideo = intent!!.mUrlAndSaveAsVideoArgs)
+        mOfferVideoToQueue(videoCashData = intent!!.mVideoCashDataArg)
 
         launch { launchCashing() }
         launch { startNotificationObserving() }
@@ -169,7 +185,7 @@ class VideoCashService : Service(), CoroutineScope by MainScope(), KoinComponent
 
     // --------------------- File Cashing ---------------------
 
-    private suspend inline fun createMediaFile(
+    private suspend inline fun createStoreMediaFile(
         url: String,
         videoMetadata: VideoMetadata,
         mediaDirectory: String,
@@ -193,53 +209,152 @@ class VideoCashService : Service(), CoroutineScope by MainScope(), KoinComponent
         }
     }
 
-    private suspend inline fun createAudioFile(
+    private suspend inline fun createDesiredMediaFile(
+        filename: String,
+        ext: String,
+        videoMetadata: VideoMetadata,
+        mediaDirectory: String,
+        externalContentUri: Uri,
+    ) = coroutineScope {
+        File("$mediaDirectory/$filename.$ext").also { file ->
+            file.createNewFile() // TODO: Create file permission
+
+            withContext(Dispatchers.IO) {
+                setAudioTagsToFile(file, videoMetadata)
+
+                insertMediaFileToMediaStore(
+                    externalContentUri,
+                    file.absolutePath,
+                    mediaDirectory,
+                    videoMetadata
+                )
+            }
+        }
+    }
+
+    private suspend inline fun createStoreAudioFile(
         url: String,
         videoMetadata: VideoMetadata
-    ) = createMediaFile(
+    ) = createStoreMediaFile(
         url = url,
         videoMetadata = videoMetadata,
         mediaDirectory = Environment.DIRECTORY_MUSIC,
         externalContentUri = MediaStore.Audio.Media.EXTERNAL_CONTENT_URI
     )
 
-    private suspend inline fun createVideoFile(
+    private suspend inline fun createDesiredAudioFile(
+        filename: String,
+        ext: String,
+        videoMetadata: VideoMetadata
+    ) = createDesiredMediaFile(
+        filename = filename,
+        ext = ext,
+        videoMetadata = videoMetadata,
+        mediaDirectory = Environment.DIRECTORY_MUSIC,
+        externalContentUri = MediaStore.Audio.Media.EXTERNAL_CONTENT_URI
+    )
+
+    private suspend inline fun createStoreVideoFile(
         url: String,
         videoMetadata: VideoMetadata
-    ) = createMediaFile(
+    ) = createStoreMediaFile(
         url = url,
         videoMetadata = videoMetadata,
         mediaDirectory = Environment.DIRECTORY_MOVIES,
         externalContentUri = MediaStore.Video.Media.EXTERNAL_CONTENT_URI
     )
 
-    private suspend inline fun cashAudioFile(audioUrl: String, videoMetadata: VideoMetadata) =
-        ktorClient.downloadFile(
-            fileUrl = audioUrl,
-            storeFile = createAudioFile(
-                url = audioUrl,
-                videoMetadata = videoMetadata
-            )
+    private suspend inline fun createDesiredVideoFile(
+        filename: String,
+        ext: String,
+        videoMetadata: VideoMetadata
+    ) = createDesiredMediaFile(
+        filename = filename,
+        ext = ext,
+        videoMetadata = videoMetadata,
+        mediaDirectory = Environment.DIRECTORY_MOVIES,
+        externalContentUri = MediaStore.Video.Media.EXTERNAL_CONTENT_URI
+    )
+
+    private suspend inline fun cashAudioFile(
+        desiredFilename: String,
+        audioUrl: String,
+        videoMetadata: VideoMetadata
+    ): HttpStatusCode {
+        val storeFile = createStoreAudioFile(
+            url = audioUrl,
+            videoMetadata = videoMetadata
         )
 
-    private suspend inline fun cashVideoFile(videoUrl: String, videoMetadata: VideoMetadata) =
-        ktorClient.downloadFile(
-            fileUrl = videoUrl,
-            storeFile = createVideoFile(
-                url = videoUrl,
+        val status = ktorClient.downloadFile(fileUrl = audioUrl, storeFile = storeFile)
+
+        if (status.isSuccess()) {
+            val desiredFile = createDesiredAudioFile(
+                filename = desiredFilename,
+                ext = "mp3",
                 videoMetadata = videoMetadata
             )
+
+            val attributes = EncodingAttributes().apply {
+                setAudioAttributes(
+                    AudioAttributes().apply {
+                        setCodec(AudioAttributes.DIRECT_STREAM_COPY)
+                        setChannels(2)
+                    }
+                )
+
+                setFormat("mp3")
+            }
+
+            encoder.encode(storeFile, desiredFile, attributes)
+        }
+
+        return status
+    }
+
+    private suspend inline fun cashVideoFile(
+        desiredFilename: String,
+        videoUrl: String,
+        videoMetadata: VideoMetadata
+    ): HttpStatusCode {
+        val storeFile = createStoreVideoFile(
+            url = videoUrl,
+            videoMetadata = videoMetadata
         )
+
+        val status = ktorClient.downloadFile(fileUrl = videoUrl, storeFile = storeFile)
+
+        if (status.isSuccess()) {
+            val desiredFile = createDesiredVideoFile(
+                filename = desiredFilename,
+                ext = "mp4",
+                videoMetadata = videoMetadata
+            )
+
+            val attributes = EncodingAttributes().apply {
+                setVideoAttributes(
+                    VideoAttributes().apply { setCodec(AudioAttributes.DIRECT_STREAM_COPY) }
+                )
+
+                setFormat("mp4")
+            }
+
+            encoder.encode(storeFile, desiredFile, attributes)
+        }
+
+        return status
+    }
 
     private suspend inline fun cashFile(
+        desiredFilename: String,
         audioOrVideoUrl: Either<String, String>,
         videoMetadata: VideoMetadata
     ) = when (audioOrVideoUrl) {
-        is Either.Left -> cashAudioFile(audioOrVideoUrl.value, videoMetadata)
-        is Either.Right -> cashVideoFile(audioOrVideoUrl.value, videoMetadata)
+        is Either.Left -> cashAudioFile(desiredFilename, audioOrVideoUrl.value, videoMetadata)
+        is Either.Right -> cashVideoFile(desiredFilename, audioOrVideoUrl.value, videoMetadata)
     }
 
-    private fun YoutubeUrlExtractor(isSaveAsVideo: Boolean) =
+    private fun YoutubeUrlExtractor(desiredFilename: String, isSaveAsVideo: Boolean) =
         YoutubeUrlExtractor(
             context = applicationContext,
             videoExtractionChannel = videoCashCompletionChannel
@@ -252,14 +367,15 @@ class VideoCashService : Service(), CoroutineScope by MainScope(), KoinComponent
             }
 
             curVideoMetadataState.update { videoMetadata }
-            cashFile(audioOrVideoUrl, videoMetadata)
+            cashFile(desiredFilename, audioOrVideoUrl, videoMetadata)
         }
 
     private suspend inline fun launchExtractionAndCashingFile(
+        desiredFilename: String,
         url: String,
         isSaveAsVideo: Boolean
     ): HttpStatusCode {
-        YoutubeUrlExtractor(isSaveAsVideo).extract(url)
+        YoutubeUrlExtractor(desiredFilename, isSaveAsVideo).extract(url)
         return videoCashCompletionChannel.receive()
     }
 
@@ -293,12 +409,12 @@ class VideoCashService : Service(), CoroutineScope by MainScope(), KoinComponent
                 if (videoCashCondVar.wait(NEXT_VIDEO_AWAIT_TIMEOUT_MS).isFailure)
                     break
 
-            pollVideoFromQueue()?.let { (url, isSaveAsVideo) ->
+            pollVideoFromQueue()?.let { (url, desiredFilename, isSaveAsVideo) ->
                 onVideoCashStatusReceived(
                     statusCode = curVideoCashJobState.updateAndGet {
                         coroutineScope {
                             async {
-                                launchExtractionAndCashingFile(url, isSaveAsVideo)
+                                launchExtractionAndCashingFile(url, desiredFilename, isSaveAsVideo)
                             }
                         }
                     }!!.await()
