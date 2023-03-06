@@ -29,8 +29,13 @@
     <string name="error">Error</string>
     <string name="cash_properties">Cash Properties</string>
     <string name="filename">File Name</string>
-    <string name="filename_placeholder">file name</string>
+    <string name="filename_placeholder">your file name</string>
     <string name="audio">Audio</string>
     <string name="video">Video</string>
     <string name="start_cashing">Start Cashing</string>
+    <string name="save_as">Save As</string>
+    <string name="permission_required">Permission is required</string>
+    <string name="external_storage_description">App needs access to storage in order to manage cashed files</string>
+    <string name="grant_permission">Grant Permission</string>
+    <string name="ok">OK</string>
 </resources>

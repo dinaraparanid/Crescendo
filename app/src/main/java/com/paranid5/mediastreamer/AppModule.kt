@@ -8,6 +8,8 @@ import com.paranid5.mediastreamer.presentation.search_stream.SearchStreamViewMod
 import com.paranid5.mediastreamer.presentation.streaming.StreamingPresenter
 import com.paranid5.mediastreamer.presentation.streaming.StreamingUIHandler
 import com.paranid5.mediastreamer.presentation.streaming.StreamingViewModel
+import com.paranid5.mediastreamer.presentation.ui.permissions.ExternalStorageDescriptionProvider
+import com.paranid5.mediastreamer.presentation.ui.permissions.externalStoragePermissionQueue
 import com.paranid5.mediastreamer.stream_service.StreamServiceAccessor
 import com.paranid5.mediastreamer.utils.GlideUtils
 import com.paranid5.mediastreamer.video_cash_service.VideoCashServiceAccessor
@@ -21,6 +23,7 @@ import org.koin.dsl.module
 
 const val STREAM_WITH_NO_NAME = "stream_no_name"
 const val UNKNOWN_STREAMER = "unknown_streamer"
+const val EXTERNAL_STORAGE_PERMISSION_QUEUE = "external_storage_permission_queue"
 
 private val resourcesModule = module {
     factory(named(STREAM_WITH_NO_NAME)) {
@@ -37,8 +40,25 @@ private val serviceAccessors = module {
     singleOf(::VideoCashServiceAccessor)
 }
 
+private val permissionDescriptionProviders = module {
+    single {
+        ExternalStorageDescriptionProvider(
+            description = androidContext().resources
+                .getString(R.string.external_storage_description)
+        )
+    }
+}
+
+private val permissionQueues = module {
+    single(named(EXTERNAL_STORAGE_PERMISSION_QUEUE)) { externalStoragePermissionQueue }
+}
+
+private val permissions = module {
+    includes(permissionDescriptionProviders, permissionQueues)
+}
+
 private val globalsModule = module {
-    includes(resourcesModule, serviceAccessors)
+    includes(resourcesModule, serviceAccessors, permissions)
 
     singleOf(::StorageHandler)
     single { androidApplication() as MainApplication }

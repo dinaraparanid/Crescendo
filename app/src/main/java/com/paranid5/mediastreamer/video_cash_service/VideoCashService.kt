@@ -111,7 +111,7 @@ class VideoCashService : Service(), CoroutineScope by MainScope(), KoinComponent
         getSystemService(NOTIFICATION_SERVICE) as NotificationManager
     }
 
-    private inline val resources
+    private inline val res
         get() = applicationContext.resources
 
     private val cashNextVideoReceiver = object : BroadcastReceiver() {
@@ -486,8 +486,8 @@ class VideoCashService : Service(), CoroutineScope by MainScope(), KoinComponent
         videoMetadata: VideoMetadata,
         videoCashQueueLen: Int
     ) = notificationBuilder
-        .setContentTitle("${resources.getString(R.string.downloading)}: $videoMetadata")
-        .setContentText("${resources.getString(R.string.tracks_in_queue)}: $videoCashQueueLen")
+        .setContentTitle("${res.getString(R.string.downloading)}: $videoMetadata")
+        .setContentText("${res.getString(R.string.tracks_in_queue)}: $videoCashQueueLen")
         .setOngoing(true)
         .addAction(cancelCurVideoAction)
         .addAction(cancelAllAction)
@@ -496,13 +496,13 @@ class VideoCashService : Service(), CoroutineScope by MainScope(), KoinComponent
         get() = when {
             Build.VERSION.SDK_INT >= Build.VERSION_CODES.M -> Notification.Action.Builder(
                 null,
-                resources.getString(R.string.cancel),
+                res.getString(R.string.cancel),
                 Actions.CancelCurVideo.playbackIntent
             )
 
             else -> Notification.Action.Builder(
                 0,
-                resources.getString(R.string.cancel),
+                res.getString(R.string.cancel),
                 Actions.CancelCurVideo.playbackIntent
             )
         }.build()
@@ -511,20 +511,20 @@ class VideoCashService : Service(), CoroutineScope by MainScope(), KoinComponent
         get() = when {
             Build.VERSION.SDK_INT >= Build.VERSION_CODES.M -> Notification.Action.Builder(
                 null,
-                resources.getString(R.string.cancel_all),
+                res.getString(R.string.cancel_all),
                 Actions.CancelAll.playbackIntent
             )
 
             else -> Notification.Action.Builder(
                 0,
-                resources.getString(R.string.cancel_all),
+                res.getString(R.string.cancel_all),
                 Actions.CancelAll.playbackIntent
             )
         }.build()
 
     private inline val finishedNotificationBuilder
         get() = notificationBuilder
-            .setContentTitle(resources.getString(R.string.video_cashed))
+            .setContentTitle(res.getString(R.string.video_cashed))
             .setOngoing(false)
 
     private fun buildNotification(

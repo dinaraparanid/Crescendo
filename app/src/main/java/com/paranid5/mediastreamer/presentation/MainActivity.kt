@@ -23,7 +23,8 @@ class MainActivity : ComponentActivity() {
 
                 CompositionLocalProvider(
                     LocalNavController provides mainNavController,
-                    LocalStreamState provides StreamState(StreamStates.SEARCHING)
+                    LocalStreamState provides StreamState(StreamStates.SEARCHING),
+                    LocalActivity provides this
                 ) {
                     App()
                 }
