@@ -9,28 +9,30 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.paranid5.mediastreamer.R
-import com.paranid5.mediastreamer.presentation.BroadcastReceiver
+import com.paranid5.mediastreamer.utils.BroadcastReceiver
 import com.paranid5.mediastreamer.presentation.ui.theme.LocalAppColors
+import kotlinx.coroutines.flow.update
 import org.koin.androidx.compose.get
 
 @Composable
-fun PlaybackButtons(modifier: Modifier = Modifier) =
+fun PlaybackButtons(streamingPresenter: StreamingPresenter, modifier: Modifier = Modifier) =
     Row(modifier.fillMaxWidth()) {
         SeekTo10SecsBackButton(Modifier.weight(2F))
-        PlayButton(Modifier.weight(1F))
+        PlayButton(streamingPresenter, modifier = Modifier.weight(1F))
         SeekTo10SecsForwardButton(Modifier.weight(2F))
     }
 
 @Composable
 private fun PlayButton(
+    streamingPresenter: StreamingPresenter,
     modifier: Modifier = Modifier,
     streamingUIHandler: StreamingUIHandler = get()
 ) {
     val colors = LocalAppColors.current.value
-    var isPlaying by remember { mutableStateOf(false) }
+    val isPlaying by streamingPresenter.isPlaying.collectAsState()
 
     BroadcastReceiver(action = Broadcast_IS_PLAYING_CHANGED) { _, intent ->
-        isPlaying = intent!!.getBooleanExtra(IS_PLAYING_ARG, !isPlaying)
+        streamingPresenter.isPlaying.update { intent!!.getBooleanExtra(IS_PLAYING_ARG, !isPlaying) }
     }
 
     when {
@@ -72,7 +74,9 @@ private fun SeekTo10SecsBackButton(
         onClick = { streamingUIHandler.sendSeekTo10SecsBackBroadcast() }
     ) {
         Icon(
-            modifier = Modifier.width(100.dp).height(50.dp),
+            modifier = Modifier
+                .width(100.dp)
+                .height(50.dp),
             painter = painterResource(R.drawable.prev_track),
             contentDescription = stringResource(R.string.ten_secs_back),
             tint = colors.primary
@@ -92,7 +96,9 @@ private fun SeekTo10SecsForwardButton(
         onClick = { streamingUIHandler.sendSeekTo10SecsForwardBroadcast() }
     ) {
         Icon(
-            modifier = Modifier.width(100.dp).height(50.dp),
+            modifier = Modifier
+                .width(100.dp)
+                .height(50.dp),
             painter = painterResource(R.drawable.next_track),
             contentDescription = stringResource(R.string.ten_secs_forward),
             tint = colors.primary

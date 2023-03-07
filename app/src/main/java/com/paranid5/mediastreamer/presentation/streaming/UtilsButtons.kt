@@ -22,7 +22,7 @@ import androidx.core.content.ContextCompat
 import com.paranid5.mediastreamer.EXTERNAL_STORAGE_PERMISSION_QUEUE
 import com.paranid5.mediastreamer.R
 import com.paranid5.mediastreamer.StorageHandler
-import com.paranid5.mediastreamer.presentation.BroadcastReceiver
+import com.paranid5.mediastreamer.utils.BroadcastReceiver
 import com.paranid5.mediastreamer.presentation.LocalActivity
 import com.paranid5.mediastreamer.presentation.ui.permissions.ExternalStorageDescriptionProvider
 import com.paranid5.mediastreamer.presentation.ui.permissions.PermissionDialog

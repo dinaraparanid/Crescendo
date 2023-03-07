@@ -8,8 +8,6 @@
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
-    <uses-permission android:name="android.permission.MANAGE_EXTERNAL_STORAGE"
-        tools:ignore="ScopedStorage" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"
         android:maxSdkVersion="29"/>
 
@@ -49,6 +47,13 @@
         <service
             android:name=".video_cash_service.VideoCashService"
             android:foregroundServiceType="dataSync" />
+        <receiver
+            android:name=".domain.media_scanner.MediaScannerReceiver"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="com.paranid5.mediastreamer.domain.media_scanner.SCAN_NEXT_FILE"/>
+            </intent-filter>
+        </receiver>
     </application>
 
 </manifest>

@@ -4,11 +4,9 @@ import android.app.*
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
-import android.net.Uri
 import android.os.Binder
 import android.os.Build
 import android.os.Environment
-import android.provider.MediaStore
 import android.util.Log
 import androidx.annotation.RequiresApi
 import arrow.core.Either
@@ -19,11 +17,10 @@ import com.paranid5.mediastreamer.downloadFile
 import com.paranid5.mediastreamer.presentation.MainActivity
 import com.paranid5.mediastreamer.presentation.streaming.Broadcast_VIDEO_CASH_COMPLETED
 import com.paranid5.mediastreamer.presentation.streaming.VIDEO_CASH_STATUS
-import com.paranid5.mediastreamer.utils.AsyncCondVar
-import com.paranid5.mediastreamer.utils.extensions.insertMediaFileToMediaStore
+import com.paranid5.mediastreamer.domain.utils.AsyncCondVar
 import com.paranid5.mediastreamer.utils.extensions.registerReceiverCompat
-import com.paranid5.mediastreamer.utils.extensions.setAudioTagsToFile
-import io.ktor.client.HttpClient
+import com.paranid5.mediastreamer.utils.extensions.sendSetTagsBroadcast
+import io.ktor.client.*
 import io.ktor.http.*
 import it.sauronsoftware.jave.AudioAttributes
 import it.sauronsoftware.jave.Encoder
@@ -187,111 +184,68 @@ class VideoCashService : Service(), CoroutineScope by MainScope(), KoinComponent
 
     private suspend inline fun createStoreMediaFile(
         url: String,
-        videoMetadata: VideoMetadata,
         mediaDirectory: String,
-        externalContentUri: Uri,
     ) = coroutineScope {
-        val relativePath = URI(url).path
-
-        File("$mediaDirectory/$relativePath").also { file ->
-            file.createNewFile() // TODO: Create file permission
-
-            withContext(Dispatchers.IO) {
-                setAudioTagsToFile(file, videoMetadata)
-
-                insertMediaFileToMediaStore(
-                    externalContentUri,
-                    file.absolutePath,
-                    relativePath,
-                    videoMetadata
-                )
-            }
-        }
+        val relativePath = URI(url).path // TODO: Path error
+        File("$mediaDirectory/$relativePath").also(File::createNewFile)
     }
 
-    private suspend inline fun createDesiredMediaFile(
-        filename: String,
-        ext: String,
-        videoMetadata: VideoMetadata,
-        mediaDirectory: String,
-        externalContentUri: Uri,
-    ) = coroutineScope {
-        File("$mediaDirectory/$filename.$ext").also { file ->
-            file.createNewFile() // TODO: Create file permission
+    private fun createDesiredMediaFile(filename: String, ext: String, mediaDirectory: String) =
+        File("$mediaDirectory/$filename.$ext").also(File::createNewFile)
 
-            withContext(Dispatchers.IO) {
-                setAudioTagsToFile(file, videoMetadata)
+    private suspend inline fun createStoreAudioFile(url: String, ) = createStoreMediaFile(
+        url = url,
+        mediaDirectory = Environment.DIRECTORY_MUSIC,
+    )
 
-                insertMediaFileToMediaStore(
-                    externalContentUri,
-                    file.absolutePath,
-                    mediaDirectory,
-                    videoMetadata
-                )
-            }
-        }
+    private fun createDesiredAudioFile(filename: String, videoMetadata: VideoMetadata): File {
+        val file = createDesiredMediaFile(
+            filename = filename,
+            ext = "mp3",
+            mediaDirectory = Environment.DIRECTORY_MUSIC,
+        )
+
+        sendSetTagsBroadcast(
+            filePath = file.absolutePath,
+            isSaveAsVideo = false,
+            videoMetadata = videoMetadata
+        )
+
+        return file
     }
 
-    private suspend inline fun createStoreAudioFile(
-        url: String,
-        videoMetadata: VideoMetadata
-    ) = createStoreMediaFile(
+    private suspend inline fun createStoreVideoFile(url: String) = createStoreMediaFile(
         url = url,
-        videoMetadata = videoMetadata,
-        mediaDirectory = Environment.DIRECTORY_MUSIC,
-        externalContentUri = MediaStore.Audio.Media.EXTERNAL_CONTENT_URI
-    )
-
-    private suspend inline fun createDesiredAudioFile(
-        filename: String,
-        ext: String,
-        videoMetadata: VideoMetadata
-    ) = createDesiredMediaFile(
-        filename = filename,
-        ext = ext,
-        videoMetadata = videoMetadata,
-        mediaDirectory = Environment.DIRECTORY_MUSIC,
-        externalContentUri = MediaStore.Audio.Media.EXTERNAL_CONTENT_URI
-    )
-
-    private suspend inline fun createStoreVideoFile(
-        url: String,
-        videoMetadata: VideoMetadata
-    ) = createStoreMediaFile(
-        url = url,
-        videoMetadata = videoMetadata,
         mediaDirectory = Environment.DIRECTORY_MOVIES,
-        externalContentUri = MediaStore.Video.Media.EXTERNAL_CONTENT_URI
     )
 
-    private suspend inline fun createDesiredVideoFile(
-        filename: String,
-        ext: String,
-        videoMetadata: VideoMetadata
-    ) = createDesiredMediaFile(
-        filename = filename,
-        ext = ext,
-        videoMetadata = videoMetadata,
-        mediaDirectory = Environment.DIRECTORY_MOVIES,
-        externalContentUri = MediaStore.Video.Media.EXTERNAL_CONTENT_URI
-    )
+    private fun createDesiredVideoFile(filename: String, videoMetadata: VideoMetadata): File {
+        val file = createDesiredMediaFile(
+            filename = filename,
+            ext = "mp4",
+            mediaDirectory = Environment.DIRECTORY_MOVIES,
+        )
+
+        sendSetTagsBroadcast(
+            filePath = file.absolutePath,
+            isSaveAsVideo = false,
+            videoMetadata = videoMetadata
+        )
+
+        return file
+    }
 
     private suspend inline fun cashAudioFile(
         desiredFilename: String,
         audioUrl: String,
         videoMetadata: VideoMetadata
     ): HttpStatusCode {
-        val storeFile = createStoreAudioFile(
-            url = audioUrl,
-            videoMetadata = videoMetadata
-        )
-
+        val storeFile = createStoreAudioFile(url = audioUrl)
         val status = ktorClient.downloadFile(fileUrl = audioUrl, storeFile = storeFile)
 
         if (status.isSuccess()) {
             val desiredFile = createDesiredAudioFile(
                 filename = desiredFilename,
-                ext = "mp3",
                 videoMetadata = videoMetadata
             )
 
@@ -317,17 +271,12 @@ class VideoCashService : Service(), CoroutineScope by MainScope(), KoinComponent
         videoUrl: String,
         videoMetadata: VideoMetadata
     ): HttpStatusCode {
-        val storeFile = createStoreVideoFile(
-            url = videoUrl,
-            videoMetadata = videoMetadata
-        )
-
+        val storeFile = createStoreVideoFile(url = videoUrl,)
         val status = ktorClient.downloadFile(fileUrl = videoUrl, storeFile = storeFile)
 
         if (status.isSuccess()) {
             val desiredFile = createDesiredVideoFile(
                 filename = desiredFilename,
-                ext = "mp4",
                 videoMetadata = videoMetadata
             )
 
@@ -371,8 +320,8 @@ class VideoCashService : Service(), CoroutineScope by MainScope(), KoinComponent
         }
 
     private suspend inline fun launchExtractionAndCashingFile(
-        desiredFilename: String,
         url: String,
+        desiredFilename: String,
         isSaveAsVideo: Boolean
     ): HttpStatusCode {
         YoutubeUrlExtractor(desiredFilename, isSaveAsVideo).extract(url)

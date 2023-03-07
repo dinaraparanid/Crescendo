@@ -1,4 +1,4 @@
-package com.paranid5.mediastreamer.utils
+package com.paranid5.mediastreamer.domain.utils
 
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.withTimeout

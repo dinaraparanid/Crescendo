@@ -21,9 +21,12 @@ import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
 import com.paranid5.mediastreamer.R
 import com.paranid5.mediastreamer.StorageHandler
 import com.paranid5.mediastreamer.data.VideoMetadata
-import com.paranid5.mediastreamer.presentation.BroadcastReceiver
+import com.paranid5.mediastreamer.utils.BroadcastReceiver
+import com.paranid5.mediastreamer.presentation.composition_locals.LocalStreamState
+import com.paranid5.mediastreamer.presentation.composition_locals.StreamStates
 import com.paranid5.mediastreamer.presentation.ui.theme.LocalAppColors
 import com.paranid5.mediastreamer.utils.GlideUtils
+import com.paranid5.mediastreamer.utils.OnBackPressedHandler
 import com.paranid5.mediastreamer.utils.extensions.timeString
 import org.koin.androidx.compose.get
 
@@ -40,10 +43,14 @@ const val VIDEO_CASH_STATUS = "video_cash_status"
 
 @Composable
 fun StreamingScreen(
+    viewModel: StreamingViewModel,
     modifier: Modifier = Modifier,
     storageHandler: StorageHandler = get()
 ) {
+    LocalStreamState.current.value = StreamStates.STREAMING
     val metadata by storageHandler.currentMetadataState.collectAsState()
+
+    OnBackPressedHandler()
 
     ConstraintLayout(modifier.fillMaxSize()) {
         val (
@@ -85,7 +92,8 @@ fun StreamingScreen(
         )
 
         PlaybackButtons(
-            Modifier.constrainAs(playbackButtons) {
+            streamingPresenter = viewModel.presenter,
+            modifier = Modifier.constrainAs(playbackButtons) {
                 top.linkTo(titleAndPropertiesButton.bottom, margin = 15.dp)
                 start.linkTo(parent.start, margin = 20.dp)
                 end.linkTo(parent.end, margin = 20.dp)
@@ -131,8 +139,6 @@ private fun VideoCover(metadata: VideoMetadata?, modifier: Modifier = Modifier) 
     ) { requestBuilder ->
         requestBuilder
             .centerCrop()
-            .error(R.drawable.cover_thumbnail)
-            .fallback(R.drawable.cover_thumbnail)
             .transition(DrawableTransitionOptions.withCrossFade(1000))
     }
 }

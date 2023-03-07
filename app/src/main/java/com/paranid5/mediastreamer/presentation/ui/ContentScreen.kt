@@ -14,12 +14,14 @@ import com.paranid5.mediastreamer.presentation.search_stream.SearchStreamScreen
 import com.paranid5.mediastreamer.presentation.ui.screens.*
 import com.paranid5.mediastreamer.presentation.search_stream.SearchStreamViewModel
 import com.paranid5.mediastreamer.presentation.streaming.StreamingScreen
+import com.paranid5.mediastreamer.presentation.streaming.StreamingViewModel
 import org.koin.androidx.compose.koinViewModel
 
 @Composable
 fun ContentScreen(
     padding: PaddingValues,
-    searchStreamViewModel: SearchStreamViewModel = koinViewModel()
+    searchStreamViewModel: SearchStreamViewModel = koinViewModel(),
+    streamingViewModel: StreamingViewModel = koinViewModel()
 ) {
     NavHost(
         navController = LocalNavController.current.value!!,
@@ -34,7 +36,7 @@ fun ContentScreen(
         }
 
         composable(route = Screens.StreamScreen.Streaming.title) {
-            StreamingScreen()
+            StreamingScreen(viewModel = streamingViewModel)
         }
 
         composable(route = Screens.AboutApp.title) {

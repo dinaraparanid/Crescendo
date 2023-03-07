@@ -2,7 +2,6 @@ package com.paranid5.mediastreamer.presentation.search_stream
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.Button
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.*
@@ -18,12 +17,12 @@ import com.paranid5.mediastreamer.presentation.StateChangedCallback
 import com.paranid5.mediastreamer.presentation.composition_locals.LocalStreamState
 import com.paranid5.mediastreamer.presentation.composition_locals.StreamStates
 import com.paranid5.mediastreamer.presentation.ui.OnUIStateChanged
+import com.paranid5.mediastreamer.utils.OnBackPressedHandler
 
 @Composable
 private fun Label(modifier: Modifier = Modifier) =
     Text(text = "${stringResource(R.string.enter_stream_url)}:", modifier = modifier)
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun UrlEditor(
     modifier: Modifier = Modifier,
@@ -68,6 +67,8 @@ fun SearchStreamScreen(
     modifier: Modifier = Modifier,
     viewModel: SearchStreamViewModel
 ) {
+    LocalStreamState.current.value = StreamStates.STREAMING
+
     val inputText by viewModel
         .presenter
         .currentTextState
@@ -90,6 +91,12 @@ fun SearchStreamScreen(
             viewModel.finishUrlSetting()
         }
     )
+
+    OnBackPressedHandler { isStackEmpty ->
+        if (isStackEmpty) {
+            // TODO: Click twice to exit
+        }
+    }
 
     Box(modifier.fillMaxSize()) {
         Column(Modifier.align(Alignment.Center)) {

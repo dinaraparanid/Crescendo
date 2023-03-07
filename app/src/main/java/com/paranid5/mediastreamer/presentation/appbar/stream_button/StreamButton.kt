@@ -3,9 +3,7 @@ package com.paranid5.mediastreamer.presentation.appbar.stream_button
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
+import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -28,16 +26,19 @@ fun StreamButton(
         modifier = modifier,
         onClick = { streamButtonUIHandler.navigateToStream(navHostController, currentScreenTitle) }
     ) {
-        Icon(
-            painter = painterResource(
-                id = when (currentScreenTitle) {
-                    Screens.StreamScreen.Streaming.title -> R.drawable.search_icon
-                    else -> R.drawable.stream_icon
-                }
-            ),
-            contentDescription = stringResource(id = R.string.home),
-            tint = LocalAppColors.current.value.primary,
-            modifier = Modifier.size(30.dp)
-        )
+        if (currentScreenTitle == Screens.StreamScreen.Streaming.title)
+            Icon(
+                painter = painterResource(id = R.drawable.search_icon),
+                contentDescription = stringResource(id = R.string.home),
+                tint = LocalAppColors.current.value.primary,
+                modifier = Modifier.size(30.dp)
+            )
+        else
+            Icon(
+                painter = painterResource(id = R.drawable.stream_icon),
+                contentDescription = stringResource(id = R.string.home),
+                tint = LocalAppColors.current.value.primary,
+                modifier = Modifier.size(30.dp)
+            )
     }
 }

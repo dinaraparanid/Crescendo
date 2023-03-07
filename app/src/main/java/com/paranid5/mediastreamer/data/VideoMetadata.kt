@@ -1,5 +1,7 @@
 package com.paranid5.mediastreamer.data
 
+import android.os.Parcel
+import android.os.Parcelable
 import at.huber.youtubeExtractor.VideoMeta
 import com.paranid5.mediastreamer.STREAM_WITH_NO_NAME
 import com.paranid5.mediastreamer.UNKNOWN_STREAMER
@@ -14,8 +16,18 @@ data class VideoMetadata(
     @JvmField val author: String = get(named(UNKNOWN_STREAMER)),
     @JvmField val covers: List<String> = listOf(),
     @JvmField val lenInMillis: Long = 0
-) {
-    private companion object : KoinComponent
+) : Parcelable {
+    companion object CREATOR : Parcelable.Creator<VideoMetadata>, KoinComponent {
+        override fun createFromParcel(parcel: Parcel) = VideoMetadata(parcel)
+        override fun newArray(size: Int) = arrayOfNulls<VideoMetadata>(size)
+    }
+
+    constructor(parcel: Parcel) : this(
+        parcel.readString()!!,
+        parcel.readString()!!,
+        parcel.createStringArrayList()!!,
+        parcel.readLong()
+    )
 
     constructor(youtubeMeta: VideoMeta) : this(
         title = youtubeMeta.title,
@@ -25,4 +37,13 @@ data class VideoMetadata(
             listOf(maxResImageUrl, hqImageUrl, mqImageUrl, sdImageUrl, thumbUrl)
         }
     )
+
+    override fun writeToParcel(parcel: Parcel, flags: Int) {
+        parcel.writeString(title)
+        parcel.writeString(author)
+        parcel.writeStringList(covers)
+        parcel.writeLong(lenInMillis)
+    }
+
+    override fun describeContents() = 0
 }

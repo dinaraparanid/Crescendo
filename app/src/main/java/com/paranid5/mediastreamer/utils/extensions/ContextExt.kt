@@ -1,14 +1,12 @@
 package com.paranid5.mediastreamer.utils.extensions
 
-import android.content.BroadcastReceiver
-import android.content.ContentValues
-import android.content.Context
-import android.content.IntentFilter
+import android.content.*
 import android.net.Uri
 import android.os.Build
 import android.provider.MediaStore
 import com.bumptech.glide.Glide
 import com.paranid5.mediastreamer.data.VideoMetadata
+import com.paranid5.mediastreamer.presentation.MainActivity
 import org.jaudiotagger.audio.AudioFileIO
 import org.jaudiotagger.tag.FieldKey
 import org.jaudiotagger.tag.images.ArtworkFactory
@@ -75,7 +73,7 @@ fun Context.insertMediaFileToMediaStore(
     absoluteFilePath: String,
     relativeFilePath: String,
     videoMetadata: VideoMetadata
-) {
+): Uri? {
     val uri = applicationContext.contentResolver.insert(
         externalContentUri,
         ContentValues().apply {
@@ -102,4 +100,18 @@ fun Context.insertMediaFileToMediaStore(
             uri, ContentValues().apply { put(MediaStore.Audio.Media.IS_PENDING, 0) },
             null, null
         )
+
+    return uri
 }
+
+fun Context.sendSetTagsBroadcast(
+    filePath: String,
+    isSaveAsVideo: Boolean,
+    videoMetadata: VideoMetadata,
+) = sendBroadcast(
+    Intent(MainActivity.Broadcast_SET_TAGS).apply {
+        putExtra(MainActivity.FILE_PATH_ARG, filePath)
+        putExtra(MainActivity.IS_VIDEO_ARG, isSaveAsVideo)
+        putExtra(MainActivity.VIDEO_METADATA_ARG, videoMetadata)
+    }
+)

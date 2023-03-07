@@ -469,7 +469,7 @@ class StreamService : Service(), CoroutineScope by MainScope(), KoinComponent {
                 .createMediaSource(MediaItem.fromUri(videoUrl))*/
 
             currentMetadata.update { videoMeta?.let(::VideoMetadata) }
-            launch { storeMetadata(videoMeta) }
+            launch(Dispatchers.IO) { storeMetadata(videoMeta) }
 
             player.run {
                 setMediaSource(

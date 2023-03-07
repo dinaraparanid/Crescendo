@@ -13,7 +13,7 @@ import kotlin.coroutines.CoroutineContext
 
 class YoutubeUrlExtractor<T>(
     context: Context,
-    coroutineContext: CoroutineContext = Dispatchers.IO,
+    coroutineContext: CoroutineContext = Dispatchers.Main,
     private val videoExtractionChannel: Channel<T>? = null,
     private val onExtractionComplete: suspend (
         audioUrl: String,
@@ -35,7 +35,8 @@ class YoutubeUrlExtractor<T>(
                 .first()
 
             launch {
-                videoExtractionChannel?.send(onExtractionComplete(audioUrl, videoUrl, videoMeta))
+                val onExtractionCompleteResult = onExtractionComplete(audioUrl, videoUrl, videoMeta)
+                videoExtractionChannel?.send(onExtractionCompleteResult)
             }
         }
     }

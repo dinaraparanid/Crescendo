@@ -7,7 +7,6 @@ import androidx.compose.ui.Modifier
 import com.paranid5.mediastreamer.presentation.appbar.AppBar
 import com.paranid5.mediastreamer.presentation.appbar.stream_button.StreamButton
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun App() = Scaffold(
     modifier = Modifier.fillMaxSize(),
