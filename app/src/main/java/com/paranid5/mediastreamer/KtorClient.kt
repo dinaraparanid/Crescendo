@@ -1,5 +1,6 @@
 package com.paranid5.mediastreamer
 
+import android.util.Log
 import io.ktor.client.*
 import io.ktor.client.call.*
 import io.ktor.client.engine.android.*
@@ -17,23 +18,35 @@ fun KtorClient() = HttpClient(Android) {
     }
 }
 
-suspend inline fun HttpClient.downloadFile(
-    fileUrl: String,
-    storeFile: File
-): HttpStatusCode {
-    val response = get(fileUrl)
-    val status = response.status
+suspend inline fun HttpClient.downloadFile(fileUrl: String, storeFile: File): HttpStatusCode {
+    Log.d("Ktor Client", "Downloading $fileUrl")
 
-    if (status.isSuccess()) {
-        val channel = response.body<ByteReadChannel>()
+    val status = prepareGet(fileUrl).execute { response ->
+        val status = response.status
 
-        while (!channel.isClosedForRead) {
-            val packet = channel.readRemaining(DEFAULT_BUFFER_SIZE.toLong())
+        if (status.isSuccess()) {
+            val channel = response.body<ByteReadChannel>()
 
-            while (packet.isNotEmpty)
-                storeFile.appendBytes(packet.readBytes())
+            while (!channel.isClosedForRead) {
+                val packet = channel.readRemaining(DEFAULT_BUFFER_SIZE.toLong())
+
+                while (packet.isNotEmpty) {
+                    val bytes = packet.readBytes()
+                    storeFile.appendBytes(bytes)
+
+                    // TODO: Send number of read bytes to channel for notification
+                    Log.d(
+                        "Ktor Client",
+                        "Read ${bytes.size} bytes from ${response.contentLength()}"
+                    )
+                }
+            }
         }
+
+        status
     }
+
+    Log.d("Ktor Client", "Downloaded")
 
     return status
 }

@@ -2,10 +2,7 @@ package com.paranid5.mediastreamer.presentation
 
 import android.app.Activity
 import android.app.RecoverableSecurityException
-import android.content.BroadcastReceiver
-import android.content.Context
-import android.content.Intent
-import android.content.IntentFilter
+import android.content.*
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
@@ -16,6 +13,7 @@ import androidx.activity.compose.setContent
 import androidx.activity.result.IntentSenderRequest
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.media3.common.MimeTypes
 import androidx.navigation.compose.rememberNavController
 import com.paranid5.mediastreamer.data.VideoMetadata
 import com.paranid5.mediastreamer.domain.media_scanner.scanNextFile
@@ -67,7 +65,14 @@ class MainActivity : ComponentActivity() {
 
         private fun isAllowedToModify(uri: Uri) =
             try {
-                contentResolver.openInputStream(uri)?.close()
+                contentResolver.openFileDescriptor(uri, "w", null)?.close()
+
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q)
+                    applicationContext.contentResolver.update(
+                        uri, ContentValues().apply { put(MediaStore.Audio.Media.IS_PENDING, 0) },
+                        null, null
+                    )
+
                 true
             } catch (securityException: SecurityException) {
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
@@ -92,14 +97,16 @@ class MainActivity : ComponentActivity() {
             externalContentUri: Uri,
             filePath: String,
             mediaDirectory: String,
-            videoMetadata: VideoMetadata
+            videoMetadata: VideoMetadata,
+            mimeType: String,
         ) = coroutineScope {
             withContext(Dispatchers.IO) {
                 val isAllowedToModify = insertMediaFileToMediaStore(
                     externalContentUri,
                     filePath,
                     mediaDirectory,
-                    videoMetadata
+                    videoMetadata,
+                    mimeType
                 )?.let { isAllowedToModify(uri = it) } ?: false
 
                 when {
@@ -119,8 +126,19 @@ class MainActivity : ComponentActivity() {
             val videoMetadata = intent.mVideoMetadataArg
 
             val externalContentUri = when {
-                isVideo -> MediaStore.Video.Media.EXTERNAL_CONTENT_URI
-                else -> MediaStore.Audio.Media.EXTERNAL_CONTENT_URI
+                isVideo -> when {
+                    Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q ->
+                        MediaStore.Video.Media.getContentUri(MediaStore.VOLUME_EXTERNAL_PRIMARY)
+                    else ->
+                        MediaStore.Video.Media.EXTERNAL_CONTENT_URI
+                }
+
+                else -> when {
+                    Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q ->
+                        MediaStore.Audio.Media.getContentUri(MediaStore.VOLUME_EXTERNAL_PRIMARY)
+                    else ->
+                        MediaStore.Audio.Media.EXTERNAL_CONTENT_URI
+                }
             }
 
             val mediaDirectory = when {
@@ -128,12 +146,18 @@ class MainActivity : ComponentActivity() {
                 else -> Environment.DIRECTORY_MUSIC
             }
 
+            val mimeType = when {
+                isVideo -> MimeTypes.VIDEO_MP4
+                else -> MimeTypes.AUDIO_MPEG
+            }
+
             launch {
                 setTags(
                     externalContentUri,
                     filePath,
                     mediaDirectory,
-                    videoMetadata
+                    videoMetadata,
+                    mimeType
                 )
             }
         }

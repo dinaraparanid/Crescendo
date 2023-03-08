@@ -72,13 +72,14 @@ fun Context.insertMediaFileToMediaStore(
     externalContentUri: Uri,
     absoluteFilePath: String,
     relativeFilePath: String,
-    videoMetadata: VideoMetadata
+    videoMetadata: VideoMetadata,
+    mimeType: String,
 ): Uri? {
     val uri = applicationContext.contentResolver.insert(
         externalContentUri,
         ContentValues().apply {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q)
-                put(MediaStore.MediaColumns.IS_PENDING, 0)
+                put(MediaStore.MediaColumns.IS_PENDING, 1)
 
             put(MediaStore.MediaColumns.TITLE, videoMetadata.title)
             put(MediaStore.MediaColumns.ARTIST, videoMetadata.author)
@@ -89,17 +90,12 @@ fun Context.insertMediaFileToMediaStore(
             put(MediaStore.MediaColumns.DURATION, videoMetadata.lenInMillis)
             put(MediaStore.MediaColumns.DATA, absoluteFilePath)
             put(MediaStore.MediaColumns.DISPLAY_NAME, videoMetadata.title)
+            put(MediaStore.MediaColumns.MIME_TYPE, mimeType)
 
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q)
                 put(MediaStore.MediaColumns.RELATIVE_PATH, relativeFilePath)
         }
     )
-
-    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q && uri != null)
-        applicationContext.contentResolver.update(
-            uri, ContentValues().apply { put(MediaStore.Audio.Media.IS_PENDING, 0) },
-            null, null
-        )
 
     return uri
 }
