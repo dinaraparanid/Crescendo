@@ -10,11 +10,13 @@ import android.os.Environment
 import android.util.Log
 import androidx.annotation.RequiresApi
 import arrow.core.Either
+import arrow.core.merge
 import com.paranid5.mediastreamer.R
 import com.paranid5.mediastreamer.YoutubeUrlExtractor
 import com.paranid5.mediastreamer.data.VideoMetadata
 import com.paranid5.mediastreamer.domain.utils.AsyncCondVar
 import com.paranid5.mediastreamer.downloadFile
+import com.paranid5.mediastreamer.getFileExt
 import com.paranid5.mediastreamer.presentation.MainActivity
 import com.paranid5.mediastreamer.presentation.streaming.Broadcast_VIDEO_CASH_COMPLETED
 import com.paranid5.mediastreamer.presentation.streaming.VIDEO_CASH_STATUS
@@ -182,70 +184,61 @@ class VideoCashService : Service(), CoroutineScope by MainScope(), KoinComponent
         File("${getFullMediaDirectory(mediaDirectory)}/$filename.$ext")
             .also(File::createNewFile)
 
-    private fun createAudioFile(filename: String, videoMetadata: VideoMetadata): File {
-        val file = createMediaFile(
-            filename = filename,
-            ext = "mp3",
-            mediaDirectory = Environment.DIRECTORY_MUSIC,
-        )
+    @Deprecated("Use createVideoFile() instead")
+    private fun createAudioFile(filename: String, ext: String) = createMediaFile(
+        filename = filename,
+        ext = ext,
+        mediaDirectory = Environment.DIRECTORY_MUSIC,
+    )
 
-        sendSetTagsBroadcast(
-            filePath = file.absolutePath,
-            isSaveAsVideo = false,
-            videoMetadata = videoMetadata
-        )
+    private fun createVideoFile(filename: String, ext: String) = createMediaFile(
+        filename = filename,
+        ext = ext,
+        mediaDirectory = Environment.DIRECTORY_MOVIES,
+    )
 
-        return file
-    }
-
-    private fun createVideoFile(filename: String, videoMetadata: VideoMetadata): File {
-        val file = createMediaFile(
-            filename = filename,
-            ext = "mp4",
-            mediaDirectory = Environment.DIRECTORY_MOVIES,
-        )
-
-        sendSetTagsBroadcast(
-            filePath = file.absolutePath,
-            isSaveAsVideo = false,
-            videoMetadata = videoMetadata
-        )
-
-        return file
-    }
-
+    @Deprecated("Use cashVideoFile() instead")
     private suspend inline fun cashAudioFile(
         desiredFilename: String,
         audioUrl: String,
         videoMetadata: VideoMetadata
-    ) = ktorClient.downloadFile(
-        fileUrl = audioUrl,
-        storeFile = createAudioFile(
-            filename = desiredFilename,
+    ): HttpStatusCode {
+        val fileExt = ktorClient.getFileExt(audioUrl)
+        val storeFile = createAudioFile(desiredFilename, fileExt)
+        val statusCode = ktorClient.downloadFile(audioUrl, storeFile)
+
+        sendSetTagsBroadcast(
+            filePath = storeFile.absolutePath,
+            isSaveAsVideo = false,
             videoMetadata = videoMetadata
         )
-    )
+
+        return statusCode
+    }
 
     private suspend inline fun cashVideoFile(
         desiredFilename: String,
         videoUrl: String,
         videoMetadata: VideoMetadata
-    ) = ktorClient.downloadFile(
-        fileUrl = videoUrl,
-        storeFile = createVideoFile(
-            filename = desiredFilename,
+    ): HttpStatusCode {
+        val fileExt = ktorClient.getFileExt(videoUrl)
+        val storeFile = createVideoFile(desiredFilename, fileExt)
+        val statusCode = ktorClient.downloadFile(videoUrl, storeFile)
+
+        sendSetTagsBroadcast(
+            filePath = storeFile.absolutePath,
+            isSaveAsVideo = true,
             videoMetadata = videoMetadata
         )
-    )
+
+        return statusCode
+    }
 
     private suspend inline fun cashFile(
         desiredFilename: String,
         audioOrVideoUrl: Either<String, String>,
         videoMetadata: VideoMetadata
-    ) = when (audioOrVideoUrl) {
-        is Either.Left -> cashAudioFile(desiredFilename, audioOrVideoUrl.value, videoMetadata)
-        is Either.Right -> cashVideoFile(desiredFilename, audioOrVideoUrl.value, videoMetadata)
-    }
+    ) = cashVideoFile(desiredFilename, audioOrVideoUrl.merge(), videoMetadata)
 
     private fun YoutubeUrlExtractor(desiredFilename: String, isSaveAsVideo: Boolean) =
         YoutubeUrlExtractor(
@@ -367,7 +360,6 @@ class VideoCashService : Service(), CoroutineScope by MainScope(), KoinComponent
                 Notification.Builder(applicationContext)
         }
             .setSmallIcon(R.drawable.save_icon)
-            .setAutoCancel(false)
             .setContentIntent(
                 PendingIntent.getActivity(
                     applicationContext,
@@ -381,9 +373,10 @@ class VideoCashService : Service(), CoroutineScope by MainScope(), KoinComponent
         videoMetadata: VideoMetadata,
         videoCashQueueLen: Int
     ) = notificationBuilder
-        .setContentTitle("${res.getString(R.string.downloading)}: $videoMetadata")
+        .setContentTitle("${res.getString(R.string.downloading)}: ${videoMetadata.title}")
         .setContentText("${res.getString(R.string.tracks_in_queue)}: $videoCashQueueLen")
         .setOngoing(true)
+        .setAutoCancel(false)
         .addAction(cancelCurVideoAction)
         .addAction(cancelAllAction)
 
@@ -421,6 +414,7 @@ class VideoCashService : Service(), CoroutineScope by MainScope(), KoinComponent
         get() = notificationBuilder
             .setContentTitle(res.getString(R.string.video_cashed))
             .setOngoing(false)
+            .setAutoCancel(true)
 
     private fun buildNotification(
         isCashing: Boolean,

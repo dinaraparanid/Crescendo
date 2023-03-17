@@ -18,7 +18,15 @@ fun KtorClient() = HttpClient(Android) {
     }
 }
 
-suspend inline fun HttpClient.downloadFile(fileUrl: String, storeFile: File): HttpStatusCode {
+suspend inline fun HttpClient.getFileExt(fileUrl: String) =
+    prepareGet(fileUrl).execute { response ->
+        response.headers["content-type"]!!.split("/")[1]
+    }
+
+suspend inline fun HttpClient.downloadFile(
+    fileUrl: String,
+    storeFile: File,
+): HttpStatusCode {
     Log.d("Ktor Client", "Downloading $fileUrl")
 
     val status = prepareGet(fileUrl).execute { response ->
@@ -34,7 +42,8 @@ suspend inline fun HttpClient.downloadFile(fileUrl: String, storeFile: File): Ht
                     val bytes = packet.readBytes()
                     storeFile.appendBytes(bytes)
 
-                    // TODO: Send number of read bytes to channel for notification
+                    // TODO: Progress Channel
+
                     Log.d(
                         "Ktor Client",
                         "Read ${bytes.size} bytes from ${response.contentLength()}"
@@ -47,6 +56,5 @@ suspend inline fun HttpClient.downloadFile(fileUrl: String, storeFile: File): Ht
     }
 
     Log.d("Ktor Client", "Downloaded")
-
     return status
 }

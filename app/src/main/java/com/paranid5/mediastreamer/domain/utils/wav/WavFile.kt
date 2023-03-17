@@ -151,7 +151,7 @@ class WavFile : Closeable {
             if (file.length() != chunkSize + 8)
                 throw Exception("Header chunk size ($chunkSize) does not match file size (${file.length()})")
 
-            var foundFormat = false
+            var isFormatFound = false
             var isDataFound = false
 
             // Search for the Format and Data Chunks
@@ -176,7 +176,7 @@ class WavFile : Closeable {
                 when (chunkID) {
                     FMT_CHUNK_ID.toLong() -> {
                         // Flag that the format chunk has been found
-                        foundFormat = true
+                        isFormatFound = true
 
                         // Read in the header info
                         bytesRead = wavFile.inStream!!.read(wavFile.buffer, 0, 16)
@@ -220,7 +220,7 @@ class WavFile : Closeable {
                         // Check if we've found the format chunk,
                         // If not, throw an exception as we need the format information
                         // before we can read the data chunk
-                        if (!foundFormat)
+                        if (!isFormatFound)
                             throw Exception("Data chunk found before Format chunk")
 
                         // Check that the chunkSize (wav data length) is a multiple of the
@@ -302,7 +302,8 @@ class WavFile : Closeable {
     private enum class IOState { READING, WRITING, CLOSED }
 
     /** File that will be read from or written to */
-    private var file: File? = null
+    var file: File? = null
+        private set
 
     /** Specifies the IO State of the Wav File (used for sanity checking) */
     private var ioState: IOState? = null

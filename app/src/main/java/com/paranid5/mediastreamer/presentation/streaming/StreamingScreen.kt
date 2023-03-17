@@ -121,25 +121,27 @@ private fun VideoCover(metadata: VideoMetadata?, modifier: Modifier = Modifier) 
         coverModel = metadata?.let { glideUtils.getVideoCoverAsync(it).await() }
     }
 
-    GlideImage(
-        modifier = modifier
-            .shadow(
-                elevation = 80.dp,
-                shape = RoundedCornerShape(5.dp),
-                ambientColor = colors.primary,
-                spotColor = colors.primary
-            )
-            .border(
-                width = 30.dp,
-                color = Color.Transparent,
-                shape = RoundedCornerShape(30.dp)
-            ),
-        model = coverModel ?: painterResource(R.drawable.cover_thumbnail),
-        contentDescription = stringResource(R.string.video_cover),
-    ) { requestBuilder ->
-        requestBuilder
-            .centerCrop()
-            .transition(DrawableTransitionOptions.withCrossFade(1000))
+    coverModel.runCatching {
+        GlideImage(
+            modifier = modifier
+                .shadow(
+                    elevation = 80.dp,
+                    shape = RoundedCornerShape(5.dp),
+                    ambientColor = colors.primary,
+                    spotColor = colors.primary
+                )
+                .border(
+                    width = 30.dp,
+                    color = Color.Transparent,
+                    shape = RoundedCornerShape(30.dp)
+                ),
+            model = this,
+            contentDescription = stringResource(R.string.video_cover),
+        ) { requestBuilder ->
+            requestBuilder
+                .centerCrop()
+                .transition(DrawableTransitionOptions.withCrossFade(1000))
+        }
     }
 }
 

@@ -210,7 +210,7 @@ private fun onVideoCashCompleted(status: VideoCashResponse, context: Context) {
                 "$errorStringRes $httpCode: $description"
             }
 
-            VideoCashResponse.Success -> successfulCashingStringRes
+            is VideoCashResponse.Success -> successfulCashingStringRes
         },
         Toast.LENGTH_LONG
     ).show()

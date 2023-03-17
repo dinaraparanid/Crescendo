@@ -68,6 +68,9 @@ fun Context.setAudioTagsToFile(file: File, videoMetadata: VideoMetadata) =
         }
     }
 
+fun Context.setAudioTagsToFileCatching(file: File, videoMetadata: VideoMetadata) =
+    kotlin.runCatching { setAudioTagsToFile(file, videoMetadata) }
+
 fun Context.insertMediaFileToMediaStore(
     externalContentUri: Uri,
     absoluteFilePath: String,

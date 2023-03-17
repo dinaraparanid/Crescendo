@@ -48,6 +48,7 @@ fun CashPropertiesDialog(isDialogShownState: MutableState<Boolean>, modifier: Mo
                 SaveOptionsMenu(fileSaveOptions, selectedSaveOptionIndexState)
                 Spacer(Modifier.height(10.dp))
                 ConfirmButton(
+                    isDialogShownState = isDialogShownState,
                     isSaveAsVideo = isSaveAsVideo,
                     isButtonClickable = isButtonClickable,
                     filename = filenameState.value,
@@ -130,6 +131,7 @@ private fun SaveOptionsMenu(
 
 @Composable
 private fun ConfirmButton(
+    isDialogShownState: MutableState<Boolean>,
     isSaveAsVideo: Boolean,
     isButtonClickable: Boolean,
     filename: String,
@@ -140,7 +142,10 @@ private fun ConfirmButton(
 
     Button(
         modifier = modifier.padding(vertical = 10.dp),
-        onClick = { streamingUIHandler.launchVideoCashService(filename, isSaveAsVideo) },
+        onClick = {
+            streamingUIHandler.launchVideoCashService(filename, isSaveAsVideo)
+            isDialogShownState.value = false
+        },
         enabled = isButtonClickable,
         colors = ButtonDefaults.buttonColors(containerColor = colors.primary)
     ) {

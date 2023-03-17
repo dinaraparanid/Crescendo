@@ -24,6 +24,10 @@ import com.paranid5.mediastreamer.presentation.ui.App
 import com.paranid5.mediastreamer.presentation.ui.theme.MediaStreamerTheme
 import com.paranid5.mediastreamer.utils.extensions.insertMediaFileToMediaStore
 import com.paranid5.mediastreamer.utils.extensions.setAudioTagsToFile
+import com.paranid5.mediastreamer.utils.extensions.setAudioTagsToFileCatching
+import it.sauronsoftware.jave.AudioAttributes
+import it.sauronsoftware.jave.Encoder
+import it.sauronsoftware.jave.EncodingAttributes
 import kotlinx.coroutines.*
 import java.io.File
 
@@ -62,6 +66,7 @@ class MainActivity : ComponentActivity() {
     private val tagsSetterReceiver = object :
         BroadcastReceiver(), CoroutineScope by CoroutineScope(Dispatchers.IO) {
         private val videoDataQueue = ArrayDeque<Pair<String, VideoMetadata>>()
+        private val encoder by lazy(::Encoder)
 
         private fun isAllowedToModify(uri: Uri) =
             try {
@@ -72,7 +77,6 @@ class MainActivity : ComponentActivity() {
                         uri, ContentValues().apply { put(MediaStore.Audio.Media.IS_PENDING, 0) },
                         null, null
                     )
-
                 true
             } catch (securityException: SecurityException) {
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
@@ -93,17 +97,19 @@ class MainActivity : ComponentActivity() {
                 false
             }
 
-        private suspend fun setTags(
+        private suspend inline fun setTags(
             externalContentUri: Uri,
-            filePath: String,
+            file: File,
             mediaDirectory: String,
             videoMetadata: VideoMetadata,
             mimeType: String,
         ) = coroutineScope {
+            val absoluteFilePath = file.absolutePath
+
             withContext(Dispatchers.IO) {
                 val isAllowedToModify = insertMediaFileToMediaStore(
                     externalContentUri,
-                    filePath,
+                    absoluteFilePath,
                     mediaDirectory,
                     videoMetadata,
                     mimeType
@@ -111,19 +117,47 @@ class MainActivity : ComponentActivity() {
 
                 when {
                     isAllowedToModify -> {
-                        setAudioTagsToFile(File(filePath), videoMetadata)
-                        scanNextFile(filePath)
+                        setAudioTagsToFileCatching(file, videoMetadata)
+                        scanNextFile(absoluteFilePath)
                     }
 
-                    else -> videoDataQueue.add(filePath to videoMetadata)
+                    else -> videoDataQueue.add(absoluteFilePath to videoMetadata)
                 }
             }
         }
 
-        private fun getDataAndSetTags(intent: Intent) {
+        /*private fun encodeToMp3(wavFile: File): File {
+            val mp3File = File(
+                wavFile.absolutePath.replace(
+                    ".${Formats.WAV.extension}",
+                    ".${Formats.MP3.extension}"
+                )
+            ).also(File::createNewFile)
+
+            val attributes = EncodingAttributes().apply {
+                setAudioAttributes(
+                    AudioAttributes().apply {
+                        setCodec(AudioAttributes.DIRECT_STREAM_COPY)
+                        setChannels(2)
+                    }
+                )
+
+                setFormat(Formats.MP3.extension)
+            }
+
+            encoder.encode(wavFile, mp3File, attributes)
+            return mp3File
+        }*/
+
+        /*private fun encodeToMp3Catching(wavFile: File) = kotlin.runCatching {
+            encodeToMp3(wavFile)
+        }*/
+
+        private suspend inline fun getDataAndSetTags(intent: Intent) = coroutineScope {
             val filePath = intent.mFilePathArg
             val isVideo = intent.mIsVideoArg
             val videoMetadata = intent.mVideoMetadataArg
+            val file = File(filePath)
 
             val externalContentUri = when {
                 isVideo -> when {
@@ -152,13 +186,7 @@ class MainActivity : ComponentActivity() {
             }
 
             launch {
-                setTags(
-                    externalContentUri,
-                    filePath,
-                    mediaDirectory,
-                    videoMetadata,
-                    mimeType
-                )
+                setTags(externalContentUri, file, mediaDirectory, videoMetadata, mimeType)
             }
         }
 
@@ -170,7 +198,7 @@ class MainActivity : ComponentActivity() {
 
         override fun onReceive(context: Context?, intent: Intent) {
             when (intent.action) {
-                Broadcast_SET_TAGS -> getDataAndSetTags(intent)
+                Broadcast_SET_TAGS -> launch { getDataAndSetTags(intent) }
                 Broadcast_RETRY_SET_TAGS -> retrySetTags()
             }
         }
