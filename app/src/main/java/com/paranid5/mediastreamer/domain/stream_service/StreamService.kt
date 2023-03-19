@@ -1,4 +1,4 @@
-package com.paranid5.mediastreamer.stream_service
+package com.paranid5.mediastreamer.domain.stream_service
 
 import android.annotation.SuppressLint
 import android.app.*
@@ -27,13 +27,13 @@ import androidx.media3.exoplayer.source.ProgressiveMediaSource
 import arrow.core.Either
 import at.huber.youtubeExtractor.VideoMeta
 import com.paranid5.mediastreamer.R
-import com.paranid5.mediastreamer.StorageHandler
-import com.paranid5.mediastreamer.YoutubeUrlExtractor
+import com.paranid5.mediastreamer.domain.StorageHandler
+import com.paranid5.mediastreamer.domain.YoutubeUrlExtractor
 import com.paranid5.mediastreamer.data.VideoMetadata
 import com.paranid5.mediastreamer.presentation.MainActivity
 import com.paranid5.mediastreamer.presentation.streaming.*
 import com.paranid5.mediastreamer.presentation.ui.screens.*
-import com.paranid5.mediastreamer.utils.GlideUtils
+import com.paranid5.mediastreamer.presentation.ui.GlideUtils
 import com.paranid5.mediastreamer.utils.extensions.registerReceiverCompat
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*

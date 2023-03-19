@@ -1,7 +1,8 @@
-package com.paranid5.mediastreamer
+package com.paranid5.mediastreamer.domain
 
 import android.content.Context
 import android.content.Intent
+import com.paranid5.mediastreamer.MainApplication
 
 abstract class ServiceAccessor(protected val application: MainApplication) {
     protected inline val appContext: Context

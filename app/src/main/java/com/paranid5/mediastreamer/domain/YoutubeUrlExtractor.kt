@@ -1,4 +1,4 @@
-package com.paranid5.mediastreamer
+package com.paranid5.mediastreamer.domain
 
 import android.content.Context
 import android.util.SparseArray

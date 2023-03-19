@@ -1,4 +1,4 @@
-package com.paranid5.mediastreamer.video_cash_service
+package com.paranid5.mediastreamer.domain.video_cash_service
 
 import android.app.*
 import android.content.BroadcastReceiver
@@ -7,24 +7,27 @@ import android.content.Intent
 import android.os.Binder
 import android.os.Build
 import android.os.Environment
+import android.provider.MediaStore
 import android.util.Log
 import androidx.annotation.RequiresApi
 import arrow.core.Either
 import arrow.core.merge
 import com.paranid5.mediastreamer.R
-import com.paranid5.mediastreamer.YoutubeUrlExtractor
 import com.paranid5.mediastreamer.data.VideoMetadata
+import com.paranid5.mediastreamer.domain.YoutubeUrlExtractor
+import com.paranid5.mediastreamer.domain.downloadFile
+import com.paranid5.mediastreamer.domain.getFileExt
+import com.paranid5.mediastreamer.domain.media_scanner.MediaScannerReceiver
+import com.paranid5.mediastreamer.domain.media_scanner.scanNextFile
 import com.paranid5.mediastreamer.domain.utils.AsyncCondVar
-import com.paranid5.mediastreamer.downloadFile
-import com.paranid5.mediastreamer.getFileExt
 import com.paranid5.mediastreamer.presentation.MainActivity
 import com.paranid5.mediastreamer.presentation.streaming.Broadcast_VIDEO_CASH_COMPLETED
 import com.paranid5.mediastreamer.presentation.streaming.VIDEO_CASH_STATUS
+import com.paranid5.mediastreamer.utils.extensions.insertMediaFileToMediaStore
 import com.paranid5.mediastreamer.utils.extensions.registerReceiverCompat
-import com.paranid5.mediastreamer.utils.extensions.sendSetTagsBroadcast
+import com.paranid5.mediastreamer.utils.extensions.setAudioTagsToFileCatching
 import io.ktor.client.*
 import io.ktor.http.*
-import it.sauronsoftware.jave.Encoder
 import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.*
@@ -49,7 +52,7 @@ class VideoCashService : Service(), CoroutineScope by MainScope(), KoinComponent
         const val SAVE_AS_VIDEO_ARG = "save_as_video"
 
         private val TAG = VideoCashService::class.simpleName!!
-        private const val NEXT_VIDEO_AWAIT_TIMEOUT_MS = 15000L
+        private const val NEXT_VIDEO_AWAIT_TIMEOUT_MS = 3000L
 
         internal inline val Intent.mVideoCashDataArg
             get() = VideoCashData(
@@ -87,12 +90,12 @@ class VideoCashService : Service(), CoroutineScope by MainScope(), KoinComponent
 
     private val binder = object : Binder() {}
     private val ktorClient by inject<HttpClient>()
-    private val encoder = Encoder()
 
     private val videoCashQueue: Queue<VideoCashData> = ConcurrentLinkedQueue()
     private val videoCashQueueLenState = MutableStateFlow(0)
 
     private val videoCashCompletionChannel = Channel<HttpStatusCode>()
+    private val videoCashProgressState = MutableStateFlow(0L to 0L)
     private val videoCashCondVar = AsyncCondVar()
 
     private val curVideoCashJobState = MutableStateFlow<Deferred<HttpStatusCode>?>(null)
@@ -130,10 +133,13 @@ class VideoCashService : Service(), CoroutineScope by MainScope(), KoinComponent
         }
     }
 
+    private val mediaScannerReceiver = MediaScannerReceiver()
+
     private fun registerReceivers() {
         registerReceiverCompat(cashNextVideoReceiver, Broadcast_CASH_NEXT_VIDEO)
         registerReceiverCompat(cancelCurVideoReceiver, Broadcast_CANCEL_CUR_VIDEO)
         registerReceiverCompat(cancelAllReceiver, Broadcast_CANCEL_ALL)
+        registerReceiverCompat(mediaScannerReceiver, MediaScannerReceiver.Broadcast_SCAN_NEXT_FILE)
     }
 
     override fun onCreate() {
@@ -148,18 +154,35 @@ class VideoCashService : Service(), CoroutineScope by MainScope(), KoinComponent
         videoCashQueueLenState.update { videoCashQueue.size }
     }
 
+    private data class CashingNotificationData(
+        val metadata: VideoMetadata,
+        val videoCashQueueLen: Int,
+        val downloadedBytes: Long,
+        val totalBytes: Long,
+    )
+
     private suspend inline fun startNotificationObserving(): Unit = combine(
         curVideoMetadataState,
-        videoCashQueueLenState
-    ) { videoMetadata, videoCashQueueLen ->
-        videoMetadata to videoCashQueueLen
-    }.collectLatest { (videoMetadataOrNull, videoCashQueueLen) ->
-        val videoMetadata = videoMetadataOrNull ?: VideoMetadata()
-
-        when (videoCashQueueLen) {
-            0 -> updateNotification(isCashing = false, videoMetadata, videoCashQueueLen)
-            else -> updateNotification(isCashing = true, videoMetadata, videoCashQueueLen)
-        }
+        videoCashQueueLenState,
+        videoCashProgressState
+    ) { videoMetadata, videoCashQueueLen, (downloadedBytes, totalBytes) ->
+        CashingNotificationData(
+            videoMetadata ?: VideoMetadata(),
+            videoCashQueueLen,
+            downloadedBytes,
+            totalBytes
+        )
+    }.collectLatest { (videoMetadata, videoCashQueueLen, downloadedBytes, totalBytes) ->
+        updateNotification(
+            isCashing = when (videoCashQueueLen) {
+                0 -> false
+                else -> true
+            },
+            videoMetadata,
+            videoCashQueueLen,
+            downloadedBytes,
+            totalBytes
+        )
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
@@ -180,65 +203,67 @@ class VideoCashService : Service(), CoroutineScope by MainScope(), KoinComponent
             .getExternalStoragePublicDirectory(mediaDirectory)
             .absolutePath
 
-    private fun createMediaFile(filename: String, ext: String, mediaDirectory: String) =
-        File("${getFullMediaDirectory(mediaDirectory)}/$filename.$ext")
-            .also(File::createNewFile)
+    private fun createMediaFile(filename: String, ext: String) =
+        "${getFullMediaDirectory(Environment.DIRECTORY_MOVIES)}/$filename.$ext"
+            .takeIf { !File(it).exists() }
+            ?.let(::File)
+            ?.also { Log.d(TAG, "Creating file ${it.absolutePath}") }
+            ?.also(File::createNewFile)
+            ?: generateSequence(1) { it + 1 }
+                .map { num -> "${getFullMediaDirectory(Environment.DIRECTORY_MOVIES)}/${filename}($num).$ext" }
+                .map(::File)
+                .first { !it.exists() }
+                .also(File::createNewFile)
 
-    @Deprecated("Use createVideoFile() instead")
-    private fun createAudioFile(filename: String, ext: String) = createMediaFile(
-        filename = filename,
-        ext = ext,
-        mediaDirectory = Environment.DIRECTORY_MUSIC,
-    )
+    private suspend inline fun setTags(mediaFile: File, videoMetadata: VideoMetadata) {
+        val externalContentUri = when {
+            Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q ->
+                MediaStore.Video.Media.getContentUri(MediaStore.VOLUME_EXTERNAL_PRIMARY)
+            else ->
+                MediaStore.Video.Media.EXTERNAL_CONTENT_URI
+        }
 
-    private fun createVideoFile(filename: String, ext: String) = createMediaFile(
-        filename = filename,
-        ext = ext,
-        mediaDirectory = Environment.DIRECTORY_MOVIES,
-    )
+        val mediaDirectory = Environment.DIRECTORY_MOVIES
+        val mimeType = "video/${mediaFile.extension}"
+        val absoluteFilePath = mediaFile.absolutePath
 
-    @Deprecated("Use cashVideoFile() instead")
-    private suspend inline fun cashAudioFile(
-        desiredFilename: String,
-        audioUrl: String,
-        videoMetadata: VideoMetadata
-    ): HttpStatusCode {
-        val fileExt = ktorClient.getFileExt(audioUrl)
-        val storeFile = createAudioFile(desiredFilename, fileExt)
-        val statusCode = ktorClient.downloadFile(audioUrl, storeFile)
+        withContext(Dispatchers.IO) {
+            insertMediaFileToMediaStore(
+                externalContentUri,
+                absoluteFilePath,
+                mediaDirectory,
+                videoMetadata,
+                mimeType
+            )
 
-        sendSetTagsBroadcast(
-            filePath = storeFile.absolutePath,
-            isSaveAsVideo = false,
-            videoMetadata = videoMetadata
-        )
-
-        return statusCode
+            setAudioTagsToFileCatching(mediaFile, videoMetadata)
+            scanNextFile(absoluteFilePath)
+        }
     }
 
-    private suspend inline fun cashVideoFile(
-        desiredFilename: String,
-        videoUrl: String,
-        videoMetadata: VideoMetadata
-    ): HttpStatusCode {
-        val fileExt = ktorClient.getFileExt(videoUrl)
-        val storeFile = createVideoFile(desiredFilename, fileExt)
-        val statusCode = ktorClient.downloadFile(videoUrl, storeFile)
-
-        sendSetTagsBroadcast(
-            filePath = storeFile.absolutePath,
-            isSaveAsVideo = true,
-            videoMetadata = videoMetadata
-        )
-
-        return statusCode
-    }
-
-    private suspend inline fun cashFile(
+    private suspend inline fun cashMediaFile(
         desiredFilename: String,
         audioOrVideoUrl: Either<String, String>,
         videoMetadata: VideoMetadata
-    ) = cashVideoFile(desiredFilename, audioOrVideoUrl.merge(), videoMetadata)
+    ): HttpStatusCode {
+        val mediaUrl = audioOrVideoUrl.merge()
+        val fileExt = ktorClient.getFileExt(mediaUrl)
+        val storeFile = createMediaFile(desiredFilename, fileExt)
+        curVideoCashFileState.update { storeFile }
+
+        val statusCode = ktorClient.downloadFile(
+            fileUrl = mediaUrl,
+            storeFile = storeFile,
+            progressState = videoCashProgressState
+        )
+
+        setTags(
+            mediaFile = storeFile,
+            videoMetadata = videoMetadata
+        )
+
+        return statusCode
+    }
 
     private fun YoutubeUrlExtractor(desiredFilename: String, isSaveAsVideo: Boolean) =
         YoutubeUrlExtractor(
@@ -253,7 +278,7 @@ class VideoCashService : Service(), CoroutineScope by MainScope(), KoinComponent
             }
 
             curVideoMetadataState.update { videoMetadata }
-            cashFile(desiredFilename, audioOrVideoUrl, videoMetadata)
+            cashMediaFile(desiredFilename, audioOrVideoUrl, videoMetadata)
         }
 
     private suspend inline fun launchExtractionAndCashingFile(
@@ -310,6 +335,7 @@ class VideoCashService : Service(), CoroutineScope by MainScope(), KoinComponent
             }
         }
 
+        removeNotification()
         stopSelf()
     }
 
@@ -329,6 +355,7 @@ class VideoCashService : Service(), CoroutineScope by MainScope(), KoinComponent
         unregisterReceiver(cashNextVideoReceiver)
         unregisterReceiver(cancelCurVideoReceiver)
         unregisterReceiver(cancelAllReceiver)
+        unregisterReceiver(mediaScannerReceiver)
     }
 
     override fun onDestroy() {
@@ -348,7 +375,7 @@ class VideoCashService : Service(), CoroutineScope by MainScope(), KoinComponent
             lockscreenVisibility = Notification.VISIBILITY_PUBLIC
             setSound(null, null)
             enableVibration(false)
-            enableLights(false)
+            enableLights(true)
         }
     )
 
@@ -371,12 +398,20 @@ class VideoCashService : Service(), CoroutineScope by MainScope(), KoinComponent
 
     private fun getCashingNotificationBuilder(
         videoMetadata: VideoMetadata,
-        videoCashQueueLen: Int
+        videoCashQueueLen: Int,
+        downloadedBytes: Long,
+        totalBytes: Long
     ) = notificationBuilder
         .setContentTitle("${res.getString(R.string.downloading)}: ${videoMetadata.title}")
-        .setContentText("${res.getString(R.string.tracks_in_queue)}: $videoCashQueueLen")
+        .extend { notificationBuilder ->
+            notificationBuilder.setContentText(
+                "${res.getString(R.string.tracks_in_queue)}: $videoCashQueueLen"
+            )
+        }
+        .setProgress(totalBytes.toInt(), downloadedBytes.toInt(), false)
         .setOngoing(true)
-        .setAutoCancel(false)
+        .setShowWhen(false)
+        .setOnlyAlertOnce(true)
         .addAction(cancelCurVideoAction)
         .addAction(cancelAllAction)
 
@@ -414,34 +449,79 @@ class VideoCashService : Service(), CoroutineScope by MainScope(), KoinComponent
         get() = notificationBuilder
             .setContentTitle(res.getString(R.string.video_cashed))
             .setOngoing(false)
-            .setAutoCancel(true)
+            .setShowWhen(false)
 
-    private fun buildNotification(
-        isCashing: Boolean,
+    private fun startCashingNotification(
         videoMetadata: VideoMetadata,
-        videoCashQueueLen: Int
-    ) = when {
-        isCashing -> getCashingNotificationBuilder(videoMetadata, videoCashQueueLen)
-        else -> finishedNotificationBuilder
-    }.build()
-
-    private fun showCashingNotification(videoMetadata: VideoMetadata, videoCashQueueLen: Int) {
+        videoCashQueueLen: Int,
+        downloadedBytes: Long,
+        totalBytes: Long
+    ) {
         wasStartForegroundUsed = true
+
         startForeground(
             NOTIFICATION_ID,
-            buildNotification(isCashing = true, videoMetadata, videoCashQueueLen)
+            getCashingNotificationBuilder(
+                videoMetadata,
+                videoCashQueueLen,
+                downloadedBytes,
+                totalBytes
+            ).build()
         )
     }
+
+    private fun updateCashingNotification(
+        videoMetadata: VideoMetadata,
+        videoCashQueueLen: Int,
+        downloadedBytes: Long,
+        totalBytes: Long
+    ) = notificationManager.notify(
+        NOTIFICATION_ID,
+        getCashingNotificationBuilder(
+            videoMetadata,
+            videoCashQueueLen,
+            downloadedBytes,
+            totalBytes
+        ).build()
+    )
+
+    private fun showFinishedNotification() = notificationManager.notify(
+        NOTIFICATION_ID,
+        finishedNotificationBuilder.build()
+    )
 
     private fun updateNotification(
         isCashing: Boolean,
         videoMetadata: VideoMetadata,
-        videoCashQueueLen: Int
+        videoCashQueueLen: Int,
+        downloadedBytes: Long,
+        totalBytes: Long
     ) = when {
-        !wasStartForegroundUsed -> showCashingNotification(videoMetadata, videoCashQueueLen)
-        else -> notificationManager.notify(
-            NOTIFICATION_ID,
-            buildNotification(isCashing, videoMetadata, videoCashQueueLen)
+        !wasStartForegroundUsed -> startCashingNotification(
+            videoMetadata,
+            videoCashQueueLen,
+            downloadedBytes,
+            totalBytes
         )
+
+        isCashing -> updateCashingNotification(
+            videoMetadata,
+            videoCashQueueLen,
+            downloadedBytes,
+            totalBytes
+        )
+
+        else -> showFinishedNotification()
+    }
+
+    private fun removeNotification() {
+        notificationManager.cancel(NOTIFICATION_ID)
+
+        when {
+            Build.VERSION.SDK_INT >= Build.VERSION_CODES.N ->
+                stopForeground(STOP_FOREGROUND_DETACH)
+            else ->
+                stopForeground(true)
+        }
     }
 }

@@ -38,4 +38,5 @@
     <string name="external_storage_description">App needs access to storage in order to manage cashed files</string>
     <string name="grant_permission">Grant Permission</string>
     <string name="ok">OK</string>
+    <string name="downloaded">Downloaded</string>
 </resources>

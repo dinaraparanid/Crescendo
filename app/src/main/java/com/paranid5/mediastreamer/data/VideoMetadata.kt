@@ -1,6 +1,7 @@
 package com.paranid5.mediastreamer.data
 
 import android.os.Parcelable
+import androidx.compose.runtime.Immutable
 import at.huber.youtubeExtractor.VideoMeta
 import com.paranid5.mediastreamer.STREAM_WITH_NO_NAME
 import com.paranid5.mediastreamer.UNKNOWN_STREAMER
@@ -12,6 +13,7 @@ import org.koin.core.qualifier.named
 
 @Serializable
 @Parcelize
+@Immutable
 data class VideoMetadata(
     @JvmField val title: String = get(named(STREAM_WITH_NO_NAME)),
     @JvmField val author: String = get(named(UNKNOWN_STREAMER)),

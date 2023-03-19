@@ -1,6 +1,8 @@
 package com.paranid5.mediastreamer
 
 import android.content.Context
+import com.paranid5.mediastreamer.domain.KtorClient
+import com.paranid5.mediastreamer.domain.StorageHandler
 import com.paranid5.mediastreamer.presentation.appbar.stream_button.StreamButtonUIHandler
 import com.paranid5.mediastreamer.presentation.search_stream.SearchStreamPresenter
 import com.paranid5.mediastreamer.presentation.search_stream.SearchStreamUIHandler
@@ -10,9 +12,9 @@ import com.paranid5.mediastreamer.presentation.streaming.StreamingUIHandler
 import com.paranid5.mediastreamer.presentation.streaming.StreamingViewModel
 import com.paranid5.mediastreamer.presentation.ui.permissions.ExternalStorageDescriptionProvider
 import com.paranid5.mediastreamer.presentation.ui.permissions.externalStoragePermissionQueue
-import com.paranid5.mediastreamer.stream_service.StreamServiceAccessor
-import com.paranid5.mediastreamer.utils.GlideUtils
-import com.paranid5.mediastreamer.video_cash_service.VideoCashServiceAccessor
+import com.paranid5.mediastreamer.domain.stream_service.StreamServiceAccessor
+import com.paranid5.mediastreamer.presentation.ui.GlideUtils
+import com.paranid5.mediastreamer.domain.video_cash_service.VideoCashServiceAccessor
 import org.koin.android.ext.koin.androidApplication
 import org.koin.android.ext.koin.androidContext
 import org.koin.androidx.viewmodel.dsl.viewModelOf

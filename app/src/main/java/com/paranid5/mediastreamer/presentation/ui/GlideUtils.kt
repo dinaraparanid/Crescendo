@@ -1,4 +1,4 @@
-package com.paranid5.mediastreamer.utils
+package com.paranid5.mediastreamer.presentation.ui
 
 import android.content.Context
 import android.graphics.Bitmap
@@ -37,7 +37,7 @@ class GlideUtils(private val context: Context) {
                     .asSequence()
                     .map(::getBitmapFromUrlCatching)
                     .firstOrNull { it.isSuccess }
-                    ?.getOrDefault(thumbnailBitmap)
+                    ?.getOrNull()
                     ?: thumbnailBitmap
             }
         }

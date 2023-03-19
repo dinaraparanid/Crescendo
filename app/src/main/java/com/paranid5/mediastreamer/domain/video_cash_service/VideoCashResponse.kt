@@ -1,4 +1,4 @@
-package com.paranid5.mediastreamer.video_cash_service
+package com.paranid5.mediastreamer.domain.video_cash_service
 
 sealed interface VideoCashResponse : java.io.Serializable {
     object Success : VideoCashResponse {

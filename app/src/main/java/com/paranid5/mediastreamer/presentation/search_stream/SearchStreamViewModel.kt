@@ -1,7 +1,7 @@
 package com.paranid5.mediastreamer.presentation.search_stream
 
 import androidx.lifecycle.SavedStateHandle
-import com.paranid5.mediastreamer.StorageHandler
+import com.paranid5.mediastreamer.domain.StorageHandler
 import com.paranid5.mediastreamer.presentation.ObservableViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow

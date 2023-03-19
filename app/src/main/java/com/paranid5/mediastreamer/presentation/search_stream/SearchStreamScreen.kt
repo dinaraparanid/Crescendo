@@ -17,7 +17,7 @@ import com.paranid5.mediastreamer.presentation.StateChangedCallback
 import com.paranid5.mediastreamer.presentation.composition_locals.LocalStreamState
 import com.paranid5.mediastreamer.presentation.composition_locals.StreamStates
 import com.paranid5.mediastreamer.presentation.ui.OnUIStateChanged
-import com.paranid5.mediastreamer.utils.OnBackPressedHandler
+import com.paranid5.mediastreamer.presentation.ui.OnBackPressedHandler
 
 @Composable
 private fun Label(modifier: Modifier = Modifier) =

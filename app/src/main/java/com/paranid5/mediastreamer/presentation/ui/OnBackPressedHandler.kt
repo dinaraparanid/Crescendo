@@ -1,4 +1,4 @@
-package com.paranid5.mediastreamer.utils
+package com.paranid5.mediastreamer.presentation.ui
 
 import androidx.activity.OnBackPressedCallback
 import androidx.activity.compose.LocalOnBackPressedDispatcherOwner

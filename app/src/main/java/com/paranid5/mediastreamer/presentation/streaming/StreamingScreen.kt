@@ -10,7 +10,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.constraintlayout.compose.ConstraintLayout
@@ -19,14 +18,14 @@ import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
 import com.bumptech.glide.integration.compose.GlideImage
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
 import com.paranid5.mediastreamer.R
-import com.paranid5.mediastreamer.StorageHandler
+import com.paranid5.mediastreamer.domain.StorageHandler
 import com.paranid5.mediastreamer.data.VideoMetadata
-import com.paranid5.mediastreamer.utils.BroadcastReceiver
 import com.paranid5.mediastreamer.presentation.composition_locals.LocalStreamState
 import com.paranid5.mediastreamer.presentation.composition_locals.StreamStates
 import com.paranid5.mediastreamer.presentation.ui.theme.LocalAppColors
-import com.paranid5.mediastreamer.utils.GlideUtils
-import com.paranid5.mediastreamer.utils.OnBackPressedHandler
+import com.paranid5.mediastreamer.utils.BroadcastReceiver
+import com.paranid5.mediastreamer.presentation.ui.GlideUtils
+import com.paranid5.mediastreamer.presentation.ui.OnBackPressedHandler
 import com.paranid5.mediastreamer.utils.extensions.timeString
 import org.koin.androidx.compose.get
 

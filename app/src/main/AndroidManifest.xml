@@ -43,18 +43,10 @@
                 android:value="" />
         </activity>
         <service
-            android:name=".stream_service.StreamService"
+            android:name=".domain.stream_service.StreamService"
             android:foregroundServiceType="mediaPlayback" />
         <service
-            android:name=".video_cash_service.VideoCashService"
+            android:name=".domain.video_cash_service.VideoCashService"
             android:foregroundServiceType="dataSync" />
-        <receiver
-            android:name=".domain.media_scanner.MediaScannerReceiver"
-            android:exported="false">
-            <intent-filter>
-                <action android:name="com.paranid5.mediastreamer.domain.media_scanner.SCAN_NEXT_FILE"/>
-            </intent-filter>
-        </receiver>
     </application>
-
 </manifest>

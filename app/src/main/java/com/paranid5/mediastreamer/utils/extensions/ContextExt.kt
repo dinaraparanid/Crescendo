@@ -1,15 +1,17 @@
 package com.paranid5.mediastreamer.utils.extensions
 
-import android.content.*
+import android.content.BroadcastReceiver
+import android.content.ContentValues
+import android.content.Context
+import android.content.IntentFilter
 import android.net.Uri
 import android.os.Build
 import android.provider.MediaStore
 import com.bumptech.glide.Glide
 import com.paranid5.mediastreamer.data.VideoMetadata
-import com.paranid5.mediastreamer.presentation.MainActivity
 import org.jaudiotagger.audio.AudioFileIO
-import org.jaudiotagger.tag.FieldKey
-import org.jaudiotagger.tag.images.ArtworkFactory
+import org.jaudiotagger.tag.mp4.Mp4FieldKey
+import org.jaudiotagger.tag.mp4.Mp4Tag
 import java.io.File
 
 fun Context.registerReceiverCompat(
@@ -46,9 +48,9 @@ fun Context.getImageBinaryDataCatching(url: String) =
 
 fun Context.setAudioTagsToFile(file: File, videoMetadata: VideoMetadata) =
     AudioFileIO.read(file).run {
-        tagOrCreateAndSetDefault.run {
-            setField(FieldKey.TITLE, videoMetadata.title)
-            setField(FieldKey.ARTIST, videoMetadata.author)
+        tagOrCreateAndSetDefault.let { it as Mp4Tag }.run {
+            setField(Mp4FieldKey.TITLE, videoMetadata.title)
+            setField(Mp4FieldKey.ARTIST, videoMetadata.author)
 
             videoMetadata
                 .covers
@@ -56,13 +58,8 @@ fun Context.setAudioTagsToFile(file: File, videoMetadata: VideoMetadata) =
                 .map { getImageBinaryDataCatching(it) }
                 .firstOrNull { it.isSuccess }
                 ?.getOrNull()
-                ?.let { byteData ->
-                    addField(
-                        ArtworkFactory
-                            .createArtworkFromFile(file)
-                            .apply { binaryData = byteData }
-                    )
-                }
+                ?.let(this::createArtworkField)
+                ?.let(this::setField)
 
             commit()
         }
@@ -77,7 +74,7 @@ fun Context.insertMediaFileToMediaStore(
     relativeFilePath: String,
     videoMetadata: VideoMetadata,
     mimeType: String,
-): Uri? {
+): Uri {
     val uri = applicationContext.contentResolver.insert(
         externalContentUri,
         ContentValues().apply {
@@ -98,19 +95,13 @@ fun Context.insertMediaFileToMediaStore(
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q)
                 put(MediaStore.MediaColumns.RELATIVE_PATH, relativeFilePath)
         }
-    )
+    )!!
+
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q)
+        applicationContext.contentResolver.update(
+            uri, ContentValues().apply { put(MediaStore.Audio.Media.IS_PENDING, 0) },
+            null, null
+        )
 
     return uri
 }
-
-fun Context.sendSetTagsBroadcast(
-    filePath: String,
-    isSaveAsVideo: Boolean,
-    videoMetadata: VideoMetadata,
-) = sendBroadcast(
-    Intent(MainActivity.Broadcast_SET_TAGS).apply {
-        putExtra(MainActivity.FILE_PATH_ARG, filePath)
-        putExtra(MainActivity.IS_VIDEO_ARG, isSaveAsVideo)
-        putExtra(MainActivity.VIDEO_METADATA_ARG, videoMetadata)
-    }
-)

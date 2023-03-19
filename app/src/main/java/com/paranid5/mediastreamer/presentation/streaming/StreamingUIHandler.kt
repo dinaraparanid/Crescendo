@@ -1,9 +1,9 @@
 package com.paranid5.mediastreamer.presentation.streaming
 
-import com.paranid5.mediastreamer.StorageHandler
+import com.paranid5.mediastreamer.domain.StorageHandler
 import com.paranid5.mediastreamer.presentation.UIHandler
-import com.paranid5.mediastreamer.stream_service.StreamServiceAccessor
-import com.paranid5.mediastreamer.video_cash_service.VideoCashServiceAccessor
+import com.paranid5.mediastreamer.domain.stream_service.StreamServiceAccessor
+import com.paranid5.mediastreamer.domain.video_cash_service.VideoCashServiceAccessor
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 

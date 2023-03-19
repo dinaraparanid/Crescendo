@@ -1,10 +1,10 @@
-package com.paranid5.mediastreamer.video_cash_service
+package com.paranid5.mediastreamer.domain.video_cash_service
 
 import android.app.Service
 import android.content.Intent
 import android.os.Build
 import com.paranid5.mediastreamer.MainApplication
-import com.paranid5.mediastreamer.ServiceAccessor
+import com.paranid5.mediastreamer.domain.ServiceAccessor
 
 class VideoCashServiceAccessor(application: MainApplication) : ServiceAccessor(application) {
     private fun Intent.putVideoCashDataArgs(
