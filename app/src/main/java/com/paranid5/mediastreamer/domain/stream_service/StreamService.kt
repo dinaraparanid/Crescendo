@@ -30,6 +30,7 @@ import com.paranid5.mediastreamer.R
 import com.paranid5.mediastreamer.domain.StorageHandler
 import com.paranid5.mediastreamer.domain.YoutubeUrlExtractor
 import com.paranid5.mediastreamer.data.VideoMetadata
+import com.paranid5.mediastreamer.data.utils.extensions.toOldMetadata
 import com.paranid5.mediastreamer.presentation.MainActivity
 import com.paranid5.mediastreamer.presentation.streaming.*
 import com.paranid5.mediastreamer.presentation.ui.screens.*
@@ -405,7 +406,7 @@ class StreamService : Service(), CoroutineScope by MainScope(), KoinComponent {
         NotificationChannel(
             STREAM_CHANNEL_ID,
             "Stream",
-            NotificationManager.IMPORTANCE_DEFAULT
+            NotificationManager.IMPORTANCE_HIGH
         ).apply {
             lockscreenVisibility = Notification.VISIBILITY_PUBLIC
             setSound(null, null)
@@ -468,7 +469,12 @@ class StreamService : Service(), CoroutineScope by MainScope(), KoinComponent {
                 .Factory(DefaultHttpDataSource.Factory())
                 .createMediaSource(MediaItem.fromUri(videoUrl))*/
 
-            currentMetadata.update { videoMeta?.let(::VideoMetadata) }
+            mediaSession.setMetadata(
+                currentMetadata
+                    .updateAndGet { videoMeta?.let(::VideoMetadata) }
+                    ?.toOldMetadata(mGetVideoCoverAsync().await())
+            )
+
             launch(Dispatchers.IO) { storeMetadata(videoMeta) }
 
             player.run {
@@ -565,7 +571,7 @@ class StreamService : Service(), CoroutineScope by MainScope(), KoinComponent {
         }
     }
 
-    private suspend inline fun getVideoCoverAsync() =
+    internal suspend inline fun mGetVideoCoverAsync() =
         currentMetadata
             .value
             ?.let { glideUtils.getVideoCoverAsync(it) }
@@ -595,7 +601,11 @@ class StreamService : Service(), CoroutineScope by MainScope(), KoinComponent {
             currentMetadata?.author
                 ?: resources.getString(R.string.unknown_streamer)
         )
-        .setStyle(Notification.MediaStyle().setMediaSession(mediaSession.sessionToken))
+        .setStyle(
+            Notification.MediaStyle()
+                .setMediaSession(mediaSession.sessionToken)
+                .setShowActionsInCompactView(1, 2, 3)
+        )
         .setContentIntent(
             PendingIntent.getActivity(
                 applicationContext,
@@ -801,7 +811,7 @@ class StreamService : Service(), CoroutineScope by MainScope(), KoinComponent {
                     startForeground(
                         NOTIFICATION_ID,
                         builder
-                            .setLargeIcon(getVideoCoverAsync().await())
+                            .setLargeIcon(mGetVideoCoverAsync().await())
                             .setActions(isPlaying, isLiked)
                             .build(),
                     )
@@ -812,7 +822,7 @@ class StreamService : Service(), CoroutineScope by MainScope(), KoinComponent {
                     startForeground(
                         NOTIFICATION_ID,
                         builder
-                            .setLargeIcon(getVideoCoverAsync().await())
+                            .setLargeIcon(mGetVideoCoverAsync().await())
                             .setActions(isPlaying, isLiked)
                             .build()
                     )
@@ -829,7 +839,7 @@ class StreamService : Service(), CoroutineScope by MainScope(), KoinComponent {
                     notificationManager.notify(
                         NOTIFICATION_ID,
                         builder
-                            .setLargeIcon(getVideoCoverAsync().await())
+                            .setLargeIcon(mGetVideoCoverAsync().await())
                             .setActions(isPlaying, isLiked)
                             .build()
                     )
@@ -840,7 +850,7 @@ class StreamService : Service(), CoroutineScope by MainScope(), KoinComponent {
                     notificationManager.notify(
                         NOTIFICATION_ID,
                         builder
-                            .setLargeIcon(getVideoCoverAsync().await())
+                            .setLargeIcon(mGetVideoCoverAsync().await())
                             .setActions(isPlaying, isLiked)
                             .build()
                     )

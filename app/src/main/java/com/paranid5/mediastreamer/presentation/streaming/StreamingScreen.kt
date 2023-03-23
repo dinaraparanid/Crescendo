@@ -4,29 +4,32 @@ import android.graphics.Bitmap
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.*
+import androidx.compose.material3.Slider
+import androidx.compose.material3.SliderDefaults
+import androidx.compose.material3.Text
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.constraintlayout.compose.Dimension
-import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
-import com.bumptech.glide.integration.compose.GlideImage
-import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
+import coil.ImageLoader
 import com.paranid5.mediastreamer.R
-import com.paranid5.mediastreamer.domain.StorageHandler
 import com.paranid5.mediastreamer.data.VideoMetadata
+import com.paranid5.mediastreamer.domain.StorageHandler
 import com.paranid5.mediastreamer.presentation.composition_locals.LocalStreamState
 import com.paranid5.mediastreamer.presentation.composition_locals.StreamStates
-import com.paranid5.mediastreamer.presentation.ui.theme.LocalAppColors
-import com.paranid5.mediastreamer.utils.BroadcastReceiver
 import com.paranid5.mediastreamer.presentation.ui.GlideUtils
 import com.paranid5.mediastreamer.presentation.ui.OnBackPressedHandler
+import com.paranid5.mediastreamer.presentation.ui.theme.LocalAppColors
+import com.paranid5.mediastreamer.utils.BroadcastReceiver
 import com.paranid5.mediastreamer.utils.extensions.timeString
+import com.skydoves.landscapist.ImageOptions
+import com.skydoves.landscapist.coil.CoilImage
 import org.koin.androidx.compose.get
 
 private const val BROADCAST_LOCATION = "com.paranid5.mediastreamer.presentation.ui.screens"
@@ -109,39 +112,45 @@ fun StreamingScreen(
     }
 }
 
-@OptIn(ExperimentalGlideComposeApi::class)
 @Composable
 private fun VideoCover(metadata: VideoMetadata?, modifier: Modifier = Modifier) {
     val colors = LocalAppColors.current.value
-    val glideUtils = GlideUtils(LocalContext.current)
+    val context = LocalContext.current
+
+    val glideUtils = GlideUtils(context)
     var coverModel by remember { mutableStateOf<Bitmap?>(null) }
 
     LaunchedEffect(key1 = metadata) {
         coverModel = metadata?.let { glideUtils.getVideoCoverAsync(it).await() }
     }
 
-    coverModel.runCatching {
-        GlideImage(
-            modifier = modifier
-                .shadow(
-                    elevation = 80.dp,
-                    shape = RoundedCornerShape(5.dp),
-                    ambientColor = colors.primary,
-                    spotColor = colors.primary
-                )
-                .border(
-                    width = 30.dp,
-                    color = Color.Transparent,
-                    shape = RoundedCornerShape(30.dp)
-                ),
-            model = this,
-            contentDescription = stringResource(R.string.video_cover),
-        ) { requestBuilder ->
-            requestBuilder
-                .centerCrop()
-                .transition(DrawableTransitionOptions.withCrossFade(1000))
-        }
-    }
+    CoilImage(
+        imageModel = { coverModel },
+        imageOptions = ImageOptions(
+            contentScale = ContentScale.Crop,
+            alignment = Alignment.Center
+        ),
+        imageLoader = {
+            ImageLoader.Builder(context)
+                .fallback(R.drawable.cover_thumbnail)
+                .error(R.drawable.cover_thumbnail)
+                .placeholder(R.drawable.cover_thumbnail)
+                .crossfade(true)
+                .build()
+        },
+        modifier = modifier
+            .shadow(
+                elevation = 80.dp,
+                shape = RoundedCornerShape(5.dp),
+                ambientColor = colors.primary,
+                spotColor = colors.primary
+            )
+            .border(
+                width = 30.dp,
+                color = Color.Transparent,
+                shape = RoundedCornerShape(30.dp)
+            )
+    )
 }
 
 @Composable
