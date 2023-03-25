@@ -29,6 +29,7 @@ import com.paranid5.mediastreamer.presentation.ui.permissions.PermissionDialog
 import com.paranid5.mediastreamer.presentation.ui.theme.LocalAppColors
 import com.paranid5.mediastreamer.utils.extensions.openAppSettings
 import com.paranid5.mediastreamer.domain.video_cash_service.VideoCashResponse
+import com.paranid5.mediastreamer.presentation.ui.extensions.primaryColorShadow
 import org.koin.androidx.compose.get
 import org.koin.core.qualifier.named
 import java.util.Queue
@@ -46,7 +47,7 @@ fun UtilsButtons(modifier: Modifier = Modifier) =
 private fun EqualizerButton(modifier: Modifier = Modifier) {
     val colors = LocalAppColors.current.value
 
-    IconButton(modifier = modifier, onClick = { /*TODO Equalizer*/ }) {
+    IconButton(modifier = modifier.primaryColorShadow(), onClick = { /*TODO Equalizer*/ }) {
         Icon(
             modifier = Modifier.size(30.dp),
             painter = painterResource(R.drawable.equalizer),
@@ -69,7 +70,10 @@ private fun RepeatButton(
         isRepeating = intent!!.getBooleanExtra(IS_REPEATING_ARG, false)
     }
 
-    IconButton(modifier = modifier, onClick = { streamingUIHandler.sendChangeRepeatBroadcast() }) {
+    IconButton(
+        modifier = modifier.primaryColorShadow(),
+        onClick = { streamingUIHandler.sendChangeRepeatBroadcast() }
+    ) {
         Icon(
             modifier = Modifier.size(30.dp),
             painter = painterResource(if (isRepeating) R.drawable.repeat else R.drawable.no_repeat),
@@ -89,7 +93,7 @@ private fun LikeButton(modifier: Modifier = Modifier) {
     }
 
     /** TODO: favourite database */
-    IconButton(modifier = modifier, onClick = { /** TODO: favourite database */ }) {
+    IconButton(modifier = modifier.primaryColorShadow(), onClick = { /** TODO: favourite database */ }) {
         Icon(
             modifier = Modifier.size(30.dp),
             painter = painterResource(if (isLiked) R.drawable.like_filled else R.drawable.like),
@@ -156,7 +160,7 @@ private fun DownloadButton(modifier: Modifier = Modifier) {
 
     Box(modifier) {
         IconButton(
-            modifier = modifier,
+            modifier = modifier.primaryColorShadow(),
             onClick = {
                 filesPermissionsResultLauncher.launch(externalStoragePermissionQueue.toTypedArray())
                 isCashPropertiesDialogShownState.value = true

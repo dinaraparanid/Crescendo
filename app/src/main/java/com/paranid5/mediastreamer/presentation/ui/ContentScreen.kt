@@ -11,17 +11,17 @@ import com.paranid5.mediastreamer.presentation.Screens
 import com.paranid5.mediastreamer.presentation.about_app.AboutApp
 import com.paranid5.mediastreamer.presentation.favourites.FavouritesScreen
 import com.paranid5.mediastreamer.presentation.search_stream.SearchStreamScreen
-import com.paranid5.mediastreamer.presentation.ui.screens.*
 import com.paranid5.mediastreamer.presentation.search_stream.SearchStreamViewModel
 import com.paranid5.mediastreamer.presentation.streaming.StreamingScreen
 import com.paranid5.mediastreamer.presentation.streaming.StreamingViewModel
+import com.paranid5.mediastreamer.presentation.ui.screens.SettingsScreen
 import org.koin.androidx.compose.koinViewModel
 
 @Composable
 fun ContentScreen(
     padding: PaddingValues,
     searchStreamViewModel: SearchStreamViewModel = koinViewModel(),
-    streamingViewModel: StreamingViewModel = koinViewModel()
+    streamingViewModel: StreamingViewModel = koinViewModel(),
 ) {
     NavHost(
         navController = LocalNavController.current.value!!,

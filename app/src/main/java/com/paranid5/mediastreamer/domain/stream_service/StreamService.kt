@@ -30,7 +30,7 @@ import com.paranid5.mediastreamer.R
 import com.paranid5.mediastreamer.domain.StorageHandler
 import com.paranid5.mediastreamer.domain.YoutubeUrlExtractor
 import com.paranid5.mediastreamer.data.VideoMetadata
-import com.paranid5.mediastreamer.data.utils.extensions.toOldMetadata
+import com.paranid5.mediastreamer.data.utils.extensions.toAndroidMetadata
 import com.paranid5.mediastreamer.presentation.MainActivity
 import com.paranid5.mediastreamer.presentation.streaming.*
 import com.paranid5.mediastreamer.presentation.ui.screens.*
@@ -69,7 +69,7 @@ class StreamService : Service(), CoroutineScope by MainScope(), KoinComponent {
         private const val ACTION_ADD_TO_FAVOURITE = "add_to_favourite"
         private const val ACTION_REMOVE_FROM_FAVOURITE = "remove_from_favourite"
         private const val ACTION_CHANGE_REPEAT = "change_repeat"
-        private const val ACTION_DISMISS = "dismiss"
+        private const val ACTION_DISMISS = "dismiss" // TODO: Dismiss notification
 
         const val URL_ARG = "url"
         const val POSITION_ARG = "position"
@@ -219,6 +219,8 @@ class StreamService : Service(), CoroutineScope by MainScope(), KoinComponent {
                 Intent(Broadcast_IS_PLAYING_CHANGED)
                     .putExtra(IS_PLAYING_ARG, isPlaying)
             )
+
+            launch { mUpdateMediaSession() }
 
             when {
                 isPlaying -> mStartPlaybackMonitoring()
@@ -469,12 +471,7 @@ class StreamService : Service(), CoroutineScope by MainScope(), KoinComponent {
                 .Factory(DefaultHttpDataSource.Factory())
                 .createMediaSource(MediaItem.fromUri(videoUrl))*/
 
-            mediaSession.setMetadata(
-                currentMetadata
-                    .updateAndGet { videoMeta?.let(::VideoMetadata) }
-                    ?.toOldMetadata(mGetVideoCoverAsync().await())
-            )
-
+            mUpdateMediaSession(videoMeta?.let(::VideoMetadata))
             launch(Dispatchers.IO) { storeMetadata(videoMeta) }
 
             player.run {
@@ -546,7 +543,7 @@ class StreamService : Service(), CoroutineScope by MainScope(), KoinComponent {
         get() = PlaybackState.Builder()
             .setActions(playbackStateActions)
             .setState(
-                PlaybackState.STATE_PAUSED,
+                if (mIsPlaying) PlaybackState.STATE_PLAYING else PlaybackState.STATE_PAUSED,
                 currentPlaybackPosition,
                 1.0F,
                 SystemClock.elapsedRealtime()
@@ -571,6 +568,17 @@ class StreamService : Service(), CoroutineScope by MainScope(), KoinComponent {
         }
     }
 
+    internal suspend fun mUpdateMediaSession(
+        videoMetadata: VideoMetadata? = currentMetadata.value
+    ) = mediaSession.run {
+        setPlaybackState(newPlaybackState)
+        setMetadata(
+            currentMetadata
+                .updateAndGet { videoMetadata }
+                ?.toAndroidMetadata(mGetVideoCoverAsync().await())
+        )
+    }
+
     internal suspend inline fun mGetVideoCoverAsync() =
         currentMetadata
             .value
@@ -584,23 +592,15 @@ class StreamService : Service(), CoroutineScope by MainScope(), KoinComponent {
     private val notificationBuilderOreo = currentMetadata.mapLatest {
         Notification
             .Builder(applicationContext, STREAM_CHANNEL_ID)
-            .setContent(currentMetadata = it)
+            .setContent()
     }
 
     @RequiresApi(Build.VERSION_CODES.O)
-    private fun Notification.Builder.setContent(currentMetadata: VideoMetadata?) = this
+    private fun Notification.Builder.setContent() = this
         .setShowWhen(false)
         .setSmallIcon(R.drawable.stream_icon)
         .setAutoCancel(false)
         .setOngoing(true)
-        .setContentTitle(
-            currentMetadata?.title
-                ?: resources.getString(R.string.stream_no_name)
-        )
-        .setContentText(
-            currentMetadata?.author
-                ?: resources.getString(R.string.unknown_streamer)
-        )
         .setStyle(
             Notification.MediaStyle()
                 .setMediaSession(mediaSession.sessionToken)
@@ -805,58 +805,51 @@ class StreamService : Service(), CoroutineScope by MainScope(), KoinComponent {
     ): Either<Unit, Unit> {
         isNotificationShown = true
 
-        return notificationBuilder.bimap(
-            { compatBuilder ->
-                compatBuilder.collectLatest { builder ->
-                    startForeground(
-                        NOTIFICATION_ID,
-                        builder
-                            .setLargeIcon(mGetVideoCoverAsync().await())
-                            .setActions(isPlaying, isLiked)
-                            .build(),
-                    )
-                }
-            },
-            { oreoBuilder ->
-                oreoBuilder.collectLatest { builder ->
-                    startForeground(
-                        NOTIFICATION_ID,
-                        builder
-                            .setLargeIcon(mGetVideoCoverAsync().await())
-                            .setActions(isPlaying, isLiked)
-                            .build()
-                    )
-                }
-            },
-        )
+        return notificationBuilder.map { oreoBuilder ->
+            oreoBuilder.collectLatest { builder ->
+                startForeground(
+                    NOTIFICATION_ID,
+                    builder
+                        .setActions(isPlaying, isLiked)
+                        .build()
+                )
+            }
+        }.mapLeft { compatBuilder ->
+            compatBuilder.collectLatest { builder ->
+                startForeground(
+                    NOTIFICATION_ID,
+                    builder
+                        .setLargeIcon(mGetVideoCoverAsync().await())
+                        .setActions(isPlaying, isLiked)
+                        .build(),
+                )
+            }
+        }
     }
 
     @SuppressLint("NewApi")
     internal suspend inline fun mUpdateNotification(isPlaying: Boolean, isLiked: Boolean) =
-        notificationBuilder.bimap(
-            { compatBuilder ->
-                compatBuilder.collectLatest { builder ->
-                    notificationManager.notify(
-                        NOTIFICATION_ID,
-                        builder
-                            .setLargeIcon(mGetVideoCoverAsync().await())
-                            .setActions(isPlaying, isLiked)
-                            .build()
-                    )
-                }
-            },
-            { oreoBuilder ->
-                oreoBuilder.collectLatest { builder ->
-                    notificationManager.notify(
-                        NOTIFICATION_ID,
-                        builder
-                            .setLargeIcon(mGetVideoCoverAsync().await())
-                            .setActions(isPlaying, isLiked)
-                            .build()
-                    )
-                }
-            },
-        )
+        notificationBuilder.map { oreoBuilder ->
+            oreoBuilder.collectLatest { builder ->
+                notificationManager.notify(
+                    NOTIFICATION_ID,
+                    builder
+                        .setLargeIcon(mGetVideoCoverAsync().await())
+                        .setActions(isPlaying, isLiked)
+                        .build()
+                )
+            }
+        }.mapLeft { compatBuilder ->
+            compatBuilder.collectLatest { builder ->
+                notificationManager.notify(
+                    NOTIFICATION_ID,
+                    builder
+                        .setLargeIcon(mGetVideoCoverAsync().await())
+                        .setActions(isPlaying, isLiked)
+                        .build()
+                )
+            }
+        }
 
     internal suspend inline fun mUpdateOrShowNotification(isPlaying: Boolean, isLiked: Boolean) =
         when {

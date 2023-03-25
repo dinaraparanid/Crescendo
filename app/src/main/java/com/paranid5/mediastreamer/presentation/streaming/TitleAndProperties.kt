@@ -14,18 +14,16 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.paranid5.mediastreamer.R
 import com.paranid5.mediastreamer.data.VideoMetadata
+import com.paranid5.mediastreamer.presentation.ui.extensions.primaryColorShadow
 import com.paranid5.mediastreamer.presentation.ui.theme.LocalAppColors
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-private fun TitleAndAuthor(metadata: VideoMetadata?, modifier: Modifier = Modifier) {
-    val colors = LocalAppColors.current.value
-
+private fun TitleAndAuthor(metadata: VideoMetadata?, modifier: Modifier = Modifier) =
     Column(modifier) {
         Text(
-            modifier = Modifier.basicMarquee(),
+            modifier = Modifier.basicMarquee().primaryColorShadow(),
             text = metadata?.title ?: stringResource(R.string.stream_no_name),
-            color = colors.primary,
             fontSize = 18.sp,
             maxLines = 1,
         )
@@ -33,14 +31,12 @@ private fun TitleAndAuthor(metadata: VideoMetadata?, modifier: Modifier = Modifi
         Spacer(Modifier.height(5.dp))
 
         Text(
-            modifier = Modifier.basicMarquee(),
+            modifier = Modifier.basicMarquee().primaryColorShadow(),
             text = metadata?.author ?: stringResource(R.string.unknown_streamer),
-            color = colors.primary,
             fontSize = 16.sp,
             maxLines = 1,
         )
     }
-}
 
 @Composable
 private fun PropertiesButton(modifier: Modifier = Modifier) {

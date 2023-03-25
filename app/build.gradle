@@ -71,7 +71,8 @@ dependencies {
 
     implementation 'com.github.HaarigerHarald:android-youtubeExtractor:master-SNAPSHOT'
 
-    implementation 'com.github.skydoves:landscapist-coil:2.1.9'
+    implementation 'io.coil-kt:coil-compose:2.2.2'
+
     implementation 'com.github.bumptech.glide:glide:4.15.1'
     implementation 'com.github.bumptech.glide:compose:1.0.0-alpha.1'
     annotationProcessor 'com.github.bumptech.glide:compiler:4.15.1'
