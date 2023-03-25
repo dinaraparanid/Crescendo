@@ -582,7 +582,7 @@ class StreamService : Service(), CoroutineScope by MainScope(), KoinComponent {
     internal suspend inline fun mGetVideoCoverAsync() =
         currentMetadata
             .value
-            ?.let { glideUtils.getVideoCoverAsync(it) }
+            ?.let { glideUtils.getVideoCoverBitmapAsync(it) }
             ?: coroutineScope { async(Dispatchers.IO) { glideUtils.thumbnailBitmap } }
 
     // --------------------------- Notification for Oreo+ ---------------------------

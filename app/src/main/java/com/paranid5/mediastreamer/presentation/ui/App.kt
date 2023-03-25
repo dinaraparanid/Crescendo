@@ -12,11 +12,12 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.blur
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalConfiguration
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.dp
 import com.paranid5.mediastreamer.R
 import com.paranid5.mediastreamer.presentation.LocalNavController
 import com.paranid5.mediastreamer.presentation.Screens
@@ -27,13 +28,14 @@ import com.paranid5.mediastreamer.presentation.ui.theme.LocalAppColors
 @OptIn(ExperimentalAnimationApi::class)
 @Composable
 fun App() {
+    val config = LocalConfiguration.current
     val colors = LocalAppColors.current.value
     val navHostController = LocalNavController.current
     val currentScreenTitle by navHostController.currentRouteState.collectAsState()
 
     val coilPainter = rememberVideoCoverPainter(
-        isPlaceholderRequired = false,
-        BlurTransformation(LocalContext.current)
+        isPlaceholderRequired = true,
+        size = config.screenWidthDp to config.screenHeightDp,
     )
 
     val backgroundColor = when (currentScreenTitle) {
@@ -50,11 +52,11 @@ fun App() {
     AnimatedContent(targetState = animBackgroundColor) { color ->
         Box(Modifier.fillMaxSize()) {
             Image(
-                modifier = Modifier.fillMaxSize(),
                 painter = coilPainter,
+                modifier = Modifier.fillMaxSize().blur(radius = 15.dp),
                 contentDescription = stringResource(R.string.video_cover),
-                contentScale = ContentScale.Crop,
-                alignment = Alignment.Center
+                contentScale = ContentScale.FillBounds,
+                alignment = Alignment.Center,
             )
 
             Scaffold(

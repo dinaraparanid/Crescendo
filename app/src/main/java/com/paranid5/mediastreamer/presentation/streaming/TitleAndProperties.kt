@@ -12,54 +12,64 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.palette.graphics.Palette
 import com.paranid5.mediastreamer.R
 import com.paranid5.mediastreamer.data.VideoMetadata
-import com.paranid5.mediastreamer.presentation.ui.extensions.primaryColorShadow
-import com.paranid5.mediastreamer.presentation.ui.theme.LocalAppColors
+import com.paranid5.mediastreamer.presentation.ui.extensions.getLightVibrantOrPrimary
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-private fun TitleAndAuthor(metadata: VideoMetadata?, modifier: Modifier = Modifier) =
+private fun TitleAndAuthor(
+    metadata: VideoMetadata?,
+    palette: Palette?,
+    modifier: Modifier = Modifier
+) {
+    val lightVibrantColor = palette.getLightVibrantOrPrimary()
+
     Column(modifier) {
         Text(
-            modifier = Modifier.basicMarquee().primaryColorShadow(),
+            modifier = Modifier.basicMarquee(),
             text = metadata?.title ?: stringResource(R.string.stream_no_name),
             fontSize = 18.sp,
             maxLines = 1,
+            color = lightVibrantColor
         )
 
         Spacer(Modifier.height(5.dp))
 
         Text(
-            modifier = Modifier.basicMarquee().primaryColorShadow(),
+            modifier = Modifier.basicMarquee(),
             text = metadata?.author ?: stringResource(R.string.unknown_streamer),
             fontSize = 16.sp,
             maxLines = 1,
+            color = lightVibrantColor
         )
     }
+}
 
 @Composable
-private fun PropertiesButton(modifier: Modifier = Modifier) {
-    val colors = LocalAppColors.current.value
+private fun PropertiesButton(palette: Palette?, modifier: Modifier = Modifier) {
+    val lightVibrantColor = palette.getLightVibrantOrPrimary()
 
     IconButton(modifier = modifier, onClick = { /*TODO*/ }) {
         Icon(
             modifier = Modifier.height(50.dp).width(25.dp),
             painter = painterResource(R.drawable.three_dots),
             contentDescription = stringResource(R.string.settings),
-            tint = colors.primary
+            tint = lightVibrantColor
         )
     }
 }
 
 @Composable
-fun TitleAndPropertiesButton(metadata: VideoMetadata?, modifier: Modifier = Modifier) =
+fun TitleAndPropertiesButton(metadata: VideoMetadata?, palette: Palette?, modifier: Modifier = Modifier) =
     Row(modifier.fillMaxWidth().padding(horizontal = 10.dp)) {
         TitleAndAuthor(
             metadata = metadata,
-            modifier = Modifier.weight(1F)
+            modifier = Modifier.weight(1F),
+            palette = palette
         )
 
         Spacer(Modifier.width(10.dp))
-        PropertiesButton()
+        PropertiesButton(palette)
     }

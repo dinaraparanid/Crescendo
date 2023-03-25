@@ -77,6 +77,8 @@ dependencies {
     implementation 'com.github.bumptech.glide:compose:1.0.0-alpha.1'
     annotationProcessor 'com.github.bumptech.glide:compiler:4.15.1'
 
+    implementation 'androidx.palette:palette:1.0.0'
+
     implementation 'io.arrow-kt:arrow-fx-coroutines:1.1.6-alpha.28'
 
     implementation 'org.jetbrains.kotlinx:kotlinx-serialization-json:1.5.0'

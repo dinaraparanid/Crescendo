@@ -17,14 +17,16 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.constraintlayout.compose.Dimension
+import androidx.palette.graphics.Palette
+import coil.compose.AsyncImagePainter
 import com.paranid5.mediastreamer.R
 import com.paranid5.mediastreamer.data.VideoMetadata
 import com.paranid5.mediastreamer.domain.StorageHandler
 import com.paranid5.mediastreamer.presentation.composition_locals.LocalStreamState
 import com.paranid5.mediastreamer.presentation.composition_locals.StreamStates
 import com.paranid5.mediastreamer.presentation.ui.OnBackPressedHandler
-import com.paranid5.mediastreamer.presentation.ui.rememberVideoCoverPainter
-import com.paranid5.mediastreamer.presentation.ui.theme.LocalAppColors
+import com.paranid5.mediastreamer.presentation.ui.extensions.getLightVibrantOrPrimary
+import com.paranid5.mediastreamer.presentation.ui.rememberVideoCoverPainterWithPalette
 import com.paranid5.mediastreamer.utils.BroadcastReceiver
 import com.paranid5.mediastreamer.utils.extensions.timeString
 import org.koin.androidx.compose.get
@@ -49,6 +51,11 @@ fun StreamingScreen(
     LocalStreamState.current.value = StreamStates.STREAMING
     val metadata by storageHandler.currentMetadataState.collectAsState()
 
+    val (coilPainter, palette) = rememberVideoCoverPainterWithPalette(
+        isPlaceholderRequired = true,
+        size = 1100 to 1000
+    )
+
     OnBackPressedHandler()
 
     ConstraintLayout(modifier.fillMaxSize()) {
@@ -68,11 +75,14 @@ fun StreamingScreen(
                 bottom.linkTo(slider.top, margin = 10.dp)
                 height = Dimension.fillToConstraints
                 width = Dimension.fillToConstraints
-            }
+            },
+            coilPainter = coilPainter,
+            palette = palette
         )
 
         PlaybackSlider(
             metadata = metadata,
+            palette = palette,
             modifier = Modifier.constrainAs(slider) {
                 centerVerticallyTo(parent)
                 start.linkTo(parent.start, margin = 20.dp)
@@ -82,6 +92,7 @@ fun StreamingScreen(
 
         TitleAndPropertiesButton(
             metadata = metadata,
+            palette = palette,
             modifier = Modifier.constrainAs(titleAndPropertiesButton) {
                 top.linkTo(slider.bottom, margin = 15.dp)
                 start.linkTo(parent.start, margin = 20.dp)
@@ -91,6 +102,7 @@ fun StreamingScreen(
 
         PlaybackButtons(
             streamingPresenter = viewModel.presenter,
+            palette = palette,
             modifier = Modifier.constrainAs(playbackButtons) {
                 top.linkTo(titleAndPropertiesButton.bottom, margin = 15.dp)
                 start.linkTo(parent.start, margin = 20.dp)
@@ -99,7 +111,8 @@ fun StreamingScreen(
         )
 
         UtilsButtons(
-            Modifier.constrainAs(utilsButtons) {
+            palette = palette,
+            modifier = Modifier.constrainAs(utilsButtons) {
                 top.linkTo(playbackButtons.bottom, margin = 5.dp)
                 start.linkTo(parent.start, margin = 20.dp)
                 end.linkTo(parent.end, margin = 20.dp)
@@ -109,38 +122,45 @@ fun StreamingScreen(
 }
 
 @Composable
-private fun VideoCover(modifier: Modifier = Modifier) {
-    val colors = LocalAppColors.current.value
-    val coilPainter = rememberVideoCoverPainter(isPlaceholderRequired = true)
+private fun VideoCover(
+    coilPainter: AsyncImagePainter,
+    palette: Palette?,
+    modifier: Modifier = Modifier
+) {
+    val lightVibrantColor = palette.getLightVibrantOrPrimary()
 
     Image(
         painter = coilPainter,
-        contentDescription = stringResource(R.string.video_cover),
-        contentScale = ContentScale.FillHeight,
-        alignment = Alignment.Center,
         modifier = modifier
+            .aspectRatio(1F)
+            .fillMaxSize()
+            .padding(20.dp)
             .shadow(
                 elevation = 80.dp,
                 shape = RoundedCornerShape(5.dp),
-                ambientColor = colors.primary,
-                spotColor = colors.primary
+                ambientColor = lightVibrantColor,
+                spotColor = lightVibrantColor
             )
             .border(
-                width = 30.dp,
+                width = 50.dp,
                 color = Color.Transparent,
-                shape = RoundedCornerShape(30.dp)
-            )
+                shape = RoundedCornerShape(50.dp)
+            ),
+        contentDescription = stringResource(R.string.video_cover),
+        contentScale = ContentScale.Crop,
+        alignment = Alignment.Center,
     )
 }
 
 @Composable
 private fun PlaybackSlider(
     metadata: VideoMetadata?,
+    palette: Palette?,
     modifier: Modifier = Modifier,
     streamingUIHandler: StreamingUIHandler = get(),
     storageHandler: StorageHandler = get()
 ) {
-    val colors = LocalAppColors.current.value
+    val lightVibrantColor = palette.getLightVibrantOrPrimary()
     val videoLength = metadata?.lenInMillis ?: 0
     var curPosition by remember { mutableStateOf(0L) }
 
@@ -157,8 +177,8 @@ private fun PlaybackSlider(
             value = curPosition.toFloat(),
             valueRange = 0F..videoLength.toFloat(),
             colors = SliderDefaults.colors(
-                thumbColor = colors.primary,
-                activeTrackColor = colors.primary
+                thumbColor = lightVibrantColor,
+                activeTrackColor = lightVibrantColor
             ),
             onValueChange = { curPosition = it.toLong() },
             onValueChangeFinished = {
@@ -167,9 +187,9 @@ private fun PlaybackSlider(
         )
 
         Row(Modifier.fillMaxWidth()) {
-            Text(curPosition.timeString)
+            Text(text = curPosition.timeString, color = lightVibrantColor)
             Spacer(Modifier.weight(1F))
-            Text(videoLength.timeString)
+            Text(text = videoLength.timeString, color = lightVibrantColor)
         }
     }
 }

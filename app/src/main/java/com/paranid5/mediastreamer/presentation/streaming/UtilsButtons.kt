@@ -19,51 +19,56 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
+import androidx.palette.graphics.Palette
 import com.paranid5.mediastreamer.EXTERNAL_STORAGE_PERMISSION_QUEUE
 import com.paranid5.mediastreamer.R
 import com.paranid5.mediastreamer.domain.StorageHandler
-import com.paranid5.mediastreamer.utils.BroadcastReceiver
+import com.paranid5.mediastreamer.domain.video_cash_service.VideoCashResponse
 import com.paranid5.mediastreamer.presentation.LocalActivity
+import com.paranid5.mediastreamer.presentation.ui.extensions.getLightVibrantOrPrimary
+import com.paranid5.mediastreamer.presentation.ui.extensions.simpleShadow
 import com.paranid5.mediastreamer.presentation.ui.permissions.ExternalStorageDescriptionProvider
 import com.paranid5.mediastreamer.presentation.ui.permissions.PermissionDialog
-import com.paranid5.mediastreamer.presentation.ui.theme.LocalAppColors
+import com.paranid5.mediastreamer.utils.BroadcastReceiver
 import com.paranid5.mediastreamer.utils.extensions.openAppSettings
-import com.paranid5.mediastreamer.domain.video_cash_service.VideoCashResponse
-import com.paranid5.mediastreamer.presentation.ui.extensions.primaryColorShadow
 import org.koin.androidx.compose.get
 import org.koin.core.qualifier.named
 import java.util.Queue
 
 @Composable
-fun UtilsButtons(modifier: Modifier = Modifier) =
+fun UtilsButtons(palette: Palette?, modifier: Modifier = Modifier) =
     Row(modifier.fillMaxWidth()) {
-        EqualizerButton(Modifier.weight(1F))
-        RepeatButton(Modifier.weight(1F))
-        LikeButton(Modifier.weight(1F))
-        DownloadButton(Modifier.weight(1F))
+        EqualizerButton(modifier = Modifier.weight(1F), palette = palette)
+        RepeatButton(modifier = Modifier.weight(1F), palette = palette)
+        LikeButton(modifier = Modifier.weight(1F), palette = palette)
+        DownloadButton(modifier = Modifier.weight(1F), palette = palette)
     }
 
 @Composable
-private fun EqualizerButton(modifier: Modifier = Modifier) {
-    val colors = LocalAppColors.current.value
+private fun EqualizerButton(palette: Palette?, modifier: Modifier = Modifier) {
+    val lightVibrantColor = palette.getLightVibrantOrPrimary()
 
-    IconButton(modifier = modifier.primaryColorShadow(), onClick = { /*TODO Equalizer*/ }) {
+    IconButton(
+        modifier = modifier.simpleShadow(color = lightVibrantColor),
+        onClick = { /*TODO Equalizer*/ }
+    ) {
         Icon(
             modifier = Modifier.size(30.dp),
             painter = painterResource(R.drawable.equalizer),
             contentDescription = stringResource(R.string.equalizer),
-            tint = colors.primary
+            tint = lightVibrantColor
         )
     }
 }
 
 @Composable
 private fun RepeatButton(
+    palette: Palette?,
     modifier: Modifier = Modifier,
     storageHandler: StorageHandler = get(),
     streamingUIHandler: StreamingUIHandler = get()
 ) {
-    val colors = LocalAppColors.current.value
+    val lightVibrantColor = palette.getLightVibrantOrPrimary()
     var isRepeating by remember { mutableStateOf(storageHandler.isRepeatingState.value) }
 
     BroadcastReceiver(action = Broadcast_IS_REPEATING_CHANGED) { _, intent ->
@@ -71,21 +76,21 @@ private fun RepeatButton(
     }
 
     IconButton(
-        modifier = modifier.primaryColorShadow(),
+        modifier = modifier.simpleShadow(color = lightVibrantColor),
         onClick = { streamingUIHandler.sendChangeRepeatBroadcast() }
     ) {
         Icon(
             modifier = Modifier.size(30.dp),
             painter = painterResource(if (isRepeating) R.drawable.repeat else R.drawable.no_repeat),
             contentDescription = stringResource(R.string.change_repeat),
-            tint = colors.primary
+            tint = lightVibrantColor
         )
     }
 }
 
 @Composable
-private fun LikeButton(modifier: Modifier = Modifier) {
-    val colors = LocalAppColors.current.value
+private fun LikeButton(palette: Palette?, modifier: Modifier = Modifier) {
+    val lightVibrantColor = palette.getLightVibrantOrPrimary()
     val isLiked by remember { mutableStateOf(false) }
 
     BroadcastReceiver(action = Broadcast_IS_REPEATING_CHANGED) { _, intent ->
@@ -93,19 +98,22 @@ private fun LikeButton(modifier: Modifier = Modifier) {
     }
 
     /** TODO: favourite database */
-    IconButton(modifier = modifier.primaryColorShadow(), onClick = { /** TODO: favourite database */ }) {
+    IconButton(
+        modifier = modifier.simpleShadow(color = lightVibrantColor),
+        onClick = { /** TODO: favourite database */ }
+    ) {
         Icon(
             modifier = Modifier.size(30.dp),
             painter = painterResource(if (isLiked) R.drawable.like_filled else R.drawable.like),
             contentDescription = stringResource(R.string.favourites),
-            tint = colors.primary
+            tint = lightVibrantColor
         )
     }
 }
 
 @Composable
-private fun DownloadButton(modifier: Modifier = Modifier) {
-    val colors = LocalAppColors.current.value
+private fun DownloadButton(palette: Palette?, modifier: Modifier = Modifier) {
+    val lightVibrantColor = palette.getLightVibrantOrPrimary()
     val activity = LocalActivity.current!!
     val isCashPropertiesDialogShownState = remember { mutableStateOf(false) }
 
@@ -160,7 +168,7 @@ private fun DownloadButton(modifier: Modifier = Modifier) {
 
     Box(modifier) {
         IconButton(
-            modifier = modifier.primaryColorShadow(),
+            modifier = modifier.simpleShadow(color = lightVibrantColor),
             onClick = {
                 filesPermissionsResultLauncher.launch(externalStoragePermissionQueue.toTypedArray())
                 isCashPropertiesDialogShownState.value = true
@@ -170,7 +178,7 @@ private fun DownloadButton(modifier: Modifier = Modifier) {
                 modifier = Modifier.size(30.dp),
                 painter = painterResource(R.drawable.save_icon),
                 contentDescription = stringResource(R.string.download_as_mp3),
-                tint = colors.primary
+                tint = lightVibrantColor
             )
         }
 
