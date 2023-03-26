@@ -1,4 +1,4 @@
-package com.paranid5.mediastreamer.utils.extensions
+package com.paranid5.mediastreamer.domain.utils.extensions
 
 import android.content.BroadcastReceiver
 import android.content.ContentValues
@@ -9,6 +9,7 @@ import android.os.Build
 import android.provider.MediaStore
 import com.bumptech.glide.Glide
 import com.paranid5.mediastreamer.data.VideoMetadata
+import com.paranid5.mediastreamer.presentation.ui.extensions.byteData
 import org.jaudiotagger.audio.AudioFileIO
 import org.jaudiotagger.tag.mp4.Mp4FieldKey
 import org.jaudiotagger.tag.mp4.Mp4Tag

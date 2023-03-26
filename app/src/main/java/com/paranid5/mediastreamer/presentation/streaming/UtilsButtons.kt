@@ -30,7 +30,7 @@ import com.paranid5.mediastreamer.presentation.ui.extensions.simpleShadow
 import com.paranid5.mediastreamer.presentation.ui.permissions.ExternalStorageDescriptionProvider
 import com.paranid5.mediastreamer.presentation.ui.permissions.PermissionDialog
 import com.paranid5.mediastreamer.utils.BroadcastReceiver
-import com.paranid5.mediastreamer.utils.extensions.openAppSettings
+import com.paranid5.mediastreamer.presentation.ui.extensions.openAppSettings
 import org.koin.androidx.compose.get
 import org.koin.core.qualifier.named
 import java.util.Queue

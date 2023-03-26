@@ -1,5 +1,6 @@
 package com.paranid5.mediastreamer.presentation.ui
 
+import android.graphics.Bitmap
 import android.graphics.drawable.BitmapDrawable
 import androidx.compose.runtime.*
 import androidx.compose.ui.platform.LocalContext
@@ -9,17 +10,16 @@ import coil.compose.rememberAsyncImagePainter
 import coil.request.ImageRequest
 import coil.size.Precision
 import coil.size.Scale
-import coil.transform.Transformation
 import com.paranid5.mediastreamer.R
 import com.paranid5.mediastreamer.domain.StorageHandler
 import org.koin.androidx.compose.get
 
 @Composable
-fun rememberVideoCoverPainter(
+internal inline fun rememberVideoCoverPainter(
     isPlaceholderRequired: Boolean,
     size: Pair<Int, Int>? = null,
-    vararg transformation: Transformation,
     storageHandler: StorageHandler = get(),
+    crossinline bitmapSettings: (Bitmap) -> Unit = {}
 ): AsyncImagePainter {
     val metadata by storageHandler.currentMetadataState.collectAsState()
     val context = LocalContext.current
@@ -28,8 +28,13 @@ fun rememberVideoCoverPainter(
     var coverModel by remember { mutableStateOf<BitmapDrawable?>(null) }
     var prevCoverModel by remember { mutableStateOf<BitmapDrawable?>(null) }
 
-    LaunchedEffect(key1 = metadata) {
-        val newModel = metadata?.let { glideUtils.getVideoCoverAsync(it, size).await() }
+    LaunchedEffect(metadata) {
+        val newModel = metadata?.let {
+            glideUtils
+                .getVideoCoverAsync(it, size, bitmapSettings)
+                .await()
+        }
+
         prevCoverModel = coverModel ?: newModel
         coverModel = newModel
     }
@@ -48,17 +53,16 @@ fun rememberVideoCoverPainter(
             .precision(Precision.EXACT)
             .scale(Scale.FILL)
             .crossfade(true)
-            .transformations(*transformation)
             .build()
     )
 }
 
 @Composable
-fun rememberVideoCoverPainterWithPalette(
+internal inline fun rememberVideoCoverPainterWithPalette(
     isPlaceholderRequired: Boolean,
     size: Pair<Int, Int>? = null,
-    vararg transformation: Transformation,
     storageHandler: StorageHandler = get(),
+    crossinline bitmapSettings: (Bitmap) -> Unit = {}
 ): Pair<AsyncImagePainter, Palette?> {
     val metadata by storageHandler.currentMetadataState.collectAsState()
     val context = LocalContext.current
@@ -68,9 +72,9 @@ fun rememberVideoCoverPainterWithPalette(
     var prevCoverModel by remember { mutableStateOf<BitmapDrawable?>(null) }
     var palette by remember { mutableStateOf<Palette?>(null) }
 
-    LaunchedEffect(key1 = metadata) {
+    LaunchedEffect(metadata) {
         val newPaletteAndModel = metadata?.let {
-            glideUtils.getVideoCoverWithPaletteAsync(it, size).await()
+            glideUtils.getVideoCoverWithPaletteAsync(it, size, bitmapSettings).await()
         }
 
         prevCoverModel = coverModel ?: newPaletteAndModel?.second
@@ -91,7 +95,6 @@ fun rememberVideoCoverPainterWithPalette(
             .precision(Precision.EXACT)
             .scale(Scale.FILL)
             .crossfade(true)
-            .transformations(*transformation)
             .build()
     ) to palette
 }

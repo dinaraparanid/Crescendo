@@ -28,7 +28,7 @@ import com.paranid5.mediastreamer.presentation.ui.OnBackPressedHandler
 import com.paranid5.mediastreamer.presentation.ui.extensions.getLightVibrantOrPrimary
 import com.paranid5.mediastreamer.presentation.ui.rememberVideoCoverPainterWithPalette
 import com.paranid5.mediastreamer.utils.BroadcastReceiver
-import com.paranid5.mediastreamer.utils.extensions.timeString
+import com.paranid5.mediastreamer.data.utils.extensions.timeString
 import org.koin.androidx.compose.get
 
 private const val BROADCAST_LOCATION = "com.paranid5.mediastreamer.presentation.ui.screens"

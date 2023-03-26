@@ -1,4 +1,4 @@
-package com.paranid5.mediastreamer.utils.extensions
+package com.paranid5.mediastreamer.presentation.ui.extensions
 
 import android.app.Activity
 import android.content.Intent

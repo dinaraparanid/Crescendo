@@ -12,6 +12,7 @@ import android.media.session.MediaSessionManager
 import android.media.session.PlaybackState
 import android.os.Binder
 import android.os.Build
+import android.os.Bundle
 import android.os.SystemClock
 import android.util.Log
 import androidx.annotation.OptIn
@@ -24,6 +25,7 @@ import androidx.media3.common.util.UnstableApi
 import androidx.media3.datasource.DefaultHttpDataSource
 import androidx.media3.exoplayer.ExoPlayer
 import androidx.media3.exoplayer.source.ProgressiveMediaSource
+import androidx.media3.session.MediaNotification
 import arrow.core.Either
 import at.huber.youtubeExtractor.VideoMeta
 import com.paranid5.mediastreamer.R
@@ -35,7 +37,7 @@ import com.paranid5.mediastreamer.presentation.MainActivity
 import com.paranid5.mediastreamer.presentation.streaming.*
 import com.paranid5.mediastreamer.presentation.ui.screens.*
 import com.paranid5.mediastreamer.presentation.ui.GlideUtils
-import com.paranid5.mediastreamer.utils.extensions.registerReceiverCompat
+import com.paranid5.mediastreamer.domain.utils.extensions.registerReceiverCompat
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
 import org.koin.core.component.KoinComponent
@@ -523,25 +525,52 @@ class StreamService : Service(), CoroutineScope by MainScope(), KoinComponent {
                 super.onPause()
                 mPausePlayback()
             }
-        }
 
-    private val playbackStateActions = (
-            PlaybackState.ACTION_PLAY
-                    or PlaybackState.ACTION_PLAY_PAUSE
-                    or PlaybackState.ACTION_PLAY_FROM_MEDIA_ID
-                    or PlaybackState.ACTION_PAUSE
-            ).let { actions ->
-            when {
-                Build.VERSION.SDK_INT >= Build.VERSION_CODES.M ->
-                    actions or PlaybackState.ACTION_PLAY_FROM_URI
+            override fun onSeekTo(pos: Long) {
+                super.onSeekTo(pos)
+                mSeekTo(pos)
+            }
 
-                else -> actions
+            override fun onSkipToNext() {
+                super.onSkipToNext()
+                mSeekTo10SecsForward()
+            }
+
+            override fun onSkipToPrevious() {
+                super.onSkipToPrevious()
+                mSeekTo10SecsBack()
+            }
+
+            override fun onCustomAction(action: String, extras: Bundle?) {
+                super.onCustomAction(action, extras)
+
+                sendBroadcast(
+                    Intent(
+                        when (action) {
+                            ACTION_CHANGE_REPEAT -> Broadcast_CHANGE_REPEAT
+                            ACTION_10_SECS_BACK -> Broadcast_10_SECS_BACK
+                            ACTION_PAUSE -> Broadcast_PAUSE
+                            ACTION_RESUME -> Broadcast_RESUME
+                            ACTION_10_SECS_FORWARD -> Broadcast_10_SECS_FORWARD
+                            ACTION_ADD_TO_FAVOURITE -> Broadcast_ADD_TO_FAVOURITE
+                            ACTION_REMOVE_FROM_FAVOURITE -> Broadcast_REMOVE_FROM_FAVOURITE
+                            else -> throw IllegalArgumentException("Unknown action")
+                        }
+                    )
+                )
             }
         }
 
     private inline val newPlaybackState
         get() = PlaybackState.Builder()
-            .setActions(playbackStateActions)
+            .setActions(
+                PlaybackState.ACTION_SKIP_TO_PREVIOUS
+                        or PlaybackState.ACTION_PLAY
+                        or PlaybackState.ACTION_PAUSE
+                        or PlaybackState.ACTION_PLAY_PAUSE
+                        or PlaybackState.ACTION_SKIP_TO_NEXT
+                        or PlaybackState.ACTION_SEEK_TO
+            )
             .setState(
                 if (mIsPlaying) PlaybackState.STATE_PLAYING else PlaybackState.STATE_PAUSED,
                 currentPlaybackPosition,

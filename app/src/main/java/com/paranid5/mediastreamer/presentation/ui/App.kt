@@ -1,5 +1,6 @@
 package com.paranid5.mediastreamer.presentation.ui
 
+import android.graphics.Bitmap
 import androidx.compose.animation.Animatable
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.ExperimentalAnimationApi
@@ -23,6 +24,7 @@ import com.paranid5.mediastreamer.presentation.LocalNavController
 import com.paranid5.mediastreamer.presentation.Screens
 import com.paranid5.mediastreamer.presentation.appbar.AppBar
 import com.paranid5.mediastreamer.presentation.appbar.stream_button.StreamButton
+import com.paranid5.mediastreamer.presentation.ui.extensions.increaseDarkness
 import com.paranid5.mediastreamer.presentation.ui.theme.LocalAppColors
 
 @OptIn(ExperimentalAnimationApi::class)
@@ -36,6 +38,7 @@ fun App() {
     val coilPainter = rememberVideoCoverPainter(
         isPlaceholderRequired = true,
         size = config.screenWidthDp to config.screenHeightDp,
+        bitmapSettings = Bitmap::increaseDarkness,
     )
 
     val backgroundColor = when (currentScreenTitle) {

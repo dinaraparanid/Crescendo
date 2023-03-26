@@ -23,9 +23,9 @@ import com.paranid5.mediastreamer.domain.utils.AsyncCondVar
 import com.paranid5.mediastreamer.presentation.MainActivity
 import com.paranid5.mediastreamer.presentation.streaming.Broadcast_VIDEO_CASH_COMPLETED
 import com.paranid5.mediastreamer.presentation.streaming.VIDEO_CASH_STATUS
-import com.paranid5.mediastreamer.utils.extensions.insertMediaFileToMediaStore
-import com.paranid5.mediastreamer.utils.extensions.registerReceiverCompat
-import com.paranid5.mediastreamer.utils.extensions.setAudioTagsToFileCatching
+import com.paranid5.mediastreamer.domain.utils.extensions.insertMediaFileToMediaStore
+import com.paranid5.mediastreamer.domain.utils.extensions.registerReceiverCompat
+import com.paranid5.mediastreamer.domain.utils.extensions.setAudioTagsToFileCatching
 import io.ktor.client.*
 import io.ktor.http.*
 import kotlinx.coroutines.*

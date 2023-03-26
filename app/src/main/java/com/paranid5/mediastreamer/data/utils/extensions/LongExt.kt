@@ -1,4 +1,4 @@
-package com.paranid5.mediastreamer.utils.extensions
+package com.paranid5.mediastreamer.data.utils.extensions
 
 private inline val Long.timeValue
     get() = toString().timeValue
