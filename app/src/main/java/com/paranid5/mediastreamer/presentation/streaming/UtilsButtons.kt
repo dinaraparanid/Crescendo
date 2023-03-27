@@ -134,26 +134,25 @@ private fun DownloadButton(palette: Palette?, modifier: Modifier = Modifier) {
     }
 
     val filesPermissionsResultLauncher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.RequestMultiplePermissions(),
-        onResult = { permissionsToGranted ->
+        contract = ActivityResultContracts.RequestMultiplePermissions()
+    ) { permissionsToGranted ->
+        permissionsToGranted
+            .asSequence()
+            .filter { (_, isGranted) -> isGranted }
+            .forEach { (permission, _) ->
+                notGrantedStoragePermissions.remove(permission)
+            }
+
+        notGrantedStoragePermissions.addAll(
             permissionsToGranted
                 .asSequence()
-                .filter { (_, isGranted) -> isGranted }
-                .forEach { (permission, _) ->
-                    notGrantedStoragePermissions.remove(permission)
-                }
+                .filter { (_, isGranted) -> !isGranted }
+                .filter { (permission, _) -> permission !in notGrantedStoragePermissions }
+                .map { (permission, _) -> permission }
+        )
 
-            notGrantedStoragePermissions.addAll(
-                permissionsToGranted
-                    .asSequence()
-                    .filter { (_, isGranted) -> !isGranted }
-                    .filter { (permission, _) -> permission !in notGrantedStoragePermissions }
-                    .map { (permission, _) -> permission }
-            )
-
-            areAllPermissionsGranted = notGrantedStoragePermissions.isEmpty()
-        }
-    )
+        areAllPermissionsGranted = notGrantedStoragePermissions.isEmpty()
+    }
 
     BroadcastReceiver(action = Broadcast_VIDEO_CASH_COMPLETED) { context, intent ->
         val status = when {

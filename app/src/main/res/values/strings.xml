@@ -39,4 +39,5 @@
     <string name="grant_permission">Grant Permission</string>
     <string name="ok">OK</string>
     <string name="downloaded">Downloaded</string>
+    <string name="notifications_description">Notifications are required for long-living media playback and track cashing</string>
 </resources>
