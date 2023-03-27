@@ -17,9 +17,9 @@
 2. Video Cashing
 
 **TODO:**
-2. Playback of cashed videos and favourites system
-3. Equalizer, Bass Booster and other sound effects
-4. App customization and settings
+1. Playback of cashed videos and favourites system
+2. Equalizer, Bass Booster and other sound effects
+3. App customization and settings
 
 ## **System Requirements**
 **Android 5.0** or higher
