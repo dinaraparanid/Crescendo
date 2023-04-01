@@ -21,7 +21,8 @@
     <string name="geo_restricted">Sorry, this video is geo-restricted :(</string>
     <string name="something_went_wrong">Something went wrong</string>
     <string name="no_internet">Check your internet connection</string>
-    <string name="video_cashed">Video is successfully cashed!</string>
+    <string name="video_cashed">Video were successfully cashed!</string>
+    <string name="video_canceled">Video was canceled</string>
     <string name="downloading">Downloading</string>
     <string name="tracks_in_queue">Tracks in queue</string>
     <string name="cancel">Cancel</string>

@@ -212,6 +212,7 @@ private fun DownloadButton(palette: Palette?, modifier: Modifier = Modifier) {
 private fun onVideoCashCompleted(status: VideoCashResponse, context: Context) {
     val errorStringRes = context.getString(R.string.error)
     val successfulCashingStringRes = context.getString(R.string.video_cashed)
+    val canceledStringRes = context.getString(R.string.video_canceled)
 
     Toast.makeText(
         context,
@@ -222,6 +223,8 @@ private fun onVideoCashCompleted(status: VideoCashResponse, context: Context) {
             }
 
             is VideoCashResponse.Success -> successfulCashingStringRes
+
+            is VideoCashResponse.Canceled -> canceledStringRes
         },
         Toast.LENGTH_LONG
     ).show()

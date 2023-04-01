@@ -1,6 +1,7 @@
 package com.paranid5.mediastreamer.domain
 
 import android.util.Log
+import com.paranid5.mediastreamer.domain.video_cash_service.VideoCashService
 import io.ktor.client.*
 import io.ktor.client.call.*
 import io.ktor.client.engine.android.*
@@ -11,6 +12,8 @@ import io.ktor.utils.io.*
 import io.ktor.utils.io.core.*
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.isActive
+import kotlinx.coroutines.yield
 import java.io.File
 
 private const val TAG = "Ktor Client"
@@ -39,8 +42,9 @@ suspend inline fun HttpClient.getFileExt(fileUrl: String) =
 internal suspend inline fun HttpClient.downloadFile(
     fileUrl: String,
     storeFile: File,
-    progressState: MutableStateFlow<Pair<Long, Long>>? = null
-): HttpStatusCode {
+    progressState: MutableStateFlow<Pair<Long, Long>>? = null,
+    cashingStatusState: MutableStateFlow<VideoCashService.CashingStatus>
+): HttpStatusCode? {
     Log.d(TAG, "Downloading $fileUrl")
 
     val status = prepareGet(fileUrl).execute { response ->
@@ -50,10 +54,20 @@ internal suspend inline fun HttpClient.downloadFile(
             val channel = response.body<ByteReadChannel>()
             var progress = 0L
 
-            while (!channel.isClosedForRead) {
+            while (!channel.isClosedForRead
+                && isActive
+                && cashingStatusState.value == VideoCashService.CashingStatus.CASHING
+            ) {
+                yield()
+
                 val packet = channel.readRemaining(DEFAULT_BUFFER_SIZE.toLong())
 
-                while (packet.isNotEmpty) {
+                while (packet.isNotEmpty
+                    && isActive
+                    && cashingStatusState.value == VideoCashService.CashingStatus.CASHING
+                ) {
+                    yield()
+
                     val bytes = packet.readBytes()
                     storeFile.appendBytes(bytes)
 
@@ -66,11 +80,23 @@ internal suspend inline fun HttpClient.downloadFile(
                     )
                 }
             }
+
+            cashingStatusState.update {
+                when (it) {
+                    VideoCashService.CashingStatus.CANCELED -> it
+                    else -> VideoCashService.CashingStatus.CASHED
+                }
+            }
+
+            Log.d(TAG, "isActive: $isActive; CashingStatus: ${cashingStatusState.value.name}")
+
+            if (!isActive || cashingStatusState.value == VideoCashService.CashingStatus.CANCELED)
+                return@execute null
         }
 
         status
     }
 
-    Log.d(TAG, "Downloaded")
+    Log.d(TAG, "Done, status: ${status?.value}")
     return status
 }

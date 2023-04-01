@@ -13,4 +13,8 @@ sealed interface VideoCashResponse : java.io.Serializable {
             private const val serialVersionUID = 2183653321912760986L
         }
     }
+
+    object Canceled : VideoCashResponse {
+        private const val serialVersionUID = -439433216307277309L
+    }
 }

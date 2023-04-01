@@ -5,7 +5,7 @@ import kotlinx.coroutines.withTimeout
 import kotlin.time.Duration
 
 class AsyncCondVar {
-    private val channel = Channel<Unit>()
+    private val channel = Channel<Unit>(Channel.CONFLATED)
 
     internal suspend inline fun notify() = channel.send(Unit)
 
