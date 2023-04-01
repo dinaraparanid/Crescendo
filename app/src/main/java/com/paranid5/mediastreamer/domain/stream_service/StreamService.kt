@@ -52,7 +52,7 @@ class StreamService : Service(), CoroutineScope by MainScope(), KoinComponent {
         private const val PLAYBACK_UPDATE_COOLDOWN = 500L
         private const val TEN_SECS_AS_MILLIS = 10000
 
-        private const val SERVICE_LOCATION = "com.paranid5.mediastreamer.stream_service"
+        private const val SERVICE_LOCATION = "com.paranid5.mediastreamer.domain.stream_service"
         const val Broadcast_PAUSE = "$SERVICE_LOCATION.PAUSE"
         const val Broadcast_RESUME = "$SERVICE_LOCATION.RESUME"
         const val Broadcast_SWITCH_VIDEO = "$SERVICE_LOCATION.SWITCH_VIDEO"

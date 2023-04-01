@@ -10,8 +10,8 @@ import org.koin.core.context.startKoin
 
 class MainApplication : Application() {
     companion object {
-        private const val STREAM_SERVICE_NAME = ".stream_service.StreamService"
-        private const val VIDEO_CASH_SERVICE_NAME = ".video_cash_service.VideoCashService"
+        private const val STREAM_SERVICE_NAME = ".domain.stream_service.StreamService"
+        private const val VIDEO_CASH_SERVICE_NAME = ".domain.video_cash_service.VideoCashService"
     }
 
     @Volatile

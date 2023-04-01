@@ -31,7 +31,7 @@ import com.paranid5.mediastreamer.utils.BroadcastReceiver
 import com.paranid5.mediastreamer.data.utils.extensions.timeString
 import org.koin.androidx.compose.get
 
-private const val BROADCAST_LOCATION = "com.paranid5.mediastreamer.presentation.ui.screens"
+private const val BROADCAST_LOCATION = "com.paranid5.mediastreamer.presentation.streaming"
 const val Broadcast_IS_PLAYING_CHANGED = "$BROADCAST_LOCATION.IS_PLAYING_CHANGED"
 const val Broadcast_CUR_POSITION_CHANGED = "$BROADCAST_LOCATION.CUR_POSITION_CHANGED"
 const val Broadcast_IS_REPEATING_CHANGED = "$BROADCAST_LOCATION.IS_REPEATING_CHANGED"

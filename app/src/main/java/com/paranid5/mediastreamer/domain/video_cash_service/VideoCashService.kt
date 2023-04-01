@@ -42,7 +42,7 @@ class VideoCashService : Service(), CoroutineScope by MainScope(), KoinComponent
         private const val NOTIFICATION_ID = 102
         private const val VIDEO_CASH_CHANNEL_ID = "video_cash_channel"
 
-        private const val SERVICE_LOCATION = "com.paranid5.mediastreamer.video_cash_service"
+        private const val SERVICE_LOCATION = "com.paranid5.mediastreamer.domain.video_cash_service"
         const val Broadcast_CASH_NEXT_VIDEO = "$SERVICE_LOCATION.CASH_NEXT_VIDEO"
         const val Broadcast_CANCEL_CUR_VIDEO = "$SERVICE_LOCATION.CANCEL_CUR_VIDEO"
         const val Broadcast_CANCEL_ALL = "$SERVICE_LOCATION.CANCEL_ALL"
@@ -53,6 +53,7 @@ class VideoCashService : Service(), CoroutineScope by MainScope(), KoinComponent
 
         private val TAG = VideoCashService::class.simpleName!!
         private const val NEXT_VIDEO_AWAIT_TIMEOUT_MS = 3000L
+        private const val NOTIFICATION_UPDATE_TIMEOUT_MS = 3000L
 
         internal inline val Intent.mVideoCashDataArg
             get() = VideoCashData(
@@ -101,6 +102,7 @@ class VideoCashService : Service(), CoroutineScope by MainScope(), KoinComponent
     private val curVideoCashJobState = MutableStateFlow<Deferred<HttpStatusCode>?>(null)
     private val curVideoCashFileState = MutableStateFlow<File?>(null)
     private val curVideoMetadataState = MutableStateFlow<VideoMetadata?>(null)
+    private val isCashingState = MutableStateFlow(false)
 
     @Volatile
     private var wasStartForegroundUsed = false
@@ -155,6 +157,7 @@ class VideoCashService : Service(), CoroutineScope by MainScope(), KoinComponent
     }
 
     private data class CashingNotificationData(
+        val isCashing: Boolean,
         val metadata: VideoMetadata,
         val videoCashQueueLen: Int,
         val downloadedBytes: Long,
@@ -162,27 +165,28 @@ class VideoCashService : Service(), CoroutineScope by MainScope(), KoinComponent
     )
 
     private suspend inline fun startNotificationObserving(): Unit = combine(
+        isCashingState,
         curVideoMetadataState,
         videoCashQueueLenState,
-        videoCashProgressState
-    ) { videoMetadata, videoCashQueueLen, (downloadedBytes, totalBytes) ->
+        videoCashProgressState,
+    ) { isCashing, videoMetadata, videoCashQueueLen, (downloadedBytes, totalBytes) ->
         CashingNotificationData(
+            isCashing,
             videoMetadata ?: VideoMetadata(),
             videoCashQueueLen,
             downloadedBytes,
-            totalBytes
+            totalBytes,
         )
-    }.collectLatest { (videoMetadata, videoCashQueueLen, downloadedBytes, totalBytes) ->
+    }.collectLatest { (isCashing, videoMetadata, videoCashQueueLen, downloadedBytes, totalBytes) ->
         updateNotification(
-            isCashing = when (videoCashQueueLen) {
-                0 -> false
-                else -> true
-            },
+            isCashing,
             videoMetadata,
             videoCashQueueLen,
             downloadedBytes,
             totalBytes
         )
+
+        delay(NOTIFICATION_UPDATE_TIMEOUT_MS)
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
@@ -316,22 +320,27 @@ class VideoCashService : Service(), CoroutineScope by MainScope(), KoinComponent
 
     private suspend inline fun launchCashing() {
         while (true) {
-            if (videoCashQueue.isEmpty())
+            if (videoCashQueue.isEmpty()) {
+                isCashingState.update { false }
+
                 if (videoCashCondVar.wait(NEXT_VIDEO_AWAIT_TIMEOUT_MS).isFailure)
                     break
+            }
 
             videoCashQueue.poll()?.let { (url, desiredFilename, isSaveAsVideo) ->
+                isCashingState.update { true }
+                videoCashQueueLenState.update { videoCashQueue.size }
+
+                // TODO: async blocking
                 onVideoCashStatusReceived(
                     statusCode = curVideoCashJobState.updateAndGet {
                         coroutineScope {
-                            async {
+                            async(Dispatchers.IO) {
                                 launchExtractionAndCashingFile(url, desiredFilename, isSaveAsVideo)
                             }
                         }
                     }!!.await()
                 )
-
-                videoCashQueueLenState.update { videoCashQueue.size }
             }
         }
 
@@ -403,11 +412,7 @@ class VideoCashService : Service(), CoroutineScope by MainScope(), KoinComponent
         totalBytes: Long
     ) = notificationBuilder
         .setContentTitle("${res.getString(R.string.downloading)}: ${videoMetadata.title}")
-        .extend { notificationBuilder ->
-            notificationBuilder.setContentText(
-                "${res.getString(R.string.tracks_in_queue)}: $videoCashQueueLen"
-            )
-        }
+        .setContentText("${res.getString(R.string.tracks_in_queue)}: $videoCashQueueLen")
         .setProgress(totalBytes.toInt(), downloadedBytes.toInt(), false)
         .setOngoing(true)
         .setShowWhen(false)
