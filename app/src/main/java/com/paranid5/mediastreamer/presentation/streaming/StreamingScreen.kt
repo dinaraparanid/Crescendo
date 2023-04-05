@@ -21,15 +21,15 @@ import androidx.palette.graphics.Palette
 import coil.compose.AsyncImagePainter
 import com.paranid5.mediastreamer.R
 import com.paranid5.mediastreamer.data.VideoMetadata
+import com.paranid5.mediastreamer.data.utils.extensions.timeString
 import com.paranid5.mediastreamer.domain.StorageHandler
 import com.paranid5.mediastreamer.presentation.composition_locals.LocalStreamState
 import com.paranid5.mediastreamer.presentation.composition_locals.StreamStates
 import com.paranid5.mediastreamer.presentation.ui.OnBackPressedHandler
 import com.paranid5.mediastreamer.presentation.ui.extensions.getLightVibrantOrPrimary
 import com.paranid5.mediastreamer.presentation.ui.rememberVideoCoverPainterWithPalette
-import com.paranid5.mediastreamer.utils.BroadcastReceiver
-import com.paranid5.mediastreamer.data.utils.extensions.timeString
-import org.koin.androidx.compose.get
+import com.paranid5.mediastreamer.presentation.ui.BroadcastReceiver
+import org.koin.compose.koinInject
 
 private const val BROADCAST_LOCATION = "com.paranid5.mediastreamer.presentation.streaming"
 const val Broadcast_IS_PLAYING_CHANGED = "$BROADCAST_LOCATION.IS_PLAYING_CHANGED"
@@ -45,7 +45,7 @@ const val VIDEO_CASH_STATUS = "video_cash_status"
 fun StreamingScreen(
     viewModel: StreamingViewModel,
     modifier: Modifier = Modifier,
-    storageHandler: StorageHandler = get()
+    storageHandler: StorageHandler = koinInject()
 ) {
     LocalStreamState.current.value = StreamStates.STREAMING
     val metadata by storageHandler.currentMetadataState.collectAsState()
@@ -156,8 +156,8 @@ private fun PlaybackSlider(
     metadata: VideoMetadata?,
     palette: Palette?,
     modifier: Modifier = Modifier,
-    streamingUIHandler: StreamingUIHandler = get(),
-    storageHandler: StorageHandler = get()
+    streamingUIHandler: StreamingUIHandler = koinInject(),
+    storageHandler: StorageHandler = koinInject()
 ) {
     val lightVibrantColor = palette.getLightVibrantOrPrimary()
     val videoLength = metadata?.lenInMillis ?: 0

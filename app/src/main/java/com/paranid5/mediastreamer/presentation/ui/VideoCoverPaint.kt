@@ -12,13 +12,13 @@ import coil.size.Precision
 import coil.size.Scale
 import com.paranid5.mediastreamer.R
 import com.paranid5.mediastreamer.domain.StorageHandler
-import org.koin.androidx.compose.get
+import org.koin.compose.koinInject
 
 @Composable
 internal inline fun rememberVideoCoverPainter(
     isPlaceholderRequired: Boolean,
     size: Pair<Int, Int>? = null,
-    storageHandler: StorageHandler = get(),
+    storageHandler: StorageHandler = koinInject(),
     crossinline bitmapSettings: (Bitmap) -> Unit = {}
 ): AsyncImagePainter {
     val metadata by storageHandler.currentMetadataState.collectAsState()
@@ -61,7 +61,7 @@ internal inline fun rememberVideoCoverPainter(
 internal inline fun rememberVideoCoverPainterWithPalette(
     isPlaceholderRequired: Boolean,
     size: Pair<Int, Int>? = null,
-    storageHandler: StorageHandler = get(),
+    storageHandler: StorageHandler = koinInject(),
     crossinline bitmapSettings: (Bitmap) -> Unit = {}
 ): Pair<AsyncImagePainter, Palette?> {
     val metadata by storageHandler.currentMetadataState.collectAsState()

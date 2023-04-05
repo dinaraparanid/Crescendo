@@ -14,7 +14,7 @@ import androidx.palette.graphics.Palette
 import com.paranid5.mediastreamer.R
 import com.paranid5.mediastreamer.presentation.ui.extensions.getLightVibrantOrPrimary
 import com.paranid5.mediastreamer.presentation.ui.extensions.simpleShadow
-import com.paranid5.mediastreamer.utils.BroadcastReceiver
+import com.paranid5.mediastreamer.presentation.ui.BroadcastReceiver
 import kotlinx.coroutines.flow.update
 import org.koin.androidx.compose.get
 

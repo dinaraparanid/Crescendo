@@ -15,7 +15,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.paranid5.mediastreamer.R
 import com.paranid5.mediastreamer.presentation.ui.theme.LocalAppColors
-import org.koin.androidx.compose.get
+import org.koin.compose.koinInject
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -136,7 +136,7 @@ private fun ConfirmButton(
     isButtonClickable: Boolean,
     filename: String,
     modifier: Modifier = Modifier,
-    streamingUIHandler: StreamingUIHandler = get()
+    streamingUIHandler: StreamingUIHandler = koinInject()
 ) {
     val colors = LocalAppColors.current.value
 

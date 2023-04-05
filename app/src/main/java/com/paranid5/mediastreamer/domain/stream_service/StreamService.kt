@@ -15,6 +15,7 @@ import android.os.Build
 import android.os.Bundle
 import android.os.SystemClock
 import android.util.Log
+import android.util.SparseArray
 import androidx.annotation.OptIn
 import androidx.annotation.RequiresApi
 import androidx.core.app.NotificationCompat
@@ -25,19 +26,19 @@ import androidx.media3.common.util.UnstableApi
 import androidx.media3.datasource.DefaultHttpDataSource
 import androidx.media3.exoplayer.ExoPlayer
 import androidx.media3.exoplayer.source.ProgressiveMediaSource
-import androidx.media3.session.MediaNotification
 import arrow.core.Either
 import at.huber.youtubeExtractor.VideoMeta
+import at.huber.youtubeExtractor.YouTubeExtractor
+import at.huber.youtubeExtractor.YtFile
 import com.paranid5.mediastreamer.R
-import com.paranid5.mediastreamer.domain.StorageHandler
-import com.paranid5.mediastreamer.domain.YoutubeUrlExtractor
 import com.paranid5.mediastreamer.data.VideoMetadata
 import com.paranid5.mediastreamer.data.utils.extensions.toAndroidMetadata
+import com.paranid5.mediastreamer.domain.StorageHandler
+import com.paranid5.mediastreamer.domain.utils.extensions.registerReceiverCompat
 import com.paranid5.mediastreamer.presentation.MainActivity
 import com.paranid5.mediastreamer.presentation.streaming.*
-import com.paranid5.mediastreamer.presentation.ui.screens.*
 import com.paranid5.mediastreamer.presentation.ui.GlideUtils
-import com.paranid5.mediastreamer.domain.utils.extensions.registerReceiverCompat
+import com.paranid5.mediastreamer.presentation.ui.screens.*
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
 import org.koin.core.component.KoinComponent
@@ -148,7 +149,7 @@ class StreamService : Service(), CoroutineScope by MainScope(), KoinComponent {
         .stateIn(this, SharingStarted.Eagerly, 0)
 
     private inline val currentPlaybackPosition
-        get() = player.currentPosition
+        get() = mPlayer.currentPosition
 
     // TODO: favourite database
     private val isCurrentVideoLikedState = MutableStateFlow(false)
@@ -180,7 +181,7 @@ class StreamService : Service(), CoroutineScope by MainScope(), KoinComponent {
     private lateinit var mediaSession: MediaSession
     private lateinit var transportControls: MediaController.TransportControls
 
-    private val player by lazy {
+    internal val mPlayer by lazy {
         ExoPlayer.Builder(applicationContext)
             .setAudioAttributes(
                 AudioAttributes.Builder()
@@ -196,7 +197,7 @@ class StreamService : Service(), CoroutineScope by MainScope(), KoinComponent {
     }
 
     internal inline val mIsPlaying
-        get() = player.isPlaying
+        get() = mPlayer.isPlaying
 
     private val playerStateChangedListener: Player.Listener = object : Player.Listener {
         override fun onPlaybackStateChanged(playbackState: Int) {
@@ -430,11 +431,11 @@ class StreamService : Service(), CoroutineScope by MainScope(), KoinComponent {
 
     internal fun mPausePlayback() {
         launch { updateAndSendPlaybackPosition() }
-        player.pause()
+        mPlayer.pause()
     }
 
     internal fun mResumePlayback() {
-        player.playWhenReady = true
+        mPlayer.playWhenReady = true
     }
 
     private suspend inline fun storePlaybackPosition() =
@@ -454,41 +455,67 @@ class StreamService : Service(), CoroutineScope by MainScope(), KoinComponent {
     internal suspend inline fun mStoreCurrentUrl(url: String) =
         storageHandler.storeCurrentUrl(url)
 
-    private suspend inline fun storeMetadata(videoMeta: VideoMeta?) =
+    internal suspend inline fun mStoreMetadata(videoMeta: VideoMeta?) =
         storageHandler.storeCurrentMetadata(videoMeta?.let(::VideoMetadata))
 
     private suspend inline fun storeCurrentUrl(newUrl: String) =
         storageHandler.storeCurrentUrl(newUrl)
 
+    private fun YoutubeUrlExtractor(initialPosition: Long) =
+        @SuppressLint("StaticFieldLeak")
+        object : YouTubeExtractor(this) {
+            override fun onExtractionComplete(
+                ytFiles: SparseArray<YtFile>?,
+                videoMeta: VideoMeta?
+            ) {
+                if (ytFiles == null)
+                    return
+
+                val audioTag = 140
+                val audioUrl = ytFiles[audioTag].url!!
+
+                val videoUrl = sequenceOf(22, 137, 18)
+                    .map(ytFiles::get)
+                    .filterNotNull()
+                    .map(YtFile::getUrl)
+                    .filterNotNull()
+                    .filter(String::isNotEmpty)
+                    .first()
+
+                val audioSource = ProgressiveMediaSource
+                    .Factory(DefaultHttpDataSource.Factory())
+                    .createMediaSource(MediaItem.fromUri(audioUrl))
+
+                // TODO: video source
+
+                /*val videoSource = ProgressiveMediaSource
+                    .Factory(DefaultHttpDataSource.Factory())
+                    .createMediaSource(MediaItem.fromUri(videoUrl))*/
+
+                launch {
+                    mUpdateMediaSession(videoMeta?.let(::VideoMetadata))
+                    launch(Dispatchers.IO) { mStoreMetadata(videoMeta) }
+
+                    mPlayer.run {
+                        setMediaSource(
+                            /*MergingMediaSource(
+                                ADJUST_PERIOD_TIME_OFFSETS,
+                                audioSource, videoSource
+                            )*/
+                            audioSource
+                        )
+                        playWhenReady = true
+                        prepare()
+                        seekTo(initialPosition)
+                    }
+                }
+            }
+
+        }
+
     @OptIn(UnstableApi::class)
     private fun playStream(url: String, initialPosition: Long = 0) =
-        YoutubeUrlExtractor(context = this) { audioUrl, videoUrl, videoMeta ->
-            val audioSource = ProgressiveMediaSource
-                .Factory(DefaultHttpDataSource.Factory())
-                .createMediaSource(MediaItem.fromUri(audioUrl))
-
-            // TODO: video source
-
-            /*val videoSource = ProgressiveMediaSource
-                .Factory(DefaultHttpDataSource.Factory())
-                .createMediaSource(MediaItem.fromUri(videoUrl))*/
-
-            mUpdateMediaSession(videoMeta?.let(::VideoMetadata))
-            launch(Dispatchers.IO) { storeMetadata(videoMeta) }
-
-            player.run {
-                setMediaSource(
-                    /*MergingMediaSource(
-                        ADJUST_PERIOD_TIME_OFFSETS,
-                        audioSource, videoSource
-                    )*/
-                    audioSource
-                )
-                playWhenReady = true
-                prepare()
-                seekTo(initialPosition)
-            }
-        }.extract(url)
+        YoutubeUrlExtractor(initialPosition).extract(url)
 
     internal fun mPlayNewStream(url: String, initialPosition: Long = 0) {
         launch { storeCurrentUrl(url) }
@@ -499,17 +526,17 @@ class StreamService : Service(), CoroutineScope by MainScope(), KoinComponent {
         storageHandler.currentUrlState.collectLatest { url -> playStream(url) }
 
     internal fun mSeekTo(position: Long) =
-        player.seekTo(position)
+        mPlayer.seekTo(position)
 
     internal fun mSeekTo10SecsBack() =
-        player.seekTo(maxOf(currentPlaybackPosition - TEN_SECS_AS_MILLIS, 0))
+        mPlayer.seekTo(maxOf(currentPlaybackPosition - TEN_SECS_AS_MILLIS, 0))
 
     internal fun mSeekTo10SecsForward() =
-        player.seekTo(minOf(currentPlaybackPosition + TEN_SECS_AS_MILLIS, videoLength.value))
+        mPlayer.seekTo(minOf(currentPlaybackPosition + TEN_SECS_AS_MILLIS, videoLength.value))
 
     private fun releaseMedia() {
-        player.stop()
-        player.release()
+        mPlayer.stop()
+        mPlayer.release()
         mediaSession.release()
         transportControls.stop()
     }
@@ -673,7 +700,7 @@ class StreamService : Service(), CoroutineScope by MainScope(), KoinComponent {
     private inline val tenSecsBackActionIfSeekableOreo
         @RequiresApi(Build.VERSION_CODES.M)
         get() = when {
-            player.isCurrentMediaItemSeekable -> Notification.Action.Builder(
+            mPlayer.isCurrentMediaItemSeekable -> Notification.Action.Builder(
                 Icon.createWithResource("", R.drawable.prev_track),
                 ACTION_10_SECS_BACK,
                 Actions.TenSecsBack.playbackIntent
@@ -699,7 +726,7 @@ class StreamService : Service(), CoroutineScope by MainScope(), KoinComponent {
     private inline val tenSecsForwardActionIfSeekableOreo
         @RequiresApi(Build.VERSION_CODES.M)
         get() = when {
-            player.isCurrentMediaItemSeekable -> Notification.Action.Builder(
+            mPlayer.isCurrentMediaItemSeekable -> Notification.Action.Builder(
                 Icon.createWithResource("", R.drawable.next_track),
                 ACTION_10_SECS_FORWARD,
                 Actions.TenSecsForward.playbackIntent
@@ -779,7 +806,7 @@ class StreamService : Service(), CoroutineScope by MainScope(), KoinComponent {
 
     private inline val tenSecsBackActionIfSeekableCompat
         get() = when {
-            player.isCurrentMediaItemSeekable -> NotificationCompat.Action.Builder(
+            mPlayer.isCurrentMediaItemSeekable -> NotificationCompat.Action.Builder(
                 IconCompat.createWithResource(this, R.drawable.prev_track),
                 ACTION_10_SECS_BACK,
                 Actions.TenSecsBack.playbackIntent
@@ -803,7 +830,7 @@ class StreamService : Service(), CoroutineScope by MainScope(), KoinComponent {
 
     private inline val tenSecsForwardActionIfSeekableCompat
         get() = when {
-            player.isCurrentMediaItemSeekable -> NotificationCompat.Action.Builder(
+            mPlayer.isCurrentMediaItemSeekable -> NotificationCompat.Action.Builder(
                 IconCompat.createWithResource(this, R.drawable.next_track),
                 ACTION_10_SECS_FORWARD,
                 Actions.TenSecsForward.playbackIntent

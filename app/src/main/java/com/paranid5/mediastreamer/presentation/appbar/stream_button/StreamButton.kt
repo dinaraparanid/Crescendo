@@ -25,7 +25,7 @@ import com.paranid5.mediastreamer.presentation.ui.extensions.openAppSettings
 import com.paranid5.mediastreamer.presentation.ui.permissions.PermissionDialog
 import com.paranid5.mediastreamer.presentation.ui.permissions.PostNotificationDescriptionProvider
 import com.paranid5.mediastreamer.presentation.ui.theme.LocalAppColors
-import org.koin.androidx.compose.get
+import org.koin.compose.koinInject
 import org.koin.core.qualifier.named
 import java.util.Queue
 
@@ -33,7 +33,7 @@ import java.util.Queue
 @Composable
 fun StreamButton(
     modifier: Modifier = Modifier,
-    streamButtonUIHandler: StreamButtonUIHandler = get()
+    streamButtonUIHandler: StreamButtonUIHandler = koinInject()
 ) {
     val activity = LocalActivity.current!!
     val navHostController = LocalNavController.current
@@ -43,14 +43,14 @@ fun StreamButton(
     val isPostNotificationsPermissionDialogShownState = remember { mutableStateOf(false) }
 
     val postNotificationsPermission = when {
-        isNotificationPermissionRequired -> get<Queue<String>>(
+        isNotificationPermissionRequired -> koinInject<Queue<String>>(
             named(POST_NOTIFICATIONS_PERMISSION_QUEUE)
         ).first()
         else -> null
     }
 
     val postNotificationsDescriptionProvider = when {
-        isNotificationPermissionRequired -> get<PostNotificationDescriptionProvider>()
+        isNotificationPermissionRequired -> koinInject<PostNotificationDescriptionProvider>()
         else -> null
     }
 

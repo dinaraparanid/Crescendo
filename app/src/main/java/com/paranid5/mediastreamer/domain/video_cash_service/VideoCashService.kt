@@ -100,6 +100,7 @@ class VideoCashService : Service(), KoinComponent {
     private val videoCashQueueLenState = MutableStateFlow(0)
 
     private val videoCashProgressState = MutableStateFlow(0L to 0L)
+    private val videoCashErrorState = MutableStateFlow(0 to "")
     private val videoCashCondVar = AsyncCondVar()
 
     private var cashingLoopJob: Job? = null
@@ -116,9 +117,6 @@ class VideoCashService : Service(), KoinComponent {
     private val notificationManager by lazy {
         getSystemService(NOTIFICATION_SERVICE) as NotificationManager
     }
-
-    private inline val res
-        get() = applicationContext.resources
 
     private val cashNextVideoReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context?, intent: Intent) {
@@ -146,7 +144,10 @@ class VideoCashService : Service(), KoinComponent {
     private fun YoutubeUrlExtractor(desiredFilename: String, isSaveAsVideo: Boolean) =
         @SuppressLint("StaticFieldLeak")
         object : YouTubeExtractor(this) {
-            override fun onExtractionComplete(ytFiles: SparseArray<YtFile>?, videoMeta: VideoMeta?) {
+            override fun onExtractionComplete(
+                ytFiles: SparseArray<YtFile>?,
+                videoMeta: VideoMeta?
+            ) {
                 if (ytFiles == null)
                     return
 
@@ -210,6 +211,8 @@ class VideoCashService : Service(), KoinComponent {
         val videoCashQueueLen: Int,
         val downloadedBytes: Long,
         val totalBytes: Long,
+        val errorCode: Int,
+        val errorDescription: String
     )
 
     private suspend inline fun startNotificationObserving(): Unit = combine(
@@ -217,21 +220,28 @@ class VideoCashService : Service(), KoinComponent {
         curVideoMetadataState,
         videoCashQueueLenState,
         videoCashProgressState,
-    ) { cashingState, videoMetadata, videoCashQueueLen, (downloadedBytes, totalBytes) ->
+        videoCashErrorState
+    ) { cashingState, videoMetadata, videoCashQueueLen,
+        (downloadedBytes, totalBytes), (errorCode, errorDescription) ->
         CashingNotificationData(
             cashingState,
             videoMetadata ?: VideoMetadata(),
             videoCashQueueLen,
             downloadedBytes,
             totalBytes,
+            errorCode,
+            errorDescription
         )
-    }.collectLatest { (cashingState, videoMetadata, videoCashQueueLen, downloadedBytes, totalBytes) ->
+    }.collectLatest { (cashingState, videoMetadata, videoCashQueueLen,
+                          downloadedBytes, totalBytes, errorCode, errorDescription) ->
         updateNotification(
             cashingState,
             videoMetadata,
             videoCashQueueLen,
             downloadedBytes,
-            totalBytes
+            totalBytes,
+            errorCode,
+            errorDescription
         )
     }
 
@@ -348,10 +358,13 @@ class VideoCashService : Service(), KoinComponent {
             .putExtra(VIDEO_CASH_STATUS, VideoCashResponse.Success)
     )
 
-    private fun onVideoCashStatusError(code: Int, description: String) = sendBroadcast(
-        Intent(MainActivity.Broadcast_VIDEO_CASH_COMPLETED)
-            .putExtra(VIDEO_CASH_STATUS, VideoCashResponse.Error(code, description))
-    )
+    private fun onVideoCashStatusError(code: Int, description: String) {
+        videoCashErrorState.update { code to description }
+        sendBroadcast(
+            Intent(MainActivity.Broadcast_VIDEO_CASH_COMPLETED)
+                .putExtra(VIDEO_CASH_STATUS, VideoCashResponse.Error(code, description))
+        )
+    }
 
     private fun onVideoCashStatusCanceled() = sendBroadcast(
         Intent(MainActivity.Broadcast_VIDEO_CASH_COMPLETED)
@@ -457,8 +470,8 @@ class VideoCashService : Service(), KoinComponent {
         downloadedBytes: Long,
         totalBytes: Long
     ) = notificationBuilder
-        .setContentTitle("${res.getString(R.string.downloading)}: ${videoMetadata.title}")
-        .setContentText("${res.getString(R.string.tracks_in_queue)}: $videoCashQueueLen")
+        .setContentTitle("${resources.getString(R.string.downloading)}: ${videoMetadata.title}")
+        .setContentText("${resources.getString(R.string.tracks_in_queue)}: $videoCashQueueLen")
         .setProgress(totalBytes.toInt(), downloadedBytes.toInt(), false)
         .setOngoing(true)
         .setShowWhen(false)
@@ -470,13 +483,13 @@ class VideoCashService : Service(), KoinComponent {
         get() = when {
             Build.VERSION.SDK_INT >= Build.VERSION_CODES.M -> Notification.Action.Builder(
                 null,
-                res.getString(R.string.cancel),
+                resources.getString(R.string.cancel),
                 Actions.CancelCurVideo.playbackIntent
             )
 
             else -> Notification.Action.Builder(
                 0,
-                res.getString(R.string.cancel),
+                resources.getString(R.string.cancel),
                 Actions.CancelCurVideo.playbackIntent
             )
         }.build()
@@ -485,21 +498,24 @@ class VideoCashService : Service(), KoinComponent {
         get() = when {
             Build.VERSION.SDK_INT >= Build.VERSION_CODES.M -> Notification.Action.Builder(
                 null,
-                res.getString(R.string.cancel_all),
+                resources.getString(R.string.cancel_all),
                 Actions.CancelAll.playbackIntent
             )
 
             else -> Notification.Action.Builder(
                 0,
-                res.getString(R.string.cancel_all),
+                resources.getString(R.string.cancel_all),
                 Actions.CancelAll.playbackIntent
             )
         }.build()
 
-    private fun finishedNotificationBuilder(@StringRes message: Int) = notificationBuilder
-        .setContentTitle(res.getString(message))
+    private fun finishedNotificationBuilder(message: String) = notificationBuilder
+        .setContentTitle(message)
         .setOngoing(false)
         .setShowWhen(false)
+
+    private fun finishedNotificationBuilder(@StringRes message: Int) =
+        finishedNotificationBuilder(resources.getString(message))
 
     private inline val cashedNotificationBuilder
         get() = finishedNotificationBuilder(R.string.video_cashed)
@@ -507,8 +523,8 @@ class VideoCashService : Service(), KoinComponent {
     private inline val canceledNotificationBuilder
         get() = finishedNotificationBuilder(R.string.video_canceled)
 
-    private inline val errorNotificationBuilder
-        get() = finishedNotificationBuilder(R.string.cashing_error)
+    private fun getErrorNotificationBuilder(code: Int, description: String) =
+        finishedNotificationBuilder("${resources.getString(R.string.error)} $code: $description")
 
     private fun startCashingNotification(
         videoMetadata: VideoMetadata,
@@ -554,9 +570,9 @@ class VideoCashService : Service(), KoinComponent {
         canceledNotificationBuilder.build()
     )
 
-    private fun showErrorNotification() = notificationManager.notify(
+    private fun showErrorNotification(code: Int, description: String) = notificationManager.notify(
         NOTIFICATION_ID,
-        errorNotificationBuilder.build()
+        getErrorNotificationBuilder(code, description).build()
     )
 
     private fun updateNotification(
@@ -564,7 +580,9 @@ class VideoCashService : Service(), KoinComponent {
         videoMetadata: VideoMetadata,
         videoCashQueueLen: Int,
         downloadedBytes: Long,
-        totalBytes: Long
+        totalBytes: Long,
+        errorCode: Int,
+        errorDescription: String
     ) = when {
         !wasStartForegroundUsed -> startCashingNotification(
             videoMetadata,
@@ -583,7 +601,7 @@ class VideoCashService : Service(), KoinComponent {
 
             CashingStatus.CASHED -> showCashedNotification()
             CashingStatus.CANCELED -> showCanceledNotification()
-            CashingStatus.ERR -> showErrorNotification()
+            CashingStatus.ERR -> showErrorNotification(errorCode, errorDescription)
             CashingStatus.NONE -> Unit
         }
     }

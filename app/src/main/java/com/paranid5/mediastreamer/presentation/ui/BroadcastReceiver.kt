@@ -1,4 +1,4 @@
-package com.paranid5.mediastreamer.utils
+package com.paranid5.mediastreamer.presentation.ui
 
 import android.content.BroadcastReceiver
 import android.content.Context
