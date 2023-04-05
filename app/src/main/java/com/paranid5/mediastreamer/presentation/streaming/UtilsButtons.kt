@@ -1,9 +1,7 @@
 package com.paranid5.mediastreamer.presentation.streaming
 
-import android.content.Context
 import android.content.pm.PackageManager
 import android.os.Build
-import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Box
@@ -23,17 +21,16 @@ import androidx.palette.graphics.Palette
 import com.paranid5.mediastreamer.EXTERNAL_STORAGE_PERMISSION_QUEUE
 import com.paranid5.mediastreamer.R
 import com.paranid5.mediastreamer.domain.StorageHandler
-import com.paranid5.mediastreamer.domain.video_cash_service.VideoCashResponse
 import com.paranid5.mediastreamer.presentation.LocalActivity
 import com.paranid5.mediastreamer.presentation.ui.extensions.getLightVibrantOrPrimary
+import com.paranid5.mediastreamer.presentation.ui.extensions.openAppSettings
 import com.paranid5.mediastreamer.presentation.ui.extensions.simpleShadow
 import com.paranid5.mediastreamer.presentation.ui.permissions.ExternalStorageDescriptionProvider
 import com.paranid5.mediastreamer.presentation.ui.permissions.PermissionDialog
 import com.paranid5.mediastreamer.utils.BroadcastReceiver
-import com.paranid5.mediastreamer.presentation.ui.extensions.openAppSettings
 import org.koin.androidx.compose.get
 import org.koin.core.qualifier.named
-import java.util.Queue
+import java.util.*
 
 @Composable
 fun UtilsButtons(palette: Palette?, modifier: Modifier = Modifier) =
@@ -97,7 +94,6 @@ private fun LikeButton(palette: Palette?, modifier: Modifier = Modifier) {
         // TODO: favourite database
     }
 
-    /** TODO: favourite database */
     IconButton(
         modifier = modifier.simpleShadow(color = lightVibrantColor),
         onClick = { /** TODO: favourite database */ }
@@ -154,17 +150,6 @@ private fun DownloadButton(palette: Palette?, modifier: Modifier = Modifier) {
         areAllPermissionsGranted = notGrantedStoragePermissions.isEmpty()
     }
 
-    BroadcastReceiver(action = Broadcast_VIDEO_CASH_COMPLETED) { context, intent ->
-        val status = when {
-            Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU ->
-                intent!!.getSerializableExtra(VIDEO_CASH_STATUS, VideoCashResponse::class.java)!!
-            else ->
-                intent!!.getSerializableExtra(VIDEO_CASH_STATUS)!! as VideoCashResponse
-        }
-
-        onVideoCashCompleted(status, context!!)
-    }
-
     Box(modifier) {
         IconButton(
             modifier = modifier.simpleShadow(color = lightVibrantColor),
@@ -207,25 +192,4 @@ private fun DownloadButton(palette: Palette?, modifier: Modifier = Modifier) {
                 )
         }
     }
-}
-
-private fun onVideoCashCompleted(status: VideoCashResponse, context: Context) {
-    val errorStringRes = context.getString(R.string.error)
-    val successfulCashingStringRes = context.getString(R.string.video_cashed)
-    val canceledStringRes = context.getString(R.string.video_canceled)
-
-    Toast.makeText(
-        context,
-        when (status) {
-            is VideoCashResponse.Error -> {
-                val (httpCode, description) = status
-                "$errorStringRes $httpCode: $description"
-            }
-
-            is VideoCashResponse.Success -> successfulCashingStringRes
-
-            is VideoCashResponse.Canceled -> canceledStringRes
-        },
-        Toast.LENGTH_LONG
-    ).show()
 }

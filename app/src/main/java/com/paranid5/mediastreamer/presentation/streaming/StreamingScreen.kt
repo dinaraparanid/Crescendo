@@ -35,7 +35,6 @@ private const val BROADCAST_LOCATION = "com.paranid5.mediastreamer.presentation.
 const val Broadcast_IS_PLAYING_CHANGED = "$BROADCAST_LOCATION.IS_PLAYING_CHANGED"
 const val Broadcast_CUR_POSITION_CHANGED = "$BROADCAST_LOCATION.CUR_POSITION_CHANGED"
 const val Broadcast_IS_REPEATING_CHANGED = "$BROADCAST_LOCATION.IS_REPEATING_CHANGED"
-const val Broadcast_VIDEO_CASH_COMPLETED = "$BROADCAST_LOCATION.VIDEO_CASH_COMPLETED"
 
 const val IS_PLAYING_ARG = "is_playing"
 const val CUR_POSITION_ARG = "cur_position"

@@ -21,12 +21,11 @@ import com.paranid5.mediastreamer.domain.getFileExt
 import com.paranid5.mediastreamer.domain.media_scanner.MediaScannerReceiver
 import com.paranid5.mediastreamer.domain.media_scanner.scanNextFile
 import com.paranid5.mediastreamer.domain.utils.AsyncCondVar
-import com.paranid5.mediastreamer.presentation.MainActivity
-import com.paranid5.mediastreamer.presentation.streaming.Broadcast_VIDEO_CASH_COMPLETED
-import com.paranid5.mediastreamer.presentation.streaming.VIDEO_CASH_STATUS
 import com.paranid5.mediastreamer.domain.utils.extensions.insertMediaFileToMediaStore
 import com.paranid5.mediastreamer.domain.utils.extensions.registerReceiverCompat
 import com.paranid5.mediastreamer.domain.utils.extensions.setAudioTagsToFileCatching
+import com.paranid5.mediastreamer.presentation.MainActivity
+import com.paranid5.mediastreamer.presentation.streaming.VIDEO_CASH_STATUS
 import io.ktor.client.*
 import io.ktor.http.*
 import kotlinx.coroutines.*
@@ -99,7 +98,6 @@ class VideoCashService : Service(), CoroutineScope by MainScope(), KoinComponent
     private val videoCashCondVar = AsyncCondVar()
 
     private var cashingLoopJob: Job? = null
-    private var curVideoCashJob: Deferred<HttpStatusCode?>? = null
     private var curVideoCashFile: File? = null
     private val curVideoMetadataState = MutableStateFlow<VideoMetadata?>(null)
 
@@ -127,14 +125,14 @@ class VideoCashService : Service(), CoroutineScope by MainScope(), KoinComponent
     private val cancelCurVideoReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context?, intent: Intent?) {
             Log.d(TAG, "Canceling video cashing")
-            launch { mCancelCurVideoCashing() }
+            mCancelCurVideoCashing()
         }
     }
 
     private val cancelAllReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context?, intent: Intent?) {
             Log.d(TAG, "Canceling all videos cashing")
-            launch { mCancelAllVideosCashing() }
+            mCancelAllVideosCashing()
         }
     }
 
@@ -284,6 +282,7 @@ class VideoCashService : Service(), CoroutineScope by MainScope(), KoinComponent
     private fun YoutubeUrlExtractor(desiredFilename: String, isSaveAsVideo: Boolean) =
         YoutubeUrlExtractor(
             context = applicationContext,
+            coroutineContext = Dispatchers.IO,
             videoExtractionChannel = videoCashCompletionChannel
         ) { audioUrl, videoUrl, videoMeta ->
             val videoMetadata = videoMeta?.let(::VideoMetadata) ?: VideoMetadata()
@@ -297,17 +296,7 @@ class VideoCashService : Service(), CoroutineScope by MainScope(), KoinComponent
             cashMediaFile(desiredFilename, audioOrVideoUrl, videoMetadata)
         }
 
-    private suspend inline fun launchExtractionAndCashingFile(
-        url: String,
-        desiredFilename: String,
-        isSaveAsVideo: Boolean
-    ): HttpStatusCode? = coroutineScope {
-        launch(Dispatchers.IO) { YoutubeUrlExtractor(desiredFilename, isSaveAsVideo).extract(url) }
-        videoCashCompletionChannel.receive()
-    }
-
     private fun clearVideoCashStates() {
-        curVideoCashJob = null
         curVideoCashFile = null
     }
 
@@ -325,17 +314,17 @@ class VideoCashService : Service(), CoroutineScope by MainScope(), KoinComponent
     }
 
     private fun onVideoCashStatusSuccessful() = sendBroadcast(
-        Intent(Broadcast_VIDEO_CASH_COMPLETED)
+        Intent(MainActivity.Broadcast_VIDEO_CASH_COMPLETED)
             .putExtra(VIDEO_CASH_STATUS, VideoCashResponse.Success)
     )
 
     private fun onVideoCashStatusError(code: Int, description: String) = sendBroadcast(
-        Intent(Broadcast_VIDEO_CASH_COMPLETED)
+        Intent(MainActivity.Broadcast_VIDEO_CASH_COMPLETED)
             .putExtra(VIDEO_CASH_STATUS, VideoCashResponse.Error(code, description))
     )
 
     private fun onVideoCashStatusCanceled() = sendBroadcast(
-        Intent(Broadcast_VIDEO_CASH_COMPLETED)
+        Intent(MainActivity.Broadcast_VIDEO_CASH_COMPLETED)
             .putExtra(VIDEO_CASH_STATUS, VideoCashResponse.Canceled)
     )
 
@@ -354,11 +343,8 @@ class VideoCashService : Service(), CoroutineScope by MainScope(), KoinComponent
                 cashingStatusState.update { CashingStatus.CASHING }
                 videoCashQueueLenState.update { videoCashQueue.size }
 
-                curVideoCashJob = async(Dispatchers.IO) {
-                    launchExtractionAndCashingFile(url, desiredFilename, isSaveAsVideo)
-                }
-
-                onVideoCashStatusReceived(statusCode = curVideoCashJob!!.await())
+                YoutubeUrlExtractor(desiredFilename, isSaveAsVideo).extract(url)
+                onVideoCashStatusReceived(statusCode = videoCashCompletionChannel.receive())
             }
         }
     }
@@ -370,16 +356,14 @@ class VideoCashService : Service(), CoroutineScope by MainScope(), KoinComponent
             cashingLoopJob = launch(Dispatchers.IO) { launchCashing() }
     }
 
-    internal suspend inline fun mCancelCurVideoCashing() {
+    internal fun mCancelCurVideoCashing() {
         cashingStatusState.update { CashingStatus.CANCELED }
-        Log.d(TAG, "Canceling job and removing file")
-        curVideoCashJob?.cancelAndJoin()
         Log.d(TAG, "File is deleted ${curVideoCashFile?.delete()}")
         Log.d(TAG, "Cashing is canceled")
         clearVideoCashStates()
     }
 
-    internal suspend inline fun mCancelAllVideosCashing() {
+    internal fun mCancelAllVideosCashing() {
         videoCashQueue.clear()
         videoCashQueueLenState.update { 0 }
         mCancelCurVideoCashing()
