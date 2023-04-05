@@ -3,17 +3,15 @@ package com.paranid5.mediastreamer.domain
 import android.util.Log
 import com.paranid5.mediastreamer.domain.video_cash_service.VideoCashService
 import io.ktor.client.*
-import io.ktor.client.call.*
 import io.ktor.client.engine.android.*
 import io.ktor.client.plugins.logging.*
 import io.ktor.client.request.*
+import io.ktor.client.statement.*
 import io.ktor.http.*
-import io.ktor.utils.io.*
 import io.ktor.utils.io.core.*
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.update
-import kotlinx.coroutines.isActive
-import kotlinx.coroutines.yield
+import kotlinx.coroutines.flow.updateAndGet
 import java.io.File
 
 private const val TAG = "Ktor Client"
@@ -50,51 +48,44 @@ internal suspend inline fun HttpClient.downloadFile(
     val status = prepareGet(fileUrl).execute { response ->
         val status = response.status
 
-        if (status.isSuccess()) {
-            val channel = response.body<ByteReadChannel>()
-            var progress = 0L
-
-            while (!channel.isClosedForRead
-                && isActive
-                && cashingStatusState.value == VideoCashService.CashingStatus.CASHING
-            ) {
-                yield()
-
-                val packet = channel.readRemaining(DEFAULT_BUFFER_SIZE.toLong())
-
-                while (packet.isNotEmpty
-                    && isActive
-                    && cashingStatusState.value == VideoCashService.CashingStatus.CASHING
-                ) {
-                    yield()
-
-                    val bytes = packet.readBytes()
-                    storeFile.appendBytes(bytes)
-
-                    progress += bytes.size
-                    progressState?.update { progress to response.contentLength()!! }
-
-                    Log.d(
-                        TAG,
-                        "Read ${bytes.size} bytes from ${response.contentLength()}. Total progress: $progress bytes"
-                    )
-                }
-            }
-
-            cashingStatusState.update {
-                when (it) {
-                    VideoCashService.CashingStatus.CANCELED -> it
-                    else -> VideoCashService.CashingStatus.CASHED
-                }
-            }
-
-            Log.d(TAG, "isActive: $isActive; CashingStatus: ${cashingStatusState.value.name}")
-
-            if (!isActive || cashingStatusState.value == VideoCashService.CashingStatus.CANCELED)
-                return@execute null
+        if (!status.isSuccess()) {
+            cashingStatusState.update { VideoCashService.CashingStatus.ERR }
+            return@execute status
         }
 
-        status
+        val channel = response.bodyAsChannel()
+        var progress = 0L
+
+        while (!channel.isClosedForRead
+            && cashingStatusState.value == VideoCashService.CashingStatus.CASHING
+        ) {
+            val packet = channel.readRemaining(DEFAULT_BUFFER_SIZE.toLong())
+
+            while (packet.isNotEmpty
+                && cashingStatusState.value == VideoCashService.CashingStatus.CASHING
+            ) {
+                val bytes = packet.readBytes()
+                storeFile.appendBytes(bytes)
+
+                progress += bytes.size
+                progressState?.update { progress to response.contentLength()!! }
+
+                Log.d(
+                    TAG,
+                    "Read ${bytes.size} bytes from ${response.contentLength()}. Total progress: $progress bytes"
+                )
+            }
+        }
+
+        val cashingStatus = cashingStatusState.updateAndGet {
+            when (it) {
+                VideoCashService.CashingStatus.CANCELED -> it
+                else -> VideoCashService.CashingStatus.CASHED
+            }
+        }
+
+        Log.d(TAG, "CashingStatus: ${cashingStatus.name}")
+        if (cashingStatusState.value == VideoCashService.CashingStatus.CANCELED) null else status
     }
 
     Log.d(TAG, "Done, status: ${status?.value}")

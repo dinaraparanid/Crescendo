@@ -10,41 +10,43 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.launch
-import kotlin.coroutines.CoroutineContext
 
+@Deprecated("YoutubeExtractor should be created for every single task when it is used")
 class YoutubeUrlExtractor<T>(
     context: Context,
-    coroutineContext: CoroutineContext = Dispatchers.Main,
+    private val coroutineScope: CoroutineScope = CoroutineScope(Dispatchers.Main),
     private val videoExtractionChannel: Channel<T>? = null,
     private val onExtractionComplete: suspend (
         audioUrl: String,
         videoUrl: String,
         videoMeta: VideoMeta?,
     ) -> T
-) : YouTubeExtractor(context), CoroutineScope by CoroutineScope(coroutineContext) {
+) : YouTubeExtractor(context) {
     private companion object {
         private val TAG = YoutubeUrlExtractor::class.simpleName!!
     }
 
     override fun onExtractionComplete(ytFiles: SparseArray<YtFile>?, videoMeta: VideoMeta?) {
-        ytFiles?.let { youtubeFiles ->
-            val audioTag = 140
-            val audioUrl = youtubeFiles[audioTag].url!!
+        if (ytFiles == null)
+            return
 
-            val videoUrl = sequenceOf(22, 137, 18)
-                .map(youtubeFiles::get)
-                .filterNotNull()
-                .map(YtFile::getUrl)
-                .filterNotNull()
-                .filter(String::isNotEmpty)
-                .first()
+        val audioTag = 140
+        val audioUrl = ytFiles[audioTag].url!!
 
-            launch {
-                val onExtractionCompleteResult = onExtractionComplete(audioUrl, videoUrl, videoMeta)
-                Log.d(TAG, "Extraction Completed")
-                videoExtractionChannel?.send(onExtractionCompleteResult)// TODO: Blocking
-                Log.d(TAG, "Result is sent")
-            }
+        val videoUrl = sequenceOf(22, 137, 18)
+            .map(ytFiles::get)
+            .filterNotNull()
+            .map(YtFile::getUrl)
+            .filterNotNull()
+            .filter(String::isNotEmpty)
+            .first()
+
+        coroutineScope.launch {
+            Log.d(TAG, "Launching extraction")
+            val onExtractionCompleteResult = onExtractionComplete(audioUrl, videoUrl, videoMeta)
+            Log.d(TAG, "Extraction Completed")
+            videoExtractionChannel?.send(onExtractionCompleteResult)
+            Log.d(TAG, "Result is sent")
         }
     }
 }

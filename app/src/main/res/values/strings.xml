@@ -41,4 +41,5 @@
     <string name="ok">OK</string>
     <string name="downloaded">Downloaded</string>
     <string name="notifications_description">Notifications are required for long-living media playback and track cashing</string>
+    <string name="cashing_error">Error while cashing</string>
 </resources>
