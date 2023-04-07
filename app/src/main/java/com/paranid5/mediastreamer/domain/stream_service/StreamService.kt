@@ -30,6 +30,7 @@ import arrow.core.Either
 import at.huber.youtubeExtractor.VideoMeta
 import at.huber.youtubeExtractor.YouTubeExtractor
 import at.huber.youtubeExtractor.YtFile
+import com.paranid5.mediastreamer.IS_PLAYING_STATE
 import com.paranid5.mediastreamer.R
 import com.paranid5.mediastreamer.data.VideoMetadata
 import com.paranid5.mediastreamer.data.utils.extensions.toAndroidMetadata
@@ -44,9 +45,10 @@ import kotlinx.coroutines.flow.*
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import org.koin.core.parameter.parametersOf
+import org.koin.core.qualifier.named
 
 @OptIn(androidx.media3.common.util.UnstableApi::class)
-class StreamService : Service(), CoroutineScope by MainScope(), KoinComponent {
+class StreamService : Service(), KoinComponent {
     companion object {
         private const val NOTIFICATION_ID = 101
         private const val STREAM_CHANNEL_ID = "stream_channel"
@@ -138,15 +140,20 @@ class StreamService : Service(), CoroutineScope by MainScope(), KoinComponent {
         )
 
     private val binder = object : Binder() {}
+    private val job = SupervisorJob()
+    private val scope = CoroutineScope(Dispatchers.Main + job)
+
     private val storageHandler by inject<StorageHandler>()
     private val glideUtils by inject<GlideUtils> { parametersOf(this) }
     private val currentMetadata = MutableStateFlow<VideoMetadata?>(null)
+    internal val mIsPlayingState by inject<MutableStateFlow<Boolean>>(named(IS_PLAYING_STATE))
+
     private lateinit var playbackMonitorTask: Job
 
     @kotlin.OptIn(ExperimentalCoroutinesApi::class)
     private val videoLength = currentMetadata
         .mapLatest { it?.lenInMillis ?: 0 }
-        .stateIn(this, SharingStarted.Eagerly, 0)
+        .stateIn(scope, SharingStarted.Eagerly, 0)
 
     private inline val currentPlaybackPosition
         get() = mPlayer.currentPosition
@@ -159,9 +166,6 @@ class StreamService : Service(), CoroutineScope by MainScope(), KoinComponent {
 
     internal inline val mIsRepeating
         get() = storageHandler.isRepeatingState.value
-
-    internal inline val mCurrentUrl
-        get() = storageHandler.currentUrlState.value
 
     @Volatile
     private var isNotificationShown = false
@@ -204,10 +208,10 @@ class StreamService : Service(), CoroutineScope by MainScope(), KoinComponent {
             super.onPlaybackStateChanged(playbackState)
 
             when (playbackState) {
-                Player.STATE_IDLE -> launch { mRestartPlayer() }
+                Player.STATE_IDLE -> scope.launch { mRestartPlayer() }
 
                 Player.STATE_ENDED -> when {
-                    mIsRepeating -> launch { mRestartPlayer() }
+                    mIsRepeating -> scope.launch { mRestartPlayer() }
                     else -> stopSelf()
                 }
 
@@ -218,19 +222,15 @@ class StreamService : Service(), CoroutineScope by MainScope(), KoinComponent {
         override fun onIsPlayingChanged(isPlaying: Boolean) {
             super.onIsPlayingChanged(isPlaying)
 
-            sendBroadcast(
-                Intent(Broadcast_IS_PLAYING_CHANGED)
-                    .putExtra(IS_PLAYING_ARG, isPlaying)
-            )
-
-            launch { mUpdateMediaSession() }
+            mIsPlayingState.update { isPlaying }
+            scope.launch { mUpdateMediaSession() }
 
             when {
                 isPlaying -> mStartPlaybackMonitoring()
                 else -> mStopPlaybackMonitoring()
             }
 
-            launch {
+            scope.launch {
                 mUpdateOrShowNotification(
                     isPlaying = isPlaying,
                     isLiked = isCurrentVideoLikedState.value
@@ -240,7 +240,7 @@ class StreamService : Service(), CoroutineScope by MainScope(), KoinComponent {
 
         override fun onMediaMetadataChanged(mediaMetadata: MediaMetadata) {
             super.onMediaMetadataChanged(mediaMetadata)
-            launch {
+            scope.launch {
                 mUpdateOrShowNotification(
                     isPlaying = mIsPlaying,
                     isLiked = isCurrentVideoLikedState.value
@@ -250,7 +250,7 @@ class StreamService : Service(), CoroutineScope by MainScope(), KoinComponent {
 
         override fun onPlayerError(error: PlaybackException) {
             super.onPlayerError(error)
-            launch {
+            scope.launch {
                 mUpdateOrShowNotification(
                     isPlaying = false,
                     isLiked = isCurrentVideoLikedState.value
@@ -277,7 +277,7 @@ class StreamService : Service(), CoroutineScope by MainScope(), KoinComponent {
     private val switchVideoReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context?, intent: Intent) {
             val url = intent.mUrlArg
-            launch { mStoreCurrentUrl(url) }
+            scope.launch { mStoreCurrentUrl(url) }
             mPlayNewStream(url)
         }
     }
@@ -320,7 +320,7 @@ class StreamService : Service(), CoroutineScope by MainScope(), KoinComponent {
 
     private val repeatChangedReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context?, intent: Intent?) {
-            launch {
+            scope.launch {
                 mStoreAndSendIsRepeating(!mIsRepeating)
                 mUpdateNotification(isPlaying = mIsPlaying, isLiked = mIsCurrentVideoLiked)
                 Log.d(TAG, "Repeating changed: $mIsRepeating")
@@ -368,13 +368,13 @@ class StreamService : Service(), CoroutineScope by MainScope(), KoinComponent {
             createChannel()
 
         initMediaSession()
-        launch { startNotificationObserving() }
+        scope.launch { startNotificationObserving() }
 
         intent.mUrlArgOrNull?.let { url ->
             // New stream
-            launch { mStoreCurrentUrl(url) }
+            scope.launch { mStoreCurrentUrl(url) }
             mPlayNewStream(url)
-        } ?: launch {
+        } ?: scope.launch {
             // Continue with previous stream
 
             mPlayNewStream(
@@ -404,6 +404,7 @@ class StreamService : Service(), CoroutineScope by MainScope(), KoinComponent {
         releaseMedia()
         mRemoveNotification()
         unregisterReceivers()
+        job.cancel()
     }
 
     @RequiresApi(Build.VERSION_CODES.O)
@@ -430,7 +431,7 @@ class StreamService : Service(), CoroutineScope by MainScope(), KoinComponent {
     }
 
     internal fun mPausePlayback() {
-        launch { updateAndSendPlaybackPosition() }
+        scope.launch { updateAndSendPlaybackPosition() }
         mPlayer.pause()
     }
 
@@ -492,7 +493,7 @@ class StreamService : Service(), CoroutineScope by MainScope(), KoinComponent {
                     .Factory(DefaultHttpDataSource.Factory())
                     .createMediaSource(MediaItem.fromUri(videoUrl))*/
 
-                launch {
+                scope.launch {
                     mUpdateMediaSession(videoMeta?.let(::VideoMetadata))
                     launch(Dispatchers.IO) { mStoreMetadata(videoMeta) }
 
@@ -518,7 +519,7 @@ class StreamService : Service(), CoroutineScope by MainScope(), KoinComponent {
         YoutubeUrlExtractor(initialPosition).extract(url)
 
     internal fun mPlayNewStream(url: String, initialPosition: Long = 0) {
-        launch { storeCurrentUrl(url) }
+        scope.launch { storeCurrentUrl(url) }
         playStream(url, initialPosition)
     }
 
@@ -925,7 +926,7 @@ class StreamService : Service(), CoroutineScope by MainScope(), KoinComponent {
     // --------------------------- Playback Monitoring ---------------------------
 
     internal fun mStartPlaybackMonitoring() {
-        playbackMonitorTask = launch {
+        playbackMonitorTask = scope.launch {
             while (true) {
                 updateAndSendPlaybackPosition()
                 delay(PLAYBACK_UPDATE_COOLDOWN)

@@ -32,7 +32,6 @@ import com.paranid5.mediastreamer.presentation.ui.BroadcastReceiver
 import org.koin.compose.koinInject
 
 private const val BROADCAST_LOCATION = "com.paranid5.mediastreamer.presentation.streaming"
-const val Broadcast_IS_PLAYING_CHANGED = "$BROADCAST_LOCATION.IS_PLAYING_CHANGED"
 const val Broadcast_CUR_POSITION_CHANGED = "$BROADCAST_LOCATION.CUR_POSITION_CHANGED"
 const val Broadcast_IS_REPEATING_CHANGED = "$BROADCAST_LOCATION.IS_REPEATING_CHANGED"
 

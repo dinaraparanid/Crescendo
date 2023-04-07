@@ -14,9 +14,7 @@ import androidx.palette.graphics.Palette
 import com.paranid5.mediastreamer.R
 import com.paranid5.mediastreamer.presentation.ui.extensions.getLightVibrantOrPrimary
 import com.paranid5.mediastreamer.presentation.ui.extensions.simpleShadow
-import com.paranid5.mediastreamer.presentation.ui.BroadcastReceiver
-import kotlinx.coroutines.flow.update
-import org.koin.androidx.compose.get
+import org.koin.compose.koinInject
 
 @Composable
 fun PlaybackButtons(
@@ -34,14 +32,10 @@ private fun PlayButton(
     streamingPresenter: StreamingPresenter,
     palette: Palette?,
     modifier: Modifier = Modifier,
-    streamingUIHandler: StreamingUIHandler = get()
+    streamingUIHandler: StreamingUIHandler = koinInject(),
 ) {
     val lightVibrantColor = palette.getLightVibrantOrPrimary()
-    val isPlaying by streamingPresenter.isPlaying.collectAsState()
-
-    BroadcastReceiver(action = Broadcast_IS_PLAYING_CHANGED) { _, intent ->
-        streamingPresenter.isPlaying.update { intent!!.getBooleanExtra(IS_PLAYING_ARG, !isPlaying) }
-    }
+    val isPlaying by streamingPresenter.isPlayingState.collectAsState()
 
     when {
         isPlaying -> IconButton(
@@ -74,7 +68,7 @@ private fun PlayButton(
 private fun SeekTo10SecsBackButton(
     palette: Palette?,
     modifier: Modifier = Modifier,
-    streamingUIHandler: StreamingUIHandler = get()
+    streamingUIHandler: StreamingUIHandler = koinInject()
 ) {
     val lightVibrantColor = palette.getLightVibrantOrPrimary()
 
@@ -95,7 +89,7 @@ private fun SeekTo10SecsBackButton(
 private fun SeekTo10SecsForwardButton(
     palette: Palette?,
     modifier: Modifier = Modifier,
-    streamingUIHandler: StreamingUIHandler = get()
+    streamingUIHandler: StreamingUIHandler = koinInject()
 ) {
     val lightVibrantColor = palette.getLightVibrantOrPrimary()
 

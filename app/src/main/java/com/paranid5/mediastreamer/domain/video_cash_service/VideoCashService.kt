@@ -602,7 +602,7 @@ class VideoCashService : Service(), KoinComponent {
             CashingStatus.CASHED -> showCashedNotification()
             CashingStatus.CANCELED -> showCanceledNotification()
             CashingStatus.ERR -> showErrorNotification(errorCode, errorDescription)
-            CashingStatus.NONE -> Unit
+            CashingStatus.NONE -> detachNotification()
         }
     }
 

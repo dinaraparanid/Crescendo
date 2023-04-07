@@ -18,6 +18,7 @@ import com.paranid5.mediastreamer.presentation.ui.GlideUtils
 import com.paranid5.mediastreamer.domain.video_cash_service.VideoCashServiceAccessor
 import com.paranid5.mediastreamer.presentation.ui.permissions.PostNotificationDescriptionProvider
 import com.paranid5.mediastreamer.presentation.ui.permissions.postNotificationsQueue
+import kotlinx.coroutines.flow.MutableStateFlow
 import org.koin.android.ext.koin.androidApplication
 import org.koin.android.ext.koin.androidContext
 import org.koin.androidx.viewmodel.dsl.viewModelOf
@@ -30,6 +31,7 @@ const val STREAM_WITH_NO_NAME = "stream_no_name"
 const val UNKNOWN_STREAMER = "unknown_streamer"
 const val EXTERNAL_STORAGE_PERMISSION_QUEUE = "external_storage_permission_queue"
 const val POST_NOTIFICATIONS_PERMISSION_QUEUE = "post_notifications_permission_queue"
+const val IS_PLAYING_STATE = "is_playing_state"
 
 private val resourcesModule = module {
     factory(named(STREAM_WITH_NO_NAME)) {
@@ -79,6 +81,7 @@ private val globalsModule = module {
     single { androidApplication() as MainApplication }
     factory { (context: Context) -> GlideUtils(context) }
     singleOf(::KtorClient)
+    single(named(IS_PLAYING_STATE)) { MutableStateFlow(false) }
 }
 
 private val searchStreamModule = module {
@@ -89,7 +92,7 @@ private val searchStreamModule = module {
 
 private val streamingModule = module {
     singleOf(::StreamingUIHandler)
-    factoryOf(::StreamingPresenter)
+    factory { StreamingPresenter(get(named(IS_PLAYING_STATE))) }
     viewModelOf(::StreamingViewModel)
 }
 
