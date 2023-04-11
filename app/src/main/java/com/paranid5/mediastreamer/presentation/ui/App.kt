@@ -1,5 +1,6 @@
 package com.paranid5.mediastreamer.presentation.ui
 
+import android.content.res.Configuration
 import android.graphics.Bitmap
 import androidx.compose.animation.Animatable
 import androidx.compose.animation.AnimatedContent
@@ -8,6 +9,7 @@ import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.FabPosition
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.*
@@ -63,8 +65,19 @@ fun App() {
             )
 
             Scaffold(
-                floatingActionButton = { StreamButton() },
-                floatingActionButtonPosition = FabPosition.Center,
+                floatingActionButton = {
+                    when (config.orientation) {
+                        Configuration.ORIENTATION_LANDSCAPE -> StreamButton(
+                            modifier = Modifier.padding(end = 10.dp)
+                        )
+
+                        else -> StreamButton()
+                    }
+                },
+                floatingActionButtonPosition = when (config.orientation) {
+                    Configuration.ORIENTATION_LANDSCAPE -> FabPosition.End
+                    else -> FabPosition.Center
+                },
                 bottomBar = { AppBar() },
                 content = { ContentScreen(padding = it) },
                 modifier = Modifier.fillMaxSize(),

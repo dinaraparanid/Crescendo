@@ -7,6 +7,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -19,18 +20,19 @@ import com.paranid5.mediastreamer.presentation.ui.extensions.getLightVibrantOrPr
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-private fun TitleAndAuthor(
+fun TitleAndAuthor(
     metadata: VideoMetadata?,
     palette: Palette?,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    textAlignment: Alignment.Horizontal = Alignment.Start,
 ) {
     val lightVibrantColor = palette.getLightVibrantOrPrimary()
 
     Column(modifier) {
         Text(
-            modifier = Modifier.basicMarquee(),
+            modifier = Modifier.basicMarquee().align(textAlignment),
             text = metadata?.title ?: stringResource(R.string.stream_no_name),
-            fontSize = 18.sp,
+            fontSize = 20.sp,
             maxLines = 1,
             color = lightVibrantColor
         )
@@ -38,9 +40,9 @@ private fun TitleAndAuthor(
         Spacer(Modifier.height(5.dp))
 
         Text(
-            modifier = Modifier.basicMarquee(),
+            modifier = Modifier.basicMarquee().align(textAlignment),
             text = metadata?.author ?: stringResource(R.string.unknown_streamer),
-            fontSize = 16.sp,
+            fontSize = 18.sp,
             maxLines = 1,
             color = lightVibrantColor
         )
@@ -48,7 +50,7 @@ private fun TitleAndAuthor(
 }
 
 @Composable
-private fun PropertiesButton(palette: Palette?, modifier: Modifier = Modifier) {
+fun PropertiesButton(palette: Palette?, modifier: Modifier = Modifier) {
     val lightVibrantColor = palette.getLightVibrantOrPrimary()
 
     IconButton(modifier = modifier, onClick = { /*TODO*/ }) {
@@ -62,14 +64,19 @@ private fun PropertiesButton(palette: Palette?, modifier: Modifier = Modifier) {
 }
 
 @Composable
-fun TitleAndPropertiesButton(metadata: VideoMetadata?, palette: Palette?, modifier: Modifier = Modifier) =
-    Row(modifier.fillMaxWidth().padding(horizontal = 10.dp)) {
-        TitleAndAuthor(
-            metadata = metadata,
-            modifier = Modifier.weight(1F),
-            palette = palette
-        )
+fun TitleAndPropertiesButton(
+    metadata: VideoMetadata?,
+    palette: Palette?,
+    modifier: Modifier = Modifier,
+    textAlignment: Alignment.Horizontal = Alignment.Start
+) = Row(modifier) {
+    TitleAndAuthor(
+        metadata = metadata,
+        modifier = Modifier.weight(1F),
+        palette = palette,
+        textAlignment = textAlignment
+    )
 
-        Spacer(Modifier.width(10.dp))
-        PropertiesButton(palette)
-    }
+    Spacer(Modifier.width(10.dp))
+    PropertiesButton(palette)
+}

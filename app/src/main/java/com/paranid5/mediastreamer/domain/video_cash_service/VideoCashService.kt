@@ -29,7 +29,7 @@ import com.paranid5.mediastreamer.domain.utils.extensions.insertMediaFileToMedia
 import com.paranid5.mediastreamer.domain.utils.extensions.registerReceiverCompat
 import com.paranid5.mediastreamer.domain.utils.extensions.setAudioTagsToFileCatching
 import com.paranid5.mediastreamer.presentation.MainActivity
-import com.paranid5.mediastreamer.presentation.streaming.VIDEO_CASH_STATUS
+import com.paranid5.mediastreamer.presentation.streaming.VIDEO_CASH_STATUS_ARG
 import io.ktor.client.*
 import io.ktor.http.*
 import kotlinx.coroutines.*
@@ -355,20 +355,20 @@ class VideoCashService : Service(), KoinComponent {
 
     private fun onVideoCashStatusSuccessful() = sendBroadcast(
         Intent(MainActivity.Broadcast_VIDEO_CASH_COMPLETED)
-            .putExtra(VIDEO_CASH_STATUS, VideoCashResponse.Success)
+            .putExtra(VIDEO_CASH_STATUS_ARG, VideoCashResponse.Success)
     )
 
     private fun onVideoCashStatusError(code: Int, description: String) {
         videoCashErrorState.update { code to description }
         sendBroadcast(
             Intent(MainActivity.Broadcast_VIDEO_CASH_COMPLETED)
-                .putExtra(VIDEO_CASH_STATUS, VideoCashResponse.Error(code, description))
+                .putExtra(VIDEO_CASH_STATUS_ARG, VideoCashResponse.Error(code, description))
         )
     }
 
     private fun onVideoCashStatusCanceled() = sendBroadcast(
         Intent(MainActivity.Broadcast_VIDEO_CASH_COMPLETED)
-            .putExtra(VIDEO_CASH_STATUS, VideoCashResponse.Canceled)
+            .putExtra(VIDEO_CASH_STATUS_ARG, VideoCashResponse.Canceled)
     )
 
     private suspend inline fun launchCashing() {

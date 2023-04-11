@@ -17,7 +17,7 @@ import com.paranid5.mediastreamer.domain.video_cash_service.VideoCashResponse
 import com.paranid5.mediastreamer.presentation.composition_locals.LocalStreamState
 import com.paranid5.mediastreamer.presentation.composition_locals.StreamState
 import com.paranid5.mediastreamer.presentation.composition_locals.StreamStates
-import com.paranid5.mediastreamer.presentation.streaming.VIDEO_CASH_STATUS
+import com.paranid5.mediastreamer.presentation.streaming.VIDEO_CASH_STATUS_ARG
 import com.paranid5.mediastreamer.presentation.ui.App
 import com.paranid5.mediastreamer.presentation.ui.theme.MediaStreamerTheme
 
@@ -35,9 +35,9 @@ class MainActivity : ComponentActivity() {
 
             val status = when {
                 Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU ->
-                    intent!!.getSerializableExtra(VIDEO_CASH_STATUS, VideoCashResponse::class.java)!!
+                    intent!!.getSerializableExtra(VIDEO_CASH_STATUS_ARG, VideoCashResponse::class.java)!!
                 else ->
-                    intent!!.getSerializableExtra(VIDEO_CASH_STATUS)!! as VideoCashResponse
+                    intent!!.getSerializableExtra(VIDEO_CASH_STATUS_ARG)!! as VideoCashResponse
             }
 
             mOnVideoCashCompleted(status, applicationContext)

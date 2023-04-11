@@ -1,5 +1,6 @@
 package com.paranid5.mediastreamer.presentation.search_stream
 
+import android.content.res.Configuration
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.Button
 import androidx.compose.material3.Text
@@ -7,6 +8,7 @@ import androidx.compose.material3.TextField
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
@@ -69,6 +71,8 @@ fun SearchStreamScreen(
 ) {
     LocalStreamState.current.value = StreamStates.STREAMING
 
+    val orientation = LocalConfiguration.current.orientation
+
     val inputText by viewModel
         .presenter
         .currentTextState
@@ -98,7 +102,16 @@ fun SearchStreamScreen(
         }
     }
 
-    Box(modifier.fillMaxSize()) {
+    Box(
+        modifier = modifier
+            .fillMaxSize()
+            .let { mod ->
+                when (orientation) {
+                    Configuration.ORIENTATION_LANDSCAPE -> mod.padding(bottom = 15.dp)
+                    else -> mod
+                }
+            }
+    ) {
         Column(Modifier.align(Alignment.Center)) {
             Label(Modifier.padding(bottom = 10.dp))
 

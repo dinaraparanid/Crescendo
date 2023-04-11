@@ -1,5 +1,6 @@
 package com.paranid5.mediastreamer.presentation.streaming
 
+import android.content.res.Configuration
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
@@ -13,6 +14,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.constraintlayout.compose.ConstraintLayout
@@ -25,26 +27,36 @@ import com.paranid5.mediastreamer.data.utils.extensions.timeString
 import com.paranid5.mediastreamer.domain.StorageHandler
 import com.paranid5.mediastreamer.presentation.composition_locals.LocalStreamState
 import com.paranid5.mediastreamer.presentation.composition_locals.StreamStates
+import com.paranid5.mediastreamer.presentation.ui.BroadcastReceiver
 import com.paranid5.mediastreamer.presentation.ui.OnBackPressedHandler
 import com.paranid5.mediastreamer.presentation.ui.extensions.getLightVibrantOrPrimary
 import com.paranid5.mediastreamer.presentation.ui.rememberVideoCoverPainterWithPalette
-import com.paranid5.mediastreamer.presentation.ui.BroadcastReceiver
 import org.koin.compose.koinInject
 
 private const val BROADCAST_LOCATION = "com.paranid5.mediastreamer.presentation.streaming"
 const val Broadcast_CUR_POSITION_CHANGED = "$BROADCAST_LOCATION.CUR_POSITION_CHANGED"
 const val Broadcast_IS_REPEATING_CHANGED = "$BROADCAST_LOCATION.IS_REPEATING_CHANGED"
 
-const val IS_PLAYING_ARG = "is_playing"
 const val CUR_POSITION_ARG = "cur_position"
 const val IS_REPEATING_ARG = "is_repeating"
-const val VIDEO_CASH_STATUS = "video_cash_status"
+const val VIDEO_CASH_STATUS_ARG = "video_cash_status"
 
 @Composable
 fun StreamingScreen(
     viewModel: StreamingViewModel,
     modifier: Modifier = Modifier,
     storageHandler: StorageHandler = koinInject()
+) = when (LocalConfiguration.current.orientation) {
+    Configuration.ORIENTATION_LANDSCAPE ->
+        StreamingScreenLandscape(viewModel, modifier, storageHandler)
+    else -> StreamingScreenPortrait(viewModel, modifier, storageHandler)
+}
+
+@Composable
+private fun StreamingScreenPortrait(
+    viewModel: StreamingViewModel,
+    modifier: Modifier,
+    storageHandler: StorageHandler
 ) {
     LocalStreamState.current.value = StreamStates.STREAMING
     val metadata by storageHandler.currentMetadataState.collectAsState()
@@ -66,14 +78,16 @@ fun StreamingScreen(
         ) = createRefs()
 
         VideoCover(
-            modifier = Modifier.constrainAs(cover) {
-                top.linkTo(parent.top, margin = 20.dp)
-                start.linkTo(parent.start, margin = 20.dp)
-                end.linkTo(parent.end, margin = 20.dp)
-                bottom.linkTo(slider.top, margin = 10.dp)
-                height = Dimension.fillToConstraints
-                width = Dimension.fillToConstraints
-            },
+            modifier = Modifier
+                .padding(20.dp)
+                .constrainAs(cover) {
+                    top.linkTo(parent.top, margin = 20.dp)
+                    start.linkTo(parent.start, margin = 20.dp)
+                    end.linkTo(parent.end, margin = 20.dp)
+                    bottom.linkTo(slider.top, margin = 10.dp)
+                    height = Dimension.fillToConstraints
+                    width = Dimension.fillToConstraints
+                },
             coilPainter = coilPainter,
             palette = palette
         )
@@ -86,16 +100,23 @@ fun StreamingScreen(
                 start.linkTo(parent.start, margin = 20.dp)
                 end.linkTo(parent.end, margin = 20.dp)
             }
-        )
+        ) { curPosition, videoLength, color ->
+            TimeText(curPosition, color)
+            Spacer(Modifier.weight(1F))
+            TimeText(videoLength, color)
+        }
 
         TitleAndPropertiesButton(
             metadata = metadata,
             palette = palette,
-            modifier = Modifier.constrainAs(titleAndPropertiesButton) {
-                top.linkTo(slider.bottom, margin = 15.dp)
-                start.linkTo(parent.start, margin = 20.dp)
-                end.linkTo(parent.end, margin = 20.dp)
-            }
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 10.dp)
+                .constrainAs(titleAndPropertiesButton) {
+                    top.linkTo(slider.bottom, margin = 15.dp)
+                    start.linkTo(parent.start, margin = 20.dp)
+                    end.linkTo(parent.end, margin = 20.dp)
+                }
         )
 
         PlaybackButtons(
@@ -120,6 +141,84 @@ fun StreamingScreen(
 }
 
 @Composable
+private fun StreamingScreenLandscape(
+    viewModel: StreamingViewModel,
+    modifier: Modifier,
+    storageHandler: StorageHandler
+) {
+    LocalStreamState.current.value = StreamStates.STREAMING
+    val metadata by storageHandler.currentMetadataState.collectAsState()
+
+    val (coilPainter, palette) = rememberVideoCoverPainterWithPalette(
+        isPlaceholderRequired = true,
+        size = 1100 to 1000
+    )
+
+    OnBackPressedHandler()
+
+    ConstraintLayout(modifier.fillMaxSize()) {
+        val (
+            cover,
+            slider,
+            playbackButtons,
+            utilsButtons
+        ) = createRefs()
+
+        VideoCover(
+            modifier = Modifier.constrainAs(cover) {
+                centerHorizontallyTo(parent)
+                top.linkTo(parent.top, margin = 8.dp)
+                bottom.linkTo(slider.top, margin = 2.dp)
+                height = Dimension.fillToConstraints
+            },
+            coilPainter = coilPainter,
+            palette = palette
+        )
+
+        PlaybackSlider(
+            metadata = metadata,
+            palette = palette,
+            modifier = Modifier.constrainAs(slider) {
+                top.linkTo(parent.top, margin = 0.dp)
+                bottom.linkTo(parent.bottom, margin = 25.dp)
+                start.linkTo(parent.start, margin = 20.dp)
+                end.linkTo(parent.end, margin = 20.dp)
+            }
+        ) { curPosition, videoLength, color ->
+            TimeText(curPosition, color)
+
+            TitleAndAuthor(
+                metadata,
+                palette,
+                modifier = Modifier.padding(horizontal = 10.dp).weight(1F, fill = true),
+                textAlignment = Alignment.CenterHorizontally
+            )
+
+            TimeText(videoLength, color)
+        }
+
+        PlaybackButtons(
+            streamingPresenter = viewModel.presenter,
+            palette = palette,
+            modifier = Modifier.constrainAs(playbackButtons) {
+                top.linkTo(slider.bottom, margin = 5.dp)
+                start.linkTo(parent.start, margin = 20.dp)
+                end.linkTo(parent.end, margin = 20.dp)
+            }
+        )
+
+        UtilsButtons(
+            palette = palette,
+            modifier = Modifier.constrainAs(utilsButtons) {
+                top.linkTo(playbackButtons.bottom, margin = 2.dp)
+                start.linkTo(parent.start, margin = 20.dp)
+                end.linkTo(parent.end, margin = 20.dp)
+            }
+        )
+    }
+}
+
+@Composable
 private fun VideoCover(
     coilPainter: AsyncImagePainter,
     palette: Palette?,
@@ -132,7 +231,6 @@ private fun VideoCover(
         modifier = modifier
             .aspectRatio(1F)
             .fillMaxSize()
-            .padding(20.dp)
             .shadow(
                 elevation = 80.dp,
                 shape = RoundedCornerShape(5.dp),
@@ -156,7 +254,8 @@ private fun PlaybackSlider(
     palette: Palette?,
     modifier: Modifier = Modifier,
     streamingUIHandler: StreamingUIHandler = koinInject(),
-    storageHandler: StorageHandler = koinInject()
+    storageHandler: StorageHandler = koinInject(),
+    content: @Composable RowScope.(curPosition: Long, videoLength: Long, color: Color) -> Unit
 ) {
     val lightVibrantColor = palette.getLightVibrantOrPrimary()
     val videoLength = metadata?.lenInMillis ?: 0
@@ -185,9 +284,11 @@ private fun PlaybackSlider(
         )
 
         Row(Modifier.fillMaxWidth()) {
-            Text(text = curPosition.timeString, color = lightVibrantColor)
-            Spacer(Modifier.weight(1F))
-            Text(text = videoLength.timeString, color = lightVibrantColor)
+            content(curPosition, videoLength, lightVibrantColor)
         }
     }
 }
+
+@Composable
+private fun TimeText(time: Long, color: Color, modifier: Modifier = Modifier) =
+    Text(text = time.timeString, color = color, modifier = modifier)
