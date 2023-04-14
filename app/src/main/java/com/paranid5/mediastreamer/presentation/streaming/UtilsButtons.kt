@@ -21,7 +21,7 @@ import androidx.palette.graphics.Palette
 import com.paranid5.mediastreamer.EXTERNAL_STORAGE_PERMISSION_QUEUE
 import com.paranid5.mediastreamer.R
 import com.paranid5.mediastreamer.domain.StorageHandler
-import com.paranid5.mediastreamer.presentation.LocalActivity
+import com.paranid5.mediastreamer.presentation.composition_locals.LocalActivity
 import com.paranid5.mediastreamer.presentation.ui.extensions.getLightVibrantOrPrimary
 import com.paranid5.mediastreamer.presentation.ui.extensions.openAppSettings
 import com.paranid5.mediastreamer.presentation.ui.extensions.simpleShadow

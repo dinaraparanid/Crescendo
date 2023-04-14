@@ -3,12 +3,25 @@ package com.paranid5.mediastreamer.presentation.streaming
 import android.content.res.Configuration
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.border
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.RowScope
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.aspectRatio
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Slider
 import androidx.compose.material3.SliderDefaults
 import androidx.compose.material3.Text
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
@@ -25,12 +38,13 @@ import com.paranid5.mediastreamer.R
 import com.paranid5.mediastreamer.data.VideoMetadata
 import com.paranid5.mediastreamer.data.utils.extensions.timeString
 import com.paranid5.mediastreamer.domain.StorageHandler
-import com.paranid5.mediastreamer.presentation.composition_locals.LocalStreamState
-import com.paranid5.mediastreamer.presentation.composition_locals.StreamStates
+import com.paranid5.mediastreamer.presentation.Screens
 import com.paranid5.mediastreamer.presentation.ui.BroadcastReceiver
 import com.paranid5.mediastreamer.presentation.ui.OnBackPressedHandler
 import com.paranid5.mediastreamer.presentation.ui.extensions.getLightVibrantOrPrimary
 import com.paranid5.mediastreamer.presentation.ui.rememberVideoCoverPainterWithPalette
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.update
 import org.koin.compose.koinInject
 
 private const val BROADCAST_LOCATION = "com.paranid5.mediastreamer.presentation.streaming"
@@ -44,12 +58,18 @@ const val VIDEO_CASH_STATUS_ARG = "video_cash_status"
 @Composable
 fun StreamingScreen(
     viewModel: StreamingViewModel,
+    curScreenState: MutableStateFlow<Screens>,
     modifier: Modifier = Modifier,
     storageHandler: StorageHandler = koinInject()
-) = when (LocalConfiguration.current.orientation) {
-    Configuration.ORIENTATION_LANDSCAPE ->
-        StreamingScreenLandscape(viewModel, modifier, storageHandler)
-    else -> StreamingScreenPortrait(viewModel, modifier, storageHandler)
+) {
+    curScreenState.update { Screens.StreamScreen.Streaming }
+
+    when (LocalConfiguration.current.orientation) {
+        Configuration.ORIENTATION_LANDSCAPE ->
+            StreamingScreenLandscape(viewModel, modifier, storageHandler)
+
+        else -> StreamingScreenPortrait(viewModel, modifier, storageHandler)
+    }
 }
 
 @Composable
@@ -58,7 +78,6 @@ private fun StreamingScreenPortrait(
     modifier: Modifier,
     storageHandler: StorageHandler
 ) {
-    LocalStreamState.current.value = StreamStates.STREAMING
     val metadata by storageHandler.currentMetadataState.collectAsState()
 
     val (coilPainter, palette) = rememberVideoCoverPainterWithPalette(
@@ -146,7 +165,6 @@ private fun StreamingScreenLandscape(
     modifier: Modifier,
     storageHandler: StorageHandler
 ) {
-    LocalStreamState.current.value = StreamStates.STREAMING
     val metadata by storageHandler.currentMetadataState.collectAsState()
 
     val (coilPainter, palette) = rememberVideoCoverPainterWithPalette(

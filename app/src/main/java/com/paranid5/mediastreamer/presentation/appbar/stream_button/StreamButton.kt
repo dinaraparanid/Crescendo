@@ -18,13 +18,15 @@ import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
 import com.paranid5.mediastreamer.POST_NOTIFICATIONS_PERMISSION_QUEUE
 import com.paranid5.mediastreamer.R
-import com.paranid5.mediastreamer.presentation.LocalActivity
-import com.paranid5.mediastreamer.presentation.LocalNavController
-import com.paranid5.mediastreamer.presentation.Screens
+import com.paranid5.mediastreamer.presentation.StreamStates
+import com.paranid5.mediastreamer.presentation.composition_locals.LocalActivity
+import com.paranid5.mediastreamer.presentation.composition_locals.LocalNavController
+import com.paranid5.mediastreamer.presentation.nextState
 import com.paranid5.mediastreamer.presentation.ui.extensions.openAppSettings
 import com.paranid5.mediastreamer.presentation.ui.permissions.PermissionDialog
 import com.paranid5.mediastreamer.presentation.ui.permissions.PostNotificationDescriptionProvider
 import com.paranid5.mediastreamer.presentation.ui.theme.LocalAppColors
+import kotlinx.coroutines.flow.StateFlow
 import org.koin.compose.koinInject
 import org.koin.core.qualifier.named
 import java.util.Queue
@@ -32,12 +34,13 @@ import java.util.Queue
 @SuppressLint("NewApi")
 @Composable
 fun StreamButton(
+    streamScreenState: StateFlow<StreamStates>,
     modifier: Modifier = Modifier,
     streamButtonUIHandler: StreamButtonUIHandler = koinInject()
 ) {
     val activity = LocalActivity.current!!
     val navHostController = LocalNavController.current
-    val currentScreenTitle by navHostController.currentRouteState.collectAsState()
+    val streamCompose by streamScreenState.collectAsState()
 
     val isNotificationPermissionRequired = Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU
     val isPostNotificationsPermissionDialogShownState = remember { mutableStateOf(false) }
@@ -46,6 +49,7 @@ fun StreamButton(
         isNotificationPermissionRequired -> koinInject<Queue<String>>(
             named(POST_NOTIFICATIONS_PERMISSION_QUEUE)
         ).first()
+
         else -> null
     }
 
@@ -73,8 +77,8 @@ fun StreamButton(
             onClick = {
                 when {
                     isPostNotificationsPermissionGranted -> streamButtonUIHandler.navigateToStream(
-                        navHostController,
-                        currentScreenTitle
+                        navHostController = navHostController,
+                        nextStreamState = streamScreenState.value.nextState
                     )
 
                     else -> {
@@ -84,20 +88,21 @@ fun StreamButton(
                 }
             }
         ) {
-            if (currentScreenTitle == Screens.StreamScreen.Streaming.title)
-                Icon(
+            when (streamCompose) {
+                StreamStates.STREAMING -> Icon(
                     painter = painterResource(id = R.drawable.search_icon),
                     contentDescription = stringResource(id = R.string.home),
                     tint = LocalAppColors.current.value.primary,
                     modifier = Modifier.size(30.dp)
                 )
-            else
-                Icon(
+
+                StreamStates.SEARCHING -> Icon(
                     painter = painterResource(id = R.drawable.stream_icon),
                     contentDescription = stringResource(id = R.string.home),
                     tint = LocalAppColors.current.value.primary,
                     modifier = Modifier.size(30.dp)
                 )
+            }
         }
 
         if (isPostNotificationsPermissionDialogShownState.value)

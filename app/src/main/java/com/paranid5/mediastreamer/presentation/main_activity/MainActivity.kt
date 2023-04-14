@@ -1,4 +1,4 @@
-package com.paranid5.mediastreamer.presentation
+package com.paranid5.mediastreamer.presentation.main_activity
 
 import android.content.BroadcastReceiver
 import android.content.Context
@@ -14,14 +14,18 @@ import androidx.compose.runtime.CompositionLocalProvider
 import androidx.navigation.compose.rememberNavController
 import com.paranid5.mediastreamer.R
 import com.paranid5.mediastreamer.domain.video_cash_service.VideoCashResponse
-import com.paranid5.mediastreamer.presentation.composition_locals.LocalStreamState
-import com.paranid5.mediastreamer.presentation.composition_locals.StreamState
-import com.paranid5.mediastreamer.presentation.composition_locals.StreamStates
+import com.paranid5.mediastreamer.presentation.NavHostController
+import com.paranid5.mediastreamer.presentation.composition_locals.LocalActivity
+import com.paranid5.mediastreamer.presentation.composition_locals.LocalMainViewModel
+import com.paranid5.mediastreamer.presentation.composition_locals.LocalNavController
 import com.paranid5.mediastreamer.presentation.streaming.VIDEO_CASH_STATUS_ARG
 import com.paranid5.mediastreamer.presentation.ui.App
 import com.paranid5.mediastreamer.presentation.ui.theme.MediaStreamerTheme
+import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class MainActivity : ComponentActivity() {
+    private val viewModel by viewModel<MainActivityViewModel>()
+
     companion object {
         private val TAG = MainActivity::class.simpleName!!
 
@@ -35,9 +39,12 @@ class MainActivity : ComponentActivity() {
 
             val status = when {
                 Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU ->
-                    intent!!.getSerializableExtra(VIDEO_CASH_STATUS_ARG, VideoCashResponse::class.java)!!
-                else ->
-                    intent!!.getSerializableExtra(VIDEO_CASH_STATUS_ARG)!! as VideoCashResponse
+                    intent!!.getSerializableExtra(
+                        VIDEO_CASH_STATUS_ARG,
+                        VideoCashResponse::class.java
+                    )!!
+
+                else -> intent!!.getSerializableExtra(VIDEO_CASH_STATUS_ARG)!! as VideoCashResponse
             }
 
             mOnVideoCashCompleted(status, applicationContext)
@@ -52,15 +59,18 @@ class MainActivity : ComponentActivity() {
             MediaStreamerTheme {
                 val mainNavController = NavHostController(
                     value = rememberNavController(),
-                    initialRoute = Screens.StreamScreen.Searching.title
+                    mainActivityViewModel = viewModel
                 )
 
                 CompositionLocalProvider(
                     LocalNavController provides mainNavController,
-                    LocalStreamState provides StreamState(StreamStates.SEARCHING),
-                    LocalActivity provides this
+                    LocalActivity provides this,
+                    LocalMainViewModel provides viewModel
                 ) {
-                    App()
+                    App(
+                        curScreenState = viewModel.curScreenState,
+                        streamScreenState = viewModel.streamScreenState
+                    )
                 }
             }
         }

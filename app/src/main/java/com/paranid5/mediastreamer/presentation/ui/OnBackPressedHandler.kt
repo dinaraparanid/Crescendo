@@ -6,7 +6,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.remember
 import androidx.compose.ui.platform.LocalLifecycleOwner
-import com.paranid5.mediastreamer.presentation.LocalNavController
+import com.paranid5.mediastreamer.presentation.composition_locals.LocalNavController
 
 @Composable
 fun OnBackPressedHandler(onBackPressedCallback: (isStackEmpty: Boolean) -> Unit = {}) {

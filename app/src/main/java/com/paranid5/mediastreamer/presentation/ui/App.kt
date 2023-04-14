@@ -22,20 +22,21 @@ import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.paranid5.mediastreamer.R
-import com.paranid5.mediastreamer.presentation.LocalNavController
 import com.paranid5.mediastreamer.presentation.Screens
+import com.paranid5.mediastreamer.presentation.StreamStates
 import com.paranid5.mediastreamer.presentation.appbar.AppBar
 import com.paranid5.mediastreamer.presentation.appbar.stream_button.StreamButton
 import com.paranid5.mediastreamer.presentation.ui.extensions.increaseDarkness
 import com.paranid5.mediastreamer.presentation.ui.theme.LocalAppColors
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 
 @OptIn(ExperimentalAnimationApi::class)
 @Composable
-fun App() {
+fun App(curScreenState: MutableStateFlow<Screens>, streamScreenState: StateFlow<StreamStates>) {
     val config = LocalConfiguration.current
     val colors = LocalAppColors.current.value
-    val navHostController = LocalNavController.current
-    val currentScreenTitle by navHostController.currentRouteState.collectAsState()
+    val curScreen by curScreenState.collectAsState()
 
     val coilPainter = rememberVideoCoverPainter(
         isPlaceholderRequired = true,
@@ -43,8 +44,8 @@ fun App() {
         bitmapSettings = Bitmap::increaseDarkness,
     )
 
-    val backgroundColor = when (currentScreenTitle) {
-        Screens.StreamScreen.Streaming.title -> Color.Transparent
+    val backgroundColor = when (curScreen) {
+        Screens.StreamScreen.Streaming -> Color.Transparent
         else -> colors.background
     }
 
@@ -58,7 +59,9 @@ fun App() {
         Box(Modifier.fillMaxSize()) {
             Image(
                 painter = coilPainter,
-                modifier = Modifier.fillMaxSize().blur(radius = 15.dp),
+                modifier = Modifier
+                    .fillMaxSize()
+                    .blur(radius = 15.dp),
                 contentDescription = stringResource(R.string.video_cover),
                 contentScale = ContentScale.FillBounds,
                 alignment = Alignment.Center,
@@ -68,10 +71,11 @@ fun App() {
                 floatingActionButton = {
                     when (config.orientation) {
                         Configuration.ORIENTATION_LANDSCAPE -> StreamButton(
-                            modifier = Modifier.padding(end = 10.dp)
+                            modifier = Modifier.padding(end = 10.dp),
+                            streamScreenState = streamScreenState
                         )
 
-                        else -> StreamButton()
+                        else -> StreamButton(streamScreenState)
                     }
                 },
                 floatingActionButtonPosition = when (config.orientation) {
@@ -79,7 +83,7 @@ fun App() {
                     else -> FabPosition.Center
                 },
                 bottomBar = { AppBar() },
-                content = { ContentScreen(padding = it) },
+                content = { ContentScreen(padding = it, curScreenState) },
                 modifier = Modifier.fillMaxSize(),
                 containerColor = color.value
             )

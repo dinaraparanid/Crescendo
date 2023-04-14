@@ -7,16 +7,16 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
-import com.paranid5.mediastreamer.presentation.LocalNavController
 import com.paranid5.mediastreamer.presentation.Screens
+import com.paranid5.mediastreamer.presentation.composition_locals.LocalNavController
 import com.paranid5.mediastreamer.presentation.ui.theme.LocalAppColors
 
 @Composable
 fun AppBarItem(
-    modifier: Modifier = Modifier,
     @StringRes title: Int,
     image: ImageVector,
-    screen: Screens
+    screen: Screens,
+    modifier: Modifier = Modifier,
 ) {
     val navHostController = LocalNavController.current
 

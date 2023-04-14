@@ -13,13 +13,13 @@ import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.paranid5.mediastreamer.R
-import com.paranid5.mediastreamer.presentation.LocalNavController
 import com.paranid5.mediastreamer.presentation.Screens
 import com.paranid5.mediastreamer.presentation.StateChangedCallback
-import com.paranid5.mediastreamer.presentation.composition_locals.LocalStreamState
-import com.paranid5.mediastreamer.presentation.composition_locals.StreamStates
-import com.paranid5.mediastreamer.presentation.ui.OnUIStateChanged
+import com.paranid5.mediastreamer.presentation.composition_locals.LocalNavController
 import com.paranid5.mediastreamer.presentation.ui.OnBackPressedHandler
+import com.paranid5.mediastreamer.presentation.ui.OnUIStateChanged
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.update
 
 @Composable
 private fun Label(modifier: Modifier = Modifier) =
@@ -42,23 +42,20 @@ private fun UrlEditor(
 }
 
 @Composable
-private fun ColumnScope.ConfirmButton(
+private fun ConfirmButton(
     isConfirmButtonActive: Boolean,
-    viewModel: SearchStreamViewModel
+    viewModel: SearchStreamViewModel,
+    modifier: Modifier = Modifier
 ) {
     val navHostController = LocalNavController.current
-    val streamState = LocalStreamState.current
 
     Button(
         enabled = isConfirmButtonActive,
+        modifier = modifier,
         onClick = {
             viewModel.onConfirmUrlButtonPressed()
             navHostController.navigateIfNotSame(Screens.StreamScreen.Streaming)
-            streamState.value = StreamStates.STREAMING
-        },
-        modifier = Modifier
-            .wrapContentWidth()
-            .align(Alignment.CenterHorizontally)
+        }
     ) {
         Text(stringResource(R.string.confirm))
     }
@@ -66,10 +63,11 @@ private fun ColumnScope.ConfirmButton(
 
 @Composable
 fun SearchStreamScreen(
+    viewModel: SearchStreamViewModel,
+    curScreenState: MutableStateFlow<Screens>,
     modifier: Modifier = Modifier,
-    viewModel: SearchStreamViewModel
 ) {
-    LocalStreamState.current.value = StreamStates.STREAMING
+    curScreenState.update { Screens.StreamScreen.Searching }
 
     val orientation = LocalConfiguration.current.orientation
 
@@ -118,12 +116,14 @@ fun SearchStreamScreen(
             UrlEditor(
                 inputText = inputText,
                 viewModel = viewModel,
-                modifier = Modifier
-                    .align(Alignment.CenterHorizontally)
-                    .padding(bottom = 10.dp)
+                modifier = Modifier.align(Alignment.CenterHorizontally).padding(bottom = 10.dp)
             )
 
-            ConfirmButton(isConfirmButtonActive, viewModel)
+            ConfirmButton(
+                isConfirmButtonActive,
+                viewModel,
+                modifier = Modifier.wrapContentWidth().align(Alignment.CenterHorizontally)
+            )
         }
     }
 }

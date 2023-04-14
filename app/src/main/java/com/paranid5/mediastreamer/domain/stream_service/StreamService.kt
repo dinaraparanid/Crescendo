@@ -36,7 +36,7 @@ import com.paranid5.mediastreamer.data.VideoMetadata
 import com.paranid5.mediastreamer.data.utils.extensions.toAndroidMetadata
 import com.paranid5.mediastreamer.domain.StorageHandler
 import com.paranid5.mediastreamer.domain.utils.extensions.registerReceiverCompat
-import com.paranid5.mediastreamer.presentation.MainActivity
+import com.paranid5.mediastreamer.presentation.main_activity.MainActivity
 import com.paranid5.mediastreamer.presentation.streaming.*
 import com.paranid5.mediastreamer.presentation.ui.GlideUtils
 import com.paranid5.mediastreamer.presentation.ui.screens.*
