@@ -40,7 +40,6 @@ import com.paranid5.mediastreamer.data.utils.extensions.timeString
 import com.paranid5.mediastreamer.domain.StorageHandler
 import com.paranid5.mediastreamer.presentation.Screens
 import com.paranid5.mediastreamer.presentation.ui.BroadcastReceiver
-import com.paranid5.mediastreamer.presentation.ui.OnBackPressedHandler
 import com.paranid5.mediastreamer.presentation.ui.extensions.getLightVibrantOrPrimary
 import com.paranid5.mediastreamer.presentation.ui.rememberVideoCoverPainterWithPalette
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -84,8 +83,6 @@ private fun StreamingScreenPortrait(
         isPlaceholderRequired = true,
         size = 1100 to 1000
     )
-
-    OnBackPressedHandler()
 
     ConstraintLayout(modifier.fillMaxSize()) {
         val (
@@ -171,8 +168,6 @@ private fun StreamingScreenLandscape(
         isPlaceholderRequired = true,
         size = 1100 to 1000
     )
-
-    OnBackPressedHandler()
 
     ConstraintLayout(modifier.fillMaxSize()) {
         val (

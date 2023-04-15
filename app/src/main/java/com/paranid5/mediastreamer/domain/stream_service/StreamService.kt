@@ -649,15 +649,23 @@ class StreamService : Service(), KoinComponent {
     private val notificationBuilderOreo = currentMetadata.mapLatest {
         Notification
             .Builder(applicationContext, STREAM_CHANNEL_ID)
-            .setContent()
+            .setContent(currentMetadata = it)
     }
 
     @RequiresApi(Build.VERSION_CODES.O)
-    private fun Notification.Builder.setContent() = this
+    private fun Notification.Builder.setContent(currentMetadata: VideoMetadata?) = this
         .setShowWhen(false)
         .setSmallIcon(R.drawable.stream_icon)
         .setAutoCancel(false)
         .setOngoing(true)
+        .setContentTitle(
+            currentMetadata?.title
+                ?: resources.getString(R.string.stream_no_name)
+        )
+        .setContentText(
+            currentMetadata?.author
+                ?: resources.getString(R.string.unknown_streamer)
+        )
         .setStyle(
             Notification.MediaStyle()
                 .setMediaSession(mediaSession.sessionToken)
@@ -706,6 +714,7 @@ class StreamService : Service(), KoinComponent {
                 ACTION_10_SECS_BACK,
                 Actions.TenSecsBack.playbackIntent
             ).build()
+
             else -> null
         }
 
@@ -732,6 +741,7 @@ class StreamService : Service(), KoinComponent {
                 ACTION_10_SECS_FORWARD,
                 Actions.TenSecsForward.playbackIntent
             ).build()
+
             else -> null
         }
 
@@ -812,6 +822,7 @@ class StreamService : Service(), KoinComponent {
                 ACTION_10_SECS_BACK,
                 Actions.TenSecsBack.playbackIntent
             ).build()
+
             else -> null
         }
 
@@ -836,6 +847,7 @@ class StreamService : Service(), KoinComponent {
                 ACTION_10_SECS_FORWARD,
                 Actions.TenSecsForward.playbackIntent
             ).build()
+
             else -> null
         }
 

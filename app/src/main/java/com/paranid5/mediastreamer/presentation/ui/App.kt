@@ -2,6 +2,7 @@ package com.paranid5.mediastreamer.presentation.ui
 
 import android.content.res.Configuration
 import android.graphics.Bitmap
+import android.os.Build
 import androidx.compose.animation.Animatable
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.ExperimentalAnimationApi
@@ -41,6 +42,7 @@ fun App(curScreenState: MutableStateFlow<Screens>, streamScreenState: StateFlow<
     val coilPainter = rememberVideoCoverPainter(
         isPlaceholderRequired = true,
         size = config.screenWidthDp to config.screenHeightDp,
+        isBlured = Build.VERSION.SDK_INT < Build.VERSION_CODES.S,
         bitmapSettings = Bitmap::increaseDarkness,
     )
 
@@ -59,9 +61,7 @@ fun App(curScreenState: MutableStateFlow<Screens>, streamScreenState: StateFlow<
         Box(Modifier.fillMaxSize()) {
             Image(
                 painter = coilPainter,
-                modifier = Modifier
-                    .fillMaxSize()
-                    .blur(radius = 15.dp),
+                modifier = Modifier.fillMaxSize().blur(radius = 15.dp),
                 contentDescription = stringResource(R.string.video_cover),
                 contentScale = ContentScale.FillBounds,
                 alignment = Alignment.Center,

@@ -1,11 +1,21 @@
 package com.paranid5.mediastreamer.presentation.search_stream
 
 import android.content.res.Configuration
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.material3.Button
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.derivedStateOf
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalConfiguration
@@ -16,7 +26,6 @@ import com.paranid5.mediastreamer.R
 import com.paranid5.mediastreamer.presentation.Screens
 import com.paranid5.mediastreamer.presentation.StateChangedCallback
 import com.paranid5.mediastreamer.presentation.composition_locals.LocalNavController
-import com.paranid5.mediastreamer.presentation.ui.OnBackPressedHandler
 import com.paranid5.mediastreamer.presentation.ui.OnUIStateChanged
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.update
@@ -61,6 +70,8 @@ private fun ConfirmButton(
     }
 }
 
+private val youtubeUrlRegex = Regex("https://(www\\.youtube\\.com/watch\\?v=|youtu\\.be/).*")
+
 @Composable
 fun SearchStreamScreen(
     viewModel: SearchStreamViewModel,
@@ -77,7 +88,7 @@ fun SearchStreamScreen(
         .collectAsState(initial = "")
 
     val isConfirmButtonActive by remember {
-        derivedStateOf { inputText?.isNotEmpty() == true }
+        derivedStateOf { inputText?.matches(youtubeUrlRegex) == true }
     }
 
     val lifecycleOwnerState by rememberUpdatedState(LocalLifecycleOwner.current)
@@ -93,12 +104,6 @@ fun SearchStreamScreen(
             viewModel.finishUrlSetting()
         }
     )
-
-    OnBackPressedHandler { isStackEmpty ->
-        if (isStackEmpty) {
-            // TODO: Click twice to exit
-        }
-    }
 
     Box(
         modifier = modifier

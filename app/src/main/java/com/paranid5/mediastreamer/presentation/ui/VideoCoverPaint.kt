@@ -18,6 +18,7 @@ import org.koin.compose.koinInject
 internal inline fun rememberVideoCoverPainter(
     isPlaceholderRequired: Boolean,
     size: Pair<Int, Int>? = null,
+    isBlured: Boolean = false,
     storageHandler: StorageHandler = koinInject(),
     crossinline bitmapSettings: (Bitmap) -> Unit = {}
 ): AsyncImagePainter {
@@ -47,6 +48,9 @@ internal inline fun rememberVideoCoverPainter(
             .apply {
                 if (isPlaceholderRequired)
                     placeholder(prevCoverModel)
+
+                if (isBlured)
+                    transformations(BlurTransformation(context))
 
                 size?.run { size(first, second) }
             }

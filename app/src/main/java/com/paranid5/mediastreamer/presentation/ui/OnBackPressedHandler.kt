@@ -5,17 +5,23 @@ import androidx.activity.compose.LocalOnBackPressedDispatcherOwner
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.platform.LocalLifecycleOwner
 import com.paranid5.mediastreamer.presentation.composition_locals.LocalNavController
+import kotlinx.coroutines.launch
 
 @Composable
-fun OnBackPressedHandler(onBackPressedCallback: (isStackEmpty: Boolean) -> Unit = {}) {
+fun OnBackPressedHandler(onBackPressedCallback: suspend (isScreenStackEmpty: Boolean) -> Unit = {}) {
     val navHostController = LocalNavController.current
+    val coroutineScope = rememberCoroutineScope()
 
     val callback = remember {
         object : OnBackPressedCallback(true) {
-            override fun handleOnBackPressed() =
-                onBackPressedCallback(navHostController.onBackPressed() == null)
+            override fun handleOnBackPressed() {
+                coroutineScope.launch {
+                    onBackPressedCallback(navHostController.onBackPressed() == null)
+                }
+            }
         }
     }
 

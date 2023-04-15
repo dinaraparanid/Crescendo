@@ -27,12 +27,14 @@ class NavHostController(
         return currentRoute
     }
 
-    fun onBackPressed() = screensStackState.update { screensStack ->
-        screensStack.apply {
-            removeLastOrNull()?.let { screen ->
-                currentRouteState.update { screen }
-                value!!.navigate(screen.title)
-            }
-        }
+    /**
+     * Pops screen stack, replacing root with deleted element.
+     * If stack is empty, nothing happens.
+     * @return null if stack is empty
+     */
+
+    fun onBackPressed() = screensStackState.value.removeLastOrNull()?.let { screen ->
+        currentRouteState.update { screen }
+        value!!.navigate(screen.title)
     }
 }

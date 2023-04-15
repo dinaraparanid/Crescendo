@@ -16,3 +16,6 @@ fun Bitmap.increaseDarkness(alpha: Int = 100) = Canvas(this).let { canvas ->
     canvas.drawARGB(alpha, 0, 0, 0)
     canvas.drawBitmap(this, Matrix(), Paint())
 }
+
+inline val Bitmap.safeConfig: Bitmap.Config
+    get() = config ?: Bitmap.Config.ARGB_8888
