@@ -16,6 +16,7 @@ import android.os.Bundle
 import android.os.SystemClock
 import android.util.Log
 import android.util.SparseArray
+import android.widget.Toast
 import androidx.annotation.OptIn
 import androidx.annotation.RequiresApi
 import androidx.core.app.NotificationCompat
@@ -150,12 +151,15 @@ class StreamService : Service(), KoinComponent {
 
     private lateinit var playbackMonitorTask: Job
 
+    @Volatile
+    private var isStoppedWithError = false
+
     @kotlin.OptIn(ExperimentalCoroutinesApi::class)
     private val videoLength = currentMetadata
         .mapLatest { it?.lenInMillis ?: 0 }
         .stateIn(scope, SharingStarted.Eagerly, 0)
 
-    private inline val currentPlaybackPosition
+    internal inline val mCurrentPlaybackPosition
         get() = mPlayer.currentPosition
 
     // TODO: favourite database
@@ -249,14 +253,22 @@ class StreamService : Service(), KoinComponent {
         }
 
         override fun onPlayerError(error: PlaybackException) {
+            isStoppedWithError = true
             super.onPlayerError(error)
+            Log.e(TAG, "onPlayerError", error)
+
+            Toast.makeText(
+                applicationContext,
+                "${resources.getString(R.string.error)}: ${error.message ?: resources.getString(R.string.unknown_error)}",
+                Toast.LENGTH_LONG
+            ).show()
+
             scope.launch {
                 mUpdateOrShowNotification(
                     isPlaying = false,
                     isLiked = isCurrentVideoLikedState.value
                 )
             }
-            Log.e(TAG, "onPlayerError", error)
         }
     }
 
@@ -270,7 +282,15 @@ class StreamService : Service(), KoinComponent {
     private val resumeReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context?, intent: Intent?) {
             Log.d(TAG, "playback resumed")
-            mResumePlayback()
+
+            when {
+                isStoppedWithError -> scope.launch {
+                    mRestartPlayer(initialPosition = mCurrentPlaybackPosition)
+                    isStoppedWithError = false
+                }
+
+                else -> mResumePlayback()
+            }
         }
     }
 
@@ -424,7 +444,7 @@ class StreamService : Service(), KoinComponent {
     private suspend inline fun updateAndSendPlaybackPosition() {
         sendBroadcast(
             Intent(Broadcast_CUR_POSITION_CHANGED)
-                .putExtra(CUR_POSITION_ARG, currentPlaybackPosition)
+                .putExtra(CUR_POSITION_ARG, mCurrentPlaybackPosition)
         )
 
         storePlaybackPosition()
@@ -440,7 +460,7 @@ class StreamService : Service(), KoinComponent {
     }
 
     private suspend inline fun storePlaybackPosition() =
-        storageHandler.storePlaybackPosition(currentPlaybackPosition)
+        storageHandler.storePlaybackPosition(mCurrentPlaybackPosition)
 
     private suspend inline fun storeIsRepeating(isRepeating: Boolean) =
         storageHandler.storeIsRepeating(isRepeating)
@@ -523,17 +543,17 @@ class StreamService : Service(), KoinComponent {
         playStream(url, initialPosition)
     }
 
-    internal suspend inline fun mRestartPlayer(): Unit =
-        storageHandler.currentUrlState.collectLatest { url -> playStream(url) }
+    internal suspend inline fun mRestartPlayer(initialPosition: Long = 0): Unit =
+        storageHandler.currentUrlState.collectLatest { url -> playStream(url, initialPosition) }
 
     internal fun mSeekTo(position: Long) =
         mPlayer.seekTo(position)
 
     internal fun mSeekTo10SecsBack() =
-        mPlayer.seekTo(maxOf(currentPlaybackPosition - TEN_SECS_AS_MILLIS, 0))
+        mPlayer.seekTo(maxOf(mCurrentPlaybackPosition - TEN_SECS_AS_MILLIS, 0))
 
     internal fun mSeekTo10SecsForward() =
-        mPlayer.seekTo(minOf(currentPlaybackPosition + TEN_SECS_AS_MILLIS, videoLength.value))
+        mPlayer.seekTo(minOf(mCurrentPlaybackPosition + TEN_SECS_AS_MILLIS, videoLength.value))
 
     private fun releaseMedia() {
         mPlayer.stop()
@@ -601,7 +621,7 @@ class StreamService : Service(), KoinComponent {
             )
             .setState(
                 if (mIsPlaying) PlaybackState.STATE_PLAYING else PlaybackState.STATE_PAUSED,
-                currentPlaybackPosition,
+                mCurrentPlaybackPosition,
                 1.0F,
                 SystemClock.elapsedRealtime()
             )

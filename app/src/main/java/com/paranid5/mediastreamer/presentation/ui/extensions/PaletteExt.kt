@@ -12,7 +12,7 @@ fun Palette?.getLightVibrantOrPrimary(): Color {
 
     return Color(
         this
-            ?.run { getLightVibrantColor(getDominantColor(primaryColorVal)) }
+            ?.run { getLightMutedColor(getDominantColor(primaryColorVal)) }
             ?: primaryColorVal
     )
 }

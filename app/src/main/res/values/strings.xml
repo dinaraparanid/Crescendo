@@ -6,7 +6,7 @@
     <string name="playlists">Playlists</string>
     <string name="favourites">Favourites</string>
     <string name="enter_stream_url">Enter YouTube URL to start streaming</string>
-    <string name="your_url">Your YouTube URL link to video</string>
+    <string name="your_url">YouTube URL link</string>
     <string name="confirm">Confirm</string>
     <string name="stream_no_name">Video with no name</string>
     <string name="unknown_streamer">Unknown channel</string>
@@ -42,4 +42,5 @@
     <string name="downloaded">Downloaded</string>
     <string name="notifications_description">Notifications are required for long-living media playback and track cashing</string>
     <string name="press_twice_to_exit">Press twice to exit</string>
+    <string name="unknown_error">Unknown error</string>
 </resources>

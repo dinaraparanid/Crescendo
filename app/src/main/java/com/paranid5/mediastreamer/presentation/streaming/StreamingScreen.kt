@@ -172,6 +172,7 @@ private fun StreamingScreenLandscape(
     ConstraintLayout(modifier.fillMaxSize()) {
         val (
             cover,
+            propertiesButton,
             slider,
             playbackButtons,
             utilsButtons
@@ -185,6 +186,14 @@ private fun StreamingScreenLandscape(
                 height = Dimension.fillToConstraints
             },
             coilPainter = coilPainter,
+            palette = palette
+        )
+
+        PropertiesButton(
+            modifier = Modifier.constrainAs(propertiesButton) {
+                top.linkTo(parent.top, margin = 8.dp)
+                end.linkTo(parent.end, margin = 5.dp)
+            },
             palette = palette
         )
 
@@ -203,7 +212,9 @@ private fun StreamingScreenLandscape(
             TitleAndAuthor(
                 metadata,
                 palette,
-                modifier = Modifier.padding(horizontal = 10.dp).weight(1F, fill = true),
+                modifier = Modifier
+                    .padding(horizontal = 10.dp)
+                    .weight(1F, fill = true),
                 textAlignment = Alignment.CenterHorizontally
             )
 
