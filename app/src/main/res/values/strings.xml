@@ -43,4 +43,7 @@
     <string name="notifications_description">Notifications are required for long-living media playback and track cashing</string>
     <string name="press_twice_to_exit">Press twice to exit</string>
     <string name="unknown_error">Unknown error</string>
+    <string name="remove_from_favourite">Remove from favourite</string>
+    <string name="add_to_favourite">Add to favourite"</string>
+    <string name="video_format_not_supported">Video format is not supported yet</string>
 </resources>

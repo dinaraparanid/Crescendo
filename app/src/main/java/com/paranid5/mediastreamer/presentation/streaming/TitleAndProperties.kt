@@ -16,7 +16,7 @@ import androidx.compose.ui.unit.sp
 import androidx.palette.graphics.Palette
 import com.paranid5.mediastreamer.R
 import com.paranid5.mediastreamer.data.VideoMetadata
-import com.paranid5.mediastreamer.presentation.ui.extensions.getLightVibrantOrPrimary
+import com.paranid5.mediastreamer.presentation.ui.extensions.getLightMutedOrPrimary
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
@@ -26,7 +26,7 @@ fun TitleAndAuthor(
     modifier: Modifier = Modifier,
     textAlignment: Alignment.Horizontal = Alignment.Start,
 ) {
-    val lightVibrantColor = palette.getLightVibrantOrPrimary()
+    val lightVibrantColor = palette.getLightMutedOrPrimary()
 
     Column(modifier) {
         Text(
@@ -51,7 +51,7 @@ fun TitleAndAuthor(
 
 @Composable
 fun PropertiesButton(palette: Palette?, modifier: Modifier = Modifier) {
-    val lightVibrantColor = palette.getLightVibrantOrPrimary()
+    val lightVibrantColor = palette.getLightMutedOrPrimary()
 
     IconButton(modifier = modifier, onClick = { /*TODO*/ }) {
         Icon(

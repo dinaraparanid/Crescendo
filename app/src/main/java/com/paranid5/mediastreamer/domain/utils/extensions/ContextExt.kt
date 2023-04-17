@@ -47,27 +47,28 @@ fun Context.getImageBinaryData(url: String) =
 fun Context.getImageBinaryDataCatching(url: String) =
     kotlin.runCatching { getImageBinaryData(url) }
 
-fun Context.setAudioTagsToFile(file: File, videoMetadata: VideoMetadata) =
+fun Context.setAudioTagsToFile(file: File, videoMetadata: VideoMetadata, isAudio: Boolean) =
     AudioFileIO.read(file).run {
         tagOrCreateAndSetDefault.let { it as Mp4Tag }.run {
             setField(Mp4FieldKey.TITLE, videoMetadata.title)
             setField(Mp4FieldKey.ARTIST, videoMetadata.author)
 
-            videoMetadata
-                .covers
-                .asSequence()
-                .map { getImageBinaryDataCatching(it) }
-                .firstOrNull { it.isSuccess }
-                ?.getOrNull()
-                ?.let(this::createArtworkField)
-                ?.let(this::setField)
+            if (isAudio)
+                videoMetadata
+                    .covers
+                    .asSequence()
+                    .map { getImageBinaryDataCatching(it) }
+                    .firstOrNull { it.isSuccess }
+                    ?.getOrNull()
+                    ?.let(this::createArtworkField)
+                    ?.let(this::setField)
 
             commit()
         }
     }
 
-fun Context.setAudioTagsToFileCatching(file: File, videoMetadata: VideoMetadata) =
-    kotlin.runCatching { setAudioTagsToFile(file, videoMetadata) }
+fun Context.setAudioTagsToFileCatching(file: File, videoMetadata: VideoMetadata, isAudio: Boolean) =
+    kotlin.runCatching { setAudioTagsToFile(file, videoMetadata, isAudio) }
 
 fun Context.insertMediaFileToMediaStore(
     externalContentUri: Uri,

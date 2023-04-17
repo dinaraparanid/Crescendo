@@ -22,7 +22,7 @@ import com.paranid5.mediastreamer.EXTERNAL_STORAGE_PERMISSION_QUEUE
 import com.paranid5.mediastreamer.R
 import com.paranid5.mediastreamer.domain.StorageHandler
 import com.paranid5.mediastreamer.presentation.composition_locals.LocalActivity
-import com.paranid5.mediastreamer.presentation.ui.extensions.getLightVibrantOrPrimary
+import com.paranid5.mediastreamer.presentation.ui.extensions.getLightMutedOrPrimary
 import com.paranid5.mediastreamer.presentation.ui.extensions.openAppSettings
 import com.paranid5.mediastreamer.presentation.ui.extensions.simpleShadow
 import com.paranid5.mediastreamer.presentation.ui.permissions.ExternalStorageDescriptionProvider
@@ -43,7 +43,7 @@ fun UtilsButtons(palette: Palette?, modifier: Modifier = Modifier) =
 
 @Composable
 private fun EqualizerButton(palette: Palette?, modifier: Modifier = Modifier) {
-    val lightVibrantColor = palette.getLightVibrantOrPrimary()
+    val lightVibrantColor = palette.getLightMutedOrPrimary()
 
     IconButton(
         modifier = modifier.simpleShadow(color = lightVibrantColor),
@@ -65,7 +65,7 @@ private fun RepeatButton(
     storageHandler: StorageHandler = get(),
     streamingUIHandler: StreamingUIHandler = get()
 ) {
-    val lightVibrantColor = palette.getLightVibrantOrPrimary()
+    val lightVibrantColor = palette.getLightMutedOrPrimary()
     var isRepeating by remember { mutableStateOf(storageHandler.isRepeatingState.value) }
 
     BroadcastReceiver(action = Broadcast_IS_REPEATING_CHANGED) { _, intent ->
@@ -87,7 +87,7 @@ private fun RepeatButton(
 
 @Composable
 private fun LikeButton(palette: Palette?, modifier: Modifier = Modifier) {
-    val lightVibrantColor = palette.getLightVibrantOrPrimary()
+    val lightVibrantColor = palette.getLightMutedOrPrimary()
     val isLiked by remember { mutableStateOf(false) }
 
     BroadcastReceiver(action = Broadcast_IS_REPEATING_CHANGED) { _, intent ->
@@ -109,7 +109,7 @@ private fun LikeButton(palette: Palette?, modifier: Modifier = Modifier) {
 
 @Composable
 private fun DownloadButton(palette: Palette?, modifier: Modifier = Modifier) {
-    val lightVibrantColor = palette.getLightVibrantOrPrimary()
+    val lightVibrantColor = palette.getLightMutedOrPrimary()
     val activity = LocalActivity.current!!
     val isCashPropertiesDialogShownState = remember { mutableStateOf(false) }
 

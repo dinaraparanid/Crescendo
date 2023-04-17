@@ -8,11 +8,15 @@ import android.content.Intent
 import android.os.Binder
 import android.os.Build
 import android.os.Environment
+import android.os.IBinder
 import android.provider.MediaStore
 import android.util.Log
 import android.util.SparseArray
 import androidx.annotation.RequiresApi
 import androidx.annotation.StringRes
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleService
+import androidx.lifecycle.repeatOnLifecycle
 import arrow.core.Either
 import arrow.core.merge
 import at.huber.youtubeExtractor.VideoMeta
@@ -40,7 +44,7 @@ import java.io.File
 import java.util.Queue
 import java.util.concurrent.ConcurrentLinkedQueue
 
-class VideoCashService : Service(), KoinComponent {
+class VideoCashService : LifecycleService(), KoinComponent {
     companion object {
         private const val NOTIFICATION_ID = 102
         private const val VIDEO_CASH_CHANNEL_ID = "video_cash_channel"
@@ -195,7 +199,10 @@ class VideoCashService : Service(), KoinComponent {
         registerReceivers()
     }
 
-    override fun onBind(intent: Intent?) = binder
+    override fun onBind(intent: Intent): IBinder {
+        super.onBind(intent)
+        return binder
+    }
 
     internal suspend inline fun mOfferVideoToQueue(videoCashData: VideoCashData) {
         Log.d(TAG, "New video added to queue")
@@ -215,35 +222,38 @@ class VideoCashService : Service(), KoinComponent {
         val errorDescription: String
     )
 
-    private suspend inline fun startNotificationObserving(): Unit = combine(
-        cashingStatusState,
-        curVideoMetadataState,
-        videoCashQueueLenState,
-        videoCashProgressState,
-        videoCashErrorState
-    ) { cashingState, videoMetadata, videoCashQueueLen,
-        (downloadedBytes, totalBytes), (errorCode, errorDescription) ->
-        CashingNotificationData(
-            cashingState,
-            videoMetadata ?: VideoMetadata(),
-            videoCashQueueLen,
-            downloadedBytes,
-            totalBytes,
-            errorCode,
-            errorDescription
-        )
-    }.collectLatest { (cashingState, videoMetadata, videoCashQueueLen,
-                          downloadedBytes, totalBytes, errorCode, errorDescription) ->
-        updateNotification(
-            cashingState,
-            videoMetadata,
-            videoCashQueueLen,
-            downloadedBytes,
-            totalBytes,
-            errorCode,
-            errorDescription
-        )
-    }
+    private suspend inline fun startNotificationObserving(): Unit =
+        lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
+            combine(
+                cashingStatusState,
+                curVideoMetadataState,
+                videoCashQueueLenState,
+                videoCashProgressState,
+                videoCashErrorState
+            ) { cashingState, videoMetadata, videoCashQueueLen,
+                (downloadedBytes, totalBytes), (errorCode, errorDescription) ->
+                CashingNotificationData(
+                    cashingState,
+                    videoMetadata ?: VideoMetadata(),
+                    videoCashQueueLen,
+                    downloadedBytes,
+                    totalBytes,
+                    errorCode,
+                    errorDescription
+                )
+            }.collectLatest { (cashingState, videoMetadata, videoCashQueueLen,
+                                  downloadedBytes, totalBytes, errorCode, errorDescription) ->
+                updateNotification(
+                    cashingState,
+                    videoMetadata,
+                    videoCashQueueLen,
+                    downloadedBytes,
+                    totalBytes,
+                    errorCode,
+                    errorDescription
+                )
+            }
+        }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
@@ -262,31 +272,50 @@ class VideoCashService : Service(), KoinComponent {
             .getExternalStoragePublicDirectory(mediaDirectory)
             .absolutePath
 
+    private inline val mediaDirectory
+        get() = when {
+            Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q -> Environment.DIRECTORY_MOVIES
+            else -> Environment.DIRECTORY_MUSIC
+        }
+
     private fun createMediaFile(filename: String, ext: String) =
-        "${getFullMediaDirectory(Environment.DIRECTORY_MOVIES)}/$filename.$ext"
+        "${getFullMediaDirectory(mediaDirectory)}/$filename.$ext"
             .takeIf { !File(it).exists() }
             ?.let(::File)
             ?.also { Log.d(TAG, "Creating file ${it.absolutePath}") }
             ?.also(File::createNewFile)
             ?: generateSequence(1) { it + 1 }
-                .map { num -> "${getFullMediaDirectory(Environment.DIRECTORY_MOVIES)}/${filename}($num).$ext" }
+                .map { num -> "${getFullMediaDirectory(mediaDirectory)}/${filename}($num).$ext" }
                 .map(::File)
                 .first { !it.exists() }
+                .also { Log.d(TAG, "Creating file ${it.absolutePath}") }
                 .also(File::createNewFile)
 
     private fun createMediaFileCatching(filename: String, ext: String) =
         kotlin.runCatching { createMediaFile(filename, ext) }
 
-    private suspend inline fun setTags(mediaFile: File, videoMetadata: VideoMetadata) {
+    private suspend inline fun setTags(
+        mediaFile: File,
+        videoMetadata: VideoMetadata,
+        isAudio: Boolean
+    ) {
         val externalContentUri = when {
             Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q ->
                 MediaStore.Video.Media.getContentUri(MediaStore.VOLUME_EXTERNAL_PRIMARY)
-            else ->
-                MediaStore.Video.Media.EXTERNAL_CONTENT_URI
+
+            else -> MediaStore.Audio.Media.EXTERNAL_CONTENT_URI
         }
 
-        val mediaDirectory = Environment.DIRECTORY_MOVIES
-        val mimeType = "video/${mediaFile.extension}"
+        val mediaDirectory = when {
+            Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q -> Environment.DIRECTORY_MOVIES
+            else -> Environment.DIRECTORY_MUSIC
+        }
+
+        val mimeType = when {
+            Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q -> "video/${mediaFile.extension}"
+            else -> if (isAudio) "audio/${mediaFile.extension}" else "video/${mediaFile.extension}"
+        }
+
         val absoluteFilePath = mediaFile.absolutePath
 
         withContext(Dispatchers.IO) {
@@ -298,7 +327,7 @@ class VideoCashService : Service(), KoinComponent {
                 mimeType
             )
 
-            setAudioTagsToFileCatching(mediaFile, videoMetadata)
+            setAudioTagsToFileCatching(mediaFile, videoMetadata, isAudio)
             scanNextFile(absoluteFilePath)
         }
     }
@@ -307,12 +336,15 @@ class VideoCashService : Service(), KoinComponent {
         desiredFilename: String,
         audioOrVideoUrl: Either<String, String>,
         videoMetadata: VideoMetadata
-    ): HttpStatusCode? {
+    ): HttpStatusCode? = coroutineScope {
+        val isAudio = audioOrVideoUrl.isLeft()
         val mediaUrl = audioOrVideoUrl.merge()
+
         val fileExt = ktorClient.getFileExt(mediaUrl)
         val storeFile = createMediaFileCatching(desiredFilename, fileExt)
+            .apply { exceptionOrNull()?.printStackTrace() }
             .getOrNull()
-            ?: return HttpStatusCode.BadRequest
+            ?: return@coroutineScope HttpStatusCode.BadRequest
 
         curVideoCashFile = storeFile
         Log.d(TAG, "Launching file download")
@@ -329,11 +361,12 @@ class VideoCashService : Service(), KoinComponent {
         statusCode?.takeIf { it.isSuccess() }?.let {
             setTags(
                 mediaFile = storeFile,
-                videoMetadata = videoMetadata
+                videoMetadata = videoMetadata,
+                isAudio = isAudio
             )
         }
 
-        return statusCode
+        statusCode
     }
 
     private fun clearVideoCashStates() {
@@ -350,7 +383,7 @@ class VideoCashService : Service(), KoinComponent {
             else -> onVideoCashStatusError(statusCode.value, statusCode.description)
         }
 
-        Log.d(TAG, "Cash status handled")
+        Log.d(TAG, "Cash status $statusCode handled")
     }
 
     private fun onVideoCashStatusSuccessful() = sendBroadcast(
@@ -376,7 +409,6 @@ class VideoCashService : Service(), KoinComponent {
             Log.d(TAG, "QUEUE ${videoCashQueue.size}")
 
             if (videoCashQueue.isEmpty()) {
-                detachNotification()
                 videoCashCondVar.wait()
                 Log.d(TAG, "Cond Var Awake")
             }
@@ -451,8 +483,8 @@ class VideoCashService : Service(), KoinComponent {
         get() = when {
             Build.VERSION.SDK_INT >= Build.VERSION_CODES.O ->
                 Notification.Builder(applicationContext, VIDEO_CASH_CHANNEL_ID)
-            else ->
-                Notification.Builder(applicationContext)
+
+            else -> Notification.Builder(applicationContext)
         }
             .setSmallIcon(R.drawable.save_icon)
             .setContentIntent(
@@ -511,7 +543,7 @@ class VideoCashService : Service(), KoinComponent {
 
     private fun finishedNotificationBuilder(message: String) = notificationBuilder
         .setContentTitle(message)
-        .setOngoing(false)
+        .setAutoCancel(true)
         .setShowWhen(false)
 
     private fun finishedNotificationBuilder(@StringRes message: Int) =
@@ -599,17 +631,23 @@ class VideoCashService : Service(), KoinComponent {
                 totalBytes
             )
 
-            CashingStatus.CASHED -> showCashedNotification()
-            CashingStatus.CANCELED -> showCanceledNotification()
-            CashingStatus.ERR -> showErrorNotification(errorCode, errorDescription)
-            CashingStatus.NONE -> detachNotification()
+            else -> {
+                when (cashingState) {
+                    CashingStatus.CASHED -> showCashedNotification()
+                    CashingStatus.CANCELED -> showCanceledNotification()
+                    CashingStatus.ERR -> showErrorNotification(errorCode, errorDescription)
+                    else -> Unit
+                }
+
+                detachNotification()
+            }
         }
     }
 
     private fun detachNotification() = when {
         Build.VERSION.SDK_INT >= Build.VERSION_CODES.N ->
             stopForeground(STOP_FOREGROUND_DETACH)
-        else ->
-            stopForeground(true)
+
+        else -> stopForeground(true)
     }
 }
