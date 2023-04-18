@@ -43,6 +43,7 @@ import org.koin.core.component.inject
 import java.io.File
 import java.util.Queue
 import java.util.concurrent.ConcurrentLinkedQueue
+import kotlin.time.Duration.Companion.seconds
 
 class VideoCashService : LifecycleService(), KoinComponent {
     companion object {
@@ -243,6 +244,8 @@ class VideoCashService : LifecycleService(), KoinComponent {
                 )
             }.collectLatest { (cashingState, videoMetadata, videoCashQueueLen,
                                   downloadedBytes, totalBytes, errorCode, errorDescription) ->
+                Log.d(TAG, "Cashing state: $cashingState")
+
                 updateNotification(
                     cashingState,
                     videoMetadata,
@@ -336,7 +339,7 @@ class VideoCashService : LifecycleService(), KoinComponent {
         desiredFilename: String,
         audioOrVideoUrl: Either<String, String>,
         videoMetadata: VideoMetadata
-    ): HttpStatusCode? = coroutineScope {
+    ): HttpStatusCode? {
         val isAudio = audioOrVideoUrl.isLeft()
         val mediaUrl = audioOrVideoUrl.merge()
 
@@ -344,7 +347,7 @@ class VideoCashService : LifecycleService(), KoinComponent {
         val storeFile = createMediaFileCatching(desiredFilename, fileExt)
             .apply { exceptionOrNull()?.printStackTrace() }
             .getOrNull()
-            ?: return@coroutineScope HttpStatusCode.BadRequest
+            ?: return HttpStatusCode.BadRequest
 
         curVideoCashFile = storeFile
         Log.d(TAG, "Launching file download")
@@ -366,7 +369,7 @@ class VideoCashService : LifecycleService(), KoinComponent {
             )
         }
 
-        statusCode
+        return statusCode
     }
 
     private fun clearVideoCashStates() {
@@ -393,6 +396,7 @@ class VideoCashService : LifecycleService(), KoinComponent {
 
     private fun onVideoCashStatusError(code: Int, description: String) {
         videoCashErrorState.update { code to description }
+
         sendBroadcast(
             Intent(MainActivity.Broadcast_VIDEO_CASH_COMPLETED)
                 .putExtra(VIDEO_CASH_STATUS_ARG, VideoCashResponse.Error(code, description))
@@ -616,26 +620,52 @@ class VideoCashService : LifecycleService(), KoinComponent {
         errorCode: Int,
         errorDescription: String
     ) = when {
-        !wasStartForegroundUsed -> startCashingNotification(
-            videoMetadata,
-            videoCashQueueLen,
-            downloadedBytes,
-            totalBytes
-        )
+        !wasStartForegroundUsed -> {
+            Log.d(TAG, "Start Notification")
 
-        else -> when (cashingState) {
-            CashingStatus.CASHING -> updateCashingNotification(
+            startCashingNotification(
                 videoMetadata,
                 videoCashQueueLen,
                 downloadedBytes,
                 totalBytes
             )
+        }
+
+        else -> when (cashingState) {
+            CashingStatus.CASHING -> {
+                Log.d(TAG, "Cashing Notification")
+
+                updateCashingNotification(
+                    videoMetadata,
+                    videoCashQueueLen,
+                    downloadedBytes,
+                    totalBytes
+                )
+            }
 
             else -> {
                 when (cashingState) {
-                    CashingStatus.CASHED -> showCashedNotification()
-                    CashingStatus.CANCELED -> showCanceledNotification()
-                    CashingStatus.ERR -> showErrorNotification(errorCode, errorDescription)
+                    CashingStatus.CASHED -> {
+                        scope.launch {
+                            // Delay for NotificationManager in order
+                            // to not skip this update
+                            delay(1.seconds)
+
+                            Log.d(TAG, "Cashed Notification")
+                            showCashedNotification()
+                        }
+                    }
+
+                    CashingStatus.CANCELED -> {
+                        Log.d(TAG, "Canceled Notification")
+                        showCanceledNotification()
+                    }
+
+                    CashingStatus.ERR -> {
+                        Log.d(TAG, "Error Notification")
+                        showErrorNotification(errorCode, errorDescription)
+                    }
+
                     else -> Unit
                 }
 

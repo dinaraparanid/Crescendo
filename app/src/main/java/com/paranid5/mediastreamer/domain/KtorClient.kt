@@ -85,7 +85,7 @@ internal suspend inline fun HttpClient.downloadFile(
         }
 
         Log.d(TAG, "CashingStatus: ${cashingStatus.name}")
-        if (cashingStatusState.value == VideoCashService.CashingStatus.CANCELED) null else status
+        if (cashingStatus == VideoCashService.CashingStatus.CANCELED) null else status
     }
 
     Log.d(TAG, "Done, status: ${status?.value}")
