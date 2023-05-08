@@ -106,7 +106,9 @@ class VideoCashService : LifecycleService(), KoinComponent {
 
     private val videoCashProgressState = MutableStateFlow(0L to 0L)
     private val videoCashErrorState = MutableStateFlow(0 to "")
-    private val videoCashCondVar = AsyncCondVar()
+
+    private val isVideoCashingCondVar = AsyncCondVar()
+    private val videoCashQueueEmptyCondVar = AsyncCondVar()
 
     private var cashingLoopJob: Job? = null
     private var curVideoCashFile: File? = null
@@ -133,14 +135,14 @@ class VideoCashService : LifecycleService(), KoinComponent {
     private val cancelCurVideoReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context?, intent: Intent?) {
             Log.d(TAG, "Canceling video cashing")
-            mCancelCurVideoCashing()
+            scope.launch { mCancelCurVideoCashing() }
         }
     }
 
     private val cancelAllReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context?, intent: Intent?) {
             Log.d(TAG, "Canceling all videos cashing")
-            mCancelAllVideosCashing()
+            scope.launch { mCancelAllVideosCashing() }
         }
     }
 
@@ -209,7 +211,7 @@ class VideoCashService : LifecycleService(), KoinComponent {
         Log.d(TAG, "New video added to queue")
         videoCashQueue.offer(videoCashData)
         videoCashQueueLenState.update { videoCashQueue.size }
-        videoCashCondVar.notify()
+        videoCashQueueEmptyCondVar.notify()
         resetCashingJobIfCanceled()
     }
 
@@ -356,9 +358,10 @@ class VideoCashService : LifecycleService(), KoinComponent {
             fileUrl = mediaUrl,
             storeFile = storeFile,
             progressState = videoCashProgressState,
-            cashingStatusState = cashingStatusState
+            cashingStatusState = cashingStatusState,
         )
 
+        isVideoCashingCondVar.notify()
         Log.d(TAG, "Status code is received")
 
         statusCode?.takeIf { it.isSuccess() }?.let {
@@ -412,9 +415,14 @@ class VideoCashService : LifecycleService(), KoinComponent {
         while (true) {
             Log.d(TAG, "QUEUE ${videoCashQueue.size}")
 
-            if (videoCashQueue.isEmpty()) {
-                videoCashCondVar.wait()
-                Log.d(TAG, "Cond Var Awake")
+            while (videoCashQueue.isEmpty()) {
+                videoCashQueueEmptyCondVar.wait()
+                Log.d(TAG, "Video Cash Queue Cond Var Awake")
+            }
+
+            while (cashingStatusState.value == CashingStatus.CASHING) {
+                isVideoCashingCondVar.wait()
+                Log.d(TAG, "Is Video Cashing Cond Var Awake")
             }
 
             videoCashQueue.poll()?.let { (url, desiredFilename, isSaveAsVideo) ->
@@ -441,14 +449,16 @@ class VideoCashService : LifecycleService(), KoinComponent {
             cashingLoopJob = scope.launch(Dispatchers.IO) { launchCashing() }
     }
 
-    internal fun mCancelCurVideoCashing() {
+    internal suspend fun mCancelCurVideoCashing() {
         cashingStatusState.update { CashingStatus.CANCELED }
+        isVideoCashingCondVar.notify()
+
         Log.d(TAG, "File is deleted ${curVideoCashFile?.delete()}")
         Log.d(TAG, "Cashing is canceled")
         clearVideoCashStates()
     }
 
-    internal fun mCancelAllVideosCashing() {
+    internal suspend fun mCancelAllVideosCashing() {
         videoCashQueue.clear()
         videoCashQueueLenState.update { 0 }
         mCancelCurVideoCashing()
