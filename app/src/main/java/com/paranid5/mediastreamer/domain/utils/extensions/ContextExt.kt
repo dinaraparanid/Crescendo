@@ -11,6 +11,8 @@ import com.bumptech.glide.Glide
 import com.paranid5.mediastreamer.data.VideoMetadata
 import com.paranid5.mediastreamer.presentation.ui.extensions.byteData
 import org.jaudiotagger.audio.AudioFileIO
+import org.jaudiotagger.tag.FieldKey
+import org.jaudiotagger.tag.images.ArtworkFactory
 import org.jaudiotagger.tag.mp4.Mp4FieldKey
 import org.jaudiotagger.tag.mp4.Mp4Tag
 import java.io.File
@@ -47,28 +49,51 @@ fun Context.getImageBinaryData(url: String) =
 fun Context.getImageBinaryDataCatching(url: String) =
     kotlin.runCatching { getImageBinaryData(url) }
 
-fun Context.setAudioTagsToFile(file: File, videoMetadata: VideoMetadata, isAudio: Boolean) =
+private fun Context.setVideoTagsToFile(file: File, videoMetadata: VideoMetadata) =
     AudioFileIO.read(file).run {
         tagOrCreateAndSetDefault.let { it as Mp4Tag }.run {
             setField(Mp4FieldKey.TITLE, videoMetadata.title)
             setField(Mp4FieldKey.ARTIST, videoMetadata.author)
 
-            if (isAudio)
-                videoMetadata
-                    .covers
-                    .asSequence()
-                    .map { getImageBinaryDataCatching(it) }
-                    .firstOrNull { it.isSuccess }
-                    ?.getOrNull()
-                    ?.let(this::createArtworkField)
-                    ?.let(this::setField)
+            videoMetadata
+                .covers
+                .asSequence()
+                .map { getImageBinaryDataCatching(it) }
+                .firstOrNull { it.isSuccess }
+                ?.getOrNull()
+                ?.let(this::createArtworkField)
+                ?.let(this::setField)
 
             commit()
         }
     }
 
-fun Context.setAudioTagsToFileCatching(file: File, videoMetadata: VideoMetadata, isAudio: Boolean) =
-    kotlin.runCatching { setAudioTagsToFile(file, videoMetadata, isAudio) }
+private fun Context.setAudioTagsToFile(file: File, videoMetadata: VideoMetadata) =
+    AudioFileIO.read(file).run {
+        tagOrCreateAndSetDefault.run {
+            setField(FieldKey.TITLE, videoMetadata.title)
+            setField(FieldKey.ARTIST, videoMetadata.author)
+
+            videoMetadata
+                .covers
+                .asSequence()
+                .map { getImageBinaryDataCatching(it) }
+                .firstOrNull { it.isSuccess }
+                ?.getOrNull()
+                ?.let { ArtworkFactory.getNew().apply { binaryData = it } }
+                ?.let(this::setField)
+
+            commit()
+        }
+    }
+
+fun Context.setTagsToFile(file: File, videoMetadata: VideoMetadata, isAudio: Boolean) = when {
+    isAudio -> setAudioTagsToFile(file, videoMetadata)
+    else -> setVideoTagsToFile(file, videoMetadata)
+}
+
+fun Context.setTagsToFileCatching(file: File, videoMetadata: VideoMetadata, isAudio: Boolean) =
+    kotlin.runCatching { setTagsToFile(file, videoMetadata, isAudio) }
 
 fun Context.insertMediaFileToMediaStore(
     externalContentUri: Uri,

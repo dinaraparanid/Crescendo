@@ -64,6 +64,7 @@ dependencies {
     implementation 'androidx.media3:media3-session:1.0.1'
     implementation 'androidx.datastore:datastore-preferences:1.1.0-alpha04'
     implementation 'androidx.constraintlayout:constraintlayout-compose:1.0.1'
+    implementation 'androidx.palette:palette:1.0.0'
 
     implementation 'io.insert-koin:koin-androidx-compose:3.4.4'
 
@@ -79,8 +80,6 @@ dependencies {
     implementation 'com.github.bumptech.glide:compose:1.0.0-alpha.1'
     annotationProcessor 'com.github.bumptech.glide:compiler:4.15.1'
 
-    implementation 'androidx.palette:palette:1.0.0'
-
     implementation 'io.arrow-kt:arrow-fx-coroutines:1.1.6-alpha.28'
 
     implementation 'org.jetbrains.kotlinx:kotlinx-serialization-json:1.5.0'
@@ -88,6 +87,8 @@ dependencies {
     implementation 'org.bitbucket.ijabz:jaudiotagger:v3.0.1'
 
     implementation 'com.anggrayudi:storage:1.5.4'
+
+    implementation 'com.arthenica:mobile-ffmpeg-full:4.4.LTS'
 
     implementation files('libs/jave-1.0.2.jar')
 }

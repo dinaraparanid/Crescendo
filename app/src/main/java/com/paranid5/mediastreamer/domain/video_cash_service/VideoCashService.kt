@@ -22,6 +22,7 @@ import arrow.core.merge
 import at.huber.youtubeExtractor.VideoMeta
 import at.huber.youtubeExtractor.YouTubeExtractor
 import at.huber.youtubeExtractor.YtFile
+import com.arthenica.mobileffmpeg.FFmpeg
 import com.paranid5.mediastreamer.R
 import com.paranid5.mediastreamer.data.VideoMetadata
 import com.paranid5.mediastreamer.domain.downloadFile
@@ -31,7 +32,7 @@ import com.paranid5.mediastreamer.domain.media_scanner.scanNextFile
 import com.paranid5.mediastreamer.domain.utils.AsyncCondVar
 import com.paranid5.mediastreamer.domain.utils.extensions.insertMediaFileToMediaStore
 import com.paranid5.mediastreamer.domain.utils.extensions.registerReceiverCompat
-import com.paranid5.mediastreamer.domain.utils.extensions.setAudioTagsToFileCatching
+import com.paranid5.mediastreamer.domain.utils.extensions.setTagsToFileCatching
 import com.paranid5.mediastreamer.presentation.main_activity.MainActivity
 import com.paranid5.mediastreamer.presentation.streaming.VIDEO_CASH_STATUS_ARG
 import io.ktor.client.*
@@ -277,13 +278,13 @@ class VideoCashService : LifecycleService(), KoinComponent {
             .getExternalStoragePublicDirectory(mediaDirectory)
             .absolutePath
 
-    private inline val mediaDirectory
-        get() = when {
-            Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q -> Environment.DIRECTORY_MOVIES
-            else -> Environment.DIRECTORY_MUSIC
-        }
+    private fun getInitialMediaDirectory(isAudio: Boolean) = when {
+        Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q -> Environment.DIRECTORY_MOVIES
+        isAudio -> Environment.DIRECTORY_MUSIC
+        else -> Environment.DIRECTORY_MOVIES
+    }
 
-    private fun createMediaFile(filename: String, ext: String) =
+    private fun createMediaFile(mediaDirectory: String, filename: String, ext: String) =
         "${getFullMediaDirectory(mediaDirectory)}/$filename.$ext"
             .takeIf { !File(it).exists() }
             ?.let(::File)
@@ -296,8 +297,29 @@ class VideoCashService : LifecycleService(), KoinComponent {
                 .also { Log.d(TAG, "Creating file ${it.absolutePath}") }
                 .also(File::createNewFile)
 
-    private fun createMediaFileCatching(filename: String, ext: String) =
-        kotlin.runCatching { createMediaFile(filename, ext) }
+    private fun createMediaFileCatching(mediaDirectory: String, filename: String, ext: String) =
+        kotlin.runCatching { createMediaFile(mediaDirectory, filename, ext) }
+
+    private fun convertToMp3(videoFile: File): File? {
+        val newFile = createMediaFileCatching(
+            mediaDirectory = Environment.DIRECTORY_MUSIC,
+            filename = videoFile.nameWithoutExtension,
+            ext = "mp3"
+        ).getOrNull() ?: return null
+
+        val convertRes = FFmpeg.execute(
+            "-y -i ${videoFile.absolutePath} " +
+                    "-vn -acodec libmp3lame -qscale:a 2 ${newFile.absolutePath}"
+        )
+
+        if (convertRes == 0) {
+            videoFile.delete()
+            return newFile
+        }
+
+        newFile.delete()
+        return null
+    }
 
     private suspend inline fun setTags(
         mediaFile: File,
@@ -305,21 +327,23 @@ class VideoCashService : LifecycleService(), KoinComponent {
         isAudio: Boolean
     ) {
         val externalContentUri = when {
-            Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q ->
-                MediaStore.Video.Media.getContentUri(MediaStore.VOLUME_EXTERNAL_PRIMARY)
+            Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q -> when {
+                isAudio -> MediaStore.Audio.Media.getContentUri(MediaStore.VOLUME_EXTERNAL_PRIMARY)
+                else -> MediaStore.Video.Media.getContentUri(MediaStore.VOLUME_EXTERNAL_PRIMARY)
+            }
 
-            else -> MediaStore.Audio.Media.EXTERNAL_CONTENT_URI
+            else -> when {
+                isAudio -> MediaStore.Audio.Media.EXTERNAL_CONTENT_URI
+                else -> MediaStore.Video.Media.EXTERNAL_CONTENT_URI
+            }
         }
 
         val mediaDirectory = when {
-            Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q -> Environment.DIRECTORY_MOVIES
-            else -> Environment.DIRECTORY_MUSIC
+            isAudio -> Environment.DIRECTORY_MUSIC
+            else -> Environment.DIRECTORY_MOVIES
         }
 
-        val mimeType = when {
-            Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q -> "video/${mediaFile.extension}"
-            else -> if (isAudio) "audio/${mediaFile.extension}" else "video/${mediaFile.extension}"
-        }
+        val mimeType = if (isAudio) "audio/mpeg" else "video/${mediaFile.extension}"
 
         val absoluteFilePath = mediaFile.absolutePath
 
@@ -332,7 +356,7 @@ class VideoCashService : LifecycleService(), KoinComponent {
                 mimeType
             )
 
-            setAudioTagsToFileCatching(mediaFile, videoMetadata, isAudio)
+            setTagsToFileCatching(mediaFile, videoMetadata, isAudio)
             scanNextFile(absoluteFilePath)
         }
     }
@@ -342,11 +366,16 @@ class VideoCashService : LifecycleService(), KoinComponent {
         audioOrVideoUrl: Either<String, String>,
         videoMetadata: VideoMetadata
     ): HttpStatusCode? {
-        val isAudio = audioOrVideoUrl.isLeft()
+        var isAudio = audioOrVideoUrl.isLeft()
         val mediaUrl = audioOrVideoUrl.merge()
 
         val fileExt = ktorClient.getFileExt(mediaUrl)
-        val storeFile = createMediaFileCatching(desiredFilename, fileExt)
+
+        var storeFile = createMediaFileCatching(
+            mediaDirectory = getInitialMediaDirectory(isAudio),
+            filename = desiredFilename.replace(Regex("\\W+"), "_"),
+            ext = fileExt
+        )
             .apply { exceptionOrNull()?.printStackTrace() }
             .getOrNull()
             ?: return HttpStatusCode.BadRequest
@@ -360,6 +389,11 @@ class VideoCashService : LifecycleService(), KoinComponent {
             progressState = videoCashProgressState,
             cashingStatusState = cashingStatusState,
         )
+
+        if (isAudio)
+            convertToMp3(storeFile)
+                ?.let { storeFile = it }
+                ?: kotlin.run { isAudio = false }
 
         isVideoCashingCondVar.notify()
         Log.d(TAG, "Status code is received")
