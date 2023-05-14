@@ -7,9 +7,7 @@ import android.content.Context
 import android.content.Intent
 import android.os.Binder
 import android.os.Build
-import android.os.Environment
 import android.os.IBinder
-import android.provider.MediaStore
 import android.util.Log
 import android.util.SparseArray
 import androidx.annotation.RequiresApi
@@ -20,18 +18,19 @@ import androidx.lifecycle.repeatOnLifecycle
 import at.huber.youtubeExtractor.VideoMeta
 import at.huber.youtubeExtractor.YouTubeExtractor
 import at.huber.youtubeExtractor.YtFile
-import com.arthenica.mobileffmpeg.FFmpeg
 import com.paranid5.mediastreamer.R
 import com.paranid5.mediastreamer.data.VideoMetadata
 import com.paranid5.mediastreamer.domain.downloadFile
 import com.paranid5.mediastreamer.domain.getFileExt
 import com.paranid5.mediastreamer.domain.media_scanner.MediaScannerReceiver
-import com.paranid5.mediastreamer.domain.media_scanner.scanNextFile
 import com.paranid5.mediastreamer.domain.utils.AsyncCondVar
-import com.paranid5.mediastreamer.domain.utils.extensions.insertMediaFileToMediaStore
 import com.paranid5.mediastreamer.domain.utils.extensions.registerReceiverCompat
-import com.paranid5.mediastreamer.domain.utils.extensions.setAudioTagsToFileCatching
-import com.paranid5.mediastreamer.domain.utils.extensions.setVideoTagsToFileCatching
+import com.paranid5.mediastreamer.domain.utils.media.MediaFile
+import com.paranid5.mediastreamer.domain.utils.media.convertToAAC
+import com.paranid5.mediastreamer.domain.utils.media.convertToAudioFileAndSetTags
+import com.paranid5.mediastreamer.domain.utils.media.createMediaFileCatching
+import com.paranid5.mediastreamer.domain.utils.media.getInitialMediaDirectory
+import com.paranid5.mediastreamer.domain.utils.media.setVideoTagsAsync
 import com.paranid5.mediastreamer.presentation.main_activity.MainActivity
 import com.paranid5.mediastreamer.presentation.streaming.VIDEO_CASH_STATUS_ARG
 import io.ktor.client.*
@@ -40,7 +39,6 @@ import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
-import java.io.File
 import java.util.Queue
 import java.util.concurrent.ConcurrentLinkedQueue
 import kotlin.time.Duration.Companion.seconds
@@ -111,9 +109,9 @@ class VideoCashService : LifecycleService(), KoinComponent {
     private val isVideoCashingCondVar = AsyncCondVar()
     private val isVideoCashQueueEmptyCondVar = AsyncCondVar()
 
-    private var curVideoCashFile: File? = null
+    private var curVideoCashFile: MediaFile? = null
     private val curVideoMetadataState = MutableStateFlow<VideoMetadata?>(null)
-    private val cashingStatusState = MutableStateFlow(CashingStatus.NONE)
+    private val cashingStatusState = MutableStateFlow(DownloadingStatus.NONE)
 
     @Volatile
     private var wasStartForegroundUsed = false
@@ -209,7 +207,7 @@ class VideoCashService : LifecycleService(), KoinComponent {
     }
 
     private data class CashingNotificationData(
-        val cashingState: CashingStatus,
+        val cashingState: DownloadingStatus,
         val metadata: VideoMetadata,
         val videoCashQueueLen: Int,
         val downloadedBytes: Long,
@@ -266,205 +264,11 @@ class VideoCashService : LifecycleService(), KoinComponent {
         return START_REDELIVER_INTENT
     }
 
-    // --------------------- File Creation ---------------------
-
-    private fun getFullMediaDirectory(mediaDirectory: String) =
-        Environment
-            .getExternalStoragePublicDirectory(mediaDirectory)
-            .absolutePath
-
-    private fun getInitialMediaDirectory(isAudio: Boolean) = when {
-        Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q -> Environment.DIRECTORY_MOVIES
-        isAudio -> Environment.DIRECTORY_MUSIC
-        else -> Environment.DIRECTORY_MOVIES
-    }
-
-    /**
-     * Creates new media file by given parameters.
-     * If file with the same filename and extension already exists,
-     * will try to create `[filename](try_number).[ext]` until such file not found
-     *
-     * @param mediaDirectory directory to put file
-     * (either [Environment.DIRECTORY_MUSIC] for audio or [Environment.DIRECTORY_MOVIES] for video)
-     * @param filename desired filename
-     * @param ext file extension
-     * @return created empty media file
-     */
-
-    private fun createMediaFile(mediaDirectory: String, filename: String, ext: String) =
-        "${getFullMediaDirectory(mediaDirectory)}/$filename.$ext"
-            .takeIf { !File(it).exists() }
-            ?.let(::File)
-            ?.also { Log.d(TAG, "Creating file ${it.absolutePath}") }
-            ?.also(File::createNewFile)
-            ?: generateSequence(1) { it + 1 }
-                .map { num -> "${getFullMediaDirectory(mediaDirectory)}/${filename}($num).$ext" }
-                .map(::File)
-                .first { !it.exists() }
-                .also { Log.d(TAG, "Creating file ${it.absolutePath}") }
-                .also(File::createNewFile)
-
-    private fun createMediaFileCatching(mediaDirectory: String, filename: String, ext: String) =
-        kotlin.runCatching { createMediaFile(mediaDirectory, filename, ext) }
-
-    // --------------------- Audio File Conversion ---------------------
-
-    /**
-     * Converts video file to an audio file with ffmpeg
-     * @param videoFile video file to convert
-     * @param audioFormat audio file format
-     * @param ffmpegCmd ffmpeg cmd command to execute
-     * @return file if conversion was successful, otherwise null
-     */
-
-    private inline fun convertToAudioFile(
-        videoFile: File,
-        audioFormat: Formats,
-        ffmpegCmd: (File) -> String
-    ): File? {
-        val ext = when (audioFormat) {
-            Formats.MP3 -> "mp3"
-            Formats.AAC -> "aac"
-            Formats.WAV -> "wav"
-            Formats.MP4 -> throw IllegalArgumentException("MP4 passed as an audio format")
-        }
-
-        val newFile = createMediaFileCatching(
-            mediaDirectory = Environment.DIRECTORY_MUSIC,
-            filename = videoFile.nameWithoutExtension,
-            ext = ext
-        ).getOrNull() ?: return null
-
-        Log.d(TAG, "Converting to file: ${newFile.absolutePath}")
-
-        val convertRes = FFmpeg.execute(ffmpegCmd(newFile))
-
-        if (convertRes == 0) {
-            videoFile.delete()
-            return newFile
-        }
-
-        newFile.delete()
-        return null
-    }
-
-    private fun convertToMP3(videoFile: File) = convertToAudioFile(
-        videoFile = videoFile,
-        audioFormat = Formats.MP3
-    ) { newFile ->
-        "-y -i ${videoFile.absolutePath} -vn -acodec libmp3lame -qscale:a 2 ${newFile.absolutePath}"
-    }
-
-    private fun convertToWAV(videoFile: File) =
-        convertToAudioFile(
-            videoFile = videoFile,
-            audioFormat = Formats.WAV
-        ) { newFile ->
-            "-y -i ${videoFile.absolutePath} -vn -acodec pcm_s16le " +
-                    "-ar 44100 ${newFile.absolutePath}"
-        }
-
-    private fun convertToAAC(videoFile: File) =
-        convertToAudioFile(
-            videoFile = videoFile,
-            audioFormat = Formats.AAC
-        ) { newFile ->
-            "-y -i ${videoFile.absolutePath} -vn -c:a aac -b:a 256k ${newFile.absolutePath}"
-        }
-
-    /**
-     * Converts video file to an audio file with ffmpeg according to the [audioFormat].
-     * Adds new file to the [MediaStore] with provided [videoMetadata] tags.
-     * For [Formats.MP3] sets tags (with cover) after conversion.
-     * Finally, scans file with [android.media.MediaScannerConnection]
-     *
-     * @param videoFile video file to convert
-     * @param videoMetadata metadata to set
-     * @param audioFormat audio file format
-     * @return file if conversion was successful, otherwise null
-     */
-
-    private suspend inline fun convertToAudioFileAndSetTags(
-        videoFile: File,
-        videoMetadata: VideoMetadata,
-        audioFormat: Formats
-    ): File? {
-        val audioFile = withContext(Dispatchers.IO) {
-            Log.d(TAG, "Audio conversion to $audioFormat")
-
-            when (audioFormat) {
-                Formats.MP3 -> convertToMP3(videoFile)
-                Formats.WAV -> convertToWAV(videoFile)
-                Formats.AAC -> convertToAAC(videoFile)
-                Formats.MP4 -> throw IllegalArgumentException("MP4 passed as an audio format")
-            }
-        } ?: return null
-
-        val externalContentUri = when {
-            Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q ->
-                MediaStore.Audio.Media.getContentUri(MediaStore.VOLUME_EXTERNAL_PRIMARY)
-
-            else -> MediaStore.Audio.Media.EXTERNAL_CONTENT_URI
-        }
-
-        val mediaDirectory = Environment.DIRECTORY_MUSIC
-
-        val mimeType = when (audioFormat) {
-            Formats.MP3 -> "audio/mpeg"
-            Formats.AAC -> "audio/aac"
-            else -> "audio/x-wav"
-        }
-
-        val absoluteFilePath = audioFile.absolutePath
-
-        withContext(Dispatchers.IO) {
-            insertMediaFileToMediaStore(
-                externalContentUri,
-                absoluteFilePath,
-                mediaDirectory,
-                videoMetadata,
-                mimeType
-            )
-
-            if (audioFormat == Formats.MP3)
-                setAudioTagsToFileCatching(audioFile, videoMetadata)
-
-            scanNextFile(absoluteFilePath)
-        }
-
-        return audioFile
-    }
-
-    private suspend inline fun setVideoTags(videoFile: File, videoMetadata: VideoMetadata) {
-        val externalContentUri = when {
-            Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q ->
-                MediaStore.Video.Media.getContentUri(MediaStore.VOLUME_EXTERNAL_PRIMARY)
-
-            else -> MediaStore.Video.Media.EXTERNAL_CONTENT_URI
-        }
-
-        val mediaDirectory = Environment.DIRECTORY_MOVIES
-        val mimeType = "video/${videoFile.extension}"
-        val absoluteFilePath = videoFile.absolutePath
-
-        withContext(Dispatchers.IO) {
-            insertMediaFileToMediaStore(
-                externalContentUri,
-                absoluteFilePath,
-                mediaDirectory,
-                videoMetadata,
-                mimeType
-            )
-
-            setVideoTagsToFileCatching(videoFile, videoMetadata)
-            scanNextFile(absoluteFilePath)
-        }
-    }
-
     // --------------------- Media File Cashing ---------------------
 
     /**
-     * Downloads initial mp4 file by the url according to the acquired itag
+     * Downloads initial mp4 file by the url according to the acquired itag.
+     * Allows the task to be canceled by user
      * @param desiredFilename filename chosen by the user
      * @param mediaUrl url to the initial mp4 file
      * @param isAudio is final file required to be in audio format
@@ -488,7 +292,7 @@ class VideoCashService : LifecycleService(), KoinComponent {
 
         if (storeFileRes.isFailure) {
             storeFileRes.exceptionOrNull()?.printStackTrace()
-            cashingStatusState.update { CashingStatus.ERR }
+            cashingStatusState.update { DownloadingStatus.ERR }
             isVideoCashingCondVar.notify()
             return CashingResult.DownloadResult.Error(HttpStatusCode.BadRequest)
         }
@@ -500,7 +304,7 @@ class VideoCashService : LifecycleService(), KoinComponent {
             fileUrl = mediaUrl,
             storeFile = curVideoCashFile!!,
             progressState = videoCashProgressState,
-            cashingStatusState = cashingStatusState,
+            downloadingState = cashingStatusState,
         )
 
         isVideoCashingCondVar.notify()
@@ -541,15 +345,16 @@ class VideoCashService : LifecycleService(), KoinComponent {
         if (audioResult !is CashingResult.DownloadResult.Success)
             return audioResult
 
-        val audioConversionResult = convertToAAC(audioResult.file)
+        val audioConversionResult = (audioResult.file as MediaFile.VideoFile).convertToAAC()
             ?: return CashingResult.AudioConversionError
 
         // TODO: combine with an audio file
 
-        setVideoTags(
-            videoFile = videoResult.file,
+        setVideoTagsAsync(
+            context = this,
+            videoFile = videoResult.file as MediaFile.VideoFile,
             videoMetadata = videoMetadata
-        )
+        ).join()
 
         return CashingResult.DownloadResult.Success(videoResult.file)
     }
@@ -577,11 +382,13 @@ class VideoCashService : LifecycleService(), KoinComponent {
         if (result !is CashingResult.DownloadResult.Success)
             return result
 
-        return when (val audioConversionResult = convertToAudioFileAndSetTags(
-            videoFile = result.file,
-            videoMetadata = videoMetadata,
-            audioFormat = audioFormat
-        )) {
+        return when (val audioConversionResult =
+            (result.file as MediaFile.VideoFile).convertToAudioFileAndSetTags(
+                context = this,
+                videoMetadata = videoMetadata,
+                audioFormat = audioFormat
+            )
+        ) {
             null -> CashingResult.DownloadResult.Canceled
             else -> CashingResult.DownloadResult.Success(audioConversionResult)
         }
@@ -690,7 +497,7 @@ class VideoCashService : LifecycleService(), KoinComponent {
                 Log.d(TAG, "Video Cash Queue Cond Var Awake")
             }
 
-            while (cashingStatusState.value == CashingStatus.CASHING) {
+            while (cashingStatusState.value == DownloadingStatus.DOWNLOADING) {
                 isVideoCashingCondVar.wait()
                 Log.d(TAG, "Is Video Cashing Cond Var Awake")
             }
@@ -698,7 +505,7 @@ class VideoCashService : LifecycleService(), KoinComponent {
             videoCashQueue.poll()?.let { (url, desiredFilename, isSaveAsVideo) ->
                 Log.d(TAG, "Prepare for cashing")
                 videoCashProgressState.update { 0L to 0L }
-                cashingStatusState.update { CashingStatus.CASHING }
+                cashingStatusState.update { DownloadingStatus.DOWNLOADING }
                 videoCashQueueLenState.update { videoCashQueue.size }
                 YoutubeUrlExtractor(desiredFilename, isSaveAsVideo).extract(url)
             }
@@ -710,7 +517,7 @@ class VideoCashService : LifecycleService(), KoinComponent {
 
         cashingStatusState.update {
             when (it) {
-                CashingStatus.CANCELED -> CashingStatus.NONE
+                DownloadingStatus.CANCELED -> DownloadingStatus.NONE
                 else -> it
             }
         }
@@ -720,7 +527,7 @@ class VideoCashService : LifecycleService(), KoinComponent {
     }
 
     internal suspend fun mCancelCurVideoCashing() {
-        cashingStatusState.update { CashingStatus.CANCELED }
+        cashingStatusState.update { DownloadingStatus.CANCELED }
         isVideoCashingCondVar.notify()
 
         Log.d(TAG, "File is deleted ${curVideoCashFile?.delete()}")
@@ -892,7 +699,7 @@ class VideoCashService : LifecycleService(), KoinComponent {
     )
 
     private fun updateNotification(
-        cashingState: CashingStatus,
+        cashingState: DownloadingStatus,
         videoMetadata: VideoMetadata,
         videoCashQueueLen: Int,
         downloadedBytes: Long,
@@ -912,7 +719,7 @@ class VideoCashService : LifecycleService(), KoinComponent {
         }
 
         else -> when (cashingState) {
-            CashingStatus.CASHING -> updateCashingNotification(
+            DownloadingStatus.DOWNLOADING -> updateCashingNotification(
                 videoMetadata,
                 videoCashQueueLen,
                 downloadedBytes,
@@ -921,7 +728,7 @@ class VideoCashService : LifecycleService(), KoinComponent {
 
             else -> {
                 when (cashingState) {
-                    CashingStatus.CASHED -> {
+                    DownloadingStatus.DOWNLOADED -> {
                         scope.launch {
                             // Delay for NotificationManager in order
                             // to not skip this update
@@ -932,12 +739,12 @@ class VideoCashService : LifecycleService(), KoinComponent {
                         }
                     }
 
-                    CashingStatus.CANCELED -> {
+                    DownloadingStatus.CANCELED -> {
                         Log.d(TAG, "Canceled Notification")
                         showCanceledNotification()
                     }
 
-                    CashingStatus.ERR -> {
+                    DownloadingStatus.ERR -> {
                         Log.d(TAG, "Error Notification")
                         showErrorNotification(errorCode, errorDescription)
                     }

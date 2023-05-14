@@ -2,6 +2,7 @@ package com.paranid5.mediastreamer.domain.video_cash_service
 
 import android.os.Parcel
 import android.os.Parcelable
+import com.paranid5.mediastreamer.domain.utils.media.MediaFile
 import io.ktor.http.HttpStatusCode
 import kotlinx.parcelize.Parcelize
 import java.io.File
@@ -9,7 +10,7 @@ import java.io.File
 sealed interface CashingResult : Parcelable {
     sealed interface DownloadResult : CashingResult {
         @Parcelize
-        data class Success(val file: File) : DownloadResult
+        data class Success(val file: MediaFile) : DownloadResult
 
         data class Error(val statusCode: HttpStatusCode) : DownloadResult {
             companion object CREATOR : Parcelable.Creator<Error> {
