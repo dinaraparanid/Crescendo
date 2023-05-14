@@ -68,6 +68,9 @@ private fun Context.setVideoTagsToFile(file: File, videoMetadata: VideoMetadata)
         }
     }
 
+fun Context.setVideoTagsToFileCatching(file: File, videoMetadata: VideoMetadata) =
+    kotlin.runCatching { setVideoTagsToFile(file, videoMetadata) }
+
 private fun Context.setAudioTagsToFile(file: File, videoMetadata: VideoMetadata) =
     AudioFileIO.read(file).run {
         tagOrCreateAndSetDefault.run {
@@ -87,13 +90,8 @@ private fun Context.setAudioTagsToFile(file: File, videoMetadata: VideoMetadata)
         }
     }
 
-fun Context.setTagsToFile(file: File, videoMetadata: VideoMetadata, isAudio: Boolean) = when {
-    isAudio -> setAudioTagsToFile(file, videoMetadata)
-    else -> setVideoTagsToFile(file, videoMetadata)
-}
-
-fun Context.setTagsToFileCatching(file: File, videoMetadata: VideoMetadata, isAudio: Boolean) =
-    kotlin.runCatching { setTagsToFile(file, videoMetadata, isAudio) }
+fun Context.setAudioTagsToFileCatching(file: File, videoMetadata: VideoMetadata) =
+    kotlin.runCatching { setAudioTagsToFile(file, videoMetadata) }
 
 fun Context.insertMediaFileToMediaStore(
     externalContentUri: Uri,

@@ -10,20 +10,20 @@ class VideoCashServiceAccessor(application: MainApplication) : ServiceAccessor(a
     private fun Intent.putVideoCashDataArgs(
         videoUrl: String,
         desiredFilename: String,
-        isSaveAsVideo: Boolean
+        format: Formats
     ) = apply {
         putExtra(VideoCashService.URL_ARG, videoUrl)
         putExtra(VideoCashService.FILENAME_ARG, desiredFilename)
-        putExtra(VideoCashService.SAVE_AS_VIDEO_ARG, isSaveAsVideo)
+        putExtra(VideoCashService.FORMAT_ARG, format)
     }
 
     private fun startVideoCashService(
         videoUrl: String,
         desiredFilename: String,
-        isSaveAsVideo: Boolean
+        format: Formats
     ) {
         val serviceIntent = Intent(appContext, VideoCashService::class.java)
-            .putVideoCashDataArgs(videoUrl, desiredFilename, isSaveAsVideo)
+            .putVideoCashDataArgs(videoUrl, desiredFilename, format)
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
             appContext.startForegroundService(serviceIntent)
@@ -40,26 +40,26 @@ class VideoCashServiceAccessor(application: MainApplication) : ServiceAccessor(a
     private fun cashNextVideo(
         videoUrl: String,
         desiredFilename: String,
-        isSaveAsVideo: Boolean
+        format: Formats
     ) = sendBroadcast(
         Intent(VideoCashService.Broadcast_CASH_NEXT_VIDEO)
-            .putVideoCashDataArgs(videoUrl, desiredFilename, isSaveAsVideo)
+            .putVideoCashDataArgs(videoUrl, desiredFilename, format)
     )
 
-    private fun startCashing(videoUrl: String, desiredFilename: String, isSaveAsVideo: Boolean) =
-        startVideoCashService(videoUrl, desiredFilename, isSaveAsVideo)
+    private fun startCashing(videoUrl: String, desiredFilename: String, format: Formats) =
+        startVideoCashService(videoUrl, desiredFilename, format)
 
     fun startCashingOrAddToQueue(
         videoUrl: String,
         desiredFilename: String,
-        isSaveAsVideo: Boolean
+        format: Formats
     ) = when {
         application.isVideoCashServiceConnected -> cashNextVideo(
             videoUrl,
             desiredFilename,
-            isSaveAsVideo
+            format
         )
 
-        else -> startCashing(videoUrl, desiredFilename, isSaveAsVideo)
+        else -> startCashing(videoUrl, desiredFilename, format)
     }
 }

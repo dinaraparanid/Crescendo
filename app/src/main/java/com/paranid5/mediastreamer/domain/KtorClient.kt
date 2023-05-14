@@ -1,14 +1,20 @@
 package com.paranid5.mediastreamer.domain
 
 import android.util.Log
-import com.paranid5.mediastreamer.domain.video_cash_service.VideoCashService
-import io.ktor.client.*
-import io.ktor.client.engine.android.*
-import io.ktor.client.plugins.logging.*
-import io.ktor.client.request.*
-import io.ktor.client.statement.*
-import io.ktor.http.*
-import io.ktor.utils.io.core.*
+import com.paranid5.mediastreamer.domain.video_cash_service.CashingStatus
+import io.ktor.client.HttpClient
+import io.ktor.client.engine.android.Android
+import io.ktor.client.plugins.logging.ANDROID
+import io.ktor.client.plugins.logging.LogLevel
+import io.ktor.client.plugins.logging.Logger
+import io.ktor.client.plugins.logging.Logging
+import io.ktor.client.request.prepareGet
+import io.ktor.client.statement.bodyAsChannel
+import io.ktor.http.HttpStatusCode
+import io.ktor.http.contentLength
+import io.ktor.http.isSuccess
+import io.ktor.utils.io.core.isNotEmpty
+import io.ktor.utils.io.core.readBytes
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.flow.updateAndGet
@@ -34,14 +40,14 @@ suspend inline fun HttpClient.getFileExt(fileUrl: String) =
  * @param storeFile file in which all content will be stored
  * @param progressState channel that indicates downloading progress
  * with both current progress in bytes and total file's size
- * @return HTTP status code on this request
+ * @return HTTP status code on this request or null, if cashing was canceled by user
  */
 
 internal suspend inline fun HttpClient.downloadFile(
     fileUrl: String,
     storeFile: File,
     progressState: MutableStateFlow<Pair<Long, Long>>? = null,
-    cashingStatusState: MutableStateFlow<VideoCashService.CashingStatus>
+    cashingStatusState: MutableStateFlow<CashingStatus>
 ): HttpStatusCode? {
     Log.d(TAG, "Downloading $fileUrl")
 
@@ -49,21 +55,17 @@ internal suspend inline fun HttpClient.downloadFile(
         val status = response.status
 
         if (!status.isSuccess()) {
-            cashingStatusState.update { VideoCashService.CashingStatus.ERR }
+            cashingStatusState.update { CashingStatus.ERR }
             return@execute status
         }
 
         val channel = response.bodyAsChannel()
         var progress = 0L
 
-        while (!channel.isClosedForRead
-            && cashingStatusState.value == VideoCashService.CashingStatus.CASHING
-        ) {
+        while (!channel.isClosedForRead && cashingStatusState.value == CashingStatus.CASHING) {
             val packet = channel.readRemaining(DEFAULT_BUFFER_SIZE.toLong())
 
-            while (packet.isNotEmpty
-                && cashingStatusState.value == VideoCashService.CashingStatus.CASHING
-            ) {
+            while (packet.isNotEmpty && cashingStatusState.value == CashingStatus.CASHING) {
                 val bytes = packet.readBytes()
                 storeFile.appendBytes(bytes)
 
@@ -79,13 +81,12 @@ internal suspend inline fun HttpClient.downloadFile(
 
         val cashingStatus = cashingStatusState.updateAndGet {
             when (it) {
-                VideoCashService.CashingStatus.CANCELED -> it
-                else -> VideoCashService.CashingStatus.CASHED
+                CashingStatus.CANCELED -> it
+                else -> CashingStatus.CASHED
             }
         }
 
-        Log.d(TAG, "CashingStatus: ${cashingStatus.name}")
-        if (cashingStatus == VideoCashService.CashingStatus.CANCELED) null else status
+        if (cashingStatus == CashingStatus.CANCELED) null else status
     }
 
     Log.d(TAG, "Done, status: ${status?.value}")

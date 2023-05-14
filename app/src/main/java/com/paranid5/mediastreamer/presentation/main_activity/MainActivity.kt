@@ -81,24 +81,24 @@ class MainActivity : ComponentActivity() {
         unregisterReceiver(cashStatusReceiver)
     }
 
-    internal fun mOnVideoCashCompleted(status: VideoCashResponse, context: Context) {
-        val errorStringRes = context.getString(R.string.error)
-        val successfulCashingStringRes = context.getString(R.string.video_cashed)
-        val canceledStringRes = context.getString(R.string.video_canceled)
-
+    internal fun mOnVideoCashCompleted(status: VideoCashResponse, context: Context) =
         Toast.makeText(
             context,
             when (status) {
                 is VideoCashResponse.Error -> {
                     val (httpCode, description) = status
-                    "$errorStringRes $httpCode: $description"
+                    "${context.getString(R.string.error)} $httpCode: $description"
                 }
 
-                is VideoCashResponse.Success -> successfulCashingStringRes
+                is VideoCashResponse.Success ->
+                    context.getString(R.string.video_cashed)
 
-                is VideoCashResponse.Canceled -> canceledStringRes
+                is VideoCashResponse.Canceled ->
+                    context.getString(R.string.video_canceled)
+
+                is VideoCashResponse.AudioConversionError ->
+                    context.getString(R.string.audio_conversion_error)
             },
             Toast.LENGTH_LONG
         ).show()
-    }
 }

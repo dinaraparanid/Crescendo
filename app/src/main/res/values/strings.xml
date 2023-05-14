@@ -31,8 +31,6 @@
     <string name="cash_properties">Cash Properties</string>
     <string name="filename">File Name</string>
     <string name="filename_placeholder">your file name</string>
-    <string name="audio">Audio</string>
-    <string name="video">Video</string>
     <string name="start_cashing">Start Cashing</string>
     <string name="save_as">Save As</string>
     <string name="permission_required">Permission is required</string>
@@ -45,5 +43,9 @@
     <string name="unknown_error">Unknown error</string>
     <string name="remove_from_favourite">Remove from favourite</string>
     <string name="add_to_favourite">Add to favourite"</string>
-    <string name="video_format_not_supported">Video format is not supported yet</string>
+    <string name="audio_conversion_error">Error when converting to audio file</string>
+    <string name="mp3">Audio: MP3</string>
+    <string name="wav">Audio: WAV</string>
+    <string name="aac">Audio: AAC</string>
+    <string name="mp4">Video: MP4</string>
 </resources>

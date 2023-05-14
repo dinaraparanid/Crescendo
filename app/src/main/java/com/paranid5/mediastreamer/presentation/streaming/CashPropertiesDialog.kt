@@ -1,6 +1,5 @@
 package com.paranid5.mediastreamer.presentation.streaming
 
-import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -11,11 +10,11 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.paranid5.mediastreamer.R
+import com.paranid5.mediastreamer.domain.video_cash_service.Formats
 import com.paranid5.mediastreamer.presentation.ui.theme.LocalAppColors
 import org.koin.compose.koinInject
 
@@ -26,9 +25,18 @@ fun CashPropertiesDialog(isDialogShownState: MutableState<Boolean>, modifier: Mo
     val filenameState = remember { mutableStateOf("") }
     val isButtonClickable by remember { derivedStateOf { filenameState.value.isNotEmpty() } }
 
-    val fileSaveOptions = arrayOf(stringResource(R.string.audio), stringResource(R.string.video))
+    val fileSaveOptions = arrayOf(
+        stringResource(R.string.mp3),
+        stringResource(R.string.wav),
+        stringResource(R.string.aac),
+        stringResource(R.string.mp4)
+    )
+
     val selectedSaveOptionIndexState = remember { mutableStateOf(0) }
-    val isSaveAsVideo by remember { derivedStateOf { selectedSaveOptionIndexState.value == 1 } }
+
+    val format by remember {
+        derivedStateOf { Formats.values()[selectedSaveOptionIndexState.value] }
+    }
 
     if (isDialogShownState.value)
         AlertDialog(
@@ -45,13 +53,16 @@ fun CashPropertiesDialog(isDialogShownState: MutableState<Boolean>, modifier: Mo
             Column(Modifier.fillMaxWidth()) {
                 Title(Modifier.align(Alignment.CenterHorizontally))
                 Spacer(Modifier.height(10.dp))
+
                 FilenameInput(filenameState = filenameState)
                 Spacer(Modifier.height(10.dp))
+
                 SaveOptionsMenu(fileSaveOptions, selectedSaveOptionIndexState)
                 Spacer(Modifier.height(10.dp))
+
                 ConfirmButton(
                     isDialogShownState = isDialogShownState,
-                    isSaveAsVideo = isSaveAsVideo,
+                    format = format,
                     isButtonClickable = isButtonClickable,
                     filename = filenameState.value,
                     modifier = Modifier.align(Alignment.CenterHorizontally)
@@ -98,7 +109,6 @@ private fun SaveOptionsMenu(
     selectedSaveOptionIndexState: MutableState<Int>,
     modifier: Modifier = Modifier
 ) {
-    val context = LocalContext.current
     val colors = LocalAppColors.current.value
     var isDropdownShown by remember { mutableStateOf(false) }
 
@@ -114,7 +124,9 @@ private fun SaveOptionsMenu(
             Text(
                 text = fileSaveOptions[selectedSaveOptionIndexState.value],
                 color = colors.primary,
-                modifier = Modifier.align(Alignment.Center).clickable { isDropdownShown = true },
+                modifier = Modifier
+                    .align(Alignment.Center)
+                    .clickable { isDropdownShown = true },
             )
 
             DropdownMenu(
@@ -124,16 +136,7 @@ private fun SaveOptionsMenu(
                 fileSaveOptions.forEachIndexed { index, item ->
                     DropdownMenuItem(
                         text = { Text(item) },
-                        onClick = {
-                            // TODO: save as video
-                            // selectedSaveOptionIndexState.value = index
-
-                            if (index == 1) Toast.makeText(
-                                context,
-                                R.string.video_format_not_supported,
-                                Toast.LENGTH_SHORT
-                            ).show()
-                        }
+                        onClick = { selectedSaveOptionIndexState.value = index }
                     )
                 }
             }
@@ -144,7 +147,7 @@ private fun SaveOptionsMenu(
 @Composable
 private fun ConfirmButton(
     isDialogShownState: MutableState<Boolean>,
-    isSaveAsVideo: Boolean,
+    format: Formats,
     isButtonClickable: Boolean,
     filename: String,
     modifier: Modifier = Modifier,
@@ -155,7 +158,7 @@ private fun ConfirmButton(
     Button(
         modifier = modifier.padding(vertical = 10.dp),
         onClick = {
-            streamingUIHandler.launchVideoCashService(filename, isSaveAsVideo)
+            streamingUIHandler.launchVideoCashService(filename, format)
             isDialogShownState.value = false
         },
         enabled = isButtonClickable,

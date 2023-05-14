@@ -28,7 +28,7 @@ import com.paranid5.mediastreamer.presentation.ui.extensions.simpleShadow
 import com.paranid5.mediastreamer.presentation.ui.permissions.ExternalStorageDescriptionProvider
 import com.paranid5.mediastreamer.presentation.ui.permissions.PermissionDialog
 import com.paranid5.mediastreamer.presentation.ui.BroadcastReceiver
-import org.koin.androidx.compose.get
+import org.koin.compose.koinInject
 import org.koin.core.qualifier.named
 import java.util.*
 
@@ -62,8 +62,8 @@ private fun EqualizerButton(palette: Palette?, modifier: Modifier = Modifier) {
 private fun RepeatButton(
     palette: Palette?,
     modifier: Modifier = Modifier,
-    storageHandler: StorageHandler = get(),
-    streamingUIHandler: StreamingUIHandler = get()
+    storageHandler: StorageHandler = koinInject(),
+    streamingUIHandler: StreamingUIHandler = koinInject()
 ) {
     val lightVibrantColor = palette.getLightMutedOrPrimary()
     var isRepeating by remember { mutableStateOf(storageHandler.isRepeatingState.value) }
@@ -113,11 +113,11 @@ private fun DownloadButton(palette: Palette?, modifier: Modifier = Modifier) {
     val activity = LocalActivity.current!!
     val isCashPropertiesDialogShownState = remember { mutableStateOf(false) }
 
-    val externalStoragePermissionQueue = get<Queue<String>>(
+    val externalStoragePermissionQueue = koinInject<Queue<String>>(
         named(EXTERNAL_STORAGE_PERMISSION_QUEUE)
     )
 
-    val externalStorageDescriptionProvider = get<ExternalStorageDescriptionProvider>()
+    val externalStorageDescriptionProvider = koinInject<ExternalStorageDescriptionProvider>()
     val notGrantedStoragePermissions = remember { mutableStateListOf<String>() }
 
     var areAllPermissionsGranted by remember {
@@ -175,6 +175,7 @@ private fun DownloadButton(palette: Palette?, modifier: Modifier = Modifier) {
                     isPermanentlyDeclined = when {
                         Build.VERSION.SDK_INT >= Build.VERSION_CODES.M ->
                             !activity.shouldShowRequestPermissionRationale(permission)
+
                         else -> false
                     },
                     onGrantedClicked = {
