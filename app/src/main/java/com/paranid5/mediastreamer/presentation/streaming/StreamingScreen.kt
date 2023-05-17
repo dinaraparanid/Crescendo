@@ -40,7 +40,7 @@ import com.paranid5.mediastreamer.data.utils.extensions.timeString
 import com.paranid5.mediastreamer.domain.StorageHandler
 import com.paranid5.mediastreamer.presentation.Screens
 import com.paranid5.mediastreamer.presentation.ui.BroadcastReceiver
-import com.paranid5.mediastreamer.presentation.ui.extensions.getLightMutedOrPrimary
+import com.paranid5.mediastreamer.presentation.ui.extensions.getLightVibrantOrPrimary
 import com.paranid5.mediastreamer.presentation.ui.rememberVideoCoverPainterWithPalette
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.update
@@ -248,7 +248,7 @@ private fun VideoCover(
     palette: Palette?,
     modifier: Modifier = Modifier
 ) {
-    val lightVibrantColor = palette.getLightMutedOrPrimary()
+    val lightVibrantColor = palette.getLightVibrantOrPrimary()
 
     Image(
         painter = coilPainter,
@@ -281,7 +281,7 @@ private fun PlaybackSlider(
     storageHandler: StorageHandler = koinInject(),
     content: @Composable RowScope.(curPosition: Long, videoLength: Long, color: Color) -> Unit
 ) {
-    val lightVibrantColor = palette.getLightMutedOrPrimary()
+    val lightVibrantColor = palette.getLightVibrantOrPrimary()
     val videoLength = metadata?.lenInMillis ?: 0
     var curPosition by remember { mutableStateOf(0L) }
 
