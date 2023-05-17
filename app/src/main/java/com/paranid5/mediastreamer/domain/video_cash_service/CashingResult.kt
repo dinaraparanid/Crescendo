@@ -5,7 +5,6 @@ import android.os.Parcelable
 import com.paranid5.mediastreamer.domain.utils.media.MediaFile
 import io.ktor.http.HttpStatusCode
 import kotlinx.parcelize.Parcelize
-import java.io.File
 
 sealed interface CashingResult : Parcelable {
     sealed interface DownloadResult : CashingResult {
@@ -35,8 +34,11 @@ sealed interface CashingResult : Parcelable {
 
         @Parcelize
         object Canceled : DownloadResult
+
+        @Parcelize
+        object FileCreationError : DownloadResult
     }
 
     @Parcelize
-    object AudioConversionError : CashingResult
+    object ConversionError : CashingResult
 }

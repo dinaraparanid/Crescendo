@@ -10,7 +10,8 @@ inline val externalStoragePermissionQueue: Queue<String>
         when {
             Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU -> mutableListOf(
                 Manifest.permission.READ_MEDIA_VIDEO,
-                Manifest.permission.READ_MEDIA_AUDIO
+                Manifest.permission.READ_MEDIA_AUDIO,
+                Manifest.permission.READ_MEDIA_IMAGES
             )
 
             else -> mutableListOf(Manifest.permission.READ_EXTERNAL_STORAGE).apply {

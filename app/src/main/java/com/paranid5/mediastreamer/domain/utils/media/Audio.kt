@@ -7,6 +7,7 @@ import android.util.Log
 import com.arthenica.mobileffmpeg.FFmpeg
 import com.paranid5.mediastreamer.data.VideoMetadata
 import com.paranid5.mediastreamer.domain.video_cash_service.Formats
+import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
@@ -39,34 +40,36 @@ sealed class MediaFile(value: File) : File(value.absolutePath) {
  * @return file if conversion was successful, otherwise null
  */
 
-private inline fun MediaFile.VideoFile.convertToAudioFileImpl(
+private suspend inline fun MediaFile.VideoFile.convertToAudioFileImplAsync(
     audioFormat: Formats,
-    ffmpegCmd: (File) -> String
-): MediaFile.AudioFile? {
-    val ext = when (audioFormat) {
-        Formats.MP3 -> "mp3"
-        Formats.AAC -> "aac"
-        Formats.WAV -> "wav"
-        Formats.MP4 -> throw IllegalArgumentException("MP4 passed as an audio format")
+    crossinline ffmpegCmd: (File) -> String
+) = coroutineScope {
+    async(Dispatchers.IO) {
+        val ext = when (audioFormat) {
+            Formats.MP3 -> "mp3"
+            Formats.AAC -> "aac"
+            Formats.WAV -> "wav"
+            Formats.MP4 -> throw IllegalArgumentException("MP4 passed as an audio format")
+        }
+
+        val newFile = createMediaFileCatching(
+            mediaDirectory = MediaDirectory(Environment.DIRECTORY_MUSIC),
+            filename = nameWithoutExtension,
+            ext = ext
+        ).getOrNull() ?: return@async null
+
+        Log.d(TAG, "Converting to file: ${newFile.absolutePath}")
+
+        val convertRes = FFmpeg.execute(ffmpegCmd(newFile))
+
+        if (convertRes == 0) {
+            delete()
+            return@async MediaFile.AudioFile(newFile)
+        }
+
+        newFile.delete()
+        null
     }
-
-    val newFile = createMediaFileCatching(
-        mediaDirectory = MediaDirectory(Environment.DIRECTORY_MUSIC),
-        filename = nameWithoutExtension,
-        ext = ext
-    ).getOrNull() ?: return null
-
-    Log.d(TAG, "Converting to file: ${newFile.absolutePath}")
-
-    val convertRes = FFmpeg.execute(ffmpegCmd(newFile))
-
-    if (convertRes == 0) {
-        delete()
-        return MediaFile.AudioFile(newFile)
-    }
-
-    newFile.delete()
-    return null
 }
 
 /**
@@ -74,8 +77,8 @@ private inline fun MediaFile.VideoFile.convertToAudioFileImpl(
  * @return .mp3 file if conversion was successful, otherwise null
  */
 
-fun MediaFile.VideoFile.convertToMP3() =
-    convertToAudioFileImpl(audioFormat = Formats.MP3) { newFile ->
+internal suspend inline fun MediaFile.VideoFile.convertToMP3Async() =
+    convertToAudioFileImplAsync(audioFormat = Formats.MP3) { newFile ->
         "-y -i $absolutePath -vn -acodec libmp3lame -qscale:a 2 ${newFile.absolutePath}"
     }
 
@@ -84,8 +87,8 @@ fun MediaFile.VideoFile.convertToMP3() =
  * @return .wav file if conversion was successful, otherwise null
  */
 
-fun MediaFile.VideoFile.convertToWAV() =
-    convertToAudioFileImpl(audioFormat = Formats.WAV) { newFile ->
+internal suspend inline fun MediaFile.VideoFile.convertToWAVAsync() =
+    convertToAudioFileImplAsync(audioFormat = Formats.WAV) { newFile ->
         "-y -i $absolutePath -vn -acodec pcm_s16le -ar 44100 ${newFile.absolutePath}"
     }
 
@@ -94,37 +97,29 @@ fun MediaFile.VideoFile.convertToWAV() =
  * @return .aac file if conversion was successful, otherwise null
  */
 
-fun MediaFile.VideoFile.convertToAAC() =
-    convertToAudioFileImpl(audioFormat = Formats.AAC) { newFile ->
+internal suspend inline fun MediaFile.VideoFile.convertToAACAsync() =
+    convertToAudioFileImplAsync(audioFormat = Formats.AAC) { newFile ->
         "-y -i $absolutePath -vn -c:a aac -b:a 256k ${newFile.absolutePath}"
     }
 
 /**
- * Converts video file to an audio file with ffmpeg synchronously
+ * Converts video file to an audio file with ffmpeg
  * @param audioFormat audio file format
  * @return file if conversion was successful, otherwise null
- * @see convertToAudioFileAsync
  */
 
-fun MediaFile.VideoFile.convertToAudioFile(audioFormat: Formats): MediaFile.AudioFile? {
+internal suspend inline fun MediaFile.VideoFile.convertToAudioFileAsync(
+    audioFormat: Formats
+): Deferred<MediaFile.AudioFile?> {
     Log.d(TAG, "Audio conversion to $audioFormat")
 
     return when (audioFormat) {
-        Formats.MP3 -> convertToMP3()
-        Formats.WAV -> convertToWAV()
-        Formats.AAC -> convertToAAC()
+        Formats.MP3 -> convertToMP3Async()
+        Formats.WAV -> convertToWAVAsync()
+        Formats.AAC -> convertToAACAsync()
         Formats.MP4 -> throw IllegalArgumentException("MP4 passed as an audio format")
     }
 }
-
-/**
- * Converts video file to an audio file with ffmpeg asynchronously
- * @param audioFormat audio file format
- * @return file if conversion was successful, otherwise null
- */
-
-suspend inline fun MediaFile.VideoFile.convertToAudioFileAsync(audioFormat: Formats) =
-    coroutineScope { async(Dispatchers.IO) { convertToAudioFile(audioFormat) } }
 
 /**
  * Converts video file to an audio file with ffmpeg according to the [audioFormat].
@@ -137,12 +132,14 @@ suspend inline fun MediaFile.VideoFile.convertToAudioFileAsync(audioFormat: Form
  * @return file if conversion was successful, otherwise null
  */
 
-internal suspend inline fun MediaFile.VideoFile.convertToAudioFileAndSetTags(
+internal suspend inline fun MediaFile.VideoFile.convertToAudioFileAndSetTagsAsync(
     context: Context,
     videoMetadata: VideoMetadata,
     audioFormat: Formats
-): MediaFile.AudioFile? {
-    val audioFile = convertToAudioFileAsync(audioFormat).await() ?: return null
-    setAudioTagsAsync(context, audioFile, videoMetadata, audioFormat).join()
-    return audioFile
+) = coroutineScope {
+    async(Dispatchers.IO) {
+        val audioFile = convertToAudioFileAsync(audioFormat).await() ?: return@async null
+        setAudioTagsAsync(context, audioFile, videoMetadata, audioFormat).join()
+        audioFile
+    }
 }

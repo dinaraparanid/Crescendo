@@ -44,6 +44,7 @@
     <string name="remove_from_favourite">Remove from favourite</string>
     <string name="add_to_favourite">Add to favourite"</string>
     <string name="audio_conversion_error">Error when converting to audio file</string>
+    <string name="file_creation_error">Error when creating file. Please, try again</string>
     <string name="mp3">Audio: MP3</string>
     <string name="wav">Audio: WAV</string>
     <string name="aac">Audio: AAC</string>

@@ -19,33 +19,21 @@ import org.jaudiotagger.tag.mp4.Mp4FieldKey
 import org.jaudiotagger.tag.mp4.Mp4Tag
 
 private fun setVideoTagsToFile(
-    context: Context,
     file: MediaFile.VideoFile,
     videoMetadata: VideoMetadata
 ) = AudioFileIO.read(file).run {
     tagOrCreateAndSetDefault.let { it as Mp4Tag }.run {
         setField(Mp4FieldKey.TITLE, videoMetadata.title)
         setField(Mp4FieldKey.ARTIST, videoMetadata.author)
-
-        videoMetadata
-            .covers
-            .asSequence()
-            .map { getImageBinaryDataCatching(context, it) }
-            .firstOrNull { it.isSuccess }
-            ?.getOrNull()
-            ?.let(this::createArtworkField)
-            ?.let(this::setField)
-
         commit()
     }
 }
 
 private fun setVideoTagsToFileCatching(
-    context: Context,
     file: MediaFile.VideoFile,
     videoMetadata: VideoMetadata
 ) = runCatching {
-    setVideoTagsToFile(context, file, videoMetadata)
+    setVideoTagsToFile(file, videoMetadata)
 }
 
 internal suspend inline fun setVideoTagsAsync(
@@ -73,7 +61,7 @@ internal suspend inline fun setVideoTagsAsync(
             mimeType
         )
 
-        setVideoTagsToFileCatching(context, videoFile, videoMetadata)
+        setVideoTagsToFileCatching(videoFile, videoMetadata)
         context.scanNextFile(absoluteFilePath)
     }
 }

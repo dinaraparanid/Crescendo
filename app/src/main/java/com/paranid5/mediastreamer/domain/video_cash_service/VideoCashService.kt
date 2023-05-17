@@ -15,22 +15,22 @@ import androidx.annotation.StringRes
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleService
 import androidx.lifecycle.repeatOnLifecycle
+import arrow.core.Either
 import at.huber.youtubeExtractor.VideoMeta
 import at.huber.youtubeExtractor.YouTubeExtractor
 import at.huber.youtubeExtractor.YtFile
 import com.paranid5.mediastreamer.R
 import com.paranid5.mediastreamer.data.VideoMetadata
 import com.paranid5.mediastreamer.domain.downloadFile
-import com.paranid5.mediastreamer.domain.getFileExt
+import com.paranid5.mediastreamer.domain.downloadFiles
 import com.paranid5.mediastreamer.domain.media_scanner.MediaScannerReceiver
 import com.paranid5.mediastreamer.domain.utils.AsyncCondVar
 import com.paranid5.mediastreamer.domain.utils.extensions.registerReceiverCompat
 import com.paranid5.mediastreamer.domain.utils.media.MediaFile
-import com.paranid5.mediastreamer.domain.utils.media.convertToAAC
-import com.paranid5.mediastreamer.domain.utils.media.convertToAudioFileAndSetTags
+import com.paranid5.mediastreamer.domain.utils.media.convertToAudioFileAndSetTagsAsync
 import com.paranid5.mediastreamer.domain.utils.media.createMediaFileCatching
 import com.paranid5.mediastreamer.domain.utils.media.getInitialMediaDirectory
-import com.paranid5.mediastreamer.domain.utils.media.setVideoTagsAsync
+import com.paranid5.mediastreamer.domain.utils.media.mergeToMP4AndSetTagsAsync
 import com.paranid5.mediastreamer.presentation.main_activity.MainActivity
 import com.paranid5.mediastreamer.presentation.streaming.VIDEO_CASH_STATUS_ARG
 import io.ktor.client.*
@@ -169,7 +169,7 @@ class VideoCashService : LifecycleService(), KoinComponent {
 
                 scope.launch {
                     mOnVideoCashStatusReceived(
-                        cashingResult = mCashMediaFile(
+                        cashingResult = mCashMediaFileOrNotifyError(
                             desiredFilename = desiredFilename,
                             audioUrl = audioUrl,
                             videoUrl = if (format == Formats.MP4) videoUrl else null,
@@ -267,8 +267,54 @@ class VideoCashService : LifecycleService(), KoinComponent {
     // --------------------- Media File Cashing ---------------------
 
     /**
+     * Prepares store file for the download request or notifies about error.
+     * @param desiredFilename filename chosen by the user
+     * @param isAudio is final file required to be in audio format
+     * @return [MediaFile.VideoFile] with file or
+     * [CashingResult.DownloadResult.Error] with [HttpStatusCode] if error has occurred
+     */
+
+    private suspend inline fun initMediaFile(
+        desiredFilename: String,
+        isAudio: Boolean
+    ): Either<MediaFile.VideoFile, CashingResult.DownloadResult.FileCreationError> {
+        val storeFileRes = createMediaFileCatching(
+            mediaDirectory = getInitialMediaDirectory(isAudio),
+            filename = desiredFilename.replace(Regex("\\W+"), "_"),
+            ext = "mp4"
+        )
+
+        return when {
+            storeFileRes.isFailure -> {
+                storeFileRes.exceptionOrNull()!!.printStackTrace()
+                Either.Right(CashingResult.DownloadResult.FileCreationError)
+            }
+
+            else -> Either.Left(storeFileRes.getOrNull()!!)
+        }
+    }
+
+    /**
+     * Prepares store file for the download request or cancels cashing and notifies about error.
+     * @param desiredFilename filename chosen by the user
+     * @param isAudio is final file required to be in audio format
+     * @return [MediaFile.VideoFile] with file or
+     * [CashingResult.DownloadResult.Error] with [HttpStatusCode] if error has occurred
+     */
+
+    private suspend inline fun initMediaFileOrNotifyError(
+        desiredFilename: String,
+        isAudio: Boolean
+    ) = initMediaFile(desiredFilename, isAudio).map { error ->
+        cashingStatusState.update { DownloadingStatus.ERR }
+        isVideoCashingCondVar.notify()
+        error
+    }
+
+    /**
      * Downloads initial mp4 file by the url according to the acquired itag.
-     * Allows the task to be canceled by user
+     * Allows the task to be canceled by user.
+     * Provides error message handling, no need to do it further
      * @param desiredFilename filename chosen by the user
      * @param mediaUrl url to the initial mp4 file
      * @param isAudio is final file required to be in audio format
@@ -277,28 +323,17 @@ class VideoCashService : LifecycleService(), KoinComponent {
      * [CashingResult.DownloadResult.Canceled] if cashing was canceled by the user
      */
 
-    private suspend inline fun downloadMediaFile(
+    private suspend inline fun downloadMediaFileOrNotifyError(
         desiredFilename: String,
         mediaUrl: String,
         isAudio: Boolean
     ): CashingResult.DownloadResult {
-        val fileExt = ktorClient.getFileExt(mediaUrl)
+        val storeFileRes = initMediaFileOrNotifyError(desiredFilename, isAudio)
 
-        val storeFileRes = createMediaFileCatching(
-            mediaDirectory = getInitialMediaDirectory(isAudio),
-            filename = desiredFilename.replace(Regex("\\W+"), "_"),
-            ext = fileExt
-        )
-
-        if (storeFileRes.isFailure) {
-            storeFileRes.exceptionOrNull()?.printStackTrace()
-            cashingStatusState.update { DownloadingStatus.ERR }
-            isVideoCashingCondVar.notify()
-            return CashingResult.DownloadResult.Error(HttpStatusCode.BadRequest)
+        curVideoCashFile = when (storeFileRes) {
+            is Either.Right -> return storeFileRes.value
+            is Either.Left -> storeFileRes.value
         }
-
-        curVideoCashFile = storeFileRes.getOrNull()!!
-        Log.d(TAG, "Launching file download")
 
         val statusCode = ktorClient.downloadFile(
             fileUrl = mediaUrl,
@@ -307,18 +342,95 @@ class VideoCashService : LifecycleService(), KoinComponent {
             downloadingState = cashingStatusState,
         )
 
+        if (statusCode?.isSuccess() != true) {
+            onCashingError()
+            return statusCode?.let(CashingResult.DownloadResult::Error)
+                ?: CashingResult.DownloadResult.Canceled
+        }
+
         isVideoCashingCondVar.notify()
         Log.d(TAG, "Status code is received")
-
-        return statusCode
-            ?.takeIf { it.isSuccess() }
-            ?.let { CashingResult.DownloadResult.Success(curVideoCashFile!!) }
-            ?: statusCode?.let(CashingResult.DownloadResult::Error)
-            ?: CashingResult.DownloadResult.Canceled
+        return CashingResult.DownloadResult.Success(curVideoCashFile!!)
     }
 
     /**
-     * Downloads both video and audio mp4 files and combines them into single mp4 file.
+     * Downloads both audio and video mp4 files by the urls according to the acquired itags.
+     * Allows the task to be canceled by user.
+     * Provides error message handling, no need to do it further
+     * @param audioUrl url to the initial audio mp4 file
+     * @param videoUrl url to the initial video mp4 file
+     * @param audioFileStore file to store downloaded audio mp4 file
+     * @param videoFileStore file to store downloaded video mp4 file
+     * @return [CashingResult.DownloadResult.Success] with file if conversion was successful,
+     * [CashingResult.DownloadResult.Error] with [HttpStatusCode] if error has occurred,
+     * [CashingResult.DownloadResult.Canceled] if cashing was canceled by the user
+     */
+
+    private suspend inline fun downloadAudioAndVideoFilesOrNotifyError(
+        audioUrl: String,
+        videoUrl: String,
+        audioFileStore: MediaFile,
+        videoFileStore: MediaFile.VideoFile
+    ): CashingResult.DownloadResult {
+        val statusCode = ktorClient.downloadFiles(
+            files = arrayOf(audioUrl to audioFileStore, videoUrl to videoFileStore),
+            progressState = videoCashProgressState,
+            downloadingState = cashingStatusState,
+        )
+
+        if (statusCode?.isSuccess() != true) {
+            onCashingError()
+            return statusCode?.let(CashingResult.DownloadResult::Error)
+                ?: CashingResult.DownloadResult.Canceled
+        }
+
+        isVideoCashingCondVar.notify()
+        Log.d(TAG, "Status code is received")
+        return CashingResult.DownloadResult.Success(audioFileStore)
+    }
+
+    /**
+     * Initialises both mp4 files (audio and video) to download data and then merge them together.
+     * Provides error message handling, no need to do it further
+     * @param desiredFilename filename chosen by the user
+     * @return audio [MediaFile] and [MediaFile.VideoFile] or
+     * [CashingResult.DownloadResult.Error] with [HttpStatusCode] if error has occurred
+     */
+
+    private suspend inline fun prepareMediaFilesForMP4MergingOrNotifyErrors(
+        desiredFilename: String,
+    ): Either<Pair<MediaFile, MediaFile.VideoFile>, CashingResult.DownloadResult.FileCreationError> {
+        val audioFileStoreRes = initMediaFileOrNotifyError(
+            desiredFilename,
+            isAudio = true
+        )
+
+        val audioFileStore = when (audioFileStoreRes) {
+            is Either.Right -> return Either.Right(audioFileStoreRes.value)
+            is Either.Left -> audioFileStoreRes.value
+        }
+
+        val videoFileStoreRes = initMediaFileOrNotifyError(
+            desiredFilename,
+            isAudio = false
+        )
+
+        val videoFileStore = when (videoFileStoreRes) {
+            is Either.Right -> {
+                audioFileStore.delete()
+                return Either.Right(videoFileStoreRes.value)
+            }
+
+            is Either.Left -> videoFileStoreRes.value
+        }
+
+        return Either.Left(audioFileStore to videoFileStore)
+    }
+
+    /**
+     * Downloads both video and audio mp4 files,
+     * convert audio to .aac file and
+     * combines them into single mp4 file
      * @param desiredFilename filename chosen by the user
      * @param audioUrl url to the audio mp4 file
      * @param videoUrl url to the video mp4 file
@@ -326,37 +438,54 @@ class VideoCashService : LifecycleService(), KoinComponent {
      * @return [CashingResult.DownloadResult.Success] with file if conversion was successful,
      * [CashingResult.DownloadResult.Error] with [HttpStatusCode] if error has occurred,
      * [CashingResult.DownloadResult.Canceled] if cashing was canceled by the user,
-     * [CashingResult.AudioConversionError] if conversion to .aac audio file has failed
+     * [CashingResult.ConversionError] if conversion to .aac audio file has failed
      */
 
-    private suspend inline fun cashVideoFile(
+    private suspend inline fun cashVideoFileOrNotifyError(
         desiredFilename: String,
         audioUrl: String,
         videoUrl: String,
         videoMetadata: VideoMetadata
     ): CashingResult {
-        val videoResult = downloadMediaFile(desiredFilename, videoUrl, isAudio = false)
+        val mediaFilesInitResult = prepareMediaFilesForMP4MergingOrNotifyErrors(desiredFilename)
 
-        if (videoResult !is CashingResult.DownloadResult.Success)
-            return videoResult
+        val (audioFileStore, videoFileStore) = when (mediaFilesInitResult) {
+            is Either.Right -> return mediaFilesInitResult.value
+            is Either.Left -> mediaFilesInitResult.value
+        }
 
-        val audioResult = downloadMediaFile(desiredFilename, audioUrl, isAudio = true)
+        val deleteStoreFilesAndHandleError = suspend {
+            audioFileStore.delete()
+            videoFileStore.delete()
+            onCashingError()
+        }
 
-        if (audioResult !is CashingResult.DownloadResult.Success)
-            return audioResult
+        downloadAudioAndVideoFilesOrNotifyError(
+            audioUrl,
+            videoUrl,
+            audioFileStore,
+            videoFileStore
+        ).let { result ->
+            if (result !is CashingResult.DownloadResult.Success)
+                return result
+        }
 
-        val audioConversionResult = (audioResult.file as MediaFile.VideoFile).convertToAAC()
-            ?: return CashingResult.AudioConversionError
+        return when (val storeFileRes =
+            initMediaFileOrNotifyError(desiredFilename, isAudio = false)
+        ) {
+            is Either.Right -> {
+                deleteStoreFilesAndHandleError()
+                storeFileRes.value
+            }
 
-        // TODO: combine with an audio file
-
-        setVideoTagsAsync(
-            context = this,
-            videoFile = videoResult.file as MediaFile.VideoFile,
-            videoMetadata = videoMetadata
-        ).join()
-
-        return CashingResult.DownloadResult.Success(videoResult.file)
+            is Either.Left -> mergeToMP4AndSetTagsAsync(
+                context = this,
+                audioTrack = audioFileStore,
+                videoTrack = videoFileStore,
+                mp4StoreFile = storeFileRes.value,
+                videoMetadata = videoMetadata
+            ).await()
+        }
     }
 
     /**
@@ -368,35 +497,39 @@ class VideoCashService : LifecycleService(), KoinComponent {
      * @return [CashingResult.DownloadResult.Success] with file if conversion was successful,
      * [CashingResult.DownloadResult.Error] with [HttpStatusCode] if error has occurred,
      * [CashingResult.DownloadResult.Canceled] if cashing was canceled by the user,
-     * [CashingResult.AudioConversionError] if conversion to .aac audio file has failed
+     * [CashingResult.ConversionError] if conversion to .aac audio file has failed
      */
 
-    private suspend inline fun cashAudioFile(
+    private suspend inline fun cashAudioFileOrNotifyError(
         desiredFilename: String,
         audioUrl: String,
         videoMetadata: VideoMetadata,
         audioFormat: Formats
     ): CashingResult {
-        val result = downloadMediaFile(desiredFilename, audioUrl, isAudio = true)
+        val result = downloadMediaFileOrNotifyError(desiredFilename, audioUrl, isAudio = true)
 
         if (result !is CashingResult.DownloadResult.Success)
             return result
 
         return when (val audioConversionResult =
-            (result.file as MediaFile.VideoFile).convertToAudioFileAndSetTags(
+            (result.file as MediaFile.VideoFile).convertToAudioFileAndSetTagsAsync(
                 context = this,
                 videoMetadata = videoMetadata,
                 audioFormat = audioFormat
-            )
+            ).await()
         ) {
-            null -> CashingResult.DownloadResult.Canceled
+            null -> {
+                onCashingError()
+                CashingResult.ConversionError
+            }
+
             else -> CashingResult.DownloadResult.Success(audioConversionResult)
         }
     }
 
     /**
-     * Cashes either with [cashAudioFile] if [videoUrl] is null,
-     * or with [cashVideoFile] otherwise
+     * Cashes either with [cashAudioFileOrNotifyError] if [videoUrl] is null,
+     * or with [cashVideoFileOrNotifyError] otherwise
      * @param desiredFilename filename chosen by the user
      * @param audioUrl url to the audio mp4 file
      * @param videoUrl url to the video mp4 file
@@ -405,33 +538,29 @@ class VideoCashService : LifecycleService(), KoinComponent {
      * @return [CashingResult.DownloadResult.Success] with file if conversion was successful,
      * [CashingResult.DownloadResult.Error] with [HttpStatusCode] if error has occurred,
      * [CashingResult.DownloadResult.Canceled] if cashing was canceled by the user,
-     * [CashingResult.AudioConversionError] if conversion to .aac audio file has failed
+     * [CashingResult.ConversionError] if conversion to .aac audio file has failed
      */
 
-    internal suspend inline fun mCashMediaFile(
+    internal suspend inline fun mCashMediaFileOrNotifyError(
         desiredFilename: String,
         audioUrl: String,
         videoUrl: String?,
         videoMetadata: VideoMetadata,
         format: Formats
-    ): CashingResult {
-        val isAudio = videoUrl == null
+    ) = when (videoUrl) {
+        null -> cashAudioFileOrNotifyError(
+            desiredFilename,
+            audioUrl,
+            videoMetadata,
+            format
+        )
 
-        return when {
-            isAudio -> cashAudioFile(
-                desiredFilename = desiredFilename,
-                audioUrl = audioUrl,
-                videoMetadata = videoMetadata,
-                audioFormat = format
-            )
-
-            else -> cashVideoFile(
-                desiredFilename = desiredFilename,
-                audioUrl = audioUrl,
-                videoUrl = videoUrl!!,
-                videoMetadata = videoMetadata
-            )
-        }
+        else -> cashVideoFileOrNotifyError(
+            desiredFilename,
+            audioUrl,
+            videoUrl,
+            videoMetadata
+        )
     }
 
     private fun clearVideoCashStates() {
@@ -447,7 +576,7 @@ class VideoCashService : LifecycleService(), KoinComponent {
         clearVideoCashStates()
 
         when (cashingResult) {
-            CashingResult.AudioConversionError -> onAudioConversionError()
+            CashingResult.ConversionError -> onAudioConversionError()
 
             CashingResult.DownloadResult.Canceled -> onVideoCashCanceled()
 
@@ -457,6 +586,8 @@ class VideoCashService : LifecycleService(), KoinComponent {
             )
 
             is CashingResult.DownloadResult.Success -> onVideoCashSuccessful()
+
+            CashingResult.DownloadResult.FileCreationError -> onFileCreationError()
         }
 
         Log.d(TAG, "Cashing result $cashingResult handled")
@@ -484,6 +615,11 @@ class VideoCashService : LifecycleService(), KoinComponent {
     private fun onAudioConversionError() = sendBroadcast(
         Intent(MainActivity.Broadcast_VIDEO_CASH_COMPLETED)
             .putExtra(VIDEO_CASH_STATUS_ARG, VideoCashResponse.AudioConversionError)
+    )
+
+    private fun onFileCreationError() = sendBroadcast(
+        Intent(MainActivity.Broadcast_VIDEO_CASH_COMPLETED)
+            .putExtra(VIDEO_CASH_STATUS_ARG, VideoCashResponse.FileCreationError)
     )
 
     /** Runs loop that cashes files from the [videoCashQueue] */
@@ -526,7 +662,16 @@ class VideoCashService : LifecycleService(), KoinComponent {
             cashingLoopJob = scope.launch(Dispatchers.IO) { launchCashing() }
     }
 
-    internal suspend fun mCancelCurVideoCashing() {
+    private suspend inline fun onCashingError() {
+        cashingStatusState.update { DownloadingStatus.ERR }
+        isVideoCashingCondVar.notify()
+
+        Log.d(TAG, "File is deleted ${curVideoCashFile?.delete()}")
+        Log.d(TAG, "Cashing was interrupted by an error")
+        clearVideoCashStates()
+    }
+
+    internal suspend inline fun mCancelCurVideoCashing() {
         cashingStatusState.update { DownloadingStatus.CANCELED }
         isVideoCashingCondVar.notify()
 
@@ -535,7 +680,7 @@ class VideoCashService : LifecycleService(), KoinComponent {
         clearVideoCashStates()
     }
 
-    internal suspend fun mCancelAllVideosCashing() {
+    internal suspend inline fun mCancelAllVideosCashing() {
         videoCashQueue.clear()
         videoCashQueueLenState.update { 0 }
         mCancelCurVideoCashing()

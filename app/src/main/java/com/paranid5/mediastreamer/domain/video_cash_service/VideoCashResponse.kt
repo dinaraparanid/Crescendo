@@ -1,24 +1,25 @@
 package com.paranid5.mediastreamer.domain.video_cash_service
 
-sealed interface VideoCashResponse : java.io.Serializable {
-    object Success : VideoCashResponse {
-        private const val serialVersionUID = -7333827722639364464L
-    }
+import android.os.Parcelable
+import kotlinx.parcelize.Parcelize
 
+sealed interface VideoCashResponse : Parcelable {
+
+    @Parcelize
+    object Success : VideoCashResponse
+
+    @Parcelize
     data class Error(
         @JvmField val httpCode: Int,
         @JvmField val description: String
-    ) : VideoCashResponse {
-        companion object {
-            private const val serialVersionUID = 2183653321912760986L
-        }
-    }
+    ) : VideoCashResponse
 
-    object Canceled : VideoCashResponse {
-        private const val serialVersionUID = -439433216307277309L
-    }
+    @Parcelize
+    object Canceled : VideoCashResponse
 
-    object AudioConversionError : VideoCashResponse {
-        private const val serialVersionUID: Long = 6821826984651124131L
-    }
+    @Parcelize
+    object AudioConversionError : VideoCashResponse
+
+    @Parcelize
+    object FileCreationError : VideoCashResponse
 }

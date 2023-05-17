@@ -39,13 +39,13 @@ class MainActivity : ComponentActivity() {
 
             val status = when {
                 Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU ->
-                    intent!!.getSerializableExtra(
+                    intent!!.getParcelableExtra(
                         VIDEO_CASH_STATUS_ARG,
                         VideoCashResponse::class.java
-                    )!!
+                    )
 
-                else -> intent!!.getSerializableExtra(VIDEO_CASH_STATUS_ARG)!! as VideoCashResponse
-            }
+                else -> intent!!.getParcelableExtra(VIDEO_CASH_STATUS_ARG)
+            }!!
 
             mOnVideoCashCompleted(status, applicationContext)
         }
@@ -90,14 +90,17 @@ class MainActivity : ComponentActivity() {
                     "${context.getString(R.string.error)} $httpCode: $description"
                 }
 
-                is VideoCashResponse.Success ->
+                VideoCashResponse.Success ->
                     context.getString(R.string.video_cashed)
 
-                is VideoCashResponse.Canceled ->
+                VideoCashResponse.Canceled ->
                     context.getString(R.string.video_canceled)
 
-                is VideoCashResponse.AudioConversionError ->
+                VideoCashResponse.AudioConversionError ->
                     context.getString(R.string.audio_conversion_error)
+
+                VideoCashResponse.FileCreationError ->
+                    context.getString(R.string.file_creation_error)
             },
             Toast.LENGTH_LONG
         ).show()
