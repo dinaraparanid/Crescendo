@@ -1,13 +1,8 @@
-package com.paranid5.mediastreamer.domain
+package com.paranid5.mediastreamer.domain.ktor_client
 
 import android.util.Log
 import com.paranid5.mediastreamer.domain.video_cash_service.DownloadingStatus
 import io.ktor.client.HttpClient
-import io.ktor.client.engine.android.Android
-import io.ktor.client.plugins.logging.ANDROID
-import io.ktor.client.plugins.logging.LogLevel
-import io.ktor.client.plugins.logging.Logger
-import io.ktor.client.plugins.logging.Logging
 import io.ktor.client.request.prepareGet
 import io.ktor.client.statement.bodyAsChannel
 import io.ktor.http.HttpStatusCode
@@ -25,13 +20,6 @@ import kotlinx.coroutines.launch
 import java.io.File
 
 private const val TAG = "Ktor Client"
-
-fun KtorClient() = HttpClient(Android) {
-    install(Logging) {
-        logger = Logger.ANDROID
-        level = LogLevel.ALL
-    }
-}
 
 suspend inline fun HttpClient.getFileExt(fileUrl: String) =
     prepareGet(fileUrl).execute { response ->

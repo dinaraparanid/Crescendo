@@ -16,13 +16,16 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleService
 import androidx.lifecycle.repeatOnLifecycle
 import arrow.core.Either
+import arrow.core.left
+import arrow.core.raise.either
+import arrow.core.raise.ensure
 import at.huber.youtubeExtractor.VideoMeta
 import at.huber.youtubeExtractor.YouTubeExtractor
 import at.huber.youtubeExtractor.YtFile
 import com.paranid5.mediastreamer.R
 import com.paranid5.mediastreamer.data.VideoMetadata
-import com.paranid5.mediastreamer.domain.downloadFile
-import com.paranid5.mediastreamer.domain.downloadFiles
+import com.paranid5.mediastreamer.domain.ktor_client.downloadFile
+import com.paranid5.mediastreamer.domain.ktor_client.downloadFiles
 import com.paranid5.mediastreamer.domain.media_scanner.MediaScannerReceiver
 import com.paranid5.mediastreamer.domain.utils.AsyncCondVar
 import com.paranid5.mediastreamer.domain.utils.extensions.registerReceiverCompat
@@ -277,21 +280,19 @@ class VideoCashService : LifecycleService(), KoinComponent {
     private suspend inline fun initMediaFile(
         desiredFilename: String,
         isAudio: Boolean
-    ): Either<MediaFile.VideoFile, CashingResult.DownloadResult.FileCreationError> {
+    ) = either {
         val storeFileRes = createMediaFileCatching(
             mediaDirectory = getInitialMediaDirectory(isAudio),
             filename = desiredFilename.replace(Regex("\\W+"), "_"),
             ext = "mp4"
         )
 
-        return when {
-            storeFileRes.isFailure -> {
-                storeFileRes.exceptionOrNull()!!.printStackTrace()
-                Either.Right(CashingResult.DownloadResult.FileCreationError)
-            }
-
-            else -> Either.Left(storeFileRes.getOrNull()!!)
+        ensure(storeFileRes.isSuccess) {
+            storeFileRes.exceptionOrNull()!!.printStackTrace()
+            CashingResult.DownloadResult.FileCreationError
         }
+
+        storeFileRes.getOrNull()!!
     }
 
     /**
@@ -331,8 +332,8 @@ class VideoCashService : LifecycleService(), KoinComponent {
         val storeFileRes = initMediaFileOrNotifyError(desiredFilename, isAudio)
 
         curVideoCashFile = when (storeFileRes) {
-            is Either.Right -> return storeFileRes.value
-            is Either.Left -> storeFileRes.value
+            is Either.Left -> return storeFileRes.value
+            is Either.Right -> storeFileRes.value
         }
 
         val statusCode = ktorClient.downloadFile(
@@ -399,15 +400,15 @@ class VideoCashService : LifecycleService(), KoinComponent {
 
     private suspend inline fun prepareMediaFilesForMP4MergingOrNotifyErrors(
         desiredFilename: String,
-    ): Either<Pair<MediaFile, MediaFile.VideoFile>, CashingResult.DownloadResult.FileCreationError> {
+    ): Either<CashingResult.DownloadResult.FileCreationError, Pair<MediaFile, MediaFile.VideoFile>> {
         val audioFileStoreRes = initMediaFileOrNotifyError(
             desiredFilename,
             isAudio = true
         )
 
         val audioFileStore = when (audioFileStoreRes) {
-            is Either.Right -> return Either.Right(audioFileStoreRes.value)
-            is Either.Left -> audioFileStoreRes.value
+            is Either.Left -> return audioFileStoreRes.value.left()
+            is Either.Right -> audioFileStoreRes.value
         }
 
         val videoFileStoreRes = initMediaFileOrNotifyError(
@@ -416,15 +417,15 @@ class VideoCashService : LifecycleService(), KoinComponent {
         )
 
         val videoFileStore = when (videoFileStoreRes) {
-            is Either.Right -> {
+            is Either.Left -> {
                 audioFileStore.delete()
-                return Either.Right(videoFileStoreRes.value)
+                return videoFileStoreRes.value.left()
             }
 
-            is Either.Left -> videoFileStoreRes.value
+            is Either.Right -> videoFileStoreRes.value
         }
 
-        return Either.Left(audioFileStore to videoFileStore)
+        return Either.Right(audioFileStore to videoFileStore)
     }
 
     /**
@@ -450,8 +451,8 @@ class VideoCashService : LifecycleService(), KoinComponent {
         val mediaFilesInitResult = prepareMediaFilesForMP4MergingOrNotifyErrors(desiredFilename)
 
         val (audioFileStore, videoFileStore) = when (mediaFilesInitResult) {
-            is Either.Right -> return mediaFilesInitResult.value
-            is Either.Left -> mediaFilesInitResult.value
+            is Either.Left -> return mediaFilesInitResult.value
+            is Either.Right -> mediaFilesInitResult.value
         }
 
         val deleteStoreFilesAndHandleError = suspend {
@@ -473,12 +474,12 @@ class VideoCashService : LifecycleService(), KoinComponent {
         return when (val storeFileRes =
             initMediaFileOrNotifyError(desiredFilename, isAudio = false)
         ) {
-            is Either.Right -> {
+            is Either.Left -> {
                 deleteStoreFilesAndHandleError()
                 storeFileRes.value
             }
 
-            is Either.Left -> mergeToMP4AndSetTagsAsync(
+            is Either.Right -> mergeToMP4AndSetTagsAsync(
                 context = this,
                 audioTrack = audioFileStore,
                 videoTrack = videoFileStore,

@@ -14,7 +14,7 @@ android {
         minSdk 21
         targetSdk 33
         versionCode 1
-        versionName '0.0.0.2'
+        versionName '0.0.0.3'
 
         testInstrumentationRunner 'androidx.test.runner.AndroidJUnitRunner'
         vectorDrawables {
@@ -51,17 +51,18 @@ android {
 }
 
 dependencies {
-    implementation 'androidx.core:core-ktx:1.10.0'
+    implementation 'androidx.core:core-ktx:1.10.1'
     implementation 'androidx.lifecycle:lifecycle-runtime-ktx:2.6.1'
     implementation 'androidx.lifecycle:lifecycle-extensions:2.2.0'
+    implementation 'androidx.lifecycle:lifecycle-viewmodel-ktx:2.6.1'
     implementation 'androidx.activity:activity-compose:1.7.1'
     implementation 'androidx.compose.ui:ui:1.4.3'
     implementation 'androidx.compose.ui:ui-tooling-preview:1.4.3'
-    implementation 'androidx.compose.material3:material3:1.1.0-rc01'
+    implementation 'androidx.compose.material3:material3:1.2.0-alpha01'
     implementation 'androidx.navigation:navigation-compose:2.5.3'
-    implementation 'androidx.media3:media3-exoplayer:1.0.1'
-    implementation 'androidx.media3:media3-ui:1.0.1'
-    implementation 'androidx.media3:media3-session:1.0.1'
+    implementation 'androidx.media3:media3-exoplayer:1.0.2'
+    implementation 'androidx.media3:media3-ui:1.0.2'
+    implementation 'androidx.media3:media3-session:1.0.2'
     implementation 'androidx.datastore:datastore-preferences:1.1.0-alpha04'
     implementation 'androidx.constraintlayout:constraintlayout-compose:1.0.1'
     implementation 'androidx.palette:palette:1.0.0'
@@ -71,6 +72,8 @@ dependencies {
     implementation 'io.ktor:ktor-client-core:2.3.0'
     implementation 'io.ktor:ktor-client-android:2.3.0'
     implementation 'io.ktor:ktor-client-logging:2.3.0'
+    implementation 'io.ktor:ktor-serialization-kotlinx-json:2.3.0'
+    implementation 'io.ktor:ktor-client-content-negotiation:2.3.0'
 
     implementation 'com.github.HaarigerHarald:android-youtubeExtractor:master-SNAPSHOT'
 
@@ -82,7 +85,7 @@ dependencies {
 
     implementation 'io.arrow-kt:arrow-fx-coroutines:1.1.6-alpha.28'
 
-    implementation 'org.jetbrains.kotlinx:kotlinx-serialization-json:1.5.0'
+    implementation 'org.jetbrains.kotlinx:kotlinx-serialization-json:1.5.1'
 
     implementation 'org.bitbucket.ijabz:jaudiotagger:v3.0.1'
 
@@ -91,6 +94,8 @@ dependencies {
     implementation 'com.arthenica:mobile-ffmpeg-full:4.4.LTS'
 
     implementation 'com.googlecode.mp4parser:isoparser:1.1.22'
+
+    implementation 'com.github.jeziellago:compose-markdown:0.3.3'
 
     implementation files('libs/jave-1.0.2.jar')
 }

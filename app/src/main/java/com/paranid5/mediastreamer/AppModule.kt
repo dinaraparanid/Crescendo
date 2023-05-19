@@ -2,7 +2,7 @@ package com.paranid5.mediastreamer
 
 import android.content.Context
 import android.os.Build
-import com.paranid5.mediastreamer.domain.KtorClient
+import com.paranid5.mediastreamer.domain.ktor_client.KtorClient
 import com.paranid5.mediastreamer.domain.StorageHandler
 import com.paranid5.mediastreamer.domain.stream_service.StreamServiceAccessor
 import com.paranid5.mediastreamer.domain.video_cash_service.VideoCashServiceAccessor

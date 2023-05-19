@@ -25,6 +25,7 @@ import androidx.compose.ui.unit.dp
 import com.paranid5.mediastreamer.R
 import com.paranid5.mediastreamer.presentation.Screens
 import com.paranid5.mediastreamer.presentation.StreamStates
+import com.paranid5.mediastreamer.presentation.UpdateCheckerDialog
 import com.paranid5.mediastreamer.presentation.appbar.AppBar
 import com.paranid5.mediastreamer.presentation.appbar.stream_button.StreamButton
 import com.paranid5.mediastreamer.presentation.ui.extensions.increaseDarkness
@@ -34,7 +35,10 @@ import kotlinx.coroutines.flow.StateFlow
 
 @OptIn(ExperimentalAnimationApi::class)
 @Composable
-fun App(curScreenState: MutableStateFlow<Screens>, streamScreenState: StateFlow<StreamStates>) {
+fun App(
+    curScreenState: MutableStateFlow<Screens>,
+    streamScreenState: StateFlow<StreamStates>,
+) {
     val config = LocalConfiguration.current
     val colors = LocalAppColors.current.value
     val curScreen by curScreenState.collectAsState()
@@ -59,6 +63,8 @@ fun App(curScreenState: MutableStateFlow<Screens>, streamScreenState: StateFlow<
 
     AnimatedContent(targetState = animBackgroundColor) { color ->
         Box(Modifier.fillMaxSize()) {
+            UpdateCheckerDialog(Modifier.align(Alignment.Center))
+
             Image(
                 painter = coilPainter,
                 modifier = Modifier.fillMaxSize().blur(radius = 15.dp),

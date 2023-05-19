@@ -49,4 +49,6 @@
     <string name="wav">Audio: WAV</string>
     <string name="aac">Audio: AAC</string>
     <string name="mp4">Video: MP4</string>
+    <string name="update_available">Update available</string>
+    <string name="download">Download</string>
 </resources>
