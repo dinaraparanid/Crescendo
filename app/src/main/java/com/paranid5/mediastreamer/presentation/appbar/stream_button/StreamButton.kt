@@ -24,7 +24,7 @@ import com.paranid5.mediastreamer.presentation.composition_locals.LocalNavContro
 import com.paranid5.mediastreamer.presentation.nextState
 import com.paranid5.mediastreamer.presentation.ui.extensions.openAppSettings
 import com.paranid5.mediastreamer.presentation.ui.permissions.PermissionDialog
-import com.paranid5.mediastreamer.presentation.ui.permissions.PostNotificationDescriptionProvider
+import com.paranid5.mediastreamer.presentation.ui.permissions.description_providers.PostNotificationDescriptionProvider
 import com.paranid5.mediastreamer.presentation.ui.theme.LocalAppColors
 import kotlinx.coroutines.flow.StateFlow
 import org.koin.compose.koinInject

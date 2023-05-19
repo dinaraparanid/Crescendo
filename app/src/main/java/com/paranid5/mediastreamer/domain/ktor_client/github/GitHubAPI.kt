@@ -14,9 +14,12 @@ private suspend inline fun HttpClient.getLatestRelease() =
         .body<List<Release>>()
         .first()
 
+private suspend inline fun HttpClient.getLatestReleaseCatching() =
+    kotlin.runCatching { getLatestRelease() }
+
 private suspend inline fun HttpClient.getLatestReleaseAsync() = coroutineScope {
-    async(Dispatchers.IO) { getLatestRelease() }
+    async(Dispatchers.IO) { getLatestReleaseCatching() }
 }
 
 internal suspend inline fun HttpClient.checkForUpdates() =
-    getLatestReleaseAsync().await().takeIf { it.tagName > CUR_VERSION }
+    getLatestReleaseAsync().await().getOrNull()?.takeIf { it.tagName > CUR_VERSION }

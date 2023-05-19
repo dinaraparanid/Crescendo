@@ -20,7 +20,10 @@ import org.koin.compose.koinInject
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun CashPropertiesDialog(isDialogShownState: MutableState<Boolean>, modifier: Modifier = Modifier) {
+internal fun CashPropertiesDialog(
+    isDialogShownState: MutableState<Boolean>,
+    modifier: Modifier = Modifier
+) {
     val colors = LocalAppColors.current.value
     val filenameState = remember { mutableStateOf("") }
     val isButtonClickable by remember { derivedStateOf { filenameState.value.isNotEmpty() } }

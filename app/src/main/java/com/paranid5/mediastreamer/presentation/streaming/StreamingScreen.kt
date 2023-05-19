@@ -1,46 +1,22 @@
 package com.paranid5.mediastreamer.presentation.streaming
 
 import android.content.res.Configuration
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.border
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.Slider
-import androidx.compose.material3.SliderDefaults
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.shadow
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalConfiguration
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.constraintlayout.compose.Dimension
-import androidx.palette.graphics.Palette
-import coil.compose.AsyncImagePainter
-import com.paranid5.mediastreamer.R
-import com.paranid5.mediastreamer.data.VideoMetadata
-import com.paranid5.mediastreamer.data.utils.extensions.timeString
 import com.paranid5.mediastreamer.domain.StorageHandler
 import com.paranid5.mediastreamer.presentation.Screens
-import com.paranid5.mediastreamer.presentation.ui.BroadcastReceiver
-import com.paranid5.mediastreamer.presentation.ui.extensions.getLightVibrantOrPrimary
 import com.paranid5.mediastreamer.presentation.ui.rememberVideoCoverPainterWithPalette
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.update
@@ -87,6 +63,7 @@ private fun StreamingScreenPortrait(
     ConstraintLayout(modifier.fillMaxSize()) {
         val (
             cover,
+            audioWave,
             slider,
             titleAndPropertiesButton,
             playbackButtons,
@@ -100,7 +77,7 @@ private fun StreamingScreenPortrait(
                     top.linkTo(parent.top, margin = 20.dp)
                     start.linkTo(parent.start, margin = 20.dp)
                     end.linkTo(parent.end, margin = 20.dp)
-                    bottom.linkTo(slider.top, margin = 10.dp)
+                    bottom.linkTo(audioWave.top, margin = 10.dp)
                     height = Dimension.fillToConstraints
                     width = Dimension.fillToConstraints
                 },
@@ -108,11 +85,24 @@ private fun StreamingScreenPortrait(
             palette = palette
         )
 
+        AudioWaveform(
+            palette = palette,
+            modifier = Modifier
+                .padding(horizontal = 20.dp)
+                .height(40.dp)
+                .fillMaxWidth()
+                .constrainAs(audioWave) {
+                    centerVerticallyTo(parent)
+                    start.linkTo(parent.start, margin = 20.dp)
+                    end.linkTo(parent.end, margin = 20.dp)
+                }
+        )
+
         PlaybackSlider(
             metadata = metadata,
             palette = palette,
             modifier = Modifier.constrainAs(slider) {
-                centerVerticallyTo(parent)
+                top.linkTo(audioWave.bottom, margin = 10.dp)
                 start.linkTo(parent.start, margin = 20.dp)
                 end.linkTo(parent.end, margin = 20.dp)
             }
@@ -172,11 +162,26 @@ private fun StreamingScreenLandscape(
     ConstraintLayout(modifier.fillMaxSize()) {
         val (
             cover,
+            audioWave,
             propertiesButton,
             slider,
             playbackButtons,
             utilsButtons
         ) = createRefs()
+
+        AudioWaveform(
+            palette = palette,
+            modifier = Modifier
+                .fillMaxWidth()
+                .constrainAs(audioWave) {
+                    top.linkTo(parent.top, margin = 8.dp)
+                    bottom.linkTo(slider.top, margin = 2.dp)
+                    height = Dimension.fillToConstraints
+
+                    start.linkTo(parent.start, margin = 20.dp)
+                    end.linkTo(parent.end, margin = 20.dp)
+                }
+        )
 
         VideoCover(
             modifier = Modifier.constrainAs(cover) {
@@ -241,78 +246,3 @@ private fun StreamingScreenLandscape(
         )
     }
 }
-
-@Composable
-private fun VideoCover(
-    coilPainter: AsyncImagePainter,
-    palette: Palette?,
-    modifier: Modifier = Modifier
-) {
-    val lightVibrantColor = palette.getLightVibrantOrPrimary()
-
-    Image(
-        painter = coilPainter,
-        modifier = modifier
-            .aspectRatio(1F)
-            .fillMaxSize()
-            .shadow(
-                elevation = 80.dp,
-                shape = RoundedCornerShape(5.dp),
-                ambientColor = lightVibrantColor,
-                spotColor = lightVibrantColor
-            )
-            .border(
-                width = 50.dp,
-                color = Color.Transparent,
-                shape = RoundedCornerShape(50.dp)
-            ),
-        contentDescription = stringResource(R.string.video_cover),
-        contentScale = ContentScale.Crop,
-        alignment = Alignment.Center,
-    )
-}
-
-@Composable
-private fun PlaybackSlider(
-    metadata: VideoMetadata?,
-    palette: Palette?,
-    modifier: Modifier = Modifier,
-    streamingUIHandler: StreamingUIHandler = koinInject(),
-    storageHandler: StorageHandler = koinInject(),
-    content: @Composable RowScope.(curPosition: Long, videoLength: Long, color: Color) -> Unit
-) {
-    val lightVibrantColor = palette.getLightVibrantOrPrimary()
-    val videoLength = metadata?.lenInMillis ?: 0
-    var curPosition by remember { mutableStateOf(0L) }
-
-    LaunchedEffect(key1 = true) {
-        curPosition = storageHandler.playbackPositionState.value
-    }
-
-    BroadcastReceiver(action = Broadcast_CUR_POSITION_CHANGED) { _, intent ->
-        curPosition = intent!!.getLongExtra(CUR_POSITION_ARG, 0)
-    }
-
-    Column(modifier.padding(horizontal = 10.dp)) {
-        Slider(
-            value = curPosition.toFloat(),
-            valueRange = 0F..videoLength.toFloat(),
-            colors = SliderDefaults.colors(
-                thumbColor = lightVibrantColor,
-                activeTrackColor = lightVibrantColor
-            ),
-            onValueChange = { curPosition = it.toLong() },
-            onValueChangeFinished = {
-                streamingUIHandler.sendSeekToBroadcast(curPosition)
-            }
-        )
-
-        Row(Modifier.fillMaxWidth()) {
-            content(curPosition, videoLength, lightVibrantColor)
-        }
-    }
-}
-
-@Composable
-private fun TimeText(time: Long, color: Color, modifier: Modifier = Modifier) =
-    Text(text = time.timeString, color = color, modifier = modifier)

@@ -1,0 +1,65 @@
+package com.paranid5.mediastreamer.presentation.streaming
+
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.RowScope
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.Slider
+import androidx.compose.material3.SliderDefaults
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.unit.dp
+import androidx.palette.graphics.Palette
+import com.paranid5.mediastreamer.data.VideoMetadata
+import com.paranid5.mediastreamer.domain.StorageHandler
+import com.paranid5.mediastreamer.presentation.ui.BroadcastReceiver
+import com.paranid5.mediastreamer.presentation.ui.extensions.getLightVibrantOrPrimary
+import org.koin.compose.koinInject
+
+@Composable
+internal fun PlaybackSlider(
+    metadata: VideoMetadata?,
+    palette: Palette?,
+    modifier: Modifier = Modifier,
+    streamingUIHandler: StreamingUIHandler = koinInject(),
+    storageHandler: StorageHandler = koinInject(),
+    content: @Composable RowScope.(curPosition: Long, videoLength: Long, color: Color) -> Unit
+) {
+    val lightVibrantColor = palette.getLightVibrantOrPrimary()
+    val videoLength = metadata?.lenInMillis ?: 0
+    var curPosition by remember { mutableStateOf(0L) }
+
+    LaunchedEffect(key1 = true) {
+        curPosition = storageHandler.playbackPositionState.value
+    }
+
+    BroadcastReceiver(action = Broadcast_CUR_POSITION_CHANGED) { _, intent ->
+        curPosition = intent!!.getLongExtra(CUR_POSITION_ARG, 0)
+    }
+
+    Column(modifier.padding(horizontal = 10.dp)) {
+        Slider(
+            value = curPosition.toFloat(),
+            valueRange = 0F..videoLength.toFloat(),
+            colors = SliderDefaults.colors(
+                thumbColor = lightVibrantColor,
+                activeTrackColor = lightVibrantColor
+            ),
+            onValueChange = { curPosition = it.toLong() },
+            onValueChangeFinished = {
+                streamingUIHandler.sendSeekToBroadcast(curPosition)
+            }
+        )
+
+        Row(Modifier.fillMaxWidth()) {
+            content(curPosition, videoLength, lightVibrantColor)
+        }
+    }
+}

@@ -35,6 +35,7 @@ import arrow.core.Either
 import at.huber.youtubeExtractor.VideoMeta
 import at.huber.youtubeExtractor.YouTubeExtractor
 import at.huber.youtubeExtractor.YtFile
+import com.paranid5.mediastreamer.AUDIO_SESSION_ID
 import com.paranid5.mediastreamer.IS_PLAYING_STATE
 import com.paranid5.mediastreamer.R
 import com.paranid5.mediastreamer.data.VideoMetadata
@@ -84,7 +85,6 @@ class StreamService : LifecycleService(), KoinComponent {
         const val URL_ARG = "url"
         const val POSITION_ARG = "position"
 
-        private const val ADJUST_PERIOD_TIME_OFFSETS = true
         private val TAG = StreamService::class.simpleName!!
 
         internal inline val Intent.mUrlArgOrNull
@@ -193,6 +193,8 @@ class StreamService : LifecycleService(), KoinComponent {
     private lateinit var mediaSession: MediaSession
     private lateinit var transportControls: MediaController.TransportControls
 
+    private val audioSessionIdState by inject<MutableStateFlow<Int>>(named(AUDIO_SESSION_ID))
+
     internal val mPlayer by lazy {
         ExoPlayer.Builder(applicationContext)
             .setAudioAttributes(
@@ -205,7 +207,10 @@ class StreamService : LifecycleService(), KoinComponent {
             .setHandleAudioBecomingNoisy(true)
             .setWakeMode(WAKE_MODE_NETWORK)
             .build()
-            .apply { addListener(playerStateChangedListener) }
+            .apply {
+                addListener(playerStateChangedListener)
+                audioSessionIdState.update { audioSessionId }
+            }
     }
 
     internal inline val mIsPlaying

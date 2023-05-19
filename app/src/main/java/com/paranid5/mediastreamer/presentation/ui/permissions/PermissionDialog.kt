@@ -14,6 +14,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.paranid5.mediastreamer.R
+import com.paranid5.mediastreamer.presentation.ui.permissions.description_providers.PermissionDescriptionProvider
 import com.paranid5.mediastreamer.presentation.ui.theme.LocalAppColors
 
 @OptIn(ExperimentalMaterial3Api::class)

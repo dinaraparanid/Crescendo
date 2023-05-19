@@ -30,6 +30,7 @@ import com.paranid5.mediastreamer.R
 import com.paranid5.mediastreamer.domain.ktor_client.github.Release
 import com.paranid5.mediastreamer.domain.ktor_client.github.checkForUpdates
 import com.paranid5.mediastreamer.presentation.composition_locals.LocalActivity
+import com.paranid5.mediastreamer.presentation.ui.extensions.simpleShadow
 import com.paranid5.mediastreamer.presentation.ui.theme.LocalAppColors
 import dev.jeziellago.compose.markdowntext.MarkdownText
 import io.ktor.client.HttpClient
@@ -66,13 +67,14 @@ fun UpdateCheckerDialog(modifier: Modifier = Modifier, ktorClient: HttpClient = 
                 MarkdownText(
                     markdown = "# ${stringResource(R.string.update_available)}: ${newVersion!!.name}",
                     color = colors.primary,
-                    fontSize = 12.sp,
-                    maxLines = 1
+                    fontSize = 8.sp,
+                    maxLines = 1,
+                    modifier = Modifier.simpleShadow(elevation = 20.dp)
                 )
 
                 Spacer(Modifier.height(20.dp))
 
-                MarkdownText(markdown = newVersion!!.body, fontSize = 14.sp)
+                MarkdownText(markdown = newVersion!!.body, color = colors.primary, fontSize = 11.sp)
                 Spacer(Modifier.height(12.dp))
 
                 Button(

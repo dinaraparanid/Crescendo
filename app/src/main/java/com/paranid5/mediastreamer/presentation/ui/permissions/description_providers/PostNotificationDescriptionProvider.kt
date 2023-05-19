@@ -1,4 +1,4 @@
-package com.paranid5.mediastreamer.presentation.ui.permissions
+package com.paranid5.mediastreamer.presentation.ui.permissions.description_providers
 
 import android.os.Build
 import androidx.annotation.RequiresApi

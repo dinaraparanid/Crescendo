@@ -8,7 +8,7 @@ import java.util.Queue
 inline val externalStoragePermissionQueue: Queue<String>
     get() = java.util.ArrayDeque(
         when {
-            Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU -> mutableListOf(
+            Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU -> listOf(
                 Manifest.permission.READ_MEDIA_VIDEO,
                 Manifest.permission.READ_MEDIA_AUDIO,
                 Manifest.permission.READ_MEDIA_IMAGES
@@ -21,6 +21,14 @@ inline val externalStoragePermissionQueue: Queue<String>
         }
     )
 
-inline val postNotificationsQueue: Queue<String>
+inline val postNotificationsPermissionQueue: Queue<String>
     @RequiresApi(Build.VERSION_CODES.TIRAMISU)
-    get() = java.util.ArrayDeque(mutableListOf(Manifest.permission.POST_NOTIFICATIONS))
+    get() = java.util.ArrayDeque(listOf(Manifest.permission.POST_NOTIFICATIONS))
+
+inline val audioRecordingPermissionQueue: Queue<String>
+    get() = java.util.ArrayDeque(
+        listOf(
+            Manifest.permission.RECORD_AUDIO,
+            Manifest.permission.MODIFY_AUDIO_SETTINGS
+        )
+    )

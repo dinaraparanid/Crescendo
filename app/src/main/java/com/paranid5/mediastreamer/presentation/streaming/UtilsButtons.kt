@@ -25,7 +25,7 @@ import com.paranid5.mediastreamer.presentation.composition_locals.LocalActivity
 import com.paranid5.mediastreamer.presentation.ui.extensions.getLightVibrantOrPrimary
 import com.paranid5.mediastreamer.presentation.ui.extensions.openAppSettings
 import com.paranid5.mediastreamer.presentation.ui.extensions.simpleShadow
-import com.paranid5.mediastreamer.presentation.ui.permissions.ExternalStorageDescriptionProvider
+import com.paranid5.mediastreamer.presentation.ui.permissions.description_providers.ExternalStorageDescriptionProvider
 import com.paranid5.mediastreamer.presentation.ui.permissions.PermissionDialog
 import com.paranid5.mediastreamer.presentation.ui.BroadcastReceiver
 import org.koin.compose.koinInject
@@ -33,7 +33,7 @@ import org.koin.core.qualifier.named
 import java.util.*
 
 @Composable
-fun UtilsButtons(palette: Palette?, modifier: Modifier = Modifier) =
+internal fun UtilsButtons(palette: Palette?, modifier: Modifier = Modifier) =
     Row(modifier.fillMaxWidth()) {
         EqualizerButton(modifier = Modifier.weight(1F), palette = palette)
         RepeatButton(modifier = Modifier.weight(1F), palette = palette)
@@ -129,7 +129,7 @@ private fun DownloadButton(palette: Palette?, modifier: Modifier = Modifier) {
         )
     }
 
-    val filesPermissionsResultLauncher = rememberLauncherForActivityResult(
+    val storagePermissionsResultLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.RequestMultiplePermissions()
     ) { permissionsToGranted ->
         permissionsToGranted
@@ -154,7 +154,8 @@ private fun DownloadButton(palette: Palette?, modifier: Modifier = Modifier) {
         IconButton(
             modifier = modifier.simpleShadow(color = lightVibrantColor),
             onClick = {
-                filesPermissionsResultLauncher.launch(externalStoragePermissionQueue.toTypedArray())
+                storagePermissionsResultLauncher
+                    .launch(externalStoragePermissionQueue.toTypedArray())
                 isCashPropertiesDialogShownState.value = true
             }
         ) {
@@ -179,7 +180,7 @@ private fun DownloadButton(palette: Palette?, modifier: Modifier = Modifier) {
                         else -> false
                     },
                     onGrantedClicked = {
-                        filesPermissionsResultLauncher.launch(arrayOf(permission))
+                        storagePermissionsResultLauncher.launch(arrayOf(permission))
                         notGrantedStoragePermissions.removeFirst()
                     },
                     onGoToAppSettingsClicked = activity::openAppSettings

@@ -17,7 +17,7 @@ import com.paranid5.mediastreamer.presentation.ui.extensions.simpleShadow
 import org.koin.compose.koinInject
 
 @Composable
-fun PlaybackButtons(
+internal fun PlaybackButtons(
     streamingPresenter: StreamingPresenter,
     palette: Palette?,
     modifier: Modifier = Modifier

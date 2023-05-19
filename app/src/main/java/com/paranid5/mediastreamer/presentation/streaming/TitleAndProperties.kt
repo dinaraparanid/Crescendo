@@ -20,7 +20,7 @@ import com.paranid5.mediastreamer.presentation.ui.extensions.getLightVibrantOrPr
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-fun TitleAndAuthor(
+internal fun TitleAndAuthor(
     metadata: VideoMetadata?,
     palette: Palette?,
     modifier: Modifier = Modifier,
@@ -50,7 +50,7 @@ fun TitleAndAuthor(
 }
 
 @Composable
-fun PropertiesButton(palette: Palette?, modifier: Modifier = Modifier) {
+internal fun PropertiesButton(palette: Palette?, modifier: Modifier = Modifier) {
     val lightVibrantColor = palette.getLightVibrantOrPrimary()
 
     IconButton(modifier = modifier, onClick = { /*TODO*/ }) {
@@ -64,7 +64,7 @@ fun PropertiesButton(palette: Palette?, modifier: Modifier = Modifier) {
 }
 
 @Composable
-fun TitleAndPropertiesButton(
+internal fun TitleAndPropertiesButton(
     metadata: VideoMetadata?,
     palette: Palette?,
     modifier: Modifier = Modifier,

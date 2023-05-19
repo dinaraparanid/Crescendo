@@ -306,10 +306,9 @@ class VideoCashService : LifecycleService(), KoinComponent {
     private suspend inline fun initMediaFileOrNotifyError(
         desiredFilename: String,
         isAudio: Boolean
-    ) = initMediaFile(desiredFilename, isAudio).map { error ->
+    ) = initMediaFile(desiredFilename, isAudio).onLeft {
         cashingStatusState.update { DownloadingStatus.ERR }
         isVideoCashingCondVar.notify()
-        error
     }
 
     /**
