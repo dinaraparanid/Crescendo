@@ -1,13 +1,13 @@
 package com.paranid5.mediastreamer.data.utils.extensions
 
 import android.graphics.Bitmap
+import android.support.v4.media.MediaMetadataCompat
 import com.paranid5.mediastreamer.data.VideoMetadata
-import android.media.MediaMetadata
 
-fun VideoMetadata.toAndroidMetadata(cover: Bitmap? = null): MediaMetadata =
-    MediaMetadata.Builder()
-        .putText(MediaMetadata.METADATA_KEY_TITLE, title)
-        .putText(MediaMetadata.METADATA_KEY_ARTIST, author)
-        .putLong(MediaMetadata.METADATA_KEY_DURATION, lenInMillis)
-        .putBitmap(MediaMetadata.METADATA_KEY_ART, cover)
+fun VideoMetadata.toAndroidMetadata(cover: Bitmap? = null): MediaMetadataCompat =
+    MediaMetadataCompat.Builder()
+        .putText(MediaMetadataCompat.METADATA_KEY_TITLE, title)
+        .putText(MediaMetadataCompat.METADATA_KEY_ARTIST, author)
+        .putLong(MediaMetadataCompat.METADATA_KEY_DURATION, lenInMillis)
+        .putBitmap(MediaMetadataCompat.METADATA_KEY_ART, cover)
         .build()

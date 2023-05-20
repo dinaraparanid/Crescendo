@@ -5,21 +5,19 @@ import android.app.*
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
-import android.graphics.drawable.Icon
-import android.media.session.MediaController
-import android.media.session.MediaSession
 import android.media.session.MediaSessionManager
-import android.media.session.PlaybackState
 import android.os.Binder
 import android.os.Build
 import android.os.Bundle
 import android.os.IBinder
 import android.os.SystemClock
+import android.support.v4.media.session.MediaControllerCompat
+import android.support.v4.media.session.MediaSessionCompat
+import android.support.v4.media.session.PlaybackStateCompat
 import android.util.Log
 import android.util.SparseArray
 import android.widget.Toast
 import androidx.annotation.OptIn
-import androidx.annotation.RequiresApi
 import androidx.core.app.NotificationCompat
 import androidx.core.graphics.drawable.IconCompat
 import androidx.lifecycle.Lifecycle
@@ -27,11 +25,12 @@ import androidx.lifecycle.LifecycleService
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.media3.common.*
 import androidx.media3.common.C.*
+import androidx.media3.common.util.NotificationUtil
 import androidx.media3.common.util.UnstableApi
 import androidx.media3.datasource.DefaultHttpDataSource
 import androidx.media3.exoplayer.ExoPlayer
 import androidx.media3.exoplayer.source.ProgressiveMediaSource
-import arrow.core.Either
+import androidx.media3.ui.PlayerNotificationManager
 import at.huber.youtubeExtractor.VideoMeta
 import at.huber.youtubeExtractor.YouTubeExtractor
 import at.huber.youtubeExtractor.YtFile
@@ -169,7 +168,7 @@ class StreamService : LifecycleService(), KoinComponent {
     // TODO: favourite database
     private val isCurrentVideoLikedState = MutableStateFlow(false)
 
-    internal inline val mIsCurrentVideoLiked
+    private inline val isCurrentVideoLiked
         get() = isCurrentVideoLikedState.value
 
     internal inline val mIsRepeating
@@ -178,20 +177,11 @@ class StreamService : LifecycleService(), KoinComponent {
     @Volatile
     private var isNotificationShown = false
 
-    private val notificationManager by lazy {
-        getSystemService(NOTIFICATION_SERVICE) as NotificationManager
-    }
-
-    private val notificationBuilder by lazy {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) Either.Right(notificationBuilderOreo)
-        else Either.Left(notificationBuilderCompat)
-    }
-
     // ----------------------- Media session management -----------------------
 
     private lateinit var mediaSessionManager: MediaSessionManager
-    private lateinit var mediaSession: MediaSession
-    private lateinit var transportControls: MediaController.TransportControls
+    private lateinit var mediaSession: MediaSessionCompat
+    private lateinit var transportControls: MediaControllerCompat.TransportControls
 
     private val audioSessionIdState by inject<MutableStateFlow<Int>>(named(AUDIO_SESSION_ID))
 
@@ -213,7 +203,118 @@ class StreamService : LifecycleService(), KoinComponent {
             }
     }
 
-    internal inline val mIsPlaying
+    internal val mPlayerNotificationManager by lazy {
+        PlayerNotificationManager.Builder(this, NOTIFICATION_ID, STREAM_CHANNEL_ID)
+            .setChannelImportance(NotificationUtil.IMPORTANCE_HIGH)
+            .setNotificationListener(notificationListener)
+            .setMediaDescriptionAdapter(mediaDescriptionProvider)
+            .setCustomActionReceiver(customActionsReceiver)
+            .setFastForwardActionIconResourceId(R.drawable.next_track)
+            .setRewindActionIconResourceId(R.drawable.prev_track)
+            .build()
+            .apply {
+                setUseFastForwardAction(false)
+                setUseChronometer(false)
+                setUseNextAction(false)
+                setUseStopAction(false)
+                setUsePreviousAction(false)
+                setUsePlayPauseActions(false)
+                setUseRewindAction(false)
+                setUseFastForwardActionInCompactView(false)
+                setUseNextActionInCompactView(false)
+                setUsePreviousActionInCompactView(false)
+                setUseRewindActionInCompactView(false)
+
+                setPriority(NotificationCompat.PRIORITY_DEFAULT)
+                setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
+                setMediaSessionToken(mediaSession.sessionToken)
+            }
+    }
+
+    private val notificationListener = object : PlayerNotificationManager.NotificationListener {
+        override fun onNotificationCancelled(notificationId: Int, dismissedByUser: Boolean) {
+            super.onNotificationCancelled(notificationId, dismissedByUser)
+            mRemoveNotification()
+            mPausePlayback()
+        }
+
+        override fun onNotificationPosted(
+            notificationId: Int,
+            notification: Notification,
+            ongoing: Boolean
+        ) {
+            super.onNotificationPosted(notificationId, notification, ongoing)
+            startForeground(notificationId, notification)
+        }
+    }
+
+    private val mediaDescriptionProvider =
+        object : PlayerNotificationManager.MediaDescriptionAdapter {
+            override fun getCurrentContentTitle(player: Player) =
+                currentMetadata.value?.title ?: resources.getString(R.string.stream_no_name)
+
+            override fun createCurrentContentIntent(player: Player) = PendingIntent.getActivity(
+                applicationContext,
+                0,
+                Intent(applicationContext, MainActivity::class.java),
+                PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+            )
+
+            override fun getCurrentContentText(player: Player) =
+                currentMetadata.value?.author ?: resources.getString(R.string.unknown_streamer)
+
+            override fun getCurrentLargeIcon(
+                player: Player,
+                callback: PlayerNotificationManager.BitmapCallback
+            ) = runBlocking { mGetVideoCoverAsync().await() }
+        }
+
+    private val customActionsReceiver: PlayerNotificationManager.CustomActionReceiver =
+        object : PlayerNotificationManager.CustomActionReceiver {
+            override fun createCustomActions(
+                context: Context,
+                instanceId: Int
+            ) = newCustomActionsCompat
+
+            override fun getCustomActions(player: Player) =
+                newCustomActionsCompat.keys.toMutableList()
+
+            override fun onCustomAction(player: Player, action: String, intent: Intent) =
+                sendBroadcast(
+                    Intent(
+                        when (action) {
+                            ACTION_CHANGE_REPEAT -> Broadcast_CHANGE_REPEAT
+                            ACTION_10_SECS_BACK -> Broadcast_10_SECS_BACK
+                            ACTION_PAUSE -> Broadcast_PAUSE
+                            ACTION_RESUME -> Broadcast_RESUME
+                            ACTION_10_SECS_FORWARD -> Broadcast_10_SECS_FORWARD
+                            ACTION_ADD_TO_FAVOURITE -> Broadcast_ADD_TO_FAVOURITE
+                            ACTION_REMOVE_FROM_FAVOURITE -> Broadcast_REMOVE_FROM_FAVOURITE
+                            else -> throw IllegalArgumentException("Unknown action")
+                        }
+                    )
+                )
+        }
+
+    internal val newCustomActionsCompat
+        get() = mutableMapOf(ACTION_CHANGE_REPEAT to repeatActionCompat).apply {
+            tenSecsBackActionIfSeekableCompat?.let { put(ACTION_10_SECS_BACK, it) }
+
+            getPlayPauseActionCompat(isPlaying).let {
+                if (isPlaying) put(ACTION_PAUSE, it) else put(ACTION_RESUME, it)
+            }
+
+            tenSecsForwardActionIfSeekableCompat?.let { put(ACTION_10_SECS_FORWARD, it) }
+
+            getLikeActionCompat(isCurrentVideoLiked).let {
+                when {
+                    isCurrentVideoLiked -> put(ACTION_ADD_TO_FAVOURITE, it)
+                    else -> put(ACTION_REMOVE_FROM_FAVOURITE, it)
+                }
+            }
+        }
+
+    private inline val isPlaying
         get() = mPlayer.isPlaying
 
     private val playerStateChangedListener: Player.Listener = object : Player.Listener {
@@ -242,23 +343,6 @@ class StreamService : LifecycleService(), KoinComponent {
                 isPlaying -> mStartPlaybackMonitoring()
                 else -> mStopPlaybackMonitoring()
             }
-
-            scope.launch {
-                mUpdateOrShowNotification(
-                    isPlaying = isPlaying,
-                    isLiked = isCurrentVideoLikedState.value
-                )
-            }
-        }
-
-        override fun onMediaMetadataChanged(mediaMetadata: MediaMetadata) {
-            super.onMediaMetadataChanged(mediaMetadata)
-            scope.launch {
-                mUpdateOrShowNotification(
-                    isPlaying = mIsPlaying,
-                    isLiked = isCurrentVideoLikedState.value
-                )
-            }
         }
 
         override fun onPlayerError(error: PlaybackException) {
@@ -271,13 +355,6 @@ class StreamService : LifecycleService(), KoinComponent {
                 "${resources.getString(R.string.error)}: ${error.message ?: resources.getString(R.string.unknown_error)}",
                 Toast.LENGTH_LONG
             ).show()
-
-            scope.launch {
-                mUpdateOrShowNotification(
-                    isPlaying = false,
-                    isLiked = isCurrentVideoLikedState.value
-                )
-            }
         }
     }
 
@@ -337,6 +414,12 @@ class StreamService : LifecycleService(), KoinComponent {
     private val addToFavouriteReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context?, intent: Intent?) {
             Log.d(TAG, "TODO: add to favourite")
+
+            scope.launch {
+                mUpdateMediaSession()
+                mPlayerNotificationManager.invalidate()
+            }
+
             // TODO: add to favourite
         }
     }
@@ -344,6 +427,12 @@ class StreamService : LifecycleService(), KoinComponent {
     private val removeFromFavouriteReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context?, intent: Intent?) {
             Log.d(TAG, "TODO: remove from favourite")
+
+            scope.launch {
+                mUpdateMediaSession()
+                mPlayerNotificationManager.invalidate()
+            }
+
             // TODO: remove from favourite
         }
     }
@@ -352,7 +441,8 @@ class StreamService : LifecycleService(), KoinComponent {
         override fun onReceive(context: Context?, intent: Intent?) {
             scope.launch {
                 mStoreAndSendIsRepeating(!mIsRepeating)
-                mUpdateNotification(isPlaying = mIsPlaying, isLiked = mIsCurrentVideoLiked)
+                mUpdateMediaSession()
+                mPlayerNotificationManager.invalidate()
                 Log.d(TAG, "Repeating changed: $mIsRepeating")
             }
         }
@@ -388,25 +478,10 @@ class StreamService : LifecycleService(), KoinComponent {
         return binder
     }
 
-    private suspend fun startNotificationObserving(): Unit =
-        lifecycle.repeatOnLifecycle(state = Lifecycle.State.STARTED) {
-            currentMetadata.collectLatest {
-                Log.d(TAG, "Metadata update, show new notification")
-                mUpdateOrShowNotification(
-                    isPlaying = mIsPlaying,
-                    isLiked = isCurrentVideoLikedState.value
-                )
-            }
-        }
-
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         super.onStartCommand(intent, flags, startId)
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
-            createChannel()
-
         initMediaSession()
-        scope.launch { startNotificationObserving() }
 
         intent?.mUrlArgOrNull?.let { url ->
             // New stream
@@ -415,7 +490,6 @@ class StreamService : LifecycleService(), KoinComponent {
             mPlayNewStream(url)
         } ?: scope.launch {
             // Continue with previous stream
-
             mPlayNewStream(
                 url = storageHandler.currentUrlState.value,
                 initialPosition = storageHandler.playbackPositionState.value
@@ -445,20 +519,6 @@ class StreamService : LifecycleService(), KoinComponent {
         unregisterReceivers()
         job.cancel()
     }
-
-    @RequiresApi(Build.VERSION_CODES.O)
-    private fun createChannel() = notificationManager.createNotificationChannel(
-        NotificationChannel(
-            STREAM_CHANNEL_ID,
-            "Stream",
-            NotificationManager.IMPORTANCE_HIGH
-        ).apply {
-            lockscreenVisibility = Notification.VISIBILITY_PUBLIC
-            setSound(null, null)
-            enableVibration(false)
-            enableLights(false)
-        }
-    )
 
     internal fun mSendPlaybackPosition(curPosition: Long = mCurrentPlaybackPosition) =
         sendBroadcast(
@@ -578,6 +638,7 @@ class StreamService : LifecycleService(), KoinComponent {
         mPlayer.seekTo(minOf(mCurrentPlaybackPosition + TEN_SECS_AS_MILLIS, videoLength.value))
 
     private fun releaseMedia() {
+        mPlayerNotificationManager.setPlayer(null)
         mPlayer.stop()
         mPlayer.release()
         mediaSession.release()
@@ -585,7 +646,7 @@ class StreamService : LifecycleService(), KoinComponent {
     }
 
     private inline val newMediaSessionCallback
-        get() = object : MediaSession.Callback() {
+        get() = object : MediaSessionCompat.Callback() {
             override fun onPlay() {
                 super.onPlay()
                 mResumePlayback()
@@ -624,6 +685,7 @@ class StreamService : LifecycleService(), KoinComponent {
                             ACTION_10_SECS_FORWARD -> Broadcast_10_SECS_FORWARD
                             ACTION_ADD_TO_FAVOURITE -> Broadcast_ADD_TO_FAVOURITE
                             ACTION_REMOVE_FROM_FAVOURITE -> Broadcast_REMOVE_FROM_FAVOURITE
+                            ACTION_DISMISS -> Broadcast_DISMISS_NOTIFICATION
                             else -> throw IllegalArgumentException("Unknown action")
                         }
                     )
@@ -632,39 +694,62 @@ class StreamService : LifecycleService(), KoinComponent {
         }
 
     private inline val newPlaybackState
-        get() = PlaybackState.Builder()
+        get() = PlaybackStateCompat.Builder()
             .setActions(
-                PlaybackState.ACTION_SKIP_TO_PREVIOUS
-                        or PlaybackState.ACTION_PLAY
-                        or PlaybackState.ACTION_PAUSE
-                        or PlaybackState.ACTION_PLAY_PAUSE
-                        or PlaybackState.ACTION_SKIP_TO_NEXT
-                        or PlaybackState.ACTION_SEEK_TO
+                PlaybackStateCompat.ACTION_SKIP_TO_PREVIOUS
+                        or PlaybackStateCompat.ACTION_PLAY
+                        or PlaybackStateCompat.ACTION_PAUSE
+                        or PlaybackStateCompat.ACTION_PLAY_PAUSE
+                        or PlaybackStateCompat.ACTION_SKIP_TO_NEXT
+                        or PlaybackStateCompat.ACTION_SEEK_TO
             )
+            .setCustomActions()
             .setState(
-                if (mIsPlaying) PlaybackState.STATE_PLAYING else PlaybackState.STATE_PAUSED,
+                if (isPlaying) PlaybackStateCompat.STATE_PLAYING else PlaybackStateCompat.STATE_PAUSED,
                 mCurrentPlaybackPosition,
                 1.0F,
                 SystemClock.elapsedRealtime()
             )
             .build()
 
+    private fun PlaybackStateCompat.Builder.setCustomActions() =
+        this
+            .addCustomAction(
+                PlaybackStateCompat.CustomAction.Builder(
+                    ACTION_CHANGE_REPEAT,
+                    resources.getString(R.string.change_repeat),
+                    when {
+                        mIsRepeating -> R.drawable.no_repeat
+                        else -> R.drawable.repeat
+                    }
+                ).build()
+            )
+            .addCustomAction(
+                PlaybackStateCompat.CustomAction.Builder(
+                    ACTION_DISMISS,
+                    resources.getString(R.string.cancel),
+                    R.drawable.dismiss
+                ).build()
+            )
+
     private fun initMediaSession() {
         mediaSessionManager = getSystemService(MEDIA_SESSION_SERVICE)!! as MediaSessionManager
-        mediaSession = MediaSession(applicationContext, "StreamService")
+        mediaSession = MediaSessionCompat(applicationContext, TAG)
         transportControls = mediaSession.controller.transportControls
 
         mediaSession.run {
             isActive = true
 
             if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) setFlags(
-                MediaSession.FLAG_HANDLES_TRANSPORT_CONTROLS
-                        or MediaSession.FLAG_HANDLES_MEDIA_BUTTONS
+                MediaSessionCompat.FLAG_HANDLES_TRANSPORT_CONTROLS
+                        or MediaSessionCompat.FLAG_HANDLES_MEDIA_BUTTONS
             )
 
             setCallback(newMediaSessionCallback)
             setPlaybackState(newPlaybackState)
         }
+
+        mPlayerNotificationManager.setPlayer(mPlayer)
     }
 
     internal suspend fun mUpdateMediaSession(
@@ -684,165 +769,8 @@ class StreamService : LifecycleService(), KoinComponent {
             ?.let { glideUtils.getVideoCoverBitmapAsync(it) }
             ?: coroutineScope { async(Dispatchers.IO) { glideUtils.thumbnailBitmap } }
 
-    // --------------------------- Notification for Oreo+ ---------------------------
+    // --------------------------- Notification Actions ---------------------------
 
-    @kotlin.OptIn(ExperimentalCoroutinesApi::class)
-    @RequiresApi(Build.VERSION_CODES.O)
-    private val notificationBuilderOreo = currentMetadata.mapLatest {
-        Notification
-            .Builder(applicationContext, STREAM_CHANNEL_ID)
-            .setContent(currentMetadata = it)
-    }
-
-    @RequiresApi(Build.VERSION_CODES.O)
-    private fun Notification.Builder.setContent(currentMetadata: VideoMetadata?) = this
-        .setShowWhen(false)
-        .setSmallIcon(R.drawable.stream_icon)
-        .setAutoCancel(false)
-        .setOngoing(true)
-        .setContentTitle(
-            currentMetadata?.title
-                ?: resources.getString(R.string.stream_no_name)
-        )
-        .setContentText(
-            currentMetadata?.author
-                ?: resources.getString(R.string.unknown_streamer)
-        )
-        .setStyle(
-            Notification.MediaStyle()
-                .setMediaSession(mediaSession.sessionToken)
-                .setShowActionsInCompactView(1, 2, 3)
-        )
-        .setContentIntent(
-            PendingIntent.getActivity(
-                applicationContext,
-                0,
-                Intent(applicationContext, MainActivity::class.java),
-                PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
-            )
-        )
-
-    @RequiresApi(Build.VERSION_CODES.N)
-    private fun Notification.Builder.setActions(isPlaying: Boolean, isLiked: Boolean) = this
-        .setActions(
-            *arrayOf(
-                repeatActionOreo,
-                tenSecsBackActionIfSeekableOreo,
-                getPlayPauseActionOreo(isPlaying),
-                tenSecsForwardActionIfSeekableOreo,
-                getLikeActionOreo(isLiked)
-            ).filterNotNull().toTypedArray()
-        )
-
-    private inline val repeatActionOreo
-        @RequiresApi(Build.VERSION_CODES.M)
-        get() = Notification.Action.Builder(
-            Icon.createWithResource(
-                "",
-                when {
-                    mIsRepeating -> R.drawable.repeat
-                    else -> R.drawable.no_repeat
-                }
-            ),
-            resources.getString(R.string.change_repeat),
-            Actions.ChangeRepeat.playbackIntent
-        ).build()
-
-    private inline val tenSecsBackActionIfSeekableOreo
-        @RequiresApi(Build.VERSION_CODES.M)
-        get() = when {
-            mPlayer.isCurrentMediaItemSeekable -> Notification.Action.Builder(
-                Icon.createWithResource("", R.drawable.prev_track),
-                resources.getString(R.string.ten_secs_back),
-                Actions.TenSecsBack.playbackIntent
-            ).build()
-
-            else -> null
-        }
-
-    @RequiresApi(Build.VERSION_CODES.M)
-    private fun getPlayPauseActionOreo(isPlaying: Boolean) = when {
-        isPlaying -> Notification.Action.Builder(
-            Icon.createWithResource("", R.drawable.pause),
-            resources.getString(R.string.pause),
-            Actions.Pause.playbackIntent
-        )
-
-        else -> Notification.Action.Builder(
-            Icon.createWithResource("", R.drawable.play),
-            resources.getString(R.string.play),
-            Actions.Resume.playbackIntent
-        )
-    }.build()
-
-    private inline val tenSecsForwardActionIfSeekableOreo
-        @RequiresApi(Build.VERSION_CODES.M)
-        get() = when {
-            mPlayer.isCurrentMediaItemSeekable -> Notification.Action.Builder(
-                Icon.createWithResource("", R.drawable.next_track),
-                resources.getString(R.string.ten_secs_forward),
-                Actions.TenSecsForward.playbackIntent
-            ).build()
-
-            else -> null
-        }
-
-    @RequiresApi(Build.VERSION_CODES.M)
-    private fun getLikeActionOreo(isLiked: Boolean) = when {
-        isLiked -> Notification.Action.Builder(
-            Icon.createWithResource("", R.drawable.like_filled),
-            resources.getString(R.string.remove_from_favourite),
-            Actions.RemoveFromFavourite.playbackIntent
-        )
-
-        else -> Notification.Action.Builder(
-            Icon.createWithResource("", R.drawable.like),
-            resources.getString(R.string.add_to_favourite),
-            Actions.AddToFavourite.playbackIntent
-        )
-    }.build()
-
-    // --------------------------- Notification Compat ---------------------------
-
-    @kotlin.OptIn(ExperimentalCoroutinesApi::class)
-    private val notificationBuilderCompat = currentMetadata.mapLatest {
-        NotificationCompat
-            .Builder(applicationContext, STREAM_CHANNEL_ID)
-            .setContent(currentMetadata = it)
-    }
-
-    private fun NotificationCompat.Builder.setContent(currentMetadata: VideoMetadata?) = this
-        .setShowWhen(false)
-        .setSmallIcon(R.drawable.stream_icon)
-        .setAutoCancel(false)
-        .setOngoing(true)
-        .setContentTitle(
-            currentMetadata?.title
-                ?: resources.getString(R.string.stream_no_name)
-        )
-        .setContentText(
-            currentMetadata?.author
-                ?: resources.getString(R.string.unknown_streamer)
-        )
-        .setContentIntent(
-            PendingIntent.getActivity(
-                applicationContext,
-                0,
-                Intent(applicationContext, MainActivity::class.java),
-                if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M)
-                    PendingIntent.FLAG_UPDATE_CURRENT
-                else
-                    PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
-            )
-        )
-
-    private fun NotificationCompat.Builder.setActions(isPlaying: Boolean, isLiked: Boolean) = this
-        .clearActions()
-        .also { tenSecsBackActionIfSeekableCompat?.let(it::addAction) }
-        .addAction(getPlayPauseActionCompat(isPlaying))
-        .also { tenSecsForwardActionIfSeekableCompat?.let(it::addAction) }
-
-    @Deprecated("No place for this action")
     private inline val repeatActionCompat
         get() = NotificationCompat.Action.Builder(
             IconCompat.createWithResource(
@@ -856,7 +784,7 @@ class StreamService : LifecycleService(), KoinComponent {
             Actions.ChangeRepeat.playbackIntent
         ).build()
 
-    private inline val tenSecsBackActionIfSeekableCompat
+    private inline val tenSecsBackActionIfSeekableCompat: NotificationCompat.Action?
         get() = when {
             mPlayer.isCurrentMediaItemSeekable -> NotificationCompat.Action.Builder(
                 IconCompat.createWithResource(this, R.drawable.prev_track),
@@ -892,7 +820,6 @@ class StreamService : LifecycleService(), KoinComponent {
             else -> null
         }
 
-    @Deprecated("No place for this action")
     private fun getLikeActionCompat(isLiked: Boolean) = when {
         isLiked -> NotificationCompat.Action.Builder(
             IconCompat.createWithResource(this, R.drawable.like_filled),
@@ -908,73 +835,6 @@ class StreamService : LifecycleService(), KoinComponent {
     }.build()
 
     // --------------------------- Handle Notification ---------------------------
-
-    @SuppressLint("NewApi")
-    private suspend inline fun showNotification(
-        isPlaying: Boolean,
-        isLiked: Boolean
-    ): Either<Unit, Unit> {
-        isNotificationShown = true
-
-        return notificationBuilder.map { oreoBuilder ->
-            lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
-                oreoBuilder.collectLatest { builder ->
-                    startForeground(
-                        NOTIFICATION_ID,
-                        builder
-                            .setActions(isPlaying, isLiked)
-                            .build()
-                    )
-                }
-            }
-        }.mapLeft { compatBuilder ->
-            lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
-                compatBuilder.collectLatest { builder ->
-                    startForeground(
-                        NOTIFICATION_ID,
-                        builder
-                            .setLargeIcon(mGetVideoCoverAsync().await())
-                            .setActions(isPlaying, isLiked)
-                            .build(),
-                    )
-                }
-            }
-        }
-    }
-
-    @SuppressLint("NewApi")
-    internal suspend inline fun mUpdateNotification(isPlaying: Boolean, isLiked: Boolean) =
-        notificationBuilder.map { oreoBuilder ->
-            lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
-                oreoBuilder.collectLatest { builder ->
-                    notificationManager.notify(
-                        NOTIFICATION_ID,
-                        builder
-                            .setLargeIcon(mGetVideoCoverAsync().await())
-                            .setActions(isPlaying, isLiked)
-                            .build()
-                    )
-                }
-            }
-        }.mapLeft { compatBuilder ->
-            lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
-                compatBuilder.collectLatest { builder ->
-                    notificationManager.notify(
-                        NOTIFICATION_ID,
-                        builder
-                            .setLargeIcon(mGetVideoCoverAsync().await())
-                            .setActions(isPlaying, isLiked)
-                            .build()
-                    )
-                }
-            }
-        }
-
-    internal suspend inline fun mUpdateOrShowNotification(isPlaying: Boolean, isLiked: Boolean) =
-        when {
-            isNotificationShown -> mUpdateNotification(isPlaying, isLiked)
-            else -> showNotification(isPlaying, isLiked)
-        }
 
     internal fun mRemoveNotification() {
         isNotificationShown = false
