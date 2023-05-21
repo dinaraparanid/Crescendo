@@ -198,6 +198,8 @@ class StreamService : SuspendService(), Receiver, NotificationManager, KoinCompo
 
     internal val mPlayerNotificationManager by lazy {
         PlayerNotificationManager.Builder(this, NOTIFICATION_ID, STREAM_CHANNEL_ID)
+            .setChannelNameResourceId(R.string.app_name)
+            .setChannelDescriptionResourceId(R.string.app_name)
             .setChannelImportance(NotificationUtil.IMPORTANCE_HIGH)
             .setNotificationListener(notificationListener)
             .setMediaDescriptionAdapter(mediaDescriptionProvider)
