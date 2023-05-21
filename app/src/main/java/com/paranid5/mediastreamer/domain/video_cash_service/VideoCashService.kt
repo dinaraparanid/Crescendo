@@ -13,7 +13,6 @@ import android.util.SparseArray
 import androidx.annotation.RequiresApi
 import androidx.annotation.StringRes
 import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.LifecycleService
 import androidx.lifecycle.repeatOnLifecycle
 import arrow.core.Either
 import arrow.core.left
@@ -24,6 +23,10 @@ import at.huber.youtubeExtractor.YouTubeExtractor
 import at.huber.youtubeExtractor.YtFile
 import com.paranid5.mediastreamer.R
 import com.paranid5.mediastreamer.data.VideoMetadata
+import com.paranid5.mediastreamer.domain.LifecycleNotificationManager
+import com.paranid5.mediastreamer.domain.Receiver
+import com.paranid5.mediastreamer.domain.ServiceAction
+import com.paranid5.mediastreamer.domain.SuspendService
 import com.paranid5.mediastreamer.domain.ktor_client.downloadFile
 import com.paranid5.mediastreamer.domain.ktor_client.downloadFiles
 import com.paranid5.mediastreamer.domain.media_scanner.MediaScannerReceiver
@@ -46,7 +49,7 @@ import java.util.Queue
 import java.util.concurrent.ConcurrentLinkedQueue
 import kotlin.time.Duration.Companion.seconds
 
-class VideoCashService : LifecycleService(), KoinComponent {
+class VideoCashService : SuspendService(), Receiver, LifecycleNotificationManager, KoinComponent {
     companion object {
         private const val NOTIFICATION_ID = 102
         private const val VIDEO_CASH_CHANNEL_ID = "video_cash_channel"
@@ -70,7 +73,10 @@ class VideoCashService : LifecycleService(), KoinComponent {
             )
     }
 
-    private sealed class Actions(val requestCode: Int, val playbackAction: String) {
+    private sealed class Actions(
+        override val requestCode: Int,
+        override val playbackAction: String
+    ) : ServiceAction {
         object CancelCurVideo : Actions(
             requestCode = NOTIFICATION_ID + 1,
             playbackAction = Broadcast_CANCEL_CUR_VIDEO
@@ -98,9 +104,6 @@ class VideoCashService : LifecycleService(), KoinComponent {
 
     private val binder = object : Binder() {}
     private val ktorClient by inject<HttpClient>()
-
-    private val job = SupervisorJob()
-    private val scope = CoroutineScope(Dispatchers.Main + job)
     private var cashingLoopJob: Job? = null
 
     private val videoCashQueue: Queue<VideoCashData> = ConcurrentLinkedQueue()
@@ -122,6 +125,8 @@ class VideoCashService : LifecycleService(), KoinComponent {
     private val notificationManager by lazy {
         getSystemService(NOTIFICATION_SERVICE) as NotificationManager
     }
+
+    // --------------------------- Action Receivers ---------------------------
 
     private val cashNextVideoReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context?, intent: Intent) {
@@ -145,6 +150,51 @@ class VideoCashService : LifecycleService(), KoinComponent {
     }
 
     private val mediaScannerReceiver = MediaScannerReceiver()
+
+    override fun registerReceivers() {
+        registerReceiverCompat(cashNextVideoReceiver, Broadcast_CASH_NEXT_VIDEO)
+        registerReceiverCompat(cancelCurVideoReceiver, Broadcast_CANCEL_CUR_VIDEO)
+        registerReceiverCompat(cancelAllReceiver, Broadcast_CANCEL_ALL)
+        registerReceiverCompat(mediaScannerReceiver, MediaScannerReceiver.Broadcast_SCAN_NEXT_FILE)
+    }
+
+    override fun unregisterReceivers() {
+        unregisterReceiver(cashNextVideoReceiver)
+        unregisterReceiver(cancelCurVideoReceiver)
+        unregisterReceiver(cancelAllReceiver)
+        unregisterReceiver(mediaScannerReceiver)
+    }
+
+    // --------------------------- Service Impl ---------------------------
+
+    override fun onCreate() {
+        super.onCreate()
+        registerReceivers()
+    }
+
+    override fun onBind(intent: Intent): IBinder {
+        super.onBind(intent)
+        return binder
+    }
+
+    override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
+        super.onStartCommand(intent, flags, startId)
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
+            createChannel()
+
+        scope.launch { mOfferVideoToQueue(videoCashData = intent!!.mVideoCashDataArg) }
+        resetCashingJobIfCanceled()
+        scope.launch { startNotificationObserving() }
+        return START_REDELIVER_INTENT
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        unregisterReceivers()
+    }
+
+    // --------------------------- Cashing Management ---------------------------
 
     private fun YoutubeUrlExtractor(desiredFilename: String, format: Formats) =
         @SuppressLint("StaticFieldLeak")
@@ -184,23 +234,6 @@ class VideoCashService : LifecycleService(), KoinComponent {
             }
         }
 
-    private fun registerReceivers() {
-        registerReceiverCompat(cashNextVideoReceiver, Broadcast_CASH_NEXT_VIDEO)
-        registerReceiverCompat(cancelCurVideoReceiver, Broadcast_CANCEL_CUR_VIDEO)
-        registerReceiverCompat(cancelAllReceiver, Broadcast_CANCEL_ALL)
-        registerReceiverCompat(mediaScannerReceiver, MediaScannerReceiver.Broadcast_SCAN_NEXT_FILE)
-    }
-
-    override fun onCreate() {
-        super.onCreate()
-        registerReceivers()
-    }
-
-    override fun onBind(intent: Intent): IBinder {
-        super.onBind(intent)
-        return binder
-    }
-
     internal suspend inline fun mOfferVideoToQueue(videoCashData: VideoCashData) {
         Log.d(TAG, "New video added to queue")
         videoCashQueue.offer(videoCashData)
@@ -209,65 +242,7 @@ class VideoCashService : LifecycleService(), KoinComponent {
         resetCashingJobIfCanceled()
     }
 
-    private data class CashingNotificationData(
-        val cashingState: DownloadingStatus,
-        val metadata: VideoMetadata,
-        val videoCashQueueLen: Int,
-        val downloadedBytes: Long,
-        val totalBytes: Long,
-        val errorCode: Int,
-        val errorDescription: String
-    )
-
-    /**
-     * Runs loop that observers all notification related states
-     * and updates notification when something has changed
-     */
-
-    private suspend inline fun startNotificationObserving(): Unit =
-        lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
-            combine(
-                cashingStatusState,
-                curVideoMetadataState,
-                videoCashQueueLenState,
-                videoCashProgressState,
-                videoCashErrorState
-            ) { cashingState, videoMetadata, videoCashQueueLen,
-                (downloadedBytes, totalBytes), (errorCode, errorDescription) ->
-                CashingNotificationData(
-                    cashingState,
-                    videoMetadata ?: VideoMetadata(),
-                    videoCashQueueLen,
-                    downloadedBytes,
-                    totalBytes,
-                    errorCode,
-                    errorDescription
-                )
-            }.collectLatest { (cashingState, videoMetadata, videoCashQueueLen,
-                                  downloadedBytes, totalBytes, errorCode, errorDescription) ->
-                updateNotification(
-                    cashingState,
-                    videoMetadata,
-                    videoCashQueueLen,
-                    downloadedBytes,
-                    totalBytes,
-                    errorCode,
-                    errorDescription
-                )
-            }
-        }
-
-    override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
-            createChannel()
-
-        scope.launch { mOfferVideoToQueue(videoCashData = intent!!.mVideoCashDataArg) }
-        resetCashingJobIfCanceled()
-        scope.launch { startNotificationObserving() }
-        return START_REDELIVER_INTENT
-    }
-
-    // --------------------- Media File Cashing ---------------------
+    // --------------------- Media File Management ---------------------
 
     /**
      * Prepares store file for the download request or notifies about error.
@@ -427,6 +402,8 @@ class VideoCashService : LifecycleService(), KoinComponent {
         return Either.Right(audioFileStore to videoFileStore)
     }
 
+    // --------------------- Media Cashing ---------------------
+
     /**
      * Downloads both video and audio mp4 files,
      * convert audio to .aac file and
@@ -563,6 +540,61 @@ class VideoCashService : LifecycleService(), KoinComponent {
         )
     }
 
+    /** Runs loop that cashes files from the [videoCashQueue] */
+
+    private suspend inline fun launchCashing() {
+        while (true) {
+            Log.d(TAG, "QUEUE ${videoCashQueue.size}")
+
+            while (videoCashQueue.isEmpty()) {
+                isVideoCashQueueEmptyCondVar.wait()
+                Log.d(TAG, "Video Cash Queue Cond Var Awake")
+            }
+
+            while (cashingStatusState.value == DownloadingStatus.DOWNLOADING) {
+                isVideoCashingCondVar.wait()
+                Log.d(TAG, "Is Video Cashing Cond Var Awake")
+            }
+
+            videoCashQueue.poll()?.let { (url, desiredFilename, isSaveAsVideo) ->
+                Log.d(TAG, "Prepare for cashing")
+                videoCashProgressState.update { 0L to 0L }
+                cashingStatusState.update { DownloadingStatus.DOWNLOADING }
+                videoCashQueueLenState.update { videoCashQueue.size }
+                YoutubeUrlExtractor(desiredFilename, isSaveAsVideo).extract(url)
+            }
+        }
+    }
+
+    private fun resetCashingJobIfCanceled() {
+        Log.d(TAG, "Cashing loop status: ${cashingLoopJob?.isActive}")
+
+        cashingStatusState.update {
+            when (it) {
+                DownloadingStatus.CANCELED -> DownloadingStatus.NONE
+                else -> it
+            }
+        }
+
+        if (cashingLoopJob?.isActive != true)
+            cashingLoopJob = scope.launch(Dispatchers.IO) { launchCashing() }
+    }
+
+    internal suspend inline fun mCancelCurVideoCashing() {
+        cashingStatusState.update { DownloadingStatus.CANCELED }
+        isVideoCashingCondVar.notify()
+
+        Log.d(TAG, "File is deleted ${curVideoCashFile?.delete()}")
+        Log.d(TAG, "Cashing is canceled")
+        clearVideoCashStates()
+    }
+
+    internal suspend inline fun mCancelAllVideosCashing() {
+        videoCashQueue.clear()
+        videoCashQueueLenState.update { 0 }
+        mCancelCurVideoCashing()
+    }
+
     private fun clearVideoCashStates() {
         curVideoCashFile = null
     }
@@ -622,46 +654,6 @@ class VideoCashService : LifecycleService(), KoinComponent {
             .putExtra(VIDEO_CASH_STATUS_ARG, VideoCashResponse.FileCreationError)
     )
 
-    /** Runs loop that cashes files from the [videoCashQueue] */
-
-    private suspend inline fun launchCashing() {
-        while (true) {
-            Log.d(TAG, "QUEUE ${videoCashQueue.size}")
-
-            while (videoCashQueue.isEmpty()) {
-                isVideoCashQueueEmptyCondVar.wait()
-                Log.d(TAG, "Video Cash Queue Cond Var Awake")
-            }
-
-            while (cashingStatusState.value == DownloadingStatus.DOWNLOADING) {
-                isVideoCashingCondVar.wait()
-                Log.d(TAG, "Is Video Cashing Cond Var Awake")
-            }
-
-            videoCashQueue.poll()?.let { (url, desiredFilename, isSaveAsVideo) ->
-                Log.d(TAG, "Prepare for cashing")
-                videoCashProgressState.update { 0L to 0L }
-                cashingStatusState.update { DownloadingStatus.DOWNLOADING }
-                videoCashQueueLenState.update { videoCashQueue.size }
-                YoutubeUrlExtractor(desiredFilename, isSaveAsVideo).extract(url)
-            }
-        }
-    }
-
-    private fun resetCashingJobIfCanceled() {
-        Log.d(TAG, "Cashing loop status: ${cashingLoopJob?.isActive}")
-
-        cashingStatusState.update {
-            when (it) {
-                DownloadingStatus.CANCELED -> DownloadingStatus.NONE
-                else -> it
-            }
-        }
-
-        if (cashingLoopJob?.isActive != true)
-            cashingLoopJob = scope.launch(Dispatchers.IO) { launchCashing() }
-    }
-
     private suspend inline fun onCashingError() {
         cashingStatusState.update { DownloadingStatus.ERR }
         isVideoCashingCondVar.notify()
@@ -671,38 +663,42 @@ class VideoCashService : LifecycleService(), KoinComponent {
         clearVideoCashStates()
     }
 
-    internal suspend inline fun mCancelCurVideoCashing() {
-        cashingStatusState.update { DownloadingStatus.CANCELED }
-        isVideoCashingCondVar.notify()
+    // --------------------------- Notification Actions ---------------------------
 
-        Log.d(TAG, "File is deleted ${curVideoCashFile?.delete()}")
-        Log.d(TAG, "Cashing is canceled")
-        clearVideoCashStates()
-    }
+    private inline val cancelCurVideoAction
+        get() = when {
+            Build.VERSION.SDK_INT >= Build.VERSION_CODES.M -> Notification.Action.Builder(
+                null,
+                resources.getString(R.string.cancel),
+                Actions.CancelCurVideo.playbackIntent
+            )
 
-    internal suspend inline fun mCancelAllVideosCashing() {
-        videoCashQueue.clear()
-        videoCashQueueLenState.update { 0 }
-        mCancelCurVideoCashing()
-    }
+            else -> Notification.Action.Builder(
+                0,
+                resources.getString(R.string.cancel),
+                Actions.CancelCurVideo.playbackIntent
+            )
+        }.build()
 
-    private fun unregisterReceivers() {
-        unregisterReceiver(cashNextVideoReceiver)
-        unregisterReceiver(cancelCurVideoReceiver)
-        unregisterReceiver(cancelAllReceiver)
-        unregisterReceiver(mediaScannerReceiver)
-    }
+    private inline val cancelAllAction
+        get() = when {
+            Build.VERSION.SDK_INT >= Build.VERSION_CODES.M -> Notification.Action.Builder(
+                null,
+                resources.getString(R.string.cancel_all),
+                Actions.CancelAll.playbackIntent
+            )
 
-    override fun onDestroy() {
-        super.onDestroy()
-        unregisterReceivers()
-        job.cancel()
-    }
+            else -> Notification.Action.Builder(
+                0,
+                resources.getString(R.string.cancel_all),
+                Actions.CancelAll.playbackIntent
+            )
+        }.build()
 
-    // --------------------- Notifications ---------------------
+    // --------------------------- Notification Handle ---------------------------
 
     @RequiresApi(Build.VERSION_CODES.O)
-    private fun createChannel() = notificationManager.createNotificationChannel(
+    override fun createChannel() = notificationManager.createNotificationChannel(
         NotificationChannel(
             VIDEO_CASH_CHANNEL_ID,
             "Video Cash",
@@ -747,36 +743,6 @@ class VideoCashService : LifecycleService(), KoinComponent {
         .addAction(cancelCurVideoAction)
         .addAction(cancelAllAction)
 
-    private inline val cancelCurVideoAction
-        get() = when {
-            Build.VERSION.SDK_INT >= Build.VERSION_CODES.M -> Notification.Action.Builder(
-                null,
-                resources.getString(R.string.cancel),
-                Actions.CancelCurVideo.playbackIntent
-            )
-
-            else -> Notification.Action.Builder(
-                0,
-                resources.getString(R.string.cancel),
-                Actions.CancelCurVideo.playbackIntent
-            )
-        }.build()
-
-    private inline val cancelAllAction
-        get() = when {
-            Build.VERSION.SDK_INT >= Build.VERSION_CODES.M -> Notification.Action.Builder(
-                null,
-                resources.getString(R.string.cancel_all),
-                Actions.CancelAll.playbackIntent
-            )
-
-            else -> Notification.Action.Builder(
-                0,
-                resources.getString(R.string.cancel_all),
-                Actions.CancelAll.playbackIntent
-            )
-        }.build()
-
     private fun finishedNotificationBuilder(message: String) = notificationBuilder
         .setContentTitle(message)
         .setAutoCancel(true)
@@ -793,6 +759,54 @@ class VideoCashService : LifecycleService(), KoinComponent {
 
     private fun getErrorNotificationBuilder(code: Int, description: String) =
         finishedNotificationBuilder("${resources.getString(R.string.error)} $code: $description")
+
+    private data class CashingNotificationData(
+        val cashingState: DownloadingStatus,
+        val metadata: VideoMetadata,
+        val videoCashQueueLen: Int,
+        val downloadedBytes: Long,
+        val totalBytes: Long,
+        val errorCode: Int,
+        val errorDescription: String
+    )
+
+    /**
+     * Runs loop that observers all notification related states
+     * and updates notification when something has changed
+     */
+
+    override suspend fun startNotificationObserving(): Unit =
+        lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
+            combine(
+                cashingStatusState,
+                curVideoMetadataState,
+                videoCashQueueLenState,
+                videoCashProgressState,
+                videoCashErrorState
+            ) { cashingState, videoMetadata, videoCashQueueLen,
+                (downloadedBytes, totalBytes), (errorCode, errorDescription) ->
+                CashingNotificationData(
+                    cashingState,
+                    videoMetadata ?: VideoMetadata(),
+                    videoCashQueueLen,
+                    downloadedBytes,
+                    totalBytes,
+                    errorCode,
+                    errorDescription
+                )
+            }.collectLatest { (cashingState, videoMetadata, videoCashQueueLen,
+                                  downloadedBytes, totalBytes, errorCode, errorDescription) ->
+                updateNotification(
+                    cashingState,
+                    videoMetadata,
+                    videoCashQueueLen,
+                    downloadedBytes,
+                    totalBytes,
+                    errorCode,
+                    errorDescription
+                )
+            }
+        }
 
     private fun startCashingNotification(
         videoMetadata: VideoMetadata,
@@ -902,7 +916,7 @@ class VideoCashService : LifecycleService(), KoinComponent {
         }
     }
 
-    private fun detachNotification() = when {
+    override fun detachNotification() = when {
         Build.VERSION.SDK_INT >= Build.VERSION_CODES.N ->
             stopForeground(STOP_FOREGROUND_DETACH)
 

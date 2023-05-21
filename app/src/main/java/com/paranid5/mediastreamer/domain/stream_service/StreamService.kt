@@ -21,7 +21,6 @@ import androidx.annotation.OptIn
 import androidx.core.app.NotificationCompat
 import androidx.core.graphics.drawable.IconCompat
 import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.LifecycleService
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.media3.common.*
 import androidx.media3.common.C.*
@@ -39,7 +38,12 @@ import com.paranid5.mediastreamer.IS_PLAYING_STATE
 import com.paranid5.mediastreamer.R
 import com.paranid5.mediastreamer.data.VideoMetadata
 import com.paranid5.mediastreamer.data.utils.extensions.toAndroidMetadata
+import com.paranid5.mediastreamer.domain.Receiver
+import com.paranid5.mediastreamer.domain.ServiceAction
 import com.paranid5.mediastreamer.domain.StorageHandler
+import com.paranid5.mediastreamer.domain.SuspendService
+import com.paranid5.mediastreamer.domain.sendBroadcast
+import com.paranid5.mediastreamer.domain.NotificationManager
 import com.paranid5.mediastreamer.domain.utils.extensions.registerReceiverCompat
 import com.paranid5.mediastreamer.presentation.main_activity.MainActivity
 import com.paranid5.mediastreamer.presentation.streaming.*
@@ -53,7 +57,7 @@ import org.koin.core.parameter.parametersOf
 import org.koin.core.qualifier.named
 
 @OptIn(androidx.media3.common.util.UnstableApi::class)
-class StreamService : LifecycleService(), KoinComponent {
+class StreamService : SuspendService(), Receiver, NotificationManager, KoinComponent {
     companion object {
         private const val NOTIFICATION_ID = 101
         private const val STREAM_CHANNEL_ID = "stream_channel"
@@ -67,8 +71,6 @@ class StreamService : LifecycleService(), KoinComponent {
         const val Broadcast_10_SECS_BACK = "$SERVICE_LOCATION.10_SECS_BACK"
         const val Broadcast_10_SECS_FORWARD = "$SERVICE_LOCATION.10_SECS_FORWARD"
         const val Broadcast_SEEK_TO = "$SERVICE_LOCATION.SEEK_TO"
-        const val Broadcast_ADD_TO_FAVOURITE = "$SERVICE_LOCATION.ADD_TO_FAVOURITE"
-        const val Broadcast_REMOVE_FROM_FAVOURITE = "$SERVICE_LOCATION.REMOVE_FROM_FAVOURITE"
         const val Broadcast_CHANGE_REPEAT = "$SERVICE_LOCATION.CHANGE_REPEAT"
         const val Broadcast_DISMISS_NOTIFICATION = "$SERVICE_LOCATION.DISMISS_NOTIFICATION"
 
@@ -76,10 +78,17 @@ class StreamService : LifecycleService(), KoinComponent {
         private const val ACTION_RESUME = "resume"
         private const val ACTION_10_SECS_BACK = "back"
         private const val ACTION_10_SECS_FORWARD = "forward"
-        private const val ACTION_ADD_TO_FAVOURITE = "add_to_favourite"
-        private const val ACTION_REMOVE_FROM_FAVOURITE = "remove_from_favourite"
         private const val ACTION_CHANGE_REPEAT = "change_repeat"
-        private const val ACTION_DISMISS = "dismiss" // TODO: Dismiss notification
+        private const val ACTION_DISMISS = "dismiss"
+
+        private val commandsToActions = mapOf(
+            ACTION_PAUSE to Actions.Pause,
+            ACTION_RESUME to Actions.Resume,
+            ACTION_10_SECS_BACK to Actions.TenSecsBack,
+            ACTION_10_SECS_FORWARD to Actions.TenSecsForward,
+            ACTION_CHANGE_REPEAT to Actions.ChangeRepeat,
+            ACTION_DISMISS to Actions.Dismiss
+        )
 
         const val URL_ARG = "url"
         const val POSITION_ARG = "position"
@@ -93,7 +102,10 @@ class StreamService : LifecycleService(), KoinComponent {
             get() = mUrlArgOrNull!!
     }
 
-    sealed class Actions(val requestCode: Int, val playbackAction: String) {
+    sealed class Actions(
+        override val requestCode: Int,
+        override val playbackAction: String
+    ) : ServiceAction {
         object Pause : Actions(
             requestCode = NOTIFICATION_ID + 1,
             playbackAction = Broadcast_PAUSE
@@ -112,16 +124,6 @@ class StreamService : LifecycleService(), KoinComponent {
         object TenSecsForward : Actions(
             requestCode = NOTIFICATION_ID + 4,
             playbackAction = Broadcast_10_SECS_FORWARD
-        )
-
-        object AddToFavourite : Actions(
-            requestCode = NOTIFICATION_ID + 5,
-            playbackAction = Broadcast_ADD_TO_FAVOURITE
-        )
-
-        object RemoveFromFavourite : Actions(
-            requestCode = NOTIFICATION_ID + 6,
-            playbackAction = Broadcast_REMOVE_FROM_FAVOURITE
         )
 
         object ChangeRepeat : Actions(
@@ -144,9 +146,6 @@ class StreamService : LifecycleService(), KoinComponent {
         )
 
     private val binder = object : Binder() {}
-    private val job = SupervisorJob()
-    private val scope = CoroutineScope(Dispatchers.Main + job)
-
     private val storageHandler by inject<StorageHandler>()
     private val glideUtils by inject<GlideUtils> { parametersOf(this) }
     private val currentMetadata = MutableStateFlow<VideoMetadata?>(null)
@@ -165,19 +164,13 @@ class StreamService : LifecycleService(), KoinComponent {
     internal inline val mCurrentPlaybackPosition
         get() = mPlayer.currentPosition
 
-    // TODO: favourite database
-    private val isCurrentVideoLikedState = MutableStateFlow(false)
-
-    private inline val isCurrentVideoLiked
-        get() = isCurrentVideoLikedState.value
-
     internal inline val mIsRepeating
         get() = storageHandler.isRepeatingState.value
 
     @Volatile
     private var isNotificationShown = false
 
-    // ----------------------- Media session management -----------------------
+    // ----------------------- Media Session Management -----------------------
 
     private lateinit var mediaSessionManager: MediaSessionManager
     private lateinit var mediaSession: MediaSessionCompat
@@ -234,7 +227,7 @@ class StreamService : LifecycleService(), KoinComponent {
     private val notificationListener = object : PlayerNotificationManager.NotificationListener {
         override fun onNotificationCancelled(notificationId: Int, dismissedByUser: Boolean) {
             super.onNotificationCancelled(notificationId, dismissedByUser)
-            mRemoveNotification()
+            detachNotification()
             mPausePlayback()
         }
 
@@ -281,18 +274,15 @@ class StreamService : LifecycleService(), KoinComponent {
 
             override fun onCustomAction(player: Player, action: String, intent: Intent) =
                 sendBroadcast(
-                    Intent(
-                        when (action) {
-                            ACTION_CHANGE_REPEAT -> Broadcast_CHANGE_REPEAT
-                            ACTION_10_SECS_BACK -> Broadcast_10_SECS_BACK
-                            ACTION_PAUSE -> Broadcast_PAUSE
-                            ACTION_RESUME -> Broadcast_RESUME
-                            ACTION_10_SECS_FORWARD -> Broadcast_10_SECS_FORWARD
-                            ACTION_ADD_TO_FAVOURITE -> Broadcast_ADD_TO_FAVOURITE
-                            ACTION_REMOVE_FROM_FAVOURITE -> Broadcast_REMOVE_FROM_FAVOURITE
-                            else -> throw IllegalArgumentException("Unknown action")
-                        }
-                    )
+                    when (action) {
+                        ACTION_CHANGE_REPEAT -> Broadcast_CHANGE_REPEAT
+                        ACTION_10_SECS_BACK -> Broadcast_10_SECS_BACK
+                        ACTION_PAUSE -> Broadcast_PAUSE
+                        ACTION_RESUME -> Broadcast_RESUME
+                        ACTION_10_SECS_FORWARD -> Broadcast_10_SECS_FORWARD
+                        ACTION_DISMISS -> Broadcast_DISMISS_NOTIFICATION
+                        else -> throw IllegalArgumentException("Unknown action")
+                    }
                 )
         }
 
@@ -306,12 +296,7 @@ class StreamService : LifecycleService(), KoinComponent {
 
             tenSecsForwardActionIfSeekableCompat?.let { put(ACTION_10_SECS_FORWARD, it) }
 
-            getLikeActionCompat(isCurrentVideoLiked).let {
-                when {
-                    isCurrentVideoLiked -> put(ACTION_ADD_TO_FAVOURITE, it)
-                    else -> put(ACTION_REMOVE_FROM_FAVOURITE, it)
-                }
-            }
+            put(ACTION_DISMISS, dismissNotificationActionCompat)
         }
 
     private inline val isPlaying
@@ -357,6 +342,8 @@ class StreamService : LifecycleService(), KoinComponent {
             ).show()
         }
     }
+
+    // --------------------------- Action Receivers ---------------------------
 
     private val pauseReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context?, intent: Intent?) {
@@ -411,32 +398,6 @@ class StreamService : LifecycleService(), KoinComponent {
         }
     }
 
-    private val addToFavouriteReceiver = object : BroadcastReceiver() {
-        override fun onReceive(context: Context?, intent: Intent?) {
-            Log.d(TAG, "TODO: add to favourite")
-
-            scope.launch {
-                mUpdateMediaSession()
-                mPlayerNotificationManager.invalidate()
-            }
-
-            // TODO: add to favourite
-        }
-    }
-
-    private val removeFromFavouriteReceiver = object : BroadcastReceiver() {
-        override fun onReceive(context: Context?, intent: Intent?) {
-            Log.d(TAG, "TODO: remove from favourite")
-
-            scope.launch {
-                mUpdateMediaSession()
-                mPlayerNotificationManager.invalidate()
-            }
-
-            // TODO: remove from favourite
-        }
-    }
-
     private val repeatChangedReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context?, intent: Intent?) {
             scope.launch {
@@ -451,22 +412,33 @@ class StreamService : LifecycleService(), KoinComponent {
     private val dismissNotificationReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context?, intent: Intent?) {
             Log.d(TAG, "Notification removed")
-            mRemoveNotification()
+            detachNotification()
         }
     }
 
-    private fun registerReceivers() {
+    override fun registerReceivers() {
         registerReceiverCompat(pauseReceiver, Broadcast_PAUSE)
         registerReceiverCompat(resumeReceiver, Broadcast_RESUME)
         registerReceiverCompat(switchVideoReceiver, Broadcast_SWITCH_VIDEO)
         registerReceiverCompat(tenSecsBackReceiver, Broadcast_10_SECS_BACK)
         registerReceiverCompat(tenSecsForwardReceiver, Broadcast_10_SECS_FORWARD)
         registerReceiverCompat(seekToReceiver, Broadcast_SEEK_TO)
-        registerReceiverCompat(addToFavouriteReceiver, Broadcast_ADD_TO_FAVOURITE)
-        registerReceiverCompat(removeFromFavouriteReceiver, Broadcast_REMOVE_FROM_FAVOURITE)
         registerReceiverCompat(repeatChangedReceiver, Broadcast_CHANGE_REPEAT)
         registerReceiverCompat(dismissNotificationReceiver, Broadcast_DISMISS_NOTIFICATION)
     }
+
+    override fun unregisterReceivers() {
+        unregisterReceiver(pauseReceiver)
+        unregisterReceiver(resumeReceiver)
+        unregisterReceiver(switchVideoReceiver)
+        unregisterReceiver(tenSecsBackReceiver)
+        unregisterReceiver(tenSecsForwardReceiver)
+        unregisterReceiver(seekToReceiver)
+        unregisterReceiver(repeatChangedReceiver)
+        unregisterReceiver(dismissNotificationReceiver)
+    }
+
+    // --------------------------- Service Impl ---------------------------
 
     override fun onCreate() {
         super.onCreate()
@@ -499,26 +471,14 @@ class StreamService : LifecycleService(), KoinComponent {
         return START_REDELIVER_INTENT
     }
 
-    private fun unregisterReceivers() {
-        unregisterReceiver(pauseReceiver)
-        unregisterReceiver(resumeReceiver)
-        unregisterReceiver(switchVideoReceiver)
-        unregisterReceiver(tenSecsBackReceiver)
-        unregisterReceiver(tenSecsForwardReceiver)
-        unregisterReceiver(seekToReceiver)
-        unregisterReceiver(addToFavouriteReceiver)
-        unregisterReceiver(removeFromFavouriteReceiver)
-        unregisterReceiver(repeatChangedReceiver)
-        unregisterReceiver(dismissNotificationReceiver)
-    }
-
     override fun onDestroy() {
         super.onDestroy()
         releaseMedia()
-        mRemoveNotification()
+        detachNotification()
         unregisterReceivers()
-        job.cancel()
     }
+
+    // ----------------------- Playback Handle -----------------------
 
     internal fun mSendPlaybackPosition(curPosition: Long = mCurrentPlaybackPosition) =
         sendBroadcast(
@@ -539,6 +499,8 @@ class StreamService : LifecycleService(), KoinComponent {
     internal fun mResumePlayback() {
         mPlayer.playWhenReady = true
     }
+
+    // ----------------------- Storage Handler Utils -----------------------
 
     private suspend inline fun storePlaybackPosition() =
         storageHandler.storePlaybackPosition(mCurrentPlaybackPosition)
@@ -562,6 +524,8 @@ class StreamService : LifecycleService(), KoinComponent {
 
     private suspend inline fun storeCurrentUrl(newUrl: String) =
         storageHandler.storeCurrentUrl(newUrl)
+
+    // ----------------------- Playback Management  -----------------------
 
     private fun YoutubeUrlExtractor(initialPosition: Long) =
         @SuppressLint("StaticFieldLeak")
@@ -645,6 +609,21 @@ class StreamService : LifecycleService(), KoinComponent {
         transportControls.stop()
     }
 
+    // --------------------------- Playback Monitoring ---------------------------
+
+    internal fun mStartPlaybackMonitoring() {
+        playbackMonitorTask = scope.launch {
+            while (true) {
+                updateAndSendPlaybackPosition()
+                delay(PLAYBACK_UPDATE_COOLDOWN)
+            }
+        }
+    }
+
+    internal fun mStopPlaybackMonitoring() = playbackMonitorTask.cancel()
+
+    // ----------------------- Media Session Utils -----------------------
+
     private inline val newMediaSessionCallback
         get() = object : MediaSessionCompat.Callback() {
             override fun onPlay() {
@@ -674,22 +653,7 @@ class StreamService : LifecycleService(), KoinComponent {
 
             override fun onCustomAction(action: String, extras: Bundle?) {
                 super.onCustomAction(action, extras)
-
-                sendBroadcast(
-                    Intent(
-                        when (action) {
-                            ACTION_CHANGE_REPEAT -> Broadcast_CHANGE_REPEAT
-                            ACTION_10_SECS_BACK -> Broadcast_10_SECS_BACK
-                            ACTION_PAUSE -> Broadcast_PAUSE
-                            ACTION_RESUME -> Broadcast_RESUME
-                            ACTION_10_SECS_FORWARD -> Broadcast_10_SECS_FORWARD
-                            ACTION_ADD_TO_FAVOURITE -> Broadcast_ADD_TO_FAVOURITE
-                            ACTION_REMOVE_FROM_FAVOURITE -> Broadcast_REMOVE_FROM_FAVOURITE
-                            ACTION_DISMISS -> Broadcast_DISMISS_NOTIFICATION
-                            else -> throw IllegalArgumentException("Unknown action")
-                        }
-                    )
-                )
+                sendBroadcast(commandsToActions[action]!!.playbackAction)
             }
         }
 
@@ -820,23 +784,16 @@ class StreamService : LifecycleService(), KoinComponent {
             else -> null
         }
 
-    private fun getLikeActionCompat(isLiked: Boolean) = when {
-        isLiked -> NotificationCompat.Action.Builder(
-            IconCompat.createWithResource(this, R.drawable.like_filled),
-            resources.getString(R.string.remove_from_favourite),
-            Actions.RemoveFromFavourite.playbackIntent
-        )
+    private inline val dismissNotificationActionCompat
+        get() = NotificationCompat.Action.Builder(
+            IconCompat.createWithResource(this, R.drawable.dismiss),
+            resources.getString(R.string.cancel),
+            Actions.Dismiss.playbackIntent
+        ).build()
 
-        else -> NotificationCompat.Action.Builder(
-            IconCompat.createWithResource(this, R.drawable.like),
-            resources.getString(R.string.add_to_favourite),
-            Actions.AddToFavourite.playbackIntent
-        )
-    }.build()
+    // --------------------------- Notification Handle ---------------------------
 
-    // --------------------------- Handle Notification ---------------------------
-
-    internal fun mRemoveNotification() {
+    override fun detachNotification() {
         isNotificationShown = false
 
         when {
@@ -844,17 +801,4 @@ class StreamService : LifecycleService(), KoinComponent {
             else -> stopForeground(true)
         }
     }
-
-    // --------------------------- Playback Monitoring ---------------------------
-
-    internal fun mStartPlaybackMonitoring() {
-        playbackMonitorTask = scope.launch {
-            while (true) {
-                updateAndSendPlaybackPosition()
-                delay(PLAYBACK_UPDATE_COOLDOWN)
-            }
-        }
-    }
-
-    internal fun mStopPlaybackMonitoring() = playbackMonitorTask.cancel()
 }
