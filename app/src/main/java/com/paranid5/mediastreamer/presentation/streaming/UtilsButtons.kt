@@ -10,7 +10,14 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateListOf
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
@@ -25,18 +32,18 @@ import com.paranid5.mediastreamer.presentation.composition_locals.LocalActivity
 import com.paranid5.mediastreamer.presentation.ui.extensions.getLightVibrantOrPrimary
 import com.paranid5.mediastreamer.presentation.ui.extensions.openAppSettings
 import com.paranid5.mediastreamer.presentation.ui.extensions.simpleShadow
-import com.paranid5.mediastreamer.presentation.ui.permissions.description_providers.ExternalStorageDescriptionProvider
 import com.paranid5.mediastreamer.presentation.ui.permissions.PermissionDialog
-import com.paranid5.mediastreamer.presentation.ui.BroadcastReceiver
+import com.paranid5.mediastreamer.presentation.ui.permissions.description_providers.ExternalStorageDescriptionProvider
+import kotlinx.coroutines.launch
 import org.koin.compose.koinInject
 import org.koin.core.qualifier.named
-import java.util.*
+import java.util.Queue
 
 @Composable
 internal fun UtilsButtons(palette: Palette?, modifier: Modifier = Modifier) =
     Row(modifier.fillMaxWidth()) {
         EqualizerButton(modifier = Modifier.weight(1F), palette = palette)
-        RepeatButton(modifier = Modifier.weight(1F), palette = palette)
+        RepeatButton(palette = palette, modifier = Modifier.weight(1F))
         LikeButton(modifier = Modifier.weight(1F), palette = palette)
         DownloadButton(modifier = Modifier.weight(1F), palette = palette)
     }
@@ -62,19 +69,15 @@ private fun EqualizerButton(palette: Palette?, modifier: Modifier = Modifier) {
 private fun RepeatButton(
     palette: Palette?,
     modifier: Modifier = Modifier,
-    storageHandler: StorageHandler = koinInject(),
-    streamingUIHandler: StreamingUIHandler = koinInject()
+    storageHandler: StorageHandler = koinInject()
 ) {
+    val scope = rememberCoroutineScope()
     val lightVibrantColor = palette.getLightVibrantOrPrimary()
-    var isRepeating by remember { mutableStateOf(storageHandler.isRepeatingState.value) }
-
-    BroadcastReceiver(action = Broadcast_IS_REPEATING_CHANGED) { _, intent ->
-        isRepeating = intent!!.getBooleanExtra(IS_REPEATING_ARG, false)
-    }
+    val isRepeating by storageHandler.isRepeatingState.collectAsState()
 
     IconButton(
         modifier = modifier.simpleShadow(color = lightVibrantColor),
-        onClick = { streamingUIHandler.sendChangeRepeatBroadcast() }
+        onClick = { scope.launch { storageHandler.storeIsRepeating(!isRepeating) } }
     ) {
         Icon(
             modifier = Modifier.size(30.dp),
@@ -89,10 +92,6 @@ private fun RepeatButton(
 private fun LikeButton(palette: Palette?, modifier: Modifier = Modifier) {
     val lightVibrantColor = palette.getLightVibrantOrPrimary()
     val isLiked by remember { mutableStateOf(false) }
-
-    BroadcastReceiver(action = Broadcast_IS_REPEATING_CHANGED) { _, intent ->
-        // TODO: favourite database
-    }
 
     IconButton(
         modifier = modifier.simpleShadow(color = lightVibrantColor),

@@ -698,7 +698,7 @@ class VideoCashService : SuspendService(), Receiver, LifecycleNotificationManage
     // --------------------------- Notification Handle ---------------------------
 
     @RequiresApi(Build.VERSION_CODES.O)
-    override fun createChannel() = notificationManager.createNotificationChannel(
+    private fun createChannel() = notificationManager.createNotificationChannel(
         NotificationChannel(
             VIDEO_CASH_CHANNEL_ID,
             "Video Cash",
@@ -775,7 +775,7 @@ class VideoCashService : SuspendService(), Receiver, LifecycleNotificationManage
      * and updates notification when something has changed
      */
 
-    override suspend fun startNotificationObserving(): Unit =
+    override suspend fun startNotificationObserving() =
         lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
             combine(
                 cashingStatusState,

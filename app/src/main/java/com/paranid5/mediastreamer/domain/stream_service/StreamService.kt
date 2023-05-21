@@ -38,12 +38,12 @@ import com.paranid5.mediastreamer.IS_PLAYING_STATE
 import com.paranid5.mediastreamer.R
 import com.paranid5.mediastreamer.data.VideoMetadata
 import com.paranid5.mediastreamer.data.utils.extensions.toAndroidMetadata
+import com.paranid5.mediastreamer.domain.LifecycleNotificationManager
 import com.paranid5.mediastreamer.domain.Receiver
 import com.paranid5.mediastreamer.domain.ServiceAction
 import com.paranid5.mediastreamer.domain.StorageHandler
 import com.paranid5.mediastreamer.domain.SuspendService
 import com.paranid5.mediastreamer.domain.sendBroadcast
-import com.paranid5.mediastreamer.domain.NotificationManager
 import com.paranid5.mediastreamer.domain.utils.extensions.registerReceiverCompat
 import com.paranid5.mediastreamer.presentation.main_activity.MainActivity
 import com.paranid5.mediastreamer.presentation.streaming.*
@@ -57,7 +57,7 @@ import org.koin.core.parameter.parametersOf
 import org.koin.core.qualifier.named
 
 @OptIn(androidx.media3.common.util.UnstableApi::class)
-class StreamService : SuspendService(), Receiver, NotificationManager, KoinComponent {
+class StreamService : SuspendService(), Receiver, LifecycleNotificationManager, KoinComponent {
     companion object {
         private const val NOTIFICATION_ID = 101
         private const val STREAM_CHANNEL_ID = "stream_channel"
@@ -78,7 +78,8 @@ class StreamService : SuspendService(), Receiver, NotificationManager, KoinCompo
         private const val ACTION_RESUME = "resume"
         private const val ACTION_10_SECS_BACK = "back"
         private const val ACTION_10_SECS_FORWARD = "forward"
-        private const val ACTION_CHANGE_REPEAT = "change_repeat"
+        private const val ACTION_REPEAT = "repeat"
+        private const val ACTION_UNREPEAT = "unrepeat"
         private const val ACTION_DISMISS = "dismiss"
 
         private val commandsToActions = mapOf(
@@ -86,7 +87,8 @@ class StreamService : SuspendService(), Receiver, NotificationManager, KoinCompo
             ACTION_RESUME to Actions.Resume,
             ACTION_10_SECS_BACK to Actions.TenSecsBack,
             ACTION_10_SECS_FORWARD to Actions.TenSecsForward,
-            ACTION_CHANGE_REPEAT to Actions.ChangeRepeat,
+            ACTION_REPEAT to Actions.Repeat,
+            ACTION_UNREPEAT to Actions.Unrepeat,
             ACTION_DISMISS to Actions.Dismiss
         )
 
@@ -126,13 +128,18 @@ class StreamService : SuspendService(), Receiver, NotificationManager, KoinCompo
             playbackAction = Broadcast_10_SECS_FORWARD
         )
 
-        object ChangeRepeat : Actions(
+        object Repeat : Actions(
             requestCode = NOTIFICATION_ID + 7,
             playbackAction = Broadcast_CHANGE_REPEAT
         )
 
-        object Dismiss : Actions(
+        object Unrepeat : Actions(
             requestCode = NOTIFICATION_ID + 8,
+            playbackAction = Broadcast_CHANGE_REPEAT
+        )
+
+        object Dismiss : Actions(
+            requestCode = NOTIFICATION_ID + 9,
             playbackAction = Broadcast_DISMISS_NOTIFICATION
         )
     }
@@ -206,21 +213,16 @@ class StreamService : SuspendService(), Receiver, NotificationManager, KoinCompo
             .setCustomActionReceiver(customActionsReceiver)
             .setFastForwardActionIconResourceId(R.drawable.next_track)
             .setRewindActionIconResourceId(R.drawable.prev_track)
+            .setPlayActionIconResourceId(R.drawable.play)
+            .setPauseActionIconResourceId(R.drawable.pause)
             .build()
             .apply {
-                setUseFastForwardAction(false)
-                setUseChronometer(false)
                 setUseNextAction(false)
-                setUseStopAction(false)
                 setUsePreviousAction(false)
-                setUsePlayPauseActions(false)
-                setUseRewindAction(false)
-                setUseFastForwardActionInCompactView(false)
-                setUseNextActionInCompactView(false)
-                setUsePreviousActionInCompactView(false)
-                setUseRewindActionInCompactView(false)
+                setUseStopAction(false)
+                setUseChronometer(true)
 
-                setPriority(NotificationCompat.PRIORITY_DEFAULT)
+                setPriority(NotificationCompat.PRIORITY_HIGH)
                 setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
                 setMediaSessionToken(mediaSession.sessionToken)
             }
@@ -269,37 +271,20 @@ class StreamService : SuspendService(), Receiver, NotificationManager, KoinCompo
             override fun createCustomActions(
                 context: Context,
                 instanceId: Int
-            ) = newCustomActionsCompat
+            ) = mutableMapOf(
+                ACTION_REPEAT to mRepeatActionCompat,
+                ACTION_UNREPEAT to mUnrepeatActionCompat,
+                ACTION_DISMISS to mDismissNotificationActionCompat
+            )
 
-            override fun getCustomActions(player: Player) =
-                newCustomActionsCompat.keys.toMutableList()
+            override fun getCustomActions(player: Player) = mNewCustomActions
 
             override fun onCustomAction(player: Player, action: String, intent: Intent) =
-                sendBroadcast(
-                    when (action) {
-                        ACTION_CHANGE_REPEAT -> Broadcast_CHANGE_REPEAT
-                        ACTION_10_SECS_BACK -> Broadcast_10_SECS_BACK
-                        ACTION_PAUSE -> Broadcast_PAUSE
-                        ACTION_RESUME -> Broadcast_RESUME
-                        ACTION_10_SECS_FORWARD -> Broadcast_10_SECS_FORWARD
-                        ACTION_DISMISS -> Broadcast_DISMISS_NOTIFICATION
-                        else -> throw IllegalArgumentException("Unknown action")
-                    }
-                )
+                sendBroadcast(commandsToActions[action]!!.playbackAction)
         }
 
-    internal val newCustomActionsCompat
-        get() = mutableMapOf(ACTION_CHANGE_REPEAT to repeatActionCompat).apply {
-            tenSecsBackActionIfSeekableCompat?.let { put(ACTION_10_SECS_BACK, it) }
-
-            getPlayPauseActionCompat(isPlaying).let {
-                if (isPlaying) put(ACTION_PAUSE, it) else put(ACTION_RESUME, it)
-            }
-
-            tenSecsForwardActionIfSeekableCompat?.let { put(ACTION_10_SECS_FORWARD, it) }
-
-            put(ACTION_DISMISS, dismissNotificationActionCompat)
-        }
+    internal val mNewCustomActions
+        get() = mutableListOf(if (mIsRepeating) ACTION_REPEAT else ACTION_UNREPEAT, ACTION_DISMISS)
 
     private inline val isPlaying
         get() = mPlayer.isPlaying
@@ -324,7 +309,7 @@ class StreamService : SuspendService(), Receiver, NotificationManager, KoinCompo
             super.onIsPlayingChanged(isPlaying)
 
             mIsPlayingState.update { isPlaying }
-            scope.launch { mUpdateMediaSession() }
+            scope.launch { mUpdateNotification() }
 
             when {
                 isPlaying -> mStartPlaybackMonitoring()
@@ -403,8 +388,7 @@ class StreamService : SuspendService(), Receiver, NotificationManager, KoinCompo
     private val repeatChangedReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context?, intent: Intent?) {
             scope.launch {
-                mStoreAndSendIsRepeating(!mIsRepeating)
-                mUpdateMediaSession()
+                mStoreIsRepeating(!mIsRepeating)
                 mPlayerNotificationManager.invalidate()
                 Log.d(TAG, "Repeating changed: $mIsRepeating")
             }
@@ -470,6 +454,7 @@ class StreamService : SuspendService(), Receiver, NotificationManager, KoinCompo
             )
         }
 
+        scope.launch { startNotificationObserving() }
         return START_REDELIVER_INTENT
     }
 
@@ -507,16 +492,8 @@ class StreamService : SuspendService(), Receiver, NotificationManager, KoinCompo
     private suspend inline fun storePlaybackPosition() =
         storageHandler.storePlaybackPosition(mCurrentPlaybackPosition)
 
-    private suspend inline fun storeIsRepeating(isRepeating: Boolean) =
+    internal suspend inline fun mStoreIsRepeating(isRepeating: Boolean) =
         storageHandler.storeIsRepeating(isRepeating)
-
-    internal suspend inline fun mStoreAndSendIsRepeating(isRepeating: Boolean) {
-        sendBroadcast(
-            Intent(Broadcast_IS_REPEATING_CHANGED)
-                .putExtra(IS_REPEATING_ARG, isRepeating)
-        )
-        storeIsRepeating(isRepeating)
-    }
 
     internal suspend inline fun mStoreCurrentUrl(url: String) =
         storageHandler.storeCurrentUrl(url)
@@ -562,6 +539,7 @@ class StreamService : SuspendService(), Receiver, NotificationManager, KoinCompo
 
                 scope.launch {
                     mUpdateMediaSession(videoMeta?.let(::VideoMetadata))
+                    mPlayerNotificationManager.invalidate()
                     launch(Dispatchers.IO) { mStoreMetadata(videoMeta) }
 
                     mPlayer.run {
@@ -681,14 +659,19 @@ class StreamService : SuspendService(), Receiver, NotificationManager, KoinCompo
     private fun PlaybackStateCompat.Builder.setCustomActions() =
         this
             .addCustomAction(
-                PlaybackStateCompat.CustomAction.Builder(
-                    ACTION_CHANGE_REPEAT,
-                    resources.getString(R.string.change_repeat),
-                    when {
-                        mIsRepeating -> R.drawable.no_repeat
-                        else -> R.drawable.repeat
-                    }
-                ).build()
+                when {
+                    mIsRepeating -> PlaybackStateCompat.CustomAction.Builder(
+                        ACTION_REPEAT,
+                        resources.getString(R.string.change_repeat),
+                        R.drawable.repeat
+                    )
+
+                    else -> PlaybackStateCompat.CustomAction.Builder(
+                        ACTION_UNREPEAT,
+                        resources.getString(R.string.change_repeat),
+                        R.drawable.no_repeat
+                    )
+                }.build()
             )
             .addCustomAction(
                 PlaybackStateCompat.CustomAction.Builder(
@@ -737,56 +720,27 @@ class StreamService : SuspendService(), Receiver, NotificationManager, KoinCompo
 
     // --------------------------- Notification Actions ---------------------------
 
-    private inline val repeatActionCompat
+    internal inline val mRepeatActionCompat
         get() = NotificationCompat.Action.Builder(
             IconCompat.createWithResource(
                 this,
-                when {
-                    mIsRepeating -> R.drawable.repeat
-                    else -> R.drawable.no_repeat
-                }
+                R.drawable.repeat
             ),
             resources.getString(R.string.change_repeat),
-            Actions.ChangeRepeat.playbackIntent
+            Actions.Repeat.playbackIntent
         ).build()
 
-    private inline val tenSecsBackActionIfSeekableCompat: NotificationCompat.Action?
-        get() = when {
-            mPlayer.isCurrentMediaItemSeekable -> NotificationCompat.Action.Builder(
-                IconCompat.createWithResource(this, R.drawable.prev_track),
-                resources.getString(R.string.ten_secs_back),
-                Actions.TenSecsBack.playbackIntent
-            ).build()
+    internal inline val mUnrepeatActionCompat
+        get() = NotificationCompat.Action.Builder(
+            IconCompat.createWithResource(
+                this,
+                R.drawable.no_repeat
+            ),
+            resources.getString(R.string.change_repeat),
+            Actions.Unrepeat.playbackIntent
+        ).build()
 
-            else -> null
-        }
-
-    private fun getPlayPauseActionCompat(isPlaying: Boolean) = when {
-        isPlaying -> NotificationCompat.Action.Builder(
-            IconCompat.createWithResource(this, R.drawable.pause),
-            resources.getString(R.string.pause),
-            Actions.Pause.playbackIntent
-        )
-
-        else -> NotificationCompat.Action.Builder(
-            IconCompat.createWithResource(this, R.drawable.play),
-            resources.getString(R.string.play),
-            Actions.Resume.playbackIntent
-        )
-    }.build()
-
-    private inline val tenSecsForwardActionIfSeekableCompat
-        get() = when {
-            mPlayer.isCurrentMediaItemSeekable -> NotificationCompat.Action.Builder(
-                IconCompat.createWithResource(this, R.drawable.next_track),
-                resources.getString(R.string.ten_secs_forward),
-                Actions.TenSecsForward.playbackIntent
-            ).build()
-
-            else -> null
-        }
-
-    private inline val dismissNotificationActionCompat
+    internal inline val mDismissNotificationActionCompat
         get() = NotificationCompat.Action.Builder(
             IconCompat.createWithResource(this, R.drawable.dismiss),
             resources.getString(R.string.cancel),
@@ -794,6 +748,23 @@ class StreamService : SuspendService(), Receiver, NotificationManager, KoinCompo
         ).build()
 
     // --------------------------- Notification Handle ---------------------------
+
+    /**
+     * Runs loop that observers all notification related states
+     * and updates notification when something has changed
+     */
+
+    override suspend fun startNotificationObserving() =
+        lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
+            storageHandler.isRepeatingState.collectLatest {
+                scope.launch { mUpdateNotification() }
+            }
+        }
+
+    internal suspend inline fun mUpdateNotification() {
+        mUpdateMediaSession()
+        mPlayerNotificationManager.invalidate()
+    }
 
     override fun detachNotification() {
         isNotificationShown = false
