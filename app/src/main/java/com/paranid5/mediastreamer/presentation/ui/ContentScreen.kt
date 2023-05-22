@@ -10,6 +10,7 @@ import androidx.navigation.compose.composable
 import com.paranid5.mediastreamer.R
 import com.paranid5.mediastreamer.presentation.Screens
 import com.paranid5.mediastreamer.presentation.about_app.AboutApp
+import com.paranid5.mediastreamer.presentation.audio_effects.AudioEffectsScreen
 import com.paranid5.mediastreamer.presentation.composition_locals.LocalActivity
 import com.paranid5.mediastreamer.presentation.composition_locals.LocalNavController
 import com.paranid5.mediastreamer.presentation.favourites.FavouritesScreen
@@ -54,18 +55,22 @@ fun ContentScreen(
 
     NavHost(
         navController = LocalNavController.current.value!!,
-        startDestination = Screens.StreamScreen.Searching.title,
+        startDestination = Screens.MainScreens.Searching.title,
         modifier = Modifier.padding(
             top = padding.calculateTopPadding(),
             bottom = padding.calculateBottomPadding()
         )
     ) {
-        composable(route = Screens.StreamScreen.Searching.title) {
+        composable(route = Screens.MainScreens.Searching.title) {
             SearchStreamScreen(viewModel = searchStreamViewModel, curScreenState)
         }
 
-        composable(route = Screens.StreamScreen.Streaming.title) {
+        composable(route = Screens.MainScreens.StreamScreens.Streaming.title) {
             StreamingScreen(viewModel = streamingViewModel, curScreenState)
+        }
+
+        composable(route = Screens.MainScreens.StreamScreens.AudioEffects.title) {
+            AudioEffectsScreen()
         }
 
         composable(route = Screens.AboutApp.title) {

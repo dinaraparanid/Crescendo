@@ -64,7 +64,7 @@ fun App(
     )
 
     val backgroundColor = when (curScreen) {
-        Screens.StreamScreen.Streaming -> Color.Transparent
+        Screens.MainScreens.StreamScreens.Streaming -> Color.Transparent
         else -> colors.background
     }
 
@@ -117,7 +117,7 @@ fun App(
         animBackgroundColor.animateTo(backgroundColor, animationSpec = tween(500))
     }
 
-    AnimatedContent(targetState = animBackgroundColor) { color ->
+    AnimatedContent(targetState = animBackgroundColor, label = "") { color ->
         Box(Modifier.fillMaxSize()) {
             UpdateCheckerDialog(Modifier.align(Alignment.Center))
 

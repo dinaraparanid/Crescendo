@@ -19,14 +19,14 @@ class MainActivityViewModel(savedStateHandle: SavedStateHandle) : ViewModel() {
     val curScreenState = MutableStateFlow(
         savedStateHandle.getStateFlow<Screens>(
             CUR_SCREEN_STATE,
-            Screens.StreamScreen.Searching
+            Screens.MainScreens.Searching
         ).value
     )
 
     val streamScreenState = curScreenState
         .map {
             when (it) {
-                Screens.StreamScreen.Streaming -> StreamStates.STREAMING
+                Screens.MainScreens.StreamScreens.Streaming -> StreamStates.STREAMING
                 else -> StreamStates.SEARCHING
             }
         }

@@ -5,6 +5,8 @@ import com.paranid5.mediastreamer.presentation.UIHandler
 import com.paranid5.mediastreamer.domain.stream_service.StreamServiceAccessor
 import com.paranid5.mediastreamer.domain.video_cash_service.Formats
 import com.paranid5.mediastreamer.domain.video_cash_service.VideoCashServiceAccessor
+import com.paranid5.mediastreamer.presentation.NavHostController
+import com.paranid5.mediastreamer.presentation.Screens
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 
@@ -30,4 +32,7 @@ class StreamingUIHandler(private val serviceAccessor: StreamServiceAccessor) :
             desiredFilename = desiredFilename,
             format = format
         )
+
+    fun navigateToAudioEffects(navHostController: NavHostController) =
+        navHostController.navigateIfNotSame(Screens.MainScreens.StreamScreens.AudioEffects)
 }

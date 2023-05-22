@@ -63,7 +63,7 @@ private fun ConfirmButton(
         modifier = modifier,
         onClick = {
             viewModel.onConfirmUrlButtonPressed()
-            navHostController.navigateIfNotSame(Screens.StreamScreen.Streaming)
+            navHostController.navigateIfNotSame(Screens.MainScreens.StreamScreens.Streaming)
         }
     ) {
         Text(stringResource(R.string.confirm))
@@ -78,7 +78,7 @@ fun SearchStreamScreen(
     curScreenState: MutableStateFlow<Screens>,
     modifier: Modifier = Modifier,
 ) {
-    curScreenState.update { Screens.StreamScreen.Searching }
+    curScreenState.update { Screens.MainScreens.Searching }
 
     val orientation = LocalConfiguration.current.orientation
 

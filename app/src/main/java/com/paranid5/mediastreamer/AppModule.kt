@@ -8,6 +8,9 @@ import com.paranid5.mediastreamer.domain.ktor_client.KtorClient
 import com.paranid5.mediastreamer.domain.stream_service.StreamServiceAccessor
 import com.paranid5.mediastreamer.domain.video_cash_service.VideoCashServiceAccessor
 import com.paranid5.mediastreamer.presentation.appbar.stream_button.StreamButtonUIHandler
+import com.paranid5.mediastreamer.presentation.audio_effects.AudioEffectsPresenter
+import com.paranid5.mediastreamer.presentation.audio_effects.AudioEffectsUIHandler
+import com.paranid5.mediastreamer.presentation.audio_effects.AudioEffectsViewModel
 import com.paranid5.mediastreamer.presentation.main_activity.MainActivityViewModel
 import com.paranid5.mediastreamer.presentation.search_stream.SearchStreamPresenter
 import com.paranid5.mediastreamer.presentation.search_stream.SearchStreamUIHandler
@@ -26,6 +29,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import org.koin.android.ext.koin.androidApplication
 import org.koin.android.ext.koin.androidContext
 import org.koin.androidx.viewmodel.dsl.viewModelOf
+import org.koin.core.module.dsl.factoryOf
 import org.koin.core.module.dsl.singleOf
 import org.koin.core.qualifier.named
 import org.koin.core.scope.Scope
@@ -108,9 +112,19 @@ private val streamingModule = module {
     viewModelOf(::StreamingViewModel)
 }
 
-private val uiModule = module {
-    includes(searchStreamModule, streamingModule)
+private val audioEffectsModule = module {
+    singleOf(::AudioEffectsUIHandler)
+    factoryOf(::AudioEffectsPresenter)
+    viewModelOf(::AudioEffectsViewModel)
+}
+
+private val uiMainModule = module {
+    includes(searchStreamModule, streamingModule, audioEffectsModule)
     singleOf(::StreamButtonUIHandler)
+}
+
+private val uiModule = module {
+    includes(uiMainModule)
 }
 
 val appModule = module {

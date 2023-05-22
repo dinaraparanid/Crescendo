@@ -29,6 +29,7 @@ import com.paranid5.mediastreamer.EXTERNAL_STORAGE_PERMISSION_QUEUE
 import com.paranid5.mediastreamer.R
 import com.paranid5.mediastreamer.domain.StorageHandler
 import com.paranid5.mediastreamer.presentation.composition_locals.LocalActivity
+import com.paranid5.mediastreamer.presentation.composition_locals.LocalNavController
 import com.paranid5.mediastreamer.presentation.ui.extensions.getLightVibrantOrPrimary
 import com.paranid5.mediastreamer.presentation.ui.extensions.openAppSettings
 import com.paranid5.mediastreamer.presentation.ui.extensions.simpleShadow
@@ -49,12 +50,17 @@ internal fun UtilsButtons(palette: Palette?, modifier: Modifier = Modifier) =
     }
 
 @Composable
-private fun EqualizerButton(palette: Palette?, modifier: Modifier = Modifier) {
+private fun EqualizerButton(
+    palette: Palette?,
+    modifier: Modifier = Modifier,
+    streamingUIHandler: StreamingUIHandler = koinInject()
+) {
+    val navHostController = LocalNavController.current
     val lightVibrantColor = palette.getLightVibrantOrPrimary()
 
     IconButton(
         modifier = modifier.simpleShadow(color = lightVibrantColor),
-        onClick = { /*TODO Equalizer*/ }
+        onClick = { streamingUIHandler.navigateToAudioEffects(navHostController) }
     ) {
         Icon(
             modifier = Modifier.size(30.dp),

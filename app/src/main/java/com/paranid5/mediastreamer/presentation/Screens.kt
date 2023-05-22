@@ -1,35 +1,30 @@
 package com.paranid5.mediastreamer.presentation
 
-import java.io.Serializable
+import android.os.Parcelable
+import kotlinx.parcelize.Parcelize
 
-sealed class Screens(val title: String) : Serializable {
-    companion object {
-        private const val serialVersionUID = 6162363934932631034L
-    }
+sealed class Screens(val title: String) : Parcelable {
 
-    sealed class StreamScreen(title: String) : Screens("stream/$title") {
-        companion object {
-            private const val serialVersionUID = -9190403684670003934L
-        }
+    sealed class MainScreens(title: String) : Screens("main/$title") {
 
-        object Searching : StreamScreen("searching") {
-            private const val serialVersionUID = 5819957036047179941L
-        }
+        @Parcelize
+        object Searching : MainScreens("searching")
 
-        object Streaming : StreamScreen("streaming") {
-            private const val serialVersionUID = -1606073483225906713L
+        sealed class StreamScreens(title: String) : MainScreens("stream/$title") {
+            @Parcelize
+            object Streaming : MainScreens("streaming")
+
+            @Parcelize
+            object AudioEffects : MainScreens("audio_effects")
         }
     }
 
-    object AboutApp : Screens("about_app") {
-        private const val serialVersionUID = 8225338587721480497L
-    }
+    @Parcelize
+    object AboutApp : Screens("about_app")
 
-    object Favourite : Screens(title = "favourites") {
-        private const val serialVersionUID = -3030101473142004909L
-    }
+    @Parcelize
+    object Favourite : Screens(title = "favourites")
 
-    object Settings : Screens(title = "settings") {
-        private const val serialVersionUID = -8106771731336221725L
-    }
+    @Parcelize
+    object Settings : Screens(title = "settings")
 }

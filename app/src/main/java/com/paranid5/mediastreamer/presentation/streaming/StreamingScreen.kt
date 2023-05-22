@@ -26,7 +26,6 @@ private const val BROADCAST_LOCATION = "com.paranid5.mediastreamer.presentation.
 const val Broadcast_CUR_POSITION_CHANGED = "$BROADCAST_LOCATION.CUR_POSITION_CHANGED"
 
 const val CUR_POSITION_ARG = "cur_position"
-const val IS_REPEATING_ARG = "is_repeating"
 const val VIDEO_CASH_STATUS_ARG = "video_cash_status"
 
 @Composable
@@ -36,7 +35,7 @@ fun StreamingScreen(
     modifier: Modifier = Modifier,
     storageHandler: StorageHandler = koinInject()
 ) {
-    curScreenState.update { Screens.StreamScreen.Streaming }
+    curScreenState.update { Screens.MainScreens.StreamScreens.Streaming }
 
     when (LocalConfiguration.current.orientation) {
         Configuration.ORIENTATION_LANDSCAPE ->
