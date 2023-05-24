@@ -21,6 +21,7 @@ class StorageHandler(private val context: Context) : CoroutineScope by MainScope
         private val CURRENT_METADATA = stringPreferencesKey("current_metadata")
         private val PLAYBACK_POSITION = longPreferencesKey("playback_position")
         private val IS_REPEATING = booleanPreferencesKey("is_repeating")
+        private val AUDIO_EFFECTS_ENABLED = booleanPreferencesKey("audio_effects_enabled")
     }
 
     private val Context.dataStore: DataStore<Preferences> by preferencesDataStore(name = "params")
@@ -67,5 +68,17 @@ class StorageHandler(private val context: Context) : CoroutineScope by MainScope
 
     internal suspend inline fun storeIsRepeating(isRepeating: Boolean) {
         context.dataStore.edit { preferences -> preferences[IS_REPEATING] = isRepeating }
+    }
+
+    @OptIn(ExperimentalCoroutinesApi::class)
+    val areAudioEffectsEnabledState = context.dataStore.data
+        .mapLatest { preferences -> preferences[AUDIO_EFFECTS_ENABLED] }
+        .mapLatest { it ?: false }
+        .stateIn(this, SharingStarted.Eagerly, false)
+
+    internal suspend inline fun storeAudioEffectsEnabled(areAudioEffectsEnabled: Boolean) {
+        context.dataStore.edit { preferences ->
+            preferences[AUDIO_EFFECTS_ENABLED] = areAudioEffectsEnabled
+        }
     }
 }

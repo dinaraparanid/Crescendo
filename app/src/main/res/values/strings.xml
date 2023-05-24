@@ -52,4 +52,5 @@
     <string name="update_available">Update available</string>
     <string name="download">Download</string>
     <string name="audio_recording_description">Audio visualizer requires recording in order to process input audio stream</string>
+    <string name="audio_effects">Audio Effects</string>
 </resources>

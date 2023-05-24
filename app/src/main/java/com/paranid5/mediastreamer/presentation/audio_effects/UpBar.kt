@@ -1,0 +1,56 @@
+package com.paranid5.mediastreamer.presentation.audio_effects
+
+import androidx.compose.foundation.layout.Box
+import androidx.compose.material3.Switch
+import androidx.compose.material3.SwitchDefaults
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.toArgb
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.sp
+import androidx.palette.graphics.Palette
+import com.paranid5.mediastreamer.R
+import com.paranid5.mediastreamer.domain.StorageHandler
+import com.paranid5.mediastreamer.presentation.ui.extensions.decreaseBrightness
+import com.paranid5.mediastreamer.presentation.ui.extensions.getLightVibrantOrPrimary
+import com.paranid5.mediastreamer.presentation.ui.extensions.simpleShadow
+import com.paranid5.mediastreamer.presentation.ui.theme.LocalAppColors
+import org.koin.compose.koinInject
+
+@Composable
+internal fun UpBar(
+    palette: Palette?,
+    modifier: Modifier = Modifier,
+    audioEffectsUIHandler: AudioEffectsUIHandler = koinInject(),
+    storageHandler: StorageHandler = koinInject(),
+) {
+    val primaryColor = palette.getLightVibrantOrPrimary()
+    val argbPrimaryColor = primaryColor.toArgb()
+
+    val areAudioEffectsEnabled by storageHandler.areAudioEffectsEnabledState.collectAsState()
+
+    Box(modifier) {
+        Text(
+            text = stringResource(R.string.audio_effects),
+            color = primaryColor,
+            fontSize = 20.sp,
+            modifier = Modifier.align(Alignment.Center).simpleShadow(color = primaryColor)
+        )
+
+        Switch(
+            modifier = Modifier.align(Alignment.CenterEnd),
+            checked = areAudioEffectsEnabled,
+            colors = SwitchDefaults.colors(
+                checkedThumbColor = primaryColor,
+                checkedTrackColor = Color(argbPrimaryColor.decreaseBrightness(0.5F)),
+                checkedBorderColor = Color(argbPrimaryColor.decreaseBrightness(0.25F))
+            ),
+            onCheckedChange = { audioEffectsUIHandler.storeAudioEffectsEnabledAsync(it) }
+        )
+    }
+}

@@ -65,6 +65,7 @@ internal inline fun rememberVideoCoverPainter(
 internal inline fun rememberVideoCoverPainterWithPalette(
     isPlaceholderRequired: Boolean,
     size: Pair<Int, Int>? = null,
+    isBlured: Boolean = false,
     storageHandler: StorageHandler = koinInject(),
     crossinline bitmapSettings: (Bitmap) -> Unit = {}
 ): Pair<AsyncImagePainter, Palette?> {
@@ -94,6 +95,10 @@ internal inline fun rememberVideoCoverPainterWithPalette(
             .apply {
                 if (isPlaceholderRequired)
                     placeholder(prevCoverModel)
+
+                if (isBlured)
+                    transformations(BlurTransformation(context))
+
                 size?.run { size(first, second) }
             }
             .precision(Precision.EXACT)
