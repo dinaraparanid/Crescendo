@@ -23,7 +23,7 @@ sealed class Screens(val title: String) : Parcelable {
     object AboutApp : Screens("about_app")
 
     @Parcelize
-    object Favourite : Screens(title = "favourites")
+    object Favourites : Screens(title = "favourites")
 
     @Parcelize
     object Settings : Screens(title = "settings")

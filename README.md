@@ -13,7 +13,7 @@ can **play audio files from YouTube and cash them.**
 ![cashing_options](app/src/main/res/drawable/cashing_options.webp)
 
 ## **Current Status**
-**Alpha V 0.0.0.2**
+**Alpha V 0.0.0.3**
 
 **Implemented features:**
 1. Media Playback

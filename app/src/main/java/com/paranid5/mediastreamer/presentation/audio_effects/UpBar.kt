@@ -13,23 +13,20 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.sp
-import androidx.palette.graphics.Palette
 import com.paranid5.mediastreamer.R
 import com.paranid5.mediastreamer.domain.StorageHandler
 import com.paranid5.mediastreamer.presentation.ui.extensions.decreaseBrightness
-import com.paranid5.mediastreamer.presentation.ui.extensions.getLightVibrantOrPrimary
 import com.paranid5.mediastreamer.presentation.ui.extensions.simpleShadow
 import com.paranid5.mediastreamer.presentation.ui.theme.LocalAppColors
 import org.koin.compose.koinInject
 
 @Composable
 internal fun UpBar(
-    palette: Palette?,
     modifier: Modifier = Modifier,
     audioEffectsUIHandler: AudioEffectsUIHandler = koinInject(),
     storageHandler: StorageHandler = koinInject(),
 ) {
-    val primaryColor = palette.getLightVibrantOrPrimary()
+    val primaryColor = LocalAppColors.current.value.primary
     val argbPrimaryColor = primaryColor.toArgb()
 
     val areAudioEffectsEnabled by storageHandler.areAudioEffectsEnabledState.collectAsState()

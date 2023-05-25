@@ -53,4 +53,8 @@
     <string name="download">Download</string>
     <string name="audio_recording_description">Audio visualizer requires recording in order to process input audio stream</string>
     <string name="audio_effects">Audio Effects</string>
+    <string name="pitch">Pitch</string>
+    <string name="speed">Speed</string>
+    <string name="bass">Bass</string>
+    <string name="reverb">Reverb</string>
 </resources>

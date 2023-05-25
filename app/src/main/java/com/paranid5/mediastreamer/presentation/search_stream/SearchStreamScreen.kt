@@ -30,46 +30,6 @@ import com.paranid5.mediastreamer.presentation.ui.OnUIStateChanged
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.update
 
-@Composable
-private fun Label(modifier: Modifier = Modifier) =
-    Text(text = "${stringResource(R.string.enter_stream_url)}:", modifier = modifier)
-
-@Composable
-private fun UrlEditor(
-    modifier: Modifier = Modifier,
-    inputText: String?,
-    hint: String = stringResource(R.string.your_url),
-    viewModel: SearchStreamViewModel
-) {
-    TextField(
-        value = inputText ?: "",
-        singleLine = true,
-        placeholder = { Text(hint) },
-        onValueChange = { viewModel.presenter.currentTextState.value = it },
-        modifier = modifier.width(300.dp),
-    )
-}
-
-@Composable
-private fun ConfirmButton(
-    isConfirmButtonActive: Boolean,
-    viewModel: SearchStreamViewModel,
-    modifier: Modifier = Modifier
-) {
-    val navHostController = LocalNavController.current
-
-    Button(
-        enabled = isConfirmButtonActive,
-        modifier = modifier,
-        onClick = {
-            viewModel.onConfirmUrlButtonPressed()
-            navHostController.navigateIfNotSame(Screens.MainScreens.StreamScreens.Streaming)
-        }
-    ) {
-        Text(stringResource(R.string.confirm))
-    }
-}
-
 private val youtubeUrlRegex = Regex("https://(www\\.youtube\\.com/watch\\?v=|youtu\\.be/).*")
 
 @Composable
@@ -130,5 +90,45 @@ fun SearchStreamScreen(
                 modifier = Modifier.wrapContentWidth().align(Alignment.CenterHorizontally)
             )
         }
+    }
+}
+
+@Composable
+private fun Label(modifier: Modifier = Modifier) =
+    Text(text = "${stringResource(R.string.enter_stream_url)}:", modifier = modifier)
+
+@Composable
+private fun UrlEditor(
+    modifier: Modifier = Modifier,
+    inputText: String?,
+    hint: String = stringResource(R.string.your_url),
+    viewModel: SearchStreamViewModel
+) {
+    TextField(
+        value = inputText ?: "",
+        singleLine = true,
+        placeholder = { Text(hint) },
+        onValueChange = { viewModel.presenter.currentTextState.value = it },
+        modifier = modifier.width(300.dp),
+    )
+}
+
+@Composable
+private fun ConfirmButton(
+    isConfirmButtonActive: Boolean,
+    viewModel: SearchStreamViewModel,
+    modifier: Modifier = Modifier
+) {
+    val navHostController = LocalNavController.current
+
+    Button(
+        enabled = isConfirmButtonActive,
+        modifier = modifier,
+        onClick = {
+            viewModel.onConfirmUrlButtonPressed()
+            navHostController.navigateIfNotSame(Screens.MainScreens.StreamScreens.Streaming)
+        }
+    ) {
+        Text(stringResource(R.string.confirm))
     }
 }

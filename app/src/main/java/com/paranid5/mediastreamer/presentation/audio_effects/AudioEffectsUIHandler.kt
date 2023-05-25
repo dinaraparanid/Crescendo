@@ -14,4 +14,15 @@ class AudioEffectsUIHandler : UIHandler, KoinComponent, CoroutineScope by MainSc
     fun storeAudioEffectsEnabledAsync(isEnabled: Boolean) = launch {
         storageHandler.storeAudioEffectsEnabled(isEnabled)
     }
+
+    fun isParamInputValid(input: String) =
+        input.takeIf { s -> s.toFloatOrNull()?.takeIf { it in 0.5F..1.5F } != null } != null
+
+    fun storePitchAsync(pitch: Float) = launch {
+        storageHandler.storePitch(pitch)
+    }
+
+    fun storeSpeedAsync(speed: Float) = launch {
+        storageHandler.storeSpeed(speed)
+    }
 }

@@ -4,16 +4,20 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import com.paranid5.mediastreamer.presentation.ui.rememberVideoCoverPainterWithPalette
+import com.paranid5.mediastreamer.presentation.Screens
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.update
 
 @Composable
-fun AudioEffectsScreen(modifier: Modifier = Modifier) {
-    val (_, palette) = rememberVideoCoverPainterWithPalette(
-        isPlaceholderRequired = false,
-        size = 1100 to 1000
-    )
+fun AudioEffectsScreen(
+    viewModel: AudioEffectsViewModel,
+    curScreenState: MutableStateFlow<Screens>,
+    modifier: Modifier = Modifier,
+) {
+    curScreenState.update { Screens.MainScreens.StreamScreens.AudioEffects }
 
     Column(modifier) {
-        UpBar(palette = palette, modifier = Modifier.fillMaxWidth())
+        UpBar(Modifier.fillMaxWidth())
+        PitchAndSpeed(viewModel, Modifier.fillMaxWidth())
     }
 }

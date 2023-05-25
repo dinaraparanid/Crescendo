@@ -11,6 +11,7 @@ import com.paranid5.mediastreamer.R
 import com.paranid5.mediastreamer.presentation.Screens
 import com.paranid5.mediastreamer.presentation.about_app.AboutApp
 import com.paranid5.mediastreamer.presentation.audio_effects.AudioEffectsScreen
+import com.paranid5.mediastreamer.presentation.audio_effects.AudioEffectsViewModel
 import com.paranid5.mediastreamer.presentation.composition_locals.LocalActivity
 import com.paranid5.mediastreamer.presentation.composition_locals.LocalNavController
 import com.paranid5.mediastreamer.presentation.favourites.FavouritesScreen
@@ -18,7 +19,7 @@ import com.paranid5.mediastreamer.presentation.search_stream.SearchStreamScreen
 import com.paranid5.mediastreamer.presentation.search_stream.SearchStreamViewModel
 import com.paranid5.mediastreamer.presentation.streaming.StreamingScreen
 import com.paranid5.mediastreamer.presentation.streaming.StreamingViewModel
-import com.paranid5.mediastreamer.presentation.ui.screens.SettingsScreen
+import com.paranid5.mediastreamer.presentation.settings.SettingsScreen
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import org.koin.androidx.compose.koinViewModel
@@ -30,6 +31,7 @@ fun ContentScreen(
     curScreenState: MutableStateFlow<Screens>,
     searchStreamViewModel: SearchStreamViewModel = koinViewModel(),
     streamingViewModel: StreamingViewModel = koinViewModel(),
+    audioEffectsViewModel: AudioEffectsViewModel = koinViewModel()
 ) {
     val backPressedCounter = AtomicInteger()
     val activity = LocalActivity.current
@@ -62,27 +64,27 @@ fun ContentScreen(
         )
     ) {
         composable(route = Screens.MainScreens.Searching.title) {
-            SearchStreamScreen(viewModel = searchStreamViewModel, curScreenState)
+            SearchStreamScreen(searchStreamViewModel, curScreenState)
         }
 
         composable(route = Screens.MainScreens.StreamScreens.Streaming.title) {
-            StreamingScreen(viewModel = streamingViewModel, curScreenState)
+            StreamingScreen(streamingViewModel, curScreenState)
         }
 
         composable(route = Screens.MainScreens.StreamScreens.AudioEffects.title) {
-            AudioEffectsScreen()
+            AudioEffectsScreen(audioEffectsViewModel, curScreenState)
         }
 
         composable(route = Screens.AboutApp.title) {
-            AboutApp()
+            AboutApp(curScreenState)
         }
 
-        composable(route = Screens.Favourite.title) {
-            FavouritesScreen()
+        composable(route = Screens.Favourites.title) {
+            FavouritesScreen(curScreenState)
         }
 
         composable(route = Screens.Settings.title) {
-            SettingsScreen()
+            SettingsScreen(curScreenState)
         }
     }
 }

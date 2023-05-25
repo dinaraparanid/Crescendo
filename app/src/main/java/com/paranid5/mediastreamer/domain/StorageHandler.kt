@@ -1,7 +1,6 @@
 package com.paranid5.mediastreamer.domain
 
 import android.content.Context
-import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.*
 import androidx.datastore.preferences.preferencesDataStore
 import com.paranid5.mediastreamer.data.VideoMetadata
@@ -11,7 +10,6 @@ import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.mapLatest
 import kotlinx.coroutines.flow.stateIn
-import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 
@@ -22,9 +20,11 @@ class StorageHandler(private val context: Context) : CoroutineScope by MainScope
         private val PLAYBACK_POSITION = longPreferencesKey("playback_position")
         private val IS_REPEATING = booleanPreferencesKey("is_repeating")
         private val AUDIO_EFFECTS_ENABLED = booleanPreferencesKey("audio_effects_enabled")
+        private val PITCH_VALUE = floatPreferencesKey("pitch_value")
+        private val SPEED_VALUE = floatPreferencesKey("speed_value")
     }
 
-    private val Context.dataStore: DataStore<Preferences> by preferencesDataStore(name = "params")
+    private val Context.dataStore by preferencesDataStore(name = "params")
 
     @OptIn(ExperimentalCoroutinesApi::class)
     val currentUrlState = context.dataStore.data
@@ -80,5 +80,25 @@ class StorageHandler(private val context: Context) : CoroutineScope by MainScope
         context.dataStore.edit { preferences ->
             preferences[AUDIO_EFFECTS_ENABLED] = areAudioEffectsEnabled
         }
+    }
+
+    @OptIn(ExperimentalCoroutinesApi::class)
+    val pitchState = context.dataStore.data
+        .mapLatest { preferences -> preferences[PITCH_VALUE] }
+        .mapLatest { it ?: 1.0F }
+        .stateIn(this, SharingStarted.Eagerly, 1.0F)
+
+    internal suspend inline fun storePitch(pitch: Float) {
+        context.dataStore.edit { preferences -> preferences[PITCH_VALUE] = pitch }
+    }
+
+    @OptIn(ExperimentalCoroutinesApi::class)
+    val speedState = context.dataStore.data
+        .mapLatest { preferences -> preferences[SPEED_VALUE] }
+        .mapLatest { it ?: 1.0F }
+        .stateIn(this, SharingStarted.Eagerly, 1.0F)
+
+    internal suspend inline fun storeSpeed(speed: Float) {
+        context.dataStore.edit { preferences -> preferences[SPEED_VALUE] = speed }
     }
 }

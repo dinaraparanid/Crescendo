@@ -114,7 +114,11 @@ private val streamingModule = module {
 
 private val audioEffectsModule = module {
     singleOf(::AudioEffectsUIHandler)
-    factoryOf(::AudioEffectsPresenter)
+
+    factory { (pitchText: String?, speedText: String?) ->
+        AudioEffectsPresenter(pitchText, speedText)
+    }
+
     viewModelOf(::AudioEffectsViewModel)
 }
 

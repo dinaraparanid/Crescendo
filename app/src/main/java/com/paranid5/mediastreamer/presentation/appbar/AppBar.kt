@@ -45,7 +45,7 @@ fun AppBar(modifier: Modifier = Modifier) {
         AppBarItem(
             title = R.string.favourites,
             image = Icons.Filled.Favorite,
-            screen = Screens.Favourite,
+            screen = Screens.Favourites,
             modifier = Modifier.weight(1F)
         )
 
