@@ -57,4 +57,5 @@
     <string name="speed">Speed</string>
     <string name="bass">Bass</string>
     <string name="reverb">Reverb</string>
+    <string name="custom">Custom</string>
 </resources>

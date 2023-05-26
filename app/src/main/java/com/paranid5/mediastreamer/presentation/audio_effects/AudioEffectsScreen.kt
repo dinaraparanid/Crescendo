@@ -19,5 +19,6 @@ fun AudioEffectsScreen(
     Column(modifier) {
         UpBar(Modifier.fillMaxWidth())
         PitchAndSpeed(viewModel, Modifier.fillMaxWidth())
+        Equalizer(Modifier.fillMaxWidth())
     }
 }

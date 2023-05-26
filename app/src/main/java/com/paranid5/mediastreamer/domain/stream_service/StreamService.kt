@@ -64,6 +64,7 @@ class StreamService : SuspendService(), Receiver, LifecycleNotificationManager, 
         private const val STREAM_CHANNEL_ID = "stream_channel"
         private const val PLAYBACK_UPDATE_COOLDOWN = 500L
         private const val TEN_SECS_AS_MILLIS = 10000
+        const val CUSTOM_EQ_PRESET = -1
 
         private const val SERVICE_LOCATION = "com.paranid5.mediastreamer.domain.stream_service"
         const val Broadcast_PAUSE = "$SERVICE_LOCATION.PAUSE"
@@ -165,8 +166,9 @@ class StreamService : SuspendService(), Receiver, LifecycleNotificationManager, 
     private val speedState = storageHandler.speedState
 
     private val equalizerState = MutableStateFlow<Equalizer?>(null)
-    private val equalizerBandsState = storageHandler.equalizerBandsState
     private val equalizerDataState by inject<MutableStateFlow<EqualizerData?>>(named(EQUALIZER_DATA))
+    private val equalizerBandsState = storageHandler.equalizerBandsState
+    private val equalizerPresetState = storageHandler.equalizerPresetState
 
     private lateinit var playbackMonitorTask: Job
 
@@ -477,6 +479,7 @@ class StreamService : SuspendService(), Receiver, LifecycleNotificationManager, 
         scope.launch { startPlaybackParametersMonitoring() }
         scope.launch { startEqualizerEnabledMonitoring() }
         scope.launch { startEqualizerBandsMonitoring() }
+        scope.launch { startEqualizerPresetMonitoring() }
     }
 
     override fun onDestroy() {
@@ -659,7 +662,7 @@ class StreamService : SuspendService(), Receiver, LifecycleNotificationManager, 
     private suspend inline fun Equalizer(audioSessionId: Int) = Equalizer(0, audioSessionId).apply {
         if (storageHandler.equalizerBandsState.value == null)
             storageHandler.storeEqualizerBands(
-                (0..numberOfBands)
+                (0 until numberOfBands)
                     .map { getBandLevel(it.toShort()) }
                     .toShortArray()
             )
@@ -668,7 +671,11 @@ class StreamService : SuspendService(), Receiver, LifecycleNotificationManager, 
             EqualizerData(
                 minBandLevel = bandLevelRange[0],
                 maxBandLevel = bandLevelRange[1],
-                bandLevels = equalizerBandsState.value!!
+                bandLevels = equalizerBandsState.value!!,
+                curPreset = currentPreset,
+                presets = (0..numberOfPresets)
+                    .map { getPresetName(it.toShort()) }
+                    .toTypedArray()
             )
         }
 
@@ -678,14 +685,14 @@ class StreamService : SuspendService(), Receiver, LifecycleNotificationManager, 
     }
 
     private suspend inline fun EqualizerCatching(audioSessionId: Int) =
-        runCatching { Equalizer(audioSessionId) }
+        runCatching { Equalizer(audioSessionId) }.onFailure { it.printStackTrace() }
 
     private suspend inline fun startEqualizerBandsMonitoring() =
         lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
             equalizerBandsState.collectLatest { eqBands ->
-                equalizerState.update { eq ->
-                    if (eq == null || eqBands == null)
-                        return@update eq
+                if (eqBands != null) equalizerState.update { eq ->
+                    if (eq == null)
+                        return@update null
 
                     eqBands.forEachIndexed { ind, level ->
                         eq.setBandLevel(ind.toShort(), level)
@@ -701,12 +708,29 @@ class StreamService : SuspendService(), Receiver, LifecycleNotificationManager, 
                         else -> EqualizerData(
                             minBandLevel = eq.bandLevelRange[0],
                             maxBandLevel = eq.bandLevelRange[1],
-                            bandLevels = (0..eq.numberOfBands)
+                            curPreset = eq.currentPreset,
+                            bandLevels = (0 until eq.numberOfBands)
                                 .map { eq.getBandLevel(it.toShort()) }
-                                .toShortArray()
+                                .toShortArray(),
+                            presets = (0 until eq.numberOfPresets)
+                                .map { eq.getPresetName(it.toShort()) }
+                                .let { it + getString(R.string.custom) }
+                                .toTypedArray()
                         )
                     }
                 }
+            }
+        }
+
+    private suspend inline fun startEqualizerPresetMonitoring() =
+        lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
+            equalizerPresetState.collectLatest { preset ->
+                if (preset != CUSTOM_EQ_PRESET) {
+                    storageHandler.storeEqualizerBands(null)
+                    equalizerState.value?.usePreset(preset.toShort())
+                }
+
+                equalizerDataState.update { it?.copy(curPreset = preset.toShort()) }
             }
         }
 

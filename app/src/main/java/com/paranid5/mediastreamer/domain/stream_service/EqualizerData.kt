@@ -1,9 +1,11 @@
 package com.paranid5.mediastreamer.domain.stream_service
 
 data class EqualizerData(
-    private val minBandLevel: Short,
-    private val maxBandLevel: Short,
-    private val bandLevels: ShortArray
+    val minBandLevel: Short,
+    val maxBandLevel: Short,
+    val bandLevels: ShortArray,
+    val curPreset: Short,
+    val presets: Array<String>
 ) {
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
@@ -13,13 +15,17 @@ data class EqualizerData(
 
         if (minBandLevel != other.minBandLevel) return false
         if (maxBandLevel != other.maxBandLevel) return false
-        return bandLevels.contentEquals(other.bandLevels)
+        if (!bandLevels.contentEquals(other.bandLevels)) return false
+        if (curPreset != other.curPreset) return false
+        return presets.contentEquals(other.presets)
     }
 
     override fun hashCode(): Int {
         var result = minBandLevel.toInt()
         result = 31 * result + maxBandLevel
         result = 31 * result + bandLevels.contentHashCode()
+        result = 31 * result + curPreset.hashCode()
+        result = 31 * result + presets.contentHashCode()
         return result
     }
 }

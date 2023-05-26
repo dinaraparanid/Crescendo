@@ -23,6 +23,7 @@ class StorageHandler(private val context: Context) : CoroutineScope by MainScope
         private val PITCH_VALUE = floatPreferencesKey("pitch_value")
         private val SPEED_VALUE = floatPreferencesKey("speed_value")
         private val EQ_BANDS = stringPreferencesKey("eq_bands")
+        private val EQ_PRESET = intPreferencesKey("eq_preset")
     }
 
     private val Context.dataStore by preferencesDataStore(name = "params")
@@ -104,12 +105,22 @@ class StorageHandler(private val context: Context) : CoroutineScope by MainScope
     @OptIn(ExperimentalCoroutinesApi::class)
     val equalizerBandsState = context.dataStore.data
         .mapLatest { preferences -> preferences[EQ_BANDS] }
-        .mapLatest { bandsStr -> bandsStr?.let { Json.decodeFromString<ShortArray>(it) } }
+        .mapLatest { bandsStr -> bandsStr?.let { Json.decodeFromString<ShortArray?>(it) } }
         .stateIn(this, SharingStarted.Eagerly, null)
 
-    internal suspend inline fun storeEqualizerBands(eqBands: ShortArray) {
+    internal suspend inline fun storeEqualizerBands(eqBands: ShortArray?) {
         context.dataStore.edit { preferences ->
             preferences[EQ_BANDS] = Json.encodeToString(eqBands)
         }
+    }
+
+    @OptIn(ExperimentalCoroutinesApi::class)
+    val equalizerPresetState = context.dataStore.data
+        .mapLatest { preferences -> preferences[EQ_PRESET] }
+        .mapLatest { preset -> preset ?: 0 }
+        .stateIn(this, SharingStarted.Eagerly, 0)
+
+    internal suspend inline fun storeEqualizerPreset(eqPreset: Int) {
+        context.dataStore.edit { preferences -> preferences[EQ_PRESET] = eqPreset }
     }
 }
