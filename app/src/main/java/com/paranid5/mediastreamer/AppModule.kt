@@ -5,6 +5,7 @@ import android.os.Build
 import androidx.annotation.StringRes
 import com.paranid5.mediastreamer.domain.StorageHandler
 import com.paranid5.mediastreamer.domain.ktor_client.KtorClient
+import com.paranid5.mediastreamer.domain.stream_service.EqualizerData
 import com.paranid5.mediastreamer.domain.stream_service.StreamServiceAccessor
 import com.paranid5.mediastreamer.domain.video_cash_service.VideoCashServiceAccessor
 import com.paranid5.mediastreamer.presentation.appbar.stream_button.StreamButtonUIHandler
@@ -29,7 +30,6 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import org.koin.android.ext.koin.androidApplication
 import org.koin.android.ext.koin.androidContext
 import org.koin.androidx.viewmodel.dsl.viewModelOf
-import org.koin.core.module.dsl.factoryOf
 import org.koin.core.module.dsl.singleOf
 import org.koin.core.qualifier.named
 import org.koin.core.scope.Scope
@@ -39,6 +39,7 @@ const val STREAM_WITH_NO_NAME = "stream_no_name"
 const val UNKNOWN_STREAMER = "unknown_streamer"
 const val IS_PLAYING_STATE = "is_playing_state"
 const val AUDIO_SESSION_ID = "audio_session_id"
+const val EQUALIZER_DATA = "equalizer_data"
 
 const val EXTERNAL_STORAGE_PERMISSION_QUEUE = "external_storage_permission_queue"
 const val POST_NOTIFICATIONS_PERMISSION_QUEUE = "post_notifications_permission_queue"
@@ -98,6 +99,7 @@ private val globalsModule = module {
     singleOf(::KtorClient)
     single(named(IS_PLAYING_STATE)) { MutableStateFlow(false) }
     single(named(AUDIO_SESSION_ID)) { MutableStateFlow(0) }
+    single(named(EQUALIZER_DATA)) { MutableStateFlow<EqualizerData?>(null) }
 }
 
 private val searchStreamModule = module {

@@ -22,6 +22,7 @@ class StorageHandler(private val context: Context) : CoroutineScope by MainScope
         private val AUDIO_EFFECTS_ENABLED = booleanPreferencesKey("audio_effects_enabled")
         private val PITCH_VALUE = floatPreferencesKey("pitch_value")
         private val SPEED_VALUE = floatPreferencesKey("speed_value")
+        private val EQ_BANDS = stringPreferencesKey("eq_bands")
     }
 
     private val Context.dataStore by preferencesDataStore(name = "params")
@@ -43,11 +44,9 @@ class StorageHandler(private val context: Context) : CoroutineScope by MainScope
         .stateIn(this, SharingStarted.Eagerly, null)
 
     internal suspend inline fun storeCurrentMetadata(metadata: VideoMetadata?) {
-        context
-            .dataStore
-            .edit { preferences ->
-                preferences[CURRENT_METADATA] = Json.encodeToString(metadata)
-            }
+        context.dataStore.edit { preferences ->
+            preferences[CURRENT_METADATA] = Json.encodeToString(metadata)
+        }
     }
 
     @OptIn(ExperimentalCoroutinesApi::class)
@@ -100,5 +99,17 @@ class StorageHandler(private val context: Context) : CoroutineScope by MainScope
 
     internal suspend inline fun storeSpeed(speed: Float) {
         context.dataStore.edit { preferences -> preferences[SPEED_VALUE] = speed }
+    }
+
+    @OptIn(ExperimentalCoroutinesApi::class)
+    val equalizerBandsState = context.dataStore.data
+        .mapLatest { preferences -> preferences[EQ_BANDS] }
+        .mapLatest { bandsStr -> bandsStr?.let { Json.decodeFromString<ShortArray>(it) } }
+        .stateIn(this, SharingStarted.Eagerly, null)
+
+    internal suspend inline fun storeEqualizerBands(eqBands: ShortArray) {
+        context.dataStore.edit { preferences ->
+            preferences[EQ_BANDS] = Json.encodeToString(eqBands)
+        }
     }
 }

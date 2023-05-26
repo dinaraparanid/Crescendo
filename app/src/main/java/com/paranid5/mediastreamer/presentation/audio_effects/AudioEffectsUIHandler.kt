@@ -16,7 +16,7 @@ class AudioEffectsUIHandler : UIHandler, KoinComponent, CoroutineScope by MainSc
     }
 
     fun isParamInputValid(input: String) =
-        input.takeIf { s -> s.toFloatOrNull()?.takeIf { it in 0.5F..1.5F } != null } != null
+        input.takeIf { s -> s.toFloatOrNull()?.takeIf { it in 0.25F..2F } != null } != null
 
     fun storePitchAsync(pitch: Float) = launch {
         storageHandler.storePitch(pitch)

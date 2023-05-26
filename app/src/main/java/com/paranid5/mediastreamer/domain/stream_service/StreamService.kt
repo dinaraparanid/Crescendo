@@ -5,6 +5,7 @@ import android.app.*
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
+import android.media.audiofx.Equalizer
 import android.media.session.MediaSessionManager
 import android.os.Binder
 import android.os.Build
@@ -34,6 +35,7 @@ import at.huber.youtubeExtractor.VideoMeta
 import at.huber.youtubeExtractor.YouTubeExtractor
 import at.huber.youtubeExtractor.YtFile
 import com.paranid5.mediastreamer.AUDIO_SESSION_ID
+import com.paranid5.mediastreamer.EQUALIZER_DATA
 import com.paranid5.mediastreamer.IS_PLAYING_STATE
 import com.paranid5.mediastreamer.R
 import com.paranid5.mediastreamer.data.VideoMetadata
@@ -48,7 +50,6 @@ import com.paranid5.mediastreamer.domain.utils.extensions.registerReceiverCompat
 import com.paranid5.mediastreamer.presentation.main_activity.MainActivity
 import com.paranid5.mediastreamer.presentation.streaming.*
 import com.paranid5.mediastreamer.presentation.ui.GlideUtils
-import com.paranid5.mediastreamer.presentation.ui.screens.*
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
 import org.koin.core.component.KoinComponent
@@ -155,8 +156,17 @@ class StreamService : SuspendService(), Receiver, LifecycleNotificationManager, 
     private val binder = object : Binder() {}
     private val storageHandler by inject<StorageHandler>()
     private val glideUtils by inject<GlideUtils> { parametersOf(this) }
-    private val currentMetadata = MutableStateFlow<VideoMetadata?>(null)
+
+    private val currentMetadataState = MutableStateFlow<VideoMetadata?>(null)
     internal val mIsPlayingState by inject<MutableStateFlow<Boolean>>(named(IS_PLAYING_STATE))
+
+    private val areAudioEffectsEnabledState = storageHandler.areAudioEffectsEnabledState
+    private val pitchState = storageHandler.pitchState
+    private val speedState = storageHandler.speedState
+
+    private val equalizerState = MutableStateFlow<Equalizer?>(null)
+    private val equalizerBandsState = storageHandler.equalizerBandsState
+    private val equalizerDataState by inject<MutableStateFlow<EqualizerData?>>(named(EQUALIZER_DATA))
 
     private lateinit var playbackMonitorTask: Job
 
@@ -164,7 +174,7 @@ class StreamService : SuspendService(), Receiver, LifecycleNotificationManager, 
     private var isStoppedWithError = false
 
     @kotlin.OptIn(ExperimentalCoroutinesApi::class)
-    private val videoLength = currentMetadata
+    private val videoLength = currentMetadataState
         .mapLatest { it?.lenInMillis ?: 0 }
         .stateIn(scope, SharingStarted.Eagerly, 0)
 
@@ -200,6 +210,9 @@ class StreamService : SuspendService(), Receiver, LifecycleNotificationManager, 
             .apply {
                 addListener(playerStateChangedListener)
                 audioSessionIdState.update { audioSessionId }
+
+                if (areAudioEffectsEnabledState.value)
+                    playbackParameters = PlaybackParameters(speedState.value, pitchState.value)
             }
     }
 
@@ -248,7 +261,7 @@ class StreamService : SuspendService(), Receiver, LifecycleNotificationManager, 
     private val mediaDescriptionProvider =
         object : PlayerNotificationManager.MediaDescriptionAdapter {
             override fun getCurrentContentTitle(player: Player) =
-                currentMetadata.value?.title ?: resources.getString(R.string.stream_no_name)
+                currentMetadataState.value?.title ?: resources.getString(R.string.stream_no_name)
 
             override fun createCurrentContentIntent(player: Player) = PendingIntent.getActivity(
                 applicationContext,
@@ -258,7 +271,7 @@ class StreamService : SuspendService(), Receiver, LifecycleNotificationManager, 
             )
 
             override fun getCurrentContentText(player: Player) =
-                currentMetadata.value?.author ?: resources.getString(R.string.unknown_streamer)
+                currentMetadataState.value?.author ?: resources.getString(R.string.unknown_streamer)
 
             override fun getCurrentLargeIcon(
                 player: Player,
@@ -310,6 +323,7 @@ class StreamService : SuspendService(), Receiver, LifecycleNotificationManager, 
 
             mIsPlayingState.update { isPlaying }
             scope.launch { mUpdateNotification() }
+            scope.launch { mInitEqualizer() }
 
             when {
                 isPlaying -> mStartPlaybackMonitoring()
@@ -454,8 +468,15 @@ class StreamService : SuspendService(), Receiver, LifecycleNotificationManager, 
             )
         }
 
-        scope.launch { startNotificationObserving() }
+        launchMonitoringTasks()
         return START_REDELIVER_INTENT
+    }
+
+    private fun launchMonitoringTasks() {
+        scope.launch { startNotificationObserving() }
+        scope.launch { startPlaybackParametersMonitoring() }
+        scope.launch { startEqualizerEnabledMonitoring() }
+        scope.launch { startEqualizerBandsMonitoring() }
     }
 
     override fun onDestroy() {
@@ -583,6 +604,7 @@ class StreamService : SuspendService(), Receiver, LifecycleNotificationManager, 
 
     private fun releaseMedia() {
         mPlayerNotificationManager.setPlayer(null)
+        releaseAudioEffects()
         mPlayer.stop()
         mPlayer.release()
         mediaSession.release()
@@ -601,6 +623,101 @@ class StreamService : SuspendService(), Receiver, LifecycleNotificationManager, 
     }
 
     internal fun mStopPlaybackMonitoring() = playbackMonitorTask.cancel()
+
+    // --------------------------- Audio Effects ---------------------------
+
+    private suspend inline fun startPlaybackParametersMonitoring() =
+        lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
+            combine(areAudioEffectsEnabledState, speedState, pitchState) { enabled, speed, pitch ->
+                Triple(enabled, speed, pitch)
+            }.collectLatest { (enabled, speed, pitch) ->
+                mPlayer.playbackParameters = when {
+                    enabled -> PlaybackParameters(speed, pitch)
+                    else -> PlaybackParameters(1F, 1F)
+                }
+            }
+        }
+
+    internal suspend inline fun mInitEqualizer() = equalizerState.update {
+        EqualizerCatching(audioSessionIdState.value).getOrNull()
+    }
+
+    private suspend inline fun startEqualizerEnabledMonitoring() =
+        lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
+            combine(areAudioEffectsEnabledState, audioSessionIdState) { enabled, audioSessionId ->
+                enabled to audioSessionId
+            }.collectLatest { (enabled, audioSessionId) ->
+                equalizerState.value?.release()
+
+                equalizerState.update {
+                    if (!enabled) null
+                    else EqualizerCatching(audioSessionId).getOrNull()
+                }
+            }
+        }
+
+    private suspend inline fun Equalizer(audioSessionId: Int) = Equalizer(0, audioSessionId).apply {
+        if (storageHandler.equalizerBandsState.value == null)
+            storageHandler.storeEqualizerBands(
+                (0..numberOfBands)
+                    .map { getBandLevel(it.toShort()) }
+                    .toShortArray()
+            )
+
+        equalizerDataState.update {
+            EqualizerData(
+                minBandLevel = bandLevelRange[0],
+                maxBandLevel = bandLevelRange[1],
+                bandLevels = equalizerBandsState.value!!
+            )
+        }
+
+        equalizerBandsState.value?.forEachIndexed { ind, level ->
+            setBandLevel(ind.toShort(), level)
+        }
+    }
+
+    private suspend inline fun EqualizerCatching(audioSessionId: Int) =
+        runCatching { Equalizer(audioSessionId) }
+
+    private suspend inline fun startEqualizerBandsMonitoring() =
+        lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
+            equalizerBandsState.collectLatest { eqBands ->
+                equalizerState.update { eq ->
+                    if (eq == null || eqBands == null)
+                        return@update eq
+
+                    eqBands.forEachIndexed { ind, level ->
+                        eq.setBandLevel(ind.toShort(), level)
+                    }
+
+                    eq
+                }
+
+                equalizerDataState.update { data ->
+                    when (val eq = equalizerState.value) {
+                        null -> data
+
+                        else -> EqualizerData(
+                            minBandLevel = eq.bandLevelRange[0],
+                            maxBandLevel = eq.bandLevelRange[1],
+                            bandLevels = (0..eq.numberOfBands)
+                                .map { eq.getBandLevel(it.toShort()) }
+                                .toShortArray()
+                        )
+                    }
+                }
+            }
+        }
+
+    private fun releaseAudioEffects() {
+        equalizerState.update {
+            it?.release()
+            null
+        }
+
+        equalizerDataState.update { null }
+    }
 
     // ----------------------- Media Session Utils -----------------------
 
@@ -702,18 +819,18 @@ class StreamService : SuspendService(), Receiver, LifecycleNotificationManager, 
     }
 
     internal suspend fun mUpdateMediaSession(
-        videoMetadata: VideoMetadata? = currentMetadata.value
+        videoMetadata: VideoMetadata? = currentMetadataState.value
     ) = mediaSession.run {
         setPlaybackState(newPlaybackState)
         setMetadata(
-            currentMetadata
+            currentMetadataState
                 .updateAndGet { videoMetadata }
                 ?.toAndroidMetadata(mGetVideoCoverAsync().await())
         )
     }
 
     internal suspend inline fun mGetVideoCoverAsync() =
-        currentMetadata
+        currentMetadataState
             .value
             ?.let { glideUtils.getVideoCoverBitmapAsync(it) }
             ?: coroutineScope { async(Dispatchers.IO) { glideUtils.thumbnailBitmap } }

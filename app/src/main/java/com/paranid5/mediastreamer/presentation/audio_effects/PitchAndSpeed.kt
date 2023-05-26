@@ -142,6 +142,7 @@ private fun AudioEffectEditor(
             value = textFieldText,
             effectInputState = effectInputState,
             effectValState = effectValState,
+            onValueChanged = onValueChanged,
             modifier = Modifier
                 .align(Alignment.CenterVertically)
                 .width(50.dp)
@@ -184,14 +185,14 @@ private fun AudioEffectSlider(
     Box(modifier) {
         Slider(
             value = effectVal,
-            valueRange = 0.5F..1.5F,
+            valueRange = 0.25F..2F,
             colors = SliderDefaults.colors(activeTrackColor = primaryColor),
             modifier = Modifier.fillMaxWidth().align(Alignment.Center),
             onValueChange = { newEffectVal ->
                 effectInput = newEffectVal.toString().take(MAX_INPUT_LENGTH)
                 effectVal = newEffectVal
+                onValueChanged(audioEffectsUIHandler, effectVal)
             },
-            onValueChangeFinished = { onValueChanged(audioEffectsUIHandler, effectVal) },
             thumb = {
                 Image(
                     painter = painterResource(R.drawable.audio_band_button),
@@ -217,6 +218,7 @@ private fun AudioEffectTextField(
     value: String,
     effectInputState: MutableState<String>,
     effectValState: MutableFloatState,
+    onValueChanged: AudioEffectsUIHandler.(effectVal: Float) -> Unit,
     modifier: Modifier = Modifier,
     audioEffectsUIHandler: AudioEffectsUIHandler = koinInject()
 ) {
@@ -254,7 +256,7 @@ private fun AudioEffectTextField(
 
             if (audioEffectsUIHandler.isParamInputValid(newEffectStr)) {
                 val newEffectVal = newEffectStr.toFloat()
-                audioEffectsUIHandler.storePitchAsync(newEffectVal)
+                onValueChanged(audioEffectsUIHandler, newEffectVal)
                 effectVal = newEffectVal
             }
         },
