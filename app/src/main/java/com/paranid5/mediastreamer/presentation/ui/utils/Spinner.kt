@@ -2,7 +2,6 @@ package com.paranid5.mediastreamer.presentation.ui.utils
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Text
@@ -11,7 +10,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import com.paranid5.mediastreamer.presentation.ui.theme.LocalAppColors
 
@@ -21,7 +19,7 @@ fun Spinner(
     selectedItemInd: Int,
     onItemSelected: (Int, String) -> Unit,
     modifier: Modifier = Modifier,
-    dropDownModifier: Modifier = Modifier,
+    dropdownModifier: Modifier = Modifier,
     selectedItemFactory: @Composable (Int, String, Modifier) -> Unit = { _, text, mod ->
         DefaultSelectedItem(text, mod)
     },
@@ -31,17 +29,17 @@ fun Spinner(
 ) {
     var isExpanded by remember { mutableStateOf(false) }
 
-    Box(modifier.wrapContentSize(Alignment.TopStart)) {
+    Box(modifier) {
         selectedItemFactory(
             selectedItemInd,
             items[selectedItemInd],
-            Modifier.clickable { isExpanded = true },
+            modifier.clickable { isExpanded = true },
         )
 
         DropdownMenu(
             expanded = isExpanded,
             onDismissRequest = { isExpanded = false },
-            modifier = dropDownModifier
+            modifier = dropdownModifier
         ) {
             items.forEachIndexed { index, element ->
                 DropdownMenuItem(
