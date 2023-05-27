@@ -5,7 +5,7 @@ import android.os.Build
 import androidx.annotation.StringRes
 import com.paranid5.mediastreamer.domain.StorageHandler
 import com.paranid5.mediastreamer.domain.ktor_client.KtorClient
-import com.paranid5.mediastreamer.domain.stream_service.EqualizerData
+import com.paranid5.mediastreamer.data.eq.EqualizerData
 import com.paranid5.mediastreamer.domain.stream_service.StreamServiceAccessor
 import com.paranid5.mediastreamer.domain.video_cash_service.VideoCashServiceAccessor
 import com.paranid5.mediastreamer.presentation.appbar.stream_button.StreamButtonUIHandler

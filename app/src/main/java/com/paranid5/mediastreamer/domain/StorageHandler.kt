@@ -4,6 +4,8 @@ import android.content.Context
 import androidx.datastore.preferences.core.*
 import androidx.datastore.preferences.preferencesDataStore
 import com.paranid5.mediastreamer.data.VideoMetadata
+import com.paranid5.mediastreamer.data.eq.EqualizerData
+import com.paranid5.mediastreamer.data.eq.EqualizerParameters
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.MainScope
@@ -22,6 +24,7 @@ class StorageHandler(private val context: Context) : CoroutineScope by MainScope
         private val AUDIO_EFFECTS_ENABLED = booleanPreferencesKey("audio_effects_enabled")
         private val PITCH_VALUE = floatPreferencesKey("pitch_value")
         private val SPEED_VALUE = floatPreferencesKey("speed_value")
+        private val EQ_PARAMS = intPreferencesKey("eq_params")
         private val EQ_BANDS = stringPreferencesKey("eq_bands")
         private val EQ_PRESET = intPreferencesKey("eq_preset")
     }
@@ -105,22 +108,33 @@ class StorageHandler(private val context: Context) : CoroutineScope by MainScope
     @OptIn(ExperimentalCoroutinesApi::class)
     val equalizerBandsState = context.dataStore.data
         .mapLatest { preferences -> preferences[EQ_BANDS] }
-        .mapLatest { bandsStr -> bandsStr?.let { Json.decodeFromString<ShortArray?>(it) } }
+        .mapLatest { bandsStr -> bandsStr?.let { Json.decodeFromString<List<Short>?>(it) } }
         .stateIn(this, SharingStarted.Eagerly, null)
 
-    internal suspend inline fun storeEqualizerBands(eqBands: ShortArray?) {
+    internal suspend inline fun storeEqualizerBands(bands: List<Short>?) {
         context.dataStore.edit { preferences ->
-            preferences[EQ_BANDS] = Json.encodeToString(eqBands)
+            preferences[EQ_BANDS] = Json.encodeToString(bands)
         }
     }
 
     @OptIn(ExperimentalCoroutinesApi::class)
     val equalizerPresetState = context.dataStore.data
         .mapLatest { preferences -> preferences[EQ_PRESET] }
-        .mapLatest { preset -> preset ?: 0 }
-        .stateIn(this, SharingStarted.Eagerly, 0)
+        .mapLatest { preset -> preset?.toShort() ?: EqualizerData.NO_EQ_PRESET }
+        .stateIn(this, SharingStarted.Eagerly, EqualizerData.NO_EQ_PRESET)
 
-    internal suspend inline fun storeEqualizerPreset(eqPreset: Int) {
-        context.dataStore.edit { preferences -> preferences[EQ_PRESET] = eqPreset }
+    internal suspend inline fun storeEqualizerPreset(preset: Short) {
+        context.dataStore.edit { preferences -> preferences[EQ_PRESET] = preset.toInt() }
+    }
+
+    @OptIn(ExperimentalCoroutinesApi::class)
+    val equalizerParamsState = context.dataStore.data
+        .mapLatest { preferences -> preferences[EQ_PARAMS] }
+        .mapLatest { param -> param ?: 0 }
+        .mapLatest { param -> EqualizerParameters.values()[param] }
+        .stateIn(this, SharingStarted.Eagerly, EqualizerParameters.NIL)
+
+    internal suspend inline fun storeEqualizerParam(param: EqualizerParameters) {
+        context.dataStore.edit { preferences -> preferences[EQ_PARAMS] = param.ordinal }
     }
 }
