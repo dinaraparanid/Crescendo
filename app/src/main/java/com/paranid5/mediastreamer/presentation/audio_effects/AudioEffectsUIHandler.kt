@@ -35,7 +35,7 @@ class AudioEffectsUIHandler :
     private fun sendEqualizerParamUpdate(context: Context) =
         context.sendBroadcast(StreamService.Broadcast_EQUALIZER_PARAM_UPDATE)
 
-    fun storeEQPresetAsync(context: Context, preset: Short) = launch {
+    fun storeAndSwitchToPresetAsync(context: Context, preset: Short) = launch {
         storageHandler.storeEqualizerPreset(preset)
         storageHandler.storeEqualizerParam(EqualizerParameters.PRESET)
         sendEqualizerParamUpdate(context)
@@ -46,7 +46,7 @@ class AudioEffectsUIHandler :
         sendEqualizerParamUpdate(context)
     }
 
-    fun storeEQBandsAsync(context: Context, bandLevels: List<Short>) = launch {
+    fun storeAndSwitchToBandsAsync(context: Context, bandLevels: List<Short>) = launch {
         storageHandler.storeEqualizerBands(bandLevels)
         switchToBandsAsync(context).join()
     }

@@ -31,7 +31,10 @@ data class EqualizerData(
             else -> eq.bandLevels
         },
         presets = eq.presets,
-        currentPreset = currentPreset,
+        currentPreset = when (currentParameter) {
+            EqualizerParameters.BANDS -> NO_EQ_PRESET
+            else -> currentPreset
+        },
         bandFrequencies = eq.frequencies,
         currentParameter = currentParameter
     )

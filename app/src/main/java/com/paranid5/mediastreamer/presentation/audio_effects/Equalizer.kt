@@ -3,11 +3,9 @@ package com.paranid5.mediastreamer.presentation.audio_effects
 import android.util.Log
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -17,6 +15,7 @@ import androidx.compose.material3.Slider
 import androidx.compose.material3.SliderDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
@@ -28,7 +27,6 @@ import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.StrokeCap
@@ -38,7 +36,6 @@ import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.layout.layout
 import androidx.compose.ui.layout.onGloballyPositioned
-import androidx.compose.ui.layout.positionInRoot
 import androidx.compose.ui.layout.positionInWindow
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
@@ -105,7 +102,7 @@ private fun PresetSpinner(
                 when (ind) {
                     customPresetIndex -> audioEffectsUIHandler.switchToBandsAsync(context)
 
-                    else -> audioEffectsUIHandler.storeEQPresetAsync(
+                    else -> audioEffectsUIHandler.storeAndSwitchToPresetAsync(
                         context = context,
                         preset = ind.toShort()
                     )
@@ -128,10 +125,20 @@ private fun Bands(
     equalizerDataState: MutableStateFlow<EqualizerData?> = koinInject(named(EQUALIZER_DATA))
 ) {
     val equalizerData by equalizerDataState.collectAsState()
-    val bandLevelsRng by remember { derivedStateOf { equalizerData!!.bandLevels.indices } }
+    val equalizerPreset by remember { derivedStateOf { equalizerData!!.currentPreset } }
 
     val pointsState = remember {
-        mutableStateListOf(*(1..5).map { Offset.Zero }.toTypedArray())
+        mutableStateListOf(*Array(equalizerData!!.bandLevels.size) { Offset.Zero })
+    }
+
+    val presentLvlsDbState = remember {
+        mutableStateListOf(*equalizerData!!.bandLevels.map { it / 1000F }.toTypedArray())
+    }
+
+    LaunchedEffect(equalizerPreset) {
+        equalizerData!!.bandLevels.forEachIndexed { index, mdb ->
+            presentLvlsDbState[index] = mdb / 1000F
+        }
     }
 
     Box(modifier) {
@@ -143,13 +150,12 @@ private fun Bands(
         )
 
         Row(Modifier.fillMaxWidth().align(Alignment.Center)) {
-            bandLevelsRng.forEach {
+            equalizerData!!.bandLevels.indices.forEach {
                 Band(
                     index = it,
+                    presentLvlsDbState = presentLvlsDbState,
                     pointsState = pointsState,
-                    modifier = Modifier
-                        .weight(1F)
-                        .padding(horizontal = 10.dp)
+                    modifier = Modifier.weight(1F).padding(horizontal = 10.dp)
                 )
             }
         }
@@ -203,6 +209,7 @@ private fun BandsCurve(
 @Composable
 private fun Band(
     index: Int,
+    presentLvlsDbState: SnapshotStateList<Float>,
     pointsState: SnapshotStateList<Offset>,
     modifier: Modifier = Modifier
 ) = Column(modifier) {
@@ -213,6 +220,7 @@ private fun Band(
 
     BandSlider(
         index = index,
+        presentLvlsDbState = presentLvlsDbState,
         pointsState = pointsState,
         modifier = Modifier
             .padding(top = 10.dp)
@@ -252,6 +260,7 @@ private fun BandDbLabel(
 @Composable
 private fun BandSlider(
     index: Int,
+    presentLvlsDbState: SnapshotStateList<Float>,
     pointsState: SnapshotStateList<Offset>,
     modifier: Modifier = Modifier,
     equalizerDataState: MutableStateFlow<EqualizerData?> = koinInject(named(EQUALIZER_DATA)),
@@ -262,12 +271,6 @@ private fun BandSlider(
     val primaryColor = LocalAppColors.current.value.primary
 
     val equalizerData by equalizerDataState.collectAsState()
-    val equalizerParam by remember { derivedStateOf { equalizerData!!.currentParameter } }
-    val isEQParamBands by remember { derivedStateOf { equalizerParam == EqualizerParameters.BANDS } }
-
-    val realLvlDb by remember { derivedStateOf { equalizerData!!.bandLevels[index] / 1000F } }
-    var inputLvlDb by remember { mutableStateOf(realLvlDb) }
-    val presentLvlDb by remember { derivedStateOf { if (isEQParamBands) inputLvlDb else realLvlDb } }
 
     val minDb by remember { derivedStateOf { equalizerData!!.minBandLevel / 1000F } }
     val maxDb by remember { derivedStateOf { equalizerData!!.maxBandLevel / 1000F } }
@@ -299,18 +302,22 @@ private fun BandSlider(
             }
     ) {
         Slider(
-            value = presentLvlDb,
+            value = presentLvlsDbState[index],
             valueRange = minDb..maxDb,
             colors = SliderDefaults.colors(activeTrackColor = primaryColor),
             modifier = Modifier.align(Alignment.Center),
             onValueChange = { level ->
-                inputLvlDb = level
+                equalizerData!!.bandLevels.forEachIndexed { ind, mdb ->
+                    presentLvlsDbState[ind] = mdb / 1000F
+                }
+
+                presentLvlsDbState[index] = level
 
                 val newLevels = equalizerData!!.bandLevels.toMutableList().also {
                     it[index] = (level * 1000).toInt().toShort()
                 }
 
-                audioEffectsUIHandler.storeEQBandsAsync(context, newLevels)
+                audioEffectsUIHandler.storeAndSwitchToBandsAsync(context, newLevels)
             },
             thumb = {
                 Image(
@@ -321,9 +328,11 @@ private fun BandSlider(
                         .align(Alignment.Center)
                         .height(20.dp)
                         .onGloballyPositioned {
-                            pointsState[index] = it.positionInWindow().let { offset ->
-                                offset.copy(y = offset.y - (screenHeight * 1.5).toInt())
-                            }
+                            pointsState[index] = it
+                                .positionInWindow()
+                                .let { offset ->
+                                    offset.copy(y = offset.y - (screenHeight * 1.5).toInt())
+                                }
                         }
                 )
             },
