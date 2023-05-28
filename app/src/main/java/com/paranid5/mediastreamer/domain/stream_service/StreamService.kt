@@ -553,7 +553,7 @@ class StreamService : SuspendService(), Receiver, LifecycleNotificationManager, 
 
     internal fun mResumePlayback() {
         mPlayer.playWhenReady = true
-        equalizer.enabled = true
+        equalizer.enabled = areAudioEffectsEnabledState.value
         Log.d(TAG, "Equalizer is switched on ${equalizer.setEnabled(true)}")
     }
 
@@ -605,7 +605,7 @@ class StreamService : SuspendService(), Receiver, LifecycleNotificationManager, 
                         seekTo(initialPosition)
                     }
 
-                    equalizer.enabled = true
+                    equalizer.enabled = areAudioEffectsEnabledState.value
                     Log.d(TAG, "Equalizer is switched on ${equalizer.setEnabled(true)}")
                 }
             }

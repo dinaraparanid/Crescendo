@@ -275,6 +275,9 @@ private fun BandSlider(
     val minDb by remember { derivedStateOf { equalizerData!!.minBandLevel / 1000F } }
     val maxDb by remember { derivedStateOf { equalizerData!!.maxBandLevel / 1000F } }
 
+    var sliderYPos by remember { mutableStateOf(0F) }
+    var sliderHeight by remember { mutableStateOf(0) }
+
     Box(
         modifier
             .graphicsLayer {
@@ -305,7 +308,12 @@ private fun BandSlider(
             value = presentLvlsDbState[index],
             valueRange = minDb..maxDb,
             colors = SliderDefaults.colors(activeTrackColor = primaryColor),
-            modifier = Modifier.align(Alignment.Center),
+            modifier = Modifier
+                .align(Alignment.Center)
+                .onGloballyPositioned {
+                    sliderYPos = it.positionInWindow().y
+                    sliderHeight = it.size.height
+                },
             onValueChange = { level ->
                 equalizerData!!.bandLevels.forEachIndexed { ind, mdb ->
                     presentLvlsDbState[ind] = mdb / 1000F
@@ -331,7 +339,7 @@ private fun BandSlider(
                             pointsState[index] = it
                                 .positionInWindow()
                                 .let { offset ->
-                                    offset.copy(y = offset.y - (screenHeight * 1.5).toInt())
+                                    offset.copy(y = offset.y + sliderHeight * 2 - sliderYPos - 30)
                                 }
                         }
                 )
