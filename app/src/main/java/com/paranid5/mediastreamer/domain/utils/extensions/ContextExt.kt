@@ -2,6 +2,7 @@ package com.paranid5.mediastreamer.domain.utils.extensions
 
 import android.content.BroadcastReceiver
 import android.content.Context
+import android.content.Intent
 import android.content.IntentFilter
 import android.os.Build
 
@@ -25,3 +26,5 @@ fun Context.registerReceiverCompat(
     receiver = receiver,
     filter = IntentFilter().also { actions.forEach(it::addAction) }
 )
+
+fun Context.sendBroadcast(action: String) = sendBroadcast(Intent(action))

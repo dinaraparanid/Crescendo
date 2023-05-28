@@ -17,10 +17,10 @@ inline val Equalizer.presets: List<String>
 
 fun Equalizer.setParameter(
     currentParameter: EqualizerParameters,
-    bandLevels: List<Short>,
+    bandLevels: List<Short>?,
     preset: Short
 ) = when (currentParameter) {
-    EqualizerParameters.BANDS -> this.bandLevels = bandLevels
+    EqualizerParameters.BANDS -> this.bandLevels = bandLevels!!
     EqualizerParameters.PRESET -> this.preset = preset
     EqualizerParameters.NIL -> Unit
 }

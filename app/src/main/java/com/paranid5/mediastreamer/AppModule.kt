@@ -97,6 +97,7 @@ private val globalsModule = module {
     single { androidApplication() as MainApplication }
     factory { (context: Context) -> GlideUtils(context) }
     singleOf(::KtorClient)
+
     single(named(IS_PLAYING_STATE)) { MutableStateFlow(false) }
     single(named(AUDIO_SESSION_ID)) { MutableStateFlow(0) }
     single(named(EQUALIZER_DATA)) { MutableStateFlow<EqualizerData?>(null) }

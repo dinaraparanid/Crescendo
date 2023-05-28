@@ -1,40 +1,53 @@
 package com.paranid5.mediastreamer.domain
 
 import android.content.Context
-import androidx.datastore.preferences.core.*
+import androidx.datastore.preferences.core.booleanPreferencesKey
+import androidx.datastore.preferences.core.edit
+import androidx.datastore.preferences.core.floatPreferencesKey
+import androidx.datastore.preferences.core.intPreferencesKey
+import androidx.datastore.preferences.core.longPreferencesKey
+import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
 import com.paranid5.mediastreamer.data.VideoMetadata
 import com.paranid5.mediastreamer.data.eq.EqualizerData
 import com.paranid5.mediastreamer.data.eq.EqualizerParameters
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.mapLatest
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 
-class StorageHandler(private val context: Context) : CoroutineScope by MainScope() {
+class StorageHandler(private val context: Context) :
+    CoroutineScope by CoroutineScope(Dispatchers.IO) {
     companion object {
+        private val TAG = StorageHandler::class.simpleName!!
+
         private val CURRENT_URL = stringPreferencesKey("current_url")
         private val CURRENT_METADATA = stringPreferencesKey("current_metadata")
+
         private val PLAYBACK_POSITION = longPreferencesKey("playback_position")
         private val IS_REPEATING = booleanPreferencesKey("is_repeating")
+
         private val AUDIO_EFFECTS_ENABLED = booleanPreferencesKey("audio_effects_enabled")
         private val PITCH_VALUE = floatPreferencesKey("pitch_value")
         private val SPEED_VALUE = floatPreferencesKey("speed_value")
-        private val EQ_PARAMS = intPreferencesKey("eq_params")
+
+        private val EQ_PARAM = intPreferencesKey("eq_param")
         private val EQ_BANDS = stringPreferencesKey("eq_bands")
         private val EQ_PRESET = intPreferencesKey("eq_preset")
     }
 
-    private val Context.dataStore by preferencesDataStore(name = "params")
+    private val Context.dataStore by preferencesDataStore("params")
 
     @OptIn(ExperimentalCoroutinesApi::class)
-    val currentUrlState = context.dataStore.data
+    val currentUrlFlow = context.dataStore.data
         .mapLatest { preferences -> preferences[CURRENT_URL] }
         .mapLatest { it ?: "" }
+
+    val currentUrlState = currentUrlFlow
         .stateIn(this, SharingStarted.Eagerly, "")
 
     internal suspend inline fun storeCurrentUrl(url: String) {
@@ -42,9 +55,11 @@ class StorageHandler(private val context: Context) : CoroutineScope by MainScope
     }
 
     @OptIn(ExperimentalCoroutinesApi::class)
-    val currentMetadataState = context.dataStore.data
+    val currentMetadataFlow = context.dataStore.data
         .mapLatest { preferences -> preferences[CURRENT_METADATA] }
         .mapLatest { metaString -> metaString?.let { Json.decodeFromString<VideoMetadata>(it) } }
+
+    val currentMetadataState = currentMetadataFlow
         .stateIn(this, SharingStarted.Eagerly, null)
 
     internal suspend inline fun storeCurrentMetadata(metadata: VideoMetadata?) {
@@ -54,9 +69,11 @@ class StorageHandler(private val context: Context) : CoroutineScope by MainScope
     }
 
     @OptIn(ExperimentalCoroutinesApi::class)
-    val playbackPositionState = context.dataStore.data
+    val playbackPositionFlow = context.dataStore.data
         .mapLatest { preferences -> preferences[PLAYBACK_POSITION] }
         .mapLatest { it ?: 0 }
+
+    val playbackPositionState = playbackPositionFlow
         .stateIn(this, SharingStarted.Eagerly, 0)
 
     internal suspend inline fun storePlaybackPosition(position: Long) {
@@ -64,9 +81,11 @@ class StorageHandler(private val context: Context) : CoroutineScope by MainScope
     }
 
     @OptIn(ExperimentalCoroutinesApi::class)
-    val isRepeatingState = context.dataStore.data
+    val isRepeatingFlow = context.dataStore.data
         .mapLatest { preferences -> preferences[IS_REPEATING] }
         .mapLatest { it ?: false }
+
+    val isRepeatingState = isRepeatingFlow
         .stateIn(this, SharingStarted.Eagerly, false)
 
     internal suspend inline fun storeIsRepeating(isRepeating: Boolean) {
@@ -74,9 +93,11 @@ class StorageHandler(private val context: Context) : CoroutineScope by MainScope
     }
 
     @OptIn(ExperimentalCoroutinesApi::class)
-    val areAudioEffectsEnabledState = context.dataStore.data
+    val areAudioEffectsEnabledFlow = context.dataStore.data
         .mapLatest { preferences -> preferences[AUDIO_EFFECTS_ENABLED] }
         .mapLatest { it ?: false }
+
+    val areAudioEffectsEnabledState = areAudioEffectsEnabledFlow
         .stateIn(this, SharingStarted.Eagerly, false)
 
     internal suspend inline fun storeAudioEffectsEnabled(areAudioEffectsEnabled: Boolean) {
@@ -86,9 +107,11 @@ class StorageHandler(private val context: Context) : CoroutineScope by MainScope
     }
 
     @OptIn(ExperimentalCoroutinesApi::class)
-    val pitchState = context.dataStore.data
+    val pitchFlow = context.dataStore.data
         .mapLatest { preferences -> preferences[PITCH_VALUE] }
         .mapLatest { it ?: 1.0F }
+
+    val pitchState = pitchFlow
         .stateIn(this, SharingStarted.Eagerly, 1.0F)
 
     internal suspend inline fun storePitch(pitch: Float) {
@@ -96,9 +119,11 @@ class StorageHandler(private val context: Context) : CoroutineScope by MainScope
     }
 
     @OptIn(ExperimentalCoroutinesApi::class)
-    val speedState = context.dataStore.data
+    val speedFlow = context.dataStore.data
         .mapLatest { preferences -> preferences[SPEED_VALUE] }
         .mapLatest { it ?: 1.0F }
+
+    val speedState = speedFlow
         .stateIn(this, SharingStarted.Eagerly, 1.0F)
 
     internal suspend inline fun storeSpeed(speed: Float) {
@@ -106,21 +131,25 @@ class StorageHandler(private val context: Context) : CoroutineScope by MainScope
     }
 
     @OptIn(ExperimentalCoroutinesApi::class)
-    val equalizerBandsState = context.dataStore.data
+    val equalizerBandsFlow = context.dataStore.data
         .mapLatest { preferences -> preferences[EQ_BANDS] }
         .mapLatest { bandsStr -> bandsStr?.let { Json.decodeFromString<List<Short>?>(it) } }
+
+    val equalizerBandsState = equalizerBandsFlow
         .stateIn(this, SharingStarted.Eagerly, null)
 
-    internal suspend inline fun storeEqualizerBands(bands: List<Short>?) {
+    internal suspend inline fun storeEqualizerBands(bands: List<Short>) {
         context.dataStore.edit { preferences ->
             preferences[EQ_BANDS] = Json.encodeToString(bands)
         }
     }
 
     @OptIn(ExperimentalCoroutinesApi::class)
-    val equalizerPresetState = context.dataStore.data
+    val equalizerPresetFlow = context.dataStore.data
         .mapLatest { preferences -> preferences[EQ_PRESET] }
         .mapLatest { preset -> preset?.toShort() ?: EqualizerData.NO_EQ_PRESET }
+
+    val equalizerPresetState = equalizerPresetFlow
         .stateIn(this, SharingStarted.Eagerly, EqualizerData.NO_EQ_PRESET)
 
     internal suspend inline fun storeEqualizerPreset(preset: Short) {
@@ -128,13 +157,14 @@ class StorageHandler(private val context: Context) : CoroutineScope by MainScope
     }
 
     @OptIn(ExperimentalCoroutinesApi::class)
-    val equalizerParamsState = context.dataStore.data
-        .mapLatest { preferences -> preferences[EQ_PARAMS] }
-        .mapLatest { param -> param ?: 0 }
-        .mapLatest { param -> EqualizerParameters.values()[param] }
+    val equalizerParamFlow = context.dataStore.data
+        .mapLatest { preferences -> preferences[EQ_PARAM] }
+        .mapLatest { param -> EqualizerParameters.values()[param ?: 0] }
+
+    val equalizerParamState = equalizerParamFlow
         .stateIn(this, SharingStarted.Eagerly, EqualizerParameters.NIL)
 
     internal suspend inline fun storeEqualizerParam(param: EqualizerParameters) {
-        context.dataStore.edit { preferences -> preferences[EQ_PARAMS] = param.ordinal }
+        context.dataStore.edit { preferences -> preferences[EQ_PARAM] = param.ordinal }
     }
 }
