@@ -77,6 +77,7 @@ class StreamService : SuspendService(), Receiver, LifecycleNotificationManager, 
         const val Broadcast_SEEK_TO = "$SERVICE_LOCATION.SEEK_TO"
         const val Broadcast_CHANGE_REPEAT = "$SERVICE_LOCATION.CHANGE_REPEAT"
         const val Broadcast_DISMISS_NOTIFICATION = "$SERVICE_LOCATION.DISMISS_NOTIFICATION"
+        const val Broadcast_EQUALIZER_ENABLED_UPDATE = "$SERVICE_LOCATION.EQUALIZER_ENABLED_UPDATE"
         const val Broadcast_EQUALIZER_PARAM_UPDATE = "$SERVICE_LOCATION.EQUALIZER_PARAM_UPDATE"
 
         private const val ACTION_PAUSE = "pause"
@@ -172,7 +173,7 @@ class StreamService : SuspendService(), Receiver, LifecycleNotificationManager, 
     private val pitchState = storageHandler.pitchState
     private val speedState = storageHandler.speedState
 
-    private val equalizerState = MutableStateFlow<Equalizer?>(null)
+    private lateinit var equalizer: Equalizer
     private val equalizerParamState = storageHandler.equalizerParamState
     private val equalizerBandsState = storageHandler.equalizerBandsState
     private val equalizerPresetState = storageHandler.equalizerPresetState
@@ -217,6 +218,7 @@ class StreamService : SuspendService(), Receiver, LifecycleNotificationManager, 
             .apply {
                 addListener(playerStateChangedListener)
                 audioSessionIdState.update { audioSessionId }
+                initEqualizer(audioSessionId)
 
                 if (areAudioEffectsEnabledState.value)
                     playbackParameters = PlaybackParameters(speedState.value, pitchState.value)
@@ -341,8 +343,6 @@ class StreamService : SuspendService(), Receiver, LifecycleNotificationManager, 
                 isPlaying -> mStartPlaybackMonitoring()
                 else -> mStopPlaybackMonitoring()
             }
-
-            equalizerState.value?.enabled = isPlaying
         }
 
         override fun onPlayerError(error: PlaybackException) {
@@ -430,27 +430,31 @@ class StreamService : SuspendService(), Receiver, LifecycleNotificationManager, 
         }
     }
 
+    private val equalizerEnabledUpdateReceiver = object : BroadcastReceiver() {
+        override fun onReceive(context: Context?, intent: Intent?) {
+            val isEnabled = areAudioEffectsEnabledState.value
+            equalizer.enabled = isEnabled
+            Log.d(TAG, "Equalizer is switched on: $isEnabled; ${equalizer.setEnabled(isEnabled)}")
+        }
+    }
+
     private val equalizerParameterUpdateReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context?, intent: Intent?) {
             val currentParameter = equalizerParamState.value
             val bandLevels = equalizerBandsState.value
             val preset = equalizerPresetState.value
 
-            Log.d(TAG, "Param update: $currentParameter")
-            equalizerState.value?.setParameter(currentParameter, bandLevels, preset)
+            equalizer.setParameter(currentParameter, bandLevels, preset)
+            Log.d(TAG, "EQ Params Set: $currentParameter; EQ: $bandLevels")
 
             mEqualizerDataState.update {
-                equalizerState.value?.let {
-                    EqualizerData(
-                        eq = it,
-                        bandLevels = bandLevels,
-                        currentPreset = preset,
-                        currentParameter = currentParameter
-                    )
-                }
+                EqualizerData(
+                    eq = equalizer,
+                    bandLevels = bandLevels,
+                    currentPreset = preset,
+                    currentParameter = currentParameter
+                )
             }
-
-            Log.d(TAG, "Param updated")
         }
     }
 
@@ -463,6 +467,7 @@ class StreamService : SuspendService(), Receiver, LifecycleNotificationManager, 
         registerReceiverCompat(seekToReceiver, Broadcast_SEEK_TO)
         registerReceiverCompat(repeatChangedReceiver, Broadcast_CHANGE_REPEAT)
         registerReceiverCompat(dismissNotificationReceiver, Broadcast_DISMISS_NOTIFICATION)
+        registerReceiverCompat(equalizerEnabledUpdateReceiver, Broadcast_EQUALIZER_ENABLED_UPDATE)
         registerReceiverCompat(equalizerParameterUpdateReceiver, Broadcast_EQUALIZER_PARAM_UPDATE)
     }
 
@@ -475,6 +480,7 @@ class StreamService : SuspendService(), Receiver, LifecycleNotificationManager, 
         unregisterReceiver(seekToReceiver)
         unregisterReceiver(repeatChangedReceiver)
         unregisterReceiver(dismissNotificationReceiver)
+        unregisterReceiver(equalizerEnabledUpdateReceiver)
         unregisterReceiver(equalizerParameterUpdateReceiver)
     }
 
@@ -515,7 +521,6 @@ class StreamService : SuspendService(), Receiver, LifecycleNotificationManager, 
     private fun launchMonitoringTasks() {
         scope.launch { startNotificationObserving() }
         scope.launch { startPlaybackParametersMonitoring() }
-        scope.launch { startEqualizerEnabledMonitoring() }
     }
 
     override fun onDestroy() {
@@ -541,10 +546,15 @@ class StreamService : SuspendService(), Receiver, LifecycleNotificationManager, 
     internal fun mPausePlayback() {
         scope.launch { updateAndSendPlaybackPosition() }
         mPlayer.pause()
+
+        equalizer.enabled = false
+        Log.d(TAG, "Equalizer is switched off ${equalizer.setEnabled(false)}")
     }
 
     internal fun mResumePlayback() {
         mPlayer.playWhenReady = true
+        equalizer.enabled = true
+        Log.d(TAG, "Equalizer is switched on ${equalizer.setEnabled(true)}")
     }
 
     // ----------------------- Storage Handler Utils -----------------------
@@ -594,6 +604,9 @@ class StreamService : SuspendService(), Receiver, LifecycleNotificationManager, 
                         prepare()
                         seekTo(initialPosition)
                     }
+
+                    equalizer.enabled = true
+                    Log.d(TAG, "Equalizer is switched on ${equalizer.setEnabled(true)}")
                 }
             }
         }
@@ -628,6 +641,7 @@ class StreamService : SuspendService(), Receiver, LifecycleNotificationManager, 
         mPlayer.release()
         mediaSession.release()
         transportControls.stop()
+        audioSessionIdState.update { 0 }
     }
 
     // --------------------------- Playback Monitoring ---------------------------
@@ -661,57 +675,30 @@ class StreamService : SuspendService(), Receiver, LifecycleNotificationManager, 
             }
         }
 
-    private suspend inline fun startEqualizerEnabledMonitoring() =
-        lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
-            combine(
-                areAudioEffectsEnabledState,
-                audioSessionIdState
-            ) { enabled, audioSessionId ->
-                enabled to audioSessionId
-            }.collectLatest { (enabled, audioSessionId) ->
-                equalizerState.value?.release()
+    private fun initEqualizer(audioSessionId: Int) {
+        equalizer = Equalizer(0, audioSessionId).apply {
+            val data = mEqualizerDataState.updateAndGet {
+                EqualizerData(
+                    eq = this,
+                    bandLevels = equalizerBandsState.value,
+                    currentPreset = equalizerPresetState.value,
+                    currentParameter = equalizerParamState.value
+                )
+            }!!
 
-                equalizerState.update {
-                    if (!enabled) null
-                    else EqualizerCatching(audioSessionId).getOrNull()
-                }
-            }
-        }
-
-    private fun Equalizer(audioSessionId: Int) = Equalizer(0, audioSessionId).also { eq ->
-        eq.enabled = true
-
-        val data = mEqualizerDataState.updateAndGet {
-            EqualizerData(
-                eq = eq,
-                bandLevels = equalizerBandsState.value,
-                currentPreset = equalizerPresetState.value,
-                currentParameter = equalizerParamState.value
+            setParameter(
+                currentParameter = data.currentParameter,
+                bandLevels = data.bandLevels,
+                preset = data.currentPreset
             )
-        }!!
 
-        eq.setParameter(
-            currentParameter = data.currentParameter,
-            bandLevels = data.bandLevels,
-            preset = data.currentPreset
-        )
-
-        Log.d(TAG, "EQ Params Set: $data; EQ: ${eq.bandLevels}")
-    }
-
-    private fun EqualizerCatching(audioSessionId: Int) =
-        runCatching { Equalizer(audioSessionId) }.onFailure { it.printStackTrace() }
-
-    internal fun mInitEqualizer() = equalizerState.update {
-        EqualizerCatching(audioSessionIdState.value).getOrNull()
+            Log.d(TAG, "EQ Params Set: $data; EQ: $bandLevels")
+        }
     }
 
     private fun releaseAudioEffects() {
-        equalizerState.update {
-            it?.release()
-            null
-        }
-
+        repeat(2) { equalizer.enabled = false }
+        equalizer.release()
         mEqualizerDataState.update { null }
     }
 

@@ -60,4 +60,7 @@
     <string name="custom">Custom</string>
     <string name="eq_presets">Equalizer presets</string>
     <string name="audio_effects_init_error">Start of the playback is required</string>
+    <string name="decibel">Db</string>
+    <string name="hertz">Hz</string>
+    <string name="equalizer_band">Equalizer band</string>
 </resources>

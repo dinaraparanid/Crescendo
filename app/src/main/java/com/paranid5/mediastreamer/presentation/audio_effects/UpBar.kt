@@ -11,6 +11,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.sp
 import com.paranid5.mediastreamer.R
@@ -26,9 +27,9 @@ internal fun UpBar(
     audioEffectsUIHandler: AudioEffectsUIHandler = koinInject(),
     storageHandler: StorageHandler = koinInject(),
 ) {
+    val context = LocalContext.current
     val primaryColor = LocalAppColors.current.value.primary
     val argbPrimaryColor = primaryColor.toArgb()
-
     val areAudioEffectsEnabled by storageHandler.areAudioEffectsEnabledState.collectAsState()
 
     Box(modifier) {
@@ -47,7 +48,9 @@ internal fun UpBar(
                 checkedTrackColor = Color(argbPrimaryColor.decreaseBrightness(0.5F)),
                 checkedBorderColor = Color(argbPrimaryColor.decreaseBrightness(0.25F))
             ),
-            onCheckedChange = { audioEffectsUIHandler.storeAudioEffectsEnabledAsync(it) }
+            onCheckedChange = {
+                audioEffectsUIHandler.storeAudioEffectsEnabledAsync(context, isEnabled = it)
+            }
         )
     }
 }

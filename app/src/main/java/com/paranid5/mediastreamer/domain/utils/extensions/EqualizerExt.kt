@@ -4,8 +4,11 @@ import android.media.audiofx.Equalizer
 import com.paranid5.mediastreamer.data.eq.EqualizerData
 import com.paranid5.mediastreamer.data.eq.EqualizerParameters
 
+inline val Equalizer.bandIndicesRange
+    get() = (0 until numberOfBands)
+
 inline var Equalizer.bandLevels
-    get() = (0 until numberOfBands).map { getBandLevel(it.toShort()) }
+    get() = bandIndicesRange.map { getBandLevel(it.toShort()) }
     set(value) = value.forEachIndexed { ind, level -> setBandLevel(ind.toShort(), level) }
 
 inline var Equalizer.preset
@@ -14,6 +17,9 @@ inline var Equalizer.preset
 
 inline val Equalizer.presets: List<String>
     get() = (0 until numberOfPresets).map { getPresetName(it.toShort()) }
+
+inline val Equalizer.frequencies
+    get() = bandIndicesRange.map { getCenterFreq(it.toShort()) }
 
 fun Equalizer.setParameter(
     currentParameter: EqualizerParameters,

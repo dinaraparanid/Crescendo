@@ -2,6 +2,7 @@ package com.paranid5.mediastreamer.data.eq
 
 import android.media.audiofx.Equalizer
 import com.paranid5.mediastreamer.domain.utils.extensions.bandLevels
+import com.paranid5.mediastreamer.domain.utils.extensions.frequencies
 import com.paranid5.mediastreamer.domain.utils.extensions.presets
 
 data class EqualizerData(
@@ -10,6 +11,7 @@ data class EqualizerData(
     val bandLevels: List<Short>,
     val presets: List<String>,
     val currentPreset: Short,
+    val bandFrequencies: List<Int>,
     val currentParameter: EqualizerParameters,
 ) {
     companion object {
@@ -30,6 +32,7 @@ data class EqualizerData(
         },
         presets = eq.presets,
         currentPreset = currentPreset,
+        bandFrequencies = eq.frequencies,
         currentParameter = currentParameter
     )
 }
