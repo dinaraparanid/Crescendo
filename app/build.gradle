@@ -66,7 +66,7 @@ dependencies {
     implementation 'androidx.media3:media3-session:1.0.2'
     implementation 'androidx.datastore:datastore-preferences:1.1.0-alpha04'
     implementation 'androidx.constraintlayout:constraintlayout-compose:1.0.1'
-    implementation 'androidx.palette:palette:1.0.0'
+    implementation 'androidx.palette:palette-ktx:1.0.0'
 
     implementation 'io.insert-koin:koin-androidx-compose:3.4.4'
 
