@@ -6,10 +6,11 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Slider
 import androidx.compose.material3.SliderDefaults
@@ -19,6 +20,8 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableFloatStateOf
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -37,7 +40,6 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.layout.layout
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.layout.positionInWindow
-import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -60,7 +62,8 @@ private const val TAG = "EqualizerView"
 @Composable
 internal fun Equalizer(modifier: Modifier = Modifier) = Column(modifier) {
     PresetSpinner(Modifier.fillMaxWidth())
-    Bands(Modifier.padding(top = 15.dp).fillMaxWidth())
+    Spacer(Modifier.height(15.dp))
+    Bands(Modifier.fillMaxWidth())
 }
 
 @Composable
@@ -78,7 +81,7 @@ private fun PresetSpinner(
     val isEQParamBands by remember { derivedStateOf { equalizerParam == EqualizerParameters.BANDS } }
 
     var selectedItemInd by remember {
-        mutableStateOf(
+        mutableIntStateOf(
             when (equalizerData!!.currentParameter) {
                 EqualizerParameters.BANDS -> customPresetIndex
                 EqualizerParameters.PRESET -> equalizerData!!.currentPreset.toInt()
@@ -144,19 +147,21 @@ private fun Bands(
     Box(modifier) {
         BandsCurve(
             pointsState = pointsState,
-            modifier = Modifier
-                .fillMaxWidth()
-                .align(Alignment.Center)
+            modifier = Modifier.fillMaxWidth().align(Alignment.Center)
         )
 
         Row(Modifier.fillMaxWidth().align(Alignment.Center)) {
+            Spacer(Modifier.width(10.dp))
+
             equalizerData!!.bandLevels.indices.forEach {
                 Band(
                     index = it,
                     presentLvlsDbState = presentLvlsDbState,
                     pointsState = pointsState,
-                    modifier = Modifier.weight(1F).padding(horizontal = 10.dp)
+                    modifier = Modifier.weight(1F)
                 )
+
+                Spacer(Modifier.width(10.dp))
             }
         }
     }
@@ -213,27 +218,20 @@ private fun Band(
     pointsState: SnapshotStateList<Offset>,
     modifier: Modifier = Modifier
 ) = Column(modifier) {
-    BandDbLabel(
-        index = index,
-        modifier = Modifier.align(Alignment.CenterHorizontally)
-    )
+    BandDbLabel(index, Modifier.align(Alignment.CenterHorizontally))
+
+    Spacer(Modifier.height(10.dp))
 
     BandSlider(
         index = index,
         presentLvlsDbState = presentLvlsDbState,
         pointsState = pointsState,
-        modifier = Modifier
-            .padding(top = 10.dp)
-            .size(width = 30.dp, height = 200.dp)
-            .align(Alignment.CenterHorizontally)
+        modifier = Modifier.fillMaxWidth().weight(1F)
     )
 
-    BandHzLabel(
-        index = index,
-        modifier = Modifier
-            .padding(top = 10.dp)
-            .align(Alignment.CenterHorizontally)
-    )
+    Spacer(Modifier.height(10.dp))
+
+    BandHzLabel(index, Modifier.align(Alignment.CenterHorizontally))
 }
 
 @Composable
@@ -267,7 +265,6 @@ private fun BandSlider(
     audioEffectsUIHandler: AudioEffectsUIHandler = koinInject()
 ) {
     val context = LocalContext.current
-    val screenHeight = LocalConfiguration.current.screenHeightDp
     val primaryColor = LocalAppColors.current.value.primary
 
     val equalizerData by equalizerDataState.collectAsState()
@@ -275,8 +272,11 @@ private fun BandSlider(
     val minDb by remember { derivedStateOf { equalizerData!!.minBandLevel / 1000F } }
     val maxDb by remember { derivedStateOf { equalizerData!!.maxBandLevel / 1000F } }
 
-    var sliderYPos by remember { mutableStateOf(0F) }
-    var sliderHeight by remember { mutableStateOf(0) }
+    var sliderYPos by remember { mutableFloatStateOf(0F) }
+    var sliderWidth by remember { mutableIntStateOf(1) }
+    var sliderHeight by remember { mutableIntStateOf(1) }
+
+    val bandTrackPainter = rememberBandTrackPainter(sliderWidth, sliderHeight)
 
     Box(
         modifier
@@ -312,6 +312,7 @@ private fun BandSlider(
                 .align(Alignment.Center)
                 .onGloballyPositioned {
                     sliderYPos = it.positionInWindow().y
+                    sliderWidth = it.size.width
                     sliderHeight = it.size.height
                 },
             onValueChange = { level ->
@@ -339,7 +340,10 @@ private fun BandSlider(
                             pointsState[index] = it
                                 .positionInWindow()
                                 .let { offset ->
-                                    offset.copy(y = offset.y + sliderHeight * 2 - sliderYPos - 30)
+                                    offset.copy(
+                                        y = offset.y + sliderWidth / 2
+                                                - sliderYPos - it.size.width / 2
+                                    )
                                 }
                         }
                 )
@@ -347,10 +351,11 @@ private fun BandSlider(
         )
 
         Image(
-            modifier = Modifier.fillMaxWidth().align(Alignment.Center),
-            painter = painterResource(R.drawable.audio_track_horizontal_night_transparent),
+            painter = bandTrackPainter,
             contentDescription = stringResource(R.string.equalizer_band),
-            contentScale = ContentScale.FillWidth
+            contentScale = ContentScale.Fit,
+            alignment = Alignment.Center,
+            modifier = Modifier.fillMaxSize()
         )
     }
 }

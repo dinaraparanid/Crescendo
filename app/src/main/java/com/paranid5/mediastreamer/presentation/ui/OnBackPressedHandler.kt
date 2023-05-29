@@ -11,7 +11,9 @@ import com.paranid5.mediastreamer.presentation.composition_locals.LocalNavContro
 import kotlinx.coroutines.launch
 
 @Composable
-fun OnBackPressedHandler(onBackPressedCallback: suspend (isScreenStackEmpty: Boolean) -> Unit = {}) {
+fun OnBackPressedHandler(
+    onBackPressedCallback: suspend (isScreenStackEmpty: Boolean) -> Unit = {}
+) {
     val navHostController = LocalNavController.current
     val coroutineScope = rememberCoroutineScope()
 

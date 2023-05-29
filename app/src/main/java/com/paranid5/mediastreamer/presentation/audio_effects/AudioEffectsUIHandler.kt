@@ -18,7 +18,7 @@ class AudioEffectsUIHandler :
 
     fun storeAudioEffectsEnabledAsync(context: Context, isEnabled: Boolean) = launch {
         storageHandler.storeAudioEffectsEnabled(isEnabled)
-        context.sendBroadcast(StreamService.Broadcast_EQUALIZER_ENABLED_UPDATE)
+        context.sendBroadcast(StreamService.Broadcast_AUDIO_EFFECTS_ENABLED_UPDATE)
     }
 
     fun isParamInputValid(input: String) =
@@ -49,5 +49,15 @@ class AudioEffectsUIHandler :
     fun storeAndSwitchToBandsAsync(context: Context, bandLevels: List<Short>) = launch {
         storageHandler.storeEqualizerBands(bandLevels)
         switchToBandsAsync(context).join()
+    }
+
+    fun storeAndSendBassStrengthAsync(context: Context, bassStrength: Short) = launch {
+        storageHandler.storeBassStrength(bassStrength)
+        context.sendBroadcast(StreamService.Broadcast_BASS_STRENGTH_UPDATE)
+    }
+
+    fun storeAndSendReverbPresetAsync(context: Context, reverbPreset: Short) = launch {
+        storageHandler.storeReverbPreset(reverbPreset)
+        context.sendBroadcast(StreamService.Broadcast_REVERB_PRESET_UPDATE)
     }
 }

@@ -10,7 +10,7 @@ import androidx.compose.material3.SliderDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
@@ -34,7 +34,7 @@ internal fun PlaybackSlider(
 ) {
     val lightVibrantColor = palette.getLightVibrantOrPrimary()
     val videoLength = metadata?.lenInMillis ?: 0
-    var curPosition by remember { mutableStateOf(0L) }
+    var curPosition by remember { mutableLongStateOf(0L) }
 
     LaunchedEffect(key1 = true) {
         curPosition = storageHandler.playbackPositionState.value

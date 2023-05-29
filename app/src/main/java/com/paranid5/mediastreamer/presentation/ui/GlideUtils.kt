@@ -2,6 +2,7 @@ package com.paranid5.mediastreamer.presentation.ui
 
 import android.content.Context
 import android.graphics.Bitmap
+import androidx.annotation.DrawableRes
 import androidx.core.graphics.drawable.toDrawable
 import androidx.palette.graphics.Palette
 import com.bumptech.glide.Glide
@@ -27,17 +28,35 @@ class GlideUtils(private val context: Context) {
     internal inline val thumbnailBitmapWithPalette
         get() = thumbnailBitmap.withPalette
 
-    private inline fun getBitmapFromUrl(
-        url: String,
+    private inline fun getBitmapFromModel(
+        model: Any,
         size: Pair<Int, Int>?,
-        bitmapSettings: (Bitmap) -> Unit
+        bitmapSettings: (Bitmap) -> Unit = {}
     ): Bitmap = bitmapGlideBuilder
-        .load(url)
+        .load(model)
         .run { size?.run { override(first, second) } ?: this }
         .submit()
         .get()
         .let { size?.run { Bitmap.createScaledBitmap(it, first, second, true) } ?: it }
         .also(bitmapSettings)
+
+    private inline fun getBitmapFromResource(
+        @DrawableRes res: Int,
+        size: Pair<Int, Int>?,
+        bitmapSettings: (Bitmap) -> Unit
+    ) = getBitmapFromModel(res, size, bitmapSettings)
+
+    internal inline fun getBitmapFromResourceCatching(
+        @DrawableRes res: Int,
+        size: Pair<Int, Int>? = null,
+        bitmapSettings: (Bitmap) -> Unit = {}
+    ) = runCatching { getBitmapFromResource(res, size, bitmapSettings) }
+
+    private inline fun getBitmapFromUrl(
+        url: String,
+        size: Pair<Int, Int>?,
+        bitmapSettings: (Bitmap) -> Unit
+    ) = getBitmapFromModel(url, size, bitmapSettings)
 
     private inline fun getBitmapFromUrlWithPalette(
         url: String,

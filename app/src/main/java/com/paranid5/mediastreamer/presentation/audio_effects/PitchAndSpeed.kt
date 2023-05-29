@@ -7,6 +7,8 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -25,6 +27,8 @@ import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableFloatStateOf
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -32,6 +36,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
@@ -64,13 +69,15 @@ internal fun PitchAndSpeed(
         PitchEditor(
             initialText = pitchInputText,
             viewModel = viewModel,
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier.fillMaxWidth().weight(1F)
         )
+
+        Spacer(Modifier.height(15.dp))
 
         SpeedEditor(
             initialText = speedInputText,
             viewModel = viewModel,
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier.fillMaxWidth().weight(1F)
         )
     }
 }
@@ -115,7 +122,10 @@ private fun AudioEffectEditor(
     modifier: Modifier = Modifier,
 ) {
     val effectInputState = remember { mutableStateOf(initialText ?: "") }
-    val effectValState = remember { mutableStateOf(effectInputState.value.toFloatOrNull() ?: 1F) }
+
+    val effectValState = remember {
+        mutableFloatStateOf(effectInputState.value.toFloatOrNull() ?: 1F)
+    }
 
     val textFieldText by remember {
         derivedStateOf { effectInputState.value.take(MAX_INPUT_LENGTH) }
@@ -124,7 +134,10 @@ private fun AudioEffectEditor(
     Row(modifier) {
         Label(
             effectTitleRes = effectTitleRes,
-            modifier = Modifier.align(Alignment.CenterVertically).width(80.dp)
+            modifier = Modifier
+                .align(Alignment.CenterVertically)
+                .width(50.dp)
+                .padding(end = 5.dp)
         )
 
         AudioEffectSlider(
@@ -132,10 +145,7 @@ private fun AudioEffectEditor(
             effectValState = effectValState,
             effectInputState = effectInputState,
             onValueChanged = onValueChanged,
-            modifier = Modifier
-                .align(Alignment.CenterVertically)
-                .padding(top = 5.dp)
-                .weight(1F)
+            modifier = Modifier.align(Alignment.CenterVertically).weight(1F)
         )
 
         AudioEffectTextField(
@@ -146,7 +156,7 @@ private fun AudioEffectEditor(
             modifier = Modifier
                 .align(Alignment.CenterVertically)
                 .width(50.dp)
-                .padding(horizontal = 10.dp)
+                .padding(start = 10.dp)
         )
     }
 }
@@ -182,12 +192,22 @@ private fun AudioEffectSlider(
     var effectVal by effectValState
     var effectInput by effectInputState
 
+    var sliderWidth by remember { mutableIntStateOf(1) }
+    var sliderHeight by remember { mutableIntStateOf(1) }
+
+    val bandTrackPainter = rememberBandTrackPainter(sliderWidth, sliderHeight)
+
     Box(modifier) {
         Slider(
             value = effectVal,
             valueRange = 0.25F..2F,
             colors = SliderDefaults.colors(activeTrackColor = primaryColor),
-            modifier = Modifier.fillMaxWidth().align(Alignment.Center),
+            modifier = Modifier
+                .align(Alignment.Center)
+                .onGloballyPositioned {
+                    sliderWidth = it.size.width
+                    sliderHeight = it.size.height
+                },
             onValueChange = { newEffectVal ->
                 effectInput = newEffectVal.toString().take(MAX_INPUT_LENGTH)
                 effectVal = newEffectVal
@@ -204,10 +224,11 @@ private fun AudioEffectSlider(
         )
 
         Image(
-            modifier = Modifier.fillMaxWidth().align(Alignment.Center),
-            painter = painterResource(R.drawable.audio_track_horizontal_night_transparent),
+            painter = bandTrackPainter,
             contentDescription = stringResource(effectTitleRes),
-            contentScale = ContentScale.FillWidth
+            contentScale = ContentScale.Fit,
+            alignment = Alignment.Center,
+            modifier = Modifier.fillMaxSize(),
         )
     }
 }

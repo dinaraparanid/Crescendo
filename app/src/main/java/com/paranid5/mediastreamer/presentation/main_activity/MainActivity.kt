@@ -13,6 +13,7 @@ import androidx.activity.compose.setContent
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.navigation.compose.rememberNavController
 import com.paranid5.mediastreamer.R
+import com.paranid5.mediastreamer.domain.utils.extensions.registerReceiverCompat
 import com.paranid5.mediastreamer.domain.video_cash_service.VideoCashResponse
 import com.paranid5.mediastreamer.presentation.NavHostController
 import com.paranid5.mediastreamer.presentation.composition_locals.LocalActivity
@@ -53,7 +54,7 @@ class MainActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        registerReceiver(cashStatusReceiver, IntentFilter(Broadcast_VIDEO_CASH_COMPLETED))
+        registerReceiverCompat(cashStatusReceiver, IntentFilter(Broadcast_VIDEO_CASH_COMPLETED))
 
         setContent {
             MediaStreamerTheme {

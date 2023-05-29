@@ -35,7 +35,7 @@ internal fun CashPropertiesDialog(
         stringResource(R.string.mp4)
     )
 
-    val selectedSaveOptionIndexState = remember { mutableStateOf(0) }
+    val selectedSaveOptionIndexState = remember { mutableIntStateOf(0) }
 
     val format by remember {
         derivedStateOf { Formats.values()[selectedSaveOptionIndexState.value] }

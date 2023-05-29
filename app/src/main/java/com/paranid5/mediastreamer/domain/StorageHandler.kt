@@ -38,12 +38,16 @@ class StorageHandler(private val context: Context) :
         private val EQ_PARAM = intPreferencesKey("eq_param")
         private val EQ_BANDS = stringPreferencesKey("eq_bands")
         private val EQ_PRESET = intPreferencesKey("eq_preset")
+
+        private val BASS_STRENGTH = intPreferencesKey("bass_strength")
+        private val REVERB_PRESET = intPreferencesKey("reverb_preset")
     }
 
     private val Context.dataStore by preferencesDataStore("params")
+    private val dataStore = context.dataStore
 
     @OptIn(ExperimentalCoroutinesApi::class)
-    val currentUrlFlow = context.dataStore.data
+    val currentUrlFlow = dataStore.data
         .mapLatest { preferences -> preferences[CURRENT_URL] }
         .mapLatest { it ?: "" }
 
@@ -51,11 +55,11 @@ class StorageHandler(private val context: Context) :
         .stateIn(this, SharingStarted.Eagerly, "")
 
     internal suspend inline fun storeCurrentUrl(url: String) {
-        context.dataStore.edit { preferences -> preferences[CURRENT_URL] = url }
+        dataStore.edit { preferences -> preferences[CURRENT_URL] = url }
     }
 
     @OptIn(ExperimentalCoroutinesApi::class)
-    val currentMetadataFlow = context.dataStore.data
+    val currentMetadataFlow = dataStore.data
         .mapLatest { preferences -> preferences[CURRENT_METADATA] }
         .mapLatest { metaString -> metaString?.let { Json.decodeFromString<VideoMetadata>(it) } }
 
@@ -63,13 +67,13 @@ class StorageHandler(private val context: Context) :
         .stateIn(this, SharingStarted.Eagerly, null)
 
     internal suspend inline fun storeCurrentMetadata(metadata: VideoMetadata?) {
-        context.dataStore.edit { preferences ->
+        dataStore.edit { preferences ->
             preferences[CURRENT_METADATA] = Json.encodeToString(metadata)
         }
     }
 
     @OptIn(ExperimentalCoroutinesApi::class)
-    val playbackPositionFlow = context.dataStore.data
+    val playbackPositionFlow = dataStore.data
         .mapLatest { preferences -> preferences[PLAYBACK_POSITION] }
         .mapLatest { it ?: 0 }
 
@@ -77,11 +81,11 @@ class StorageHandler(private val context: Context) :
         .stateIn(this, SharingStarted.Eagerly, 0)
 
     internal suspend inline fun storePlaybackPosition(position: Long) {
-        context.dataStore.edit { preferences -> preferences[PLAYBACK_POSITION] = position }
+        dataStore.edit { preferences -> preferences[PLAYBACK_POSITION] = position }
     }
 
     @OptIn(ExperimentalCoroutinesApi::class)
-    val isRepeatingFlow = context.dataStore.data
+    val isRepeatingFlow = dataStore.data
         .mapLatest { preferences -> preferences[IS_REPEATING] }
         .mapLatest { it ?: false }
 
@@ -89,11 +93,11 @@ class StorageHandler(private val context: Context) :
         .stateIn(this, SharingStarted.Eagerly, false)
 
     internal suspend inline fun storeIsRepeating(isRepeating: Boolean) {
-        context.dataStore.edit { preferences -> preferences[IS_REPEATING] = isRepeating }
+        dataStore.edit { preferences -> preferences[IS_REPEATING] = isRepeating }
     }
 
     @OptIn(ExperimentalCoroutinesApi::class)
-    val areAudioEffectsEnabledFlow = context.dataStore.data
+    val areAudioEffectsEnabledFlow = dataStore.data
         .mapLatest { preferences -> preferences[AUDIO_EFFECTS_ENABLED] }
         .mapLatest { it ?: false }
 
@@ -101,13 +105,13 @@ class StorageHandler(private val context: Context) :
         .stateIn(this, SharingStarted.Eagerly, false)
 
     internal suspend inline fun storeAudioEffectsEnabled(areAudioEffectsEnabled: Boolean) {
-        context.dataStore.edit { preferences ->
+        dataStore.edit { preferences ->
             preferences[AUDIO_EFFECTS_ENABLED] = areAudioEffectsEnabled
         }
     }
 
     @OptIn(ExperimentalCoroutinesApi::class)
-    val pitchFlow = context.dataStore.data
+    val pitchFlow = dataStore.data
         .mapLatest { preferences -> preferences[PITCH_VALUE] }
         .mapLatest { it ?: 1.0F }
 
@@ -115,11 +119,11 @@ class StorageHandler(private val context: Context) :
         .stateIn(this, SharingStarted.Eagerly, 1.0F)
 
     internal suspend inline fun storePitch(pitch: Float) {
-        context.dataStore.edit { preferences -> preferences[PITCH_VALUE] = pitch }
+        dataStore.edit { preferences -> preferences[PITCH_VALUE] = pitch }
     }
 
     @OptIn(ExperimentalCoroutinesApi::class)
-    val speedFlow = context.dataStore.data
+    val speedFlow = dataStore.data
         .mapLatest { preferences -> preferences[SPEED_VALUE] }
         .mapLatest { it ?: 1.0F }
 
@@ -127,11 +131,11 @@ class StorageHandler(private val context: Context) :
         .stateIn(this, SharingStarted.Eagerly, 1.0F)
 
     internal suspend inline fun storeSpeed(speed: Float) {
-        context.dataStore.edit { preferences -> preferences[SPEED_VALUE] = speed }
+        dataStore.edit { preferences -> preferences[SPEED_VALUE] = speed }
     }
 
     @OptIn(ExperimentalCoroutinesApi::class)
-    val equalizerBandsFlow = context.dataStore.data
+    val equalizerBandsFlow = dataStore.data
         .mapLatest { preferences -> preferences[EQ_BANDS] }
         .mapLatest { bandsStr -> bandsStr?.let { Json.decodeFromString<List<Short>?>(it) } }
 
@@ -139,13 +143,13 @@ class StorageHandler(private val context: Context) :
         .stateIn(this, SharingStarted.Eagerly, null)
 
     internal suspend inline fun storeEqualizerBands(bands: List<Short>) {
-        context.dataStore.edit { preferences ->
+        dataStore.edit { preferences ->
             preferences[EQ_BANDS] = Json.encodeToString(bands)
         }
     }
 
     @OptIn(ExperimentalCoroutinesApi::class)
-    val equalizerPresetFlow = context.dataStore.data
+    val equalizerPresetFlow = dataStore.data
         .mapLatest { preferences -> preferences[EQ_PRESET] }
         .mapLatest { preset -> preset?.toShort() ?: EqualizerData.NO_EQ_PRESET }
 
@@ -153,11 +157,11 @@ class StorageHandler(private val context: Context) :
         .stateIn(this, SharingStarted.Eagerly, EqualizerData.NO_EQ_PRESET)
 
     internal suspend inline fun storeEqualizerPreset(preset: Short) {
-        context.dataStore.edit { preferences -> preferences[EQ_PRESET] = preset.toInt() }
+        dataStore.edit { preferences -> preferences[EQ_PRESET] = preset.toInt() }
     }
 
     @OptIn(ExperimentalCoroutinesApi::class)
-    val equalizerParamFlow = context.dataStore.data
+    val equalizerParamFlow = dataStore.data
         .mapLatest { preferences -> preferences[EQ_PARAM] }
         .mapLatest { param -> EqualizerParameters.values()[param ?: 0] }
 
@@ -165,6 +169,28 @@ class StorageHandler(private val context: Context) :
         .stateIn(this, SharingStarted.Eagerly, EqualizerParameters.NIL)
 
     internal suspend inline fun storeEqualizerParam(param: EqualizerParameters) {
-        context.dataStore.edit { preferences -> preferences[EQ_PARAM] = param.ordinal }
+        dataStore.edit { preferences -> preferences[EQ_PARAM] = param.ordinal }
+    }
+
+    @OptIn(ExperimentalCoroutinesApi::class)
+    val bassStrengthFlow = dataStore.data
+        .mapLatest { preferences -> preferences[BASS_STRENGTH] }
+        .mapLatest { strength -> strength?.toShort() ?: 0 }
+
+    val bassStrengthState = bassStrengthFlow.stateIn(this, SharingStarted.Eagerly, 0)
+
+    internal suspend inline fun storeBassStrength(bassStrength: Short) {
+        dataStore.edit { preferences -> preferences[BASS_STRENGTH] = bassStrength.toInt() }
+    }
+
+    @OptIn(ExperimentalCoroutinesApi::class)
+    val reverbPresetFlow = dataStore.data
+        .mapLatest { preferences -> preferences[REVERB_PRESET] }
+        .mapLatest { preset -> preset?.toShort() ?: 0 }
+
+    val reverbPresetState = reverbPresetFlow.stateIn(this, SharingStarted.Eagerly, 0)
+
+    internal suspend inline fun storeReverbPreset(reverbPreset: Short) {
+        dataStore.edit { preferences -> preferences[REVERB_PRESET] = reverbPreset.toInt() }
     }
 }

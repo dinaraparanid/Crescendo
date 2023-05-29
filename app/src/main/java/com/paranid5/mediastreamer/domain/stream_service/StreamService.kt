@@ -5,7 +5,9 @@ import android.app.*
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
+import android.media.audiofx.BassBoost
 import android.media.audiofx.Equalizer
+import android.media.audiofx.PresetReverb
 import android.media.session.MediaSessionManager
 import android.os.Binder
 import android.os.Build
@@ -69,16 +71,23 @@ class StreamService : SuspendService(), Receiver, LifecycleNotificationManager, 
         private const val TEN_SECS_AS_MILLIS = 10000
 
         private const val SERVICE_LOCATION = "com.paranid5.mediastreamer.domain.stream_service"
+
         const val Broadcast_PAUSE = "$SERVICE_LOCATION.PAUSE"
         const val Broadcast_RESUME = "$SERVICE_LOCATION.RESUME"
+
         const val Broadcast_SWITCH_VIDEO = "$SERVICE_LOCATION.SWITCH_VIDEO"
+
         const val Broadcast_10_SECS_BACK = "$SERVICE_LOCATION.10_SECS_BACK"
         const val Broadcast_10_SECS_FORWARD = "$SERVICE_LOCATION.10_SECS_FORWARD"
         const val Broadcast_SEEK_TO = "$SERVICE_LOCATION.SEEK_TO"
+
         const val Broadcast_CHANGE_REPEAT = "$SERVICE_LOCATION.CHANGE_REPEAT"
         const val Broadcast_DISMISS_NOTIFICATION = "$SERVICE_LOCATION.DISMISS_NOTIFICATION"
-        const val Broadcast_EQUALIZER_ENABLED_UPDATE = "$SERVICE_LOCATION.EQUALIZER_ENABLED_UPDATE"
+
+        const val Broadcast_AUDIO_EFFECTS_ENABLED_UPDATE = "$SERVICE_LOCATION.AUDIO_EFFECTS_ENABLED_UPDATE"
         const val Broadcast_EQUALIZER_PARAM_UPDATE = "$SERVICE_LOCATION.EQUALIZER_PARAM_UPDATE"
+        const val Broadcast_BASS_STRENGTH_UPDATE = "$SERVICE_LOCATION.BASS_STRENGTH_UPDATE"
+        const val Broadcast_REVERB_PRESET_UPDATE = "$SERVICE_LOCATION.REVERB_PRESET_UPDATE"
 
         private const val ACTION_PAUSE = "pause"
         private const val ACTION_RESUME = "resume"
@@ -174,9 +183,16 @@ class StreamService : SuspendService(), Receiver, LifecycleNotificationManager, 
     private val speedState = storageHandler.speedState
 
     private lateinit var equalizer: Equalizer
+    private lateinit var bassBoost: BassBoost
+    private lateinit var reverb: PresetReverb
+
     private val equalizerParamState = storageHandler.equalizerParamState
     private val equalizerBandsState = storageHandler.equalizerBandsState
     private val equalizerPresetState = storageHandler.equalizerPresetState
+
+    private val bassStrengthState = storageHandler.bassStrengthState
+    private val reverbPresetState = storageHandler.reverbPresetState
+
     internal val mEqualizerDataState by inject<MutableStateFlow<EqualizerData?>>(named(EQUALIZER_DATA))
 
     private lateinit var playbackMonitorTask: Job
@@ -218,7 +234,10 @@ class StreamService : SuspendService(), Receiver, LifecycleNotificationManager, 
             .apply {
                 addListener(playerStateChangedListener)
                 audioSessionIdState.update { audioSessionId }
+
                 initEqualizer(audioSessionId)
+                initBassBoost(audioSessionId)
+                initReverb(audioSessionId)
 
                 if (areAudioEffectsEnabledState.value)
                     playbackParameters = PlaybackParameters(speedState.value, pitchState.value)
@@ -430,11 +449,10 @@ class StreamService : SuspendService(), Receiver, LifecycleNotificationManager, 
         }
     }
 
-    private val equalizerEnabledUpdateReceiver = object : BroadcastReceiver() {
+    private val audioEffectsEnabledUpdateReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context?, intent: Intent?) {
             val isEnabled = areAudioEffectsEnabledState.value
-            equalizer.enabled = isEnabled
-            Log.d(TAG, "Equalizer is switched on: $isEnabled; ${equalizer.setEnabled(isEnabled)}")
+            mSetAudioEffectsEnabled(isEnabled)
         }
     }
 
@@ -458,6 +476,18 @@ class StreamService : SuspendService(), Receiver, LifecycleNotificationManager, 
         }
     }
 
+    private val bassStrengthUpdateReceiver = object : BroadcastReceiver() {
+        override fun onReceive(context: Context?, intent: Intent?) {
+            bassBoost.setStrength(bassStrengthState.value)
+        }
+    }
+
+    private val reverbPresetUpdateReceiver = object : BroadcastReceiver() {
+        override fun onReceive(context: Context?, intent: Intent?) {
+            reverb.preset = reverbPresetState.value
+        }
+    }
+
     override fun registerReceivers() {
         registerReceiverCompat(pauseReceiver, Broadcast_PAUSE)
         registerReceiverCompat(resumeReceiver, Broadcast_RESUME)
@@ -467,8 +497,10 @@ class StreamService : SuspendService(), Receiver, LifecycleNotificationManager, 
         registerReceiverCompat(seekToReceiver, Broadcast_SEEK_TO)
         registerReceiverCompat(repeatChangedReceiver, Broadcast_CHANGE_REPEAT)
         registerReceiverCompat(dismissNotificationReceiver, Broadcast_DISMISS_NOTIFICATION)
-        registerReceiverCompat(equalizerEnabledUpdateReceiver, Broadcast_EQUALIZER_ENABLED_UPDATE)
+        registerReceiverCompat(audioEffectsEnabledUpdateReceiver, Broadcast_AUDIO_EFFECTS_ENABLED_UPDATE)
         registerReceiverCompat(equalizerParameterUpdateReceiver, Broadcast_EQUALIZER_PARAM_UPDATE)
+        registerReceiverCompat(bassStrengthUpdateReceiver, Broadcast_BASS_STRENGTH_UPDATE)
+        registerReceiverCompat(reverbPresetUpdateReceiver, Broadcast_REVERB_PRESET_UPDATE)
     }
 
     override fun unregisterReceivers() {
@@ -480,8 +512,10 @@ class StreamService : SuspendService(), Receiver, LifecycleNotificationManager, 
         unregisterReceiver(seekToReceiver)
         unregisterReceiver(repeatChangedReceiver)
         unregisterReceiver(dismissNotificationReceiver)
-        unregisterReceiver(equalizerEnabledUpdateReceiver)
+        unregisterReceiver(audioEffectsEnabledUpdateReceiver)
         unregisterReceiver(equalizerParameterUpdateReceiver)
+        unregisterReceiver(bassStrengthUpdateReceiver)
+        unregisterReceiver(reverbPresetUpdateReceiver)
     }
 
     // --------------------------- Service Impl ---------------------------
@@ -546,15 +580,12 @@ class StreamService : SuspendService(), Receiver, LifecycleNotificationManager, 
     internal fun mPausePlayback() {
         scope.launch { updateAndSendPlaybackPosition() }
         mPlayer.pause()
-
-        equalizer.enabled = false
-        Log.d(TAG, "Equalizer is switched off ${equalizer.setEnabled(false)}")
+        mSetAudioEffectsEnabled(isEnabled = false)
     }
 
     internal fun mResumePlayback() {
         mPlayer.playWhenReady = true
-        equalizer.enabled = areAudioEffectsEnabledState.value
-        Log.d(TAG, "Equalizer is switched on ${equalizer.setEnabled(true)}")
+        mSetAudioEffectsEnabled(isEnabled = areAudioEffectsEnabledState.value)
     }
 
     // ----------------------- Storage Handler Utils -----------------------
@@ -605,8 +636,7 @@ class StreamService : SuspendService(), Receiver, LifecycleNotificationManager, 
                         seekTo(initialPosition)
                     }
 
-                    equalizer.enabled = areAudioEffectsEnabledState.value
-                    Log.d(TAG, "Equalizer is switched on ${equalizer.setEnabled(true)}")
+                    mSetAudioEffectsEnabled(isEnabled = areAudioEffectsEnabledState.value)
                 }
             }
         }
@@ -696,8 +726,41 @@ class StreamService : SuspendService(), Receiver, LifecycleNotificationManager, 
         }
     }
 
+    private fun initBassBoost(audioSessionId: Int) {
+        bassBoost = BassBoost(0, audioSessionId).apply {
+            try {
+                setStrength(bassStrengthState.value)
+            } catch (ignored: IllegalArgumentException) {
+                // Invalid strength
+            }
+        }
+    }
+
+    private fun initReverb(audioSessionId: Int) {
+        reverb = PresetReverb(0, audioSessionId).apply {
+            try {
+                preset = reverbPresetState.value
+            } catch (ignored: IllegalArgumentException) {
+                // Invalid preset
+            }
+        }
+    }
+
+    internal fun mSetAudioEffectsEnabled(isEnabled: Boolean) {
+        mPlayer.playbackParameters = when {
+            isEnabled -> PlaybackParameters(speedState.value, pitchState.value)
+            else -> PlaybackParameters(1F, 1F)
+        }
+
+        repeat(3) {
+            equalizer.enabled = isEnabled
+            bassBoost.enabled = isEnabled
+            reverb.enabled = isEnabled
+        }
+    }
+
     private fun releaseAudioEffects() {
-        repeat(2) { equalizer.enabled = false }
+        mSetAudioEffectsEnabled(isEnabled = false)
         equalizer.release()
         mEqualizerDataState.update { null }
     }
