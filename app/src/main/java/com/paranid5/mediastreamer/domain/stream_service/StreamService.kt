@@ -261,7 +261,7 @@ class StreamService : SuspendService(), Receiver, LifecycleNotificationManager, 
                 setUseNextAction(false)
                 setUsePreviousAction(false)
                 setUseStopAction(false)
-                setUseChronometer(true)
+                setUseChronometer(false)
 
                 setPriority(NotificationCompat.PRIORITY_HIGH)
                 setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
@@ -702,6 +702,8 @@ class StreamService : SuspendService(), Receiver, LifecycleNotificationManager, 
                     enabled -> PlaybackParameters(speed, pitch)
                     else -> PlaybackParameters(1F, 1F)
                 }
+
+                mUpdateNotification()
             }
         }
 
@@ -814,7 +816,7 @@ class StreamService : SuspendService(), Receiver, LifecycleNotificationManager, 
             .setState(
                 if (isPlaying) PlaybackStateCompat.STATE_PLAYING else PlaybackStateCompat.STATE_PAUSED,
                 mCurrentPlaybackPosition,
-                1.0F,
+                speedState.value,
                 SystemClock.elapsedRealtime()
             )
             .build()
