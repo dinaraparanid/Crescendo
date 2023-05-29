@@ -4,6 +4,10 @@ import android.util.Log
 import android.view.MotionEvent
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.gestures.awaitEachGesture
+import androidx.compose.foundation.gestures.detectDragGestures
+import androidx.compose.foundation.gestures.detectTapGestures
+import androidx.compose.foundation.gestures.forEachGesture
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -24,6 +28,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.rotate
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.input.pointer.consumeAllChanges
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.input.pointer.pointerInteropFilter
 import androidx.compose.ui.layout.boundsInWindow
 import androidx.compose.ui.layout.onGloballyPositioned
@@ -124,6 +131,7 @@ private fun AudioController(
 
     var touchX by remember { mutableFloatStateOf(0F) }
     var touchY by remember { mutableFloatStateOf(0F) }
+    var touchOffset by remember { mutableStateOf(Offset.Zero) }
 
     var centerX by remember { mutableFloatStateOf(0F) }
     var centerY by remember { mutableFloatStateOf(0F) }
@@ -146,7 +154,10 @@ private fun AudioController(
     }
 
     Box(modifier) {
-        Canvas(Modifier.size(85.dp).align(Alignment.Center)) {
+        Canvas(
+            Modifier
+                .size(85.dp)
+                .align(Alignment.Center)) {
             drawArc(
                 color = Disabled,
                 startAngle = arcStartAngle,
@@ -172,28 +183,26 @@ private fun AudioController(
                     centerX = boundsInWindow.size.width / 2F
                     centerY = boundsInWindow.size.height / 2F
                 }
-                .pointerInteropFilter { motionEvent ->
-                    val degrees = -atan2(
-                        centerX - motionEvent.x,
-                        centerY - motionEvent.y
-                    ) * (180 / PI).toFloat()
+                .pointerInput(Unit) {
+                    detectDragGestures { change, offset ->
+                        change.consume()
+                        touchOffset += offset
 
-                    if (degrees !in angleRange)
-                        return@pointerInteropFilter false
+                        val degrees = -atan2(
+                            centerX - touchOffset.x,
+                            centerY - touchOffset.y
+                        ) * (180 / PI).toFloat()
 
-                    touchX = motionEvent.x
-                    touchY = motionEvent.y
+                        if (degrees !in angleRange)
+                            return@detectDragGestures
 
-                    when (motionEvent.action) {
-                        MotionEvent.ACTION_DOWN, MotionEvent.ACTION_MOVE -> {
-                            val rotationPercents = (degrees - angleRange.start) / anglePercent
-                            rotationAngle = degrees
-                            inputValue = valuePercent * rotationPercents
-                            onValueChange(inputValue)
-                            true
-                        }
+                        touchX = touchOffset.x
+                        touchY = touchOffset.y
 
-                        else -> false
+                        val rotationPercents = (degrees - angleRange.start) / anglePercent
+                        rotationAngle = degrees
+                        inputValue = valuePercent * rotationPercents
+                        onValueChange(inputValue)
                     }
                 }
                 .rotate(rotationAngle)
@@ -219,7 +228,9 @@ private fun AudioControllerWithLabel(
             valueRange = valueRange,
             angleRange = angleRange,
             onValueChange = onValueChange,
-            modifier = Modifier.align(Alignment.CenterHorizontally).width(100.dp)
+            modifier = Modifier
+                .align(Alignment.CenterHorizontally)
+                .width(100.dp)
         )
 
         Text(
