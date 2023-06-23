@@ -30,7 +30,7 @@ import com.paranid5.mediastreamer.presentation.ui.OnUIStateChanged
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.update
 
-private val youtubeUrlRegex = Regex("https://(www\\.youtube\\.com/watch\\?v=|youtu\\.be/)\\w{11}")
+private val youtubeUrlRegex = Regex("https://(www\\.youtube\\.com/watch\\?v=|youtu\\.be/)\\S{11}")
 
 @Composable
 fun SearchStreamScreen(
