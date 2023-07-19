@@ -22,4 +22,7 @@ sealed interface VideoCashResponse : Parcelable {
 
     @Parcelize
     object FileCreationError : VideoCashResponse
+
+    @Parcelize
+    object ConnectionLostError : VideoCashResponse
 }

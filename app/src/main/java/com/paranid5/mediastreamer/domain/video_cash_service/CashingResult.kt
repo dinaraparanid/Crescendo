@@ -37,6 +37,9 @@ sealed interface CashingResult : Parcelable {
 
         @Parcelize
         object FileCreationError : DownloadResult
+
+        @Parcelize
+        object ConnectionLostError : DownloadResult
     }
 
     @Parcelize

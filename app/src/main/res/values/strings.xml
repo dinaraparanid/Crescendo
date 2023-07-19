@@ -63,4 +63,5 @@
     <string name="decibel">Db</string>
     <string name="hertz">Hz</string>
     <string name="equalizer_band">Equalizer band</string>
+    <string name="connection_lost">Connection is lost</string>
 </resources>

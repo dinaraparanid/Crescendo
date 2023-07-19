@@ -102,6 +102,9 @@ class MainActivity : ComponentActivity() {
 
                 VideoCashResponse.FileCreationError ->
                     context.getString(R.string.file_creation_error)
+
+                VideoCashResponse.ConnectionLostError ->
+                    context.getString(R.string.connection_lost)
             },
             Toast.LENGTH_LONG
         ).show()

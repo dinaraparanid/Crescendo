@@ -310,15 +310,24 @@ class VideoCashService : SuspendService(), Receiver, LifecycleNotificationManage
             is Either.Right -> storeFileRes.value
         }
 
-        val statusCode = ktorClient.downloadFile(
-            fileUrl = mediaUrl,
-            storeFile = curVideoCashFile!!,
-            progressState = videoCashProgressState,
-            downloadingState = cashingStatusState,
-        )
+        val statusCodeRes = kotlin.runCatching {
+            ktorClient.downloadFile(
+                fileUrl = mediaUrl,
+                storeFile = curVideoCashFile!!,
+                progressState = videoCashProgressState,
+                downloadingState = cashingStatusState,
+            )
+        }
+
+        if (statusCodeRes.isFailure) {
+            onCashingError(errorStatus = DownloadingStatus.CONNECT_LOST)
+            return CashingResult.DownloadResult.ConnectionLostError
+        }
+
+        val statusCode = statusCodeRes.getOrNull()
 
         if (statusCode?.isSuccess() != true) {
-            onCashingError()
+            onCashingError(errorStatus = DownloadingStatus.ERR)
             return statusCode?.let(CashingResult.DownloadResult::Error)
                 ?: CashingResult.DownloadResult.Canceled
         }
@@ -347,14 +356,23 @@ class VideoCashService : SuspendService(), Receiver, LifecycleNotificationManage
         audioFileStore: MediaFile,
         videoFileStore: MediaFile.VideoFile
     ): CashingResult.DownloadResult {
-        val statusCode = ktorClient.downloadFiles(
-            files = arrayOf(audioUrl to audioFileStore, videoUrl to videoFileStore),
-            progressState = videoCashProgressState,
-            downloadingState = cashingStatusState,
-        )
+        val statusCodeRes = runCatching {
+            ktorClient.downloadFiles(
+                files = arrayOf(audioUrl to audioFileStore, videoUrl to videoFileStore),
+                progressState = videoCashProgressState,
+                downloadingState = cashingStatusState,
+            )
+        }
+
+        if (statusCodeRes.isFailure) {
+            onCashingError(errorStatus = DownloadingStatus.CONNECT_LOST)
+            return CashingResult.DownloadResult.ConnectionLostError
+        }
+
+        val statusCode = statusCodeRes.getOrNull()
 
         if (statusCode?.isSuccess() != true) {
-            onCashingError()
+            onCashingError(errorStatus = DownloadingStatus.ERR)
             return statusCode?.let(CashingResult.DownloadResult::Error)
                 ?: CashingResult.DownloadResult.Canceled
         }
@@ -434,7 +452,7 @@ class VideoCashService : SuspendService(), Receiver, LifecycleNotificationManage
         val deleteStoreFilesAndHandleError = suspend {
             audioFileStore.delete()
             videoFileStore.delete()
-            onCashingError()
+            onCashingError(errorStatus = DownloadingStatus.ERR)
         }
 
         downloadAudioAndVideoFilesOrNotifyError(
@@ -496,7 +514,7 @@ class VideoCashService : SuspendService(), Receiver, LifecycleNotificationManage
             ).await()
         ) {
             null -> {
-                onCashingError()
+                onCashingError(errorStatus = DownloadingStatus.ERR)
                 CashingResult.ConversionError
             }
 
@@ -620,6 +638,8 @@ class VideoCashService : SuspendService(), Receiver, LifecycleNotificationManage
             is CashingResult.DownloadResult.Success -> onVideoCashSuccessful()
 
             CashingResult.DownloadResult.FileCreationError -> onFileCreationError()
+
+            CashingResult.DownloadResult.ConnectionLostError -> onConnectionLostError()
         }
 
         Log.d(TAG, "Cashing result $cashingResult handled")
@@ -654,8 +674,13 @@ class VideoCashService : SuspendService(), Receiver, LifecycleNotificationManage
             .putExtra(VIDEO_CASH_STATUS_ARG, VideoCashResponse.FileCreationError)
     )
 
-    private suspend inline fun onCashingError() {
-        cashingStatusState.update { DownloadingStatus.ERR }
+    private fun onConnectionLostError() = sendBroadcast(
+        Intent(MainActivity.Broadcast_VIDEO_CASH_COMPLETED)
+            .putExtra(VIDEO_CASH_STATUS_ARG, VideoCashResponse.ConnectionLostError)
+    )
+
+    private suspend inline fun onCashingError(errorStatus: DownloadingStatus) {
+        cashingStatusState.update { errorStatus }
         isVideoCashingCondVar.notify()
 
         Log.d(TAG, "File is deleted ${curVideoCashFile?.delete()}")
@@ -760,6 +785,9 @@ class VideoCashService : SuspendService(), Receiver, LifecycleNotificationManage
     private fun getErrorNotificationBuilder(code: Int, description: String) =
         finishedNotificationBuilder("${resources.getString(R.string.error)} $code: $description")
 
+    private inline val connectionLostNotificationBuilder
+        get() = finishedNotificationBuilder(R.string.connection_lost)
+
     private data class CashingNotificationData(
         val cashingState: DownloadingStatus,
         val metadata: VideoMetadata,
@@ -857,6 +885,11 @@ class VideoCashService : SuspendService(), Receiver, LifecycleNotificationManage
         getErrorNotificationBuilder(code, description).build()
     )
 
+    private fun showConnectionLostNotification() = notificationManager.notify(
+        NOTIFICATION_ID,
+        connectionLostNotificationBuilder.build()
+    )
+
     private fun updateNotification(
         cashingState: DownloadingStatus,
         videoMetadata: VideoMetadata,
@@ -906,6 +939,11 @@ class VideoCashService : SuspendService(), Receiver, LifecycleNotificationManage
                     DownloadingStatus.ERR -> {
                         Log.d(TAG, "Error Notification")
                         showErrorNotification(errorCode, errorDescription)
+                    }
+
+                    DownloadingStatus.CONNECT_LOST -> {
+                        Log.d(TAG, "Connection Lost Notification")
+                        showConnectionLostNotification()
                     }
 
                     else -> Unit
