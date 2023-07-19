@@ -1,15 +1,14 @@
 package com.paranid5.mediastreamer.presentation.streaming
 
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
@@ -37,11 +36,7 @@ internal fun VideoCover(
                 ambientColor = lightVibrantColor,
                 spotColor = lightVibrantColor
             )
-            .border(
-                width = 50.dp,
-                color = Color.Transparent,
-                shape = RoundedCornerShape(50.dp)
-            ),
+            .clip(RoundedCornerShape(20.dp)),
         contentDescription = stringResource(R.string.video_cover),
         contentScale = ContentScale.Crop,
         alignment = Alignment.Center,

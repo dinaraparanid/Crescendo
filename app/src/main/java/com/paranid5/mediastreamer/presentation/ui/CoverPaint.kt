@@ -107,3 +107,87 @@ internal inline fun rememberVideoCoverPainterWithPalette(
             .build()
     ) to palette
 }
+
+@Composable
+internal inline fun rememberTrackCoverPainter(
+    path: String,
+    isPlaceholderRequired: Boolean,
+    size: Pair<Int, Int>? = null,
+    isBlured: Boolean = false,
+    crossinline bitmapSettings: (Bitmap) -> Unit = {}
+): AsyncImagePainter {
+    val context = LocalContext.current
+    val glideUtils = GlideUtils(context)
+
+    var coverModel by remember { mutableStateOf<BitmapDrawable?>(null) }
+
+    LaunchedEffect(Unit) {
+        coverModel = glideUtils
+            .getTrackCoverAsync(path, size, bitmapSettings)
+            .await()
+    }
+
+    return rememberAsyncImagePainter(
+        model = ImageRequest.Builder(context)
+            .data(coverModel)
+            .error(R.drawable.cover_thumbnail)
+            .fallback(R.drawable.cover_thumbnail)
+            .apply {
+                if (isPlaceholderRequired)
+                    placeholder(R.drawable.cover_thumbnail)
+
+                if (isBlured)
+                    transformations(BlurTransformation(context))
+
+                size?.run { size(first, second) }
+            }
+            .precision(Precision.EXACT)
+            .scale(Scale.FILL)
+            .crossfade(true)
+            .build()
+    )
+}
+
+@Composable
+internal inline fun rememberTrackCoverPainterWithPalette(
+    path: String,
+    isPlaceholderRequired: Boolean,
+    size: Pair<Int, Int>? = null,
+    isBlured: Boolean = false,
+    crossinline bitmapSettings: (Bitmap) -> Unit = {}
+): Pair<AsyncImagePainter, Palette?> {
+    val context = LocalContext.current
+    val glideUtils = GlideUtils(context)
+
+    var coverModel by remember { mutableStateOf<BitmapDrawable?>(null) }
+    var palette by remember { mutableStateOf<Palette?>(null) }
+
+    LaunchedEffect(Unit) {
+        val (plt, cover) = glideUtils
+            .getTrackCoverWithPaletteAsync(path, size, bitmapSettings)
+            .await()
+
+        coverModel = cover
+        palette = plt
+    }
+
+    return rememberAsyncImagePainter(
+        model = ImageRequest.Builder(context)
+            .data(coverModel)
+            .error(R.drawable.cover_thumbnail)
+            .fallback(R.drawable.cover_thumbnail)
+            .apply {
+                if (isPlaceholderRequired)
+                    placeholder(R.drawable.cover_thumbnail)
+
+                if (isBlured)
+                    transformations(BlurTransformation(context))
+
+                size?.run { size(first, second) }
+            }
+            .precision(Precision.EXACT)
+            .scale(Scale.FILL)
+            .crossfade(true)
+            .build()
+    ) to palette
+}

@@ -69,4 +69,8 @@
     <string name="track_collections">Track Collections</string>
     <string name="albums">Albums</string>
     <string name="streaming">Streaming</string>
+    <string name="unknown_track">Unknown Track</string>
+    <string name="unknown_artist">Unknown Artist</string>
+    <string name="unknown_album">Unknown Album</string>
+    <string name="track_cover">Track cover</string>
 </resources>

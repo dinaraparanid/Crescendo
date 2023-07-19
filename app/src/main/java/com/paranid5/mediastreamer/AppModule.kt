@@ -3,9 +3,10 @@ package com.paranid5.mediastreamer
 import android.content.Context
 import android.os.Build
 import androidx.annotation.StringRes
+import com.paranid5.mediastreamer.data.eq.EqualizerData
+import com.paranid5.mediastreamer.data.tracks.Track
 import com.paranid5.mediastreamer.domain.StorageHandler
 import com.paranid5.mediastreamer.domain.ktor_client.KtorClient
-import com.paranid5.mediastreamer.data.eq.EqualizerData
 import com.paranid5.mediastreamer.domain.stream_service.StreamServiceAccessor
 import com.paranid5.mediastreamer.domain.video_cash_service.VideoCashServiceAccessor
 import com.paranid5.mediastreamer.presentation.appbar.stream_button.StreamButtonUIHandler
@@ -33,7 +34,6 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import org.koin.android.ext.koin.androidApplication
 import org.koin.android.ext.koin.androidContext
 import org.koin.androidx.viewmodel.dsl.viewModelOf
-import org.koin.core.module.dsl.factoryOf
 import org.koin.core.module.dsl.singleOf
 import org.koin.core.qualifier.named
 import org.koin.core.scope.Scope
@@ -131,7 +131,7 @@ private val audioEffectsModule = module {
 
 private val tracksModule = module {
     singleOf(::TracksUIHandler)
-    factoryOf(::TracksPresenter)
+    factory { (tracks: List<Track>) -> TracksPresenter(tracks) }
     viewModelOf(::TracksViewModel)
 }
 
