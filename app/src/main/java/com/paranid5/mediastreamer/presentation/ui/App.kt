@@ -69,7 +69,7 @@ fun App(
     )
 
     val backgroundColor = when (curScreen) {
-        Screens.MainScreens.StreamScreens.Streaming -> Color.Transparent
+        Screens.Stream.Streaming -> Color.Transparent
         else -> colors.background
     }
 

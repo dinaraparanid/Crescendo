@@ -20,6 +20,9 @@ import com.paranid5.mediastreamer.presentation.search_stream.SearchStreamViewMod
 import com.paranid5.mediastreamer.presentation.streaming.StreamingScreen
 import com.paranid5.mediastreamer.presentation.streaming.StreamingViewModel
 import com.paranid5.mediastreamer.presentation.settings.SettingsScreen
+import com.paranid5.mediastreamer.presentation.track_collections.AlbumsScreen
+import com.paranid5.mediastreamer.presentation.tracks.TracksScreen
+import com.paranid5.mediastreamer.presentation.tracks.TracksViewModel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import org.koin.androidx.compose.koinViewModel
@@ -31,7 +34,8 @@ fun ContentScreen(
     curScreenState: MutableStateFlow<Screens>,
     searchStreamViewModel: SearchStreamViewModel = koinViewModel(),
     streamingViewModel: StreamingViewModel = koinViewModel(),
-    audioEffectsViewModel: AudioEffectsViewModel = koinViewModel()
+    audioEffectsViewModel: AudioEffectsViewModel = koinViewModel(),
+    tracksViewModel: TracksViewModel = koinViewModel()
 ) {
     val backPressedCounter = AtomicInteger()
     val activity = LocalActivity.current
@@ -57,21 +61,29 @@ fun ContentScreen(
 
     NavHost(
         navController = LocalNavController.current.value!!,
-        startDestination = Screens.MainScreens.Searching.title,
+        startDestination = Screens.Tracks.title,
         modifier = Modifier.padding(
             top = padding.calculateTopPadding(),
             bottom = padding.calculateBottomPadding()
         )
     ) {
-        composable(route = Screens.MainScreens.Searching.title) {
+        composable(route = Screens.Tracks.title) {
+            TracksScreen(tracksViewModel, curScreenState)
+        }
+
+        composable(route = Screens.TrackCollections.Albums.title) {
+            AlbumsScreen(curScreenState)
+        }
+
+        composable(route = Screens.Searching.title) {
             SearchStreamScreen(searchStreamViewModel, curScreenState)
         }
 
-        composable(route = Screens.MainScreens.StreamScreens.Streaming.title) {
+        composable(route = Screens.Stream.Streaming.title) {
             StreamingScreen(streamingViewModel, curScreenState)
         }
 
-        composable(route = Screens.MainScreens.StreamScreens.AudioEffects.title) {
+        composable(route = Screens.Stream.AudioEffects.title) {
             AudioEffectsScreen(audioEffectsViewModel, curScreenState)
         }
 

@@ -49,7 +49,7 @@ class StreamingUIHandler(private val serviceAccessor: StreamServiceAccessor) :
             ).show()
 
             else -> navHostController.navigateIfNotSame(
-                Screens.MainScreens.StreamScreens.AudioEffects
+                Screens.Stream.AudioEffects
             )
         }
     }

@@ -64,4 +64,9 @@
     <string name="hertz">Hz</string>
     <string name="equalizer_band">Equalizer band</string>
     <string name="connection_lost">Connection is lost</string>
+    <string name="tracks">Tracks</string>
+    <string name="artists">Artists</string>
+    <string name="track_collections">Track Collections</string>
+    <string name="albums">Albums</string>
+    <string name="streaming">Streaming</string>
 </resources>

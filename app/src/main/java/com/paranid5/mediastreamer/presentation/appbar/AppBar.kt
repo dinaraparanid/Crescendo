@@ -14,6 +14,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import com.paranid5.mediastreamer.R
 import com.paranid5.mediastreamer.presentation.Screens
@@ -36,9 +37,23 @@ fun AppBar(modifier: Modifier = Modifier) {
             .background(color = LocalAppColors.current.value.primary)
     ) {
         AppBarItem(
-            title = R.string.about_app,
-            image = Icons.Filled.Info,
-            screen = Screens.AboutApp,
+            title = R.string.tracks,
+            image = painterResource(R.drawable.tracks),
+            screen = Screens.Tracks,
+            modifier = Modifier.weight(1F)
+        )
+
+        AppBarItem(
+            title = R.string.track_collections,
+            image = painterResource(R.drawable.playlists),
+            screen = Screens.TrackCollections.Albums,
+            modifier = Modifier.weight(1F)
+        )
+
+        AppBarItem(
+            title = R.string.streaming,
+            image = painterResource(R.drawable.stream_icon),
+            screen = Screens.Searching,
             modifier = Modifier.weight(1F)
         )
 

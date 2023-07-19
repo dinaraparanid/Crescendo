@@ -35,7 +35,7 @@ fun StreamingScreen(
     modifier: Modifier = Modifier,
     storageHandler: StorageHandler = koinInject()
 ) {
-    curScreenState.update { Screens.MainScreens.StreamScreens.Streaming }
+    curScreenState.update { Screens.Stream.Streaming }
 
     when (LocalConfiguration.current.orientation) {
         Configuration.ORIENTATION_LANDSCAPE ->

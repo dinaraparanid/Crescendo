@@ -5,18 +5,29 @@ import kotlinx.parcelize.Parcelize
 
 sealed class Screens(val title: String) : Parcelable {
 
-    sealed class MainScreens(title: String) : Screens("main/$title") {
+    @Parcelize
+    object Tracks : Screens("tracks")
+
+    sealed class TrackCollections(title: String) : Screens("track_collections/$title") {
+        @Parcelize
+        object Albums : TrackCollections("albums")
 
         @Parcelize
-        object Searching : MainScreens("searching")
+        object CustomPlaylists : TrackCollections("custom_playlists")
+    }
 
-        sealed class StreamScreens(title: String) : MainScreens("stream/$title") {
-            @Parcelize
-            object Streaming : MainScreens("streaming")
+    @Parcelize
+    object Artists : Screens("artists")
 
-            @Parcelize
-            object AudioEffects : MainScreens("audio_effects")
-        }
+    @Parcelize
+    object Searching : Screens("searching")
+
+    sealed class Stream(title: String) : Screens("stream/$title") {
+        @Parcelize
+        object Streaming : Stream("streaming")
+
+        @Parcelize
+        object AudioEffects : Stream("audio_effects")
     }
 
     @Parcelize

@@ -4,8 +4,8 @@ enum class StreamStates { SEARCHING, STREAMING }
 
 inline val StreamStates.screen
     get() = when (this) {
-        StreamStates.SEARCHING -> Screens.MainScreens.Searching
-        StreamStates.STREAMING -> Screens.MainScreens.StreamScreens.Streaming
+        StreamStates.SEARCHING -> Screens.Searching
+        StreamStates.STREAMING -> Screens.Stream.Streaming
     }
 
 inline val StreamStates.nextState

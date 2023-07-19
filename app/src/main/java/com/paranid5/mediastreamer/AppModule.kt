@@ -19,6 +19,9 @@ import com.paranid5.mediastreamer.presentation.search_stream.SearchStreamViewMod
 import com.paranid5.mediastreamer.presentation.streaming.StreamingPresenter
 import com.paranid5.mediastreamer.presentation.streaming.StreamingUIHandler
 import com.paranid5.mediastreamer.presentation.streaming.StreamingViewModel
+import com.paranid5.mediastreamer.presentation.tracks.TracksPresenter
+import com.paranid5.mediastreamer.presentation.tracks.TracksUIHandler
+import com.paranid5.mediastreamer.presentation.tracks.TracksViewModel
 import com.paranid5.mediastreamer.presentation.ui.GlideUtils
 import com.paranid5.mediastreamer.presentation.ui.permissions.audioRecordingPermissionQueue
 import com.paranid5.mediastreamer.presentation.ui.permissions.description_providers.AudioRecordingDescriptionProvider
@@ -30,6 +33,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import org.koin.android.ext.koin.androidApplication
 import org.koin.android.ext.koin.androidContext
 import org.koin.androidx.viewmodel.dsl.viewModelOf
+import org.koin.core.module.dsl.factoryOf
 import org.koin.core.module.dsl.singleOf
 import org.koin.core.qualifier.named
 import org.koin.core.scope.Scope
@@ -125,8 +129,14 @@ private val audioEffectsModule = module {
     viewModelOf(::AudioEffectsViewModel)
 }
 
+private val tracksModule = module {
+    singleOf(::TracksUIHandler)
+    factoryOf(::TracksPresenter)
+    viewModelOf(::TracksViewModel)
+}
+
 private val uiMainModule = module {
-    includes(searchStreamModule, streamingModule, audioEffectsModule)
+    includes(searchStreamModule, streamingModule, audioEffectsModule, tracksModule)
     singleOf(::StreamButtonUIHandler)
 }
 
