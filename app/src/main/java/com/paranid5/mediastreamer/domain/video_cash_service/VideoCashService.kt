@@ -38,7 +38,7 @@ import com.paranid5.mediastreamer.domain.utils.media.createMediaFileCatching
 import com.paranid5.mediastreamer.domain.utils.media.getInitialMediaDirectory
 import com.paranid5.mediastreamer.domain.utils.media.mergeToMP4AndSetTagsAsync
 import com.paranid5.mediastreamer.presentation.main_activity.MainActivity
-import com.paranid5.mediastreamer.presentation.streaming.VIDEO_CASH_STATUS_ARG
+import com.paranid5.mediastreamer.presentation.main_activity.MainActivity.Companion.VIDEO_CASH_STATUS_ARG
 import io.ktor.client.*
 import io.ktor.http.*
 import kotlinx.coroutines.*

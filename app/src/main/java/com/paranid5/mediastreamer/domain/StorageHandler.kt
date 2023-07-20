@@ -11,6 +11,7 @@ import androidx.datastore.preferences.preferencesDataStore
 import com.paranid5.mediastreamer.data.VideoMetadata
 import com.paranid5.mediastreamer.data.eq.EqualizerData
 import com.paranid5.mediastreamer.data.eq.EqualizerParameters
+import com.paranid5.mediastreamer.data.tracks.DefaultTrack
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -20,13 +21,16 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 
-class StorageHandler(private val context: Context) :
+class StorageHandler(context: Context) :
     CoroutineScope by CoroutineScope(Dispatchers.IO) {
     companion object {
         private val TAG = StorageHandler::class.simpleName!!
 
         private val CURRENT_URL = stringPreferencesKey("current_url")
         private val CURRENT_METADATA = stringPreferencesKey("current_metadata")
+
+        private val CURRENT_TRACK_INDEX = intPreferencesKey("current_track_index")
+        private val CURRENT_PLAYLIST = stringPreferencesKey("current_playlist")
 
         private val PLAYBACK_POSITION = longPreferencesKey("playback_position")
         private val IS_REPEATING = booleanPreferencesKey("is_repeating")
@@ -69,6 +73,34 @@ class StorageHandler(private val context: Context) :
     internal suspend inline fun storeCurrentMetadata(metadata: VideoMetadata?) {
         dataStore.edit { preferences ->
             preferences[CURRENT_METADATA] = Json.encodeToString(metadata)
+        }
+    }
+
+    @OptIn(ExperimentalCoroutinesApi::class)
+    val currentTrackIndexFlow = dataStore.data
+        .mapLatest { preferences -> preferences[CURRENT_TRACK_INDEX] }
+        .mapLatest { it ?: 0 }
+
+    val currentTrackIndexState = currentTrackIndexFlow
+        .stateIn(this, SharingStarted.Eagerly, 0)
+
+    internal suspend inline fun storeCurrentTrackIndex(index: Int) {
+        dataStore.edit { preferences ->
+            preferences[CURRENT_TRACK_INDEX] = index
+        }
+    }
+
+    @OptIn(ExperimentalCoroutinesApi::class)
+    val currentPlaylistFlow = dataStore.data
+        .mapLatest { preferences -> preferences[CURRENT_PLAYLIST] }
+        .mapLatest { trackStr -> trackStr?.let { Json.decodeFromString<List<DefaultTrack>>(it) } }
+
+    val currentPlaylistState = currentPlaylistFlow
+        .stateIn(this, SharingStarted.Eagerly, null)
+
+    internal suspend inline fun storeCurrentPlaylist(playlist: List<DefaultTrack>) {
+        dataStore.edit { preferences ->
+            preferences[CURRENT_PLAYLIST] = Json.encodeToString(playlist)
         }
     }
 

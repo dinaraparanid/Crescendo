@@ -11,16 +11,21 @@ import org.koin.core.context.startKoin
 class MainApplication : Application() {
     companion object {
         private const val STREAM_SERVICE_NAME = ".domain.stream_service.StreamService"
+        private const val TRACK_SERVICE_NAME = ".domain.track_service.TrackService"
         private const val VIDEO_CASH_SERVICE_NAME = ".domain.video_cash_service.VideoCashService"
     }
 
     @Volatile
+    @JvmField
     var isStreamServiceConnected = false
-        private set
 
     @Volatile
+    @JvmField
+    var isTrackServiceConnected = false
+
+    @Volatile
+    @JvmField
     var isVideoCashServiceConnected = false
-        private set
 
     @JvmField
     val streamServiceConnection = object : ServiceConnection {
@@ -32,6 +37,19 @@ class MainApplication : Application() {
         override fun onServiceDisconnected(name: ComponentName) {
             if (name.shortClassName == STREAM_SERVICE_NAME)
                 isStreamServiceConnected = false
+        }
+    }
+
+    @JvmField
+    val trackServiceConnection = object : ServiceConnection {
+        override fun onServiceConnected(name: ComponentName, service: IBinder) {
+            if (name.shortClassName == TRACK_SERVICE_NAME)
+                isTrackServiceConnected = true
+        }
+
+        override fun onServiceDisconnected(name: ComponentName) {
+            if (name.shortClassName == TRACK_SERVICE_NAME)
+                isTrackServiceConnected = false
         }
     }
 

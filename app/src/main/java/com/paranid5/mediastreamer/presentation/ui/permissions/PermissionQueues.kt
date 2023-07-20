@@ -21,9 +21,18 @@ inline val externalStoragePermissionQueue: Queue<String>
         }
     )
 
-inline val postNotificationsPermissionQueue: Queue<String>
+inline val foregroundServicePermissionQueue: Queue<String>
     @RequiresApi(Build.VERSION_CODES.TIRAMISU)
-    get() = java.util.ArrayDeque(listOf(Manifest.permission.POST_NOTIFICATIONS))
+    get() = java.util.ArrayDeque(
+        when {
+            Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE -> listOf(
+                Manifest.permission.POST_NOTIFICATIONS,
+                Manifest.permission.FOREGROUND_SERVICE_MEDIA_PLAYBACK
+            )
+
+            else -> listOf(Manifest.permission.POST_NOTIFICATIONS)
+        }
+    )
 
 inline val audioRecordingPermissionQueue: Queue<String>
     get() = java.util.ArrayDeque(

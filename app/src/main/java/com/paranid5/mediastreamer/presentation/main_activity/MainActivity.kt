@@ -19,7 +19,6 @@ import com.paranid5.mediastreamer.presentation.NavHostController
 import com.paranid5.mediastreamer.presentation.composition_locals.LocalActivity
 import com.paranid5.mediastreamer.presentation.composition_locals.LocalMainViewModel
 import com.paranid5.mediastreamer.presentation.composition_locals.LocalNavController
-import com.paranid5.mediastreamer.presentation.streaming.VIDEO_CASH_STATUS_ARG
 import com.paranid5.mediastreamer.presentation.ui.App
 import com.paranid5.mediastreamer.presentation.ui.theme.MediaStreamerTheme
 import org.koin.androidx.viewmodel.ext.android.viewModel
@@ -32,6 +31,8 @@ class MainActivity : ComponentActivity() {
 
         private const val BROADCAST_LOCATION = "com.paranid5.mediastreamer.presentation"
         const val Broadcast_VIDEO_CASH_COMPLETED = "$BROADCAST_LOCATION.VIDEO_CASH_COMPLETED"
+
+        const val VIDEO_CASH_STATUS_ARG = "video_cash_status"
     }
 
     private val cashStatusReceiver = object : BroadcastReceiver() {

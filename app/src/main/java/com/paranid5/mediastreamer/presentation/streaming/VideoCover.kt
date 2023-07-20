@@ -27,6 +27,9 @@ internal fun VideoCover(
 
     Image(
         painter = coilPainter,
+        contentDescription = stringResource(R.string.video_cover),
+        contentScale = ContentScale.Crop,
+        alignment = Alignment.Center,
         modifier = modifier
             .aspectRatio(1F)
             .fillMaxSize()
@@ -37,8 +40,5 @@ internal fun VideoCover(
                 spotColor = lightVibrantColor
             )
             .clip(RoundedCornerShape(20.dp)),
-        contentDescription = stringResource(R.string.video_cover),
-        contentScale = ContentScale.Crop,
-        alignment = Alignment.Center,
     )
 }

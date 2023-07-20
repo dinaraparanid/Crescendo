@@ -1,6 +1,7 @@
 package com.paranid5.mediastreamer.presentation.tracks
 
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -57,11 +58,11 @@ fun TracksScreen(
         }
     }
 
-    LazyColumn(modifier = modifier.fillMaxSize().padding(10.dp)) {
-        items(items = tracks, key = { it.path }) {
-            TrackItem(track = it)
-            Spacer(Modifier.height(10.dp))
-        }
+    LazyColumn(
+        modifier = modifier.fillMaxSize().padding(10.dp),
+        verticalArrangement = Arrangement.spacedBy(10.dp)
+    ) {
+        items(items = tracks, key = { it.path }) { TrackItem(track = it) }
     }
 }
 

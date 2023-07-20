@@ -5,6 +5,7 @@
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
     <uses-permission android:name="android.permission.WAKE_LOCK" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_MEDIA_PLAYBACK" />
 
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.INTERNET" />
@@ -56,6 +57,7 @@
                 android:foregroundServiceType="mediaPlayback" />
         <service
                 android:name=".domain.video_cash_service.VideoCashService"
-                android:foregroundServiceType="dataSync" />
+                android:foregroundServiceType="mediaPlayback" />
+        <service android:name="com.paranid5.mediastreamer.domain.track_service.TrackService" />
     </application>
 </manifest>

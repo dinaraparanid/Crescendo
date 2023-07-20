@@ -5,12 +5,12 @@ import android.widget.Toast
 import com.paranid5.mediastreamer.AUDIO_SESSION_ID
 import com.paranid5.mediastreamer.R
 import com.paranid5.mediastreamer.domain.StorageHandler
-import com.paranid5.mediastreamer.presentation.UIHandler
 import com.paranid5.mediastreamer.domain.stream_service.StreamServiceAccessor
 import com.paranid5.mediastreamer.domain.video_cash_service.Formats
 import com.paranid5.mediastreamer.domain.video_cash_service.VideoCashServiceAccessor
 import com.paranid5.mediastreamer.presentation.NavHostController
 import com.paranid5.mediastreamer.presentation.Screens
+import com.paranid5.mediastreamer.presentation.UIHandler
 import kotlinx.coroutines.flow.MutableStateFlow
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject

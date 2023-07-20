@@ -202,6 +202,30 @@ class GlideUtils(private val context: Context) {
         }
     }
 
+    internal suspend inline fun getTrackCoverBitmapAsync(
+        path: String,
+        size: Pair<Int, Int>? = null,
+        crossinline bitmapSettings: (Bitmap) -> Unit = {}
+    ) = coroutineScope {
+        async(Dispatchers.IO) {
+            getBitmapFromPathCatching(path, size, bitmapSettings)
+                .getOrNull()
+                ?: thumbnailBitmap
+        }
+    }
+
+    internal suspend inline fun getTrackCoverBitmapWithPaletteAsync(
+        path: String,
+        size: Pair<Int, Int>? = null,
+        crossinline bitmapSettings: (Bitmap) -> Unit = {}
+    ) = coroutineScope {
+        async(Dispatchers.IO) {
+            getBitmapFromPathWithPaletteCatching(path, size, bitmapSettings)
+                .getOrNull()
+                ?: thumbnailBitmapWithPalette
+        }
+    }
+
     internal suspend inline fun getTrackCoverAsync(
         path: String,
         size: Pair<Int, Int>?,

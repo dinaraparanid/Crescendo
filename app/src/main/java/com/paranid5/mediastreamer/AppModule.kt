@@ -8,6 +8,7 @@ import com.paranid5.mediastreamer.data.tracks.Track
 import com.paranid5.mediastreamer.domain.StorageHandler
 import com.paranid5.mediastreamer.domain.ktor_client.KtorClient
 import com.paranid5.mediastreamer.domain.stream_service.StreamServiceAccessor
+import com.paranid5.mediastreamer.domain.track_service.TrackServiceAccessor
 import com.paranid5.mediastreamer.domain.video_cash_service.VideoCashServiceAccessor
 import com.paranid5.mediastreamer.presentation.appbar.stream_button.StreamButtonUIHandler
 import com.paranid5.mediastreamer.presentation.audio_effects.AudioEffectsPresenter
@@ -29,7 +30,7 @@ import com.paranid5.mediastreamer.presentation.ui.permissions.description_provid
 import com.paranid5.mediastreamer.presentation.ui.permissions.description_providers.ExternalStorageDescriptionProvider
 import com.paranid5.mediastreamer.presentation.ui.permissions.description_providers.PostNotificationDescriptionProvider
 import com.paranid5.mediastreamer.presentation.ui.permissions.externalStoragePermissionQueue
-import com.paranid5.mediastreamer.presentation.ui.permissions.postNotificationsPermissionQueue
+import com.paranid5.mediastreamer.presentation.ui.permissions.foregroundServicePermissionQueue
 import kotlinx.coroutines.flow.MutableStateFlow
 import org.koin.android.ext.koin.androidApplication
 import org.koin.android.ext.koin.androidContext
@@ -59,6 +60,7 @@ private val resourcesModule = module {
 
 private val serviceAccessors = module {
     singleOf(::StreamServiceAccessor)
+    singleOf(::TrackServiceAccessor)
     singleOf(::VideoCashServiceAccessor)
 }
 
@@ -87,7 +89,7 @@ private val permissionQueues = module {
     single(named(AUDIO_RECORDING_PERMISSION_QUEUE)) { audioRecordingPermissionQueue }
 
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU)
-        single(named(POST_NOTIFICATIONS_PERMISSION_QUEUE)) { postNotificationsPermissionQueue }
+        single(named(POST_NOTIFICATIONS_PERMISSION_QUEUE)) { foregroundServicePermissionQueue }
 }
 
 private val permissions = module {

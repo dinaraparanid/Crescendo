@@ -2,7 +2,9 @@ package com.paranid5.mediastreamer.data.tracks
 
 import androidx.compose.runtime.Immutable
 import kotlinx.parcelize.Parcelize
+import kotlinx.serialization.Serializable
 
+@Serializable
 @Parcelize
 @Immutable
 data class DefaultTrack(
