@@ -110,7 +110,7 @@ internal inline fun rememberVideoCoverPainterWithPalette(
 
 @Composable
 internal inline fun rememberTrackCoverPainter(
-    path: String,
+    path: String?,
     isPlaceholderRequired: Boolean,
     size: Pair<Int, Int>? = null,
     isBlured: Boolean = false,
@@ -121,7 +121,7 @@ internal inline fun rememberTrackCoverPainter(
 
     var coverModel by remember { mutableStateOf<BitmapDrawable?>(null) }
 
-    LaunchedEffect(Unit) {
+    LaunchedEffect(key1 = path) {
         coverModel = glideUtils
             .getTrackCoverAsync(path, size, bitmapSettings)
             .await()
@@ -150,7 +150,7 @@ internal inline fun rememberTrackCoverPainter(
 
 @Composable
 internal inline fun rememberTrackCoverPainterWithPalette(
-    path: String,
+    path: String?,
     isPlaceholderRequired: Boolean,
     size: Pair<Int, Int>? = null,
     isBlured: Boolean = false,
@@ -162,7 +162,7 @@ internal inline fun rememberTrackCoverPainterWithPalette(
     var coverModel by remember { mutableStateOf<BitmapDrawable?>(null) }
     var palette by remember { mutableStateOf<Palette?>(null) }
 
-    LaunchedEffect(Unit) {
+    LaunchedEffect(key1 = path) {
         val (plt, cover) = glideUtils
             .getTrackCoverWithPaletteAsync(path, size, bitmapSettings)
             .await()
@@ -190,4 +190,42 @@ internal inline fun rememberTrackCoverPainterWithPalette(
             .crossfade(true)
             .build()
     ) to palette
+}
+
+@Composable
+internal inline fun rememberCurrentTrackCoverPainter(
+    isPlaceholderRequired: Boolean,
+    size: Pair<Int, Int>? = null,
+    isBlured: Boolean = false,
+    storageHandler: StorageHandler = koinInject(),
+    crossinline bitmapSettings: (Bitmap) -> Unit = {}
+): AsyncImagePainter {
+    val curTrack by storageHandler.currentTrackState.collectAsState()
+    val path by remember { derivedStateOf { curTrack?.path } }
+    return rememberTrackCoverPainter(
+        path = path,
+        isPlaceholderRequired = isPlaceholderRequired,
+        size = size,
+        isBlured = isBlured,
+        bitmapSettings = bitmapSettings
+    )
+}
+
+@Composable
+internal inline fun rememberCurrentTrackCoverPainterWithPalette(
+    isPlaceholderRequired: Boolean,
+    size: Pair<Int, Int>? = null,
+    isBlured: Boolean = false,
+    storageHandler: StorageHandler = koinInject(),
+    crossinline bitmapSettings: (Bitmap) -> Unit = {}
+): Pair<AsyncImagePainter, Palette?> {
+    val curTrack by storageHandler.currentTrackState.collectAsState()
+    val path by remember { derivedStateOf { curTrack?.path } }
+    return rememberTrackCoverPainterWithPalette(
+        path = path,
+        isPlaceholderRequired = isPlaceholderRequired,
+        size = size,
+        isBlured = isBlured,
+        bitmapSettings = bitmapSettings
+    )
 }

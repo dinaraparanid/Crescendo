@@ -34,6 +34,7 @@ import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
 import com.paranid5.mediastreamer.AUDIO_RECORDING_PERMISSION_QUEUE
 import com.paranid5.mediastreamer.R
+import com.paranid5.mediastreamer.domain.StorageHandler
 import com.paranid5.mediastreamer.presentation.Screens
 import com.paranid5.mediastreamer.presentation.StreamStates
 import com.paranid5.mediastreamer.presentation.UpdateCheckerDialog
@@ -55,21 +56,32 @@ import java.util.Queue
 fun App(
     curScreenState: MutableStateFlow<Screens>,
     streamScreenState: StateFlow<StreamStates>,
+    storageHandler: StorageHandler = koinInject()
 ) {
     val activity = LocalActivity.current
     val config = LocalConfiguration.current
     val colors = LocalAppColors.current.value
     val curScreen by curScreenState.collectAsState()
+    val audioStatus by storageHandler.audioStatusState.collectAsState()
 
-    val coilPainter = rememberVideoCoverPainter(
-        isPlaceholderRequired = true,
-        size = config.screenWidthDp to config.screenHeightDp,
-        isBlured = Build.VERSION.SDK_INT < Build.VERSION_CODES.S,
-        bitmapSettings = Bitmap::increaseDarkness,
-    )
+    val coilPainter = when (audioStatus) {
+        AudioStatus.STREAMING -> rememberVideoCoverPainter(
+            isPlaceholderRequired = true,
+            size = config.screenWidthDp to config.screenHeightDp,
+            isBlured = Build.VERSION.SDK_INT < Build.VERSION_CODES.S,
+            bitmapSettings = Bitmap::increaseDarkness,
+        )
+
+        else -> rememberCurrentTrackCoverPainter(
+            isPlaceholderRequired = true,
+            size = config.screenWidthDp to config.screenHeightDp,
+            isBlured = Build.VERSION.SDK_INT < Build.VERSION_CODES.S,
+            bitmapSettings = Bitmap::increaseDarkness,
+        )
+    }
 
     val backgroundColor = when (curScreen) {
-        Screens.Stream.Streaming -> Color.Transparent
+        Screens.Audio.Playing -> Color.Transparent
         else -> colors.background
     }
 
@@ -148,7 +160,9 @@ fun App(
 
             Image(
                 painter = coilPainter,
-                modifier = Modifier.fillMaxSize().blur(radius = 15.dp),
+                modifier = Modifier
+                    .fillMaxSize()
+                    .blur(radius = 15.dp),
                 contentDescription = stringResource(R.string.video_cover),
                 contentScale = ContentScale.FillBounds,
                 alignment = Alignment.Center,

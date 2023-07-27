@@ -1,4 +1,4 @@
-package com.paranid5.mediastreamer.presentation.search_stream
+package com.paranid5.mediastreamer.presentation.fetch_stream
 
 import android.content.res.Configuration
 import androidx.compose.foundation.layout.Box
@@ -15,6 +15,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -23,22 +24,26 @@ import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.paranid5.mediastreamer.R
+import com.paranid5.mediastreamer.domain.StorageHandler
 import com.paranid5.mediastreamer.presentation.Screens
 import com.paranid5.mediastreamer.presentation.StateChangedCallback
 import com.paranid5.mediastreamer.presentation.composition_locals.LocalNavController
+import com.paranid5.mediastreamer.presentation.ui.AudioStatus
 import com.paranid5.mediastreamer.presentation.ui.OnUIStateChanged
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
+import org.koin.compose.koinInject
 
 private val youtubeUrlRegex = Regex("https://(www\\.youtube\\.com/watch\\?v=|youtu\\.be/)\\S{11}")
 
 @Composable
 fun SearchStreamScreen(
-    viewModel: SearchStreamViewModel,
+    viewModel: FetchStreamViewModel,
     curScreenState: MutableStateFlow<Screens>,
-    modifier: Modifier = Modifier,
+    modifier: Modifier = Modifier
 ) {
-    curScreenState.update { Screens.Searching }
+    curScreenState.update { Screens.StreamFetching }
 
     val orientation = LocalConfiguration.current.orientation
 
@@ -81,13 +86,17 @@ fun SearchStreamScreen(
             UrlEditor(
                 inputText = inputText,
                 viewModel = viewModel,
-                modifier = Modifier.align(Alignment.CenterHorizontally).padding(bottom = 10.dp)
+                modifier = Modifier
+                    .align(Alignment.CenterHorizontally)
+                    .padding(bottom = 10.dp)
             )
 
             ConfirmButton(
                 isConfirmButtonActive,
                 viewModel,
-                modifier = Modifier.wrapContentWidth().align(Alignment.CenterHorizontally)
+                modifier = Modifier
+                    .wrapContentWidth()
+                    .align(Alignment.CenterHorizontally)
             )
         }
     }
@@ -102,7 +111,7 @@ private fun UrlEditor(
     modifier: Modifier = Modifier,
     inputText: String?,
     hint: String = stringResource(R.string.your_url),
-    viewModel: SearchStreamViewModel
+    viewModel: FetchStreamViewModel
 ) {
     TextField(
         value = inputText ?: "",
@@ -116,17 +125,22 @@ private fun UrlEditor(
 @Composable
 private fun ConfirmButton(
     isConfirmButtonActive: Boolean,
-    viewModel: SearchStreamViewModel,
-    modifier: Modifier = Modifier
+    viewModel: FetchStreamViewModel,
+    modifier: Modifier = Modifier,
+    storageHandler: StorageHandler = koinInject()
 ) {
     val navHostController = LocalNavController.current
+    val scope = rememberCoroutineScope()
 
     Button(
         enabled = isConfirmButtonActive,
         modifier = modifier,
         onClick = {
-            viewModel.onConfirmUrlButtonPressed()
-            navHostController.navigateIfNotSame(Screens.Stream.Streaming)
+            scope.launch {
+                storageHandler.storeAudioStatus(AudioStatus.STREAMING)
+                viewModel.onConfirmUrlButtonPressed()
+                navHostController.navigateIfNotSame(Screens.Audio.Playing)
+            }
         }
     ) {
         Text(stringResource(R.string.confirm))

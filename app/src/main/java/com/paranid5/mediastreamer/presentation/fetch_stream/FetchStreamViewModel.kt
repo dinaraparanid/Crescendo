@@ -1,4 +1,4 @@
-package com.paranid5.mediastreamer.presentation.search_stream
+package com.paranid5.mediastreamer.presentation.fetch_stream
 
 import androidx.lifecycle.SavedStateHandle
 import com.paranid5.mediastreamer.domain.StorageHandler
@@ -8,15 +8,15 @@ import kotlinx.coroutines.flow.asStateFlow
 import org.koin.core.component.inject
 import org.koin.core.parameter.parametersOf
 
-class SearchStreamViewModel(savedStateHandle: SavedStateHandle) :
-    ObservableViewModel<SearchStreamPresenter, SearchStreamUIHandler>() {
+class FetchStreamViewModel(
+    savedStateHandle: SavedStateHandle,
+    private val storageHandler: StorageHandler,
+) : ObservableViewModel<FetchStreamPresenter, FetchStreamUIHandler>() {
     private companion object {
         private const val CURRENT_TEXT = "current_text"
     }
 
-    private val storageHandler by inject<StorageHandler>()
-
-    override val presenter by inject<SearchStreamPresenter> {
+    override val presenter by inject<FetchStreamPresenter> {
         val savedByStateHandle = savedStateHandle
             .getStateFlow<String?>(CURRENT_TEXT, null)
             .value
@@ -25,7 +25,7 @@ class SearchStreamViewModel(savedStateHandle: SavedStateHandle) :
         parametersOf(savedByStateHandle ?: savedByStorageHandler)
     }
 
-    override val handler by inject<SearchStreamUIHandler>()
+    override val handler by inject<FetchStreamUIHandler>()
 
     private val _isConfirmButtonPressedState = MutableStateFlow(false)
     val isConfirmButtonPressedState = _isConfirmButtonPressedState.asStateFlow()

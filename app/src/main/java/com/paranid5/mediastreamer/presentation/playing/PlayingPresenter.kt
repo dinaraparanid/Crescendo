@@ -1,9 +1,9 @@
-package com.paranid5.mediastreamer.presentation.streaming
+package com.paranid5.mediastreamer.presentation.playing
 
 import com.paranid5.mediastreamer.presentation.BasePresenter
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 
-class StreamingPresenter(isPlayingState: MutableStateFlow<Boolean>) : BasePresenter {
+class PlayingPresenter(isPlayingState: MutableStateFlow<Boolean>) : BasePresenter {
     val isPlayingState = isPlayingState.asStateFlow()
 }

@@ -1,4 +1,4 @@
-package com.paranid5.mediastreamer.presentation.streaming
+package com.paranid5.mediastreamer.presentation.playing
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.Icon
@@ -18,29 +18,29 @@ import org.koin.compose.koinInject
 
 @Composable
 internal fun PlaybackButtons(
-    streamingPresenter: StreamingPresenter,
+    playingPresenter: PlayingPresenter,
     palette: Palette?,
     modifier: Modifier = Modifier
 ) = Row(modifier.fillMaxWidth()) {
     SeekTo10SecsBackButton(modifier = Modifier.weight(2F), palette = palette)
-    PlayButton(streamingPresenter, modifier = Modifier.weight(1F), palette = palette)
+    PlayButton(playingPresenter, modifier = Modifier.weight(1F), palette = palette)
     SeekTo10SecsForwardButton(modifier = Modifier.weight(2F), palette = palette)
 }
 
 @Composable
 private fun PlayButton(
-    streamingPresenter: StreamingPresenter,
+    playingPresenter: PlayingPresenter,
     palette: Palette?,
     modifier: Modifier = Modifier,
-    streamingUIHandler: StreamingUIHandler = koinInject(),
+    playingUIHandler: PlayingUIHandler = koinInject(),
 ) {
     val lightVibrantColor = palette.getLightVibrantOrPrimary()
-    val isPlaying by streamingPresenter.isPlayingState.collectAsState()
+    val isPlaying by playingPresenter.isPlayingState.collectAsState()
 
     when {
         isPlaying -> IconButton(
             modifier = modifier.simpleShadow(color = lightVibrantColor),
-            onClick = { streamingUIHandler.sendPauseBroadcast() }
+            onClick = { playingUIHandler.sendPauseBroadcast() }
         ) {
             Icon(
                 modifier = Modifier.size(50.dp),
@@ -52,7 +52,7 @@ private fun PlayButton(
 
         else -> IconButton(
             modifier = modifier.simpleShadow(color = lightVibrantColor),
-            onClick = { streamingUIHandler.startStreamingOrSendResumeBroadcast() }
+            onClick = { playingUIHandler.startStreamingOrSendResumeBroadcast() }
         ) {
             Icon(
                 modifier = Modifier.size(50.dp),
@@ -68,13 +68,13 @@ private fun PlayButton(
 private fun SeekTo10SecsBackButton(
     palette: Palette?,
     modifier: Modifier = Modifier,
-    streamingUIHandler: StreamingUIHandler = koinInject()
+    playingUIHandler: PlayingUIHandler = koinInject()
 ) {
     val lightVibrantColor = palette.getLightVibrantOrPrimary()
 
     IconButton(
         modifier = modifier.simpleShadow(color = lightVibrantColor),
-        onClick = { streamingUIHandler.sendSeekTo10SecsBackBroadcast() }
+        onClick = { playingUIHandler.sendSeekTo10SecsBackBroadcast() }
     ) {
         Icon(
             modifier = Modifier.width(100.dp).height(50.dp),
@@ -89,13 +89,13 @@ private fun SeekTo10SecsBackButton(
 private fun SeekTo10SecsForwardButton(
     palette: Palette?,
     modifier: Modifier = Modifier,
-    streamingUIHandler: StreamingUIHandler = koinInject()
+    playingUIHandler: PlayingUIHandler = koinInject()
 ) {
     val lightVibrantColor = palette.getLightVibrantOrPrimary()
 
     IconButton(
         modifier = modifier.simpleShadow(color = lightVibrantColor),
-        onClick = { streamingUIHandler.sendSeekTo10SecsForwardBroadcast() }
+        onClick = { playingUIHandler.sendSeekTo10SecsForwardBroadcast() }
     ) {
         Icon(
             modifier = Modifier.width(100.dp).height(50.dp),

@@ -1,4 +1,4 @@
-package com.paranid5.mediastreamer.presentation.streaming
+package com.paranid5.mediastreamer.presentation.playing
 
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.basicMarquee
@@ -21,7 +21,8 @@ import com.paranid5.mediastreamer.presentation.ui.extensions.getLightVibrantOrPr
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 internal fun TitleAndAuthor(
-    metadata: VideoMetadata?,
+    title: String,
+    author: String,
     palette: Palette?,
     modifier: Modifier = Modifier,
     textAlignment: Alignment.Horizontal = Alignment.Start,
@@ -31,7 +32,7 @@ internal fun TitleAndAuthor(
     Column(modifier) {
         Text(
             modifier = Modifier.basicMarquee().align(textAlignment),
-            text = metadata?.title ?: stringResource(R.string.stream_no_name),
+            text = title,
             fontSize = 20.sp,
             maxLines = 1,
             color = lightVibrantColor
@@ -41,7 +42,7 @@ internal fun TitleAndAuthor(
 
         Text(
             modifier = Modifier.basicMarquee().align(textAlignment),
-            text = metadata?.author ?: stringResource(R.string.unknown_streamer),
+            text = author,
             fontSize = 18.sp,
             maxLines = 1,
             color = lightVibrantColor
@@ -53,7 +54,7 @@ internal fun TitleAndAuthor(
 internal fun PropertiesButton(palette: Palette?, modifier: Modifier = Modifier) {
     val lightVibrantColor = palette.getLightVibrantOrPrimary()
 
-    IconButton(modifier = modifier, onClick = { /*TODO*/ }) {
+    IconButton(modifier = modifier, onClick = { /** TODO: Track properties */ }) {
         Icon(
             modifier = Modifier.height(50.dp).width(25.dp),
             painter = painterResource(R.drawable.three_dots),
@@ -65,13 +66,15 @@ internal fun PropertiesButton(palette: Palette?, modifier: Modifier = Modifier) 
 
 @Composable
 internal fun TitleAndPropertiesButton(
-    metadata: VideoMetadata?,
+    title: String,
+    author: String,
     palette: Palette?,
     modifier: Modifier = Modifier,
     textAlignment: Alignment.Horizontal = Alignment.Start
 ) = Row(modifier) {
     TitleAndAuthor(
-        metadata = metadata,
+        title = title,
+        author = author,
         modifier = Modifier.weight(1F),
         palette = palette,
         textAlignment = textAlignment

@@ -12,10 +12,12 @@ import com.paranid5.mediastreamer.data.VideoMetadata
 import com.paranid5.mediastreamer.data.eq.EqualizerData
 import com.paranid5.mediastreamer.data.eq.EqualizerParameters
 import com.paranid5.mediastreamer.data.tracks.DefaultTrack
+import com.paranid5.mediastreamer.presentation.ui.AudioStatus
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.mapLatest
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.serialization.encodeToString
@@ -34,6 +36,7 @@ class StorageHandler(context: Context) :
 
         private val PLAYBACK_POSITION = longPreferencesKey("playback_position")
         private val IS_REPEATING = booleanPreferencesKey("is_repeating")
+        private val AUDIO_STATUS = intPreferencesKey("audio_status")
 
         private val AUDIO_EFFECTS_ENABLED = booleanPreferencesKey("audio_effects_enabled")
         private val PITCH_VALUE = floatPreferencesKey("pitch_value")
@@ -104,6 +107,11 @@ class StorageHandler(context: Context) :
         }
     }
 
+    val currentTrackState =
+        combine(currentTrackIndexFlow, currentPlaylistFlow) { trackInd, playlist ->
+            playlist?.get(trackInd)
+        }.stateIn(this, SharingStarted.Eagerly, null)
+
     @OptIn(ExperimentalCoroutinesApi::class)
     val playbackPositionFlow = dataStore.data
         .mapLatest { preferences -> preferences[PLAYBACK_POSITION] }
@@ -126,6 +134,18 @@ class StorageHandler(context: Context) :
 
     internal suspend inline fun storeIsRepeating(isRepeating: Boolean) {
         dataStore.edit { preferences -> preferences[IS_REPEATING] = isRepeating }
+    }
+
+    @OptIn(ExperimentalCoroutinesApi::class, ExperimentalStdlibApi::class)
+    val audioStatusFlow = dataStore.data
+        .mapLatest { preferences -> preferences[AUDIO_STATUS] }
+        .mapLatest { audioStatusInd -> audioStatusInd?.let { AudioStatus.entries[it] } }
+
+    val audioStatusState = audioStatusFlow
+        .stateIn(this, SharingStarted.Eagerly, null)
+
+    internal suspend inline fun storeAudioStatus(audioStatus: AudioStatus) {
+        dataStore.edit { preferences -> preferences[AUDIO_STATUS] = audioStatus.ordinal }
     }
 
     @OptIn(ExperimentalCoroutinesApi::class)

@@ -1,4 +1,4 @@
-package com.paranid5.mediastreamer.presentation.streaming
+package com.paranid5.mediastreamer.presentation.playing
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -154,14 +154,14 @@ private fun ConfirmButton(
     isButtonClickable: Boolean,
     filename: String,
     modifier: Modifier = Modifier,
-    streamingUIHandler: StreamingUIHandler = koinInject()
+    playingUIHandler: PlayingUIHandler = koinInject()
 ) {
     val colors = LocalAppColors.current.value
 
     Button(
         modifier = modifier.padding(vertical = 10.dp),
         onClick = {
-            streamingUIHandler.launchVideoCashService(filename, format)
+            playingUIHandler.launchVideoCashService(filename, format)
             isDialogShownState.value = false
         },
         enabled = isButtonClickable,

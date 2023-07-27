@@ -7,7 +7,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Favorite
-import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.BottomAppBar
 import androidx.compose.runtime.Composable
@@ -53,7 +52,7 @@ fun AppBar(modifier: Modifier = Modifier) {
         AppBarItem(
             title = R.string.streaming,
             image = painterResource(R.drawable.stream_icon),
-            screen = Screens.Searching,
+            screen = Screens.StreamFetching,
             modifier = Modifier.weight(1F)
         )
 

@@ -1,6 +1,7 @@
 package com.paranid5.mediastreamer.presentation.tracks
 
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -13,7 +14,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -22,6 +23,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -36,21 +38,30 @@ import androidx.compose.ui.unit.sp
 import com.paranid5.mediastreamer.R
 import com.paranid5.mediastreamer.data.tracks.Track
 import com.paranid5.mediastreamer.data.tracks.artistAlbum
+import com.paranid5.mediastreamer.data.tracks.toDefaultTrackList
+import com.paranid5.mediastreamer.domain.StorageHandler
+import com.paranid5.mediastreamer.domain.track_service.TrackServiceAccessor
 import com.paranid5.mediastreamer.presentation.Screens
+import com.paranid5.mediastreamer.presentation.ui.AudioStatus
 import com.paranid5.mediastreamer.presentation.ui.rememberTrackCoverPainter
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
+import org.koin.compose.koinInject
 
 @Composable
 fun TracksScreen(
     tracksViewModel: TracksViewModel,
     curScreenState: MutableStateFlow<Screens>,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    storageHandler: StorageHandler = koinInject(),
+    trackServiceAccessor: TrackServiceAccessor = koinInject()
 ) {
     curScreenState.update { Screens.Tracks }
 
     val context = LocalContext.current
     val tracks by tracksViewModel.presenter.tracksState.collectAsState()
+    val scope = rememberCoroutineScope()
 
     LaunchedEffect(Unit) {
         tracksViewModel.presenter.tracksState.update {
@@ -59,22 +70,43 @@ fun TracksScreen(
     }
 
     LazyColumn(
-        modifier = modifier.fillMaxSize().padding(10.dp),
-        verticalArrangement = Arrangement.spacedBy(10.dp)
+        verticalArrangement = Arrangement.spacedBy(10.dp),
+        modifier = modifier
+            .fillMaxSize()
+            .padding(10.dp)
     ) {
-        items(items = tracks, key = { it.path }) { TrackItem(track = it) }
+        itemsIndexed(
+            items = tracks,
+            key = { _, track -> track.path }
+        ) { ind, track ->
+            TrackItem(
+                track = track,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clickable {
+                        scope.launch {
+                            storageHandler.storeAudioStatus(AudioStatus.PLAYING)
+
+                            trackServiceAccessor.startPlaying(
+                                playlist = tracks.toDefaultTrackList(),
+                                trackInd = ind
+                            )
+                        }
+                    }
+            )
+        }
     }
 }
 
 @Composable
-fun TrackItem(track: Track, modifier: Modifier = Modifier) {
+private fun TrackItem(track: Track, modifier: Modifier = Modifier) {
     val trackCover = rememberTrackCoverPainter(
         path = track.path,
         isPlaceholderRequired = true,
         size = 200 to 200
     )
 
-    Row(modifier.fillMaxWidth()) {
+    Row(modifier) {
         Image(
             painter = trackCover,
             contentDescription = stringResource(id = R.string.track_cover),
@@ -88,7 +120,11 @@ fun TrackItem(track: Track, modifier: Modifier = Modifier) {
 
         Spacer(Modifier.width(5.dp))
 
-        Column(Modifier.fillMaxWidth(1F).padding(start = 10.dp)) {
+        Column(
+            Modifier
+                .fillMaxWidth(1F)
+                .padding(start = 10.dp)
+        ) {
             Text(
                 modifier = Modifier.align(Alignment.Start),
                 text = track.title,

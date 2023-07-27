@@ -55,9 +55,8 @@
         <service
                 android:name=".domain.stream_service.StreamService"
                 android:foregroundServiceType="mediaPlayback" />
-        <service
-                android:name=".domain.video_cash_service.VideoCashService"
+        <service android:name=".domain.track_service.TrackService"
                 android:foregroundServiceType="mediaPlayback" />
-        <service android:name="com.paranid5.mediastreamer.domain.track_service.TrackService" />
+        <service android:name=".domain.video_cash_service.VideoCashService" />
     </application>
 </manifest>

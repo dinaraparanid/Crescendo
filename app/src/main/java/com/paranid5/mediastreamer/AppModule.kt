@@ -15,12 +15,12 @@ import com.paranid5.mediastreamer.presentation.audio_effects.AudioEffectsPresent
 import com.paranid5.mediastreamer.presentation.audio_effects.AudioEffectsUIHandler
 import com.paranid5.mediastreamer.presentation.audio_effects.AudioEffectsViewModel
 import com.paranid5.mediastreamer.presentation.main_activity.MainActivityViewModel
-import com.paranid5.mediastreamer.presentation.search_stream.SearchStreamPresenter
-import com.paranid5.mediastreamer.presentation.search_stream.SearchStreamUIHandler
-import com.paranid5.mediastreamer.presentation.search_stream.SearchStreamViewModel
-import com.paranid5.mediastreamer.presentation.streaming.StreamingPresenter
-import com.paranid5.mediastreamer.presentation.streaming.StreamingUIHandler
-import com.paranid5.mediastreamer.presentation.streaming.StreamingViewModel
+import com.paranid5.mediastreamer.presentation.fetch_stream.FetchStreamPresenter
+import com.paranid5.mediastreamer.presentation.fetch_stream.FetchStreamUIHandler
+import com.paranid5.mediastreamer.presentation.fetch_stream.FetchStreamViewModel
+import com.paranid5.mediastreamer.presentation.playing.PlayingPresenter
+import com.paranid5.mediastreamer.presentation.playing.PlayingUIHandler
+import com.paranid5.mediastreamer.presentation.playing.PlayingViewModel
 import com.paranid5.mediastreamer.presentation.tracks.TracksPresenter
 import com.paranid5.mediastreamer.presentation.tracks.TracksUIHandler
 import com.paranid5.mediastreamer.presentation.tracks.TracksViewModel
@@ -110,15 +110,15 @@ private val globalsModule = module {
 }
 
 private val searchStreamModule = module {
-    singleOf(::SearchStreamUIHandler)
-    factory { (currentText: String?) -> SearchStreamPresenter(currentText) }
-    viewModelOf(::SearchStreamViewModel)
+    singleOf(::FetchStreamUIHandler)
+    factory { (currentText: String?) -> FetchStreamPresenter(currentText) }
+    viewModelOf(::FetchStreamViewModel)
 }
 
-private val streamingModule = module {
-    singleOf(::StreamingUIHandler)
-    factory { StreamingPresenter(get(named(IS_PLAYING_STATE))) }
-    viewModelOf(::StreamingViewModel)
+private val playingModule = module {
+    singleOf(::PlayingUIHandler)
+    factory { PlayingPresenter(get(named(IS_PLAYING_STATE))) }
+    viewModelOf(::PlayingViewModel)
 }
 
 private val audioEffectsModule = module {
@@ -138,7 +138,7 @@ private val tracksModule = module {
 }
 
 private val uiMainModule = module {
-    includes(searchStreamModule, streamingModule, audioEffectsModule, tracksModule)
+    includes(searchStreamModule, playingModule, audioEffectsModule, tracksModule)
     singleOf(::StreamButtonUIHandler)
 }
 

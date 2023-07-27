@@ -17,4 +17,16 @@ data class DefaultTrack(
     override val displayName: String,
     override val dateAdded: Long,
     override val numberInAlbum: Int
-) : Track
+) : Track {
+    constructor(track: Track) : this(
+        androidId = track.androidId,
+        title = track.title,
+        artist = track.artist,
+        album = track.album,
+        path = track.path,
+        duration = track.duration,
+        displayName = track.displayName,
+        dateAdded = track.dateAdded,
+        numberInAlbum = track.numberInAlbum
+    )
+}

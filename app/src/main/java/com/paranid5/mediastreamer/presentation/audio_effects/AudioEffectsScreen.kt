@@ -24,7 +24,7 @@ fun AudioEffectsScreen(
     curScreenState: MutableStateFlow<Screens>,
     modifier: Modifier = Modifier,
 ) {
-    curScreenState.update { Screens.Stream.AudioEffects }
+    curScreenState.update { Screens.Audio.AudioEffects }
 
     when (LocalConfiguration.current.orientation) {
         Configuration.ORIENTATION_LANDSCAPE -> AudioEffectsScreenLandscape(viewModel, modifier)

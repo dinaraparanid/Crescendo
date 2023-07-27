@@ -53,7 +53,7 @@ import com.paranid5.mediastreamer.domain.utils.extensions.registerReceiverCompat
 import com.paranid5.mediastreamer.domain.utils.extensions.sendBroadcast
 import com.paranid5.mediastreamer.domain.utils.extensions.setParameter
 import com.paranid5.mediastreamer.presentation.main_activity.MainActivity
-import com.paranid5.mediastreamer.presentation.streaming.*
+import com.paranid5.mediastreamer.presentation.playing.*
 import com.paranid5.mediastreamer.presentation.ui.GlideUtils
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
@@ -123,37 +123,37 @@ class StreamService : SuspendService(), Receiver, LifecycleNotificationManager, 
         override val requestCode: Int,
         override val playbackAction: String
     ) : ServiceAction {
-        object Pause : Actions(
+        data object Pause : Actions(
             requestCode = NOTIFICATION_ID + 1,
             playbackAction = Broadcast_PAUSE
         )
 
-        object Resume : Actions(
+        data object Resume : Actions(
             requestCode = NOTIFICATION_ID + 2,
             playbackAction = Broadcast_RESUME
         )
 
-        object TenSecsBack : Actions(
+        data object TenSecsBack : Actions(
             requestCode = NOTIFICATION_ID + 3,
             playbackAction = Broadcast_10_SECS_BACK
         )
 
-        object TenSecsForward : Actions(
+        data object TenSecsForward : Actions(
             requestCode = NOTIFICATION_ID + 4,
             playbackAction = Broadcast_10_SECS_FORWARD
         )
 
-        object Repeat : Actions(
+        data object Repeat : Actions(
             requestCode = NOTIFICATION_ID + 7,
             playbackAction = Broadcast_CHANGE_REPEAT
         )
 
-        object Unrepeat : Actions(
+        data object Unrepeat : Actions(
             requestCode = NOTIFICATION_ID + 8,
             playbackAction = Broadcast_CHANGE_REPEAT
         )
 
-        object Dismiss : Actions(
+        data object Dismiss : Actions(
             requestCode = NOTIFICATION_ID + 9,
             playbackAction = Broadcast_DISMISS_NOTIFICATION
         )
@@ -164,7 +164,7 @@ class StreamService : SuspendService(), Receiver, LifecycleNotificationManager, 
             this@StreamService,
             requestCode,
             Intent(playbackAction),
-            PendingIntent.FLAG_MUTABLE
+            PendingIntent.FLAG_IMMUTABLE
         )
 
     private val binder = object : Binder() {}
@@ -358,7 +358,6 @@ class StreamService : SuspendService(), Receiver, LifecycleNotificationManager, 
             super.onIsPlayingChanged(isPlaying)
 
             mIsPlayingState.update { isPlaying }
-            scope.launch { mUpdateNotification() }
 
             when {
                 isPlaying -> mStartPlaybackMonitoring()
@@ -537,20 +536,22 @@ class StreamService : SuspendService(), Receiver, LifecycleNotificationManager, 
 
         initMediaSession()
 
-        intent?.mUrlArgOrNull?.let { url ->
-            // New stream
-            mSendPlaybackPosition(0)
-            scope.launch { mStoreCurrentUrl(url) }
-            mPlayNewStream(url)
-        } ?: scope.launch {
-            // Continue with previous stream
-            mPlayNewStream(
-                url = currentUrlState.value,
-                initialPosition = playbackPositionState.value
-            )
+        scope.launch {
+            intent?.mUrlArgOrNull?.let { url ->
+                // New stream
+                mSendPlaybackPosition(0)
+                mStoreCurrentUrl(url)
+                mPlayNewStream(url)
+                launchMonitoringTasks()
+            } ?: kotlin.run {
+                // Continue with previous stream
+                mPlayNewStream(
+                    url = currentUrlState.value,
+                    initialPosition = playbackPositionState.value
+                )
+            }
         }
 
-        launchMonitoringTasks()
         return START_REDELIVER_INTENT
     }
 
@@ -705,7 +706,7 @@ class StreamService : SuspendService(), Receiver, LifecycleNotificationManager, 
                     else -> PlaybackParameters(1F, 1F)
                 }
 
-                mUpdateNotification()
+                updateNotification()
             }
         }
 
@@ -923,12 +924,14 @@ class StreamService : SuspendService(), Receiver, LifecycleNotificationManager, 
 
     override suspend fun startNotificationObserving() =
         lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
-            mIsRepeatingState.collectLatest {
-                scope.launch { mUpdateNotification() }
+            combine(mIsPlayingState, mIsRepeatingState) { isPlaying, isRepeating ->
+                isPlaying to isRepeating
+            }.collectLatest {
+                scope.launch { updateNotification() }
             }
         }
 
-    internal suspend inline fun mUpdateNotification() {
+    private suspend inline fun updateNotification() {
         mUpdateMediaSession()
         mPlayerNotificationManager.invalidate()
     }

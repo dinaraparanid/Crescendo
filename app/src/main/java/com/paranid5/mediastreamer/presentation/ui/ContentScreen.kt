@@ -15,10 +15,10 @@ import com.paranid5.mediastreamer.presentation.audio_effects.AudioEffectsViewMod
 import com.paranid5.mediastreamer.presentation.composition_locals.LocalActivity
 import com.paranid5.mediastreamer.presentation.composition_locals.LocalNavController
 import com.paranid5.mediastreamer.presentation.favourites.FavouritesScreen
-import com.paranid5.mediastreamer.presentation.search_stream.SearchStreamScreen
-import com.paranid5.mediastreamer.presentation.search_stream.SearchStreamViewModel
-import com.paranid5.mediastreamer.presentation.streaming.StreamingScreen
-import com.paranid5.mediastreamer.presentation.streaming.StreamingViewModel
+import com.paranid5.mediastreamer.presentation.fetch_stream.SearchStreamScreen
+import com.paranid5.mediastreamer.presentation.fetch_stream.FetchStreamViewModel
+import com.paranid5.mediastreamer.presentation.playing.PlayingScreen
+import com.paranid5.mediastreamer.presentation.playing.PlayingViewModel
 import com.paranid5.mediastreamer.presentation.settings.SettingsScreen
 import com.paranid5.mediastreamer.presentation.track_collections.AlbumsScreen
 import com.paranid5.mediastreamer.presentation.tracks.TracksScreen
@@ -32,8 +32,8 @@ import java.util.concurrent.atomic.AtomicInteger
 fun ContentScreen(
     padding: PaddingValues,
     curScreenState: MutableStateFlow<Screens>,
-    searchStreamViewModel: SearchStreamViewModel = koinViewModel(),
-    streamingViewModel: StreamingViewModel = koinViewModel(),
+    fetchStreamViewModel: FetchStreamViewModel = koinViewModel(),
+    playingViewModel: PlayingViewModel = koinViewModel(),
     audioEffectsViewModel: AudioEffectsViewModel = koinViewModel(),
     tracksViewModel: TracksViewModel = koinViewModel()
 ) {
@@ -75,15 +75,15 @@ fun ContentScreen(
             AlbumsScreen(curScreenState)
         }
 
-        composable(route = Screens.Searching.title) {
-            SearchStreamScreen(searchStreamViewModel, curScreenState)
+        composable(route = Screens.StreamFetching.title) {
+            SearchStreamScreen(fetchStreamViewModel, curScreenState)
         }
 
-        composable(route = Screens.Stream.Streaming.title) {
-            StreamingScreen(streamingViewModel, curScreenState)
+        composable(route = Screens.Audio.Playing.title) {
+            PlayingScreen(playingViewModel, curScreenState)
         }
 
-        composable(route = Screens.Stream.AudioEffects.title) {
+        composable(route = Screens.Audio.AudioEffects.title) {
             AudioEffectsScreen(audioEffectsViewModel, curScreenState)
         }
 

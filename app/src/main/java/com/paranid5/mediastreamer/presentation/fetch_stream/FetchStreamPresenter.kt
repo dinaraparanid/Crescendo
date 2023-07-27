@@ -1,8 +1,8 @@
-package com.paranid5.mediastreamer.presentation.search_stream
+package com.paranid5.mediastreamer.presentation.fetch_stream
 
 import com.paranid5.mediastreamer.presentation.BasePresenter
 import kotlinx.coroutines.flow.MutableStateFlow
 
-class SearchStreamPresenter(currentText: String?) : BasePresenter {
+class FetchStreamPresenter(currentText: String?) : BasePresenter {
     val currentTextState = MutableStateFlow(currentText)
 }

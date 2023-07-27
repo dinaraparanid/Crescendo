@@ -1,4 +1,4 @@
-package com.paranid5.mediastreamer.presentation.streaming
+package com.paranid5.mediastreamer.presentation.playing
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -17,7 +17,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.palette.graphics.Palette
-import com.paranid5.mediastreamer.data.VideoMetadata
 import com.paranid5.mediastreamer.domain.StorageHandler
 import com.paranid5.mediastreamer.presentation.ui.BroadcastReceiver
 import com.paranid5.mediastreamer.presentation.ui.extensions.getLightVibrantOrPrimary
@@ -25,15 +24,14 @@ import org.koin.compose.koinInject
 
 @Composable
 internal fun PlaybackSlider(
-    metadata: VideoMetadata?,
+    length: Long,
     palette: Palette?,
     modifier: Modifier = Modifier,
-    streamingUIHandler: StreamingUIHandler = koinInject(),
+    playingUIHandler: PlayingUIHandler = koinInject(),
     storageHandler: StorageHandler = koinInject(),
     content: @Composable RowScope.(curPosition: Long, videoLength: Long, color: Color) -> Unit
 ) {
     val lightVibrantColor = palette.getLightVibrantOrPrimary()
-    val videoLength = metadata?.lenInMillis ?: 0
     var curPosition by remember { mutableLongStateOf(0L) }
 
     LaunchedEffect(key1 = true) {
@@ -47,19 +45,19 @@ internal fun PlaybackSlider(
     Column(modifier.padding(horizontal = 10.dp)) {
         Slider(
             value = curPosition.toFloat(),
-            valueRange = 0F..videoLength.toFloat(),
+            valueRange = 0F..length.toFloat(),
             colors = SliderDefaults.colors(
                 thumbColor = lightVibrantColor,
                 activeTrackColor = lightVibrantColor
             ),
             onValueChange = { curPosition = it.toLong() },
             onValueChangeFinished = {
-                streamingUIHandler.sendSeekToBroadcast(curPosition)
+                playingUIHandler.sendSeekToBroadcast(curPosition)
             }
         )
 
         Row(Modifier.fillMaxWidth()) {
-            content(curPosition, videoLength, lightVibrantColor)
+            content(curPosition, length, lightVibrantColor)
         }
     }
 }

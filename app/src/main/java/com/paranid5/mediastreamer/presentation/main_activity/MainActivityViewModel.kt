@@ -23,10 +23,10 @@ class MainActivityViewModel(savedStateHandle: SavedStateHandle) : ViewModel() {
         ).value
     )
 
-    val streamScreenState = curScreenState
+    val audioScreenState = curScreenState
         .map {
             when (it) {
-                Screens.Stream.Streaming -> StreamStates.STREAMING
+                Screens.Audio.Playing -> StreamStates.STREAMING
                 else -> StreamStates.SEARCHING
             }
         }

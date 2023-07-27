@@ -1,4 +1,4 @@
-package com.paranid5.mediastreamer.presentation.streaming
+package com.paranid5.mediastreamer.presentation.playing
 
 import android.content.pm.PackageManager
 import android.os.Build
@@ -16,7 +16,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -29,14 +28,16 @@ import androidx.palette.graphics.Palette
 import com.paranid5.mediastreamer.EXTERNAL_STORAGE_PERMISSION_QUEUE
 import com.paranid5.mediastreamer.R
 import com.paranid5.mediastreamer.domain.StorageHandler
+import com.paranid5.mediastreamer.domain.stream_service.StreamServiceAccessor
+import com.paranid5.mediastreamer.domain.track_service.TrackServiceAccessor
 import com.paranid5.mediastreamer.presentation.composition_locals.LocalActivity
 import com.paranid5.mediastreamer.presentation.composition_locals.LocalNavController
+import com.paranid5.mediastreamer.presentation.ui.AudioStatus
 import com.paranid5.mediastreamer.presentation.ui.extensions.getLightVibrantOrPrimary
 import com.paranid5.mediastreamer.presentation.ui.extensions.openAppSettings
 import com.paranid5.mediastreamer.presentation.ui.extensions.simpleShadow
 import com.paranid5.mediastreamer.presentation.ui.permissions.PermissionDialog
 import com.paranid5.mediastreamer.presentation.ui.permissions.description_providers.ExternalStorageDescriptionProvider
-import kotlinx.coroutines.launch
 import org.koin.compose.koinInject
 import org.koin.core.qualifier.named
 import java.util.Queue
@@ -54,7 +55,7 @@ internal fun UtilsButtons(palette: Palette?, modifier: Modifier = Modifier) =
 private fun EqualizerButton(
     palette: Palette?,
     modifier: Modifier = Modifier,
-    streamingUIHandler: StreamingUIHandler = koinInject()
+    playingUIHandler: PlayingUIHandler = koinInject()
 ) {
     val context = LocalContext.current
     val navHostController = LocalNavController.current
@@ -62,7 +63,7 @@ private fun EqualizerButton(
 
     IconButton(
         modifier = modifier.simpleShadow(color = lightVibrantColor),
-        onClick = { streamingUIHandler.navigateToAudioEffects(context, navHostController) }
+        onClick = { playingUIHandler.navigateToAudioEffects(context, navHostController) }
     ) {
         Icon(
             modifier = Modifier.size(30.dp),
@@ -77,15 +78,23 @@ private fun EqualizerButton(
 private fun RepeatButton(
     palette: Palette?,
     modifier: Modifier = Modifier,
-    storageHandler: StorageHandler = koinInject()
+    storageHandler: StorageHandler = koinInject(),
+    streamServiceAccessor: StreamServiceAccessor = koinInject(),
+    trackServiceAccessor: TrackServiceAccessor = koinInject()
 ) {
-    val scope = rememberCoroutineScope()
     val lightVibrantColor = palette.getLightVibrantOrPrimary()
     val isRepeating by storageHandler.isRepeatingState.collectAsState()
+    val audioStatus by storageHandler.audioStatusState.collectAsState()
 
     IconButton(
         modifier = modifier.simpleShadow(color = lightVibrantColor),
-        onClick = { scope.launch { storageHandler.storeIsRepeating(!isRepeating) } }
+        onClick = {
+            when (audioStatus) {
+                AudioStatus.STREAMING -> streamServiceAccessor.sendChangeRepeatBroadcast()
+                AudioStatus.PLAYING -> trackServiceAccessor.sendChangeRepeatBroadcast()
+                else -> Unit
+            }
+        }
     ) {
         Icon(
             modifier = Modifier.size(30.dp),

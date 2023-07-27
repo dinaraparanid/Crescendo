@@ -1,4 +1,4 @@
-package com.paranid5.mediastreamer.presentation.streaming
+package com.paranid5.mediastreamer.presentation.playing
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.aspectRatio

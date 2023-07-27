@@ -95,16 +95,17 @@ class GlideUtils(private val context: Context) {
     }
 
     private inline fun getBitmapFromPath(
-        path: String,
+        path: String?,
         size: Pair<Int, Int>?,
         crossinline bitmapSettings: (Bitmap) -> Unit
     ) = when {
-        Build.VERSION.SDK_INT >= Build.VERSION_CODES.O ->
+        Build.VERSION.SDK_INT >= Build.VERSION_CODES.O -> path?.let {
             AudioFileIO
-                .read(File(path))
+                .read(File(it))
                 .tagOrCreateAndSetDefault
                 ?.firstArtwork
                 ?.binaryData
+        }
 
         else -> MediaMetadataRetriever()
             .apply { setDataSource(path) }
@@ -115,13 +116,13 @@ class GlideUtils(private val context: Context) {
         ?: thumbnailBitmap
 
     private inline fun getBitmapFromPathWithPalette(
-        path: String,
+        path: String?,
         size: Pair<Int, Int>?,
         crossinline bitmapSettings: (Bitmap) -> Unit
     ) = getBitmapFromPath(path, size, bitmapSettings).withPalette
 
     internal inline fun getBitmapFromPathCatching(
-        path: String,
+        path: String?,
         size: Pair<Int, Int>?,
         crossinline bitmapSettings: (Bitmap) -> Unit = {}
     ) = kotlin.runCatching {
@@ -129,7 +130,7 @@ class GlideUtils(private val context: Context) {
     }
 
     internal inline fun getBitmapFromPathWithPaletteCatching(
-        path: String,
+        path: String?,
         size: Pair<Int, Int>?,
         crossinline bitmapSettings: (Bitmap) -> Unit = {}
     ) = kotlin.runCatching {
@@ -203,7 +204,7 @@ class GlideUtils(private val context: Context) {
     }
 
     internal suspend inline fun getTrackCoverBitmapAsync(
-        path: String,
+        path: String?,
         size: Pair<Int, Int>? = null,
         crossinline bitmapSettings: (Bitmap) -> Unit = {}
     ) = coroutineScope {
@@ -227,7 +228,7 @@ class GlideUtils(private val context: Context) {
     }
 
     internal suspend inline fun getTrackCoverAsync(
-        path: String,
+        path: String?,
         size: Pair<Int, Int>?,
         crossinline bitmapSettings: (Bitmap) -> Unit = {}
     ) = coroutineScope {
@@ -240,7 +241,7 @@ class GlideUtils(private val context: Context) {
     }
 
     internal suspend inline fun getTrackCoverWithPaletteAsync(
-        path: String,
+        path: String?,
         size: Pair<Int, Int>?,
         crossinline bitmapSettings: (Bitmap) -> Unit = {}
     ) = coroutineScope {

@@ -93,7 +93,7 @@ class VideoCashService : SuspendService(), Receiver, LifecycleNotificationManage
             this@VideoCashService,
             requestCode,
             Intent(playbackAction),
-            PendingIntent.FLAG_MUTABLE
+            PendingIntent.FLAG_IMMUTABLE
         )
 
     internal data class VideoCashData(

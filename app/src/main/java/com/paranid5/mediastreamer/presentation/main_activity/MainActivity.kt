@@ -71,7 +71,7 @@ class MainActivity : ComponentActivity() {
                 ) {
                     App(
                         curScreenState = viewModel.curScreenState,
-                        streamScreenState = viewModel.streamScreenState
+                        streamScreenState = viewModel.audioScreenState
                     )
                 }
             }
