@@ -47,9 +47,9 @@ class TrackServiceAccessor(application: MainApplication) : ServiceAccessor(appli
     fun startPlaying(playlist: List<DefaultTrack>?, trackInd: Int) =
         launchTrackService(playlist, trackInd)
 
-    fun sendSeekTo10SecsBackBroadcast() = sendBroadcast(TrackService.Broadcast_10_SECS_BACK)
+    fun sendSwitchToPrevTrackBroadcast() = sendBroadcast(TrackService.Broadcast_PREV_TRACK)
 
-    fun sendSeekTo10SecsForwardBroadcast() = sendBroadcast(TrackService.Broadcast_10_SECS_FORWARD)
+    fun sendSwitchToNextTrackBroadcast() = sendBroadcast(TrackService.Broadcast_NEXT_TRACK)
 
     fun sendSeekToBroadcast(position: Long) = sendBroadcast(
         Intent(TrackService.Broadcast_SEEK_TO)

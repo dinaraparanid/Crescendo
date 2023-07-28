@@ -36,6 +36,7 @@ import androidx.media3.common.util.NotificationUtil
 import androidx.media3.common.util.UnstableApi
 import androidx.media3.exoplayer.ExoPlayer
 import androidx.media3.ui.PlayerNotificationManager
+import arrow.core.Tuple4
 import com.paranid5.mediastreamer.AUDIO_SESSION_ID
 import com.paranid5.mediastreamer.EQUALIZER_DATA
 import com.paranid5.mediastreamer.IS_PLAYING_STATE
@@ -56,14 +57,12 @@ import com.paranid5.mediastreamer.presentation.main_activity.MainActivity
 import com.paranid5.mediastreamer.presentation.playing.Broadcast_CUR_POSITION_CHANGED
 import com.paranid5.mediastreamer.presentation.playing.CUR_POSITION_ARG
 import com.paranid5.mediastreamer.presentation.ui.GlideUtils
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.mapLatest
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.flow.updateAndGet
@@ -80,7 +79,6 @@ class TrackService : SuspendService(), Receiver, LifecycleNotificationManager, K
         private const val NOTIFICATION_ID = 101
         private const val AUDIO_CHANNEL_ID = "stream_channel"
         private const val PLAYBACK_UPDATE_COOLDOWN = 500L
-        private const val TEN_SECS_AS_MILLIS = 10000
 
         private const val SERVICE_LOCATION = "com.paranid5.mediastreamer.domain.track_service"
 
@@ -88,8 +86,8 @@ class TrackService : SuspendService(), Receiver, LifecycleNotificationManager, K
         const val Broadcast_RESUME = "$SERVICE_LOCATION.RESUME"
         const val Broadcast_SWITCH_PLAYLIST = "$SERVICE_LOCATION.SWITCH_PLAYLIST"
 
-        const val Broadcast_10_SECS_BACK = "$SERVICE_LOCATION.10_SECS_BACK"
-        const val Broadcast_10_SECS_FORWARD = "$SERVICE_LOCATION.10_SECS_FORWARD"
+        const val Broadcast_PREV_TRACK = "$SERVICE_LOCATION.PREV_TRACK"
+        const val Broadcast_NEXT_TRACK = "$SERVICE_LOCATION.NEXT_TRACK"
         const val Broadcast_SEEK_TO = "$SERVICE_LOCATION.SEEK_TO"
 
         const val Broadcast_CHANGE_REPEAT = "$SERVICE_LOCATION.CHANGE_REPEAT"
@@ -102,8 +100,8 @@ class TrackService : SuspendService(), Receiver, LifecycleNotificationManager, K
 
         private const val ACTION_PAUSE = "pause"
         private const val ACTION_RESUME = "resume"
-        private const val ACTION_10_SECS_BACK = "back"
-        private const val ACTION_10_SECS_FORWARD = "forward"
+        private const val ACTION_PREV_TRACK = "prev_track"
+        private const val ACTION_NEXT_TRACK = "next_track"
         private const val ACTION_REPEAT = "repeat"
         private const val ACTION_UNREPEAT = "unrepeat"
         private const val ACTION_DISMISS = "dismiss"
@@ -111,8 +109,8 @@ class TrackService : SuspendService(), Receiver, LifecycleNotificationManager, K
         private val commandsToActions = mapOf(
             ACTION_PAUSE to Actions.Pause,
             ACTION_RESUME to Actions.Resume,
-            ACTION_10_SECS_BACK to Actions.TenSecsBack,
-            ACTION_10_SECS_FORWARD to Actions.TenSecsForward,
+            ACTION_PREV_TRACK to Actions.PrevTrack,
+            ACTION_NEXT_TRACK to Actions.NextTrack,
             ACTION_REPEAT to Actions.Repeat,
             ACTION_UNREPEAT to Actions.Unrepeat,
             ACTION_DISMISS to Actions.Dismiss
@@ -125,6 +123,7 @@ class TrackService : SuspendService(), Receiver, LifecycleNotificationManager, K
         private val TAG = TrackService::class.simpleName!!
 
         internal inline val Intent.mPlaylistArgOrNull
+            @Suppress("UNCHECKED_CAST")
             get() = when {
                 Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU ->
                     getParcelableArrayExtra(PLAYLIST_ARG, DefaultTrack::class.java)
@@ -137,6 +136,11 @@ class TrackService : SuspendService(), Receiver, LifecycleNotificationManager, K
 
         internal inline val Intent.mTrackIndexArg
             get() = getIntExtra(TRACK_INDEX_ARG, 0)
+
+        internal fun mGetRepeatMode(isRepeating: Boolean) = when {
+            isRepeating -> Player.REPEAT_MODE_ONE
+            else -> Player.REPEAT_MODE_ALL
+        }
     }
 
     sealed class Actions(
@@ -153,14 +157,14 @@ class TrackService : SuspendService(), Receiver, LifecycleNotificationManager, K
             playbackAction = Broadcast_RESUME
         )
 
-        data object TenSecsBack : Actions(
+        data object PrevTrack : Actions(
             requestCode = NOTIFICATION_ID + 3,
-            playbackAction = Broadcast_10_SECS_BACK
+            playbackAction = Broadcast_PREV_TRACK
         )
 
-        data object TenSecsForward : Actions(
+        data object NextTrack : Actions(
             requestCode = NOTIFICATION_ID + 4,
-            playbackAction = Broadcast_10_SECS_FORWARD
+            playbackAction = Broadcast_NEXT_TRACK
         )
 
         data object Repeat : Actions(
@@ -227,13 +231,20 @@ class TrackService : SuspendService(), Receiver, LifecycleNotificationManager, K
     @Volatile
     private var isStoppedWithError = false
 
-    @kotlin.OptIn(ExperimentalCoroutinesApi::class)
-    private val trackLength = currentTrackState
-        .mapLatest { it?.duration ?: 0 }
-        .stateIn(scope, SharingStarted.Eagerly, 0)
-
     internal inline val mCurrentPlaybackPosition
         get() = mPlayer.currentPosition
+
+    private inline val savedPlaybackPosition
+        get() = playbackPositionState.value
+
+    internal inline val mCurrentTrackIndex
+        get() = currentTrackIndexState.value
+
+    internal inline val mCurrentPlaylistOrNull
+        get() = currentPlaylistState.value
+
+    private inline val currentPlaylist
+        get() = mCurrentPlaylistOrNull!!
 
     @Volatile
     private var isNotificationShown = false
@@ -245,11 +256,6 @@ class TrackService : SuspendService(), Receiver, LifecycleNotificationManager, K
     private lateinit var transportControls: MediaControllerCompat.TransportControls
 
     private val audioSessionIdState by inject<MutableStateFlow<Int>>(named(AUDIO_SESSION_ID))
-
-    internal fun mGetRepeatMode(isRepeating: Boolean = mIsRepeatingState.value) = when {
-        isRepeating -> Player.REPEAT_MODE_ONE
-        else -> Player.REPEAT_MODE_ALL
-    }
 
     internal val mPlayer by lazy {
         ExoPlayer.Builder(applicationContext)
@@ -266,7 +272,7 @@ class TrackService : SuspendService(), Receiver, LifecycleNotificationManager, K
             .apply {
                 addListener(playerStateChangedListener)
                 audioSessionIdState.update { audioSessionId }
-                repeatMode = mGetRepeatMode()
+                repeatMode = mGetRepeatMode(isRepeating = mIsRepeatingState.value)
 
                 initEqualizer(audioSessionId)
                 initBassBoost(audioSessionId)
@@ -373,10 +379,9 @@ class TrackService : SuspendService(), Receiver, LifecycleNotificationManager, K
         override fun onMediaItemTransition(mediaItem: MediaItem?, reason: Int) {
             super.onMediaItemTransition(mediaItem, reason)
 
-            val curInd = (mPlayer.currentMediaItemIndex + currentTrackIndexState.value) %
-                    (currentPlaylistState.value?.size ?: 1)
+            val curInd = mPlayer.currentMediaItemIndex
 
-            if (curInd != currentTrackIndexState.value)
+            if (curInd != mCurrentTrackIndex)
                 scope.launch { mStoreCurrentTrackIndex(curInd) }
         }
 
@@ -453,26 +458,21 @@ class TrackService : SuspendService(), Receiver, LifecycleNotificationManager, K
         override fun onReceive(context: Context?, intent: Intent) {
             val playlist = intent.mPlaylistArg
             val trackInd = intent.mTrackIndexArg
-
-            scope.launch {
-                mStoreCurrentPlaylist(playlist)
-                mStoreCurrentTrackIndex(trackInd)
-                mPlayPlaylist(playlist, trackInd)
-            }
+            scope.launch { mOnTrackClicked(playlist, trackInd) }
         }
     }
 
-    private val tenSecsBackReceiver = object : BroadcastReceiver() {
+    private val switchToPrevTrackReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context?, intent: Intent?) {
-            Log.d(TAG, "10 secs back")
-            mSeekTo10SecsBack()
+            Log.d(TAG, "prev track")
+            scope.launch { mSwitchToPrevTrack() }
         }
     }
 
-    private val tenSecsForwardReceiver = object : BroadcastReceiver() {
+    private val switchToNextTrackReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context?, intent: Intent?) {
-            Log.d(TAG, "10 secs forward")
-            mSeekTo10SecsForward()
+            Log.d(TAG, "next track")
+            scope.launch { mSwitchToNextTrack() }
         }
     }
 
@@ -546,8 +546,8 @@ class TrackService : SuspendService(), Receiver, LifecycleNotificationManager, K
         registerReceiverCompat(pauseReceiver, Broadcast_PAUSE)
         registerReceiverCompat(resumeReceiver, Broadcast_RESUME)
         registerReceiverCompat(switchPlaylistReceiver, Broadcast_SWITCH_PLAYLIST)
-        registerReceiverCompat(tenSecsBackReceiver, Broadcast_10_SECS_BACK)
-        registerReceiverCompat(tenSecsForwardReceiver, Broadcast_10_SECS_FORWARD)
+        registerReceiverCompat(switchToPrevTrackReceiver, Broadcast_PREV_TRACK)
+        registerReceiverCompat(switchToNextTrackReceiver, Broadcast_NEXT_TRACK)
         registerReceiverCompat(seekToReceiver, Broadcast_SEEK_TO)
         registerReceiverCompat(repeatChangedReceiver, Broadcast_CHANGE_REPEAT)
         registerReceiverCompat(dismissNotificationReceiver, Broadcast_DISMISS_NOTIFICATION)
@@ -561,8 +561,8 @@ class TrackService : SuspendService(), Receiver, LifecycleNotificationManager, K
         unregisterReceiver(pauseReceiver)
         unregisterReceiver(resumeReceiver)
         unregisterReceiver(switchPlaylistReceiver)
-        unregisterReceiver(tenSecsBackReceiver)
-        unregisterReceiver(tenSecsForwardReceiver)
+        unregisterReceiver(switchToPrevTrackReceiver)
+        unregisterReceiver(switchToNextTrackReceiver)
         unregisterReceiver(seekToReceiver)
         unregisterReceiver(repeatChangedReceiver)
         unregisterReceiver(dismissNotificationReceiver)
@@ -586,7 +586,6 @@ class TrackService : SuspendService(), Receiver, LifecycleNotificationManager, K
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         super.onStartCommand(intent, flags, startId)
-
         initMediaSession()
 
         val playlist = intent?.mPlaylistArgOrNull
@@ -595,28 +594,43 @@ class TrackService : SuspendService(), Receiver, LifecycleNotificationManager, K
         scope.launch {
             when (playlist) {
                 null -> {
-                    // Continue with previous stream
+                    // Resume received
+                    mResetPlaylistForPlayer(currentPlaylist, mCurrentTrackIndex)
+
                     mPlayPlaylist(
-                        playlist = currentPlaylistState.value!!,
-                        trackInd = currentTrackIndexState.value!!,
-                        initialPosition = playbackPositionState.value
+                        playlist = currentPlaylist,
+                        curTrackInd = mCurrentTrackIndex,
+                        initialPosition = savedPlaybackPosition
                     )
-
-                    launchMonitoringTasks()
                 }
 
-                else -> {
-                    // New stream
-                    mSendPlaybackPosition(0)
-                    mStoreCurrentPlaylist(playlist)
-                    mStoreCurrentTrackIndex(trackInd!!)
-                    mPlayPlaylist(playlist, trackInd)
-                    launchMonitoringTasks()
-                }
+                // New stream received
+                else -> mOnTrackClicked(playlist, trackInd!!)
             }
+
+            launchMonitoringTasks()
         }
 
         return START_REDELIVER_INTENT
+    }
+
+    internal suspend inline fun mOnTrackClicked(playlist: List<DefaultTrack>, trackInd: Int) {
+        val newCurTrackPath = playlist[trackInd].path
+        val prevCurTrackPath = currentTrackState.value?.path
+
+        mStoreCurrentPlaylist(playlist)
+        mStoreCurrentTrackIndex(trackInd)
+        mResetPlaylistForPlayer(playlist, trackInd)
+
+        when {
+            newCurTrackPath == prevCurTrackPath && mPlayer.isPlaying ->
+                mPausePlayback()
+
+            newCurTrackPath == prevCurTrackPath ->
+                mResumePlayback()
+
+            else -> mPlayPlaylist(playlist, trackInd)
+        }
     }
 
     private fun launchMonitoringTasks() {
@@ -671,40 +685,39 @@ class TrackService : SuspendService(), Receiver, LifecycleNotificationManager, K
 
     // ----------------------- Playback Management  -----------------------
 
+    internal fun mResetPlaylistForPlayer(playlist: List<DefaultTrack>, curTrackInd: Int) =
+        mPlayer.run {
+            clearMediaItems()
+            playlist.forEach { track -> addMediaItem(MediaItem.fromUri(track.path)) }
+        }
+
     @OptIn(UnstableApi::class)
     internal suspend inline fun mPlayPlaylist(
         playlist: List<DefaultTrack>,
-        trackInd: Int,
+        curTrackInd: Int,
         initialPosition: Long = 0
     ) {
-        Log.d(TAG, "Playing track with index $trackInd")
+        Log.d(TAG, "Playing track with index $curTrackInd: ${playlist[curTrackInd]}")
 
-        val track = playlist[trackInd]
-        val curPlaylistOrder = playlist.drop(trackInd) + playlist.take(trackInd)
-
-        mUpdateMediaSession(track)
+        mUpdateMediaSession(track = playlist[curTrackInd])
         mPlayerNotificationManager.invalidate()
 
         mPlayer.run {
-            clearMediaItems()
-
-            curPlaylistOrder.forEach { track ->
-                addMediaItem(MediaItem.fromUri(track.path))
-            }
-
             playWhenReady = true
             prepare()
-            seekTo(initialPosition)
+            seekTo(curTrackInd, initialPosition)
         }
 
         mSetAudioEffectsEnabled(isEnabled = areAudioEffectsEnabledState.value)
     }
 
     internal suspend inline fun mRestartPlayer(initialPosition: Long = 0) =
-        currentPlaylistState.value?.let {
+        mCurrentPlaylistOrNull?.let {
+            mResetPlaylistForPlayer(playlist = it, curTrackInd = mCurrentTrackIndex)
+
             mPlayPlaylist(
                 playlist = it,
-                trackInd = currentTrackIndexState.value,
+                curTrackInd = mCurrentTrackIndex,
                 initialPosition = initialPosition
             )
         }
@@ -712,11 +725,24 @@ class TrackService : SuspendService(), Receiver, LifecycleNotificationManager, K
     internal fun mSeekTo(position: Long) =
         mPlayer.seekTo(position)
 
-    internal fun mSeekTo10SecsBack() =
-        mPlayer.seekTo(maxOf(mCurrentPlaybackPosition - TEN_SECS_AS_MILLIS, 0))
+    private suspend inline fun switchToTrackAt(index: Int) {
+        mStoreCurrentTrackIndex(index)
+        mPlayer.seekTo(index, 0)
+    }
 
-    internal fun mSeekTo10SecsForward() =
-        mPlayer.seekTo(minOf(mCurrentPlaybackPosition + TEN_SECS_AS_MILLIS, trackLength.value))
+    internal suspend inline fun mSwitchToPrevTrack() = switchToTrackAt(
+        index = when {
+            mPlayer.hasPreviousMediaItem() -> mPlayer.previousMediaItemIndex
+            else -> mCurrentPlaylistOrNull?.size?.let { it - 1 } ?: 0
+        }
+    )
+
+    internal suspend inline fun mSwitchToNextTrack() = switchToTrackAt(
+        index = when {
+            mPlayer.hasNextMediaItem() -> mPlayer.nextMediaItemIndex
+            else -> 0
+        }
+    )
 
     private fun releaseMedia() {
         mPlayerNotificationManager.setPlayer(null)
@@ -842,12 +868,12 @@ class TrackService : SuspendService(), Receiver, LifecycleNotificationManager, K
 
             override fun onSkipToNext() {
                 super.onSkipToNext()
-                mSeekTo10SecsForward()
+                scope.launch { mSwitchToNextTrack() }
             }
 
             override fun onSkipToPrevious() {
                 super.onSkipToPrevious()
-                mSeekTo10SecsBack()
+                scope.launch { mSwitchToPrevTrack() }
             }
 
             override fun onCustomAction(action: String, extras: Bundle?) {
@@ -969,15 +995,18 @@ class TrackService : SuspendService(), Receiver, LifecycleNotificationManager, K
             combine(
                 mIsPlayingState,
                 mIsRepeatingState,
-                currentTrackIndexState
-            ) { isPlaying, isRepeating, curTrackInd ->
-                Triple(isPlaying, isRepeating, curTrackInd)
+                currentTrackIndexState,
+                currentPlaylistState
+            ) { isPlaying, isRepeating, curTrackInd, curPlaylist ->
+                Tuple4(isPlaying, isRepeating, curTrackInd, curPlaylist)
             }.collectLatest {
                 scope.launch { mUpdateNotification() }
             }
         }
 
     internal suspend inline fun mUpdateNotification() {
+        Log.d(TAG, "Update Notification")
+        Exception("KEK").printStackTrace()
         mUpdateMediaSession(currentTrackState.value!!)
         mPlayerNotificationManager.invalidate()
     }

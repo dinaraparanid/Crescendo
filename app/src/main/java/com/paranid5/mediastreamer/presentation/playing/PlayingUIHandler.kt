@@ -32,13 +32,13 @@ class PlayingUIHandler(
 
     fun sendSeekTo10SecsBackBroadcast() = when (audioStatus) {
         AudioStatus.STREAMING -> streamServiceAccessor.sendSeekTo10SecsBackBroadcast()
-        AudioStatus.PLAYING -> trackServiceAccessor.sendSeekTo10SecsBackBroadcast()
+        AudioStatus.PLAYING -> trackServiceAccessor.sendSwitchToPrevTrackBroadcast()
         else -> throw NullPointerException("Audio system was not initialized")
     }
 
     fun sendSeekTo10SecsForwardBroadcast() = when (audioStatus) {
         AudioStatus.STREAMING -> streamServiceAccessor.sendSeekTo10SecsForwardBroadcast()
-        AudioStatus.PLAYING -> trackServiceAccessor.sendSeekTo10SecsForwardBroadcast()
+        AudioStatus.PLAYING -> trackServiceAccessor.sendSwitchToNextTrackBroadcast()
         else -> throw NullPointerException("Audio system was not initialized")
     }
 
