@@ -12,7 +12,7 @@ import com.paranid5.mediastreamer.domain.video_cash_service.VideoCashServiceAcce
 import com.paranid5.mediastreamer.presentation.NavHostController
 import com.paranid5.mediastreamer.presentation.Screens
 import com.paranid5.mediastreamer.presentation.UIHandler
-import com.paranid5.mediastreamer.presentation.ui.AudioStatus
+import com.paranid5.mediastreamer.presentation.ui.handleOrIgnore
 import kotlinx.coroutines.flow.MutableStateFlow
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
@@ -30,35 +30,30 @@ class PlayingUIHandler(
     private inline val audioStatus
         get() = audioStatusState.value
 
-    fun sendSeekTo10SecsBackBroadcast() = when (audioStatus) {
-        AudioStatus.STREAMING -> streamServiceAccessor.sendSeekTo10SecsBackBroadcast()
-        AudioStatus.PLAYING -> trackServiceAccessor.sendSwitchToPrevTrackBroadcast()
-        else -> throw NullPointerException("Audio system was not initialized")
-    }
+    fun sendOnPrevButtonClickedBroadcast() = audioStatus.handleOrIgnore(
+        streamAction = streamServiceAccessor::sendSeekTo10SecsBackBroadcast,
+        trackAction = trackServiceAccessor::sendSwitchToPrevTrackBroadcast
+    )
 
-    fun sendSeekTo10SecsForwardBroadcast() = when (audioStatus) {
-        AudioStatus.STREAMING -> streamServiceAccessor.sendSeekTo10SecsForwardBroadcast()
-        AudioStatus.PLAYING -> trackServiceAccessor.sendSwitchToNextTrackBroadcast()
-        else -> throw NullPointerException("Audio system was not initialized")
-    }
+    fun sendOnNextButtonClickedBroadcast() = audioStatus.handleOrIgnore(
+        streamAction = streamServiceAccessor::sendSeekTo10SecsForwardBroadcast,
+        trackAction = trackServiceAccessor::sendSwitchToNextTrackBroadcast
+    )
 
-    fun sendSeekToBroadcast(position: Long) = when (audioStatus) {
-        AudioStatus.STREAMING -> streamServiceAccessor.sendSeekToBroadcast(position)
-        AudioStatus.PLAYING -> trackServiceAccessor.sendSeekToBroadcast(position)
-        else -> throw NullPointerException("Audio system was not initialized")
-    }
+    fun sendSeekToBroadcast(position: Long) = audioStatus.handleOrIgnore(
+        streamAction = { streamServiceAccessor.sendSeekToBroadcast(position) },
+        trackAction = { trackServiceAccessor.sendSeekToBroadcast(position) }
+    )
 
-    fun sendPauseBroadcast() = when (audioStatus) {
-        AudioStatus.STREAMING -> streamServiceAccessor.sendPauseBroadcast()
-        AudioStatus.PLAYING -> trackServiceAccessor.sendPauseBroadcast()
-        else -> throw NullPointerException("Audio system was not initialized")
-    }
+    fun sendPauseBroadcast() = audioStatus.handleOrIgnore(
+        streamAction = streamServiceAccessor::sendPauseBroadcast,
+        trackAction = trackServiceAccessor::sendPauseBroadcast
+    )
 
-    fun startStreamingOrSendResumeBroadcast() = when (audioStatus) {
-        AudioStatus.STREAMING -> streamServiceAccessor.startStreamingOrSendResumeBroadcast()
-        AudioStatus.PLAYING -> trackServiceAccessor.startStreamingOrSendResumeBroadcast()
-        else -> throw NullPointerException("Audio system was not initialized")
-    }
+    fun startStreamingOrSendResumeBroadcast() = audioStatus.handleOrIgnore(
+        streamAction = streamServiceAccessor::startStreamingOrSendResumeBroadcast,
+        trackAction = trackServiceAccessor::startStreamingOrSendResumeBroadcast
+    )
 
     fun launchVideoCashService(desiredFilename: String, format: Formats) =
         videoCashServiceAccessor.startCashingOrAddToQueue(

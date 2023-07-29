@@ -74,7 +74,7 @@ private fun SeekTo10SecsBackButton(
 
     IconButton(
         modifier = modifier.simpleShadow(color = lightVibrantColor),
-        onClick = { playingUIHandler.sendSeekTo10SecsBackBroadcast() }
+        onClick = { playingUIHandler.sendOnPrevButtonClickedBroadcast() }
     ) {
         Icon(
             modifier = Modifier.width(100.dp).height(50.dp),
@@ -95,7 +95,7 @@ private fun SeekTo10SecsForwardButton(
 
     IconButton(
         modifier = modifier.simpleShadow(color = lightVibrantColor),
-        onClick = { playingUIHandler.sendSeekTo10SecsForwardBroadcast() }
+        onClick = { playingUIHandler.sendOnNextButtonClickedBroadcast() }
     ) {
         Icon(
             modifier = Modifier.width(100.dp).height(50.dp),
