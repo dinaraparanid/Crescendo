@@ -56,6 +56,8 @@ import com.paranid5.mediastreamer.presentation.main_activity.MainActivity
 import com.paranid5.mediastreamer.presentation.playing.Broadcast_CUR_POSITION_CHANGED
 import com.paranid5.mediastreamer.presentation.playing.CUR_POSITION_ARG
 import com.paranid5.mediastreamer.presentation.ui.GlideUtils
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.combine
@@ -73,6 +75,7 @@ class TrackService : SuspendService(), Receiver, LifecycleNotificationManager, K
     companion object {
         private const val NOTIFICATION_ID = 101
         private const val AUDIO_CHANNEL_ID = "stream_channel"
+        private const val PLAYBACK_UPDATE_COOLDOWN = 500L
 
         private const val SERVICE_LOCATION = "com.paranid5.mediastreamer.domain.services.track_service"
 
@@ -215,6 +218,8 @@ class TrackService : SuspendService(), Receiver, LifecycleNotificationManager, K
     internal val mEqualizerDataState by inject<MutableStateFlow<EqualizerData?>>(
         named(EQUALIZER_DATA)
     )
+
+    private lateinit var playbackMonitorTask: Job
 
     @Volatile
     private var isStoppedWithError = false
@@ -400,6 +405,11 @@ class TrackService : SuspendService(), Receiver, LifecycleNotificationManager, K
         override fun onIsPlayingChanged(isPlaying: Boolean) {
             super.onIsPlayingChanged(isPlaying)
             mIsPlayingState.update { isPlaying }
+
+            when {
+                isPlaying -> mStartPlaybackMonitoring()
+                else -> mStopPlaybackMonitoring()
+            }
         }
 
         override fun onPlayerError(error: PlaybackException) {
@@ -806,6 +816,19 @@ class TrackService : SuspendService(), Receiver, LifecycleNotificationManager, K
         transportControls.stop()
         audioSessionIdState.update { 0 }
     }
+
+    // --------------------------- Playback Monitoring ---------------------------
+
+    internal fun mStartPlaybackMonitoring() {
+        playbackMonitorTask = scope.launch {
+            while (true) {
+                mSendAndStorePlaybackPosition()
+                delay(PLAYBACK_UPDATE_COOLDOWN)
+            }
+        }
+    }
+
+    internal fun mStopPlaybackMonitoring() = playbackMonitorTask.cancel()
 
     // --------------------------- Audio Effects ---------------------------
 

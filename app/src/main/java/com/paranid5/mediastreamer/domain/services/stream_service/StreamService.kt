@@ -67,6 +67,7 @@ class StreamService : SuspendService(), Receiver, LifecycleNotificationManager, 
     companion object {
         private const val NOTIFICATION_ID = 101
         private const val STREAM_CHANNEL_ID = "stream_channel"
+        private const val PLAYBACK_UPDATE_COOLDOWN = 500L
         private const val TEN_SECS_AS_MILLIS = 10000
 
         private const val SERVICE_LOCATION = "com.paranid5.mediastreamer.domain.services.stream_service"
@@ -195,6 +196,8 @@ class StreamService : SuspendService(), Receiver, LifecycleNotificationManager, 
     internal val mEqualizerDataState by inject<MutableStateFlow<EqualizerData?>>(
         named(EQUALIZER_DATA)
     )
+
+    private lateinit var playbackMonitorTask: Job
 
     @Volatile
     private var isStoppedWithError = false
@@ -369,6 +372,11 @@ class StreamService : SuspendService(), Receiver, LifecycleNotificationManager, 
         override fun onIsPlayingChanged(isPlaying: Boolean) {
             super.onIsPlayingChanged(isPlaying)
             mIsPlayingState.update { isPlaying }
+
+            when {
+                isPlaying -> mStartPlaybackMonitoring()
+                else -> mStopPlaybackMonitoring()
+            }
         }
 
         override fun onPlayerError(error: PlaybackException) {
@@ -692,6 +700,19 @@ class StreamService : SuspendService(), Receiver, LifecycleNotificationManager, 
         transportControls.stop()
         audioSessionIdState.update { 0 }
     }
+
+    // --------------------------- Playback Monitoring ---------------------------
+
+    internal fun mStartPlaybackMonitoring() {
+        playbackMonitorTask = scope.launch {
+            while (true) {
+                mSendAndStorePlaybackPosition()
+                delay(PLAYBACK_UPDATE_COOLDOWN)
+            }
+        }
+    }
+
+    internal fun mStopPlaybackMonitoring() = playbackMonitorTask.cancel()
 
     // --------------------------- Audio Effects ---------------------------
 
