@@ -15,7 +15,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.palette.graphics.Palette
 import com.paranid5.mediastreamer.R
-import com.paranid5.mediastreamer.data.VideoMetadata
 import com.paranid5.mediastreamer.presentation.ui.extensions.getLightVibrantOrPrimary
 
 @OptIn(ExperimentalFoundationApi::class)

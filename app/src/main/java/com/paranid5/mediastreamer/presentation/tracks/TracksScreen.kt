@@ -22,7 +22,9 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -44,6 +46,7 @@ import com.paranid5.mediastreamer.domain.services.track_service.TrackServiceAcce
 import com.paranid5.mediastreamer.presentation.Screens
 import com.paranid5.mediastreamer.presentation.ui.AudioStatus
 import com.paranid5.mediastreamer.presentation.ui.rememberTrackCoverPainter
+import com.paranid5.mediastreamer.presentation.ui.theme.LocalAppColors
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -81,6 +84,7 @@ fun TracksScreen(
         ) { ind, track ->
             TrackItem(
                 track = track,
+                storageHandler = storageHandler,
                 modifier = Modifier
                     .fillMaxWidth()
                     .clickable {
@@ -99,7 +103,18 @@ fun TracksScreen(
 }
 
 @Composable
-private fun TrackItem(track: Track, modifier: Modifier = Modifier) {
+private fun TrackItem(track: Track, storageHandler: StorageHandler, modifier: Modifier = Modifier) {
+    val colors = LocalAppColors.current.value
+    val currentTrack by storageHandler.currentTrackState.collectAsState()
+
+    val isTrackCurrent by remember {
+        derivedStateOf { track.path == currentTrack?.path }
+    }
+
+    val textColor by remember {
+        derivedStateOf { if (isTrackCurrent) colors.primary else Color.White }
+    }
+
     val trackCover = rememberTrackCoverPainter(
         path = track.path,
         isPlaceholderRequired = true,
@@ -128,6 +143,7 @@ private fun TrackItem(track: Track, modifier: Modifier = Modifier) {
             Text(
                 modifier = Modifier.align(Alignment.Start),
                 text = track.title,
+                color = textColor,
                 fontSize = 18.sp,
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis,
@@ -136,6 +152,7 @@ private fun TrackItem(track: Track, modifier: Modifier = Modifier) {
             Text(
                 modifier = Modifier.align(Alignment.Start),
                 text = track.artistAlbum,
+                color = textColor,
                 fontSize = 15.sp,
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis,

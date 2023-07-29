@@ -7,12 +7,8 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalConfiguration
@@ -23,13 +19,11 @@ import androidx.constraintlayout.compose.Dimension
 import androidx.palette.graphics.Palette
 import coil.compose.AsyncImagePainter
 import com.paranid5.mediastreamer.R
-import com.paranid5.mediastreamer.data.VideoMetadata
-import com.paranid5.mediastreamer.data.tracks.Track
+import com.paranid5.mediastreamer.data.tracks.artistAlbum
 import com.paranid5.mediastreamer.domain.StorageHandler
 import com.paranid5.mediastreamer.presentation.Screens
 import com.paranid5.mediastreamer.presentation.ui.AudioStatus
 import com.paranid5.mediastreamer.presentation.ui.rememberCurrentTrackCoverPainterWithPalette
-import com.paranid5.mediastreamer.presentation.ui.rememberTrackCoverPainterWithPalette
 import com.paranid5.mediastreamer.presentation.ui.rememberVideoCoverPainterWithPalette
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.update
@@ -63,7 +57,7 @@ fun PlayingScreen(
             currentMetadata?.author ?: stringResource(R.string.unknown_streamer)
 
         AudioStatus.PLAYING ->
-            currentTrack?.artist ?: stringResource(R.string.unknown_artist)
+            currentTrack?.artistAlbum ?: stringResource(R.string.unknown_artist)
 
         else -> stringResource(R.string.unknown_artist)
     }

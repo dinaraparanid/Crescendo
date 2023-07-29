@@ -67,7 +67,6 @@ class StreamService : SuspendService(), Receiver, LifecycleNotificationManager, 
     companion object {
         private const val NOTIFICATION_ID = 101
         private const val STREAM_CHANNEL_ID = "stream_channel"
-        private const val PLAYBACK_UPDATE_COOLDOWN = 500L
         private const val TEN_SECS_AS_MILLIS = 10000
 
         private const val SERVICE_LOCATION = "com.paranid5.mediastreamer.domain.services.stream_service"
@@ -196,8 +195,6 @@ class StreamService : SuspendService(), Receiver, LifecycleNotificationManager, 
     internal val mEqualizerDataState by inject<MutableStateFlow<EqualizerData?>>(
         named(EQUALIZER_DATA)
     )
-
-    private lateinit var playbackMonitorTask: Job
 
     @Volatile
     private var isStoppedWithError = false
@@ -339,6 +336,19 @@ class StreamService : SuspendService(), Receiver, LifecycleNotificationManager, 
         get() = mPlayer.isPlaying
 
     private val playerStateChangedListener: Player.Listener = object : Player.Listener {
+        override fun onPositionDiscontinuity(
+            oldPosition: Player.PositionInfo,
+            newPosition: Player.PositionInfo,
+            reason: Int
+        ) {
+            super.onPositionDiscontinuity(oldPosition, newPosition, reason)
+
+            if (reason == Player.DISCONTINUITY_REASON_AUTO_TRANSITION) scope.launch {
+                mSendAndStorePlaybackPosition()
+                mUpdateNotification()
+            }
+        }
+
         override fun onPlaybackStateChanged(playbackState: Int) {
             super.onPlaybackStateChanged(playbackState)
 
@@ -358,13 +368,7 @@ class StreamService : SuspendService(), Receiver, LifecycleNotificationManager, 
 
         override fun onIsPlayingChanged(isPlaying: Boolean) {
             super.onIsPlayingChanged(isPlaying)
-
             mIsPlayingState.update { isPlaying }
-
-            when {
-                isPlaying -> mStartPlaybackMonitoring()
-                else -> mStopPlaybackMonitoring()
-            }
         }
 
         override fun onPlayerError(error: PlaybackException) {
@@ -583,13 +587,13 @@ class StreamService : SuspendService(), Receiver, LifecycleNotificationManager, 
                 .putExtra(CUR_POSITION_ARG, curPosition)
         )
 
-    private suspend inline fun sendAndStorePlaybackPosition() {
+    internal suspend inline fun mSendAndStorePlaybackPosition() {
         mSendPlaybackPosition()
         storePlaybackPosition()
     }
 
     internal fun mPausePlayback() {
-        scope.launch { sendAndStorePlaybackPosition() }
+        scope.launch { mSendAndStorePlaybackPosition() }
         mPlayer.pause()
         mSetAudioEffectsEnabled(isEnabled = false)
     }
@@ -689,19 +693,6 @@ class StreamService : SuspendService(), Receiver, LifecycleNotificationManager, 
         audioSessionIdState.update { 0 }
     }
 
-    // --------------------------- Playback Monitoring ---------------------------
-
-    internal fun mStartPlaybackMonitoring() {
-        playbackMonitorTask = scope.launch {
-            while (true) {
-                sendAndStorePlaybackPosition()
-                delay(PLAYBACK_UPDATE_COOLDOWN)
-            }
-        }
-    }
-
-    internal fun mStopPlaybackMonitoring() = playbackMonitorTask.cancel()
-
     // --------------------------- Audio Effects ---------------------------
 
     private suspend inline fun startAudioEffectsMonitoring() =
@@ -718,7 +709,7 @@ class StreamService : SuspendService(), Receiver, LifecycleNotificationManager, 
                     else -> PlaybackParameters(1F, 1F)
                 }
 
-                updateNotification()
+                mUpdateNotification()
             }
         }
 
@@ -940,11 +931,11 @@ class StreamService : SuspendService(), Receiver, LifecycleNotificationManager, 
             combine(mIsPlayingState, mIsRepeatingState) { isPlaying, isRepeating ->
                 isPlaying to isRepeating
             }.collectLatest {
-                scope.launch { updateNotification() }
+                scope.launch { mUpdateNotification() }
             }
         }
 
-    private suspend inline fun updateNotification() {
+    internal suspend inline fun mUpdateNotification() {
         mUpdateMediaSession()
         mPlayerNotificationManager.invalidate()
     }
