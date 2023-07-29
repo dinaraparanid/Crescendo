@@ -3,7 +3,7 @@ package com.paranid5.mediastreamer.domain.utils.media
 import android.content.Context
 import com.arthenica.mobileffmpeg.FFmpeg
 import com.paranid5.mediastreamer.data.VideoMetadata
-import com.paranid5.mediastreamer.domain.video_cash_service.CashingResult
+import com.paranid5.mediastreamer.domain.services.video_cash_service.CashingResult
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope

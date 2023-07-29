@@ -6,7 +6,7 @@ import android.provider.MediaStore
 import android.util.Log
 import com.arthenica.mobileffmpeg.FFmpeg
 import com.paranid5.mediastreamer.data.VideoMetadata
-import com.paranid5.mediastreamer.domain.video_cash_service.Formats
+import com.paranid5.mediastreamer.domain.services.video_cash_service.Formats
 import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async

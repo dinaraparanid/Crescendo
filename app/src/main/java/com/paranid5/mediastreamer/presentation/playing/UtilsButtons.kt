@@ -28,8 +28,8 @@ import androidx.palette.graphics.Palette
 import com.paranid5.mediastreamer.EXTERNAL_STORAGE_PERMISSION_QUEUE
 import com.paranid5.mediastreamer.R
 import com.paranid5.mediastreamer.domain.StorageHandler
-import com.paranid5.mediastreamer.domain.stream_service.StreamServiceAccessor
-import com.paranid5.mediastreamer.domain.track_service.TrackServiceAccessor
+import com.paranid5.mediastreamer.domain.services.stream_service.StreamServiceAccessor
+import com.paranid5.mediastreamer.domain.services.track_service.TrackServiceAccessor
 import com.paranid5.mediastreamer.presentation.composition_locals.LocalActivity
 import com.paranid5.mediastreamer.presentation.composition_locals.LocalNavController
 import com.paranid5.mediastreamer.presentation.ui.AudioStatus

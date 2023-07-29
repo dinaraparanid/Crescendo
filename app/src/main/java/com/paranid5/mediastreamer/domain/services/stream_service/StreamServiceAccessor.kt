@@ -1,4 +1,4 @@
-package com.paranid5.mediastreamer.domain.stream_service
+package com.paranid5.mediastreamer.domain.services.stream_service
 
 import android.app.Service
 import android.content.Intent

@@ -1,4 +1,4 @@
-package com.paranid5.mediastreamer.domain.video_cash_service
+package com.paranid5.mediastreamer.domain.services.video_cash_service
 
 import android.os.Parcel
 import android.os.Parcelable

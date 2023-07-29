@@ -7,9 +7,9 @@ import com.paranid5.mediastreamer.data.eq.EqualizerData
 import com.paranid5.mediastreamer.data.tracks.Track
 import com.paranid5.mediastreamer.domain.StorageHandler
 import com.paranid5.mediastreamer.domain.ktor_client.KtorClient
-import com.paranid5.mediastreamer.domain.stream_service.StreamServiceAccessor
-import com.paranid5.mediastreamer.domain.track_service.TrackServiceAccessor
-import com.paranid5.mediastreamer.domain.video_cash_service.VideoCashServiceAccessor
+import com.paranid5.mediastreamer.domain.services.stream_service.StreamServiceAccessor
+import com.paranid5.mediastreamer.domain.services.track_service.TrackServiceAccessor
+import com.paranid5.mediastreamer.domain.services.video_cash_service.VideoCashServiceAccessor
 import com.paranid5.mediastreamer.presentation.appbar.stream_button.StreamButtonUIHandler
 import com.paranid5.mediastreamer.presentation.audio_effects.AudioEffectsPresenter
 import com.paranid5.mediastreamer.presentation.audio_effects.AudioEffectsUIHandler

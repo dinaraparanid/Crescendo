@@ -40,7 +40,7 @@ import com.paranid5.mediastreamer.data.tracks.Track
 import com.paranid5.mediastreamer.data.tracks.artistAlbum
 import com.paranid5.mediastreamer.data.tracks.toDefaultTrackList
 import com.paranid5.mediastreamer.domain.StorageHandler
-import com.paranid5.mediastreamer.domain.track_service.TrackServiceAccessor
+import com.paranid5.mediastreamer.domain.services.track_service.TrackServiceAccessor
 import com.paranid5.mediastreamer.presentation.Screens
 import com.paranid5.mediastreamer.presentation.ui.AudioStatus
 import com.paranid5.mediastreamer.presentation.ui.rememberTrackCoverPainter

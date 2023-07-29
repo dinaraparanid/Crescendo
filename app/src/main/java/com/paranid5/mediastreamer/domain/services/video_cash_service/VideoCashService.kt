@@ -1,4 +1,4 @@
-package com.paranid5.mediastreamer.domain.video_cash_service
+package com.paranid5.mediastreamer.domain.services.video_cash_service
 
 import android.annotation.SuppressLint
 import android.app.*
@@ -54,7 +54,7 @@ class VideoCashService : SuspendService(), Receiver, LifecycleNotificationManage
         private const val NOTIFICATION_ID = 102
         private const val VIDEO_CASH_CHANNEL_ID = "video_cash_channel"
 
-        private const val SERVICE_LOCATION = "com.paranid5.mediastreamer.domain.video_cash_service"
+        private const val SERVICE_LOCATION = "com.paranid5.mediastreamer.domain.services.video_cash_service"
         const val Broadcast_CASH_NEXT_VIDEO = "$SERVICE_LOCATION.CASH_NEXT_VIDEO"
         const val Broadcast_CANCEL_CUR_VIDEO = "$SERVICE_LOCATION.CANCEL_CUR_VIDEO"
         const val Broadcast_CANCEL_ALL = "$SERVICE_LOCATION.CANCEL_ALL"
@@ -77,12 +77,12 @@ class VideoCashService : SuspendService(), Receiver, LifecycleNotificationManage
         override val requestCode: Int,
         override val playbackAction: String
     ) : ServiceAction {
-        object CancelCurVideo : Actions(
+        data object CancelCurVideo : Actions(
             requestCode = NOTIFICATION_ID + 1,
             playbackAction = Broadcast_CANCEL_CUR_VIDEO
         )
 
-        object CancelAll : Actions(
+        data object CancelAll : Actions(
             requestCode = NOTIFICATION_ID + 2,
             playbackAction = Broadcast_CANCEL_ALL
         )

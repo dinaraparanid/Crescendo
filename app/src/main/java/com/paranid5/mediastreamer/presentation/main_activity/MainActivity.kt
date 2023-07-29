@@ -14,7 +14,7 @@ import androidx.compose.runtime.CompositionLocalProvider
 import androidx.navigation.compose.rememberNavController
 import com.paranid5.mediastreamer.R
 import com.paranid5.mediastreamer.domain.utils.extensions.registerReceiverCompat
-import com.paranid5.mediastreamer.domain.video_cash_service.VideoCashResponse
+import com.paranid5.mediastreamer.domain.services.video_cash_service.VideoCashResponse
 import com.paranid5.mediastreamer.presentation.NavHostController
 import com.paranid5.mediastreamer.presentation.composition_locals.LocalActivity
 import com.paranid5.mediastreamer.presentation.composition_locals.LocalMainViewModel

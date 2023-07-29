@@ -1,7 +1,7 @@
-package com.paranid5.mediastreamer.domain.stream_service
+package com.paranid5.mediastreamer.domain.services.track_service
 
-import android.annotation.SuppressLint
-import android.app.*
+import android.app.Notification
+import android.app.PendingIntent
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
@@ -18,30 +18,31 @@ import android.support.v4.media.session.MediaControllerCompat
 import android.support.v4.media.session.MediaSessionCompat
 import android.support.v4.media.session.PlaybackStateCompat
 import android.util.Log
-import android.util.SparseArray
 import android.widget.Toast
 import androidx.annotation.OptIn
 import androidx.core.app.NotificationCompat
 import androidx.core.graphics.drawable.IconCompat
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.repeatOnLifecycle
-import androidx.media3.common.*
-import androidx.media3.common.C.*
+import androidx.media3.common.AudioAttributes
+import androidx.media3.common.C.AUDIO_CONTENT_TYPE_MOVIE
+import androidx.media3.common.C.USAGE_MEDIA
+import androidx.media3.common.C.WAKE_MODE_NETWORK
+import androidx.media3.common.MediaItem
+import androidx.media3.common.PlaybackException
+import androidx.media3.common.PlaybackParameters
+import androidx.media3.common.Player
 import androidx.media3.common.util.NotificationUtil
 import androidx.media3.common.util.UnstableApi
-import androidx.media3.datasource.DefaultHttpDataSource
 import androidx.media3.exoplayer.ExoPlayer
-import androidx.media3.exoplayer.source.ProgressiveMediaSource
 import androidx.media3.ui.PlayerNotificationManager
-import at.huber.youtubeExtractor.VideoMeta
-import at.huber.youtubeExtractor.YouTubeExtractor
-import at.huber.youtubeExtractor.YtFile
+import arrow.core.Tuple4
 import com.paranid5.mediastreamer.AUDIO_SESSION_ID
 import com.paranid5.mediastreamer.EQUALIZER_DATA
 import com.paranid5.mediastreamer.IS_PLAYING_STATE
 import com.paranid5.mediastreamer.R
-import com.paranid5.mediastreamer.data.VideoMetadata
 import com.paranid5.mediastreamer.data.eq.EqualizerData
+import com.paranid5.mediastreamer.data.tracks.DefaultTrack
 import com.paranid5.mediastreamer.data.utils.extensions.toAndroidMetadata
 import com.paranid5.mediastreamer.domain.LifecycleNotificationManager
 import com.paranid5.mediastreamer.domain.Receiver
@@ -53,32 +54,40 @@ import com.paranid5.mediastreamer.domain.utils.extensions.registerReceiverCompat
 import com.paranid5.mediastreamer.domain.utils.extensions.sendBroadcast
 import com.paranid5.mediastreamer.domain.utils.extensions.setParameter
 import com.paranid5.mediastreamer.presentation.main_activity.MainActivity
-import com.paranid5.mediastreamer.presentation.playing.*
+import com.paranid5.mediastreamer.presentation.playing.Broadcast_CUR_POSITION_CHANGED
+import com.paranid5.mediastreamer.presentation.playing.CUR_POSITION_ARG
 import com.paranid5.mediastreamer.presentation.ui.GlideUtils
-import kotlinx.coroutines.*
-import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.flow.updateAndGet
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import org.koin.core.parameter.parametersOf
 import org.koin.core.qualifier.named
 
 @OptIn(androidx.media3.common.util.UnstableApi::class)
-class StreamService : SuspendService(), Receiver, LifecycleNotificationManager, KoinComponent {
+class TrackService : SuspendService(), Receiver, LifecycleNotificationManager, KoinComponent {
     companion object {
         private const val NOTIFICATION_ID = 101
-        private const val STREAM_CHANNEL_ID = "stream_channel"
+        private const val AUDIO_CHANNEL_ID = "stream_channel"
         private const val PLAYBACK_UPDATE_COOLDOWN = 500L
-        private const val TEN_SECS_AS_MILLIS = 10000
 
-        private const val SERVICE_LOCATION = "com.paranid5.mediastreamer.domain.stream_service"
+        private const val SERVICE_LOCATION = "com.paranid5.mediastreamer.domain.services.track_service"
 
         const val Broadcast_PAUSE = "$SERVICE_LOCATION.PAUSE"
         const val Broadcast_RESUME = "$SERVICE_LOCATION.RESUME"
+        const val Broadcast_SWITCH_PLAYLIST = "$SERVICE_LOCATION.SWITCH_PLAYLIST"
 
-        const val Broadcast_SWITCH_VIDEO = "$SERVICE_LOCATION.SWITCH_VIDEO"
-
-        const val Broadcast_10_SECS_BACK = "$SERVICE_LOCATION.10_SECS_BACK"
-        const val Broadcast_10_SECS_FORWARD = "$SERVICE_LOCATION.10_SECS_FORWARD"
+        const val Broadcast_PREV_TRACK = "$SERVICE_LOCATION.PREV_TRACK"
+        const val Broadcast_NEXT_TRACK = "$SERVICE_LOCATION.NEXT_TRACK"
         const val Broadcast_SEEK_TO = "$SERVICE_LOCATION.SEEK_TO"
 
         const val Broadcast_CHANGE_REPEAT = "$SERVICE_LOCATION.CHANGE_REPEAT"
@@ -91,8 +100,8 @@ class StreamService : SuspendService(), Receiver, LifecycleNotificationManager, 
 
         private const val ACTION_PAUSE = "pause"
         private const val ACTION_RESUME = "resume"
-        private const val ACTION_10_SECS_BACK = "back"
-        private const val ACTION_10_SECS_FORWARD = "forward"
+        private const val ACTION_PREV_TRACK = "prev_track"
+        private const val ACTION_NEXT_TRACK = "next_track"
         private const val ACTION_REPEAT = "repeat"
         private const val ACTION_UNREPEAT = "unrepeat"
         private const val ACTION_DISMISS = "dismiss"
@@ -100,23 +109,38 @@ class StreamService : SuspendService(), Receiver, LifecycleNotificationManager, 
         private val commandsToActions = mapOf(
             ACTION_PAUSE to Actions.Pause,
             ACTION_RESUME to Actions.Resume,
-            ACTION_10_SECS_BACK to Actions.TenSecsBack,
-            ACTION_10_SECS_FORWARD to Actions.TenSecsForward,
+            ACTION_PREV_TRACK to Actions.PrevTrack,
+            ACTION_NEXT_TRACK to Actions.NextTrack,
             ACTION_REPEAT to Actions.Repeat,
             ACTION_UNREPEAT to Actions.Unrepeat,
             ACTION_DISMISS to Actions.Dismiss
         )
 
-        const val URL_ARG = "url"
+        const val PLAYLIST_ARG = "playlist"
+        const val TRACK_INDEX_ARG = "track_index"
         const val POSITION_ARG = "position"
 
-        private val TAG = StreamService::class.simpleName!!
+        private val TAG = TrackService::class.simpleName!!
 
-        internal inline val Intent.mUrlArgOrNull
-            get() = getStringExtra(URL_ARG)
+        internal inline val Intent.mPlaylistArgOrNull
+            @Suppress("UNCHECKED_CAST")
+            get() = when {
+                Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU ->
+                    getParcelableArrayExtra(PLAYLIST_ARG, DefaultTrack::class.java)
 
-        internal inline val Intent.mUrlArg
-            get() = mUrlArgOrNull!!
+                else -> getParcelableArrayExtra(PLAYLIST_ARG) as Array<DefaultTrack>
+            }?.toList()
+
+        internal inline val Intent.mPlaylistArg
+            get() = mPlaylistArgOrNull!!
+
+        internal inline val Intent.mTrackIndexArg
+            get() = getIntExtra(TRACK_INDEX_ARG, 0)
+
+        internal fun mGetRepeatMode(isRepeating: Boolean) = when {
+            isRepeating -> Player.REPEAT_MODE_ONE
+            else -> Player.REPEAT_MODE_ALL
+        }
     }
 
     sealed class Actions(
@@ -133,14 +157,14 @@ class StreamService : SuspendService(), Receiver, LifecycleNotificationManager, 
             playbackAction = Broadcast_RESUME
         )
 
-        data object TenSecsBack : Actions(
+        data object PrevTrack : Actions(
             requestCode = NOTIFICATION_ID + 3,
-            playbackAction = Broadcast_10_SECS_BACK
+            playbackAction = Broadcast_PREV_TRACK
         )
 
-        data object TenSecsForward : Actions(
+        data object NextTrack : Actions(
             requestCode = NOTIFICATION_ID + 4,
-            playbackAction = Broadcast_10_SECS_FORWARD
+            playbackAction = Broadcast_NEXT_TRACK
         )
 
         data object Repeat : Actions(
@@ -161,7 +185,7 @@ class StreamService : SuspendService(), Receiver, LifecycleNotificationManager, 
 
     private inline val Actions.playbackIntent: PendingIntent
         get() = PendingIntent.getBroadcast(
-            this@StreamService,
+            this@TrackService,
             requestCode,
             Intent(playbackAction),
             PendingIntent.FLAG_IMMUTABLE
@@ -171,8 +195,13 @@ class StreamService : SuspendService(), Receiver, LifecycleNotificationManager, 
     private val storageHandler by inject<StorageHandler>()
     private val glideUtils by inject<GlideUtils> { parametersOf(this) }
 
-    private val currentUrlState = storageHandler.currentUrlState
-    private val currentMetadataState = MutableStateFlow<VideoMetadata?>(null)
+    private val currentTrackIndexState = storageHandler.currentTrackIndexState
+    private val currentPlaylistState = storageHandler.currentPlaylistState
+
+    private val currentTrackState = combine(
+        currentTrackIndexState, currentPlaylistState
+    ) { ind, playlist -> playlist?.getOrNull(ind) }
+        .stateIn(scope, SharingStarted.Eagerly, null)
 
     private val playbackPositionState = storageHandler.playbackPositionState
     internal val mIsRepeatingState = storageHandler.isRepeatingState
@@ -193,20 +222,29 @@ class StreamService : SuspendService(), Receiver, LifecycleNotificationManager, 
     private val bassStrengthState = storageHandler.bassStrengthState
     private val reverbPresetState = storageHandler.reverbPresetState
 
-    internal val mEqualizerDataState by inject<MutableStateFlow<EqualizerData?>>(named(EQUALIZER_DATA))
+    internal val mEqualizerDataState by inject<MutableStateFlow<EqualizerData?>>(
+        named(EQUALIZER_DATA)
+    )
 
     private lateinit var playbackMonitorTask: Job
 
     @Volatile
     private var isStoppedWithError = false
 
-    @kotlin.OptIn(ExperimentalCoroutinesApi::class)
-    private val videoLength = currentMetadataState
-        .mapLatest { it?.lenInMillis ?: 0 }
-        .stateIn(scope, SharingStarted.Eagerly, 0)
-
     internal inline val mCurrentPlaybackPosition
         get() = mPlayer.currentPosition
+
+    private inline val savedPlaybackPosition
+        get() = playbackPositionState.value
+
+    internal inline val mCurrentTrackIndex
+        get() = currentTrackIndexState.value
+
+    internal inline val mCurrentPlaylistOrNull
+        get() = currentPlaylistState.value
+
+    private inline val currentPlaylist
+        get() = mCurrentPlaylistOrNull!!
 
     @Volatile
     private var isNotificationShown = false
@@ -234,6 +272,7 @@ class StreamService : SuspendService(), Receiver, LifecycleNotificationManager, 
             .apply {
                 addListener(playerStateChangedListener)
                 audioSessionIdState.update { audioSessionId }
+                repeatMode = mGetRepeatMode(isRepeating = mIsRepeatingState.value)
 
                 initEqualizer(audioSessionId)
                 initBassBoost(audioSessionId)
@@ -245,7 +284,7 @@ class StreamService : SuspendService(), Receiver, LifecycleNotificationManager, 
     }
 
     internal val mPlayerNotificationManager by lazy {
-        PlayerNotificationManager.Builder(this, NOTIFICATION_ID, STREAM_CHANNEL_ID)
+        PlayerNotificationManager.Builder(this, NOTIFICATION_ID, AUDIO_CHANNEL_ID)
             .setChannelNameResourceId(R.string.app_name)
             .setChannelDescriptionResourceId(R.string.app_name)
             .setChannelImportance(NotificationUtil.IMPORTANCE_HIGH)
@@ -289,7 +328,7 @@ class StreamService : SuspendService(), Receiver, LifecycleNotificationManager, 
     private val mediaDescriptionProvider =
         object : PlayerNotificationManager.MediaDescriptionAdapter {
             override fun getCurrentContentTitle(player: Player) =
-                currentMetadataState.value?.title ?: getString(R.string.stream_no_name)
+                currentTrackState.value?.title ?: getString(R.string.unknown_track)
 
             override fun createCurrentContentIntent(player: Player) = PendingIntent.getActivity(
                 applicationContext,
@@ -299,12 +338,12 @@ class StreamService : SuspendService(), Receiver, LifecycleNotificationManager, 
             )
 
             override fun getCurrentContentText(player: Player) =
-                currentMetadataState.value?.author ?: getString(R.string.unknown_streamer)
+                currentTrackState.value?.artist ?: getString(R.string.unknown_artist)
 
             override fun getCurrentLargeIcon(
                 player: Player,
                 callback: PlayerNotificationManager.BitmapCallback
-            ) = runBlocking { mGetVideoCoverAsync().await() }
+            ) = runBlocking { mGetTrackCoverAsync(currentTrackState.value?.path).await() }
         }
 
     private val customActionsReceiver: PlayerNotificationManager.CustomActionReceiver =
@@ -337,17 +376,30 @@ class StreamService : SuspendService(), Receiver, LifecycleNotificationManager, 
         get() = mPlayer.isPlaying
 
     private val playerStateChangedListener: Player.Listener = object : Player.Listener {
+        override fun onMediaItemTransition(mediaItem: MediaItem?, reason: Int) {
+            super.onMediaItemTransition(mediaItem, reason)
+
+            val curInd = mPlayer.currentMediaItemIndex
+
+            if (curInd != mCurrentTrackIndex)
+                scope.launch { mStoreCurrentTrackIndex(curInd) }
+        }
+
+        override fun onPositionDiscontinuity(
+            oldPosition: Player.PositionInfo,
+            newPosition: Player.PositionInfo,
+            reason: Int
+        ) {
+            super.onPositionDiscontinuity(oldPosition, newPosition, reason)
+            scope.launch { mUpdateNotification() }
+        }
+
         override fun onPlaybackStateChanged(playbackState: Int) {
             super.onPlaybackStateChanged(playbackState)
 
             when (playbackState) {
                 Player.STATE_IDLE -> scope.launch {
                     mRestartPlayer(initialPosition = mCurrentPlaybackPosition)
-                }
-
-                Player.STATE_ENDED -> when {
-                    mIsRepeatingState.value -> scope.launch { mRestartPlayer() }
-                    else -> stopSelf()
                 }
 
                 else -> Unit
@@ -360,8 +412,8 @@ class StreamService : SuspendService(), Receiver, LifecycleNotificationManager, 
             mIsPlayingState.update { isPlaying }
 
             when {
-                isPlaying -> mStartPlaybackMonitoring()
-                else -> mStopPlaybackMonitoring()
+                isPlaying -> mStartPlaybackPositionMonitoring()
+                else -> mStopPlaybackPositionMonitoring()
             }
         }
 
@@ -402,26 +454,26 @@ class StreamService : SuspendService(), Receiver, LifecycleNotificationManager, 
         }
     }
 
-    private val switchVideoReceiver = object : BroadcastReceiver() {
+    private val switchPlaylistReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context?, intent: Intent) {
-            mSendPlaybackPosition(0)
-            val url = intent.mUrlArg
-            scope.launch { mStoreCurrentUrl(url) }
-            mPlayNewStream(url)
+            Log.d(TAG, "switch playlist")
+            val playlist = intent.mPlaylistArg
+            val trackInd = intent.mTrackIndexArg
+            scope.launch { mOnTrackClicked(playlist, trackInd) }
         }
     }
 
-    private val tenSecsBackReceiver = object : BroadcastReceiver() {
+    private val switchToPrevTrackReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context?, intent: Intent?) {
-            Log.d(TAG, "10 secs back")
-            mSeekTo10SecsBack()
+            Log.d(TAG, "prev track")
+            scope.launch { mSwitchToPrevTrack() }
         }
     }
 
-    private val tenSecsForwardReceiver = object : BroadcastReceiver() {
+    private val switchToNextTrackReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context?, intent: Intent?) {
-            Log.d(TAG, "10 secs forward")
-            mSeekTo10SecsForward()
+            Log.d(TAG, "next track")
+            scope.launch { mSwitchToNextTrack() }
         }
     }
 
@@ -436,7 +488,9 @@ class StreamService : SuspendService(), Receiver, LifecycleNotificationManager, 
     private val repeatChangedReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context?, intent: Intent?) {
             scope.launch {
-                mStoreIsRepeating(!mIsRepeatingState.value)
+                val newRepeatMode = !mIsRepeatingState.value
+                mStoreIsRepeating(newRepeatMode)
+                mPlayer.repeatMode = mGetRepeatMode(newRepeatMode)
                 mPlayerNotificationManager.invalidate()
                 Log.d(TAG, "Repeating changed: ${mIsRepeatingState.value}")
             }
@@ -492,9 +546,9 @@ class StreamService : SuspendService(), Receiver, LifecycleNotificationManager, 
     override fun registerReceivers() {
         registerReceiverCompat(pauseReceiver, Broadcast_PAUSE)
         registerReceiverCompat(resumeReceiver, Broadcast_RESUME)
-        registerReceiverCompat(switchVideoReceiver, Broadcast_SWITCH_VIDEO)
-        registerReceiverCompat(tenSecsBackReceiver, Broadcast_10_SECS_BACK)
-        registerReceiverCompat(tenSecsForwardReceiver, Broadcast_10_SECS_FORWARD)
+        registerReceiverCompat(switchPlaylistReceiver, Broadcast_SWITCH_PLAYLIST)
+        registerReceiverCompat(switchToPrevTrackReceiver, Broadcast_PREV_TRACK)
+        registerReceiverCompat(switchToNextTrackReceiver, Broadcast_NEXT_TRACK)
         registerReceiverCompat(seekToReceiver, Broadcast_SEEK_TO)
         registerReceiverCompat(repeatChangedReceiver, Broadcast_CHANGE_REPEAT)
         registerReceiverCompat(dismissNotificationReceiver, Broadcast_DISMISS_NOTIFICATION)
@@ -507,9 +561,9 @@ class StreamService : SuspendService(), Receiver, LifecycleNotificationManager, 
     override fun unregisterReceivers() {
         unregisterReceiver(pauseReceiver)
         unregisterReceiver(resumeReceiver)
-        unregisterReceiver(switchVideoReceiver)
-        unregisterReceiver(tenSecsBackReceiver)
-        unregisterReceiver(tenSecsForwardReceiver)
+        unregisterReceiver(switchPlaylistReceiver)
+        unregisterReceiver(switchToPrevTrackReceiver)
+        unregisterReceiver(switchToNextTrackReceiver)
         unregisterReceiver(seekToReceiver)
         unregisterReceiver(repeatChangedReceiver)
         unregisterReceiver(dismissNotificationReceiver)
@@ -533,31 +587,58 @@ class StreamService : SuspendService(), Receiver, LifecycleNotificationManager, 
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         super.onStartCommand(intent, flags, startId)
-
         initMediaSession()
 
+        val playlist = intent?.mPlaylistArgOrNull
+        val trackInd = intent?.mTrackIndexArg
+
         scope.launch {
-            intent?.mUrlArgOrNull?.let { url ->
-                // New stream
-                mSendPlaybackPosition(0)
-                mStoreCurrentUrl(url)
-                mPlayNewStream(url)
-                launchMonitoringTasks()
-            } ?: kotlin.run {
-                // Continue with previous stream
-                mPlayNewStream(
-                    url = currentUrlState.value,
-                    initialPosition = playbackPositionState.value
-                )
+            when (playlist) {
+                // Resume received
+                null -> onResumeClicked()
+
+                // New playlist received
+                else -> mOnTrackClicked(playlist, trackInd!!)
             }
+
+            launchMonitoringTasks()
         }
 
         return START_REDELIVER_INTENT
     }
 
+    private suspend inline fun onResumeClicked() {
+        mResetPlaylistForPlayer(currentPlaylist)
+
+        mPlayPlaylist(
+            playlist = currentPlaylist,
+            curTrackInd = mCurrentTrackIndex,
+            initialPosition = savedPlaybackPosition
+        )
+    }
+
+    internal suspend inline fun mOnTrackClicked(playlist: List<DefaultTrack>, trackInd: Int) {
+        val newCurTrackPath = playlist[trackInd].path
+        val prevCurTrackPath = currentTrackState.value?.path
+
+        mStoreCurrentPlaylist(playlist)
+        mStoreCurrentTrackIndex(trackInd)
+        mResetPlaylistForPlayer(playlist)
+
+        when {
+            newCurTrackPath == prevCurTrackPath && mPlayer.isPlaying ->
+                mPausePlayback()
+
+            newCurTrackPath == prevCurTrackPath ->
+                mResumePlayback()
+
+            else -> mPlayPlaylist(playlist, trackInd)
+        }
+    }
+
     private fun launchMonitoringTasks() {
         scope.launch { startNotificationObserving() }
-        scope.launch { startPlaybackParametersMonitoring() }
+        scope.launch { startAudioEffectsMonitoring() }
     }
 
     override fun onDestroy() {
@@ -569,22 +650,29 @@ class StreamService : SuspendService(), Receiver, LifecycleNotificationManager, 
 
     // ----------------------- Playback Handle -----------------------
 
-    internal fun mSendPlaybackPosition(curPosition: Long = mCurrentPlaybackPosition) =
+    private fun sendPlaybackPosition(curPosition: Long = mCurrentPlaybackPosition) =
         sendBroadcast(
             Intent(Broadcast_CUR_POSITION_CHANGED)
                 .putExtra(CUR_POSITION_ARG, curPosition)
         )
 
-    private suspend inline fun updateAndSendPlaybackPosition() {
-        mSendPlaybackPosition()
+    private suspend inline fun sendAndStorePlaybackPosition() {
+        sendPlaybackPosition()
         storePlaybackPosition()
     }
 
+    /**
+     * Updates playback position for the UI,
+     * pauses both the player and the audio effects
+     */
+
     internal fun mPausePlayback() {
-        scope.launch { updateAndSendPlaybackPosition() }
+        scope.launch { sendAndStorePlaybackPosition() }
         mPlayer.pause()
         mSetAudioEffectsEnabled(isEnabled = false)
     }
+
+    /** Resumes the player and the audio effects */
 
     internal fun mResumePlayback() {
         mPlayer.playWhenReady = true
@@ -599,73 +687,102 @@ class StreamService : SuspendService(), Receiver, LifecycleNotificationManager, 
     internal suspend inline fun mStoreIsRepeating(isRepeating: Boolean) =
         storageHandler.storeIsRepeating(isRepeating)
 
-    internal suspend inline fun mStoreCurrentUrl(url: String) =
-        storageHandler.storeCurrentUrl(url)
+    internal suspend inline fun mStoreCurrentPlaylist(playlist: List<DefaultTrack>) =
+        storageHandler.storeCurrentPlaylist(playlist)
 
-    internal suspend inline fun mStoreMetadata(videoMeta: VideoMeta?) =
-        storageHandler.storeCurrentMetadata(videoMeta?.let(::VideoMetadata))
-
-    private suspend inline fun storeCurrentUrl(newUrl: String) =
-        storageHandler.storeCurrentUrl(newUrl)
+    internal suspend inline fun mStoreCurrentTrackIndex(index: Int) =
+        storageHandler.storeCurrentTrackIndex(index)
 
     // ----------------------- Playback Management  -----------------------
 
-    private fun YoutubeUrlExtractor(initialPosition: Long) =
-        @SuppressLint("StaticFieldLeak")
-        object : YouTubeExtractor(this) {
-            override fun onExtractionComplete(
-                ytFiles: SparseArray<YtFile>?,
-                videoMeta: VideoMeta?
-            ) {
-                if (ytFiles == null)
-                    return
-
-                val audioTag = 140
-                val audioUrl = ytFiles[audioTag].url!!
-
-                val audioSource = ProgressiveMediaSource
-                    .Factory(DefaultHttpDataSource.Factory())
-                    .createMediaSource(MediaItem.fromUri(audioUrl))
-
-                scope.launch {
-                    mUpdateMediaSession(videoMeta?.let(::VideoMetadata))
-                    mPlayerNotificationManager.invalidate()
-                    launch(Dispatchers.IO) { mStoreMetadata(videoMeta) }
-
-                    mPlayer.run {
-                        setMediaSource(audioSource)
-                        playWhenReady = true
-                        prepare()
-                        seekTo(initialPosition)
-                    }
-
-                    mSetAudioEffectsEnabled(isEnabled = areAudioEffectsEnabledState.value)
-                }
-            }
+    internal fun mResetPlaylistForPlayer(playlist: List<DefaultTrack>) =
+        mPlayer.run {
+            clearMediaItems()
+            playlist.forEach { track -> addMediaItem(MediaItem.fromUri(track.path)) }
         }
 
-    @OptIn(UnstableApi::class)
-    private fun playStream(url: String, initialPosition: Long = 0) =
-        YoutubeUrlExtractor(initialPosition).extract(url)
+    /**
+     * Resets [playlist] for the player
+     * and starts playback from the given track
+     * by its [curTrackInd] with the given [initialPosition]
+     */
 
-    internal fun mPlayNewStream(url: String, initialPosition: Long = 0) {
-        scope.launch { storeCurrentUrl(url) }
-        playStream(url, initialPosition)
+    @OptIn(UnstableApi::class)
+    internal suspend inline fun mPlayPlaylist(
+        playlist: List<DefaultTrack>,
+        curTrackInd: Int,
+        initialPosition: Long = 0
+    ) {
+        Log.d(TAG, "Playing track with index $curTrackInd: ${playlist[curTrackInd]}")
+
+        mUpdateMediaSession(track = playlist[curTrackInd])
+        mPlayerNotificationManager.invalidate()
+
+        mPlayer.run {
+            playWhenReady = true
+            prepare()
+            seekTo(curTrackInd, initialPosition)
+        }
+
+        mSetAudioEffectsEnabled(isEnabled = areAudioEffectsEnabledState.value)
     }
 
+    /**
+     * Resets playlist for the player with [mCurrentPlaylistOrNull]
+     * and starts the playback from the track with [mCurrentTrackIndex]
+     * with the given [initialPosition]
+     */
+
     internal suspend inline fun mRestartPlayer(initialPosition: Long = 0) =
-        lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
-            currentUrlState.collectLatest { url -> playStream(url, initialPosition) }
+        mCurrentPlaylistOrNull?.let {
+            mResetPlaylistForPlayer(playlist = it)
+
+            mPlayPlaylist(
+                playlist = it,
+                curTrackInd = mCurrentTrackIndex,
+                initialPosition = initialPosition
+            )
         }
 
     internal fun mSeekTo(position: Long) =
         mPlayer.seekTo(position)
 
-    internal fun mSeekTo10SecsBack() =
-        mPlayer.seekTo(maxOf(mCurrentPlaybackPosition - TEN_SECS_AS_MILLIS, 0))
+    private suspend inline fun storeAndSwitchToTrackAt(index: Int) {
+        mStoreCurrentTrackIndex(index)
+        mPlayer.seekTo(index, 0)
+    }
 
-    internal fun mSeekTo10SecsForward() =
-        mPlayer.seekTo(minOf(mCurrentPlaybackPosition + TEN_SECS_AS_MILLIS, videoLength.value))
+    /**
+     * Stores previous track as the current one and switches to it.
+     * If current track is the first one,
+     * switches to the last one from the playlist
+     */
+
+    internal suspend inline fun mSwitchToPrevTrack() = storeAndSwitchToTrackAt(
+        index = when {
+            mPlayer.hasPreviousMediaItem() -> mPlayer.previousMediaItemIndex
+            else -> mCurrentPlaylistOrNull?.size?.let { it - 1 } ?: 0
+        }
+    )
+
+    /**
+     * Stores next track as the current one and switches to it.
+     * If current track is the last one,
+     * switches to the next one from the playlist
+     */
+
+    internal suspend inline fun mSwitchToNextTrack() = storeAndSwitchToTrackAt(
+        index = when {
+            mPlayer.hasNextMediaItem() -> mPlayer.nextMediaItemIndex
+            else -> 0
+        }
+    )
+
+    /**
+     * Releases all media related handlers, such as
+     * [mPlayer], audio effects, [mediaSession] and [transportControls].
+     * Additionally, resets [audioSessionIdState] with zero
+     */
 
     private fun releaseMedia() {
         mPlayerNotificationManager.setPlayer(null)
@@ -679,20 +796,20 @@ class StreamService : SuspendService(), Receiver, LifecycleNotificationManager, 
 
     // --------------------------- Playback Monitoring ---------------------------
 
-    internal fun mStartPlaybackMonitoring() {
+    internal fun mStartPlaybackPositionMonitoring() {
         playbackMonitorTask = scope.launch {
             while (true) {
-                updateAndSendPlaybackPosition()
+                sendAndStorePlaybackPosition()
                 delay(PLAYBACK_UPDATE_COOLDOWN)
             }
         }
     }
 
-    internal fun mStopPlaybackMonitoring() = playbackMonitorTask.cancel()
+    internal fun mStopPlaybackPositionMonitoring() = playbackMonitorTask.cancel()
 
     // --------------------------- Audio Effects ---------------------------
 
-    private suspend inline fun startPlaybackParametersMonitoring() =
+    private suspend inline fun startAudioEffectsMonitoring() =
         lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
             combine(
                 areAudioEffectsEnabledState,
@@ -706,7 +823,7 @@ class StreamService : SuspendService(), Receiver, LifecycleNotificationManager, 
                     else -> PlaybackParameters(1F, 1F)
                 }
 
-                updateNotification()
+                mUpdateNotification()
             }
         }
 
@@ -757,6 +874,7 @@ class StreamService : SuspendService(), Receiver, LifecycleNotificationManager, 
             else -> PlaybackParameters(1F, 1F)
         }
 
+        // For some reason, it requires multiple tries to enable...
         repeat(3) {
             equalizer.enabled = isEnabled
             bassBoost.enabled = isEnabled
@@ -791,12 +909,12 @@ class StreamService : SuspendService(), Receiver, LifecycleNotificationManager, 
 
             override fun onSkipToNext() {
                 super.onSkipToNext()
-                mSeekTo10SecsForward()
+                scope.launch { mSwitchToNextTrack() }
             }
 
             override fun onSkipToPrevious() {
                 super.onSkipToPrevious()
-                mSeekTo10SecsBack()
+                scope.launch { mSwitchToPrevTrack() }
             }
 
             override fun onCustomAction(action: String, extras: Bundle?) {
@@ -830,13 +948,13 @@ class StreamService : SuspendService(), Receiver, LifecycleNotificationManager, 
                 when {
                     mIsRepeatingState.value -> PlaybackStateCompat.CustomAction.Builder(
                         ACTION_REPEAT,
-                        getString(R.string.change_repeat),
+                        resources.getString(R.string.change_repeat),
                         R.drawable.repeat
                     )
 
                     else -> PlaybackStateCompat.CustomAction.Builder(
                         ACTION_UNREPEAT,
-                        getString(R.string.change_repeat),
+                        resources.getString(R.string.change_repeat),
                         R.drawable.no_repeat
                     )
                 }.build()
@@ -844,7 +962,7 @@ class StreamService : SuspendService(), Receiver, LifecycleNotificationManager, 
             .addCustomAction(
                 PlaybackStateCompat.CustomAction.Builder(
                     ACTION_DISMISS,
-                    getString(R.string.cancel),
+                    resources.getString(R.string.cancel),
                     R.drawable.dismiss
                 ).build()
             )
@@ -869,22 +987,13 @@ class StreamService : SuspendService(), Receiver, LifecycleNotificationManager, 
         mPlayerNotificationManager.setPlayer(mPlayer)
     }
 
-    internal suspend inline fun mUpdateMediaSession(
-        videoMetadata: VideoMetadata? = currentMetadataState.value
-    ) = mediaSession.run {
+    internal suspend inline fun mUpdateMediaSession(track: DefaultTrack) = mediaSession.run {
         setPlaybackState(newPlaybackState)
-        setMetadata(
-            currentMetadataState
-                .updateAndGet { videoMetadata }
-                ?.toAndroidMetadata(mGetVideoCoverAsync().await())
-        )
+        setMetadata(track.toAndroidMetadata(mGetTrackCoverAsync(track.path).await()))
     }
 
-    internal suspend inline fun mGetVideoCoverAsync() =
-        currentMetadataState
-            .value
-            ?.let { glideUtils.getVideoCoverBitmapAsync(it) }
-            ?: coroutineScope { async(Dispatchers.IO) { glideUtils.thumbnailBitmap } }
+    internal suspend inline fun mGetTrackCoverAsync(path: String?) =
+        glideUtils.getTrackCoverBitmapAsync(path)
 
     // --------------------------- Notification Actions ---------------------------
 
@@ -894,7 +1003,7 @@ class StreamService : SuspendService(), Receiver, LifecycleNotificationManager, 
                 this,
                 R.drawable.repeat
             ),
-            getString(R.string.change_repeat),
+            resources.getString(R.string.change_repeat),
             Actions.Repeat.playbackIntent
         ).build()
 
@@ -904,14 +1013,14 @@ class StreamService : SuspendService(), Receiver, LifecycleNotificationManager, 
                 this,
                 R.drawable.no_repeat
             ),
-            getString(R.string.change_repeat),
+            resources.getString(R.string.change_repeat),
             Actions.Unrepeat.playbackIntent
         ).build()
 
     internal inline val mDismissNotificationActionCompat
         get() = NotificationCompat.Action.Builder(
             IconCompat.createWithResource(this, R.drawable.dismiss),
-            getString(R.string.cancel),
+            resources.getString(R.string.cancel),
             Actions.Dismiss.playbackIntent
         ).build()
 
@@ -924,15 +1033,22 @@ class StreamService : SuspendService(), Receiver, LifecycleNotificationManager, 
 
     override suspend fun startNotificationObserving() =
         lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
-            combine(mIsPlayingState, mIsRepeatingState) { isPlaying, isRepeating ->
-                isPlaying to isRepeating
+            combine(
+                mIsPlayingState,
+                mIsRepeatingState,
+                currentTrackIndexState,
+                currentPlaylistState
+            ) { isPlaying, isRepeating, curTrackInd, curPlaylist ->
+                Tuple4(isPlaying, isRepeating, curTrackInd, curPlaylist)
             }.collectLatest {
-                scope.launch { updateNotification() }
+                scope.launch { mUpdateNotification() }
             }
         }
 
-    private suspend inline fun updateNotification() {
-        mUpdateMediaSession()
+    internal suspend inline fun mUpdateNotification() {
+        Log.d(TAG, "Update Notification")
+        Exception("KEK").printStackTrace()
+        mUpdateMediaSession(currentTrackState.value!!)
         mPlayerNotificationManager.invalidate()
     }
 

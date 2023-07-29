@@ -1,4 +1,4 @@
-package com.paranid5.mediastreamer.domain.track_service
+package com.paranid5.mediastreamer.domain.services.track_service
 
 import android.app.Service
 import android.content.Intent

@@ -5,10 +5,10 @@ import android.widget.Toast
 import com.paranid5.mediastreamer.AUDIO_SESSION_ID
 import com.paranid5.mediastreamer.R
 import com.paranid5.mediastreamer.domain.StorageHandler
-import com.paranid5.mediastreamer.domain.stream_service.StreamServiceAccessor
-import com.paranid5.mediastreamer.domain.track_service.TrackServiceAccessor
-import com.paranid5.mediastreamer.domain.video_cash_service.Formats
-import com.paranid5.mediastreamer.domain.video_cash_service.VideoCashServiceAccessor
+import com.paranid5.mediastreamer.domain.services.stream_service.StreamServiceAccessor
+import com.paranid5.mediastreamer.domain.services.track_service.TrackServiceAccessor
+import com.paranid5.mediastreamer.domain.services.video_cash_service.Formats
+import com.paranid5.mediastreamer.domain.services.video_cash_service.VideoCashServiceAccessor
 import com.paranid5.mediastreamer.presentation.NavHostController
 import com.paranid5.mediastreamer.presentation.Screens
 import com.paranid5.mediastreamer.presentation.UIHandler

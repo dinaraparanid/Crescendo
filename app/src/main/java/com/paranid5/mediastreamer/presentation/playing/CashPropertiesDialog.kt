@@ -14,7 +14,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.paranid5.mediastreamer.R
-import com.paranid5.mediastreamer.domain.video_cash_service.Formats
+import com.paranid5.mediastreamer.domain.services.video_cash_service.Formats
 import com.paranid5.mediastreamer.presentation.ui.theme.LocalAppColors
 import org.koin.compose.koinInject
 

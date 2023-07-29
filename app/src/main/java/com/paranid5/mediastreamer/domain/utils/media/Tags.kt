@@ -8,7 +8,7 @@ import android.os.Environment
 import android.provider.MediaStore
 import com.paranid5.mediastreamer.data.VideoMetadata
 import com.paranid5.mediastreamer.domain.media_scanner.scanNextFile
-import com.paranid5.mediastreamer.domain.video_cash_service.Formats
+import com.paranid5.mediastreamer.domain.services.video_cash_service.Formats
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch

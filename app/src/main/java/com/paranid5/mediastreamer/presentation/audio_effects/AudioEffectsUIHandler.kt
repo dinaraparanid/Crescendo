@@ -3,8 +3,8 @@ package com.paranid5.mediastreamer.presentation.audio_effects
 import android.content.Context
 import com.paranid5.mediastreamer.data.eq.EqualizerParameters
 import com.paranid5.mediastreamer.domain.StorageHandler
-import com.paranid5.mediastreamer.domain.stream_service.StreamService
-import com.paranid5.mediastreamer.domain.track_service.TrackService
+import com.paranid5.mediastreamer.domain.services.stream_service.StreamService
+import com.paranid5.mediastreamer.domain.services.track_service.TrackService
 import com.paranid5.mediastreamer.domain.utils.extensions.sendBroadcast
 import com.paranid5.mediastreamer.presentation.UIHandler
 import com.paranid5.mediastreamer.presentation.ui.handleOrIgnore
