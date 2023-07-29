@@ -236,10 +236,7 @@ class StreamService : SuspendService(), Receiver, LifecycleNotificationManager, 
             .apply {
                 addListener(playerStateChangedListener)
                 audioSessionIdState.update { audioSessionId }
-
-                initEqualizer(audioSessionId)
-                initBassBoost(audioSessionId)
-                initReverb(audioSessionId)
+                initAudioEffects(audioSessionId)
 
                 if (areAudioEffectsEnabledState.value)
                     playbackParameters = PlaybackParameters(speedState.value, pitchState.value)
@@ -443,6 +440,7 @@ class StreamService : SuspendService(), Receiver, LifecycleNotificationManager, 
         override fun onReceive(context: Context, intent: Intent) {
             val position = intent.getLongExtra(POSITION_ARG, 0)
             Log.d(TAG, "seek to $position")
+            mResetAudioSessionId()
             mSeekTo(position)
         }
     }
@@ -607,8 +605,15 @@ class StreamService : SuspendService(), Receiver, LifecycleNotificationManager, 
     }
 
     internal fun mResumePlayback() {
+        mResetAudioSessionId()
         mPlayer.playWhenReady = true
         mSetAudioEffectsEnabled(isEnabled = areAudioEffectsEnabledState.value)
+    }
+
+    private fun initAudioEffects(audioSessionId: Int) {
+        initEqualizer(audioSessionId)
+        initBassBoost(audioSessionId)
+        initReverb(audioSessionId)
     }
 
     // ----------------------- Storage Handler Utils -----------------------
@@ -629,6 +634,11 @@ class StreamService : SuspendService(), Receiver, LifecycleNotificationManager, 
         storageHandler.storeCurrentUrl(newUrl)
 
     // ----------------------- Playback Management  -----------------------
+
+    internal fun mResetAudioSessionId() {
+        audioSessionIdState.update { mPlayer.audioSessionId }
+        initAudioEffects(mPlayer.audioSessionId)
+    }
 
     private fun YoutubeUrlExtractor(initialPosition: Long) =
         @SuppressLint("StaticFieldLeak")
@@ -665,8 +675,10 @@ class StreamService : SuspendService(), Receiver, LifecycleNotificationManager, 
         }
 
     @OptIn(UnstableApi::class)
-    private fun playStream(url: String, initialPosition: Long = 0) =
+    private fun playStream(url: String, initialPosition: Long = 0) {
+        mResetAudioSessionId()
         YoutubeUrlExtractor(initialPosition).extract(url)
+    }
 
     internal fun mStoreAndPlayNewStream(url: String, initialPosition: Long = 0) {
         scope.launch { storeCurrentUrl(url) }
@@ -676,14 +688,20 @@ class StreamService : SuspendService(), Receiver, LifecycleNotificationManager, 
     internal fun mRestartPlayer(initialPosition: Long = 0) =
         playStream(url = currentUrlState.value, initialPosition)
 
-    internal fun mSeekTo(position: Long) =
+    internal fun mSeekTo(position: Long) {
+        mResetAudioSessionId()
         mPlayer.seekTo(position)
+    }
 
-    internal fun mSeekTo10SecsBack() =
+    internal fun mSeekTo10SecsBack() {
+        mResetAudioSessionId()
         mPlayer.seekTo(maxOf(mCurrentPlaybackPosition - TEN_SECS_AS_MILLIS, 0))
+    }
 
-    internal fun mSeekTo10SecsForward() =
+    internal fun mSeekTo10SecsForward() {
+        mResetAudioSessionId()
         mPlayer.seekTo(minOf(mCurrentPlaybackPosition + TEN_SECS_AS_MILLIS, videoLength.value))
+    }
 
     /**
      * Releases all media related handlers, such as
@@ -792,6 +810,8 @@ class StreamService : SuspendService(), Receiver, LifecycleNotificationManager, 
     private fun releaseAudioEffects() {
         mSetAudioEffectsEnabled(isEnabled = false)
         equalizer.release()
+        bassBoost.release()
+        reverb.release()
         mEqualizerDataState.update { null }
     }
 
