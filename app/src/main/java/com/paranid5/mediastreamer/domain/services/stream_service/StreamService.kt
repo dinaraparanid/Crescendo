@@ -9,10 +9,8 @@ import android.media.audiofx.BassBoost
 import android.media.audiofx.Equalizer
 import android.media.audiofx.PresetReverb
 import android.media.session.MediaSessionManager
-import android.os.Binder
 import android.os.Build
 import android.os.Bundle
-import android.os.IBinder
 import android.os.SystemClock
 import android.support.v4.media.session.MediaControllerCompat
 import android.support.v4.media.session.MediaSessionCompat
@@ -40,6 +38,7 @@ import com.paranid5.mediastreamer.AUDIO_SESSION_ID
 import com.paranid5.mediastreamer.EQUALIZER_DATA
 import com.paranid5.mediastreamer.IS_PLAYING_STATE
 import com.paranid5.mediastreamer.R
+import com.paranid5.mediastreamer.STREAM_SERVICE_CONNECTION
 import com.paranid5.mediastreamer.data.VideoMetadata
 import com.paranid5.mediastreamer.data.eq.EqualizerData
 import com.paranid5.mediastreamer.data.utils.extensions.toAndroidMetadata
@@ -74,7 +73,6 @@ class StreamService : SuspendService(), Receiver, LifecycleNotificationManager, 
 
         const val Broadcast_PAUSE = "$SERVICE_LOCATION.PAUSE"
         const val Broadcast_RESUME = "$SERVICE_LOCATION.RESUME"
-
         const val Broadcast_SWITCH_VIDEO = "$SERVICE_LOCATION.SWITCH_VIDEO"
 
         const val Broadcast_10_SECS_BACK = "$SERVICE_LOCATION.10_SECS_BACK"
@@ -83,6 +81,7 @@ class StreamService : SuspendService(), Receiver, LifecycleNotificationManager, 
 
         const val Broadcast_CHANGE_REPEAT = "$SERVICE_LOCATION.CHANGE_REPEAT"
         const val Broadcast_DISMISS_NOTIFICATION = "$SERVICE_LOCATION.DISMISS_NOTIFICATION"
+        const val Broadcast_STOP = "$SERVICE_LOCATION.STOP"
 
         const val Broadcast_AUDIO_EFFECTS_ENABLED_UPDATE = "$SERVICE_LOCATION.AUDIO_EFFECTS_ENABLED_UPDATE"
         const val Broadcast_EQUALIZER_PARAM_UPDATE = "$SERVICE_LOCATION.EQUALIZER_PARAM_UPDATE"
@@ -117,6 +116,11 @@ class StreamService : SuspendService(), Receiver, LifecycleNotificationManager, 
 
         internal inline val Intent.mUrlArg
             get() = mUrlArgOrNull!!
+
+        internal fun mGetRepeatMode(isRepeating: Boolean) = when {
+            isRepeating -> Player.REPEAT_MODE_ONE
+            else -> Player.REPEAT_MODE_ALL
+        }
     }
 
     sealed class Actions(
@@ -167,7 +171,6 @@ class StreamService : SuspendService(), Receiver, LifecycleNotificationManager, 
             PendingIntent.FLAG_IMMUTABLE
         )
 
-    private val binder = object : Binder() {}
     private val storageHandler by inject<StorageHandler>()
     private val glideUtils by inject<GlideUtils> { parametersOf(this) }
 
@@ -197,7 +200,14 @@ class StreamService : SuspendService(), Receiver, LifecycleNotificationManager, 
         named(EQUALIZER_DATA)
     )
 
-    private lateinit var playbackMonitorTask: Job
+    private val isConnectedState by inject<MutableStateFlow<Boolean>>(
+        named(STREAM_SERVICE_CONNECTION)
+    )
+
+    private val startIdState = MutableStateFlow(0)
+
+    private lateinit var playbackTask: Job
+    private lateinit var playbackPosMonitorTask: Job
 
     @Volatile
     private var isStoppedWithError = false
@@ -223,25 +233,23 @@ class StreamService : SuspendService(), Receiver, LifecycleNotificationManager, 
 
     internal val mPlayer by lazy {
         ExoPlayer.Builder(applicationContext)
-            .setAudioAttributes(
-                AudioAttributes.Builder()
-                    .setContentType(AUDIO_CONTENT_TYPE_MOVIE)
-                    .setUsage(USAGE_MEDIA)
-                    .build(),
-                true
-            )
+            .setAudioAttributes(newAudioAttributes, true)
             .setHandleAudioBecomingNoisy(true)
             .setWakeMode(WAKE_MODE_NETWORK)
             .build()
             .apply {
                 addListener(playerStateChangedListener)
                 audioSessionIdState.update { audioSessionId }
+                repeatMode = mGetRepeatMode(isRepeating = mIsRepeatingState.value)
                 initAudioEffects(audioSessionId)
-
-                if (areAudioEffectsEnabledState.value)
-                    playbackParameters = PlaybackParameters(speedState.value, pitchState.value)
             }
     }
+
+    private inline val newAudioAttributes
+        get() = AudioAttributes.Builder()
+            .setContentType(AUDIO_CONTENT_TYPE_MOVIE)
+            .setUsage(USAGE_MEDIA)
+            .build()
 
     internal val mPlayerNotificationManager by lazy {
         PlayerNotificationManager.Builder(this, NOTIFICATION_ID, STREAM_CHANNEL_ID)
@@ -257,10 +265,12 @@ class StreamService : SuspendService(), Receiver, LifecycleNotificationManager, 
             .setPauseActionIconResourceId(R.drawable.pause)
             .build()
             .apply {
-                setUseNextAction(false)
-                setUsePreviousAction(false)
                 setUseStopAction(false)
                 setUseChronometer(false)
+                setUseNextAction(false)
+                setUsePreviousAction(false)
+                setUseNextActionInCompactView(false)
+                setUsePreviousActionInCompactView(false)
 
                 setPriority(NotificationCompat.PRIORITY_HIGH)
                 setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
@@ -357,11 +367,6 @@ class StreamService : SuspendService(), Receiver, LifecycleNotificationManager, 
                     mRestartPlayer(initialPosition = mCurrentPlaybackPosition)
                 }
 
-                Player.STATE_ENDED -> when {
-                    mIsRepeatingState.value -> scope.launch { mRestartPlayer() }
-                    else -> stopSelf()
-                }
-
                 else -> Unit
             }
         }
@@ -448,9 +453,11 @@ class StreamService : SuspendService(), Receiver, LifecycleNotificationManager, 
     private val repeatChangedReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context?, intent: Intent?) {
             scope.launch {
-                mStoreIsRepeating(!mIsRepeatingState.value)
+                val newRepeatMode = !mIsRepeatingState.value
+                mStoreIsRepeating(newRepeatMode)
+                mPlayer.repeatMode = mGetRepeatMode(newRepeatMode)
                 mPlayerNotificationManager.invalidate()
-                Log.d(TAG, "Repeating changed: ${mIsRepeatingState.value}")
+                Log.d(TAG, "Repeating changed: $newRepeatMode")
             }
         }
     }
@@ -501,6 +508,12 @@ class StreamService : SuspendService(), Receiver, LifecycleNotificationManager, 
         }
     }
 
+    private val stopReceiver = object : BroadcastReceiver() {
+        override fun onReceive(context: Context?, intent: Intent?) {
+            Log.d(TAG, "Stopped after stop receive: ${stopSelfResult(startIdState.value)}")
+        }
+    }
+
     override fun registerReceivers() {
         registerReceiverCompat(pauseReceiver, Broadcast_PAUSE)
         registerReceiverCompat(resumeReceiver, Broadcast_RESUME)
@@ -514,6 +527,7 @@ class StreamService : SuspendService(), Receiver, LifecycleNotificationManager, 
         registerReceiverCompat(equalizerParameterUpdateReceiver, Broadcast_EQUALIZER_PARAM_UPDATE)
         registerReceiverCompat(bassStrengthUpdateReceiver, Broadcast_BASS_STRENGTH_UPDATE)
         registerReceiverCompat(reverbPresetUpdateReceiver, Broadcast_REVERB_PRESET_UPDATE)
+        registerReceiverCompat(stopReceiver, Broadcast_STOP)
     }
 
     override fun unregisterReceivers() {
@@ -529,6 +543,7 @@ class StreamService : SuspendService(), Receiver, LifecycleNotificationManager, 
         unregisterReceiver(equalizerParameterUpdateReceiver)
         unregisterReceiver(bassStrengthUpdateReceiver)
         unregisterReceiver(reverbPresetUpdateReceiver)
+        unregisterReceiver(stopReceiver)
     }
 
     // --------------------------- Service Impl ---------------------------
@@ -538,14 +553,12 @@ class StreamService : SuspendService(), Receiver, LifecycleNotificationManager, 
         registerReceivers()
     }
 
-    override fun onBind(intent: Intent): IBinder {
-        super.onBind(intent)
-        return binder
-    }
-
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         super.onStartCommand(intent, flags, startId)
+        Log.d(TAG, "onStart called with id $startId")
 
+        isConnectedState.update { true }
+        startIdState.update { startId }
         initMediaSession()
 
         scope.launch {
@@ -558,7 +571,7 @@ class StreamService : SuspendService(), Receiver, LifecycleNotificationManager, 
             }
         }
 
-        return START_REDELIVER_INTENT
+        return START_STICKY
     }
 
     private fun onResumeClicked() = mStoreAndPlayNewStream(
@@ -580,8 +593,10 @@ class StreamService : SuspendService(), Receiver, LifecycleNotificationManager, 
 
     override fun onDestroy() {
         super.onDestroy()
-        releaseMedia()
+        isConnectedState.update { false }
+        playbackTask.cancel()
         detachNotification()
+        releaseMedia()
         unregisterReceivers()
     }
 
@@ -614,6 +629,9 @@ class StreamService : SuspendService(), Receiver, LifecycleNotificationManager, 
         initEqualizer(audioSessionId)
         initBassBoost(audioSessionId)
         initReverb(audioSessionId)
+
+        if (areAudioEffectsEnabledState.value)
+            mPlayer.playbackParameters = PlaybackParameters(speedState.value, pitchState.value)
     }
 
     // ----------------------- Storage Handler Utils -----------------------
@@ -657,7 +675,7 @@ class StreamService : SuspendService(), Receiver, LifecycleNotificationManager, 
                     .Factory(DefaultHttpDataSource.Factory())
                     .createMediaSource(MediaItem.fromUri(audioUrl))
 
-                scope.launch {
+                playbackTask = scope.launch {
                     mUpdateMediaSession(videoMeta?.let(::VideoMetadata))
                     mPlayerNotificationManager.invalidate()
                     launch(Dispatchers.IO) { mStoreMetadata(videoMeta) }
@@ -722,7 +740,7 @@ class StreamService : SuspendService(), Receiver, LifecycleNotificationManager, 
     // --------------------------- Playback Monitoring ---------------------------
 
     internal fun mStartPlaybackMonitoring() {
-        playbackMonitorTask = scope.launch {
+        playbackPosMonitorTask = scope.launch {
             while (true) {
                 mSendAndStorePlaybackPosition()
                 delay(PLAYBACK_UPDATE_COOLDOWN)
@@ -730,7 +748,7 @@ class StreamService : SuspendService(), Receiver, LifecycleNotificationManager, 
         }
     }
 
-    internal fun mStopPlaybackMonitoring() = playbackMonitorTask.cancel()
+    internal fun mStopPlaybackMonitoring() = playbackPosMonitorTask.cancel()
 
     // --------------------------- Audio Effects ---------------------------
 
@@ -801,9 +819,13 @@ class StreamService : SuspendService(), Receiver, LifecycleNotificationManager, 
 
         // For some reason, it requires multiple tries to enable...
         repeat(3) {
-            equalizer.enabled = isEnabled
-            bassBoost.enabled = isEnabled
-            reverb.enabled = isEnabled
+            try {
+                equalizer.enabled = isEnabled
+                bassBoost.enabled = isEnabled
+                reverb.enabled = isEnabled
+            } catch (ignored: IllegalStateException) {
+                // not initialized
+            }
         }
     }
 
@@ -982,6 +1004,7 @@ class StreamService : SuspendService(), Receiver, LifecycleNotificationManager, 
     }
 
     override fun detachNotification() {
+        Log.d(TAG, "Notification is remove")
         isNotificationShown = false
 
         when {

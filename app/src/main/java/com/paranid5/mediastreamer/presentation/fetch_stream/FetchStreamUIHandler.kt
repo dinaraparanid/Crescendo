@@ -4,5 +4,5 @@ import com.paranid5.mediastreamer.domain.services.stream_service.StreamServiceAc
 import com.paranid5.mediastreamer.presentation.UIHandler
 
 class FetchStreamUIHandler(private val serviceAccessor: StreamServiceAccessor) : UIHandler {
-    fun startStreaming(url: String?) = serviceAccessor.startStreaming(url)
+    fun startStreaming(url: String) = serviceAccessor.startStreaming(url)
 }

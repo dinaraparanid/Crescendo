@@ -5,9 +5,7 @@ import android.app.*
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
-import android.os.Binder
 import android.os.Build
-import android.os.IBinder
 import android.util.Log
 import android.util.SparseArray
 import androidx.annotation.RequiresApi
@@ -22,6 +20,7 @@ import at.huber.youtubeExtractor.VideoMeta
 import at.huber.youtubeExtractor.YouTubeExtractor
 import at.huber.youtubeExtractor.YtFile
 import com.paranid5.mediastreamer.R
+import com.paranid5.mediastreamer.VIDEO_CASH_SERVICE_CONNECTION
 import com.paranid5.mediastreamer.data.VideoMetadata
 import com.paranid5.mediastreamer.domain.LifecycleNotificationManager
 import com.paranid5.mediastreamer.domain.Receiver
@@ -45,6 +44,7 @@ import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
+import org.koin.core.qualifier.named
 import java.util.Queue
 import java.util.concurrent.ConcurrentLinkedQueue
 import kotlin.time.Duration.Companion.seconds
@@ -102,7 +102,6 @@ class VideoCashService : SuspendService(), Receiver, LifecycleNotificationManage
         val format: Formats
     )
 
-    private val binder = object : Binder() {}
     private val ktorClient by inject<HttpClient>()
     private var cashingLoopJob: Job? = null
 
@@ -111,6 +110,10 @@ class VideoCashService : SuspendService(), Receiver, LifecycleNotificationManage
 
     private val videoCashProgressState = MutableStateFlow(0L to 0L)
     private val videoCashErrorState = MutableStateFlow(0 to "")
+
+    private val isConnectedState by inject<MutableStateFlow<Boolean>>(
+        named(VIDEO_CASH_SERVICE_CONNECTION)
+    )
 
     private val isVideoCashingCondVar = AsyncCondVar()
     private val isVideoCashQueueEmptyCondVar = AsyncCondVar()
@@ -172,13 +175,9 @@ class VideoCashService : SuspendService(), Receiver, LifecycleNotificationManage
         registerReceivers()
     }
 
-    override fun onBind(intent: Intent): IBinder {
-        super.onBind(intent)
-        return binder
-    }
-
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         super.onStartCommand(intent, flags, startId)
+        isConnectedState.update { true }
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
             createChannel()
@@ -191,6 +190,7 @@ class VideoCashService : SuspendService(), Receiver, LifecycleNotificationManage
 
     override fun onDestroy() {
         super.onDestroy()
+        isConnectedState.update { false }
         unregisterReceivers()
     }
 
@@ -212,7 +212,7 @@ class VideoCashService : SuspendService(), Receiver, LifecycleNotificationManage
                 val videoUrl = sequenceOf(137, 22, 18)
                     .map(ytFiles::get)
                     .filterNotNull()
-                    .map(YtFile::getUrl)
+                    .map(YtFile::url)
                     .filterNotNull()
                     .filter(String::isNotEmpty)
                     .first()

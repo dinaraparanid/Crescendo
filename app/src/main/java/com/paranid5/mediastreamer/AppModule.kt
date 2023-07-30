@@ -46,6 +46,10 @@ const val IS_PLAYING_STATE = "is_playing_state"
 const val AUDIO_SESSION_ID = "audio_session_id"
 const val EQUALIZER_DATA = "equalizer_data"
 
+const val STREAM_SERVICE_CONNECTION = "stream_service_connection"
+const val TRACK_SERVICE_CONNECTION = "track_service_connection"
+const val VIDEO_CASH_SERVICE_CONNECTION = "video_cash_service_connection"
+
 const val EXTERNAL_STORAGE_PERMISSION_QUEUE = "external_storage_permission_queue"
 const val POST_NOTIFICATIONS_PERMISSION_QUEUE = "post_notifications_permission_queue"
 const val AUDIO_RECORDING_PERMISSION_QUEUE = "audio_recording_permission_queue"
@@ -58,10 +62,20 @@ private val resourcesModule = module {
     factory(named(UNKNOWN_STREAMER)) { getString(R.string.unknown_streamer) }
 }
 
-private val serviceAccessors = module {
+private val serviceAccessorsModule = module {
     singleOf(::StreamServiceAccessor)
     singleOf(::TrackServiceAccessor)
     singleOf(::VideoCashServiceAccessor)
+}
+
+private val serviceConnectionsModule = module {
+    single(named(STREAM_SERVICE_CONNECTION)) { MutableStateFlow(false) }
+    single(named(TRACK_SERVICE_CONNECTION)) { MutableStateFlow(false) }
+    single(named(VIDEO_CASH_SERVICE_CONNECTION)) { MutableStateFlow(false) }
+}
+
+private val servicesModule = module {
+    includes(serviceAccessorsModule, serviceConnectionsModule)
 }
 
 private val permissionDescriptionProviders = module {
@@ -92,12 +106,12 @@ private val permissionQueues = module {
         single(named(POST_NOTIFICATIONS_PERMISSION_QUEUE)) { foregroundServicePermissionQueue }
 }
 
-private val permissions = module {
+private val permissionsModule = module {
     includes(permissionDescriptionProviders, permissionQueues)
 }
 
 private val globalsModule = module {
-    includes(resourcesModule, serviceAccessors, permissions)
+    includes(resourcesModule, servicesModule, permissionsModule)
 
     singleOf(::StorageHandler)
     single { androidApplication() as MainApplication }

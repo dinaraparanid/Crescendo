@@ -1,12 +1,22 @@
 package com.paranid5.mediastreamer.domain.services.video_cash_service
 
-import android.app.Service
 import android.content.Intent
 import android.os.Build
 import com.paranid5.mediastreamer.MainApplication
+import com.paranid5.mediastreamer.VIDEO_CASH_SERVICE_CONNECTION
 import com.paranid5.mediastreamer.domain.ServiceAccessor
+import kotlinx.coroutines.flow.MutableStateFlow
+import org.koin.core.component.inject
+import org.koin.core.qualifier.named
 
 class VideoCashServiceAccessor(application: MainApplication) : ServiceAccessor(application) {
+    private val isVideoCashServiceConnectedState by inject<MutableStateFlow<Boolean>>(
+        named(VIDEO_CASH_SERVICE_CONNECTION)
+    )
+
+    private inline val isVideoCashServiceConnected
+        get() = isVideoCashServiceConnectedState.value
+
     private fun Intent.putVideoCashDataArgs(
         videoUrl: String,
         desiredFilename: String,
@@ -29,12 +39,6 @@ class VideoCashServiceAccessor(application: MainApplication) : ServiceAccessor(a
             appContext.startForegroundService(serviceIntent)
         else
             appContext.startService(serviceIntent)
-
-        appContext.bindService(
-            serviceIntent,
-            application.videoCashServiceConnection,
-            Service.BIND_AUTO_CREATE
-        )
     }
 
     private fun cashNextVideo(
@@ -54,7 +58,7 @@ class VideoCashServiceAccessor(application: MainApplication) : ServiceAccessor(a
         desiredFilename: String,
         format: Formats
     ) = when {
-        application.isVideoCashServiceConnected -> cashNextVideo(
+        isVideoCashServiceConnected -> cashNextVideo(
             videoUrl,
             desiredFilename,
             format

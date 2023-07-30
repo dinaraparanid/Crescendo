@@ -9,63 +9,6 @@ import org.koin.android.ext.koin.androidLogger
 import org.koin.core.context.startKoin
 
 class MainApplication : Application() {
-    companion object {
-        private const val STREAM_SERVICE_NAME = ".domain.services.stream_service.StreamService"
-        private const val TRACK_SERVICE_NAME = ".domain.services.track_service.TrackService"
-        private const val VIDEO_CASH_SERVICE_NAME = ".domain.services.video_cash_service.VideoCashService"
-    }
-
-    @Volatile
-    @JvmField
-    var isStreamServiceConnected = false
-
-    @Volatile
-    @JvmField
-    var isTrackServiceConnected = false
-
-    @Volatile
-    @JvmField
-    var isVideoCashServiceConnected = false
-
-    @JvmField
-    val streamServiceConnection = object : ServiceConnection {
-        override fun onServiceConnected(name: ComponentName, service: IBinder) {
-            if (name.shortClassName == STREAM_SERVICE_NAME)
-                isStreamServiceConnected = true
-        }
-
-        override fun onServiceDisconnected(name: ComponentName) {
-            if (name.shortClassName == STREAM_SERVICE_NAME)
-                isStreamServiceConnected = false
-        }
-    }
-
-    @JvmField
-    val trackServiceConnection = object : ServiceConnection {
-        override fun onServiceConnected(name: ComponentName, service: IBinder) {
-            if (name.shortClassName == TRACK_SERVICE_NAME)
-                isTrackServiceConnected = true
-        }
-
-        override fun onServiceDisconnected(name: ComponentName) {
-            if (name.shortClassName == TRACK_SERVICE_NAME)
-                isTrackServiceConnected = false
-        }
-    }
-
-    @JvmField
-    val videoCashServiceConnection = object : ServiceConnection {
-        override fun onServiceConnected(name: ComponentName, service: IBinder) {
-            if (name.shortClassName == VIDEO_CASH_SERVICE_NAME)
-                isVideoCashServiceConnected = true
-        }
-
-        override fun onServiceDisconnected(name: ComponentName) {
-            if (name.shortClassName == VIDEO_CASH_SERVICE_NAME)
-                isVideoCashServiceConnected = false
-        }
-    }
-
     override fun onCreate() {
         super.onCreate()
 
