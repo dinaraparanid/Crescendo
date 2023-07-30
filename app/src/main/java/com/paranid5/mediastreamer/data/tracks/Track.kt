@@ -15,6 +15,6 @@ interface Track : Parcelable {
 }
 
 inline val Track.artistAlbum
-    get() = "$artist/$album"
+    get() = "$artist / E$album"
 
 fun Iterable<Track>.toDefaultTrackList() = map(::DefaultTrack)

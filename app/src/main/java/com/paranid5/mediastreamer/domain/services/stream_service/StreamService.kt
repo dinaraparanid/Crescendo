@@ -241,7 +241,7 @@ class StreamService : SuspendService(), Receiver, LifecycleNotificationManager, 
                 addListener(playerStateChangedListener)
                 audioSessionIdState.update { audioSessionId }
                 repeatMode = mGetRepeatMode(isRepeating = mIsRepeatingState.value)
-                initAudioEffects(audioSessionId)
+                initAudioEffects()
             }
     }
 
@@ -625,7 +625,7 @@ class StreamService : SuspendService(), Receiver, LifecycleNotificationManager, 
         mSetAudioEffectsEnabled(isEnabled = areAudioEffectsEnabledState.value)
     }
 
-    private fun initAudioEffects(audioSessionId: Int) {
+    private fun ExoPlayer.initAudioEffects() {
         initEqualizer(audioSessionId)
         initBassBoost(audioSessionId)
         initReverb(audioSessionId)
@@ -655,7 +655,7 @@ class StreamService : SuspendService(), Receiver, LifecycleNotificationManager, 
 
     internal fun mResetAudioSessionId() {
         audioSessionIdState.update { mPlayer.audioSessionId }
-        initAudioEffects(mPlayer.audioSessionId)
+        mPlayer.initAudioEffects()
     }
 
     private fun YoutubeUrlExtractor(initialPosition: Long) =

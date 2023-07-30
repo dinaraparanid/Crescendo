@@ -212,7 +212,7 @@ class VideoCashService : SuspendService(), Receiver, LifecycleNotificationManage
                 val videoUrl = sequenceOf(137, 22, 18)
                     .map(ytFiles::get)
                     .filterNotNull()
-                    .map(YtFile::url)
+                    .map(YtFile::getUrl)
                     .filterNotNull()
                     .filter(String::isNotEmpty)
                     .first()

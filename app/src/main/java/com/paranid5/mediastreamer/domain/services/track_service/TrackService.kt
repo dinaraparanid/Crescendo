@@ -268,7 +268,7 @@ class TrackService : SuspendService(), Receiver, LifecycleNotificationManager, K
                 addListener(playerStateChangedListener)
                 audioSessionIdState.update { audioSessionId }
                 repeatMode = mGetRepeatMode(isRepeating = mIsRepeatingState.value)
-                initAudioEffects(audioSessionId)
+                initAudioEffects()
             }
     }
 
@@ -715,13 +715,13 @@ class TrackService : SuspendService(), Receiver, LifecycleNotificationManager, K
         mSetAudioEffectsEnabled(areEnabled = false)
     }
 
-    private fun initAudioEffects(audioSessionId: Int) {
+    private fun ExoPlayer.initAudioEffects() {
         initEqualizer(audioSessionId)
         initBassBoost(audioSessionId)
         initReverb(audioSessionId)
 
         if (areAudioEffectsEnabledState.value)
-            mPlayer.playbackParameters = PlaybackParameters(speedState.value, pitchState.value)
+            playbackParameters = PlaybackParameters(speedState.value, pitchState.value)
     }
 
     /** Resumes the player and the audio effects */
@@ -758,7 +758,7 @@ class TrackService : SuspendService(), Receiver, LifecycleNotificationManager, K
     private fun resetAudioSessionId() {
         releaseAudioEffects()
         audioSessionIdState.update { mPlayer.audioSessionId }
-        initAudioEffects(mPlayer.audioSessionId)
+        mPlayer.initAudioEffects()
         mSetAudioEffectsEnabled(areEnabled = areAudioEffectsEnabledState.value)
     }
 
