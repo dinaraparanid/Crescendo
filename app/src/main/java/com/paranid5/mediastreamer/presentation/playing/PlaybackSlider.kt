@@ -18,7 +18,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.palette.graphics.Palette
 import com.paranid5.mediastreamer.domain.StorageHandler
-import com.paranid5.mediastreamer.presentation.ui.BroadcastReceiver
+import com.paranid5.mediastreamer.presentation.ui.utils.BroadcastReceiver
 import com.paranid5.mediastreamer.presentation.ui.extensions.getLightVibrantOrPrimary
 import org.koin.compose.koinInject
 

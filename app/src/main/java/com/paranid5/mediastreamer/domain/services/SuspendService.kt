@@ -1,4 +1,4 @@
-package com.paranid5.mediastreamer.domain
+package com.paranid5.mediastreamer.domain.services
 
 import androidx.lifecycle.LifecycleService
 import kotlinx.coroutines.CoroutineScope

@@ -12,6 +12,8 @@ import coil.size.Precision
 import coil.size.Scale
 import com.paranid5.mediastreamer.R
 import com.paranid5.mediastreamer.domain.StorageHandler
+import com.paranid5.mediastreamer.presentation.ui.utils.BlurTransformation
+import com.paranid5.mediastreamer.presentation.ui.utils.GlideUtils
 import org.koin.compose.koinInject
 
 @Composable

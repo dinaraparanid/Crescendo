@@ -109,7 +109,7 @@ class StorageHandler(context: Context) :
 
     val currentTrackState =
         combine(currentTrackIndexFlow, currentPlaylistFlow) { trackInd, playlist ->
-            playlist?.get(trackInd)
+            playlist?.getOrNull(trackInd)
         }.stateIn(this, SharingStarted.Eagerly, null)
 
     @OptIn(ExperimentalCoroutinesApi::class)

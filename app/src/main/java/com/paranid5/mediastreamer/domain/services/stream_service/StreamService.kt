@@ -43,17 +43,17 @@ import com.paranid5.mediastreamer.data.VideoMetadata
 import com.paranid5.mediastreamer.data.eq.EqualizerData
 import com.paranid5.mediastreamer.data.utils.extensions.toAndroidMetadata
 import com.paranid5.mediastreamer.domain.LifecycleNotificationManager
-import com.paranid5.mediastreamer.domain.Receiver
-import com.paranid5.mediastreamer.domain.ServiceAction
+import com.paranid5.mediastreamer.domain.ReceiverManager
+import com.paranid5.mediastreamer.domain.services.ServiceAction
 import com.paranid5.mediastreamer.domain.StorageHandler
-import com.paranid5.mediastreamer.domain.SuspendService
+import com.paranid5.mediastreamer.domain.services.SuspendService
 import com.paranid5.mediastreamer.domain.utils.extensions.bandLevels
 import com.paranid5.mediastreamer.domain.utils.extensions.registerReceiverCompat
 import com.paranid5.mediastreamer.domain.utils.extensions.sendBroadcast
 import com.paranid5.mediastreamer.domain.utils.extensions.setParameter
 import com.paranid5.mediastreamer.presentation.main_activity.MainActivity
 import com.paranid5.mediastreamer.presentation.playing.*
-import com.paranid5.mediastreamer.presentation.ui.GlideUtils
+import com.paranid5.mediastreamer.presentation.ui.utils.GlideUtils
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
 import org.koin.core.component.KoinComponent
@@ -62,7 +62,7 @@ import org.koin.core.parameter.parametersOf
 import org.koin.core.qualifier.named
 
 @OptIn(androidx.media3.common.util.UnstableApi::class)
-class StreamService : SuspendService(), Receiver, LifecycleNotificationManager, KoinComponent {
+class StreamService : SuspendService(), ReceiverManager, LifecycleNotificationManager, KoinComponent {
     companion object {
         private const val NOTIFICATION_ID = 101
         private const val STREAM_CHANNEL_ID = "stream_channel"

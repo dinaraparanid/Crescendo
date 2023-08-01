@@ -16,7 +16,7 @@ import coil.request.ImageRequest
 import coil.size.Precision
 import coil.size.Scale
 import com.paranid5.mediastreamer.R
-import com.paranid5.mediastreamer.presentation.ui.GlideUtils
+import com.paranid5.mediastreamer.presentation.ui.utils.GlideUtils
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 

@@ -8,7 +8,6 @@ import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -17,16 +16,19 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -65,15 +67,29 @@ fun TracksScreen(
     curScreenState: MutableStateFlow<Screens>,
     modifier: Modifier = Modifier,
 ) {
+    val context = LocalContext.current
     curScreenState.update { Screens.Tracks }
 
-    val context = LocalContext.current
+    val allTracks by tracksViewModel.presenter.tracksState.collectAsState()
+    val filterTracksState = remember { mutableStateOf(listOf<Track>()) }
+    var showsTracks by remember { mutableStateOf(listOf<Track>()) }
+
+    var tracksScrollingState = rememberLazyListState()
+    val isSearchBarActiveState = remember { mutableStateOf(false) }
+
     val isAudioRecordingPermissionDialogShownState = remember { mutableStateOf(true) }
     val isForegroundServicePermissionDialogShownState = remember { mutableStateOf(true) }
 
     LaunchedEffect(Unit) {
         tracksViewModel.presenter.tracksState.update {
             context.allTracksFromMediaStore
+        }
+    }
+
+    LaunchedEffect(key1 = allTracks, key2 = filterTracksState.value) {
+        showsTracks = when (isSearchBarActiveState.value) {
+            false -> allTracks
+            true -> filterTracksState.value
         }
     }
 
@@ -88,16 +104,20 @@ fun TracksScreen(
             modifier = Modifier.align(Alignment.Center)
         )
 
-        TrackSearcher(
-            tracksState = tracksViewModel.presenter.tracksState,
-            queryState = tracksViewModel.presenter.queryState,
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(horizontal = 10.dp)
-        ) { filteredTracks, scrollingState ->
+        Column(Modifier.padding(horizontal = 10.dp)) {
+            TrackSearcher(
+                tracksState = tracksViewModel.presenter.tracksState,
+                queryState = tracksViewModel.presenter.queryState,
+                isSearchBarActiveState = isSearchBarActiveState,
+                modifier = Modifier.fillMaxWidth().height(80.dp)
+            ) { filteredTracks, scrollingState ->
+                filterTracksState.value = filteredTracks
+                tracksScrollingState = scrollingState
+            }
+
             TrackList(
-                tracks = filteredTracks,
-                scrollingState = scrollingState,
+                tracks = showsTracks,
+                scrollingState = tracksScrollingState,
                 modifier = Modifier
                     .fillMaxWidth()
                     .fillMaxHeight(1F),
@@ -110,6 +130,7 @@ fun TracksScreen(
 private fun TrackSearcher(
     tracksState: StateFlow<List<Track>>,
     queryState: MutableStateFlow<String?>,
+    isSearchBarActiveState: MutableState<Boolean>,
     modifier: Modifier = Modifier,
     content: @Composable (ColumnScope.(List<Track>, LazyListState) -> Unit)
 ) = Searcher(
@@ -117,6 +138,7 @@ private fun TrackSearcher(
     allItemsState = tracksState,
     queryState = queryState,
     filteredContent = content,
+    isSearchBarActiveState = isSearchBarActiveState,
     filter = { query, track ->
         val title = track.title.lowercase()
         val artist = track.artist.lowercase()

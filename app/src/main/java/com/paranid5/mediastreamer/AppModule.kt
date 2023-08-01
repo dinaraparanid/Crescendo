@@ -24,7 +24,7 @@ import com.paranid5.mediastreamer.presentation.playing.PlayingViewModel
 import com.paranid5.mediastreamer.presentation.tracks.TracksPresenter
 import com.paranid5.mediastreamer.presentation.tracks.TracksUIHandler
 import com.paranid5.mediastreamer.presentation.tracks.TracksViewModel
-import com.paranid5.mediastreamer.presentation.ui.GlideUtils
+import com.paranid5.mediastreamer.presentation.ui.utils.GlideUtils
 import com.paranid5.mediastreamer.presentation.ui.permissions.audioRecordingPermissionQueue
 import com.paranid5.mediastreamer.presentation.ui.permissions.description_providers.AudioRecordingDescriptionProvider
 import com.paranid5.mediastreamer.presentation.ui.permissions.description_providers.ExternalStorageDescriptionProvider

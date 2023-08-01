@@ -43,10 +43,10 @@ import com.paranid5.mediastreamer.data.eq.EqualizerData
 import com.paranid5.mediastreamer.data.tracks.DefaultTrack
 import com.paranid5.mediastreamer.data.utils.extensions.toAndroidMetadata
 import com.paranid5.mediastreamer.domain.LifecycleNotificationManager
-import com.paranid5.mediastreamer.domain.Receiver
-import com.paranid5.mediastreamer.domain.ServiceAction
+import com.paranid5.mediastreamer.domain.ReceiverManager
+import com.paranid5.mediastreamer.domain.services.ServiceAction
 import com.paranid5.mediastreamer.domain.StorageHandler
-import com.paranid5.mediastreamer.domain.SuspendService
+import com.paranid5.mediastreamer.domain.services.SuspendService
 import com.paranid5.mediastreamer.domain.utils.extensions.bandLevels
 import com.paranid5.mediastreamer.domain.utils.extensions.registerReceiverCompat
 import com.paranid5.mediastreamer.domain.utils.extensions.sendBroadcast
@@ -54,7 +54,7 @@ import com.paranid5.mediastreamer.domain.utils.extensions.setParameter
 import com.paranid5.mediastreamer.presentation.main_activity.MainActivity
 import com.paranid5.mediastreamer.presentation.playing.Broadcast_CUR_POSITION_CHANGED
 import com.paranid5.mediastreamer.presentation.playing.CUR_POSITION_ARG
-import com.paranid5.mediastreamer.presentation.ui.GlideUtils
+import com.paranid5.mediastreamer.presentation.ui.utils.GlideUtils
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -70,7 +70,7 @@ import org.koin.core.parameter.parametersOf
 import org.koin.core.qualifier.named
 
 @OptIn(androidx.media3.common.util.UnstableApi::class)
-class TrackService : SuspendService(), Receiver, LifecycleNotificationManager, KoinComponent {
+class TrackService : SuspendService(), ReceiverManager, LifecycleNotificationManager, KoinComponent {
     companion object {
         private const val NOTIFICATION_ID = 102
         private const val AUDIO_CHANNEL_ID = "stream_channel"

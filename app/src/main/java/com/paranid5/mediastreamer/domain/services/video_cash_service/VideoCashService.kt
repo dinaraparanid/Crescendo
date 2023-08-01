@@ -23,9 +23,9 @@ import com.paranid5.mediastreamer.R
 import com.paranid5.mediastreamer.VIDEO_CASH_SERVICE_CONNECTION
 import com.paranid5.mediastreamer.data.VideoMetadata
 import com.paranid5.mediastreamer.domain.LifecycleNotificationManager
-import com.paranid5.mediastreamer.domain.Receiver
-import com.paranid5.mediastreamer.domain.ServiceAction
-import com.paranid5.mediastreamer.domain.SuspendService
+import com.paranid5.mediastreamer.domain.ReceiverManager
+import com.paranid5.mediastreamer.domain.services.ServiceAction
+import com.paranid5.mediastreamer.domain.services.SuspendService
 import com.paranid5.mediastreamer.domain.ktor_client.downloadFile
 import com.paranid5.mediastreamer.domain.ktor_client.downloadFiles
 import com.paranid5.mediastreamer.domain.media_scanner.MediaScannerReceiver
@@ -49,7 +49,7 @@ import java.util.Queue
 import java.util.concurrent.ConcurrentLinkedQueue
 import kotlin.time.Duration.Companion.seconds
 
-class VideoCashService : SuspendService(), Receiver, LifecycleNotificationManager, KoinComponent {
+class VideoCashService : SuspendService(), ReceiverManager, LifecycleNotificationManager, KoinComponent {
     companion object {
         private const val NOTIFICATION_ID = 102
         private const val VIDEO_CASH_CHANNEL_ID = "video_cash_channel"

@@ -1,4 +1,4 @@
-package com.paranid5.mediastreamer.presentation.ui
+package com.paranid5.mediastreamer.presentation.ui.utils
 
 import android.content.Context
 import android.graphics.Bitmap

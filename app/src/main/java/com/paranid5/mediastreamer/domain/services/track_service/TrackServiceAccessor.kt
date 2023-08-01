@@ -6,7 +6,7 @@ import android.util.Log
 import com.paranid5.mediastreamer.MainApplication
 import com.paranid5.mediastreamer.TRACK_SERVICE_CONNECTION
 import com.paranid5.mediastreamer.data.tracks.DefaultTrack
-import com.paranid5.mediastreamer.domain.ServiceAccessor
+import com.paranid5.mediastreamer.domain.services.ServiceAccessor
 import com.paranid5.mediastreamer.domain.services.stream_service.StreamService
 import kotlinx.coroutines.flow.MutableStateFlow
 import org.koin.core.component.inject
