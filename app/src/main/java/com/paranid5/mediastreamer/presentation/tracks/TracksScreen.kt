@@ -1,9 +1,10 @@
 package com.paranid5.mediastreamer.presentation.tracks
 
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
@@ -14,16 +15,16 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
@@ -32,11 +33,12 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import coil.compose.AsyncImage
 import com.paranid5.mediastreamer.R
 import com.paranid5.mediastreamer.data.tracks.Track
 import com.paranid5.mediastreamer.data.tracks.artistAlbum
@@ -45,9 +47,14 @@ import com.paranid5.mediastreamer.domain.StorageHandler
 import com.paranid5.mediastreamer.domain.services.track_service.TrackServiceAccessor
 import com.paranid5.mediastreamer.presentation.Screens
 import com.paranid5.mediastreamer.presentation.ui.AudioStatus
-import com.paranid5.mediastreamer.presentation.ui.rememberTrackCoverPainter
+import com.paranid5.mediastreamer.presentation.ui.permissions.requests.AudioRecordingPermissionsRequest
+import com.paranid5.mediastreamer.presentation.ui.permissions.requests.ForegroundServicePermissionsRequest
+import com.paranid5.mediastreamer.presentation.ui.rememberTrackCoverModel
 import com.paranid5.mediastreamer.presentation.ui.theme.LocalAppColors
+import com.paranid5.mediastreamer.presentation.ui.utils.Searcher
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import org.koin.compose.koinInject
@@ -57,14 +64,12 @@ fun TracksScreen(
     tracksViewModel: TracksViewModel,
     curScreenState: MutableStateFlow<Screens>,
     modifier: Modifier = Modifier,
-    storageHandler: StorageHandler = koinInject(),
-    trackServiceAccessor: TrackServiceAccessor = koinInject()
 ) {
     curScreenState.update { Screens.Tracks }
 
     val context = LocalContext.current
-    val tracks by tracksViewModel.presenter.tracksState.collectAsState()
-    val scope = rememberCoroutineScope()
+    val isAudioRecordingPermissionDialogShownState = remember { mutableStateOf(true) }
+    val isForegroundServicePermissionDialogShownState = remember { mutableStateOf(true) }
 
     LaunchedEffect(Unit) {
         tracksViewModel.presenter.tracksState.update {
@@ -72,105 +77,231 @@ fun TracksScreen(
         }
     }
 
-    LazyColumn(
-        verticalArrangement = Arrangement.spacedBy(10.dp),
-        modifier = modifier
-            .fillMaxSize()
-            .padding(10.dp)
-    ) {
-        itemsIndexed(
-            items = tracks,
-            key = { _, track -> track.path }
-        ) { ind, track ->
-            TrackItem(
-                track = track,
-                storageHandler = storageHandler,
+    Box(modifier) {
+        AudioRecordingPermissionsRequest(
+            isAudioRecordingPermissionDialogShownState,
+            modifier = Modifier.align(Alignment.Center)
+        )
+
+        ForegroundServicePermissionsRequest(
+            isForegroundServicePermissionDialogShownState,
+            modifier = Modifier.align(Alignment.Center)
+        )
+
+        TrackSearcher(
+            tracksState = tracksViewModel.presenter.tracksState,
+            queryState = tracksViewModel.presenter.queryState,
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(horizontal = 10.dp)
+        ) { filteredTracks, scrollingState ->
+            TrackList(
+                tracks = filteredTracks,
+                scrollingState = scrollingState,
                 modifier = Modifier
                     .fillMaxWidth()
-                    .clickable {
-                        scope.launch {
-                            storageHandler.storeAudioStatus(AudioStatus.PLAYING)
-
-                            trackServiceAccessor.startPlaying(
-                                playlist = tracks.toDefaultTrackList(),
-                                trackInd = ind
-                            )
-                        }
-                    }
+                    .fillMaxHeight(1F),
             )
         }
     }
 }
 
 @Composable
-private fun TrackItem(track: Track, storageHandler: StorageHandler, modifier: Modifier = Modifier) {
+private fun TrackSearcher(
+    tracksState: StateFlow<List<Track>>,
+    queryState: MutableStateFlow<String?>,
+    modifier: Modifier = Modifier,
+    content: @Composable (ColumnScope.(List<Track>, LazyListState) -> Unit)
+) = Searcher(
+    modifier = modifier,
+    allItemsState = tracksState,
+    queryState = queryState,
+    filteredContent = content,
+    filter = { query, track ->
+        val title = track.title.lowercase()
+        val artist = track.artist.lowercase()
+        val album = track.album.lowercase()
+        query in title || query in artist || query in album
+    }
+)
+
+@Composable
+private fun TrackList(
+    tracks: List<Track>,
+    scrollingState: LazyListState,
+    modifier: Modifier = Modifier,
+    storageHandler: StorageHandler = koinInject(),
+    trackServiceAccessor: TrackServiceAccessor = koinInject()
+) {
+    val scope = rememberCoroutineScope()
+
+    LazyColumn(
+        verticalArrangement = Arrangement.spacedBy(10.dp),
+        state = scrollingState,
+        modifier = modifier
+    ) {
+        itemsIndexed(
+            items = tracks,
+            key = { _, track -> track.path }
+        ) { ind, _ ->
+            TrackItem(
+                tracks = tracks,
+                trackInd = ind,
+                scope = scope,
+                storageHandler = storageHandler,
+                trackServiceAccessor = trackServiceAccessor,
+                modifier = Modifier.fillMaxWidth()
+            )
+        }
+    }
+}
+
+@Composable
+private fun TrackItem(
+    tracks: List<Track>,
+    trackInd: Int,
+    scope: CoroutineScope,
+    storageHandler: StorageHandler,
+    trackServiceAccessor: TrackServiceAccessor,
+    modifier: Modifier = Modifier
+) {
     val colors = LocalAppColors.current.value
     val currentTrack by storageHandler.currentTrackState.collectAsState()
 
+    val trackMb by remember { derivedStateOf { tracks.getOrNull(trackInd) } }
+    val trackPath by remember { derivedStateOf { trackMb?.path } }
+
     val isTrackCurrent by remember {
-        derivedStateOf { track.path == currentTrack?.path }
+        derivedStateOf { trackPath == currentTrack?.path }
     }
 
     val textColor by remember {
         derivedStateOf { if (isTrackCurrent) colors.primary else Color.White }
     }
 
-    val trackCover = rememberTrackCoverPainter(
-        path = track.path,
-        isPlaceholderRequired = true,
-        size = 200 to 200
-    )
-
-    Row(modifier) {
-        Image(
-            painter = trackCover,
-            contentDescription = stringResource(id = R.string.track_cover),
-            alignment = Alignment.Center,
-            contentScale = ContentScale.FillBounds,
-            modifier = Modifier
-                .size(50.dp)
-                .align(Alignment.CenterVertically)
-                .clip(RoundedCornerShape(7.dp))
-        )
-
-        Spacer(Modifier.width(5.dp))
-
-        Column(
-            Modifier
-                .fillMaxWidth(1F)
-                .padding(start = 10.dp)
+    trackMb?.let { track ->
+        Row(
+            modifier.clickable {
+                scope.launch {
+                    onTrackClicked(tracks, trackInd, storageHandler, trackServiceAccessor)
+                }
+            }
         ) {
-            Text(
-                modifier = Modifier.align(Alignment.Start),
-                text = track.title,
-                color = textColor,
-                fontSize = 18.sp,
-                maxLines = 1,
-                overflow = TextOverflow.Ellipsis,
+            TrackCover(
+                trackPath = trackPath ?: "",
+                modifier = Modifier
+                    .size(50.dp)
+                    .align(Alignment.CenterVertically)
+                    .clip(RoundedCornerShape(7.dp))
             )
 
-            Text(
-                modifier = Modifier.align(Alignment.Start),
-                text = track.artistAlbum,
-                color = textColor,
-                fontSize = 15.sp,
-                maxLines = 1,
-                overflow = TextOverflow.Ellipsis,
+            Spacer(Modifier.width(5.dp))
+
+            TrackInfo(
+                track = track,
+                textColor = textColor,
+                modifier = Modifier
+                    .fillMaxWidth(1F)
+                    .padding(start = 10.dp)
             )
-        }
 
-        Spacer(Modifier.width(5.dp))
+            Spacer(Modifier.width(5.dp))
 
-        IconButton(
-            modifier = Modifier.fillMaxHeight(1F),
-            onClick = { /** TODO: Track settings */ }
-        ) {
-            Icon(
-                modifier = Modifier.height(20.dp),
-                painter = painterResource(R.drawable.three_dots),
-                contentDescription = stringResource(R.string.settings),
-                tint = Color.White
+            TrackPropertiesButton(
+                modifier = Modifier.fillMaxHeight(1F),
+                iconModifier = Modifier.height(20.dp)
             )
         }
     }
 }
+
+private suspend inline fun onTrackClicked(
+    tracks: List<Track>,
+    trackInd: Int,
+    storageHandler: StorageHandler,
+    trackServiceAccessor: TrackServiceAccessor
+) {
+    storageHandler.storeAudioStatus(AudioStatus.PLAYING)
+
+    trackServiceAccessor.startPlaying(
+        playlist = tracks.toDefaultTrackList(),
+        trackInd = trackInd
+    )
+}
+
+@Composable
+private fun TrackCover(trackPath: String, modifier: Modifier = Modifier) {
+    val trackCover = rememberTrackCoverModel(
+        path = trackPath,
+        isPlaceholderRequired = true,
+        size = 200 to 200
+    )
+
+    AsyncImage(
+        model = trackCover,
+        contentDescription = stringResource(id = R.string.track_cover),
+        alignment = Alignment.Center,
+        contentScale = ContentScale.FillBounds,
+        modifier = modifier
+    )
+}
+
+@Composable
+private fun TrackInfo(
+    track: Track,
+    textColor: Color,
+    modifier: Modifier = Modifier
+) {
+    Column(modifier) {
+        TrackTitle(
+            modifier = Modifier.align(Alignment.Start),
+            trackTitle = track.title,
+            textColor = textColor,
+        )
+
+        TrackArtistAlbum(
+            modifier = Modifier.align(Alignment.Start),
+            trackArtistAlbum = track.artistAlbum,
+            textColor = textColor,
+        )
+    }
+}
+
+@Composable
+private fun TrackTitle(
+    trackTitle: String,
+    textColor: Color,
+    modifier: Modifier = Modifier
+) = TrackText(
+    modifier = modifier,
+    text = trackTitle,
+    textColor = textColor,
+    fontSize = 18.sp,
+)
+
+@Composable
+private fun TrackArtistAlbum(
+    trackArtistAlbum: String,
+    textColor: Color,
+    modifier: Modifier = Modifier
+) = TrackText(
+    modifier = modifier,
+    text = trackArtistAlbum,
+    textColor = textColor,
+    fontSize = 15.sp,
+)
+
+@Composable
+private fun TrackText(
+    text: String,
+    textColor: Color,
+    fontSize: TextUnit,
+    modifier: Modifier = Modifier
+) = Text(
+    modifier = modifier,
+    text = text,
+    color = textColor,
+    fontSize = fontSize,
+    maxLines = 1,
+    overflow = TextOverflow.Ellipsis
+)

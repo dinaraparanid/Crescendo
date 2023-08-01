@@ -117,7 +117,7 @@ private fun UrlEditor(
         value = inputText ?: "",
         singleLine = true,
         placeholder = { Text(hint) },
-        onValueChange = { viewModel.presenter.currentTextState.value = it },
+        onValueChange = { query -> viewModel.presenter.currentTextState.update { query } },
         modifier = modifier.width(300.dp),
     )
 }

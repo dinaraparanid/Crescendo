@@ -16,7 +16,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
-import com.paranid5.mediastreamer.POST_NOTIFICATIONS_PERMISSION_QUEUE
+import com.paranid5.mediastreamer.FOREGROUND_SERVICE_PERMISSION_QUEUE
 import com.paranid5.mediastreamer.R
 import com.paranid5.mediastreamer.presentation.StreamStates
 import com.paranid5.mediastreamer.presentation.composition_locals.LocalActivity
@@ -24,7 +24,7 @@ import com.paranid5.mediastreamer.presentation.composition_locals.LocalNavContro
 import com.paranid5.mediastreamer.presentation.nextState
 import com.paranid5.mediastreamer.presentation.ui.extensions.openAppSettings
 import com.paranid5.mediastreamer.presentation.ui.permissions.PermissionDialog
-import com.paranid5.mediastreamer.presentation.ui.permissions.description_providers.PostNotificationDescriptionProvider
+import com.paranid5.mediastreamer.presentation.ui.permissions.description_providers.ForegroundServiceDescriptionProvider
 import com.paranid5.mediastreamer.presentation.ui.theme.LocalAppColors
 import kotlinx.coroutines.flow.StateFlow
 import org.koin.compose.koinInject
@@ -47,14 +47,14 @@ fun StreamButton(
 
     val postNotificationsPermission = when {
         isNotificationPermissionRequired -> koinInject<Queue<String>>(
-            named(POST_NOTIFICATIONS_PERMISSION_QUEUE)
+            named(FOREGROUND_SERVICE_PERMISSION_QUEUE)
         ).first()
 
         else -> null
     }
 
     val postNotificationsDescriptionProvider = when {
-        isNotificationPermissionRequired -> koinInject<PostNotificationDescriptionProvider>()
+        isNotificationPermissionRequired -> koinInject<ForegroundServiceDescriptionProvider>()
         else -> null
     }
 

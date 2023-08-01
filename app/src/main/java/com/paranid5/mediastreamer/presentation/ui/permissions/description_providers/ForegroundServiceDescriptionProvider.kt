@@ -4,5 +4,5 @@ import android.os.Build
 import androidx.annotation.RequiresApi
 
 @RequiresApi(Build.VERSION_CODES.TIRAMISU)
-data class PostNotificationDescriptionProvider(override val description: String) :
+data class ForegroundServiceDescriptionProvider(override val description: String) :
     PermissionDescriptionProvider

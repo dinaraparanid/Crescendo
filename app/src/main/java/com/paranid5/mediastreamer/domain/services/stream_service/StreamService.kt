@@ -631,7 +631,7 @@ class StreamService : SuspendService(), Receiver, LifecycleNotificationManager, 
         initReverb(audioSessionId)
 
         if (areAudioEffectsEnabledState.value)
-            mPlayer.playbackParameters = PlaybackParameters(speedState.value, pitchState.value)
+            playbackParameters = PlaybackParameters(speedState.value, pitchState.value)
     }
 
     // ----------------------- Storage Handler Utils -----------------------

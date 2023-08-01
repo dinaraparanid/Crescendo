@@ -10,14 +10,19 @@ class TracksViewModel(savedStateHandle: SavedStateHandle) :
     ObservableViewModel<TracksPresenter, TracksUIHandler>() {
     private companion object {
         private const val TRACKS = "tracks"
+        private const val QUERY = "query"
     }
 
     override val presenter by inject<TracksPresenter> {
-        val savedByStateHandle = savedStateHandle
+        val trackSavedByStateHandle = savedStateHandle
             .getStateFlow<List<Track>>(TRACKS, listOf())
             .value
 
-        parametersOf(savedByStateHandle)
+        val querySavedByStateHandle = savedStateHandle
+            .getStateFlow<String?>(QUERY, null)
+            .value
+
+        parametersOf(trackSavedByStateHandle, querySavedByStateHandle)
     }
 
     override val handler by inject<TracksUIHandler>()

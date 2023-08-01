@@ -10,7 +10,9 @@ import android.util.Log
 import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.ui.Modifier
 import androidx.navigation.compose.rememberNavController
 import com.paranid5.mediastreamer.R
 import com.paranid5.mediastreamer.domain.utils.extensions.registerReceiverCompat
@@ -71,7 +73,8 @@ class MainActivity : ComponentActivity() {
                 ) {
                     App(
                         curScreenState = viewModel.curScreenState,
-                        streamScreenState = viewModel.audioScreenState
+                        streamScreenState = viewModel.audioScreenState,
+                        modifier = Modifier.fillMaxSize()
                     )
                 }
             }

@@ -28,7 +28,7 @@ import com.paranid5.mediastreamer.presentation.ui.GlideUtils
 import com.paranid5.mediastreamer.presentation.ui.permissions.audioRecordingPermissionQueue
 import com.paranid5.mediastreamer.presentation.ui.permissions.description_providers.AudioRecordingDescriptionProvider
 import com.paranid5.mediastreamer.presentation.ui.permissions.description_providers.ExternalStorageDescriptionProvider
-import com.paranid5.mediastreamer.presentation.ui.permissions.description_providers.PostNotificationDescriptionProvider
+import com.paranid5.mediastreamer.presentation.ui.permissions.description_providers.ForegroundServiceDescriptionProvider
 import com.paranid5.mediastreamer.presentation.ui.permissions.externalStoragePermissionQueue
 import com.paranid5.mediastreamer.presentation.ui.permissions.foregroundServicePermissionQueue
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -51,7 +51,7 @@ const val TRACK_SERVICE_CONNECTION = "track_service_connection"
 const val VIDEO_CASH_SERVICE_CONNECTION = "video_cash_service_connection"
 
 const val EXTERNAL_STORAGE_PERMISSION_QUEUE = "external_storage_permission_queue"
-const val POST_NOTIFICATIONS_PERMISSION_QUEUE = "post_notifications_permission_queue"
+const val FOREGROUND_SERVICE_PERMISSION_QUEUE = "foreground_service_permission_queue"
 const val AUDIO_RECORDING_PERMISSION_QUEUE = "audio_recording_permission_queue"
 
 private fun Scope.getString(@StringRes strRes: Int) =
@@ -92,7 +92,7 @@ private val permissionDescriptionProviders = module {
     }
 
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) single {
-        PostNotificationDescriptionProvider(
+        ForegroundServiceDescriptionProvider(
             description = getString(R.string.notifications_description)
         )
     }
@@ -103,7 +103,7 @@ private val permissionQueues = module {
     single(named(AUDIO_RECORDING_PERMISSION_QUEUE)) { audioRecordingPermissionQueue }
 
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU)
-        single(named(POST_NOTIFICATIONS_PERMISSION_QUEUE)) { foregroundServicePermissionQueue }
+        single(named(FOREGROUND_SERVICE_PERMISSION_QUEUE)) { foregroundServicePermissionQueue }
 }
 
 private val permissionsModule = module {
@@ -147,7 +147,7 @@ private val audioEffectsModule = module {
 
 private val tracksModule = module {
     singleOf(::TracksUIHandler)
-    factory { (tracks: List<Track>) -> TracksPresenter(tracks) }
+    factory { (tracks: List<Track>, query: String?) -> TracksPresenter(tracks, query) }
     viewModelOf(::TracksViewModel)
 }
 

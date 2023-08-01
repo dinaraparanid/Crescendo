@@ -34,7 +34,7 @@
     <string name="start_cashing">Start Cashing</string>
     <string name="save_as">Save As</string>
     <string name="permission_required">Permission is required</string>
-    <string name="external_storage_description">App needs access to storage in order to manage cashed files</string>
+    <string name="external_storage_description">App needs access to storage in order to manage local and cashed files</string>
     <string name="grant_permission">Grant Permission</string>
     <string name="ok">OK</string>
     <string name="downloaded">Downloaded</string>
@@ -73,4 +73,5 @@
     <string name="unknown_artist">Unknown Artist</string>
     <string name="unknown_album">Unknown Album</string>
     <string name="track_cover">Track cover</string>
+    <string name="track_input_filter_hint">Your track input filter</string>
 </resources>

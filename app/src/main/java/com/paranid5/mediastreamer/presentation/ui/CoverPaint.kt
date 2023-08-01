@@ -109,6 +109,44 @@ internal inline fun rememberVideoCoverPainterWithPalette(
 }
 
 @Composable
+internal inline fun rememberTrackCoverModel(
+    path: String?,
+    isPlaceholderRequired: Boolean,
+    size: Pair<Int, Int>? = null,
+    isBlured: Boolean = false,
+    crossinline bitmapSettings: (Bitmap) -> Unit = {}
+): ImageRequest {
+    val context = LocalContext.current
+    val glideUtils = GlideUtils(context)
+
+    var coverModel by remember { mutableStateOf<BitmapDrawable?>(null) }
+
+    LaunchedEffect(key1 = path, key2 = size) {
+        coverModel = glideUtils
+            .getTrackCoverAsync(path, size, bitmapSettings)
+            .await()
+    }
+
+    return ImageRequest.Builder(context)
+        .data(coverModel)
+        .error(R.drawable.cover_thumbnail)
+        .fallback(R.drawable.cover_thumbnail)
+        .apply {
+            if (isPlaceholderRequired)
+                placeholder(R.drawable.cover_thumbnail)
+
+            if (isBlured)
+                transformations(BlurTransformation(context))
+
+            size?.run { size(first, second) }
+        }
+        .precision(Precision.EXACT)
+        .scale(Scale.FILL)
+        .crossfade(true)
+        .build()
+}
+
+@Composable
 internal inline fun rememberTrackCoverPainter(
     path: String?,
     isPlaceholderRequired: Boolean,
@@ -116,36 +154,11 @@ internal inline fun rememberTrackCoverPainter(
     isBlured: Boolean = false,
     crossinline bitmapSettings: (Bitmap) -> Unit = {}
 ): AsyncImagePainter {
-    val context = LocalContext.current
-    val glideUtils = GlideUtils(context)
-
-    var coverModel by remember { mutableStateOf<BitmapDrawable?>(null) }
-
-    LaunchedEffect(key1 = path) {
-        coverModel = glideUtils
-            .getTrackCoverAsync(path, size, bitmapSettings)
-            .await()
-    }
-
-    return rememberAsyncImagePainter(
-        model = ImageRequest.Builder(context)
-            .data(coverModel)
-            .error(R.drawable.cover_thumbnail)
-            .fallback(R.drawable.cover_thumbnail)
-            .apply {
-                if (isPlaceholderRequired)
-                    placeholder(R.drawable.cover_thumbnail)
-
-                if (isBlured)
-                    transformations(BlurTransformation(context))
-
-                size?.run { size(first, second) }
-            }
-            .precision(Precision.EXACT)
-            .scale(Scale.FILL)
-            .crossfade(true)
-            .build()
+    val trackCoverPainter = rememberTrackCoverModel(
+        path, isPlaceholderRequired, size, isBlured, bitmapSettings
     )
+
+    return rememberAsyncImagePainter(model = trackCoverPainter)
 }
 
 @Composable
@@ -162,7 +175,7 @@ internal inline fun rememberTrackCoverPainterWithPalette(
     var coverModel by remember { mutableStateOf<BitmapDrawable?>(null) }
     var palette by remember { mutableStateOf<Palette?>(null) }
 
-    LaunchedEffect(key1 = path) {
+    LaunchedEffect(key1 = path, key2 = size) {
         val (plt, cover) = glideUtils
             .getTrackCoverWithPaletteAsync(path, size, bitmapSettings)
             .await()
@@ -202,6 +215,7 @@ internal inline fun rememberCurrentTrackCoverPainter(
 ): AsyncImagePainter {
     val curTrack by storageHandler.currentTrackState.collectAsState()
     val path by remember { derivedStateOf { curTrack?.path } }
+
     return rememberTrackCoverPainter(
         path = path,
         isPlaceholderRequired = isPlaceholderRequired,
@@ -221,6 +235,7 @@ internal inline fun rememberCurrentTrackCoverPainterWithPalette(
 ): Pair<AsyncImagePainter, Palette?> {
     val curTrack by storageHandler.currentTrackState.collectAsState()
     val path by remember { derivedStateOf { curTrack?.path } }
+
     return rememberTrackCoverPainterWithPalette(
         path = path,
         isPlaceholderRequired = isPlaceholderRequired,

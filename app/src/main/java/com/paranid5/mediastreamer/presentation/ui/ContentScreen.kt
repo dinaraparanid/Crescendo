@@ -2,9 +2,11 @@ package com.paranid5.mediastreamer.presentation.ui
 
 import android.widget.Toast
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import com.paranid5.mediastreamer.R
@@ -68,7 +70,11 @@ fun ContentScreen(
         )
     ) {
         composable(route = Screens.Tracks.title) {
-            TracksScreen(tracksViewModel, curScreenState)
+            TracksScreen(
+                tracksViewModel = tracksViewModel,
+                curScreenState = curScreenState,
+                modifier = Modifier.fillMaxSize().padding(10.dp)
+            )
         }
 
         composable(route = Screens.TrackCollections.Albums.title) {
