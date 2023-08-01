@@ -16,24 +16,26 @@ import com.paranid5.mediastreamer.presentation.ui.theme.LocalAppColors
 @Composable
 fun Spinner(
     items: List<String>,
-    selectedItemInd: Int,
+    selectedItemIndexes: List<Int>,
     onItemSelected: (Int, String) -> Unit,
     modifier: Modifier = Modifier,
     dropdownModifier: Modifier = Modifier,
+    previewItemIndex: Int = selectedItemIndexes.firstOrNull() ?: 0,
     selectedItemFactory: @Composable (Int, String, Modifier) -> Unit = { _, text, mod ->
         DefaultSelectedItem(text, mod)
     },
+    previewItemFactory: @Composable (Int, String, Modifier) -> Unit = selectedItemFactory,
     dropdownItemFactory: @Composable (Int, String, Modifier) -> Unit = { _, text, mod ->
         DefaultItem(text, mod)
     },
 ) {
     var isExpanded by remember { mutableStateOf(false) }
 
-    Box(modifier) {
-        selectedItemFactory(
-            selectedItemInd,
-            items[selectedItemInd],
-            modifier.clickable { isExpanded = true },
+    Box(modifier.clickable { isExpanded = true }) {
+        previewItemFactory(
+            previewItemIndex,
+            items[previewItemIndex],
+            modifier,
         )
 
         DropdownMenu(
@@ -43,7 +45,12 @@ fun Spinner(
         ) {
             items.forEachIndexed { index, element ->
                 DropdownMenuItem(
-                    text = { dropdownItemFactory(index, element, Modifier) },
+                    text = {
+                        when (index) {
+                            in selectedItemIndexes -> selectedItemFactory(index, element, Modifier)
+                            else -> dropdownItemFactory(index, element, Modifier)
+                        }
+                    },
                     onClick = {
                         onItemSelected(index, element)
                         isExpanded = false
@@ -61,5 +68,4 @@ private fun DefaultSelectedItem(text: String, modifier: Modifier = Modifier) {
 }
 
 @Composable
-private fun DefaultItem(text: String, modifier: Modifier = Modifier) =
-    Text(text, modifier)
+private fun DefaultItem(text: String, modifier: Modifier = Modifier) = Text(text, modifier)

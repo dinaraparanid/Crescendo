@@ -74,4 +74,11 @@
     <string name="unknown_album">Unknown Album</string>
     <string name="track_cover">Track cover</string>
     <string name="track_input_filter_hint">Your track input filter</string>
+    <string name="by">By</string>
+    <string name="title">Title</string>
+    <string name="artist">Artist</string>
+    <string name="album">Album</string>
+    <string name="date">Date</string>
+    <string name="asc">Ascending</string>
+    <string name="desc">Descending</string>
 </resources>

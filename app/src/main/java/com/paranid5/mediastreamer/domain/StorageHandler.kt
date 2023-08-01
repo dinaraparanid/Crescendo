@@ -2,6 +2,7 @@ package com.paranid5.mediastreamer.domain
 
 import android.content.Context
 import androidx.datastore.preferences.core.booleanPreferencesKey
+import androidx.datastore.preferences.core.byteArrayPreferencesKey
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.floatPreferencesKey
 import androidx.datastore.preferences.core.intPreferencesKey
@@ -12,6 +13,7 @@ import com.paranid5.mediastreamer.data.VideoMetadata
 import com.paranid5.mediastreamer.data.eq.EqualizerData
 import com.paranid5.mediastreamer.data.eq.EqualizerParameters
 import com.paranid5.mediastreamer.data.tracks.DefaultTrack
+import com.paranid5.mediastreamer.data.tracks.TrackOrder
 import com.paranid5.mediastreamer.presentation.ui.AudioStatus
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -33,6 +35,8 @@ class StorageHandler(context: Context) :
 
         private val CURRENT_TRACK_INDEX = intPreferencesKey("current_track_index")
         private val CURRENT_PLAYLIST = stringPreferencesKey("current_playlist")
+
+        private val TRACK_ORDER = byteArrayPreferencesKey("track_order")
 
         private val PLAYBACK_POSITION = longPreferencesKey("playback_position")
         private val IS_REPEATING = booleanPreferencesKey("is_repeating")
@@ -111,6 +115,32 @@ class StorageHandler(context: Context) :
         combine(currentTrackIndexFlow, currentPlaylistFlow) { trackInd, playlist ->
             playlist?.getOrNull(trackInd)
         }.stateIn(this, SharingStarted.Eagerly, null)
+
+    @OptIn(ExperimentalCoroutinesApi::class)
+    val trackOrderFlow = dataStore.data
+        .mapLatest { preferences -> preferences[TRACK_ORDER] }
+        .mapLatest { trackOrder ->
+            trackOrder?.let {
+                val (contentOrder, orderType) = it
+
+                TrackOrder(
+                    contentOrder = TrackOrder.TrackContentOrder.entries[contentOrder.toInt()],
+                    orderType = TrackOrder.TrackOrderType.entries[orderType.toInt()]
+                )
+            } ?: TrackOrder.default
+        }
+
+    val trackOrderState = trackOrderFlow
+        .stateIn(this, SharingStarted.Eagerly, TrackOrder.default)
+
+    internal suspend inline fun storeTrackOrder(trackOrder: TrackOrder) {
+        dataStore.edit { preferences ->
+            preferences[TRACK_ORDER] = byteArrayOf(
+                trackOrder.contentOrder.ordinal.toByte(),
+                trackOrder.orderType.ordinal.toByte()
+            )
+        }
+    }
 
     @OptIn(ExperimentalCoroutinesApi::class)
     val playbackPositionFlow = dataStore.data

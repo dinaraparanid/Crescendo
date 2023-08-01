@@ -21,6 +21,8 @@ internal inline fun rememberVideoCoverPainter(
     isPlaceholderRequired: Boolean,
     size: Pair<Int, Int>? = null,
     isBlured: Boolean = false,
+    usePrevCoverAsPlaceholder: Boolean = true,
+    animationMillis: Int = 400,
     storageHandler: StorageHandler = koinInject(),
     crossinline bitmapSettings: (Bitmap) -> Unit = {}
 ): AsyncImagePainter {
@@ -45,11 +47,11 @@ internal inline fun rememberVideoCoverPainter(
     return rememberAsyncImagePainter(
         model = ImageRequest.Builder(context)
             .data(coverModel)
-            .error(R.drawable.cover_thumbnail)
-            .fallback(R.drawable.cover_thumbnail)
+            .prevCoverErrorOrDefault(usePrevCoverAsPlaceholder, prevCoverModel)
+            .prevCoverFallbackOrDefault(usePrevCoverAsPlaceholder, prevCoverModel)
             .apply {
                 if (isPlaceholderRequired)
-                    placeholder(prevCoverModel)
+                    prevCoverPlaceholderOrDefault(usePrevCoverAsPlaceholder, prevCoverModel)
 
                 if (isBlured)
                     transformations(BlurTransformation(context))
@@ -58,7 +60,7 @@ internal inline fun rememberVideoCoverPainter(
             }
             .precision(Precision.EXACT)
             .scale(Scale.FILL)
-            .crossfade(true)
+            .crossfade(animationMillis)
             .build()
     )
 }
@@ -68,6 +70,8 @@ internal inline fun rememberVideoCoverPainterWithPalette(
     isPlaceholderRequired: Boolean,
     size: Pair<Int, Int>? = null,
     isBlured: Boolean = false,
+    usePrevCoverAsPlaceholder: Boolean = true,
+    animationMillis: Int = 400,
     storageHandler: StorageHandler = koinInject(),
     crossinline bitmapSettings: (Bitmap) -> Unit = {}
 ): Pair<AsyncImagePainter, Palette?> {
@@ -92,11 +96,11 @@ internal inline fun rememberVideoCoverPainterWithPalette(
     return rememberAsyncImagePainter(
         model = ImageRequest.Builder(context)
             .data(coverModel)
-            .error(R.drawable.cover_thumbnail)
-            .fallback(R.drawable.cover_thumbnail)
+            .prevCoverErrorOrDefault(usePrevCoverAsPlaceholder, prevCoverModel)
+            .prevCoverFallbackOrDefault(usePrevCoverAsPlaceholder, prevCoverModel)
             .apply {
                 if (isPlaceholderRequired)
-                    placeholder(prevCoverModel)
+                    prevCoverPlaceholderOrDefault(usePrevCoverAsPlaceholder, prevCoverModel)
 
                 if (isBlured)
                     transformations(BlurTransformation(context))
@@ -105,7 +109,7 @@ internal inline fun rememberVideoCoverPainterWithPalette(
             }
             .precision(Precision.EXACT)
             .scale(Scale.FILL)
-            .crossfade(true)
+            .crossfade(animationMillis)
             .build()
     ) to palette
 }
@@ -116,14 +120,19 @@ internal inline fun rememberTrackCoverModel(
     isPlaceholderRequired: Boolean,
     size: Pair<Int, Int>? = null,
     isBlured: Boolean = false,
+    usePrevCoverAsPlaceholder: Boolean = false,
+    animationMillis: Int = 400,
     crossinline bitmapSettings: (Bitmap) -> Unit = {}
 ): ImageRequest {
     val context = LocalContext.current
     val glideUtils = GlideUtils(context)
 
     var coverModel by remember { mutableStateOf<BitmapDrawable?>(null) }
+    var prevCoverModel by remember { mutableStateOf<BitmapDrawable?>(null) }
 
     LaunchedEffect(key1 = path, key2 = size) {
+        prevCoverModel = coverModel
+
         coverModel = glideUtils
             .getTrackCoverAsync(path, size, bitmapSettings)
             .await()
@@ -131,11 +140,11 @@ internal inline fun rememberTrackCoverModel(
 
     return ImageRequest.Builder(context)
         .data(coverModel)
-        .error(R.drawable.cover_thumbnail)
-        .fallback(R.drawable.cover_thumbnail)
+        .prevCoverErrorOrDefault(usePrevCoverAsPlaceholder, prevCoverModel)
+        .prevCoverFallbackOrDefault(usePrevCoverAsPlaceholder, prevCoverModel)
         .apply {
             if (isPlaceholderRequired)
-                placeholder(R.drawable.cover_thumbnail)
+                prevCoverPlaceholderOrDefault(usePrevCoverAsPlaceholder, prevCoverModel)
 
             if (isBlured)
                 transformations(BlurTransformation(context))
@@ -144,7 +153,7 @@ internal inline fun rememberTrackCoverModel(
         }
         .precision(Precision.EXACT)
         .scale(Scale.FILL)
-        .crossfade(true)
+        .crossfade(animationMillis)
         .build()
 }
 
@@ -154,10 +163,18 @@ internal inline fun rememberTrackCoverPainter(
     isPlaceholderRequired: Boolean,
     size: Pair<Int, Int>? = null,
     isBlured: Boolean = false,
+    usePrevCoverAsPlaceholder: Boolean = false,
+    animationMillis: Int = 400,
     crossinline bitmapSettings: (Bitmap) -> Unit = {}
 ): AsyncImagePainter {
     val trackCoverPainter = rememberTrackCoverModel(
-        path, isPlaceholderRequired, size, isBlured, bitmapSettings
+        path = path,
+        isPlaceholderRequired = isPlaceholderRequired,
+        size = size,
+        isBlured = isBlured,
+        usePrevCoverAsPlaceholder = usePrevCoverAsPlaceholder,
+        animationMillis = animationMillis,
+        bitmapSettings = bitmapSettings
     )
 
     return rememberAsyncImagePainter(model = trackCoverPainter)
@@ -169,12 +186,15 @@ internal inline fun rememberTrackCoverPainterWithPalette(
     isPlaceholderRequired: Boolean,
     size: Pair<Int, Int>? = null,
     isBlured: Boolean = false,
+    usePrevCoverAsPlaceholder: Boolean = true,
+    animationMillis: Int = 400,
     crossinline bitmapSettings: (Bitmap) -> Unit = {}
 ): Pair<AsyncImagePainter, Palette?> {
     val context = LocalContext.current
     val glideUtils = GlideUtils(context)
 
     var coverModel by remember { mutableStateOf<BitmapDrawable?>(null) }
+    var prevCoverModel by remember { mutableStateOf<BitmapDrawable?>(null) }
     var palette by remember { mutableStateOf<Palette?>(null) }
 
     LaunchedEffect(key1 = path, key2 = size) {
@@ -182,6 +202,7 @@ internal inline fun rememberTrackCoverPainterWithPalette(
             .getTrackCoverWithPaletteAsync(path, size, bitmapSettings)
             .await()
 
+        prevCoverModel = coverModel
         coverModel = cover
         palette = plt
     }
@@ -189,11 +210,11 @@ internal inline fun rememberTrackCoverPainterWithPalette(
     return rememberAsyncImagePainter(
         model = ImageRequest.Builder(context)
             .data(coverModel)
-            .error(R.drawable.cover_thumbnail)
-            .fallback(R.drawable.cover_thumbnail)
+            .prevCoverErrorOrDefault(usePrevCoverAsPlaceholder, prevCoverModel)
+            .prevCoverFallbackOrDefault(usePrevCoverAsPlaceholder, prevCoverModel)
             .apply {
                 if (isPlaceholderRequired)
-                    placeholder(R.drawable.cover_thumbnail)
+                    prevCoverPlaceholderOrDefault(usePrevCoverAsPlaceholder, prevCoverModel)
 
                 if (isBlured)
                     transformations(BlurTransformation(context))
@@ -202,7 +223,7 @@ internal inline fun rememberTrackCoverPainterWithPalette(
             }
             .precision(Precision.EXACT)
             .scale(Scale.FILL)
-            .crossfade(true)
+            .crossfade(animationMillis)
             .build()
     ) to palette
 }
@@ -212,6 +233,8 @@ internal inline fun rememberCurrentTrackCoverPainter(
     isPlaceholderRequired: Boolean,
     size: Pair<Int, Int>? = null,
     isBlured: Boolean = false,
+    usePrevCoverAsPlaceholder: Boolean = true,
+    animationMillis: Int = 400,
     storageHandler: StorageHandler = koinInject(),
     crossinline bitmapSettings: (Bitmap) -> Unit = {}
 ): AsyncImagePainter {
@@ -223,6 +246,8 @@ internal inline fun rememberCurrentTrackCoverPainter(
         isPlaceholderRequired = isPlaceholderRequired,
         size = size,
         isBlured = isBlured,
+        usePrevCoverAsPlaceholder = usePrevCoverAsPlaceholder,
+        animationMillis = animationMillis,
         bitmapSettings = bitmapSettings
     )
 }
@@ -232,6 +257,8 @@ internal inline fun rememberCurrentTrackCoverPainterWithPalette(
     isPlaceholderRequired: Boolean,
     size: Pair<Int, Int>? = null,
     isBlured: Boolean = false,
+    usePrevCoverAsPlaceholder: Boolean = true,
+    animationMillis: Int = 400,
     storageHandler: StorageHandler = koinInject(),
     crossinline bitmapSettings: (Bitmap) -> Unit = {}
 ): Pair<AsyncImagePainter, Palette?> {
@@ -243,6 +270,50 @@ internal inline fun rememberCurrentTrackCoverPainterWithPalette(
         isPlaceholderRequired = isPlaceholderRequired,
         size = size,
         isBlured = isBlured,
+        usePrevCoverAsPlaceholder = usePrevCoverAsPlaceholder,
+        animationMillis = animationMillis,
         bitmapSettings = bitmapSettings
     )
+}
+
+private fun ImageRequest.Builder.prevCoverPlaceholder(prevCoverModel: BitmapDrawable?) =
+    when (prevCoverModel) {
+        null -> placeholder(R.drawable.cover_thumbnail)
+        else -> placeholder(prevCoverModel)
+    }
+
+private fun ImageRequest.Builder.prevCoverError(prevCoverModel: BitmapDrawable?) =
+    when (prevCoverModel) {
+        null -> error(R.drawable.cover_thumbnail)
+        else -> error(prevCoverModel)
+    }
+
+private fun ImageRequest.Builder.prevCoverFallback(prevCoverModel: BitmapDrawable?) =
+    when (prevCoverModel) {
+        null -> fallback(R.drawable.cover_thumbnail)
+        else -> fallback(prevCoverModel)
+    }
+
+private fun ImageRequest.Builder.prevCoverPlaceholderOrDefault(
+    usePrevCoverAsPlaceholder: Boolean,
+    prevCoverModel: BitmapDrawable?,
+) = when {
+    usePrevCoverAsPlaceholder -> prevCoverPlaceholder(prevCoverModel)
+    else -> placeholder(R.drawable.cover_thumbnail)
+}
+
+private fun ImageRequest.Builder.prevCoverErrorOrDefault(
+    usePrevCoverAsPlaceholder: Boolean,
+    prevCoverModel: BitmapDrawable?,
+) = when {
+    usePrevCoverAsPlaceholder -> prevCoverError(prevCoverModel)
+    else -> error(R.drawable.cover_thumbnail)
+}
+
+private fun ImageRequest.Builder.prevCoverFallbackOrDefault(
+    usePrevCoverAsPlaceholder: Boolean,
+    prevCoverModel: BitmapDrawable?,
+) = when {
+    usePrevCoverAsPlaceholder -> prevCoverFallback(prevCoverModel)
+    else -> fallback(R.drawable.cover_thumbnail)
 }

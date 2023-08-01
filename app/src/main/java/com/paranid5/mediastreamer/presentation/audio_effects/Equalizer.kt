@@ -23,7 +23,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateListOf
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshots.SnapshotStateList
@@ -97,7 +96,7 @@ private fun PresetSpinner(
     Box(modifier) {
         Spinner(
             items = equalizerData!!.presets.toList() + stringResource(R.string.custom),
-            selectedItemInd = curItemInd,
+            selectedItemIndexes = listOf(curItemInd),
             modifier = Modifier.fillMaxWidth().align(Alignment.CenterStart),
             onItemSelected = { ind, _ ->
                 selectedItemInd = ind
