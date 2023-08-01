@@ -7,7 +7,6 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -216,6 +215,7 @@ private fun TrackOrderSpinner(
         stringResource(R.string.artist),
         stringResource(R.string.album),
         stringResource(R.string.date),
+        stringResource(R.string.number_in_album),
         stringResource(R.string.asc),
         stringResource(R.string.desc)
     ).map { "${stringResource(R.string.by)} $it" }

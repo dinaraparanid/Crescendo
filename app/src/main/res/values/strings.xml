@@ -81,4 +81,5 @@
     <string name="date">Date</string>
     <string name="asc">Ascending</string>
     <string name="desc">Descending</string>
+    <string name="number_in_album">№ in Album</string>
 </resources>
