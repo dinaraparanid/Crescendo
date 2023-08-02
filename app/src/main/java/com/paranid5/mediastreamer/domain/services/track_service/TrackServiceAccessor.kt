@@ -24,6 +24,9 @@ class TrackServiceAccessor(application: MainApplication) : ServiceAccessor(appli
     private inline val isTrackServiceConnected
         get() = isTrackServiceConnectedState.value
 
+    private fun Intent.putTrack(track: DefaultTrack) =
+        apply { putExtra(TrackService.TRACK_ARG, track) }
+
     private fun Intent.putPlaylistAndTrackIndexIfNotNull(
         playlist: List<DefaultTrack>?,
         trackInd: Int
@@ -53,6 +56,11 @@ class TrackServiceAccessor(application: MainApplication) : ServiceAccessor(appli
             Intent(TrackService.Broadcast_SWITCH_PLAYLIST)
                 .putPlaylistAndTrackIndexIfNotNull(playlist, trackInd)
         )
+    }
+
+    fun addToPlaylist(track: DefaultTrack) {
+        Log.d(TAG, "Send track $track to playlist")
+        sendBroadcast(Intent(TrackService.Broadcast_ADD_TO_PLAYLIST).putTrack(track))
     }
 
     private fun launchTrackService(playlist: List<DefaultTrack>, trackInd: Int) = when {

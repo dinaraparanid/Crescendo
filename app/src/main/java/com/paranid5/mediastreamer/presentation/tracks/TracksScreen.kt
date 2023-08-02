@@ -422,7 +422,12 @@ private fun TrackItem(
 
                 Spacer(Modifier.width(5.dp))
 
-                TrackPropertiesButton(iconModifier = Modifier.height(20.dp))
+                TrackPropertiesButton(
+                    track = track,
+                    iconModifier = Modifier.height(20.dp),
+                    storageHandler = storageHandler,
+                    trackServiceAccessor = trackServiceAccessor
+                )
             }
         }
     }

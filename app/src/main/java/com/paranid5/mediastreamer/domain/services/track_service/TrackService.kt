@@ -81,6 +81,7 @@ class TrackService : SuspendService(), ReceiverManager, LifecycleNotificationMan
         const val Broadcast_PAUSE = "$SERVICE_LOCATION.PAUSE"
         const val Broadcast_RESUME = "$SERVICE_LOCATION.RESUME"
         const val Broadcast_SWITCH_PLAYLIST = "$SERVICE_LOCATION.SWITCH_PLAYLIST"
+        const val Broadcast_ADD_TO_PLAYLIST = "$SERVICE_LOCATION.ADD_TO_PLAYLIST"
 
         const val Broadcast_PREV_TRACK = "$SERVICE_LOCATION.PREV_TRACK"
         const val Broadcast_NEXT_TRACK = "$SERVICE_LOCATION.NEXT_TRACK"
@@ -113,11 +114,20 @@ class TrackService : SuspendService(), ReceiverManager, LifecycleNotificationMan
             ACTION_DISMISS to Actions.Dismiss
         )
 
+        const val TRACK_ARG = "track"
         const val PLAYLIST_ARG = "playlist"
         const val TRACK_INDEX_ARG = "track_index"
         const val POSITION_ARG = "position"
 
         private val TAG = TrackService::class.simpleName!!
+
+        internal inline val Intent.mTrackArgOrNull
+            get() = when {
+                Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU ->
+                    getParcelableExtra(TRACK_ARG, DefaultTrack::class.java)
+
+                else -> getParcelableExtra(TRACK_ARG)
+            }
 
         internal inline val Intent.mPlaylistArgOrNull
             @Suppress("UNCHECKED_CAST")
@@ -127,6 +137,9 @@ class TrackService : SuspendService(), ReceiverManager, LifecycleNotificationMan
 
                 else -> getParcelableArrayExtra(PLAYLIST_ARG) as Array<DefaultTrack>
             }?.toList()
+
+        internal inline val Intent.mTrackArg
+            get() = mTrackArgOrNull!!
 
         internal inline val Intent.mPlaylistArg
             get() = mPlaylistArgOrNull!!
@@ -464,6 +477,14 @@ class TrackService : SuspendService(), ReceiverManager, LifecycleNotificationMan
         }
     }
 
+    private val addToPlaylistReceiver = object : BroadcastReceiver() {
+        override fun onReceive(context: Context?, intent: Intent) {
+            val track = intent.mTrackArg
+            Log.d(TAG, "Add track $track to playlist")
+            mPlayer.addMediaItem(MediaItem.fromUri(track.path))
+        }
+    }
+
     private val switchToPrevTrackReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context?, intent: Intent?) {
             Log.d(TAG, "prev track")
@@ -553,6 +574,7 @@ class TrackService : SuspendService(), ReceiverManager, LifecycleNotificationMan
         registerReceiverCompat(pauseReceiver, Broadcast_PAUSE)
         registerReceiverCompat(resumeReceiver, Broadcast_RESUME)
         registerReceiverCompat(switchPlaylistReceiver, Broadcast_SWITCH_PLAYLIST)
+        registerReceiverCompat(addToPlaylistReceiver, Broadcast_ADD_TO_PLAYLIST)
         registerReceiverCompat(switchToPrevTrackReceiver, Broadcast_PREV_TRACK)
         registerReceiverCompat(switchToNextTrackReceiver, Broadcast_NEXT_TRACK)
         registerReceiverCompat(seekToReceiver, Broadcast_SEEK_TO)
@@ -569,6 +591,7 @@ class TrackService : SuspendService(), ReceiverManager, LifecycleNotificationMan
         unregisterReceiver(pauseReceiver)
         unregisterReceiver(resumeReceiver)
         unregisterReceiver(switchPlaylistReceiver)
+        unregisterReceiver(addToPlaylistReceiver)
         unregisterReceiver(switchToPrevTrackReceiver)
         unregisterReceiver(switchToNextTrackReceiver)
         unregisterReceiver(seekToReceiver)
@@ -1118,8 +1141,9 @@ class TrackService : SuspendService(), ReceiverManager, LifecycleNotificationMan
         }
 
     internal suspend inline fun mUpdateNotification() {
-        Log.d(TAG, "Update Notification; track: ${currentTrackState.value!!}")
-        mUpdateMediaSession(currentTrackState.value!!)
+        val currentTrack = currentTrackState.value ?: return
+        Log.d(TAG, "Update Notification; track: $currentTrack")
+        mUpdateMediaSession(currentTrack)
         mPlayerNotificationManager.invalidate()
     }
 

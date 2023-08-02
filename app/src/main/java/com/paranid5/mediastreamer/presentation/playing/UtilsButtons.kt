@@ -32,10 +32,10 @@ import org.koin.compose.koinInject
 @Composable
 internal fun UtilsButtons(palette: Palette?, modifier: Modifier = Modifier) =
     Row(modifier.fillMaxWidth()) {
-        EqualizerButton(modifier = Modifier.weight(1F), palette = palette)
-        RepeatButton(palette = palette, modifier = Modifier.weight(1F))
-        LikeButton(modifier = Modifier.weight(1F), palette = palette)
-        DownloadButton(modifier = Modifier.weight(1F), palette = palette)
+        EqualizerButton(palette, Modifier.weight(1F))
+        RepeatButton(palette, Modifier.weight(1F))
+        LikeButton(palette, Modifier.weight(1F))
+        PlaylistOrDownloadButton(palette, Modifier.weight(1F))
     }
 
 @Composable
@@ -111,6 +111,20 @@ private fun LikeButton(palette: Palette?, modifier: Modifier = Modifier) {
 }
 
 @Composable
+private fun PlaylistOrDownloadButton(
+    palette: Palette?,
+    modifier: Modifier = Modifier,
+    storageHandler: StorageHandler = koinInject()
+) {
+    val audioStatus by storageHandler.audioStatusState.collectAsState()
+
+    when (audioStatus) {
+        AudioStatus.STREAMING -> DownloadButton(palette, modifier)
+        else -> CurrentPlaylistButton(palette, modifier)
+    }
+}
+
+@Composable
 private fun DownloadButton(palette: Palette?, modifier: Modifier = Modifier) {
     val lightVibrantColor = palette.getLightVibrantOrPrimary()
     val isCashPropertiesDialogShownState = remember { mutableStateOf(false) }
@@ -143,5 +157,25 @@ private fun DownloadButton(palette: Palette?, modifier: Modifier = Modifier) {
                 isDialogShownState = isCashPropertiesDialogShownState,
                 modifier = Modifier.align(Alignment.Center)
             )
+    }
+}
+
+@Composable
+private fun CurrentPlaylistButton(
+    palette: Palette?,
+    modifier: Modifier = Modifier,
+) {
+    val lightVibrantColor = palette.getLightVibrantOrPrimary()
+
+    IconButton(
+        modifier = modifier.simpleShadow(color = lightVibrantColor),
+        onClick = { /** TODO: Current playlist view */ }
+    ) {
+        Icon(
+            modifier = Modifier.size(30.dp),
+            painter = painterResource(R.drawable.playlists),
+            contentDescription = stringResource(R.string.current_playlist),
+            tint = lightVibrantColor
+        )
     }
 }
