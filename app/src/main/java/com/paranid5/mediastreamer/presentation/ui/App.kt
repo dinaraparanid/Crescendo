@@ -36,7 +36,7 @@ import com.paranid5.mediastreamer.presentation.UpdateCheckerDialog
 import com.paranid5.mediastreamer.presentation.appbar.AppBar
 import com.paranid5.mediastreamer.presentation.appbar.stream_button.StreamButton
 import com.paranid5.mediastreamer.presentation.ui.extensions.increaseDarkness
-import com.paranid5.mediastreamer.presentation.ui.permissions.requests.ExternalStoragePermissionsRequest
+import com.paranid5.mediastreamer.presentation.ui.permissions.requests.externalStoragePermissionsRequestLauncher
 import com.paranid5.mediastreamer.presentation.ui.theme.LocalAppColors
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -67,10 +67,15 @@ fun App(
         Box(modifier) {
             UpdateCheckerDialog(Modifier.align(Alignment.Center))
 
-            ExternalStoragePermissionsRequest(
+            val (areStoragePermissionsGranted, launchStoragePermissions) = externalStoragePermissionsRequestLauncher(
                 isExternalStoragePermissionDialogShownState,
                 modifier = Modifier.align(Alignment.Center)
             )
+
+            LaunchedEffect(Unit) {
+                if (!areStoragePermissionsGranted)
+                    launchStoragePermissions()
+            }
 
             BackgroundImage(Modifier.fillMaxSize())
 

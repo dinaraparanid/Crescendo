@@ -14,6 +14,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.rememberUpdatedState
@@ -30,6 +31,8 @@ import com.paranid5.mediastreamer.presentation.StateChangedCallback
 import com.paranid5.mediastreamer.presentation.composition_locals.LocalNavController
 import com.paranid5.mediastreamer.presentation.ui.AudioStatus
 import com.paranid5.mediastreamer.presentation.ui.OnUIStateChanged
+import com.paranid5.mediastreamer.presentation.ui.permissions.requests.audioRecordingPermissionsRequestLauncher
+import com.paranid5.mediastreamer.presentation.ui.permissions.requests.foregroundServicePermissionsRequestLauncher
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -132,17 +135,42 @@ private fun ConfirmButton(
     val navHostController = LocalNavController.current
     val scope = rememberCoroutineScope()
 
-    Button(
-        enabled = isConfirmButtonActive,
-        modifier = modifier,
-        onClick = {
-            scope.launch {
-                storageHandler.storeAudioStatus(AudioStatus.STREAMING)
-                viewModel.onConfirmUrlButtonPressed()
-                navHostController.navigateIfNotSame(Screens.Audio.Playing)
+    val isForegroundServicePermissionDialogShownState = remember { mutableStateOf(false) }
+    val isAudioRecordingPermissionDialogShownState = remember { mutableStateOf(false) }
+
+    Box(modifier) {
+        val (areForegroundPermissionsGranted, launchFSPermissions) = foregroundServicePermissionsRequestLauncher(
+            isForegroundServicePermissionDialogShownState,
+            modifier = Modifier.align(Alignment.Center)
+        )
+
+        val (isRecordingPermissionGranted, launchRecordPermissions) = audioRecordingPermissionsRequestLauncher(
+            isAudioRecordingPermissionDialogShownState,
+            modifier = Modifier.align(Alignment.Center)
+        )
+
+        Button(
+            enabled = isConfirmButtonActive,
+            modifier = Modifier.align(Alignment.Center),
+            onClick = {
+                if (!areForegroundPermissionsGranted) {
+                    launchFSPermissions()
+                    return@Button
+                }
+
+                if (!isRecordingPermissionGranted) {
+                    launchRecordPermissions()
+                    return@Button
+                }
+
+                scope.launch {
+                    storageHandler.storeAudioStatus(AudioStatus.STREAMING)
+                    viewModel.onConfirmUrlButtonPressed()
+                    navHostController.navigateIfNotSame(Screens.Audio.Playing)
+                }
             }
+        ) {
+            Text(stringResource(R.string.confirm))
         }
-    ) {
-        Text(stringResource(R.string.confirm))
     }
 }

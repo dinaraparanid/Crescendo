@@ -10,17 +10,17 @@ import org.koin.core.qualifier.named
 import java.util.Queue
 
 @Composable
-fun ForegroundServicePermissionsRequest(
+fun foregroundServicePermissionsRequestLauncher(
     isForegroundServicePermissionDialogShownState: MutableState<Boolean>,
     modifier: Modifier = Modifier
-) {
+): Pair<Boolean, () -> Unit> {
     val foregroundServicePermissionQueue = koinInject<Queue<String>>(
         named(FOREGROUND_SERVICE_PERMISSION_QUEUE)
     )
 
     val foregroundServiceDescriptionProvider = koinInject<ExternalStorageDescriptionProvider>()
 
-    PermissionsRequest(
+    return permissionsRequestLauncher(
         modifier = modifier,
         permissionQueue = foregroundServicePermissionQueue,
         descriptionProvider = foregroundServiceDescriptionProvider,

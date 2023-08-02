@@ -1,10 +1,6 @@
 package com.paranid5.mediastreamer.presentation.appbar.stream_button
 
 import android.annotation.SuppressLint
-import android.content.pm.PackageManager
-import android.os.Build
-import androidx.activity.compose.rememberLauncherForActivityResult
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.FloatingActionButton
@@ -15,21 +11,15 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import androidx.core.content.ContextCompat
-import com.paranid5.mediastreamer.FOREGROUND_SERVICE_PERMISSION_QUEUE
 import com.paranid5.mediastreamer.R
 import com.paranid5.mediastreamer.presentation.StreamStates
-import com.paranid5.mediastreamer.presentation.composition_locals.LocalActivity
 import com.paranid5.mediastreamer.presentation.composition_locals.LocalNavController
 import com.paranid5.mediastreamer.presentation.nextState
-import com.paranid5.mediastreamer.presentation.ui.extensions.openAppSettings
-import com.paranid5.mediastreamer.presentation.ui.permissions.PermissionDialog
-import com.paranid5.mediastreamer.presentation.ui.permissions.description_providers.ForegroundServiceDescriptionProvider
+import com.paranid5.mediastreamer.presentation.ui.permissions.requests.audioRecordingPermissionsRequestLauncher
+import com.paranid5.mediastreamer.presentation.ui.permissions.requests.foregroundServicePermissionsRequestLauncher
 import com.paranid5.mediastreamer.presentation.ui.theme.LocalAppColors
 import kotlinx.coroutines.flow.StateFlow
 import org.koin.compose.koinInject
-import org.koin.core.qualifier.named
-import java.util.Queue
 
 @SuppressLint("NewApi")
 @Composable
@@ -38,54 +28,40 @@ fun StreamButton(
     modifier: Modifier = Modifier,
     streamButtonUIHandler: StreamButtonUIHandler = koinInject()
 ) {
-    val activity = LocalActivity.current!!
     val navHostController = LocalNavController.current
     val streamCompose by streamScreenState.collectAsState()
 
-    val isNotificationPermissionRequired = Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU
-    val isPostNotificationsPermissionDialogShownState = remember { mutableStateOf(false) }
-
-    val postNotificationsPermission = when {
-        isNotificationPermissionRequired -> koinInject<Queue<String>>(
-            named(FOREGROUND_SERVICE_PERMISSION_QUEUE)
-        ).first()
-
-        else -> null
-    }
-
-    val postNotificationsDescriptionProvider = when {
-        isNotificationPermissionRequired -> koinInject<ForegroundServiceDescriptionProvider>()
-        else -> null
-    }
-
-    var isPostNotificationsPermissionGranted by remember {
-        mutableStateOf(
-            postNotificationsPermission?.let { permission ->
-                ContextCompat.checkSelfPermission(activity, permission) ==
-                        PackageManager.PERMISSION_GRANTED
-            } ?: true
-        )
-    }
-
-    val notificationsPermissionResultLauncher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.RequestPermission()
-    ) { isPostNotificationsPermissionGranted = it }
+    val isForegroundServicePermissionDialogShownState = remember { mutableStateOf(false) }
+    val isAudioRecordingPermissionDialogShownState = remember { mutableStateOf(false) }
 
     Box(modifier) {
+        val (areForegroundPermissionsGranted, launchFSPermissions) = foregroundServicePermissionsRequestLauncher(
+            isForegroundServicePermissionDialogShownState,
+            modifier = Modifier.align(Alignment.Center)
+        )
+
+        val (isRecordingPermissionGranted, launchRecordPermissions) = audioRecordingPermissionsRequestLauncher(
+            isAudioRecordingPermissionDialogShownState,
+            modifier = Modifier.align(Alignment.Center)
+        )
+
         FloatingActionButton(
             modifier = modifier,
             onClick = {
-                when {
-                    isPostNotificationsPermissionGranted -> streamButtonUIHandler.navigateToStream(
-                        navHostController = navHostController,
-                        nextStreamState = streamScreenState.value.nextState
-                    )
-
-                    else -> {
-                        notificationsPermissionResultLauncher.launch(postNotificationsPermission)
-                        isPostNotificationsPermissionDialogShownState.value = true
-                    }
+                if (!areForegroundPermissionsGranted) {
+                    launchFSPermissions()
+                    return@FloatingActionButton
                 }
+
+                if (!isRecordingPermissionGranted) {
+                    launchRecordPermissions()
+                    return@FloatingActionButton
+                }
+
+                streamButtonUIHandler.navigateToStream(
+                    navHostController = navHostController,
+                    nextStreamState = streamScreenState.value.nextState
+                )
             }
         ) {
             when (streamCompose) {
@@ -104,20 +80,5 @@ fun StreamButton(
                 )
             }
         }
-
-        if (isPostNotificationsPermissionDialogShownState.value)
-            if (!isPostNotificationsPermissionGranted)
-                PermissionDialog(
-                    isDialogShownState = isPostNotificationsPermissionDialogShownState,
-                    modifier = Modifier.align(Alignment.Center),
-                    permissionDescriptionProvider = postNotificationsDescriptionProvider!!,
-                    isPermanentlyDeclined = !activity.shouldShowRequestPermissionRationale(
-                        postNotificationsPermission!!
-                    ),
-                    onGrantedClicked = {
-                        notificationsPermissionResultLauncher.launch(postNotificationsPermission)
-                    },
-                    onGoToAppSettingsClicked = activity::openAppSettings
-                )
     }
 }

@@ -55,8 +55,8 @@ import com.paranid5.mediastreamer.domain.StorageHandler
 import com.paranid5.mediastreamer.domain.services.track_service.TrackServiceAccessor
 import com.paranid5.mediastreamer.presentation.Screens
 import com.paranid5.mediastreamer.presentation.ui.AudioStatus
-import com.paranid5.mediastreamer.presentation.ui.permissions.requests.AudioRecordingPermissionsRequest
-import com.paranid5.mediastreamer.presentation.ui.permissions.requests.ForegroundServicePermissionsRequest
+import com.paranid5.mediastreamer.presentation.ui.permissions.requests.audioRecordingPermissionsRequestLauncher
+import com.paranid5.mediastreamer.presentation.ui.permissions.requests.foregroundServicePermissionsRequestLauncher
 import com.paranid5.mediastreamer.presentation.ui.rememberTrackCoverModel
 import com.paranid5.mediastreamer.presentation.ui.theme.LocalAppColors
 import com.paranid5.mediastreamer.presentation.ui.utils.Searcher
@@ -103,16 +103,6 @@ fun TracksScreen(
     }
 
     Box(modifier) {
-        AudioRecordingPermissionsRequest(
-            isAudioRecordingPermissionDialogShownState,
-            modifier = Modifier.align(Alignment.Center)
-        )
-
-        ForegroundServicePermissionsRequest(
-            isForegroundServicePermissionDialogShownState,
-            modifier = Modifier.align(Alignment.Center)
-        )
-
         Column(Modifier.fillMaxSize()) {
             TrackSearcher(
                 tracksState = tracksViewModel.presenter.tracksState,
@@ -379,36 +369,61 @@ private fun TrackItem(
         derivedStateOf { if (isTrackCurrent) colors.primary else Color.White }
     }
 
+    val isForegroundServicePermissionDialogShownState = remember { mutableStateOf(false) }
+    val isAudioRecordingPermissionDialogShownState = remember { mutableStateOf(false) }
+
     trackMb?.let { track ->
-        Row(
-            modifier.clickable {
-                scope.launch {
-                    onTrackClicked(tracks, trackInd, storageHandler, trackServiceAccessor)
+        Box(modifier) {
+            val (areForegroundPermissionsGranted, launchFSPermissions) = foregroundServicePermissionsRequestLauncher(
+                isForegroundServicePermissionDialogShownState,
+                modifier = Modifier.align(Alignment.Center)
+            )
+
+            val (isRecordingPermissionGranted, launchRecordPermissions) = audioRecordingPermissionsRequestLauncher(
+                isAudioRecordingPermissionDialogShownState,
+                modifier = Modifier.align(Alignment.Center)
+            )
+
+            Row(
+                modifier.clickable {
+                    if (!areForegroundPermissionsGranted) {
+                        launchFSPermissions()
+                        return@clickable
+                    }
+
+                    if (!isRecordingPermissionGranted) {
+                        launchRecordPermissions()
+                        return@clickable
+                    }
+
+                    scope.launch {
+                        onTrackClicked(tracks, trackInd, storageHandler, trackServiceAccessor)
+                    }
                 }
+            ) {
+                TrackCover(
+                    trackPath = trackPath ?: "",
+                    modifier = Modifier
+                        .size(50.dp)
+                        .align(Alignment.CenterVertically)
+                        .clip(RoundedCornerShape(7.dp))
+                )
+
+                Spacer(Modifier.width(5.dp))
+
+                TrackInfo(
+                    track = track,
+                    textColor = textColor,
+                    modifier = Modifier
+                        .weight(1F)
+                        .padding(start = 5.dp)
+                        .align(Alignment.CenterVertically)
+                )
+
+                Spacer(Modifier.width(5.dp))
+
+                TrackPropertiesButton(iconModifier = Modifier.height(20.dp))
             }
-        ) {
-            TrackCover(
-                trackPath = trackPath ?: "",
-                modifier = Modifier
-                    .size(50.dp)
-                    .align(Alignment.CenterVertically)
-                    .clip(RoundedCornerShape(7.dp))
-            )
-
-            Spacer(Modifier.width(5.dp))
-
-            TrackInfo(
-                track = track,
-                textColor = textColor,
-                modifier = Modifier
-                    .weight(1F)
-                    .padding(start = 5.dp)
-                    .align(Alignment.CenterVertically)
-            )
-
-            Spacer(Modifier.width(5.dp))
-
-            TrackPropertiesButton(iconModifier = Modifier.height(20.dp))
         }
     }
 }

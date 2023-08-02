@@ -5,7 +5,6 @@ import android.os.Build
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
@@ -21,12 +20,12 @@ import com.paranid5.mediastreamer.presentation.ui.permissions.description_provid
 import java.util.Queue
 
 @Composable
-fun PermissionsRequest(
+fun permissionsRequestLauncher(
     permissionQueue: Queue<String>,
     descriptionProvider: PermissionDescriptionProvider,
     isPermissionDialogShownState: MutableState<Boolean>,
     modifier: Modifier = Modifier
-) {
+): Pair<Boolean, () -> Unit> {
     val activity = LocalActivity.current
     val notGrantedPermissions = remember { mutableStateListOf<String>() }
 
@@ -60,10 +59,6 @@ fun PermissionsRequest(
         areAllPermissionsGranted = notGrantedPermissions.isEmpty()
     }
 
-    LaunchedEffect(Unit) {
-        permissionResultLauncher.launch(permissionQueue.toTypedArray())
-    }
-
     if (isPermissionDialogShownState.value)
         notGrantedPermissions.forEach { permission ->
             PermissionDialog(
@@ -83,4 +78,8 @@ fun PermissionsRequest(
                 onGoToAppSettingsClicked = activity!!::openAppSettings,
             )
         }
+
+    return areAllPermissionsGranted to {
+        permissionResultLauncher.launch(permissionQueue.toTypedArray())
+    }
 }

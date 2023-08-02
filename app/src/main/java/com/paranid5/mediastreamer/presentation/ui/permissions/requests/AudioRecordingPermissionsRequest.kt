@@ -10,17 +10,17 @@ import org.koin.core.qualifier.named
 import java.util.Queue
 
 @Composable
-fun AudioRecordingPermissionsRequest(
+fun audioRecordingPermissionsRequestLauncher(
     isAudioRecordingPermissionDialogShownState: MutableState<Boolean>,
     modifier: Modifier = Modifier
-) {
+): Pair<Boolean, () -> Unit> {
     val audioRecordingPermissionQueue = koinInject<Queue<String>>(
         named(AUDIO_RECORDING_PERMISSION_QUEUE)
     )
 
     val audioRecordingDescriptionProvider = koinInject<AudioRecordingDescriptionProvider>()
 
-    PermissionsRequest(
+    return permissionsRequestLauncher(
         modifier = modifier,
         permissionQueue = audioRecordingPermissionQueue,
         descriptionProvider = audioRecordingDescriptionProvider,
