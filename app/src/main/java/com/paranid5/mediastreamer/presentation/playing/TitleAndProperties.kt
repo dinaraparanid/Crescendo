@@ -25,7 +25,7 @@ import com.paranid5.mediastreamer.R
 import com.paranid5.mediastreamer.domain.StorageHandler
 import com.paranid5.mediastreamer.presentation.tracks.TrackPropertiesButton
 import com.paranid5.mediastreamer.presentation.ui.AudioStatus
-import com.paranid5.mediastreamer.presentation.ui.extensions.getLightVibrantOrPrimary
+import com.paranid5.mediastreamer.presentation.ui.extensions.getLightMutedOrPrimary
 import org.koin.compose.koinInject
 
 @OptIn(ExperimentalFoundationApi::class)
@@ -37,14 +37,14 @@ fun TitleAndAuthor(
     modifier: Modifier = Modifier,
     textAlignment: Alignment.Horizontal = Alignment.Start,
 ) {
-    val lightVibrantColor = palette.getLightVibrantOrPrimary()
+    val paletteColor = palette.getLightMutedOrPrimary()
 
     Column(modifier) {
         Text(
             text = title,
             fontSize = 20.sp,
             maxLines = 1,
-            color = lightVibrantColor,
+            color = paletteColor,
             modifier = Modifier
                 .basicMarquee()
                 .align(textAlignment)
@@ -56,7 +56,7 @@ fun TitleAndAuthor(
             text = author,
             fontSize = 18.sp,
             maxLines = 1,
-            color = lightVibrantColor,
+            color = paletteColor,
             modifier = Modifier
                 .basicMarquee()
                 .align(textAlignment)
@@ -71,20 +71,22 @@ fun PropertiesButton(
     storageHandler: StorageHandler = koinInject()
 ) {
     val audioStatus by storageHandler.audioStatusState.collectAsState()
-    val currentTrack by storageHandler.currentTrackState.collectAsState()
+    val currentTrackMb by storageHandler.currentTrackState.collectAsState()
 
     when (audioStatus) {
         AudioStatus.STREAMING -> VideoPropertiesButton(
-            tint = palette.getLightVibrantOrPrimary(),
+            tint = palette.getLightMutedOrPrimary(),
             modifier = modifier
         )
 
-        else -> TrackPropertiesButton(
-            track = currentTrack!!,
-            tint = palette.getLightVibrantOrPrimary(),
-            modifier = modifier,
-            iconModifier = Modifier.height(50.dp).width(25.dp),
-        )
+        else -> currentTrackMb?.let { currentTrack ->
+            TrackPropertiesButton(
+                track = currentTrack,
+                tint = palette.getLightMutedOrPrimary(),
+                modifier = modifier,
+                iconModifier = Modifier.height(50.dp).width(25.dp),
+            )
+        }
     }
 }
 

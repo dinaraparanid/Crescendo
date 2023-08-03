@@ -24,7 +24,7 @@ import com.paranid5.mediastreamer.domain.services.stream_service.StreamServiceAc
 import com.paranid5.mediastreamer.domain.services.track_service.TrackServiceAccessor
 import com.paranid5.mediastreamer.presentation.composition_locals.LocalNavController
 import com.paranid5.mediastreamer.presentation.ui.AudioStatus
-import com.paranid5.mediastreamer.presentation.ui.extensions.getLightVibrantOrPrimary
+import com.paranid5.mediastreamer.presentation.ui.extensions.getLightMutedOrPrimary
 import com.paranid5.mediastreamer.presentation.ui.extensions.simpleShadow
 import com.paranid5.mediastreamer.presentation.ui.permissions.requests.externalStoragePermissionsRequestLauncher
 import org.koin.compose.koinInject
@@ -46,17 +46,17 @@ private fun EqualizerButton(
 ) {
     val context = LocalContext.current
     val navHostController = LocalNavController.current
-    val lightVibrantColor = palette.getLightVibrantOrPrimary()
+    val paletteColor = palette.getLightMutedOrPrimary()
 
     IconButton(
-        modifier = modifier.simpleShadow(color = lightVibrantColor),
+        modifier = modifier.simpleShadow(color = paletteColor),
         onClick = { playingUIHandler.navigateToAudioEffects(context, navHostController) }
     ) {
         Icon(
             modifier = Modifier.size(30.dp),
             painter = painterResource(R.drawable.equalizer),
             contentDescription = stringResource(R.string.equalizer),
-            tint = lightVibrantColor
+            tint = paletteColor
         )
     }
 }
@@ -69,12 +69,12 @@ private fun RepeatButton(
     streamServiceAccessor: StreamServiceAccessor = koinInject(),
     trackServiceAccessor: TrackServiceAccessor = koinInject()
 ) {
-    val lightVibrantColor = palette.getLightVibrantOrPrimary()
+    val paletteColor = palette.getLightMutedOrPrimary()
     val isRepeating by storageHandler.isRepeatingState.collectAsState()
     val audioStatus by storageHandler.audioStatusState.collectAsState()
 
     IconButton(
-        modifier = modifier.simpleShadow(color = lightVibrantColor),
+        modifier = modifier.simpleShadow(color = paletteColor),
         onClick = {
             when (audioStatus) {
                 AudioStatus.STREAMING -> streamServiceAccessor.sendChangeRepeatBroadcast()
@@ -87,25 +87,25 @@ private fun RepeatButton(
             modifier = Modifier.size(30.dp),
             painter = painterResource(if (isRepeating) R.drawable.repeat else R.drawable.no_repeat),
             contentDescription = stringResource(R.string.change_repeat),
-            tint = lightVibrantColor
+            tint = paletteColor
         )
     }
 }
 
 @Composable
 private fun LikeButton(palette: Palette?, modifier: Modifier = Modifier) {
-    val lightVibrantColor = palette.getLightVibrantOrPrimary()
+    val paletteColor = palette.getLightMutedOrPrimary()
     val isLiked by remember { mutableStateOf(false) }
 
     IconButton(
-        modifier = modifier.simpleShadow(color = lightVibrantColor),
+        modifier = modifier.simpleShadow(color = paletteColor),
         onClick = { /** TODO: favourite database */ }
     ) {
         Icon(
             modifier = Modifier.size(30.dp),
             painter = painterResource(if (isLiked) R.drawable.like_filled else R.drawable.like),
             contentDescription = stringResource(R.string.favourites),
-            tint = lightVibrantColor
+            tint = paletteColor
         )
     }
 }
@@ -126,7 +126,7 @@ private fun PlaylistOrDownloadButton(
 
 @Composable
 private fun DownloadButton(palette: Palette?, modifier: Modifier = Modifier) {
-    val lightVibrantColor = palette.getLightVibrantOrPrimary()
+    val paletteColor = palette.getLightMutedOrPrimary()
     val isCashPropertiesDialogShownState = remember { mutableStateOf(false) }
 
     Box(modifier) {
@@ -136,7 +136,7 @@ private fun DownloadButton(palette: Palette?, modifier: Modifier = Modifier) {
         )
 
         IconButton(
-            modifier = modifier.simpleShadow(color = lightVibrantColor),
+            modifier = modifier.simpleShadow(color = paletteColor),
             onClick = {
                 if (!areStoragePermissionsGranted) {
                     launchStoragePermissions()
@@ -148,7 +148,7 @@ private fun DownloadButton(palette: Palette?, modifier: Modifier = Modifier) {
                 modifier = Modifier.size(30.dp),
                 painter = painterResource(R.drawable.save_icon),
                 contentDescription = stringResource(R.string.download_as_mp3),
-                tint = lightVibrantColor
+                tint = paletteColor
             )
         }
 
@@ -165,17 +165,17 @@ private fun CurrentPlaylistButton(
     palette: Palette?,
     modifier: Modifier = Modifier,
 ) {
-    val lightVibrantColor = palette.getLightVibrantOrPrimary()
+    val paletteColor = palette.getLightMutedOrPrimary()
 
     IconButton(
-        modifier = modifier.simpleShadow(color = lightVibrantColor),
+        modifier = modifier.simpleShadow(color = paletteColor),
         onClick = { /** TODO: Current playlist view */ }
     ) {
         Icon(
             modifier = Modifier.size(30.dp),
             painter = painterResource(R.drawable.playlists),
             contentDescription = stringResource(R.string.current_playlist),
-            tint = lightVibrantColor
+            tint = paletteColor
         )
     }
 }

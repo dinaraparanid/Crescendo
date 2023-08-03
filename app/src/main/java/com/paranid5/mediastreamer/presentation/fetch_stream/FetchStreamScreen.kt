@@ -166,7 +166,6 @@ private fun ConfirmButton(
                 scope.launch {
                     storageHandler.storeAudioStatus(AudioStatus.STREAMING)
                     viewModel.onConfirmUrlButtonPressed()
-                    navHostController.navigateIfNotSame(Screens.Audio.Playing)
                 }
             }
         ) {

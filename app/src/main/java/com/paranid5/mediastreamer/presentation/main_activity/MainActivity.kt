@@ -73,7 +73,6 @@ class MainActivity : ComponentActivity() {
                 ) {
                     App(
                         curScreenState = viewModel.curScreenState,
-                        streamScreenState = viewModel.audioScreenState,
                         modifier = Modifier.fillMaxSize()
                     )
                 }

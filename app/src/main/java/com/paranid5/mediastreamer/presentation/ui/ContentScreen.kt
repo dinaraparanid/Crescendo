@@ -36,7 +36,6 @@ fun ContentScreen(
     padding: PaddingValues,
     curScreenState: MutableStateFlow<Screens>,
     fetchStreamViewModel: FetchStreamViewModel = koinViewModel(),
-    playingViewModel: PlayingViewModel = koinViewModel(),
     audioEffectsViewModel: AudioEffectsViewModel = koinViewModel(),
     tracksViewModel: TracksViewModel = koinViewModel()
 ) {
@@ -84,10 +83,6 @@ fun ContentScreen(
 
         composable(route = Screens.StreamFetching.title) {
             SearchStreamScreen(fetchStreamViewModel, curScreenState)
-        }
-
-        composable(route = Screens.Audio.Playing.title) {
-            PlayingScreen(playingViewModel, curScreenState)
         }
 
         composable(route = Screens.Audio.AudioEffects.title) {

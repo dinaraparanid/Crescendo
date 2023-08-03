@@ -12,7 +12,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.palette.graphics.Palette
 import com.paranid5.mediastreamer.R
-import com.paranid5.mediastreamer.presentation.ui.extensions.getLightVibrantOrPrimary
+import com.paranid5.mediastreamer.presentation.ui.extensions.getLightMutedOrPrimary
 import com.paranid5.mediastreamer.presentation.ui.extensions.simpleShadow
 import org.koin.compose.koinInject
 
@@ -34,31 +34,31 @@ private fun PlayButton(
     modifier: Modifier = Modifier,
     playingUIHandler: PlayingUIHandler = koinInject(),
 ) {
-    val lightVibrantColor = palette.getLightVibrantOrPrimary()
+    val paletteColor = palette.getLightMutedOrPrimary()
     val isPlaying by playingPresenter.isPlayingState.collectAsState()
 
     when {
         isPlaying -> IconButton(
-            modifier = modifier.simpleShadow(color = lightVibrantColor),
+            modifier = modifier.simpleShadow(color = paletteColor),
             onClick = { playingUIHandler.sendPauseBroadcast() }
         ) {
             Icon(
                 modifier = Modifier.size(50.dp),
                 painter = painterResource(R.drawable.pause),
                 contentDescription = stringResource(R.string.pause),
-                tint = lightVibrantColor
+                tint = paletteColor
             )
         }
 
         else -> IconButton(
-            modifier = modifier.simpleShadow(color = lightVibrantColor),
+            modifier = modifier.simpleShadow(color = paletteColor),
             onClick = { playingUIHandler.startStreamingOrSendResumeBroadcast() }
         ) {
             Icon(
                 modifier = Modifier.size(50.dp),
                 painter = painterResource(R.drawable.play),
                 contentDescription = stringResource(R.string.play),
-                tint = lightVibrantColor
+                tint = paletteColor
             )
         }
     }
@@ -70,17 +70,17 @@ private fun SeekTo10SecsBackButton(
     modifier: Modifier = Modifier,
     playingUIHandler: PlayingUIHandler = koinInject()
 ) {
-    val lightVibrantColor = palette.getLightVibrantOrPrimary()
+    val paletteColor = palette.getLightMutedOrPrimary()
 
     IconButton(
-        modifier = modifier.simpleShadow(color = lightVibrantColor),
+        modifier = modifier.simpleShadow(color = paletteColor),
         onClick = { playingUIHandler.sendOnPrevButtonClickedBroadcast() }
     ) {
         Icon(
             modifier = Modifier.width(100.dp).height(50.dp),
             painter = painterResource(R.drawable.prev_track),
             contentDescription = stringResource(R.string.ten_secs_back),
-            tint = lightVibrantColor
+            tint = paletteColor
         )
     }
 }
@@ -91,17 +91,17 @@ private fun SeekTo10SecsForwardButton(
     modifier: Modifier = Modifier,
     playingUIHandler: PlayingUIHandler = koinInject()
 ) {
-    val lightVibrantColor = palette.getLightVibrantOrPrimary()
+    val paletteColor = palette.getLightMutedOrPrimary()
 
     IconButton(
-        modifier = modifier.simpleShadow(color = lightVibrantColor),
+        modifier = modifier.simpleShadow(color = paletteColor),
         onClick = { playingUIHandler.sendOnNextButtonClickedBroadcast() }
     ) {
         Icon(
             modifier = Modifier.width(100.dp).height(50.dp),
             painter = painterResource(R.drawable.next_track),
             contentDescription = stringResource(R.string.ten_secs_forward),
-            tint = lightVibrantColor
+            tint = paletteColor
         )
     }
 }

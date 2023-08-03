@@ -19,7 +19,7 @@ import androidx.compose.ui.unit.dp
 import androidx.palette.graphics.Palette
 import com.paranid5.mediastreamer.domain.StorageHandler
 import com.paranid5.mediastreamer.presentation.ui.utils.BroadcastReceiver
-import com.paranid5.mediastreamer.presentation.ui.extensions.getLightVibrantOrPrimary
+import com.paranid5.mediastreamer.presentation.ui.extensions.getLightMutedOrPrimary
 import org.koin.compose.koinInject
 
 @Composable
@@ -31,7 +31,7 @@ internal fun PlaybackSlider(
     storageHandler: StorageHandler = koinInject(),
     content: @Composable RowScope.(curPosition: Long, videoLength: Long, color: Color) -> Unit
 ) {
-    val lightVibrantColor = palette.getLightVibrantOrPrimary()
+    val paletteColor = palette.getLightMutedOrPrimary()
     var curPosition by remember { mutableLongStateOf(0L) }
 
     LaunchedEffect(key1 = true) {
@@ -47,8 +47,9 @@ internal fun PlaybackSlider(
             value = curPosition.toFloat(),
             valueRange = 0F..length.toFloat(),
             colors = SliderDefaults.colors(
-                thumbColor = lightVibrantColor,
-                activeTrackColor = lightVibrantColor
+                thumbColor = paletteColor,
+                activeTrackColor = paletteColor,
+                inactiveTrackColor = Color.White.copy(alpha = 0.15F)
             ),
             onValueChange = { curPosition = it.toLong() },
             onValueChangeFinished = {
@@ -57,7 +58,7 @@ internal fun PlaybackSlider(
         )
 
         Row(Modifier.fillMaxWidth()) {
-            content(curPosition, length, lightVibrantColor)
+            content(curPosition, length, paletteColor)
         }
     }
 }

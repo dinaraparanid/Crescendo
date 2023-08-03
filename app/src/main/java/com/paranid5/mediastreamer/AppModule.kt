@@ -10,27 +10,26 @@ import com.paranid5.mediastreamer.domain.ktor_client.KtorClient
 import com.paranid5.mediastreamer.domain.services.stream_service.StreamServiceAccessor
 import com.paranid5.mediastreamer.domain.services.track_service.TrackServiceAccessor
 import com.paranid5.mediastreamer.domain.services.video_cash_service.VideoCashServiceAccessor
-import com.paranid5.mediastreamer.presentation.appbar.stream_button.StreamButtonUIHandler
 import com.paranid5.mediastreamer.presentation.audio_effects.AudioEffectsPresenter
 import com.paranid5.mediastreamer.presentation.audio_effects.AudioEffectsUIHandler
 import com.paranid5.mediastreamer.presentation.audio_effects.AudioEffectsViewModel
-import com.paranid5.mediastreamer.presentation.main_activity.MainActivityViewModel
 import com.paranid5.mediastreamer.presentation.fetch_stream.FetchStreamPresenter
 import com.paranid5.mediastreamer.presentation.fetch_stream.FetchStreamUIHandler
 import com.paranid5.mediastreamer.presentation.fetch_stream.FetchStreamViewModel
+import com.paranid5.mediastreamer.presentation.main_activity.MainActivityViewModel
 import com.paranid5.mediastreamer.presentation.playing.PlayingPresenter
 import com.paranid5.mediastreamer.presentation.playing.PlayingUIHandler
 import com.paranid5.mediastreamer.presentation.playing.PlayingViewModel
 import com.paranid5.mediastreamer.presentation.tracks.TracksPresenter
 import com.paranid5.mediastreamer.presentation.tracks.TracksUIHandler
 import com.paranid5.mediastreamer.presentation.tracks.TracksViewModel
-import com.paranid5.mediastreamer.presentation.ui.utils.GlideUtils
 import com.paranid5.mediastreamer.presentation.ui.permissions.audioRecordingPermissionQueue
 import com.paranid5.mediastreamer.presentation.ui.permissions.description_providers.AudioRecordingDescriptionProvider
 import com.paranid5.mediastreamer.presentation.ui.permissions.description_providers.ExternalStorageDescriptionProvider
 import com.paranid5.mediastreamer.presentation.ui.permissions.description_providers.ForegroundServiceDescriptionProvider
 import com.paranid5.mediastreamer.presentation.ui.permissions.externalStoragePermissionQueue
 import com.paranid5.mediastreamer.presentation.ui.permissions.foregroundServicePermissionQueue
+import com.paranid5.mediastreamer.presentation.ui.utils.GlideUtils
 import kotlinx.coroutines.flow.MutableStateFlow
 import org.koin.android.ext.koin.androidApplication
 import org.koin.android.ext.koin.androidContext
@@ -153,7 +152,6 @@ private val tracksModule = module {
 
 private val uiMainModule = module {
     includes(searchStreamModule, playingModule, audioEffectsModule, tracksModule)
-    singleOf(::StreamButtonUIHandler)
 }
 
 private val uiModule = module {

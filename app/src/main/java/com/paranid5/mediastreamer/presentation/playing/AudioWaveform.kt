@@ -15,7 +15,7 @@ import androidx.palette.graphics.Palette
 import com.gauravk.audiovisualizer.visualizer.WaveVisualizer
 import com.paranid5.mediastreamer.AUDIO_SESSION_ID
 import com.paranid5.mediastreamer.R
-import com.paranid5.mediastreamer.presentation.ui.extensions.getLightVibrantOrPrimary
+import com.paranid5.mediastreamer.presentation.ui.extensions.getLightMutedOrPrimary
 import kotlinx.coroutines.flow.MutableStateFlow
 import org.koin.compose.koinInject
 import org.koin.core.qualifier.named
@@ -26,7 +26,7 @@ fun AudioWaveform(
     palette: Palette? = null,
     audioSessionIdState: MutableStateFlow<Int> = koinInject(named(AUDIO_SESSION_ID))
 ) {
-    val color = palette.getLightVibrantOrPrimary()
+    val color = palette.getLightMutedOrPrimary()
     val audioSessionId by audioSessionIdState.collectAsState()
     var visualizer: WaveVisualizer? = null
 

@@ -20,54 +20,52 @@ import com.paranid5.mediastreamer.presentation.Screens
 import com.paranid5.mediastreamer.presentation.ui.theme.LocalAppColors
 
 @Composable
-fun AppBar(modifier: Modifier = Modifier) {
-    val orientation = LocalConfiguration.current.orientation
+fun AppBar(modifier: Modifier = Modifier) = BottomAppBar(
+    modifier
+        .fillMaxWidth()
+        .height(appBarHeight)
+        .clip(RoundedCornerShape(topStart = 20.dp, topEnd = 20.dp))
+        .background(color = LocalAppColors.current.value.primary)
+) {
+    AppBarItem(
+        title = R.string.tracks,
+        image = painterResource(R.drawable.tracks),
+        screen = Screens.Tracks,
+        modifier = Modifier.weight(1F)
+    )
 
-    BottomAppBar(
-        modifier
-            .fillMaxWidth()
-            .height(
-                when (orientation) {
-                    Configuration.ORIENTATION_LANDSCAPE -> 60.dp
-                    else -> 80.dp
-                }
-            )
-            .clip(RoundedCornerShape(topStart = 20.dp, topEnd = 20.dp))
-            .background(color = LocalAppColors.current.value.primary)
-    ) {
-        AppBarItem(
-            title = R.string.tracks,
-            image = painterResource(R.drawable.tracks),
-            screen = Screens.Tracks,
-            modifier = Modifier.weight(1F)
-        )
+    AppBarItem(
+        title = R.string.track_collections,
+        image = painterResource(R.drawable.playlists),
+        screen = Screens.TrackCollections.Albums,
+        modifier = Modifier.weight(1F)
+    )
 
-        AppBarItem(
-            title = R.string.track_collections,
-            image = painterResource(R.drawable.playlists),
-            screen = Screens.TrackCollections.Albums,
-            modifier = Modifier.weight(1F)
-        )
+    AppBarItem(
+        title = R.string.streaming,
+        image = painterResource(R.drawable.stream_icon),
+        screen = Screens.StreamFetching,
+        modifier = Modifier.weight(1F)
+    )
 
-        AppBarItem(
-            title = R.string.streaming,
-            image = painterResource(R.drawable.stream_icon),
-            screen = Screens.StreamFetching,
-            modifier = Modifier.weight(1F)
-        )
+    AppBarItem(
+        title = R.string.favourites,
+        image = Icons.Filled.Favorite,
+        screen = Screens.Favourites,
+        modifier = Modifier.weight(1F)
+    )
 
-        AppBarItem(
-            title = R.string.favourites,
-            image = Icons.Filled.Favorite,
-            screen = Screens.Favourites,
-            modifier = Modifier.weight(1F)
-        )
-
-        AppBarItem(
-            title = R.string.settings,
-            image = Icons.Filled.Settings,
-            screen = Screens.Settings,
-            modifier = Modifier.weight(1F)
-        )
-    }
+    AppBarItem(
+        title = R.string.settings,
+        image = Icons.Filled.Settings,
+        screen = Screens.Settings,
+        modifier = Modifier.weight(1F)
+    )
 }
+
+inline val appBarHeight
+    @Composable
+    get() = when (LocalConfiguration.current.orientation) {
+        Configuration.ORIENTATION_LANDSCAPE -> 60.dp
+        else -> 80.dp
+    }

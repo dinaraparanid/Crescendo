@@ -57,7 +57,7 @@ import com.paranid5.mediastreamer.presentation.Screens
 import com.paranid5.mediastreamer.presentation.ui.AudioStatus
 import com.paranid5.mediastreamer.presentation.ui.permissions.requests.audioRecordingPermissionsRequestLauncher
 import com.paranid5.mediastreamer.presentation.ui.permissions.requests.foregroundServicePermissionsRequestLauncher
-import com.paranid5.mediastreamer.presentation.ui.rememberTrackCoverModel
+import com.paranid5.mediastreamer.presentation.ui.getTrackCoverModel
 import com.paranid5.mediastreamer.presentation.ui.theme.LocalAppColors
 import com.paranid5.mediastreamer.presentation.ui.utils.Searcher
 import com.paranid5.mediastreamer.presentation.ui.utils.Spinner
@@ -449,7 +449,7 @@ private suspend inline fun onTrackClicked(
 
 @Composable
 private fun TrackCover(trackPath: String, modifier: Modifier = Modifier) {
-    val trackCover = rememberTrackCoverModel(
+    val trackCover = getTrackCoverModel(
         path = trackPath,
         isPlaceholderRequired = true,
         size = 200 to 200,

@@ -6,12 +6,12 @@ import androidx.palette.graphics.Palette
 import com.paranid5.mediastreamer.presentation.ui.theme.LocalAppColors
 
 @Composable
-fun Palette?.getLightVibrantOrPrimary(): Color {
+fun Palette?.getLightMutedOrPrimary(): Color {
     val colors = LocalAppColors.current.value
     val primaryColorVal = colors.primary.value.toInt()
 
     val resultColor = this
-        ?.run { getLightVibrantColor(getDominantColor(primaryColorVal)) }
+        ?.run { getLightMutedColor(getDominantColor(primaryColorVal)) }
         ?.run(Int::increaseBrightness)
         ?: primaryColorVal.increaseBrightness()
 

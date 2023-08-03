@@ -24,9 +24,6 @@ sealed class Screens(val title: String) : Parcelable {
 
     sealed class Audio(title: String) : Screens("audio/$title") {
         @Parcelize
-        data object Playing : Audio("playing")
-
-        @Parcelize
         data object AudioEffects : Audio("audio_effects")
     }
 
