@@ -20,6 +20,7 @@ import androidx.palette.graphics.Palette
 import com.paranid5.mediastreamer.domain.StorageHandler
 import com.paranid5.mediastreamer.presentation.ui.utils.BroadcastReceiver
 import com.paranid5.mediastreamer.presentation.ui.extensions.getLightMutedOrPrimary
+import com.paranid5.mediastreamer.presentation.ui.theme.TransparentUtility
 import org.koin.compose.koinInject
 
 @Composable
@@ -49,7 +50,7 @@ internal fun PlaybackSlider(
             colors = SliderDefaults.colors(
                 thumbColor = paletteColor,
                 activeTrackColor = paletteColor,
-                inactiveTrackColor = Color.White.copy(alpha = 0.15F)
+                inactiveTrackColor = TransparentUtility
             ),
             onValueChange = { curPosition = it.toLong() },
             onValueChangeFinished = {

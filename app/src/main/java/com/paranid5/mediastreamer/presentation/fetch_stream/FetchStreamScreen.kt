@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentWidth
+import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material3.Button
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
@@ -28,7 +29,7 @@ import com.paranid5.mediastreamer.R
 import com.paranid5.mediastreamer.domain.StorageHandler
 import com.paranid5.mediastreamer.presentation.Screens
 import com.paranid5.mediastreamer.presentation.StateChangedCallback
-import com.paranid5.mediastreamer.presentation.composition_locals.LocalNavController
+import com.paranid5.mediastreamer.presentation.composition_locals.LocalPlayingSheetState
 import com.paranid5.mediastreamer.presentation.ui.AudioStatus
 import com.paranid5.mediastreamer.presentation.ui.OnUIStateChanged
 import com.paranid5.mediastreamer.presentation.ui.permissions.requests.audioRecordingPermissionsRequestLauncher
@@ -125,6 +126,7 @@ private fun UrlEditor(
     )
 }
 
+@OptIn(ExperimentalMaterialApi::class)
 @Composable
 private fun ConfirmButton(
     isConfirmButtonActive: Boolean,
@@ -132,11 +134,10 @@ private fun ConfirmButton(
     modifier: Modifier = Modifier,
     storageHandler: StorageHandler = koinInject()
 ) {
-    val navHostController = LocalNavController.current
-    val scope = rememberCoroutineScope()
-
+    val playingSheetState = LocalPlayingSheetState.current
     val isForegroundServicePermissionDialogShownState = remember { mutableStateOf(false) }
     val isAudioRecordingPermissionDialogShownState = remember { mutableStateOf(false) }
+    val scope = rememberCoroutineScope()
 
     Box(modifier) {
         val (areForegroundPermissionsGranted, launchFSPermissions) = foregroundServicePermissionsRequestLauncher(
@@ -166,6 +167,7 @@ private fun ConfirmButton(
                 scope.launch {
                     storageHandler.storeAudioStatus(AudioStatus.STREAMING)
                     viewModel.onConfirmUrlButtonPressed()
+                    playingSheetState?.bottomSheetState?.expand()
                 }
             }
         ) {

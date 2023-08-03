@@ -63,6 +63,14 @@ class TrackServiceAccessor(application: MainApplication) : ServiceAccessor(appli
         sendBroadcast(Intent(TrackService.Broadcast_ADD_TO_PLAYLIST).putTrack(track))
     }
 
+    fun removeFromPlaylist(trackInd: Int) {
+        Log.d(TAG, "Send remove track at $trackInd")
+        sendBroadcast(
+            Intent(TrackService.Broadcast_REMOVE_FROM_PLAYLIST)
+                .putExtra(TrackService.TRACK_INDEX_ARG, trackInd)
+        )
+    }
+
     private fun launchTrackService(playlist: List<DefaultTrack>, trackInd: Int) = when {
         isTrackServiceConnected -> switchPlaylist(playlist, trackInd)
         else -> startTrackService(playlist, trackInd)

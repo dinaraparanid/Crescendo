@@ -4,6 +4,7 @@ import android.content.res.Configuration
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Favorite
@@ -31,35 +32,35 @@ fun AppBar(modifier: Modifier = Modifier) = BottomAppBar(
         title = R.string.tracks,
         image = painterResource(R.drawable.tracks),
         screen = Screens.Tracks,
-        modifier = Modifier.weight(1F)
+        modifier = Modifier.weight(1F).padding(top = 5.dp)
     )
 
     AppBarItem(
         title = R.string.track_collections,
         image = painterResource(R.drawable.playlists),
         screen = Screens.TrackCollections.Albums,
-        modifier = Modifier.weight(1F)
+        modifier = Modifier.weight(1F).padding(top = 5.dp)
     )
 
     AppBarItem(
         title = R.string.streaming,
         image = painterResource(R.drawable.stream_icon),
         screen = Screens.StreamFetching,
-        modifier = Modifier.weight(1F)
+        modifier = Modifier.weight(1F).padding(top = 5.dp)
     )
 
     AppBarItem(
         title = R.string.favourites,
         image = Icons.Filled.Favorite,
         screen = Screens.Favourites,
-        modifier = Modifier.weight(1F)
+        modifier = Modifier.weight(1F).padding(top = 5.dp)
     )
 
     AppBarItem(
         title = R.string.settings,
         image = Icons.Filled.Settings,
         screen = Screens.Settings,
-        modifier = Modifier.weight(1F)
+        modifier = Modifier.weight(1F).padding(top = 5.dp)
     )
 }
 

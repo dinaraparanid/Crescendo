@@ -4,6 +4,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.size
+import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.runtime.Composable
@@ -11,6 +12,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -22,11 +24,14 @@ import com.paranid5.mediastreamer.R
 import com.paranid5.mediastreamer.domain.StorageHandler
 import com.paranid5.mediastreamer.domain.services.stream_service.StreamServiceAccessor
 import com.paranid5.mediastreamer.domain.services.track_service.TrackServiceAccessor
+import com.paranid5.mediastreamer.presentation.composition_locals.LocalCurrentPlaylistSheetState
 import com.paranid5.mediastreamer.presentation.composition_locals.LocalNavController
+import com.paranid5.mediastreamer.presentation.composition_locals.LocalPlayingSheetState
 import com.paranid5.mediastreamer.presentation.ui.AudioStatus
 import com.paranid5.mediastreamer.presentation.ui.extensions.getLightMutedOrPrimary
 import com.paranid5.mediastreamer.presentation.ui.extensions.simpleShadow
 import com.paranid5.mediastreamer.presentation.ui.permissions.requests.externalStoragePermissionsRequestLauncher
+import kotlinx.coroutines.launch
 import org.koin.compose.koinInject
 
 @Composable
@@ -38,6 +43,7 @@ internal fun UtilsButtons(palette: Palette?, modifier: Modifier = Modifier) =
         PlaylistOrDownloadButton(palette, Modifier.weight(1F))
     }
 
+@OptIn(ExperimentalMaterialApi::class)
 @Composable
 private fun EqualizerButton(
     palette: Palette?,
@@ -46,11 +52,16 @@ private fun EqualizerButton(
 ) {
     val context = LocalContext.current
     val navHostController = LocalNavController.current
+    val playingSheetState = LocalPlayingSheetState.current
     val paletteColor = palette.getLightMutedOrPrimary()
+    val scope = rememberCoroutineScope()
 
     IconButton(
         modifier = modifier.simpleShadow(color = paletteColor),
-        onClick = { playingUIHandler.navigateToAudioEffects(context, navHostController) }
+        onClick = {
+            playingUIHandler.navigateToAudioEffects(context, navHostController)
+            scope.launch { playingSheetState?.bottomSheetState?.collapse() }
+        }
     ) {
         Icon(
             modifier = Modifier.size(30.dp),
@@ -160,16 +171,19 @@ private fun DownloadButton(palette: Palette?, modifier: Modifier = Modifier) {
     }
 }
 
+@OptIn(ExperimentalMaterialApi::class)
 @Composable
 private fun CurrentPlaylistButton(
     palette: Palette?,
     modifier: Modifier = Modifier,
 ) {
     val paletteColor = palette.getLightMutedOrPrimary()
+    val scope = rememberCoroutineScope()
+    val curPlaylistSheetState = LocalCurrentPlaylistSheetState.current
 
     IconButton(
         modifier = modifier.simpleShadow(color = paletteColor),
-        onClick = { /** TODO: Current playlist view */ }
+        onClick = { scope.launch { curPlaylistSheetState?.show() } }
     ) {
         Icon(
             modifier = Modifier.size(30.dp),

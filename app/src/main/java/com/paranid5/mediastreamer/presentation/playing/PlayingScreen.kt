@@ -142,7 +142,7 @@ private fun PlayingScreenPortrait(
             modifier = Modifier
                 .alpha(coverAlpha)
                 .constrainAs(cover) {
-                    top.linkTo(parent.top, margin = 20.dp)
+                    top.linkTo(parent.top, margin = 30.dp)
                     bottom.linkTo(audioWave.top, margin = 10.dp)
                     start.linkTo(parent.start, margin = 15.dp)
                     end.linkTo(parent.end, margin = 15.dp)

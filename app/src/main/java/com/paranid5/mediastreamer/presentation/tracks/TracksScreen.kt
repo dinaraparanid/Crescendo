@@ -1,5 +1,6 @@
 package com.paranid5.mediastreamer.presentation.tracks
 
+import android.util.Log
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -20,7 +21,11 @@ import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.CheckboxDefaults
+import androidx.compose.material3.DismissValue
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.SwipeToDismiss
 import androidx.compose.material3.Text
+import androidx.compose.material3.rememberDismissState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
@@ -75,7 +80,6 @@ fun TracksScreen(
     modifier: Modifier = Modifier,
     storageHandler: StorageHandler = koinInject()
 ) {
-    val context = LocalContext.current
     curScreenState.update { Screens.Tracks }
 
     val allTracks by tracksViewModel.presenter.tracksState.collectAsState()
@@ -86,8 +90,7 @@ fun TracksScreen(
     val isSearchBarActiveState = remember { mutableStateOf(false) }
     val trackOrder by storageHandler.trackOrderState.collectAsState()
 
-    val isAudioRecordingPermissionDialogShownState = remember { mutableStateOf(true) }
-    val isForegroundServicePermissionDialogShownState = remember { mutableStateOf(true) }
+    val context = LocalContext.current
 
     LaunchedEffect(Unit) {
         tracksViewModel.presenter.tracksState.update {
@@ -314,7 +317,7 @@ private fun selectedTrackOrder(
 // -------------------------------- Track List --------------------------------
 
 @Composable
-private fun TrackList(
+fun TrackList(
     tracks: List<Track>,
     scrollingState: LazyListState,
     modifier: Modifier = Modifier,
@@ -330,7 +333,7 @@ private fun TrackList(
     ) {
         itemsIndexed(
             items = tracks,
-            key = { _, track -> track.path }
+            key = { ind, track -> track.path.hashCode() + ind }
         ) { ind, _ ->
             TrackItem(
                 tracks = tracks,
@@ -339,6 +342,56 @@ private fun TrackList(
                 storageHandler = storageHandler,
                 trackServiceAccessor = trackServiceAccessor,
                 modifier = Modifier.fillMaxWidth()
+            )
+        }
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun DismissableTrackList(
+    tracks: List<Track>,
+    scrollingState: LazyListState,
+    modifier: Modifier = Modifier,
+    storageHandler: StorageHandler = koinInject(),
+    trackServiceAccessor: TrackServiceAccessor = koinInject(),
+    onTrackDismiss: suspend (Int, Track) -> Unit
+) {
+    val scope = rememberCoroutineScope()
+
+    LazyColumn(
+        verticalArrangement = Arrangement.spacedBy(10.dp),
+        state = scrollingState,
+        modifier = modifier
+    ) {
+        itemsIndexed(
+            items = tracks,
+            key = { ind, track -> track.path.hashCode() + ind }
+        ) { ind, track ->
+            val dismissState = rememberDismissState(
+                confirmValueChange = {
+                    if (it == DismissValue.DismissedToEnd) {
+                        Log.d("TrackScreen", "Track $track is removed from the current playlist")
+                        scope.launch { onTrackDismiss(ind, track) }
+                    }
+
+                    it != DismissValue.DismissedToEnd
+                }
+            )
+
+            SwipeToDismiss(
+                state = dismissState,
+                background = {},
+                dismissContent = {
+                    TrackItem(
+                        tracks = tracks,
+                        trackInd = ind,
+                        scope = scope,
+                        storageHandler = storageHandler,
+                        trackServiceAccessor = trackServiceAccessor,
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                }
             )
         }
     }

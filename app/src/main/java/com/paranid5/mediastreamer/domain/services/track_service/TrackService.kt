@@ -81,7 +81,9 @@ class TrackService : SuspendService(), ReceiverManager, LifecycleNotificationMan
         const val Broadcast_PAUSE = "$SERVICE_LOCATION.PAUSE"
         const val Broadcast_RESUME = "$SERVICE_LOCATION.RESUME"
         const val Broadcast_SWITCH_PLAYLIST = "$SERVICE_LOCATION.SWITCH_PLAYLIST"
+
         const val Broadcast_ADD_TO_PLAYLIST = "$SERVICE_LOCATION.ADD_TO_PLAYLIST"
+        const val Broadcast_REMOVE_FROM_PLAYLIST = "$SERVICE_LOCATION.REMOVE_FROM_PLAYLIST"
 
         const val Broadcast_PREV_TRACK = "$SERVICE_LOCATION.PREV_TRACK"
         const val Broadcast_NEXT_TRACK = "$SERVICE_LOCATION.NEXT_TRACK"
@@ -485,6 +487,14 @@ class TrackService : SuspendService(), ReceiverManager, LifecycleNotificationMan
         }
     }
 
+    private val removeFromPlaylistReceiver = object : BroadcastReceiver() {
+        override fun onReceive(context: Context?, intent: Intent) {
+            val index = intent.getIntExtra(TRACK_INDEX_ARG, 0)
+            Log.d(TAG, "Remove $index track from playlist")
+            mPlayer.removeMediaItem(index)
+        }
+    }
+
     private val switchToPrevTrackReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context?, intent: Intent?) {
             Log.d(TAG, "prev track")
@@ -575,6 +585,7 @@ class TrackService : SuspendService(), ReceiverManager, LifecycleNotificationMan
         registerReceiverCompat(resumeReceiver, Broadcast_RESUME)
         registerReceiverCompat(switchPlaylistReceiver, Broadcast_SWITCH_PLAYLIST)
         registerReceiverCompat(addToPlaylistReceiver, Broadcast_ADD_TO_PLAYLIST)
+        registerReceiverCompat(removeFromPlaylistReceiver, Broadcast_REMOVE_FROM_PLAYLIST)
         registerReceiverCompat(switchToPrevTrackReceiver, Broadcast_PREV_TRACK)
         registerReceiverCompat(switchToNextTrackReceiver, Broadcast_NEXT_TRACK)
         registerReceiverCompat(seekToReceiver, Broadcast_SEEK_TO)
@@ -592,6 +603,7 @@ class TrackService : SuspendService(), ReceiverManager, LifecycleNotificationMan
         unregisterReceiver(resumeReceiver)
         unregisterReceiver(switchPlaylistReceiver)
         unregisterReceiver(addToPlaylistReceiver)
+        unregisterReceiver(removeFromPlaylistReceiver)
         unregisterReceiver(switchToPrevTrackReceiver)
         unregisterReceiver(switchToNextTrackReceiver)
         unregisterReceiver(seekToReceiver)
