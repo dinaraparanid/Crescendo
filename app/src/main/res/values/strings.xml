@@ -84,4 +84,5 @@
     <string name="number_in_album">№ in Album</string>
     <string name="current_playlist">Current playlist</string>
     <string name="add_to_cur_playlist">Add to current playlist</string>
+    <string name="duration">Duration</string>
 </resources>

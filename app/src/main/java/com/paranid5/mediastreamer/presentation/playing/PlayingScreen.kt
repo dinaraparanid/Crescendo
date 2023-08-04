@@ -27,17 +27,14 @@ import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.constraintlayout.compose.Dimension
 import coil.compose.AsyncImage
 import com.paranid5.mediastreamer.R
-import com.paranid5.mediastreamer.data.tracks.artistAlbum
+import com.paranid5.mediastreamer.data.utils.extensions.artistAlbum
 import com.paranid5.mediastreamer.domain.StorageHandler
-import com.paranid5.mediastreamer.presentation.Screens
 import com.paranid5.mediastreamer.presentation.ui.AudioStatus
 import com.paranid5.mediastreamer.presentation.ui.extensions.increaseDarkness
 import com.paranid5.mediastreamer.presentation.ui.getCurrentTrackCoverModel
 import com.paranid5.mediastreamer.presentation.ui.getCurrentTrackCoverModelWithPalette
 import com.paranid5.mediastreamer.presentation.ui.getVideoCoverModel
 import com.paranid5.mediastreamer.presentation.ui.getVideoCoverModelWithPalette
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.update
 import org.koin.compose.koinInject
 
 private const val BROADCAST_LOCATION = "com.paranid5.mediastreamer.presentation.playing"

@@ -112,9 +112,9 @@ private fun PlayingBottomSheet(
     playingViewModel: PlayingViewModel = koinViewModel(),
 ) {
     val backgroundColor = LocalAppColors.current.value.background
-    val scaffoldState = LocalCurrentPlaylistSheetState.current
+    val curPlaylistSheetState = LocalCurrentPlaylistSheetState.current
 
-    scaffoldState?.let { curPlaylistScaffoldState ->
+    curPlaylistSheetState?.let { curPlaylistScaffoldState ->
         ModalBottomSheetLayout(
             modifier = modifier,
             sheetState = curPlaylistScaffoldState,
@@ -151,7 +151,7 @@ private fun CurrentPlaylistBottomSheet(modifier: Modifier = Modifier) =
         CurrentPlaylistScreen(
             Modifier
                 .fillMaxSize()
-                .padding(start = 10.dp, end = 5.dp, top = 25.dp)
+                .padding(top = 25.dp)
         )
 
         PushUpButton(

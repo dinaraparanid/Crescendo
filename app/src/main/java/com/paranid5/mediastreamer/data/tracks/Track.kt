@@ -13,8 +13,3 @@ interface Track : Parcelable {
     val dateAdded: Long
     val numberInAlbum: Int
 }
-
-inline val Track.artistAlbum
-    get() = "$artist / $album"
-
-fun Iterable<Track>.toDefaultTrackList() = map(::DefaultTrack)

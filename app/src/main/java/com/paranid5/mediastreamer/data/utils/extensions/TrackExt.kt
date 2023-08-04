@@ -2,7 +2,11 @@ package com.paranid5.mediastreamer.data.utils.extensions
 
 import android.graphics.Bitmap
 import android.support.v4.media.MediaMetadataCompat
+import com.paranid5.mediastreamer.data.tracks.DefaultTrack
 import com.paranid5.mediastreamer.data.tracks.Track
+
+inline val Track.artistAlbum
+    get() = "$artist / $album"
 
 fun Track.toAndroidMetadata(cover: Bitmap? = null): MediaMetadataCompat =
     MediaMetadataCompat.Builder()
@@ -12,3 +16,8 @@ fun Track.toAndroidMetadata(cover: Bitmap? = null): MediaMetadataCompat =
         .putLong(MediaMetadataCompat.METADATA_KEY_DURATION, duration)
         .putBitmap(MediaMetadataCompat.METADATA_KEY_ART, cover)
         .build()
+
+fun Iterable<Track>.toDefaultTrackList() = map(::DefaultTrack)
+
+inline val Iterable<Track>.totalDuration
+    get() = fold(0L) { acc, track -> acc + track.duration }

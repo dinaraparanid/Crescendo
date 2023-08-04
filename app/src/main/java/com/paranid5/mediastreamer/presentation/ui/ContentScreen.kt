@@ -4,6 +4,7 @@ import android.widget.Toast
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
@@ -15,12 +16,12 @@ import com.paranid5.mediastreamer.presentation.about_app.AboutApp
 import com.paranid5.mediastreamer.presentation.audio_effects.AudioEffectsScreen
 import com.paranid5.mediastreamer.presentation.audio_effects.AudioEffectsViewModel
 import com.paranid5.mediastreamer.presentation.composition_locals.LocalActivity
+import com.paranid5.mediastreamer.presentation.composition_locals.LocalCurrentPlaylistSheetState
 import com.paranid5.mediastreamer.presentation.composition_locals.LocalNavController
+import com.paranid5.mediastreamer.presentation.composition_locals.LocalPlayingSheetState
 import com.paranid5.mediastreamer.presentation.favourites.FavouritesScreen
-import com.paranid5.mediastreamer.presentation.fetch_stream.SearchStreamScreen
 import com.paranid5.mediastreamer.presentation.fetch_stream.FetchStreamViewModel
-import com.paranid5.mediastreamer.presentation.playing.PlayingScreen
-import com.paranid5.mediastreamer.presentation.playing.PlayingViewModel
+import com.paranid5.mediastreamer.presentation.fetch_stream.SearchStreamScreen
 import com.paranid5.mediastreamer.presentation.settings.SettingsScreen
 import com.paranid5.mediastreamer.presentation.track_collections.AlbumsScreen
 import com.paranid5.mediastreamer.presentation.tracks.TracksScreen
@@ -31,6 +32,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import org.koin.androidx.compose.koinViewModel
 import java.util.concurrent.atomic.AtomicInteger
 
+@OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun ContentScreen(
     padding: PaddingValues,
@@ -41,8 +43,20 @@ fun ContentScreen(
 ) {
     val backPressedCounter = AtomicInteger()
     val activity = LocalActivity.current
+    val playingSheetState = LocalPlayingSheetState.current
+    val currentPlaylistSheetState = LocalCurrentPlaylistSheetState.current
 
     OnBackPressedHandler { isStackEmpty ->
+        if (currentPlaylistSheetState?.isVisible == true) {
+            currentPlaylistSheetState.hide()
+            return@OnBackPressedHandler
+        }
+
+        if (playingSheetState?.bottomSheetState?.isExpanded == true) {
+            playingSheetState.bottomSheetState.collapse()
+            return@OnBackPressedHandler
+        }
+
         if (isStackEmpty) {
             when (backPressedCounter.incrementAndGet()) {
                 2 -> activity?.finish()
