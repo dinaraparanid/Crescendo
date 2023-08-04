@@ -7,7 +7,7 @@
 ## **About App**
 **Crescendo** is a music player Android app that
 **plays both local files and audio from YouTube.**
-Applications provides multiple features to move
+Application provides multiple features to move
 your music experience to a new level!
 
 ### **Preview**
