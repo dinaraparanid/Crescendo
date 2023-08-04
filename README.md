@@ -14,31 +14,44 @@ your music experience to a new level!
 
 **Playback of local tracks**
 
-![playing_preview](https://i.ibb.co/JkdSjn2/playing-track.jpg)
-![tracks](https://i.ibb.co/KhGH5qt/tracks.jpg)
-![track_sort](https://i.ibb.co/PwMtJqm/track-sort.jpg)
+<p>
+    <img src="https://i.ibb.co/JkdSjn2/playing-track.jpg" alt="playing_preview" width="100">
+    &nbsp;
+    <img src="https://i.ibb.co/KhGH5qt/tracks.jpg" alt="tracks" width="100">
+    &nbsp;
+    <img src="https://i.ibb.co/PwMtJqm/track-sort.jpg" alt="track_sort" width="100">
+</p>
 
-**Support of audio effects (Equalizer, Bass, Reverb, Pitch and Speed)**
+**Support of audio effects (Equalizer, Bass, Reverb, Pitch and Speed shifter)**
 
-![audio_effects](https://i.ibb.co/TRN3zF5/audio-effects.jpg)
+<img src="https://i.ibb.co/TRN3zF5/audio-effects.jpg" alt="audio_effects" width="100">
 
 **Customize your current playlist**
-![cur_playlist](https://i.ibb.co/cQyxngv/current-playlist.jpg)
+
+<img src="https://i.ibb.co/cQyxngv/current-playlist.jpg" alt="cur_playlist" width="100">
 
 **Stream tracks from the YouTube**
-![fetch_youtube](https://i.ibb.co/vL6GqhD/fetch-youtube.jpg)
-![playing_youtube](https://i.ibb.co/bBFTvP5/playing-youtube.jpg)
 
-**Cash video to the prefered format**
-![cash_video](https://i.ibb.co/jk1PB6m/cash-youtube.jpg)
+<p>
+    <img src="https://i.ibb.co/vL6GqhD/fetch-youtube.jpg" alt="fetch_youtube" width="100">
+    &nbsp;
+    <img src="https://i.ibb.co/bBFTvP5/playing-youtube.jpg" alt="playing_youtube" width="100">
+</p>
+
+**Cash video to the preferred format**
+
+<img src="https://i.ibb.co/jk1PB6m/cash-youtube.jpg" alt="cash_video" width="100">
 
 **Control playback and cashing with notifications**
-![notifications](https://i.ibb.co/zfkTCTn/notifications.jpg)
+
+<img src="https://i.ibb.co/zfkTCTn/notifications.jpg" alt="notifications" width="100">
 
 **Landscape mode support**
-![landscape](https://i.ibb.co/r4xyJq9/landscape.jpg)
+
+<img src="https://i.ibb.co/r4xyJq9/landscape.jpg" alt="landscape" width="100">
 
 ## **Current Status:**
+
 **Alpha V 0.0.0.4**
 
 ### **Implemented features:**
