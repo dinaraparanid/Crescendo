@@ -22,7 +22,7 @@
             android:maxSdkVersion="29"/>
 
     <application
-            android:name=".MainApplication"
+            android:name="com.paranid5.crescendo.MainApplication"
             android:allowBackup="true"
             android:dataExtractionRules="@xml/data_extraction_rules"
             android:fullBackupContent="@xml/backup_rules"
@@ -53,10 +53,10 @@
                     android:value="" />
         </activity>
         <service
-                android:name="com.paranid5.mediastreamer.domain.services.stream_service.StreamService"
+                android:name="com.paranid5.crescendo.domain.services.stream_service.StreamService"
                 android:foregroundServiceType="mediaPlayback" />
-        <service android:name="com.paranid5.mediastreamer.domain.services.track_service.TrackService"
+        <service android:name="com.paranid5.crescendo.domain.services.track_service.TrackService"
                 android:foregroundServiceType="mediaPlayback" />
-        <service android:name="com.paranid5.mediastreamer.domain.services.video_cash_service.VideoCashService" />
+        <service android:name="com.paranid5.crescendo.domain.services.video_cash_service.VideoCashService" />
     </application>
 </manifest>

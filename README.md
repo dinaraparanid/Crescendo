@@ -1,31 +1,60 @@
-**MediaStreamer**
+**Crescendo**
 -----------------
 
 ## **Developer**
 [Paranid5](https://github.com/dinaraparanid)
 
 ## **About App**
-**Media Streamer** is a music player Android app that
-can **play audio files from YouTube and cash them.**
+**Crescendo** is a music player Android app that
+**plays both local files and audio from YouTube.**
+Applications provides multiple features to move
+your music experience to a new level!
 
-![playing_preview](app/src/main/res/drawable/playing_preview.webp)
-![notifications](app/src/main/res/drawable/notifications.webp)
-![cashing_options](app/src/main/res/drawable/cashing_options.webp)
-![audio_effects](app/src/main/res/drawable/audio_effects.webp)
+### **Preview**
 
-## **Current Status**
-**Alpha V 0.0.0.3**
+**Playback of local tracks**
 
-**Implemented features:**
-1. Media Playback
-2. Audio Cashing
-3. Video Cashing
+![playing_preview](https://i.ibb.co/JkdSjn2/playing-track.jpg)
+![tracks](https://i.ibb.co/KhGH5qt/tracks.jpg)
+![track_sort](https://i.ibb.co/PwMtJqm/track-sort.jpg)
+
+**Support of audio effects (Equalizer, Bass, Reverb, Pitch and Speed)**
+
+![audio_effects](https://i.ibb.co/TRN3zF5/audio-effects.jpg)
+
+**Customize your current playlist**
+![cur_playlist](https://i.ibb.co/cQyxngv/current-playlist.jpg)
+
+**Stream tracks from the YouTube**
+![fetch_youtube](https://i.ibb.co/vL6GqhD/fetch-youtube.jpg)
+![playing_youtube](https://i.ibb.co/bBFTvP5/playing-youtube.jpg)
+
+**Cash video to the prefered format**
+![cash_video](https://i.ibb.co/jk1PB6m/cash-youtube.jpg)
+
+**Control playback and cashing with notifications**
+![notifications](https://i.ibb.co/zfkTCTn/notifications.jpg)
+
+**Landscape mode support**
+![landscape](https://i.ibb.co/r4xyJq9/landscape.jpg)
+
+## **Current Status:**
+**Alpha V 0.0.0.4**
+
+### **Implemented features:**
+1. Media playback with local tracks and youtube videos
+2. Audio and Video cashing to multiple formats
+3. Current playlist system (add and remove tracks)
 4. Audio Effects: EQ, Bass Boost, Reverb, Pitch and Speed shifters
-5. New versions (update) notification
+5. Updates notifications
 
-**TODO:**
-1. Playback of cashed videos and favourites system
-2. App customization and settings
+### **TODO:**
+1. Artists, albums and playlists
+2. Favourites
+3. Track trimming
+4. Tags changing
+5. Lyrics
+6. App customization and settings
 
 ## **System Requirements**
 **Android 5.0** or higher
