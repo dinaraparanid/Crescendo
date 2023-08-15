@@ -102,7 +102,7 @@ internal inline fun getVideoCoverModelWithPalette(
     var prevCoverModel by remember { mutableStateOf<BitmapDrawable?>(null) }
     var palette by remember { mutableStateOf<Palette?>(null) }
 
-    LaunchedEffect(metadata) {
+    LaunchedEffect(key1 = metadata, key2 = size) {
         val newPaletteAndModel = metadata?.let {
             glideUtils.getVideoCoverWithPaletteAsync(it, size, bitmapSettings).await()
         }

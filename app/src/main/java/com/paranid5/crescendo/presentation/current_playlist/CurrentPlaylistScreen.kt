@@ -62,15 +62,17 @@ fun CurrentPlaylistScreen(
             modifier = modifier.padding(start = 10.dp, end = 5.dp, bottom = 10.dp),
             storageHandler = storageHandler
         ) { index, _ ->
-            if (index != currentTrackIndex) {
-                val newPlaylist = currentPlaylist.take(index) + currentPlaylist.drop(index + 1)
-                storageHandler.storeCurrentPlaylist(newPlaylist)
+            if (index == currentTrackIndex)
+                return@DismissableTrackList false
 
-                if (index < currentTrackIndex)
-                    storageHandler.storeCurrentTrackIndex(currentTrackIndex - 1)
+            val newPlaylist = currentPlaylist.take(index) + currentPlaylist.drop(index + 1)
+            storageHandler.storeCurrentPlaylist(newPlaylist)
 
-                trackServiceAccessor.removeFromPlaylist(index)
-            }
+            if (index < currentTrackIndex)
+                storageHandler.storeCurrentTrackIndex(currentTrackIndex - 1)
+
+            trackServiceAccessor.removeFromPlaylist(index)
+            true
         }
     }
 }

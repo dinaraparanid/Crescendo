@@ -108,17 +108,17 @@ private fun PlayingScreenPortrait(
     viewModel: PlayingViewModel,
     modifier: Modifier,
 ) {
-    var size by remember { mutableStateOf(1 to 1) }
+    var coverSize by remember { mutableStateOf(1 to 1) }
 
     val (coverModel, palette) = when (audioStatus) {
         AudioStatus.STREAMING -> getVideoCoverModelWithPalette(
             isPlaceholderRequired = true,
-            size = size
+            size = coverSize
         )
 
         else -> getCurrentTrackCoverModelWithPalette(
             isPlaceholderRequired = true,
-            size = size
+            size = coverSize
         )
     }
 
@@ -138,7 +138,7 @@ private fun PlayingScreenPortrait(
                 .alpha(coverAlpha)
         )
 
-        VideoCover(
+        Cover(
             coverModel = coverModel,
             palette = palette,
             modifier = Modifier
@@ -152,7 +152,7 @@ private fun PlayingScreenPortrait(
                     width = Dimension.fillToConstraints
                 }
                 .onGloballyPositioned { coordinates ->
-                    size = coordinates.size.width to coordinates.size.height
+                    coverSize = coordinates.size.width to coordinates.size.height
                 },
         )
 
@@ -228,15 +228,17 @@ private fun PlayingScreenLandscape(
     viewModel: PlayingViewModel,
     modifier: Modifier,
 ) {
+    var coverSize by remember { mutableStateOf(1 to 1) }
+
     val (coverModel, palette) = when (audioStatus) {
         AudioStatus.STREAMING -> getVideoCoverModelWithPalette(
             isPlaceholderRequired = true,
-            size = 1100 to 1000
+            size = coverSize
         )
 
         else -> getCurrentTrackCoverModelWithPalette(
             isPlaceholderRequired = true,
-            size = 1100 to 1000
+            size = coverSize
         )
     }
 
@@ -270,7 +272,7 @@ private fun PlayingScreenLandscape(
                 }
         )
 
-        VideoCover(
+        Cover(
             coverModel = coverModel,
             palette = palette,
             modifier = Modifier
@@ -281,6 +283,9 @@ private fun PlayingScreenLandscape(
                     top.linkTo(parent.top, margin = 8.dp)
                     bottom.linkTo(slider.top, margin = 2.dp)
                     height = Dimension.fillToConstraints
+                }
+                .onGloballyPositioned { coordinates ->
+                    coverSize = coordinates.size.width to coordinates.size.height
                 },
         )
 

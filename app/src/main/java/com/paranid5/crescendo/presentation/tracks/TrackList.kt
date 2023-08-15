@@ -96,7 +96,7 @@ fun DismissableTrackList(
     trackItemView: TrackItemView,
     storageHandler: StorageHandler = koinInject(),
     trackServiceAccessor: TrackServiceAccessor = koinInject(),
-    onTrackDismiss: suspend (Int, Track) -> Unit
+    onTrackDismiss: suspend (Int, Track) -> Boolean
 ) {
     val scope = rememberCoroutineScope()
 
@@ -116,7 +116,7 @@ fun DismissableTrackList(
                         scope.launch { onTrackDismiss(ind, track) }
                     }
 
-                    it != DismissValue.DismissedToEnd
+                    it == DismissValue.DismissedToEnd
                 }
             )
 
@@ -145,7 +145,7 @@ fun DismissableTrackList(
     modifier: Modifier = Modifier,
     storageHandler: StorageHandler = koinInject(),
     trackServiceAccessor: TrackServiceAccessor = koinInject(),
-    onTrackDismiss: suspend (Int, Track) -> Unit
+    onTrackDismiss: suspend (Int, Track) -> Boolean
 ) = DismissableTrackList(
     tracks = tracks,
     scrollingState = scrollingState,

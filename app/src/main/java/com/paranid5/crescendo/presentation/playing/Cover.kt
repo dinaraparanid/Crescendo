@@ -17,7 +17,7 @@ import com.paranid5.crescendo.R
 import com.paranid5.crescendo.presentation.ui.extensions.getLightMutedOrPrimary
 
 @Composable
-fun VideoCover(
+fun Cover(
     coverModel: ImageRequest,
     palette: Palette?,
     modifier: Modifier = Modifier

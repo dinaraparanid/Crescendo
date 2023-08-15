@@ -50,9 +50,55 @@ your music experience to a new level!
 
 <img src="https://i.ibb.co/r4xyJq9/landscape.jpg" alt="landscape" width="100">
 
+## **Stack**
+
+<ul>
+    <li>General</li>
+    <ul>
+        <li>Kotlin 1.9</li>
+        <li>Coroutines</li>
+        <li>Koin</li>
+        <li>Ktor</li>
+        <li>KotlinX.Serialization</li>
+        <li>Arrow</li>
+    </ul>
+    <p></p>
+    <li>Media</li>
+    <ul>
+        <li>Exoplayer (as part of AndroidX.Media3)</li>
+        <li>FFMpeg</li>
+        <li>JAudioTagger</li>
+        <li>Java Audio Video Encoder</li>
+        <li>AndroidX.Media (audio effects)</li>
+        <li>Android Storage Access Framework</li>
+        <li>Android Media Store</li>
+        <li>Android Media Scanner</li>
+    </ul>
+    <p></p>
+    <li>UI</li>
+    <ul>
+        <li>Compose Material</li>
+        <li>Glide</li>
+        <li>Coil + Compose extensions</li>
+        <li>AndroidX.Palette</li>
+        <li>AndroidX.Navigation.Compose (NavHost)</li>
+        <li>AndroidX.ConstraintLayout (Compose version)</li>
+        <li>Composition Local</li>
+        <li>Android Canvas (Compose version)</li>
+    </ul>
+    <p></p>
+    <li>Android specific</li>
+    <ul>
+        <li>View Model (+ Kotlin extensions)</li>
+        <li>Foreground Services + Broadcast Receivers</li>
+        <li>DataStore</li>
+        <li>KotlinX.Parcelize</li>
+    </ul>
+</ul>
+
 ## **Current Status:**
 
-**Alpha V 0.0.0.4**
+**Alpha V 0.1.0.0**
 
 ### **Implemented features:**
 1. Media playback with local tracks and youtube videos
