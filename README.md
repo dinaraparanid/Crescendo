@@ -1,6 +1,8 @@
 **Crescendo**
 -----------------
 
+[![Kotlin](https://img.shields.io/badge/kotlin-1.9.0-blue.svg?logo=kotlin)](http://kotlinlang.org)
+
 ## **Developer**
 [Paranid5](https://github.com/dinaraparanid)
 
@@ -58,7 +60,7 @@ your music experience to a new level!
         <li>Kotlin 1.9</li>
         <li>Coroutines</li>
         <li>Koin</li>
-        <li>Ktor</li>
+        <li>Ktor (Content Negotiation + Json, Logging extensions)</li>
         <li>KotlinX.Serialization</li>
         <li>Arrow</li>
     </ul>
