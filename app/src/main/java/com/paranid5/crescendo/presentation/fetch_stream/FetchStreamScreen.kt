@@ -40,7 +40,9 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import org.koin.compose.koinInject
 
-private val youtubeUrlRegex = Regex("https://(www\\.youtube\\.com/watch\\?v=|youtu\\.be/)\\S{11}")
+private val youtubeUrlRegex = Regex(
+    "https://(www\\.youtube\\.com/watch\\?v=|youtu\\.be/)\\S{11}(\\?si=\\S{16})?"
+)
 
 @Composable
 fun SearchStreamScreen(

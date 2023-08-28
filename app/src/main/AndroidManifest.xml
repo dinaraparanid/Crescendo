@@ -33,7 +33,6 @@
             android:theme="@style/Theme.MediaStreamer"
             android:usesCleartextTraffic="true"
             android:requestLegacyExternalStorage="true"
-            android:extractNativeLibs="true"
             tools:targetApi="33">
         <provider
                 android:name="androidx.startup.InitializationProvider"
