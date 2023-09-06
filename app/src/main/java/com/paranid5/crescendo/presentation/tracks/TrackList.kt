@@ -1,15 +1,10 @@
 package com.paranid5.crescendo.presentation.tracks
 
-import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.itemsIndexed
-import androidx.compose.material3.DismissValue
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.SwipeToDismiss
-import androidx.compose.material3.rememberDismissState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
@@ -18,7 +13,6 @@ import com.paranid5.crescendo.data.tracks.Track
 import com.paranid5.crescendo.domain.StorageHandler
 import com.paranid5.crescendo.domain.services.track_service.TrackServiceAccessor
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.launch
 import org.koin.compose.koinInject
 
 typealias TrackItemView = @Composable (
@@ -35,6 +29,7 @@ fun TrackList(
     tracks: List<Track>,
     scrollingState: LazyListState,
     modifier: Modifier = Modifier,
+    trackItemModifier: Modifier = Modifier,
     trackItemView: TrackItemView,
     storageHandler: StorageHandler = koinInject(),
     trackServiceAccessor: TrackServiceAccessor = koinInject()
@@ -51,12 +46,12 @@ fun TrackList(
             key = { ind, track -> track.path.hashCode() + ind }
         ) { ind, _ ->
             trackItemView(
-                tracks = tracks,
-                trackInd = ind,
-                scope = scope,
-                storageHandler = storageHandler,
-                trackServiceAccessor = trackServiceAccessor,
-                modifier = Modifier.fillMaxWidth()
+                tracks,
+                ind,
+                scope,
+                storageHandler,
+                trackServiceAccessor,
+                trackItemModifier.fillMaxWidth()
             )
         }
     }
@@ -67,100 +62,23 @@ fun TrackList(
     tracks: List<Track>,
     scrollingState: LazyListState,
     modifier: Modifier = Modifier,
+    trackItemModifier: Modifier = Modifier,
     storageHandler: StorageHandler = koinInject(),
     trackServiceAccessor: TrackServiceAccessor = koinInject()
 ) = TrackList(
     tracks = tracks,
     scrollingState = scrollingState,
     modifier = modifier,
-    trackItemView = { _, trackInd, scope, _, _, modifier ->
+    trackItemView = { _, trackInd, scope, _, _, trackModifier ->
         DefaultTrackItem(
-            tracks,
-            trackInd,
-            scope,
-            storageHandler,
-            trackServiceAccessor,
-            modifier
+            modifier = trackModifier.then(trackItemModifier),
+            tracks = tracks,
+            trackInd = trackInd,
+            scope = scope,
+            storageHandler = storageHandler,
+            trackServiceAccessor = trackServiceAccessor,
         )
     },
     storageHandler = storageHandler,
     trackServiceAccessor = trackServiceAccessor
-)
-
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-fun DismissableTrackList(
-    tracks: List<Track>,
-    scrollingState: LazyListState,
-    modifier: Modifier = Modifier,
-    trackItemView: TrackItemView,
-    storageHandler: StorageHandler = koinInject(),
-    trackServiceAccessor: TrackServiceAccessor = koinInject(),
-    onTrackDismiss: suspend (Int, Track) -> Boolean
-) {
-    val scope = rememberCoroutineScope()
-
-    LazyColumn(
-        verticalArrangement = Arrangement.spacedBy(10.dp),
-        state = scrollingState,
-        modifier = modifier
-    ) {
-        itemsIndexed(
-            items = tracks,
-            key = { ind, track -> track.path.hashCode() + ind }
-        ) { ind, track ->
-            val dismissState = rememberDismissState(
-                confirmValueChange = {
-                    if (it == DismissValue.DismissedToEnd) {
-                        Log.d("TrackList", "Track $track is removed from the current playlist")
-                        scope.launch { onTrackDismiss(ind, track) }
-                    }
-
-                    it == DismissValue.DismissedToEnd
-                }
-            )
-
-            SwipeToDismiss(
-                state = dismissState,
-                background = {},
-                dismissContent = {
-                    trackItemView(
-                        tracks = tracks,
-                        trackInd = ind,
-                        scope = scope,
-                        storageHandler = storageHandler,
-                        trackServiceAccessor = trackServiceAccessor,
-                        modifier = Modifier.fillMaxWidth()
-                    )
-                }
-            )
-        }
-    }
-}
-
-@Composable
-fun DismissableTrackList(
-    tracks: List<Track>,
-    scrollingState: LazyListState,
-    modifier: Modifier = Modifier,
-    storageHandler: StorageHandler = koinInject(),
-    trackServiceAccessor: TrackServiceAccessor = koinInject(),
-    onTrackDismiss: suspend (Int, Track) -> Boolean
-) = DismissableTrackList(
-    tracks = tracks,
-    scrollingState = scrollingState,
-    modifier = modifier,
-    trackItemView = { _, trackInd, scope, _, _, modifier ->
-        DefaultTrackItem(
-            tracks,
-            trackInd,
-            scope,
-            storageHandler,
-            trackServiceAccessor,
-            modifier
-        )
-    },
-    storageHandler = storageHandler,
-    trackServiceAccessor = trackServiceAccessor,
-    onTrackDismiss = onTrackDismiss
 )

@@ -15,16 +15,15 @@ import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.paranid5.crescendo.R
+import com.paranid5.crescendo.data.tracks.DefaultTrack
 import com.paranid5.crescendo.data.utils.extensions.timeString
 import com.paranid5.crescendo.data.utils.extensions.totalDuration
 import com.paranid5.crescendo.domain.StorageHandler
 import com.paranid5.crescendo.domain.services.track_service.TrackServiceAccessor
-import com.paranid5.crescendo.presentation.tracks.DismissableTrackList
 import com.paranid5.crescendo.presentation.ui.theme.LocalAppColors
 import com.paranid5.crescendo.presentation.ui.theme.TransparentUtility
 import org.koin.compose.koinInject
@@ -50,29 +49,33 @@ fun CurrentPlaylistScreen(
         )
 
         Spacer(
-            modifier = Modifier
+            Modifier
                 .fillMaxWidth()
                 .height(2.dp)
                 .background(TransparentUtility)
         )
 
-        DismissableTrackList(
+        DraggableTrackList(
             tracks = currentPlaylist,
             scrollingState = scrollingState,
             modifier = modifier.padding(start = 10.dp, end = 5.dp, bottom = 10.dp),
-            storageHandler = storageHandler
-        ) { index, _ ->
-            if (index == currentTrackIndex)
-                return@DismissableTrackList false
+            onTrackDismissed = { index, _ ->
+                if (index == currentTrackIndex)
+                    return@DraggableTrackList false
 
-            val newPlaylist = currentPlaylist.take(index) + currentPlaylist.drop(index + 1)
-            storageHandler.storeCurrentPlaylist(newPlaylist)
+                val newPlaylist = currentPlaylist.take(index) + currentPlaylist.drop(index + 1)
+                storageHandler.storeCurrentPlaylist(newPlaylist)
 
-            if (index < currentTrackIndex)
-                storageHandler.storeCurrentTrackIndex(currentTrackIndex - 1)
+                if (index < currentTrackIndex)
+                    storageHandler.storeCurrentTrackIndex(currentTrackIndex - 1)
 
-            trackServiceAccessor.removeFromPlaylist(index)
-            true
+                trackServiceAccessor.removeFromPlaylist(index)
+                true
+            }
+        ) { newTracks, newCurTrackIndex ->
+            @Suppress("UNCHECKED_CAST")
+            storageHandler.storeCurrentPlaylist(newTracks as List<DefaultTrack>)
+            storageHandler.storeCurrentTrackIndex(newCurTrackIndex)
         }
     }
 }
