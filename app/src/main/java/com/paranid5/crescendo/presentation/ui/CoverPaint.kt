@@ -33,7 +33,7 @@ internal inline fun getVideoCoverModel(
     var coverModel by remember { mutableStateOf<BitmapDrawable?>(null) }
     var prevCoverModel by remember { mutableStateOf<BitmapDrawable?>(null) }
 
-    LaunchedEffect(metadata) {
+    LaunchedEffect(key1 = metadata) {
         val newModel = metadata?.let {
             glideUtils
                 .getVideoCoverAsync(it, size, bitmapSettings)

@@ -72,6 +72,10 @@ internal inline fun DraggableTrackList(
         draggableTracks = tracks
     }
 
+    LaunchedEffect(key1 = currentTrackIndex) {
+        currentTrackDragIndexState.intValue = currentTrackIndex
+    }
+
     val indexWithOffset by remember {
         derivedStateOf {
             draggedItemIndexState
