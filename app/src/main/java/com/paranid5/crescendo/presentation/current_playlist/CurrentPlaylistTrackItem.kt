@@ -1,8 +1,7 @@
-package com.paranid5.crescendo.presentation.tracks
+package com.paranid5.crescendo.presentation.current_playlist
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.height
@@ -10,9 +9,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.IntState
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -21,21 +19,14 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
-import coil.compose.AsyncImage
-import com.paranid5.crescendo.R
 import com.paranid5.crescendo.data.tracks.Track
-import com.paranid5.crescendo.data.utils.extensions.artistAlbum
-import com.paranid5.crescendo.data.utils.extensions.toDefaultTrackList
 import com.paranid5.crescendo.domain.StorageHandler
 import com.paranid5.crescendo.domain.services.track_service.TrackServiceAccessor
-import com.paranid5.crescendo.presentation.ui.AudioStatus
-import com.paranid5.crescendo.presentation.ui.getTrackCoverModel
+import com.paranid5.crescendo.presentation.tracks.TrackCover
+import com.paranid5.crescendo.presentation.tracks.TrackInfo
+import com.paranid5.crescendo.presentation.tracks.TrackPropertiesButton
+import com.paranid5.crescendo.presentation.tracks.startPlaylistPlayback
 import com.paranid5.crescendo.presentation.ui.permissions.requests.audioRecordingPermissionsRequestLauncher
 import com.paranid5.crescendo.presentation.ui.permissions.requests.foregroundServicePermissionsRequestLauncher
 import com.paranid5.crescendo.presentation.ui.theme.LocalAppColors
@@ -43,9 +34,10 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
 @Composable
-fun DefaultTrackItem(
+fun CurrentPlaylistTrackItem(
     tracks: List<Track>,
     trackInd: Int,
+    currentTrackDragIndState: IntState,
     scope: CoroutineScope,
     storageHandler: StorageHandler,
     trackServiceAccessor: TrackServiceAccessor,
@@ -55,13 +47,13 @@ fun DefaultTrackItem(
     }
 ) {
     val colors = LocalAppColors.current.value
-    val currentTrack by storageHandler.currentTrackState.collectAsState()
+    val currentTrackDragInd by currentTrackDragIndState
 
     val trackMb by remember { derivedStateOf { tracks.getOrNull(trackInd) } }
     val trackPath by remember { derivedStateOf { trackMb?.path } }
 
     val isTrackCurrent by remember {
-        derivedStateOf { trackPath == currentTrack?.path }
+        derivedStateOf { trackInd == currentTrackDragInd }
     }
 
     val textColor by remember {
@@ -129,95 +121,3 @@ fun DefaultTrackItem(
         }
     }
 }
-
-internal suspend inline fun startPlaylistPlayback(
-    tracks: List<Track>,
-    trackInd: Int,
-    storageHandler: StorageHandler,
-    trackServiceAccessor: TrackServiceAccessor
-) {
-    storageHandler.storeAudioStatus(AudioStatus.PLAYING)
-
-    trackServiceAccessor.startPlaying(
-        playlist = tracks.toDefaultTrackList(),
-        trackInd = trackInd
-    )
-}
-
-@Composable
-fun TrackCover(trackPath: String, modifier: Modifier = Modifier) {
-    val trackCover = getTrackCoverModel(
-        path = trackPath,
-        isPlaceholderRequired = true,
-        size = 200 to 200,
-        animationMillis = 250
-    )
-
-    AsyncImage(
-        model = trackCover,
-        contentDescription = stringResource(id = R.string.track_cover),
-        alignment = Alignment.Center,
-        contentScale = ContentScale.FillBounds,
-        modifier = modifier
-    )
-}
-
-@Composable
-fun TrackInfo(
-    track: Track,
-    textColor: Color,
-    modifier: Modifier = Modifier
-) {
-    Column(modifier) {
-        TrackTitle(
-            modifier = Modifier.align(Alignment.Start),
-            trackTitle = track.title,
-            textColor = textColor,
-        )
-
-        TrackArtistAlbum(
-            modifier = Modifier.align(Alignment.Start),
-            trackArtistAlbum = track.artistAlbum,
-            textColor = textColor,
-        )
-    }
-}
-
-@Composable
-private fun TrackTitle(
-    trackTitle: String,
-    textColor: Color,
-    modifier: Modifier = Modifier
-) = TrackText(
-    modifier = modifier,
-    text = trackTitle,
-    textColor = textColor,
-    fontSize = 18.sp,
-)
-
-@Composable
-private fun TrackArtistAlbum(
-    trackArtistAlbum: String,
-    textColor: Color,
-    modifier: Modifier = Modifier
-) = TrackText(
-    modifier = modifier,
-    text = trackArtistAlbum,
-    textColor = textColor,
-    fontSize = 15.sp,
-)
-
-@Composable
-private fun TrackText(
-    text: String,
-    textColor: Color,
-    fontSize: TextUnit,
-    modifier: Modifier = Modifier
-) = Text(
-    modifier = modifier,
-    text = text,
-    color = textColor,
-    fontSize = fontSize,
-    maxLines = 1,
-    overflow = TextOverflow.Ellipsis
-)

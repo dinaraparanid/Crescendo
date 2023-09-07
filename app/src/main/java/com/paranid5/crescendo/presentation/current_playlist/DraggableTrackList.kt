@@ -5,6 +5,7 @@ import androidx.compose.foundation.gestures.detectDragGesturesAfterLongPress
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.IntState
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableIntState
 import androidx.compose.runtime.MutableState
@@ -25,7 +26,7 @@ import androidx.compose.ui.zIndex
 import com.paranid5.crescendo.data.tracks.Track
 import com.paranid5.crescendo.data.utils.extensions.move
 import com.paranid5.crescendo.domain.StorageHandler
-import com.paranid5.crescendo.presentation.tracks.TrackItemView
+import com.paranid5.crescendo.domain.services.track_service.TrackServiceAccessor
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
@@ -35,10 +36,20 @@ import kotlin.math.absoluteValue
 
 private const val TAG = "DraggableTrackList"
 
+typealias TrackItemView = @Composable (
+    tracks: List<Track>,
+    trackInd: Int,
+    currentTrackDragIndState: IntState,
+    scope: CoroutineScope,
+    storageHandler: StorageHandler,
+    trackServiceAccessor: TrackServiceAccessor,
+    modifier: Modifier
+) -> Unit
+
 @Composable
 internal inline fun DraggableTrackList(
     tracks: List<Track>,
-    noinline onTrackDismissed: suspend (Int, Track) -> Boolean,
+    crossinline onTrackDismissed: suspend (Int, Track) -> Boolean,
     crossinline onTrackDragged: suspend (List<Track>, Int) -> Unit,
     modifier: Modifier = Modifier,
     trackItemModifier: Modifier = Modifier,
@@ -52,13 +63,13 @@ internal inline fun DraggableTrackList(
     val isDraggingState = remember { mutableStateOf(false) }
 
     val draggableTracksState = remember { mutableStateOf(tracks) }
-    val draggableTracks by draggableTracksState
+    var draggableTracks by draggableTracksState
 
     val currentTrackIndex by storageHandler.currentTrackIndexState.collectAsState()
     val currentTrackDragIndexState = remember { mutableIntStateOf(currentTrackIndex) }
 
     LaunchedEffect(key1 = tracks) {
-        draggableTracksState.value = tracks
+        draggableTracks = tracks
     }
 
     val indexWithOffset by remember {
@@ -101,93 +112,65 @@ internal inline fun DraggableTrackList(
             coroutineScope = coroutineScope,
             onTrackDragged = onTrackDragged
         ),
-        trackItemModifier = { ind ->
+        trackItemModifier = trackItemModifier,
+        trackItemView = { tracks, trackInd, scope, storageHandler, trackServiceAccessor, trackModifier ->
             val offset by remember {
-                derivedStateOf { indexWithOffset?.takeIf { it.first == ind }?.second }
+                derivedStateOf { indexWithOffset?.takeIf { it.first == trackInd }?.second }
             }
 
-            trackItemModifier
-                .zIndex(offset?.let { 1F } ?: 0F)
-                .graphicsLayer { translationY = offset ?: 0F }
+            var mod by remember {
+                mutableStateOf(
+                    trackItemModifier
+                        .zIndex(offset?.let { 1F } ?: 0F)
+                        .graphicsLayer { translationY = offset ?: 0F }
+                )
+            }
+
+            LaunchedEffect(key1 = trackInd) {
+                mod = trackItemModifier
+                    .zIndex(offset?.let { 1F } ?: 0F)
+                    .graphicsLayer { translationY = offset ?: 0F }
+            }
+
+            trackItemView(
+                tracks,
+                trackInd,
+                currentTrackDragIndexState,
+                scope,
+                storageHandler,
+                trackServiceAccessor,
+                trackModifier then mod
+            )
         },
-        trackItemView = trackItemView,
     )
 }
 
 @Composable
 internal inline fun DraggableTrackList(
     tracks: List<Track>,
-    noinline onTrackDismissed: suspend (Int, Track) -> Boolean,
+    crossinline onTrackDismissed: suspend (Int, Track) -> Boolean,
     modifier: Modifier = Modifier,
     trackItemModifier: Modifier = Modifier,
     scrollingState: LazyListState = rememberLazyListState(),
     storageHandler: StorageHandler = koinInject(),
     crossinline onTrackDragged: suspend (List<Track>, Int) -> Unit,
-) {
-    val coroutineScope = rememberCoroutineScope()
-    val positionState = remember { mutableStateOf<Float?>(null) }
-    val draggedItemIndexState = remember { mutableStateOf<Int?>(null) }
-    val isDraggingState = remember { mutableStateOf(false) }
-
-    val draggableTracksState = remember { mutableStateOf(tracks) }
-    val draggableTracks by draggableTracksState
-
-    val currentTrackIndex by storageHandler.currentTrackIndexState.collectAsState()
-    val currentTrackDragIndexState = remember { mutableIntStateOf(currentTrackIndex) }
-
-    LaunchedEffect(key1 = tracks) {
-        draggableTracksState.value = tracks
-    }
-
-    val indexWithOffset by remember {
-        derivedStateOf {
-            draggedItemIndexState
-                .value
-                ?.let {
-                    scrollingState
-                        .layoutInfo
-                        .visibleItemsInfo
-                        .getOrNull(it - scrollingState.firstVisibleItemIndex)
-                }
-                ?.let {
-                    val offset = ((positionState.value ?: 0F) - it.offset - it.size / 2F)
-                    it.index to offset
-                }
-        }
-    }
-
-    LaunchDraggingHandling(
-        tracksState = draggableTracksState,
-        scrollingState = scrollingState,
-        positionState = positionState,
-        isDraggingState = isDraggingState,
-        draggedItemIndexState = draggedItemIndexState,
-        currentTrackDragIndexState = currentTrackDragIndexState
-    )
-
-    DismissableTrackList(
-        tracks = draggableTracks,
-        scrollingState = scrollingState,
-        onTrackDismissed = onTrackDismissed,
-        modifier = modifier.handleTracksMovement(
-            tracksState = draggableTracksState,
-            currentTrackDragIndexState = currentTrackDragIndexState,
-            scrollingState = scrollingState,
-            positionState = positionState,
-            isDraggingState = isDraggingState,
-            draggedItemIndexState = draggedItemIndexState,
-            coroutineScope = coroutineScope,
-            onTrackDragged = onTrackDragged
-        ),
-        trackItemModifier = { ind ->
-            val offset by remember {
-                derivedStateOf { indexWithOffset?.takeIf { it.first == ind }?.second }
-            }
-
-            trackItemModifier
-                .zIndex(offset?.let { 1F } ?: 0F)
-                .graphicsLayer { translationY = offset ?: 0F }
-        },
+) = DraggableTrackList(
+    tracks = tracks,
+    onTrackDismissed = onTrackDismissed,
+    onTrackDragged = onTrackDragged,
+    modifier = modifier,
+    trackItemModifier = trackItemModifier,
+    scrollingState = scrollingState,
+    storageHandler = storageHandler
+) { tracks, trackInd, currentTrackDragIndState, scope, storageHandler, trackServiceAccessor, trackModifier ->
+    CurrentPlaylistTrackItem(
+        tracks = tracks,
+        trackInd = trackInd,
+        currentTrackDragIndState = currentTrackDragIndState,
+        scope = scope,
+        storageHandler = storageHandler,
+        trackServiceAccessor = trackServiceAccessor,
+        modifier = trackModifier
     )
 }
 

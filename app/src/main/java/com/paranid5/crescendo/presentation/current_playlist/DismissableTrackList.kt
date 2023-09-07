@@ -19,21 +19,20 @@ import com.paranid5.crescendo.domain.StorageHandler
 import com.paranid5.crescendo.domain.services.track_service.TrackServiceAccessor
 import com.paranid5.crescendo.presentation.tracks.DefaultTrackItem
 import com.paranid5.crescendo.presentation.tracks.TrackItemView
-import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import org.koin.compose.koinInject
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun DismissableTrackList(
+internal inline fun DismissableTrackList(
     tracks: List<Track>,
     scrollingState: LazyListState,
     modifier: Modifier = Modifier,
-    trackItemModifier: @Composable (Int) -> Modifier = { _ -> Modifier },
-    onTrackDismissed: suspend (Int, Track) -> Boolean,
+    trackItemModifier: Modifier = Modifier,
+    crossinline onTrackDismissed: suspend (Int, Track) -> Boolean,
     storageHandler: StorageHandler = koinInject(),
     trackServiceAccessor: TrackServiceAccessor = koinInject(),
-    trackItemView: TrackItemView,
+    crossinline trackItemView: TrackItemView,
 ) {
     val scope = rememberCoroutineScope()
 
@@ -69,7 +68,7 @@ fun DismissableTrackList(
                         scope,
                         storageHandler,
                         trackServiceAccessor,
-                        trackItemModifier(ind).fillMaxWidth()
+                        trackItemModifier.fillMaxWidth()
                     )
                 }
             )
@@ -78,21 +77,21 @@ fun DismissableTrackList(
 }
 
 @Composable
-fun DismissableTrackList(
+internal inline fun DismissableTrackList(
     tracks: List<Track>,
     scrollingState: LazyListState,
     modifier: Modifier = Modifier,
-    trackItemModifier: @Composable (Int) -> Modifier = { _ -> Modifier },
+    trackItemModifier: Modifier = Modifier,
     storageHandler: StorageHandler = koinInject(),
     trackServiceAccessor: TrackServiceAccessor = koinInject(),
-    onTrackDismissed: suspend (Int, Track) -> Boolean
+    crossinline onTrackDismissed: suspend (Int, Track) -> Boolean
 ) = DismissableTrackList(
     tracks = tracks,
     scrollingState = scrollingState,
     modifier = modifier,
     trackItemView = { _, trackInd, scope, _, _, trackModifier ->
         DefaultTrackItem(
-            modifier = trackModifier.then(trackItemModifier(trackInd)),
+            modifier = trackModifier.then(trackItemModifier),
             tracks = tracks,
             trackInd = trackInd,
             scope = scope,
