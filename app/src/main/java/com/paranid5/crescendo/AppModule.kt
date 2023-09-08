@@ -29,7 +29,7 @@ import com.paranid5.crescendo.presentation.ui.permissions.description_providers.
 import com.paranid5.crescendo.presentation.ui.permissions.description_providers.ForegroundServiceDescriptionProvider
 import com.paranid5.crescendo.presentation.ui.permissions.externalStoragePermissionQueue
 import com.paranid5.crescendo.presentation.ui.permissions.foregroundServicePermissionQueue
-import com.paranid5.crescendo.presentation.ui.utils.GlideUtils
+import com.paranid5.crescendo.presentation.ui.utils.CoilUtils
 import kotlinx.coroutines.flow.MutableStateFlow
 import org.koin.android.ext.koin.androidApplication
 import org.koin.android.ext.koin.androidContext
@@ -114,7 +114,7 @@ private val globalsModule = module {
 
     singleOf(::StorageHandler)
     single { androidApplication() as MainApplication }
-    factory { (context: Context) -> GlideUtils(context) }
+    factory { (context: Context) -> CoilUtils(context) }
     singleOf(::KtorClient)
 
     single(named(IS_PLAYING_STATE)) { MutableStateFlow(false) }

@@ -1,15 +1,13 @@
 package com.paranid5.crescendo.domain.utils.media
 
 import android.content.Context
-import com.bumptech.glide.Glide
 import com.paranid5.crescendo.presentation.ui.extensions.byteData
+import com.paranid5.crescendo.presentation.ui.utils.CoilUtils
 
 private fun getImageBinaryData(context: Context, url: String) =
-    Glide.with(context)
-        .asBitmap()
-        .load(url)
-        .submit()
-        .get()
+    CoilUtils(context)
+        .getBitmapFromUrlBlockingCatching(url)
+        .getOrNull()!!
         .byteData
 
 fun getImageBinaryDataCatching(context: Context, url: String) =

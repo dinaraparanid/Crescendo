@@ -13,7 +13,7 @@ import coil.size.Scale
 import com.paranid5.crescendo.R
 import com.paranid5.crescendo.domain.StorageHandler
 import com.paranid5.crescendo.presentation.ui.utils.BlurTransformation
-import com.paranid5.crescendo.presentation.ui.utils.GlideUtils
+import com.paranid5.crescendo.presentation.ui.utils.CoilUtils
 import org.koin.compose.koinInject
 
 @Composable
@@ -28,14 +28,14 @@ internal inline fun getVideoCoverModel(
 ): ImageRequest {
     val metadata by storageHandler.currentMetadataState.collectAsState()
     val context = LocalContext.current
-    val glideUtils = GlideUtils(context)
+    val coilUtils = CoilUtils(context)
 
     var coverModel by remember { mutableStateOf<BitmapDrawable?>(null) }
     var prevCoverModel by remember { mutableStateOf<BitmapDrawable?>(null) }
 
     LaunchedEffect(key1 = metadata) {
         val newModel = metadata?.let {
-            glideUtils
+            coilUtils
                 .getVideoCoverAsync(it, size, bitmapSettings)
                 .await()
         }
@@ -96,7 +96,7 @@ internal inline fun getVideoCoverModelWithPalette(
 ): Pair<ImageRequest, Palette?> {
     val metadata by storageHandler.currentMetadataState.collectAsState()
     val context = LocalContext.current
-    val glideUtils = GlideUtils(context)
+    val coilUtils = CoilUtils(context)
 
     var coverModel by remember { mutableStateOf<BitmapDrawable?>(null) }
     var prevCoverModel by remember { mutableStateOf<BitmapDrawable?>(null) }
@@ -104,7 +104,7 @@ internal inline fun getVideoCoverModelWithPalette(
 
     LaunchedEffect(key1 = metadata, key2 = size) {
         val newPaletteAndModel = metadata?.let {
-            glideUtils.getVideoCoverWithPaletteAsync(it, size, bitmapSettings).await()
+            coilUtils.getVideoCoverWithPaletteAsync(it, size, bitmapSettings).await()
         }
 
         prevCoverModel = coverModel ?: newPaletteAndModel?.second
@@ -165,7 +165,7 @@ internal inline fun getTrackCoverModel(
     crossinline bitmapSettings: (Bitmap) -> Unit = {}
 ): ImageRequest {
     val context = LocalContext.current
-    val glideUtils = GlideUtils(context)
+    val coilUtils = CoilUtils(context)
 
     var coverModel by remember { mutableStateOf<BitmapDrawable?>(null) }
     var prevCoverModel by remember { mutableStateOf<BitmapDrawable?>(null) }
@@ -173,7 +173,7 @@ internal inline fun getTrackCoverModel(
     LaunchedEffect(key1 = path, key2 = size) {
         prevCoverModel = coverModel
 
-        coverModel = glideUtils
+        coverModel = coilUtils
             .getTrackCoverAsync(path, size, bitmapSettings)
             .await()
     }
@@ -229,14 +229,14 @@ internal inline fun getTrackCoverModelWithPalette(
     crossinline bitmapSettings: (Bitmap) -> Unit = {}
 ): Pair<ImageRequest, Palette?> {
     val context = LocalContext.current
-    val glideUtils = GlideUtils(context)
+    val coilUtils = CoilUtils(context)
 
     var coverModel by remember { mutableStateOf<BitmapDrawable?>(null) }
     var prevCoverModel by remember { mutableStateOf<BitmapDrawable?>(null) }
     var palette by remember { mutableStateOf<Palette?>(null) }
 
     LaunchedEffect(key1 = path, key2 = size) {
-        val (plt, cover) = glideUtils
+        val (plt, cover) = coilUtils
             .getTrackCoverWithPaletteAsync(path, size, bitmapSettings)
             .await()
 

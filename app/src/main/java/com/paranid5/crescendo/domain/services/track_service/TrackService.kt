@@ -5,6 +5,8 @@ import android.app.PendingIntent
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.media.audiofx.BassBoost
 import android.media.audiofx.Equalizer
 import android.media.audiofx.PresetReverb
@@ -54,7 +56,8 @@ import com.paranid5.crescendo.domain.utils.extensions.setParameter
 import com.paranid5.crescendo.presentation.main_activity.MainActivity
 import com.paranid5.crescendo.presentation.playing.Broadcast_CUR_POSITION_CHANGED
 import com.paranid5.crescendo.presentation.playing.CUR_POSITION_ARG
-import com.paranid5.crescendo.presentation.ui.utils.GlideUtils
+import com.paranid5.crescendo.presentation.ui.utils.CoilUtils
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -63,7 +66,6 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.flow.updateAndGet
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import org.koin.core.parameter.parametersOf
@@ -204,7 +206,7 @@ class TrackService : SuspendService(), ReceiverManager, LifecycleNotificationMan
         )
 
     private val storageHandler by inject<StorageHandler>()
-    private val glideUtils by inject<GlideUtils> { parametersOf(this) }
+    private val coilUtils by inject<CoilUtils> { parametersOf(this) }
 
     private val currentTrackIndexState = storageHandler.currentTrackIndexState
     private val currentPlaylistState = storageHandler.currentPlaylistState
@@ -355,7 +357,16 @@ class TrackService : SuspendService(), ReceiverManager, LifecycleNotificationMan
             override fun getCurrentLargeIcon(
                 player: Player,
                 callback: PlayerNotificationManager.BitmapCallback
-            ) = runBlocking { mGetTrackCoverAsync(path = currentTrackState.value?.path).await() }
+            ): Bitmap {
+                scope.launch(Dispatchers.IO) {
+                    callback.onBitmap(
+                        mGetTrackCoverAsync(path = currentTrackState.value?.path)
+                            .await()
+                    )
+                }
+
+                return trackThumbnail
+            }
         }
 
     private val customActionsReceiver =
@@ -1101,7 +1112,10 @@ class TrackService : SuspendService(), ReceiverManager, LifecycleNotificationMan
     }
 
     internal suspend inline fun mGetTrackCoverAsync(path: String?) =
-        glideUtils.getTrackCoverBitmapAsync(path)
+        coilUtils.getTrackCoverBitmapAsync(path)
+
+    internal inline val trackThumbnail
+        get() = BitmapFactory.decodeResource(resources, R.drawable.cover_thumbnail)
 
     // --------------------------- Notification Actions ---------------------------
 

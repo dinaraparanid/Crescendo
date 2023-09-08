@@ -5,6 +5,8 @@ import android.app.*
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.media.audiofx.BassBoost
 import android.media.audiofx.Equalizer
 import android.media.audiofx.PresetReverb
@@ -53,7 +55,7 @@ import com.paranid5.crescendo.domain.utils.extensions.sendBroadcast
 import com.paranid5.crescendo.domain.utils.extensions.setParameter
 import com.paranid5.crescendo.presentation.main_activity.MainActivity
 import com.paranid5.crescendo.presentation.playing.*
-import com.paranid5.crescendo.presentation.ui.utils.GlideUtils
+import com.paranid5.crescendo.presentation.ui.utils.CoilUtils
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
 import org.koin.core.component.KoinComponent
@@ -172,7 +174,7 @@ class StreamService : SuspendService(), ReceiverManager, LifecycleNotificationMa
         )
 
     private val storageHandler by inject<StorageHandler>()
-    private val glideUtils by inject<GlideUtils> { parametersOf(this) }
+    private val coilUtils by inject<CoilUtils> { parametersOf(this) }
 
     private val currentUrlState = storageHandler.currentUrlState
     private val currentMetadataState = MutableStateFlow<VideoMetadata?>(null)
@@ -313,7 +315,13 @@ class StreamService : SuspendService(), ReceiverManager, LifecycleNotificationMa
             override fun getCurrentLargeIcon(
                 player: Player,
                 callback: PlayerNotificationManager.BitmapCallback
-            ) = runBlocking { mGetVideoCoverAsync().await() }
+            ): Bitmap {
+                scope.launch(Dispatchers.IO) {
+                    callback.onBitmap(mGetVideoCoverAsync().await())
+                }
+
+                return trackThumbnail
+            }
         }
 
     private val customActionsReceiver: PlayerNotificationManager.CustomActionReceiver =
@@ -950,8 +958,11 @@ class StreamService : SuspendService(), ReceiverManager, LifecycleNotificationMa
     internal suspend inline fun mGetVideoCoverAsync() =
         currentMetadataState
             .value
-            ?.let { glideUtils.getVideoCoverBitmapAsync(it) }
-            ?: coroutineScope { async(Dispatchers.IO) { glideUtils.thumbnailBitmap } }
+            ?.let { coilUtils.getVideoCoverBitmapAsync(it) }
+            ?: coroutineScope { async(Dispatchers.IO) { coilUtils.getThumbnailBitmap() } }
+
+    internal inline val trackThumbnail
+        get() = BitmapFactory.decodeResource(resources, R.drawable.cover_thumbnail)
 
     // --------------------------- Notification Actions ---------------------------
 

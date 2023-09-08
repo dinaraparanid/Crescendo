@@ -10,13 +10,12 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.LocalContext
 import androidx.core.graphics.drawable.toDrawable
-import coil.compose.AsyncImagePainter
 import coil.compose.rememberAsyncImagePainter
 import coil.request.ImageRequest
 import coil.size.Precision
 import coil.size.Scale
 import com.paranid5.crescendo.R
-import com.paranid5.crescendo.presentation.ui.utils.GlideUtils
+import com.paranid5.crescendo.presentation.ui.utils.CoilUtils
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
@@ -25,14 +24,14 @@ private const val TAG = "BandTrackPainter"
 @Composable
 fun getBandTrackModel(width: Int, height: Int): ImageRequest {
     val context = LocalContext.current
-    val glideUtils = GlideUtils(context)
+    val coilUtils = CoilUtils(context)
 
     var coverModel by remember { mutableStateOf<BitmapDrawable?>(null) }
     Log.d(TAG, "Band width: $width height: $height")
 
     LaunchedEffect(width, height) {
         coverModel = withContext(Dispatchers.IO) {
-            glideUtils.getBitmapFromResourceCatching(
+            coilUtils.getBitmapFromResourceCatching(
                 res = R.drawable.audio_track_horizontal_night_transparent,
                 size = width to height
             )
