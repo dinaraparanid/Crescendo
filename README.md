@@ -80,7 +80,6 @@ your music experience to a new level!
     <li>UI</li>
     <ul>
         <li>Compose Material</li>
-        <li>Glide</li>
         <li>Coil + Compose extensions</li>
         <li>AndroidX.Palette</li>
         <li>AndroidX.Navigation.Compose (NavHost)</li>
@@ -100,7 +99,7 @@ your music experience to a new level!
 
 ## **Current Status:**
 
-**Alpha V 0.1.0.0**
+**Alpha V 0.1.1.0**
 
 ### **Implemented features:**
 1. Media playback with local tracks and youtube videos
