@@ -38,7 +38,7 @@ fun CashPropertiesDialog(
     val selectedSaveOptionIndexState = remember { mutableIntStateOf(0) }
 
     val format by remember {
-        derivedStateOf { Formats.values()[selectedSaveOptionIndexState.value] }
+        derivedStateOf { Formats.entries[selectedSaveOptionIndexState.intValue] }
     }
 
     if (isDialogShownState.value)
