@@ -310,21 +310,12 @@ class VideoCashService : SuspendService(), ReceiverManager, LifecycleNotificatio
             is Either.Right -> storeFileRes.value
         }
 
-        val statusCodeRes = kotlin.runCatching {
-            ktorClient.downloadFile(
-                fileUrl = mediaUrl,
-                storeFile = curVideoCashFile!!,
-                progressState = videoCashProgressState,
-                downloadingState = cashingStatusState,
-            )
-        }
-
-        if (statusCodeRes.isFailure) {
-            onCashingError(errorStatus = DownloadingStatus.CONNECT_LOST)
-            return CashingResult.DownloadResult.ConnectionLostError
-        }
-
-        val statusCode = statusCodeRes.getOrNull()
+        val statusCode = ktorClient.downloadFile(
+            fileUrl = mediaUrl,
+            storeFile = curVideoCashFile!!,
+            progressState = videoCashProgressState,
+            downloadingState = cashingStatusState,
+        )
 
         if (statusCode?.isSuccess() != true) {
             onCashingError(errorStatus = DownloadingStatus.ERR)

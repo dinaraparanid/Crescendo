@@ -6,18 +6,21 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.staticCompositionLocalOf
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 
 private val DarkColorScheme = darkColorScheme(
     primary = Purple80,
     secondary = PurpleGrey80,
-    tertiary = Pink80
+    tertiary = Pink80,
+    inverseSurface = Color.White
 )
 
 private val LightColorScheme = lightColorScheme(
     primary = Purple80,
     secondary = PurpleGrey40,
-    tertiary = Pink40
+    tertiary = Pink40,
+    inverseSurface = Color.Black
 )
 
 @JvmInline

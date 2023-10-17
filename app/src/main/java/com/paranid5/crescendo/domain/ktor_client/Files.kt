@@ -10,6 +10,7 @@ import io.ktor.http.contentLength
 import io.ktor.http.isSuccess
 import io.ktor.utils.io.core.isNotEmpty
 import io.ktor.utils.io.core.readBytes
+import io.ktor.utils.io.discardExact
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -45,45 +46,54 @@ internal suspend inline fun HttpClient.downloadFile(
 ): HttpStatusCode? {
     Log.d(TAG, "Downloading $fileUrl")
 
-    val status = prepareGet(fileUrl).execute { response ->
-        val status = response.status
+    var progress = 0L
+    var statusRes: Result<HttpStatusCode?>
 
-        if (!status.isSuccess()) {
-            downloadingState.update { DownloadingStatus.ERR }
-            return@execute status
-        }
+    do {
+        statusRes = runCatching {
+            prepareGet(fileUrl).execute { response ->
+                val status = response.status
 
-        val channel = response.bodyAsChannel()
-        var progress = 0L
+                if (!status.isSuccess()) {
+                    downloadingState.update { DownloadingStatus.ERR }
+                    return@execute status
+                }
 
-        while (!channel.isClosedForRead && downloadingState.value == DownloadingStatus.DOWNLOADING) {
-            val packet = channel.readRemaining(DEFAULT_BUFFER_SIZE.toLong())
+                val channel = response
+                    .bodyAsChannel()
+                    .apply { discardExact(progress) }
 
-            while (packet.isNotEmpty && downloadingState.value == DownloadingStatus.DOWNLOADING) {
-                val bytes = packet.readBytes()
-                storeFile.appendBytes(bytes)
+                while (!channel.isClosedForRead && downloadingState.value == DownloadingStatus.DOWNLOADING) {
+                    val packet = channel.readRemaining(DEFAULT_BUFFER_SIZE.toLong())
 
-                progress += bytes.size
-                progressState?.update { progress to response.contentLength()!! }
+                    while (packet.isNotEmpty && downloadingState.value == DownloadingStatus.DOWNLOADING) {
+                        val bytes = packet.readBytes()
+                        storeFile.appendBytes(bytes)
 
-                Log.d(
-                    TAG,
-                    "Read ${bytes.size} bytes from ${response.contentLength()}. " +
-                            "Total progress: $progress bytes"
-                )
+                        progress += bytes.size
+                        progressState?.update { progress to response.contentLength()!! }
+
+                        Log.d(
+                            TAG,
+                            "Read ${bytes.size} bytes from ${response.contentLength()}. " +
+                                    "Total progress: $progress bytes"
+                        )
+                    }
+                }
+
+                val downloadingStatus = downloadingState.updateAndGet {
+                    when (it) {
+                        DownloadingStatus.CANCELED -> it
+                        else -> DownloadingStatus.DOWNLOADED
+                    }
+                }
+
+                if (downloadingStatus == DownloadingStatus.CANCELED) null else status
             }
         }
+    } while (statusRes.isFailure)
 
-        val downloadingStatus = downloadingState.updateAndGet {
-            when (it) {
-                DownloadingStatus.CANCELED -> it
-                else -> DownloadingStatus.DOWNLOADED
-            }
-        }
-
-        if (downloadingStatus == DownloadingStatus.CANCELED) null else status
-    }
-
+    val status = statusRes.getOrNull()
     Log.d(TAG, "Done, status: ${status?.value}")
     return status
 }
