@@ -4,6 +4,7 @@ import android.util.Log
 import com.paranid5.crescendo.domain.services.video_cash_service.DownloadingStatus
 import io.ktor.client.HttpClient
 import io.ktor.client.request.prepareGet
+import io.ktor.client.statement.HttpResponse
 import io.ktor.client.statement.bodyAsChannel
 import io.ktor.http.HttpStatusCode
 import io.ktor.http.contentLength
@@ -11,14 +12,12 @@ import io.ktor.http.isSuccess
 import io.ktor.utils.io.core.isNotEmpty
 import io.ktor.utils.io.core.readBytes
 import io.ktor.utils.io.discardExact
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.flow.updateAndGet
-import kotlinx.coroutines.joinAll
-import kotlinx.coroutines.launch
 import java.io.File
+import java.util.concurrent.atomic.AtomicLong
 
 private const val TAG = "Ktor Client"
 
@@ -46,49 +45,21 @@ internal suspend inline fun HttpClient.downloadFile(
 ): HttpStatusCode? {
     Log.d(TAG, "Downloading $fileUrl")
 
-    var progress = 0L
     var statusRes: Result<HttpStatusCode?>
+    val progress = AtomicLong()
 
     do {
         statusRes = runCatching {
             prepareGet(fileUrl).execute { response ->
-                val status = response.status
+                val totalBytes = response.contentLength()!!
 
-                if (!status.isSuccess()) {
-                    downloadingState.update { DownloadingStatus.ERR }
-                    return@execute status
-                }
-
-                val channel = response
-                    .bodyAsChannel()
-                    .apply { discardExact(progress) }
-
-                while (!channel.isClosedForRead && downloadingState.value == DownloadingStatus.DOWNLOADING) {
-                    val packet = channel.readRemaining(DEFAULT_BUFFER_SIZE.toLong())
-
-                    while (packet.isNotEmpty && downloadingState.value == DownloadingStatus.DOWNLOADING) {
-                        val bytes = packet.readBytes()
-                        storeFile.appendBytes(bytes)
-
-                        progress += bytes.size
-                        progressState?.update { progress to response.contentLength()!! }
-
-                        Log.d(
-                            TAG,
-                            "Read ${bytes.size} bytes from ${response.contentLength()}. " +
-                                    "Total progress: $progress bytes"
-                        )
-                    }
-                }
-
-                val downloadingStatus = downloadingState.updateAndGet {
-                    when (it) {
-                        DownloadingStatus.CANCELED -> it
-                        else -> DownloadingStatus.DOWNLOADED
-                    }
-                }
-
-                if (downloadingStatus == DownloadingStatus.CANCELED) null else status
+                response.downloadFileImpl(
+                    downloadingState,
+                    progressState,
+                    storeFile,
+                    totalBytes,
+                    progress
+                )
             }
         }
     } while (statusRes.isFailure)
@@ -110,49 +81,47 @@ internal suspend inline fun HttpClient.downloadFile(
  */
 
 internal suspend inline fun HttpClient.downloadFiles(
-    files: Array<Pair<String, File>>,
+    downloadingState: MutableStateFlow<DownloadingStatus>,
     progressState: MutableStateFlow<Pair<Long, Long>>? = null,
-    downloadingState: MutableStateFlow<DownloadingStatus>
+    vararg files: Pair<String, File>
 ): HttpStatusCode? = coroutineScope {
     Log.d(TAG, "Downloading multiple files")
 
-    val getRequests = files.map { (fileUrl, storeFile) -> prepareGet(fileUrl) to storeFile }
+    val getRequests = files.map { (fileUrl, storeFile) ->
+        prepareGet(fileUrl) to storeFile
+    }
 
     getRequests
         .map { (request, _) -> request.execute { it.status } }
         .firstOrNull { !it.isSuccess() }
         ?.let { return@coroutineScope it }
 
-    val totalBytes = getRequests.fold(0L) { acc, (request, _) ->
-        acc + request.execute { response -> response.contentLength()!! }
+    val bytesPerFiles = getRequests.map { (request, _) ->
+        request.execute { response -> response.contentLength()!! }
     }
 
-    getRequests.map { (request, storeFile) ->
-        launch(Dispatchers.IO) {
-            request.execute { response ->
-                val channel = response.bodyAsChannel()
+    val totalBytes = bytesPerFiles.sum()
 
-                while (!channel.isClosedForRead && downloadingState.value == DownloadingStatus.DOWNLOADING) {
-                    val packet = channel.readRemaining(DEFAULT_BUFFER_SIZE.toLong())
+    getRequests.firstOrNull { (request, storeFile) ->
+        var statusRes: Result<HttpStatusCode?>
+        val progress = AtomicLong()
 
-                    while (packet.isNotEmpty && downloadingState.value == DownloadingStatus.DOWNLOADING) {
-                        val bytes = packet.readBytes()
-                        storeFile.appendBytes(bytes)
-
-                        progressState?.update { (progress, _) ->
-                            progress + bytes.size to totalBytes
-                        }
-
-                        Log.d(
-                            TAG,
-                            "Read ${bytes.size} bytes from $totalBytes. " +
-                                    "Total progress: ${progressState?.value?.first} bytes"
-                        )
-                    }
+        do {
+            statusRes = runCatching {
+                request.execute { response ->
+                    response.downloadFileImpl(
+                        downloadingState,
+                        progressState,
+                        storeFile,
+                        totalBytes,
+                        progress
+                    )
                 }
             }
-        }
-    }.joinAll()
+        } while (statusRes.isFailure)
+
+        statusRes.getOrNull() == null
+    }
 
     val downloadingStatus = downloadingState.updateAndGet {
         when (it) {
@@ -168,4 +137,48 @@ internal suspend inline fun HttpClient.downloadFiles(
 
     Log.d(TAG, "Done, status: ${status?.value}")
     status
+}
+
+private suspend inline fun HttpResponse.downloadFileImpl(
+    downloadingState: MutableStateFlow<DownloadingStatus>,
+    progressState: MutableStateFlow<Pair<Long, Long>>?,
+    storeFile: File,
+    totalBytes: Long,
+    progress: AtomicLong
+): HttpStatusCode? {
+    if (!status.isSuccess()) {
+        downloadingState.update { DownloadingStatus.ERR }
+        return status
+    }
+
+    val channel = bodyAsChannel().apply { discardExact(progress.get()) }
+
+    while (!channel.isClosedForRead && downloadingState.value == DownloadingStatus.DOWNLOADING) {
+        val packet = channel.readRemaining(DEFAULT_BUFFER_SIZE.toLong())
+
+        while (packet.isNotEmpty && downloadingState.value == DownloadingStatus.DOWNLOADING) {
+            val bytes = packet.readBytes()
+            progress.addAndGet(bytes.size.toLong())
+            storeFile.appendBytes(bytes)
+
+            progressState?.update { (progress, _) ->
+                progress + bytes.size to totalBytes
+            }
+
+            Log.d(
+                TAG,
+                "Read ${bytes.size} bytes from $totalBytes. " +
+                        "Total progress: ${progressState?.value?.first} bytes"
+            )
+        }
+    }
+
+    val downloadingStatus = downloadingState.updateAndGet {
+        when (it) {
+            DownloadingStatus.CANCELED -> it
+            else -> DownloadingStatus.DOWNLOADED
+        }
+    }
+
+    return if (downloadingStatus == DownloadingStatus.CANCELED) null else status
 }
