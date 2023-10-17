@@ -47,18 +47,22 @@ internal suspend inline fun HttpClient.downloadFile(
 
     var statusRes: Result<HttpStatusCode?>
     val progress = AtomicLong()
+    val request = prepareGet(fileUrl)
 
     do {
         statusRes = runCatching {
-            prepareGet(fileUrl).execute { response ->
-                val totalBytes = response.contentLength()!!
+            request.execute { response ->
+                if (!response.status.isSuccess()) {
+                    downloadingState.update { DownloadingStatus.ERR }
+                    return@execute response.status
+                }
 
                 response.downloadFileImpl(
-                    downloadingState,
-                    progressState,
-                    storeFile,
-                    totalBytes,
-                    progress
+                    downloadingState = downloadingState,
+                    progressState = progressState,
+                    storeFile = storeFile,
+                    totalBytes = response.contentLength()!!,
+                    progress = progress
                 )
             }
         }
@@ -146,11 +150,6 @@ private suspend inline fun HttpResponse.downloadFileImpl(
     totalBytes: Long,
     progress: AtomicLong
 ): HttpStatusCode? {
-    if (!status.isSuccess()) {
-        downloadingState.update { DownloadingStatus.ERR }
-        return status
-    }
-
     val channel = bodyAsChannel().apply { discardExact(progress.get()) }
 
     while (!channel.isClosedForRead && downloadingState.value == DownloadingStatus.DOWNLOADING) {

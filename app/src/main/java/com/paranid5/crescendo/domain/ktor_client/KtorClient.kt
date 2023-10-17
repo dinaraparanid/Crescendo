@@ -1,7 +1,7 @@
 package com.paranid5.crescendo.domain.ktor_client
 
 import io.ktor.client.HttpClient
-import io.ktor.client.engine.android.Android
+import io.ktor.client.engine.okhttp.OkHttp
 import io.ktor.client.plugins.HttpRequestRetry
 import io.ktor.client.plugins.HttpTimeout
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
@@ -12,7 +12,7 @@ import io.ktor.client.plugins.logging.Logging
 import io.ktor.serialization.kotlinx.json.json
 import kotlinx.serialization.json.Json
 
-fun KtorClient() = HttpClient(Android) {
+fun KtorClient() = HttpClient(OkHttp) {
     install(HttpRequestRetry)
 
     install(HttpTimeout) {
@@ -26,10 +26,5 @@ fun KtorClient() = HttpClient(Android) {
     install(Logging) {
         logger = Logger.ANDROID
         level = LogLevel.ALL
-    }
-
-    engine {
-        socketTimeout = 0
-        connectTimeout = 0
     }
 }
