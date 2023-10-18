@@ -38,7 +38,7 @@ import androidx.media3.exoplayer.ExoPlayer
 import androidx.media3.ui.PlayerNotificationManager
 import com.paranid5.crescendo.AUDIO_SESSION_ID
 import com.paranid5.crescendo.EQUALIZER_DATA
-import com.paranid5.crescendo.IS_PLAYING_STATE
+import com.paranid5.crescendo.IS_PLAYING
 import com.paranid5.crescendo.R
 import com.paranid5.crescendo.TRACK_SERVICE_CONNECTION
 import com.paranid5.crescendo.data.eq.EqualizerData
@@ -214,7 +214,7 @@ class TrackService : SuspendService(), ReceiverManager, LifecycleNotificationMan
 
     private val playbackPositionState = storageHandler.playbackPositionState
     internal val mIsRepeatingState = storageHandler.isRepeatingState
-    internal val mIsPlayingState by inject<MutableStateFlow<Boolean>>(named(IS_PLAYING_STATE))
+    internal val mIsPlayingState by inject<MutableStateFlow<Boolean>>(named(IS_PLAYING))
 
     private val areAudioEffectsEnabledState = storageHandler.areAudioEffectsEnabledState
     private val pitchState = storageHandler.pitchState

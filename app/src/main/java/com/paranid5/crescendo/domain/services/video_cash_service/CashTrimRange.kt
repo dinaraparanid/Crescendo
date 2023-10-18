@@ -4,4 +4,4 @@ import android.os.Parcelable
 import kotlinx.parcelize.Parcelize
 
 @Parcelize
-data class CashTrimRange(val offset: Int, val endPoint: Int) : Parcelable
+data class CashTrimRange(val offset: Long, val endPoint: Long) : Parcelable

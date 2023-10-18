@@ -21,30 +21,63 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.MutableLongState
 import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.paranid5.crescendo.R
+import com.paranid5.crescendo.domain.StorageHandler
+import com.paranid5.crescendo.domain.services.video_cash_service.CashTrimRange
 import com.paranid5.crescendo.domain.services.video_cash_service.Formats
 import com.paranid5.crescendo.presentation.ui.theme.LocalAppColors
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.withContext
+import linc.com.amplituda.Amplituda
+import linc.com.amplituda.callback.AmplitudaErrorListener
 import org.koin.compose.koinInject
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CashPropertiesDialog(
     isDialogShownState: MutableState<Boolean>,
-    modifier: Modifier = Modifier
+    playingPresenter: PlayingPresenter,
+    modifier: Modifier = Modifier,
+    storageHandler: StorageHandler = koinInject()
 ) {
     val colors = LocalAppColors.current.value
+    val url by storageHandler.currentUrlState.collectAsState()
+    val currentMetadata by storageHandler.currentMetadataState.collectAsState()
+
+    val length by remember {
+        derivedStateOf {
+            currentMetadata?.lenInMillis?.let { it * 1000 } ?: 0
+        }
+    }
+
+    val trimOffsetState = remember { mutableLongStateOf(0) }
+    val endPointState = remember { mutableLongStateOf(length) }
+
+    val trimOffset by trimOffsetState
+    val endPoint by endPointState
+
+    val trimRange by remember {
+        derivedStateOf { CashTrimRange(trimOffset, endPoint) }
+    }
+
     val filenameState = remember { mutableStateOf("") }
     val isButtonClickable by remember { derivedStateOf { filenameState.value.isNotEmpty() } }
 
@@ -81,6 +114,7 @@ fun CashPropertiesDialog(
                     ConfirmButton(
                         isDialogShownState = isDialogShownState,
                         format = format,
+                        trimRange = trimRange,
                         isButtonClickable = isButtonClickable,
                         filename = filenameState.value,
                         modifier = Modifier.align(Alignment.CenterHorizontally)
@@ -104,13 +138,37 @@ private fun Title(modifier: Modifier = Modifier) {
 }
 
 @Composable
+private fun TrimWaveform(
+    url: String,
+    trimOffsetState: MutableLongState,
+    endPointState: MutableLongState,
+    playingPresenter: PlayingPresenter,
+    modifier: Modifier = Modifier,
+) {
+    val context = LocalContext.current
+    val amplituda by remember { derivedStateOf { Amplituda(context) } }
+    val amplitudesState = playingPresenter.amplitudesState
+    val amplitudes by amplitudesState.collectAsState()
+
+    LaunchedEffect(key1 = url) {
+        withContext(Dispatchers.IO) {
+            amplitudesState.update {
+                amplituda
+                    .processAudio(url)
+                    .get(AmplitudaErrorListener { it.printStackTrace() })
+                    .amplitudesAsList()
+            }
+        }
+    }
+
+    // TODO: Audio Waveform UI
+}
+
+@Composable
 private fun FilenameInput(filenameState: MutableState<String>, modifier: Modifier = Modifier) {
     val colors = LocalAppColors.current.value
 
-    Row(
-        modifier
-            .fillMaxWidth()
-            .padding(horizontal = 10.dp)) {
+    Row(modifier.fillMaxWidth().padding(horizontal = 10.dp)) {
         Text(
             text = "${stringResource(R.string.filename)}:",
             modifier = Modifier.align(Alignment.CenterVertically),
@@ -178,6 +236,7 @@ private fun SaveOptionsMenu(
 private fun ConfirmButton(
     isDialogShownState: MutableState<Boolean>,
     format: Formats,
+    trimRange: CashTrimRange,
     isButtonClickable: Boolean,
     filename: String,
     modifier: Modifier = Modifier,
@@ -188,7 +247,7 @@ private fun ConfirmButton(
     Button(
         modifier = modifier.padding(vertical = 10.dp),
         onClick = {
-            playingUIHandler.launchVideoCashService(filename, format)
+            playingUIHandler.launchVideoCashService(filename, format, trimRange)
             isDialogShownState.value = false
         },
         enabled = isButtonClickable,

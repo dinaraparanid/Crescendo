@@ -39,7 +39,7 @@ import at.huber.youtubeExtractor.YtFile
 import com.paranid5.crescendo.R
 import com.paranid5.crescendo.AUDIO_SESSION_ID
 import com.paranid5.crescendo.EQUALIZER_DATA
-import com.paranid5.crescendo.IS_PLAYING_STATE
+import com.paranid5.crescendo.IS_PLAYING
 import com.paranid5.crescendo.STREAM_SERVICE_CONNECTION
 import com.paranid5.crescendo.data.VideoMetadata
 import com.paranid5.crescendo.data.eq.EqualizerData
@@ -181,7 +181,7 @@ class StreamService : SuspendService(), ReceiverManager, LifecycleNotificationMa
 
     private val playbackPositionState = storageHandler.playbackPositionState
     internal val mIsRepeatingState = storageHandler.isRepeatingState
-    internal val mIsPlayingState by inject<MutableStateFlow<Boolean>>(named(IS_PLAYING_STATE))
+    internal val mIsPlayingState by inject<MutableStateFlow<Boolean>>(named(IS_PLAYING))
 
     private val areAudioEffectsEnabledState = storageHandler.areAudioEffectsEnabledState
     private val pitchState = storageHandler.pitchState

@@ -118,10 +118,10 @@ private fun Label(modifier: Modifier = Modifier) = Text(
 
 @Composable
 private fun UrlEditor(
-    modifier: Modifier = Modifier,
     inputText: String?,
+    viewModel: FetchStreamViewModel,
+    modifier: Modifier = Modifier,
     hint: String = stringResource(R.string.your_url),
-    viewModel: FetchStreamViewModel
 ) {
     TextField(
         value = inputText ?: "",

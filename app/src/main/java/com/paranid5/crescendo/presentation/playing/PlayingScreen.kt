@@ -209,6 +209,7 @@ private fun PlayingScreenPortrait(
 
         UtilsButtons(
             palette = palette,
+            playingPresenter = viewModel.presenter,
             modifier = Modifier.constrainAs(utilsButtons) {
                 bottom.linkTo(parent.bottom, margin = 20.dp)
                 start.linkTo(parent.start, margin = 20.dp)
@@ -334,6 +335,7 @@ private fun PlayingScreenLandscape(
 
         UtilsButtons(
             palette = palette,
+            playingPresenter = viewModel.presenter,
             modifier = Modifier.constrainAs(utilsButtons) {
                 top.linkTo(playbackButtons.bottom, margin = 2.dp)
                 start.linkTo(parent.start, margin = 20.dp)

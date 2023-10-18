@@ -35,13 +35,16 @@ import kotlinx.coroutines.launch
 import org.koin.compose.koinInject
 
 @Composable
-fun UtilsButtons(palette: Palette?, modifier: Modifier = Modifier) =
-    Row(modifier.fillMaxWidth()) {
-        EqualizerButton(palette, Modifier.weight(1F))
-        RepeatButton(palette, Modifier.weight(1F))
-        LikeButton(palette, Modifier.weight(1F))
-        PlaylistOrDownloadButton(palette, Modifier.weight(1F))
-    }
+fun UtilsButtons(
+    palette: Palette?,
+    playingPresenter: PlayingPresenter,
+    modifier: Modifier = Modifier
+) = Row(modifier.fillMaxWidth()) {
+    EqualizerButton(palette, Modifier.weight(1F))
+    RepeatButton(palette, Modifier.weight(1F))
+    LikeButton(palette, Modifier.weight(1F))
+    PlaylistOrDownloadButton(palette, playingPresenter, Modifier.weight(1F))
+}
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
@@ -124,19 +127,24 @@ private fun LikeButton(palette: Palette?, modifier: Modifier = Modifier) {
 @Composable
 private fun PlaylistOrDownloadButton(
     palette: Palette?,
+    playingPresenter: PlayingPresenter,
     modifier: Modifier = Modifier,
     storageHandler: StorageHandler = koinInject()
 ) {
     val audioStatus by storageHandler.audioStatusState.collectAsState()
 
     when (audioStatus) {
-        AudioStatus.STREAMING -> DownloadButton(palette, modifier)
+        AudioStatus.STREAMING -> DownloadButton(palette, playingPresenter, modifier)
         else -> CurrentPlaylistButton(palette, modifier)
     }
 }
 
 @Composable
-private fun DownloadButton(palette: Palette?, modifier: Modifier = Modifier) {
+private fun DownloadButton(
+    palette: Palette?,
+    playingPresenter: PlayingPresenter,
+    modifier: Modifier = Modifier
+) {
     val paletteColor = palette.getLightMutedOrPrimary()
     val isCashPropertiesDialogShownState = remember { mutableStateOf(false) }
 
@@ -168,6 +176,7 @@ private fun DownloadButton(palette: Palette?, modifier: Modifier = Modifier) {
         if (isCashPropertiesDialogShownState.value && areStoragePermissionsGranted)
             CashPropertiesDialog(
                 isDialogShownState = isCashPropertiesDialogShownState,
+                playingPresenter = playingPresenter,
                 modifier = Modifier.align(Alignment.Center)
             )
     }

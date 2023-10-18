@@ -41,7 +41,7 @@ import org.koin.dsl.module
 
 const val STREAM_WITH_NO_NAME = "stream_no_name"
 const val UNKNOWN_STREAMER = "unknown_streamer"
-const val IS_PLAYING_STATE = "is_playing_state"
+const val IS_PLAYING = "is_playing_state"
 const val AUDIO_SESSION_ID = "audio_session_id"
 const val EQUALIZER_DATA = "equalizer_data"
 
@@ -117,7 +117,7 @@ private val globalsModule = module {
     factory { (context: Context) -> CoilUtils(context) }
     singleOf(::KtorClient)
 
-    single(named(IS_PLAYING_STATE)) { MutableStateFlow(false) }
+    single(named(IS_PLAYING)) { MutableStateFlow(false) }
     single(named(AUDIO_SESSION_ID)) { MutableStateFlow(0) }
     single(named(EQUALIZER_DATA)) { MutableStateFlow<EqualizerData?>(null) }
 }
@@ -130,7 +130,7 @@ private val searchStreamModule = module {
 
 private val playingModule = module {
     singleOf(::PlayingUIHandler)
-    factory { PlayingPresenter(get(named(IS_PLAYING_STATE))) }
+    factory { (amplitudes: List<Int>) -> PlayingPresenter(get(named(IS_PLAYING)), amplitudes) }
     viewModelOf(::PlayingViewModel)
 }
 

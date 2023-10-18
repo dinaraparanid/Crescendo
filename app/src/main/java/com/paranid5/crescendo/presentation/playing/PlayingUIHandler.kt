@@ -56,12 +56,12 @@ class PlayingUIHandler(
         trackAction = trackServiceAccessor::startStreamingOrSendResumeBroadcast
     )
 
-    fun launchVideoCashService(desiredFilename: String, format: Formats) =
+    fun launchVideoCashService(desiredFilename: String, format: Formats, trimRange: CashTrimRange) =
         videoCashServiceAccessor.startCashingOrAddToQueue(
             videoUrl = storageHandler.currentUrlState.value,
             desiredFilename = desiredFilename,
             format = format,
-            trimRange = CashTrimRange(0, 0) // TODO: range
+            trimRange = trimRange
         )
 
     fun navigateToAudioEffects(context: Context, navHostController: NavHostController) {
