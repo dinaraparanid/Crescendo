@@ -6,6 +6,7 @@ import android.provider.MediaStore
 import android.util.Log
 import com.arthenica.mobileffmpeg.FFmpeg
 import com.paranid5.crescendo.data.VideoMetadata
+import com.paranid5.crescendo.domain.services.video_cash_service.CashTrimRange
 import com.paranid5.crescendo.domain.services.video_cash_service.Formats
 import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.Dispatchers
@@ -77,9 +78,9 @@ private suspend inline fun MediaFile.VideoFile.convertToAudioFileImplAsync(
  * @return .mp3 file if conversion was successful, otherwise null
  */
 
-internal suspend inline fun MediaFile.VideoFile.convertToMP3Async() =
+internal suspend inline fun MediaFile.VideoFile.convertToMP3Async(trimRange: CashTrimRange) =
     convertToAudioFileImplAsync(audioFormat = Formats.MP3) { newFile ->
-        "-y -i $absolutePath -vn -acodec libmp3lame -qscale:a 2 ${newFile.absolutePath}"
+        "-y -i $absolutePath -ss ${trimRange.offset} -to ${trimRange.endPoint} -vn -acodec libmp3lame -qscale:a 2 ${newFile.absolutePath}"
     }
 
 /**
@@ -87,9 +88,9 @@ internal suspend inline fun MediaFile.VideoFile.convertToMP3Async() =
  * @return .wav file if conversion was successful, otherwise null
  */
 
-internal suspend inline fun MediaFile.VideoFile.convertToWAVAsync() =
+internal suspend inline fun MediaFile.VideoFile.convertToWAVAsync(trimRange: CashTrimRange) =
     convertToAudioFileImplAsync(audioFormat = Formats.WAV) { newFile ->
-        "-y -i $absolutePath -vn -acodec pcm_s16le -ar 44100 ${newFile.absolutePath}"
+        "-y -i $absolutePath -ss ${trimRange.offset} -to ${trimRange.endPoint} -vn -acodec pcm_s16le -ar 44100 ${newFile.absolutePath}"
     }
 
 /**
@@ -97,9 +98,9 @@ internal suspend inline fun MediaFile.VideoFile.convertToWAVAsync() =
  * @return .aac file if conversion was successful, otherwise null
  */
 
-internal suspend inline fun MediaFile.VideoFile.convertToAACAsync() =
+internal suspend inline fun MediaFile.VideoFile.convertToAACAsync(trimRange: CashTrimRange) =
     convertToAudioFileImplAsync(audioFormat = Formats.AAC) { newFile ->
-        "-y -i $absolutePath -vn -c:a aac -b:a 256k ${newFile.absolutePath}"
+        "-y -i $absolutePath -ss ${trimRange.offset} -to ${trimRange.endPoint} -vn -c:a aac -b:a 256k ${newFile.absolutePath}"
     }
 
 /**
@@ -109,14 +110,15 @@ internal suspend inline fun MediaFile.VideoFile.convertToAACAsync() =
  */
 
 internal suspend inline fun MediaFile.VideoFile.convertToAudioFileAsync(
-    audioFormat: Formats
+    audioFormat: Formats,
+    trimRange: CashTrimRange
 ): Deferred<MediaFile.AudioFile?> {
     Log.d(TAG, "Audio conversion to $audioFormat")
 
     return when (audioFormat) {
-        Formats.MP3 -> convertToMP3Async()
-        Formats.WAV -> convertToWAVAsync()
-        Formats.AAC -> convertToAACAsync()
+        Formats.MP3 -> convertToMP3Async(trimRange)
+        Formats.WAV -> convertToWAVAsync(trimRange)
+        Formats.AAC -> convertToAACAsync(trimRange)
         Formats.MP4 -> throw IllegalArgumentException("MP4 passed as an audio format")
     }
 }
@@ -135,10 +137,13 @@ internal suspend inline fun MediaFile.VideoFile.convertToAudioFileAsync(
 internal suspend inline fun MediaFile.VideoFile.convertToAudioFileAndSetTagsAsync(
     context: Context,
     videoMetadata: VideoMetadata,
-    audioFormat: Formats
+    audioFormat: Formats,
+    trimRange: CashTrimRange
 ) = coroutineScope {
     async(Dispatchers.IO) {
-        val audioFile = convertToAudioFileAsync(audioFormat).await() ?: return@async null
+        val audioFile = convertToAudioFileAsync(audioFormat, trimRange).await()
+            ?: return@async null
+
         setAudioTagsAsync(context, audioFile, videoMetadata, audioFormat).join()
         audioFile
     }

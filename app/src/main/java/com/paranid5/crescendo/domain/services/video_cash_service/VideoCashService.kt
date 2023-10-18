@@ -62,6 +62,7 @@ class VideoCashService : SuspendService(), ReceiverManager, LifecycleNotificatio
         const val URL_ARG = "url"
         const val FILENAME_ARG = "filename"
         const val FORMAT_ARG = "format"
+        const val TRIM_RANGE_ARG = "trim_range"
 
         private val TAG = VideoCashService::class.simpleName!!
 
@@ -69,7 +70,8 @@ class VideoCashService : SuspendService(), ReceiverManager, LifecycleNotificatio
             get() = VideoCashData(
                 url = getStringExtra(URL_ARG)!!,
                 desiredFilename = getStringExtra(FILENAME_ARG)!!,
-                format = getParcelableExtra(FORMAT_ARG, Formats::class.java)!!
+                format = getParcelableExtra(FORMAT_ARG, Formats::class.java)!!,
+                trimRange = getParcelableExtra(TRIM_RANGE_ARG, CashTrimRange::class.java)!!
             )
     }
 
@@ -99,7 +101,8 @@ class VideoCashService : SuspendService(), ReceiverManager, LifecycleNotificatio
     internal data class VideoCashData(
         val url: String,
         val desiredFilename: String,
-        val format: Formats
+        val format: Formats,
+        val trimRange: CashTrimRange
     )
 
     private val ktorClient by inject<HttpClient>()
@@ -196,7 +199,11 @@ class VideoCashService : SuspendService(), ReceiverManager, LifecycleNotificatio
 
     // --------------------------- Cashing Management ---------------------------
 
-    private fun YoutubeUrlExtractor(desiredFilename: String, format: Formats) =
+    private fun YoutubeUrlExtractor(
+        desiredFilename: String,
+        format: Formats,
+        trimRange: CashTrimRange
+    ) =
         @SuppressLint("StaticFieldLeak")
         object : YouTubeExtractor(this) {
             override fun onExtractionComplete(
@@ -227,7 +234,8 @@ class VideoCashService : SuspendService(), ReceiverManager, LifecycleNotificatio
                             audioUrl = audioUrl,
                             videoUrl = if (format == Formats.MP4) videoUrl else null,
                             videoMetadata = videoMetadata,
-                            format = format
+                            format = format,
+                            trimRange = trimRange
                         )
                     )
                 }
@@ -481,7 +489,8 @@ class VideoCashService : SuspendService(), ReceiverManager, LifecycleNotificatio
         desiredFilename: String,
         audioUrl: String,
         videoMetadata: VideoMetadata,
-        audioFormat: Formats
+        audioFormat: Formats,
+        trimRange: CashTrimRange
     ): CashingResult {
         val result = downloadMediaFileOrNotifyError(desiredFilename, audioUrl, isAudio = true)
 
@@ -492,7 +501,8 @@ class VideoCashService : SuspendService(), ReceiverManager, LifecycleNotificatio
             (result.file as MediaFile.VideoFile).convertToAudioFileAndSetTagsAsync(
                 context = this,
                 videoMetadata = videoMetadata,
-                audioFormat = audioFormat
+                audioFormat = audioFormat,
+                trimRange = trimRange
             ).await()
         ) {
             null -> {
@@ -523,20 +533,22 @@ class VideoCashService : SuspendService(), ReceiverManager, LifecycleNotificatio
         audioUrl: String,
         videoUrl: String?,
         videoMetadata: VideoMetadata,
-        format: Formats
+        format: Formats,
+        trimRange: CashTrimRange
     ) = when (videoUrl) {
         null -> cashAudioFileOrNotifyError(
             desiredFilename,
             audioUrl,
             videoMetadata,
-            format
+            format,
+            trimRange
         )
 
         else -> cashVideoFileOrNotifyError(
             desiredFilename,
             audioUrl,
             videoUrl,
-            videoMetadata
+            videoMetadata,
         )
     }
 
@@ -556,12 +568,12 @@ class VideoCashService : SuspendService(), ReceiverManager, LifecycleNotificatio
                 Log.d(TAG, "Is Video Cashing Cond Var Awake")
             }
 
-            videoCashQueue.poll()?.let { (url, desiredFilename, isSaveAsVideo) ->
+            videoCashQueue.poll()?.let { (url, desiredFilename, isSaveAsVideo, trimRange) ->
                 Log.d(TAG, "Prepare for cashing")
                 videoCashProgressState.update { 0L to 0L }
                 cashingStatusState.update { DownloadingStatus.DOWNLOADING }
                 videoCashQueueLenState.update { videoCashQueue.size }
-                YoutubeUrlExtractor(desiredFilename, isSaveAsVideo).extract(url)
+                YoutubeUrlExtractor(desiredFilename, isSaveAsVideo, trimRange).extract(url)
             }
         }
     }

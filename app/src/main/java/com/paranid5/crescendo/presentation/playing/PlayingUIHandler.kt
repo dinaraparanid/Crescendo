@@ -7,6 +7,7 @@ import com.paranid5.crescendo.R
 import com.paranid5.crescendo.domain.StorageHandler
 import com.paranid5.crescendo.domain.services.stream_service.StreamServiceAccessor
 import com.paranid5.crescendo.domain.services.track_service.TrackServiceAccessor
+import com.paranid5.crescendo.domain.services.video_cash_service.CashTrimRange
 import com.paranid5.crescendo.domain.services.video_cash_service.Formats
 import com.paranid5.crescendo.domain.services.video_cash_service.VideoCashServiceAccessor
 import com.paranid5.crescendo.presentation.NavHostController
@@ -59,7 +60,8 @@ class PlayingUIHandler(
         videoCashServiceAccessor.startCashingOrAddToQueue(
             videoUrl = storageHandler.currentUrlState.value,
             desiredFilename = desiredFilename,
-            format = format
+            format = format,
+            trimRange = CashTrimRange(0, 0) // TODO: range
         )
 
     fun navigateToAudioEffects(context: Context, navHostController: NavHostController) {
