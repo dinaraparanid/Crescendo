@@ -9,14 +9,19 @@ class PlayingViewModel(savedStateHandle: SavedStateHandle) :
     ObservableViewModel<PlayingPresenter, PlayingUIHandler>() {
     private companion object {
         private const val AMPLITUDES = "amplitudes"
+        private const val AUDIO_URL = "audio_url"
     }
 
     override val presenter by inject<PlayingPresenter> {
-        val savedByStateHandle = savedStateHandle
+        val amplitudesSavedByStateHandle = savedStateHandle
             .getStateFlow<List<Int>>(AMPLITUDES, listOf())
             .value
 
-        parametersOf(savedByStateHandle)
+        val audioUrlSavedByStateHandle = savedStateHandle
+            .getStateFlow<String?>(AUDIO_URL, null)
+            .value
+
+        parametersOf(amplitudesSavedByStateHandle, audioUrlSavedByStateHandle)
     }
 
     override val handler by inject<PlayingUIHandler>()

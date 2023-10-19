@@ -130,7 +130,11 @@ private val searchStreamModule = module {
 
 private val playingModule = module {
     singleOf(::PlayingUIHandler)
-    factory { (amplitudes: List<Int>) -> PlayingPresenter(get(named(IS_PLAYING)), amplitudes) }
+
+    factory { (amplitudes: List<Int>, audioUrl: String?) ->
+        PlayingPresenter(get(named(IS_PLAYING)), amplitudes, audioUrl)
+    }
+
     viewModelOf(::PlayingViewModel)
 }
 

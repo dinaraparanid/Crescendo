@@ -6,8 +6,10 @@ import kotlinx.coroutines.flow.asStateFlow
 
 class PlayingPresenter(
     isPlayingState: MutableStateFlow<Boolean>,
-    amplitudes: List<Int>
+    amplitudes: List<Int>,
+    audioUrl: String?
 ) : BasePresenter {
     val isPlayingState = isPlayingState.asStateFlow()
     val amplitudesState = MutableStateFlow(amplitudes)
+    val audioUrlState = MutableStateFlow(audioUrl)
 }
