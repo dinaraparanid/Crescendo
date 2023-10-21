@@ -142,8 +142,8 @@ private fun List<Int>.toDrawableAmplitudes(
 }
 
 private fun <T> Iterable<T>.fillToSize(size: Int, transform: (List<T>) -> T): List<T> {
-    val capacity = ceil(size safeDiv count()).roundToInt()
-    return map { data -> List(capacity) { data } }.flatten().chunkToSize(size, transform)
+    val len = ceil(size safeDiv count()).roundToInt()
+    return map { data -> List(len) { data } }.flatten().chunkToSize(size, transform)
 }
 
 private fun <T> Iterable<T>.chunkToSize(size: Int, transform: (List<T>) -> T): List<T> {

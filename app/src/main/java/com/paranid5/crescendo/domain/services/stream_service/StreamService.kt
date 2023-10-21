@@ -315,12 +315,12 @@ class StreamService : SuspendService(), ReceiverManager, LifecycleNotificationMa
             override fun getCurrentLargeIcon(
                 player: Player,
                 callback: PlayerNotificationManager.BitmapCallback
-            ): Bitmap {
+            ): Bitmap? {
                 scope.launch(Dispatchers.IO) {
                     callback.onBitmap(mGetVideoCoverAsync().await())
                 }
 
-                return trackThumbnail
+                return null
             }
         }
 
@@ -960,9 +960,6 @@ class StreamService : SuspendService(), ReceiverManager, LifecycleNotificationMa
             .value
             ?.let { coilUtils.getVideoCoverBitmapAsync(it) }
             ?: coroutineScope { async(Dispatchers.IO) { coilUtils.getThumbnailBitmap() } }
-
-    internal inline val trackThumbnail
-        get() = BitmapFactory.decodeResource(resources, R.drawable.cover_thumbnail)
 
     // --------------------------- Notification Actions ---------------------------
 

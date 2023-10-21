@@ -6,7 +6,6 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.graphics.Bitmap
-import android.graphics.BitmapFactory
 import android.media.audiofx.BassBoost
 import android.media.audiofx.Equalizer
 import android.media.audiofx.PresetReverb
@@ -46,13 +45,14 @@ import com.paranid5.crescendo.data.tracks.DefaultTrack
 import com.paranid5.crescendo.data.utils.extensions.toAndroidMetadata
 import com.paranid5.crescendo.domain.LifecycleNotificationManager
 import com.paranid5.crescendo.domain.ReceiverManager
-import com.paranid5.crescendo.domain.services.ServiceAction
 import com.paranid5.crescendo.domain.StorageHandler
+import com.paranid5.crescendo.domain.services.ServiceAction
 import com.paranid5.crescendo.domain.services.SuspendService
 import com.paranid5.crescendo.domain.utils.extensions.bandLevels
 import com.paranid5.crescendo.domain.utils.extensions.registerReceiverCompat
 import com.paranid5.crescendo.domain.utils.extensions.sendBroadcast
 import com.paranid5.crescendo.domain.utils.extensions.setParameter
+import com.paranid5.crescendo.domain.utils.extensions.toMediaItemList
 import com.paranid5.crescendo.presentation.main_activity.MainActivity
 import com.paranid5.crescendo.presentation.playing.Broadcast_CUR_POSITION_CHANGED
 import com.paranid5.crescendo.presentation.playing.CUR_POSITION_ARG
@@ -86,6 +86,7 @@ class TrackService : SuspendService(), ReceiverManager, LifecycleNotificationMan
 
         const val Broadcast_ADD_TO_PLAYLIST = "$SERVICE_LOCATION.ADD_TO_PLAYLIST"
         const val Broadcast_REMOVE_FROM_PLAYLIST = "$SERVICE_LOCATION.REMOVE_FROM_PLAYLIST"
+        const val Broadcast_PLAYLIST_DRAGGED = "$SERVICE_LOCATION.PLAYLIST_DRAGGED"
 
         const val Broadcast_PREV_TRACK = "$SERVICE_LOCATION.PREV_TRACK"
         const val Broadcast_NEXT_TRACK = "$SERVICE_LOCATION.NEXT_TRACK"
@@ -357,7 +358,7 @@ class TrackService : SuspendService(), ReceiverManager, LifecycleNotificationMan
             override fun getCurrentLargeIcon(
                 player: Player,
                 callback: PlayerNotificationManager.BitmapCallback
-            ): Bitmap {
+            ): Bitmap? {
                 scope.launch(Dispatchers.IO) {
                     callback.onBitmap(
                         mGetTrackCoverAsync(path = currentTrackState.value?.path)
@@ -365,7 +366,7 @@ class TrackService : SuspendService(), ReceiverManager, LifecycleNotificationMan
                     )
                 }
 
-                return trackThumbnail
+                return null
             }
         }
 
@@ -500,9 +501,24 @@ class TrackService : SuspendService(), ReceiverManager, LifecycleNotificationMan
 
     private val removeFromPlaylistReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context?, intent: Intent) {
-            val index = intent.getIntExtra(TRACK_INDEX_ARG, 0)
+            val index = intent.mTrackIndexArg
             Log.d(TAG, "Remove $index track from playlist")
             mPlayer.removeMediaItem(index)
+        }
+    }
+
+    private val playlistDraggedReceiver = object : BroadcastReceiver() {
+        override fun onReceive(context: Context?, intent: Intent) {
+            Log.d(TAG, "on playlist dragged")
+
+            val newPlaylist = intent.mPlaylistArg
+            val newTrackInd = intent.mTrackIndexArg
+
+            mPlayer.setMediaItems(
+                newPlaylist.toMediaItemList(),
+                newTrackInd,
+                mPlayer.currentPosition
+            )
         }
     }
 
@@ -597,6 +613,7 @@ class TrackService : SuspendService(), ReceiverManager, LifecycleNotificationMan
         registerReceiverCompat(switchPlaylistReceiver, Broadcast_SWITCH_PLAYLIST)
         registerReceiverCompat(addToPlaylistReceiver, Broadcast_ADD_TO_PLAYLIST)
         registerReceiverCompat(removeFromPlaylistReceiver, Broadcast_REMOVE_FROM_PLAYLIST)
+        registerReceiverCompat(playlistDraggedReceiver, Broadcast_PLAYLIST_DRAGGED)
         registerReceiverCompat(switchToPrevTrackReceiver, Broadcast_PREV_TRACK)
         registerReceiverCompat(switchToNextTrackReceiver, Broadcast_NEXT_TRACK)
         registerReceiverCompat(seekToReceiver, Broadcast_SEEK_TO)
@@ -615,6 +632,7 @@ class TrackService : SuspendService(), ReceiverManager, LifecycleNotificationMan
         unregisterReceiver(switchPlaylistReceiver)
         unregisterReceiver(addToPlaylistReceiver)
         unregisterReceiver(removeFromPlaylistReceiver)
+        unregisterReceiver(playlistDraggedReceiver)
         unregisterReceiver(switchToPrevTrackReceiver)
         unregisterReceiver(switchToNextTrackReceiver)
         unregisterReceiver(seekToReceiver)
@@ -798,7 +816,7 @@ class TrackService : SuspendService(), ReceiverManager, LifecycleNotificationMan
 
     internal fun mResetPlaylistForPlayer(playlist: List<DefaultTrack>) = mPlayer.run {
         clearMediaItems()
-        playlist.forEach { track -> addMediaItem(MediaItem.fromUri(track.path)) }
+        addMediaItems(playlist.toMediaItemList())
     }
 
     private fun resetAudioSessionId() {
@@ -1113,9 +1131,6 @@ class TrackService : SuspendService(), ReceiverManager, LifecycleNotificationMan
 
     internal suspend inline fun mGetTrackCoverAsync(path: String?) =
         coilUtils.getTrackCoverBitmapAsync(path)
-
-    internal inline val trackThumbnail
-        get() = BitmapFactory.decodeResource(resources, R.drawable.cover_thumbnail)
 
     // --------------------------- Notification Actions ---------------------------
 

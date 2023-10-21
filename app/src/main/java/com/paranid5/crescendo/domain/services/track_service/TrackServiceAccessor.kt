@@ -65,9 +65,19 @@ class TrackServiceAccessor(application: MainApplication) : ServiceAccessor(appli
 
     fun removeFromPlaylist(trackInd: Int) {
         Log.d(TAG, "Send remove track at $trackInd")
+
         sendBroadcast(
             Intent(TrackService.Broadcast_REMOVE_FROM_PLAYLIST)
                 .putExtra(TrackService.TRACK_INDEX_ARG, trackInd)
+        )
+    }
+
+    fun updatePlaylistAfterDrag(newPlaylist: List<DefaultTrack>, newCurTrackIndex: Int) {
+        Log.d(TAG, "Send update playlist after drag")
+
+        sendBroadcast(
+            Intent(TrackService.Broadcast_PLAYLIST_DRAGGED)
+                .putPlaylistAndTrackIndexIfNotNull(newPlaylist, newCurTrackIndex)
         )
     }
 

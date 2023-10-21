@@ -76,6 +76,7 @@ fun CurrentPlaylistScreen(
             @Suppress("UNCHECKED_CAST")
             storageHandler.storeCurrentPlaylist(newTracks as List<DefaultTrack>)
             storageHandler.storeCurrentTrackIndex(newCurTrackIndex)
+            trackServiceAccessor.updatePlaylistAfterDrag(newTracks, newCurTrackIndex)
         }
     }
 }
