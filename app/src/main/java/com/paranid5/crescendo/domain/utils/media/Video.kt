@@ -3,7 +3,7 @@ package com.paranid5.crescendo.domain.utils.media
 import android.content.Context
 import com.arthenica.mobileffmpeg.FFmpeg
 import com.paranid5.crescendo.data.VideoMetadata
-import com.paranid5.crescendo.domain.services.video_cash_service.CashingResult
+import com.paranid5.crescendo.domain.services.video_cache_service.CachingResult
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
@@ -23,7 +23,7 @@ internal suspend inline fun mergeToMP4AndSetTagsAsync(
         )
 
         if (status != 0)
-            return@async CashingResult.ConversionError
+            return@async CachingResult.ConversionError
 
         val tagsTask = setVideoTagsAsync(
             context = context,
@@ -35,6 +35,6 @@ internal suspend inline fun mergeToMP4AndSetTagsAsync(
         videoTrack.delete()
 
         tagsTask.join()
-        CashingResult.DownloadResult.Success(mp4StoreFile)
+        CachingResult.DownloadResult.Success(mp4StoreFile)
     }
 }

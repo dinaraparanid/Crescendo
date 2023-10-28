@@ -1,4 +1,4 @@
-package com.paranid5.crescendo.domain.services.video_cash_service
+package com.paranid5.crescendo.domain.services.video_cache_service
 
 import android.os.Parcel
 import android.os.Parcelable
@@ -6,8 +6,8 @@ import com.paranid5.crescendo.domain.utils.media.MediaFile
 import io.ktor.http.HttpStatusCode
 import kotlinx.parcelize.Parcelize
 
-sealed interface CashingResult : Parcelable {
-    sealed interface DownloadResult : CashingResult {
+sealed interface CachingResult : Parcelable {
+    sealed interface DownloadResult : CachingResult {
         @Parcelize
         data class Success(val file: MediaFile) : DownloadResult
 
@@ -43,5 +43,5 @@ sealed interface CashingResult : Parcelable {
     }
 
     @Parcelize
-    data object ConversionError : CashingResult
+    data object ConversionError : CachingResult
 }

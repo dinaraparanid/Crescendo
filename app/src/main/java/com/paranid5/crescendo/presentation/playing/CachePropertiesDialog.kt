@@ -37,14 +37,14 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.paranid5.crescendo.R
 import com.paranid5.crescendo.domain.StorageHandler
-import com.paranid5.crescendo.domain.services.video_cash_service.CashTrimRange
-import com.paranid5.crescendo.domain.services.video_cash_service.Formats
+import com.paranid5.crescendo.domain.services.video_cache_service.CacheTrimRange
+import com.paranid5.crescendo.domain.services.video_cache_service.Formats
 import com.paranid5.crescendo.presentation.ui.theme.LocalAppColors
 import org.koin.compose.koinInject
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun CashPropertiesDialog(
+fun CachePropertiesDialog(
     isDialogShownState: MutableState<Boolean>,
     playingPresenter: PlayingPresenter,
     modifier: Modifier = Modifier,
@@ -66,7 +66,7 @@ fun CashPropertiesDialog(
     val endPointSecs by endPointSecsState
 
     val trimRange by remember {
-        derivedStateOf { CashTrimRange(trimOffsetSecs, endPointSecs) }
+        derivedStateOf { CacheTrimRange(trimOffsetSecs, endPointSecs) }
     }
 
     val filenameState = remember { mutableStateOf("") }
@@ -120,7 +120,7 @@ private fun Title(modifier: Modifier = Modifier) {
     val colors = LocalAppColors.current.value
 
     Text(
-        text = stringResource(R.string.cash_properties),
+        text = stringResource(R.string.cache_properties),
         modifier = modifier.padding(vertical = 15.dp),
         color = colors.primary,
         maxLines = 1,
@@ -205,7 +205,7 @@ private fun SaveOptionsMenu(
 private fun ConfirmButton(
     isDialogShownState: MutableState<Boolean>,
     format: Formats,
-    trimRange: CashTrimRange,
+    trimRange: CacheTrimRange,
     isButtonClickable: Boolean,
     filename: String,
     modifier: Modifier = Modifier,
@@ -222,6 +222,6 @@ private fun ConfirmButton(
         enabled = isButtonClickable,
         colors = ButtonDefaults.buttonColors(containerColor = colors.primary)
     ) {
-        Text(stringResource(R.string.start_cashing))
+        Text(stringResource(R.string.start_caching))
     }
 }

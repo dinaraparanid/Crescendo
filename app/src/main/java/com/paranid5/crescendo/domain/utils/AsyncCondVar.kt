@@ -1,7 +1,7 @@
 package com.paranid5.crescendo.domain.utils
 
+import com.paranid5.crescendo.domain.utils.extensions.receiveTimeout
 import kotlinx.coroutines.channels.Channel
-import kotlinx.coroutines.withTimeout
 import kotlin.time.Duration
 
 class AsyncCondVar {
@@ -11,10 +11,9 @@ class AsyncCondVar {
 
     internal suspend inline fun wait() = channel.receive()
 
-    internal suspend inline fun wait(timeoutMs: Long) = kotlin.runCatching {
-        withTimeout(timeoutMs) { channel.receive() }
-    }
+    internal suspend inline fun wait(timeoutMs: Long) =
+        channel.receiveTimeout(timeoutMs)
 
     internal suspend inline fun wait(timeout: Duration) =
-        withTimeout(timeout) { channel.receive() }
+        channel.receiveTimeout(timeout)
 }

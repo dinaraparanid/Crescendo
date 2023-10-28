@@ -8,7 +8,7 @@ import android.os.Environment
 import android.provider.MediaStore
 import com.paranid5.crescendo.data.VideoMetadata
 import com.paranid5.crescendo.domain.media_scanner.scanNextFile
-import com.paranid5.crescendo.domain.services.video_cash_service.Formats
+import com.paranid5.crescendo.domain.services.video_cache_service.Formats
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch

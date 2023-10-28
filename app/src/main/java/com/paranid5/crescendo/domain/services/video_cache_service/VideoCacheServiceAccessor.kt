@@ -1,4 +1,4 @@
-package com.paranid5.crescendo.domain.services.video_cash_service
+package com.paranid5.crescendo.domain.services.video_cache_service
 
 import android.content.Intent
 import android.os.Build
@@ -9,7 +9,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import org.koin.core.component.inject
 import org.koin.core.qualifier.named
 
-class VideoCashServiceAccessor(application: MainApplication) : ServiceAccessor(application) {
+class VideoCacheServiceAccessor(application: MainApplication) : ServiceAccessor(application) {
     private val isVideoCashServiceConnectedState by inject<MutableStateFlow<Boolean>>(
         named(VIDEO_CASH_SERVICE_CONNECTION)
     )
@@ -21,21 +21,21 @@ class VideoCashServiceAccessor(application: MainApplication) : ServiceAccessor(a
         videoUrl: String,
         desiredFilename: String,
         format: Formats,
-        trimRange: CashTrimRange
+        trimRange: CacheTrimRange
     ) = apply {
-        putExtra(VideoCashService.URL_ARG, videoUrl)
-        putExtra(VideoCashService.FILENAME_ARG, desiredFilename)
-        putExtra(VideoCashService.FORMAT_ARG, format)
-        putExtra(VideoCashService.TRIM_RANGE_ARG, trimRange)
+        putExtra(VideoCacheService.URL_ARG, videoUrl)
+        putExtra(VideoCacheService.FILENAME_ARG, desiredFilename)
+        putExtra(VideoCacheService.FORMAT_ARG, format)
+        putExtra(VideoCacheService.TRIM_RANGE_ARG, trimRange)
     }
 
     private fun startVideoCashService(
         videoUrl: String,
         desiredFilename: String,
         format: Formats,
-        trimRange: CashTrimRange
+        trimRange: CacheTrimRange
     ) {
-        val serviceIntent = Intent(appContext, VideoCashService::class.java)
+        val serviceIntent = Intent(appContext, VideoCacheService::class.java)
             .putVideoCashDataArgs(videoUrl, desiredFilename, format, trimRange)
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
@@ -48,9 +48,9 @@ class VideoCashServiceAccessor(application: MainApplication) : ServiceAccessor(a
         videoUrl: String,
         desiredFilename: String,
         format: Formats,
-        trimRange: CashTrimRange
+        trimRange: CacheTrimRange
     ) = sendBroadcast(
-        Intent(VideoCashService.Broadcast_CASH_NEXT_VIDEO)
+        Intent(VideoCacheService.Broadcast_CASH_NEXT_VIDEO)
             .putVideoCashDataArgs(videoUrl, desiredFilename, format, trimRange)
     )
 
@@ -58,14 +58,14 @@ class VideoCashServiceAccessor(application: MainApplication) : ServiceAccessor(a
         videoUrl: String,
         desiredFilename: String,
         format: Formats,
-        trimRange: CashTrimRange
+        trimRange: CacheTrimRange
     ) = startVideoCashService(videoUrl, desiredFilename, format, trimRange)
 
     fun startCashingOrAddToQueue(
         videoUrl: String,
         desiredFilename: String,
         format: Formats,
-        trimRange: CashTrimRange
+        trimRange: CacheTrimRange
     ) = when {
         isVideoCashServiceConnected -> cashNextVideo(
             videoUrl,

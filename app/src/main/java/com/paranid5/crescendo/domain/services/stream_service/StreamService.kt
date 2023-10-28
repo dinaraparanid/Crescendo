@@ -1,12 +1,10 @@
 package com.paranid5.crescendo.domain.services.stream_service
 
-import android.annotation.SuppressLint
 import android.app.*
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.graphics.Bitmap
-import android.graphics.BitmapFactory
 import android.media.audiofx.BassBoost
 import android.media.audiofx.Equalizer
 import android.media.audiofx.PresetReverb
@@ -18,7 +16,6 @@ import android.support.v4.media.session.MediaControllerCompat
 import android.support.v4.media.session.MediaSessionCompat
 import android.support.v4.media.session.PlaybackStateCompat
 import android.util.Log
-import android.util.SparseArray
 import android.widget.Toast
 import androidx.annotation.OptIn
 import androidx.core.app.NotificationCompat
@@ -33,21 +30,20 @@ import androidx.media3.datasource.DefaultHttpDataSource
 import androidx.media3.exoplayer.ExoPlayer
 import androidx.media3.exoplayer.source.ProgressiveMediaSource
 import androidx.media3.ui.PlayerNotificationManager
-import at.huber.youtubeExtractor.VideoMeta
-import at.huber.youtubeExtractor.YouTubeExtractor
-import at.huber.youtubeExtractor.YtFile
-import com.paranid5.crescendo.R
 import com.paranid5.crescendo.AUDIO_SESSION_ID
 import com.paranid5.crescendo.EQUALIZER_DATA
 import com.paranid5.crescendo.IS_PLAYING
+import com.paranid5.crescendo.R
 import com.paranid5.crescendo.STREAM_SERVICE_CONNECTION
 import com.paranid5.crescendo.data.VideoMetadata
 import com.paranid5.crescendo.data.eq.EqualizerData
 import com.paranid5.crescendo.data.utils.extensions.toAndroidMetadata
 import com.paranid5.crescendo.domain.LifecycleNotificationManager
 import com.paranid5.crescendo.domain.ReceiverManager
-import com.paranid5.crescendo.domain.services.ServiceAction
 import com.paranid5.crescendo.domain.StorageHandler
+import com.paranid5.crescendo.domain.ktor_client.youtube.VideoMeta
+import com.paranid5.crescendo.domain.ktor_client.youtube.extractYtFilesWithMeta
+import com.paranid5.crescendo.domain.services.ServiceAction
 import com.paranid5.crescendo.domain.services.SuspendService
 import com.paranid5.crescendo.domain.utils.extensions.bandLevels
 import com.paranid5.crescendo.domain.utils.extensions.registerReceiverCompat
@@ -56,6 +52,7 @@ import com.paranid5.crescendo.domain.utils.extensions.setParameter
 import com.paranid5.crescendo.presentation.main_activity.MainActivity
 import com.paranid5.crescendo.presentation.playing.*
 import com.paranid5.crescendo.presentation.ui.utils.CoilUtils
+import io.ktor.client.HttpClient
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
 import org.koin.core.component.KoinComponent
@@ -64,7 +61,10 @@ import org.koin.core.parameter.parametersOf
 import org.koin.core.qualifier.named
 
 @OptIn(androidx.media3.common.util.UnstableApi::class)
-class StreamService : SuspendService(), ReceiverManager, LifecycleNotificationManager, KoinComponent {
+class StreamService : SuspendService(),
+    ReceiverManager,
+    LifecycleNotificationManager,
+    KoinComponent {
     companion object {
         private const val NOTIFICATION_ID = 101
         private const val STREAM_CHANNEL_ID = "stream_channel"
@@ -175,6 +175,7 @@ class StreamService : SuspendService(), ReceiverManager, LifecycleNotificationMa
 
     private val storageHandler by inject<StorageHandler>()
     private val coilUtils by inject<CoilUtils> { parametersOf(this) }
+    private val ktorClient by inject<HttpClient>()
 
     private val currentUrlState = storageHandler.currentUrlState
     private val currentMetadataState = MutableStateFlow<VideoMetadata?>(null)
@@ -371,7 +372,7 @@ class StreamService : SuspendService(), ReceiverManager, LifecycleNotificationMa
             super.onPlaybackStateChanged(playbackState)
 
             when (playbackState) {
-                Player.STATE_IDLE -> scope.launch {
+                Player.STATE_IDLE -> {
                     mRestartPlayer(initialPosition = mCurrentPlaybackPosition)
                 }
 
@@ -416,7 +417,7 @@ class StreamService : SuspendService(), ReceiverManager, LifecycleNotificationMa
             Log.d(TAG, "playback resumed")
 
             when {
-                isStoppedWithError -> scope.launch {
+                isStoppedWithError -> {
                     mRestartPlayer(initialPosition = mCurrentPlaybackPosition)
                     isStoppedWithError = false
                 }
@@ -654,7 +655,7 @@ class StreamService : SuspendService(), ReceiverManager, LifecycleNotificationMa
     internal suspend inline fun mStoreCurrentUrl(url: String) =
         storageHandler.storeCurrentUrl(url)
 
-    internal suspend inline fun mStoreMetadata(videoMeta: VideoMeta?) =
+    private suspend inline fun storeMetadata(videoMeta: VideoMeta?) =
         storageHandler.storeCurrentMetadata(videoMeta?.let(::VideoMetadata))
 
     private suspend inline fun storeCurrentUrl(newUrl: String) =
@@ -667,44 +668,51 @@ class StreamService : SuspendService(), ReceiverManager, LifecycleNotificationMa
         mPlayer.initAudioEffects()
     }
 
-    private fun YoutubeUrlExtractor(initialPosition: Long) =
-        @SuppressLint("StaticFieldLeak")
-        object : YouTubeExtractor(this) {
-            override fun onExtractionComplete(
-                ytFiles: SparseArray<YtFile>?,
-                videoMeta: VideoMeta?
-            ) {
-                if (ytFiles == null)
-                    return
+    private fun extractMediaFilesAndStartPlayingAsync(
+        ytUrl: String,
+        initialPosition: Long
+    ) = scope.launch(Dispatchers.IO) {
+        val extractRes = ktorClient.extractYtFilesWithMeta(
+            context = applicationContext,
+            ytUrl = ytUrl
+        )
 
-                val audioTag = 140
-                val audioUrl = ytFiles[audioTag].url!!
-
-                val audioSource = ProgressiveMediaSource
-                    .Factory(DefaultHttpDataSource.Factory())
-                    .createMediaSource(MediaItem.fromUri(audioUrl))
-
-                playbackTask = scope.launch {
-                    mUpdateMediaSession(videoMeta?.let(::VideoMetadata))
-                    mPlayerNotificationManager.invalidate()
-                    launch(Dispatchers.IO) { mStoreMetadata(videoMeta) }
-
-                    mPlayer.run {
-                        setMediaSource(audioSource)
-                        playWhenReady = true
-                        prepare()
-                        seekTo(initialPosition)
-                    }
-
-                    mSetAudioEffectsEnabled(isEnabled = areAudioEffectsEnabledState.value)
-                }
-            }
+        val (ytFiles, videoMeta) = when (val res = extractRes.getOrNull()) {
+            null -> return@launch
+            else -> res
         }
 
+        ytFiles.forEach {
+            println(it.value)
+        }
+
+        val audioTag = 140
+        val audioUrl = ytFiles[audioTag]!!.url!!
+
+        val audioSource = ProgressiveMediaSource
+            .Factory(DefaultHttpDataSource.Factory())
+            .createMediaSource(MediaItem.fromUri(audioUrl))
+
+        playbackTask = scope.launch {
+            mUpdateMediaSession(videoMeta?.let(::VideoMetadata))
+            mPlayerNotificationManager.invalidate()
+            launch(Dispatchers.IO) { storeMetadata(videoMeta) }
+
+            mPlayer.run {
+                setMediaSource(audioSource)
+                playWhenReady = true
+                prepare()
+                seekTo(initialPosition)
+            }
+
+            mSetAudioEffectsEnabled(isEnabled = areAudioEffectsEnabledState.value)
+        }
+    }
+
     @OptIn(UnstableApi::class)
-    private fun playStream(url: String, initialPosition: Long = 0) {
+    private fun playStream(ytUrl: String, initialPosition: Long = 0) {
         mResetAudioSessionId()
-        YoutubeUrlExtractor(initialPosition).extract(url)
+        extractMediaFilesAndStartPlayingAsync(ytUrl = ytUrl, initialPosition = initialPosition)
     }
 
     internal fun mStoreAndPlayNewStream(url: String, initialPosition: Long = 0) {
@@ -713,7 +721,7 @@ class StreamService : SuspendService(), ReceiverManager, LifecycleNotificationMa
     }
 
     internal fun mRestartPlayer(initialPosition: Long = 0) =
-        playStream(url = currentUrlState.value, initialPosition)
+        playStream(ytUrl = currentUrlState.value, initialPosition)
 
     internal fun mSeekTo(position: Long) {
         mResetAudioSessionId()

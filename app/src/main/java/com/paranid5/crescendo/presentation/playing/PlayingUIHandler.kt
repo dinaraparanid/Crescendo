@@ -7,9 +7,9 @@ import com.paranid5.crescendo.R
 import com.paranid5.crescendo.domain.StorageHandler
 import com.paranid5.crescendo.domain.services.stream_service.StreamServiceAccessor
 import com.paranid5.crescendo.domain.services.track_service.TrackServiceAccessor
-import com.paranid5.crescendo.domain.services.video_cash_service.CashTrimRange
-import com.paranid5.crescendo.domain.services.video_cash_service.Formats
-import com.paranid5.crescendo.domain.services.video_cash_service.VideoCashServiceAccessor
+import com.paranid5.crescendo.domain.services.video_cache_service.CacheTrimRange
+import com.paranid5.crescendo.domain.services.video_cache_service.Formats
+import com.paranid5.crescendo.domain.services.video_cache_service.VideoCacheServiceAccessor
 import com.paranid5.crescendo.presentation.NavHostController
 import com.paranid5.crescendo.presentation.Screens
 import com.paranid5.crescendo.presentation.UIHandler
@@ -23,7 +23,7 @@ class PlayingUIHandler(
     private val storageHandler: StorageHandler,
     private val streamServiceAccessor: StreamServiceAccessor,
     private val trackServiceAccessor: TrackServiceAccessor,
-    private val videoCashServiceAccessor: VideoCashServiceAccessor
+    private val videoCacheServiceAccessor: VideoCacheServiceAccessor
 ) : UIHandler, KoinComponent {
     private val audioSessionIdState by inject<MutableStateFlow<Int>>(named(AUDIO_SESSION_ID))
     private val audioStatusState = storageHandler.audioStatusState
@@ -56,8 +56,8 @@ class PlayingUIHandler(
         trackAction = trackServiceAccessor::startStreamingOrSendResumeBroadcast
     )
 
-    fun launchVideoCashService(desiredFilename: String, format: Formats, trimRange: CashTrimRange) =
-        videoCashServiceAccessor.startCashingOrAddToQueue(
+    fun launchVideoCashService(desiredFilename: String, format: Formats, trimRange: CacheTrimRange) =
+        videoCacheServiceAccessor.startCashingOrAddToQueue(
             videoUrl = storageHandler.currentUrlState.value,
             desiredFilename = desiredFilename,
             format = format,

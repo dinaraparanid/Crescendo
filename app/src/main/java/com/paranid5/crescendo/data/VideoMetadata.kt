@@ -2,9 +2,9 @@ package com.paranid5.crescendo.data
 
 import android.os.Parcelable
 import androidx.compose.runtime.Immutable
-import at.huber.youtubeExtractor.VideoMeta
 import com.paranid5.crescendo.STREAM_WITH_NO_NAME
 import com.paranid5.crescendo.UNKNOWN_STREAMER
+import com.paranid5.crescendo.domain.ktor_client.youtube.VideoMeta
 import kotlinx.parcelize.Parcelize
 import kotlinx.serialization.Serializable
 import org.koin.core.component.KoinComponent
@@ -25,9 +25,9 @@ data class VideoMetadata(
     constructor(youtubeMeta: VideoMeta) : this(
         title = youtubeMeta.title,
         author = youtubeMeta.author,
-        lenInMillis = youtubeMeta.videoLength * 1000,
+        lenInMillis = youtubeMeta.videoLengthSecs * 1000,
         covers = youtubeMeta.run {
-            listOf(maxResImageUrl, hqImageUrl, mqImageUrl, sdImageUrl, thumbUrl)
+            listOf(maxResImageUrl, hqImageUrl, mqImageUrl, sdImageUrl, thumbnailUrl)
         }
     )
 }

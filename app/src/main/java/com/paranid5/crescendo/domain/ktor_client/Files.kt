@@ -1,7 +1,7 @@
 package com.paranid5.crescendo.domain.ktor_client
 
 import android.util.Log
-import com.paranid5.crescendo.domain.services.video_cash_service.DownloadingStatus
+import com.paranid5.crescendo.domain.services.video_cache_service.DownloadingStatus
 import io.ktor.client.HttpClient
 import io.ktor.client.request.prepareGet
 import io.ktor.client.statement.HttpResponse

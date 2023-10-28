@@ -1,13 +1,11 @@
-package com.paranid5.crescendo.domain.services.video_cash_service
+package com.paranid5.crescendo.domain.services.video_cache_service
 
-import android.annotation.SuppressLint
 import android.app.*
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.os.Build
 import android.util.Log
-import android.util.SparseArray
 import androidx.annotation.RequiresApi
 import androidx.annotation.StringRes
 import androidx.lifecycle.Lifecycle
@@ -16,9 +14,6 @@ import arrow.core.Either
 import arrow.core.left
 import arrow.core.raise.either
 import arrow.core.raise.ensure
-import at.huber.youtubeExtractor.VideoMeta
-import at.huber.youtubeExtractor.YouTubeExtractor
-import at.huber.youtubeExtractor.YtFile
 import com.paranid5.crescendo.R
 import com.paranid5.crescendo.VIDEO_CASH_SERVICE_CONNECTION
 import com.paranid5.crescendo.data.VideoMetadata
@@ -28,6 +23,8 @@ import com.paranid5.crescendo.domain.services.ServiceAction
 import com.paranid5.crescendo.domain.services.SuspendService
 import com.paranid5.crescendo.domain.ktor_client.downloadFile
 import com.paranid5.crescendo.domain.ktor_client.downloadFiles
+import com.paranid5.crescendo.domain.ktor_client.youtube.YtFile
+import com.paranid5.crescendo.domain.ktor_client.youtube.extractYtFilesWithMeta
 import com.paranid5.crescendo.domain.media_scanner.MediaScannerReceiver
 import com.paranid5.crescendo.domain.utils.AsyncCondVar
 import com.paranid5.crescendo.domain.utils.extensions.registerReceiverCompat
@@ -49,12 +46,12 @@ import java.util.Queue
 import java.util.concurrent.ConcurrentLinkedQueue
 import kotlin.time.Duration.Companion.seconds
 
-class VideoCashService : SuspendService(), ReceiverManager, LifecycleNotificationManager, KoinComponent {
+class VideoCacheService : SuspendService(), ReceiverManager, LifecycleNotificationManager, KoinComponent {
     companion object {
         private const val NOTIFICATION_ID = 102
-        private const val VIDEO_CASH_CHANNEL_ID = "video_cash_channel"
+        private const val VIDEO_CASH_CHANNEL_ID = "video_cache_channel"
 
-        private const val SERVICE_LOCATION = "com.paranid5.crescendo.domain.services.video_cash_service"
+        private const val SERVICE_LOCATION = "com.paranid5.crescendo.domain.services.video_cache_service"
         const val Broadcast_CASH_NEXT_VIDEO = "$SERVICE_LOCATION.CASH_NEXT_VIDEO"
         const val Broadcast_CANCEL_CUR_VIDEO = "$SERVICE_LOCATION.CANCEL_CUR_VIDEO"
         const val Broadcast_CANCEL_ALL = "$SERVICE_LOCATION.CANCEL_ALL"
@@ -64,14 +61,14 @@ class VideoCashService : SuspendService(), ReceiverManager, LifecycleNotificatio
         const val FORMAT_ARG = "format"
         const val TRIM_RANGE_ARG = "trim_range"
 
-        private val TAG = VideoCashService::class.simpleName!!
+        private val TAG = VideoCacheService::class.simpleName!!
 
-        internal inline val Intent.mVideoCashDataArg
-            get() = VideoCashData(
+        internal inline val Intent.mVideoCacheDataArg
+            get() = VideoCacheData(
                 url = getStringExtra(URL_ARG)!!,
                 desiredFilename = getStringExtra(FILENAME_ARG)!!,
                 format = getParcelableExtra(FORMAT_ARG, Formats::class.java)!!,
-                trimRange = getParcelableExtra(TRIM_RANGE_ARG, CashTrimRange::class.java)!!
+                trimRange = getParcelableExtra(TRIM_RANGE_ARG, CacheTrimRange::class.java)!!
             )
     }
 
@@ -92,23 +89,23 @@ class VideoCashService : SuspendService(), ReceiverManager, LifecycleNotificatio
 
     private inline val Actions.playbackIntent: PendingIntent
         get() = PendingIntent.getBroadcast(
-            this@VideoCashService,
+            this@VideoCacheService,
             requestCode,
             Intent(playbackAction),
             PendingIntent.FLAG_IMMUTABLE
         )
 
-    internal data class VideoCashData(
+    internal data class VideoCacheData(
         val url: String,
         val desiredFilename: String,
         val format: Formats,
-        val trimRange: CashTrimRange
+        val trimRange: CacheTrimRange
     )
 
     private val ktorClient by inject<HttpClient>()
-    private var cashingLoopJob: Job? = null
+    private var cachingLoopJob: Job? = null
 
-    private val videoCashQueue: Queue<VideoCashData> = ConcurrentLinkedQueue()
+    private val videoCashQueue: Queue<VideoCacheData> = ConcurrentLinkedQueue()
     private val videoCashQueueLenState = MutableStateFlow(0)
 
     private val videoCashProgressState = MutableStateFlow(0L to 0L)
@@ -123,7 +120,7 @@ class VideoCashService : SuspendService(), ReceiverManager, LifecycleNotificatio
 
     private var curVideoCashFile: MediaFile? = null
     private val curVideoMetadataState = MutableStateFlow<VideoMetadata?>(null)
-    private val cashingStatusState = MutableStateFlow(DownloadingStatus.NONE)
+    private val cachingStatusState = MutableStateFlow(DownloadingStatus.NONE)
 
     @Volatile
     private var wasStartForegroundUsed = false
@@ -134,23 +131,23 @@ class VideoCashService : SuspendService(), ReceiverManager, LifecycleNotificatio
 
     // --------------------------- Action Receivers ---------------------------
 
-    private val cashNextVideoReceiver = object : BroadcastReceiver() {
+    private val cacheNextVideoReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context?, intent: Intent) {
             Log.d(TAG, "Cash next is received")
-            scope.launch { mOfferVideoToQueue(videoCashData = intent.mVideoCashDataArg) }
+            scope.launch { mOfferVideoToQueue(videoCacheData = intent.mVideoCacheDataArg) }
         }
     }
 
     private val cancelCurVideoReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context?, intent: Intent?) {
-            Log.d(TAG, "Canceling video cashing")
+            Log.d(TAG, "Canceling video caching")
             scope.launch { mCancelCurVideoCashing() }
         }
     }
 
     private val cancelAllReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context?, intent: Intent?) {
-            Log.d(TAG, "Canceling all videos cashing")
+            Log.d(TAG, "Canceling all videos caching")
             scope.launch { mCancelAllVideosCashing() }
         }
     }
@@ -158,14 +155,14 @@ class VideoCashService : SuspendService(), ReceiverManager, LifecycleNotificatio
     private val mediaScannerReceiver = MediaScannerReceiver()
 
     override fun registerReceivers() {
-        registerReceiverCompat(cashNextVideoReceiver, Broadcast_CASH_NEXT_VIDEO)
+        registerReceiverCompat(cacheNextVideoReceiver, Broadcast_CASH_NEXT_VIDEO)
         registerReceiverCompat(cancelCurVideoReceiver, Broadcast_CANCEL_CUR_VIDEO)
         registerReceiverCompat(cancelAllReceiver, Broadcast_CANCEL_ALL)
         registerReceiverCompat(mediaScannerReceiver, MediaScannerReceiver.Broadcast_SCAN_NEXT_FILE)
     }
 
     override fun unregisterReceivers() {
-        unregisterReceiver(cashNextVideoReceiver)
+        unregisterReceiver(cacheNextVideoReceiver)
         unregisterReceiver(cancelCurVideoReceiver)
         unregisterReceiver(cancelAllReceiver)
         unregisterReceiver(mediaScannerReceiver)
@@ -185,7 +182,7 @@ class VideoCashService : SuspendService(), ReceiverManager, LifecycleNotificatio
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
             createChannel()
 
-        scope.launch { mOfferVideoToQueue(videoCashData = intent!!.mVideoCashDataArg) }
+        scope.launch { mOfferVideoToQueue(videoCacheData = intent!!.mVideoCacheDataArg) }
         resetCashingJobIfCanceled()
         scope.launch { startNotificationObserving() }
         return START_REDELIVER_INTENT
@@ -199,52 +196,57 @@ class VideoCashService : SuspendService(), ReceiverManager, LifecycleNotificatio
 
     // --------------------------- Cashing Management ---------------------------
 
-    private fun YoutubeUrlExtractor(
+    private suspend inline fun extractMediaFilesAndStartCaching(
+        ytUrl: String,
         desiredFilename: String,
         format: Formats,
-        trimRange: CashTrimRange
-    ) =
-        @SuppressLint("StaticFieldLeak")
-        object : YouTubeExtractor(this) {
-            override fun onExtractionComplete(
-                ytFiles: SparseArray<YtFile>?,
-                videoMeta: VideoMeta?
-            ) {
-                if (ytFiles == null)
-                    return
+        trimRange: CacheTrimRange
+    ) {
+        val extractRes = ktorClient.extractYtFilesWithMeta(
+            context = this,
+            ytUrl = ytUrl
+        )
 
-                val audioTag = 140
-                val audioUrl = ytFiles[audioTag].url!!
-
-                val videoUrl = sequenceOf(137, 22, 18)
-                    .map(ytFiles::get)
-                    .filterNotNull()
-                    .map(YtFile::getUrl)
-                    .filterNotNull()
-                    .filter(String::isNotEmpty)
-                    .first()
-
-                val videoMetadata = videoMeta?.let(::VideoMetadata) ?: VideoMetadata()
-                curVideoMetadataState.update { videoMetadata }
-
-                scope.launch {
-                    mOnVideoCashStatusReceived(
-                        cashingResult = mCashMediaFileOrNotifyError(
-                            desiredFilename = desiredFilename,
-                            audioUrl = audioUrl,
-                            videoUrl = if (format == Formats.MP4) videoUrl else null,
-                            videoMetadata = videoMetadata,
-                            format = format,
-                            trimRange = trimRange
-                        )
-                    )
-                }
+        val (ytFiles, videoMeta) = when (val res = extractRes.getOrNull()) {
+            null -> {
+                extractRes.exceptionOrNull()!!.printStackTrace()
+                return
             }
+
+            else -> res
         }
 
-    internal suspend inline fun mOfferVideoToQueue(videoCashData: VideoCashData) {
+        val audioTag = 140
+        val audioUrl = ytFiles[audioTag]!!.url!!
+
+        val videoUrl = sequenceOf(137, 22, 18)
+            .map(ytFiles::get)
+            .filterNotNull()
+            .map(YtFile::url)
+            .filterNotNull()
+            .filter(String::isNotEmpty)
+            .first()
+
+        val videoMetadata = videoMeta?.let(::VideoMetadata) ?: VideoMetadata()
+        curVideoMetadataState.update { videoMetadata }
+
+        scope.launch {
+            onVideoCacheStatusReceived(
+                cachingResult = cacheMediaFileOrNotifyError(
+                    desiredFilename = desiredFilename,
+                    audioUrl = audioUrl,
+                    videoUrl = if (format == Formats.MP4) videoUrl else null,
+                    videoMetadata = videoMetadata,
+                    format = format,
+                    trimRange = trimRange
+                )
+            )
+        }
+    }
+
+    internal suspend inline fun mOfferVideoToQueue(videoCacheData: VideoCacheData) {
         Log.d(TAG, "New video added to queue")
-        videoCashQueue.offer(videoCashData)
+        videoCashQueue.offer(videoCacheData)
         videoCashQueueLenState.update { videoCashQueue.size }
         isVideoCashQueueEmptyCondVar.notify()
         resetCashingJobIfCanceled()
@@ -257,7 +259,7 @@ class VideoCashService : SuspendService(), ReceiverManager, LifecycleNotificatio
      * @param desiredFilename filename chosen by the user
      * @param isAudio is final file required to be in audio format
      * @return [MediaFile.VideoFile] with file or
-     * [CashingResult.DownloadResult.Error] with [HttpStatusCode] if error has occurred
+     * [CachingResult.DownloadResult.Error] with [HttpStatusCode] if error has occurred
      */
 
     private suspend inline fun initMediaFile(
@@ -272,25 +274,25 @@ class VideoCashService : SuspendService(), ReceiverManager, LifecycleNotificatio
 
         ensure(storeFileRes.isSuccess) {
             storeFileRes.exceptionOrNull()!!.printStackTrace()
-            CashingResult.DownloadResult.FileCreationError
+            CachingResult.DownloadResult.FileCreationError
         }
 
         storeFileRes.getOrNull()!!
     }
 
     /**
-     * Prepares store file for the download request or cancels cashing and notifies about error.
+     * Prepares store file for the download request or cancels caching and notifies about error.
      * @param desiredFilename filename chosen by the user
      * @param isAudio is final file required to be in audio format
      * @return [MediaFile.VideoFile] with file or
-     * [CashingResult.DownloadResult.Error] with [HttpStatusCode] if error has occurred
+     * [CachingResult.DownloadResult.Error] with [HttpStatusCode] if error has occurred
      */
 
     private suspend inline fun initMediaFileOrNotifyError(
         desiredFilename: String,
         isAudio: Boolean
     ) = initMediaFile(desiredFilename, isAudio).onLeft {
-        cashingStatusState.update { DownloadingStatus.ERR }
+        cachingStatusState.update { DownloadingStatus.ERR }
         isVideoCashingCondVar.notify()
     }
 
@@ -301,16 +303,16 @@ class VideoCashService : SuspendService(), ReceiverManager, LifecycleNotificatio
      * @param desiredFilename filename chosen by the user
      * @param mediaUrl url to the initial mp4 file
      * @param isAudio is final file required to be in audio format
-     * @return [CashingResult.DownloadResult.Success] with file if conversion was successful,
-     * [CashingResult.DownloadResult.Error] with [HttpStatusCode] if error has occurred,
-     * [CashingResult.DownloadResult.Canceled] if cashing was canceled by the user
+     * @return [CachingResult.DownloadResult.Success] with file if conversion was successful,
+     * [CachingResult.DownloadResult.Error] with [HttpStatusCode] if error has occurred,
+     * [CachingResult.DownloadResult.Canceled] if caching was canceled by the user
      */
 
     private suspend inline fun downloadMediaFileOrNotifyError(
         desiredFilename: String,
         mediaUrl: String,
         isAudio: Boolean
-    ): CashingResult.DownloadResult {
+    ): CachingResult.DownloadResult {
         val storeFileRes = initMediaFileOrNotifyError(desiredFilename, isAudio)
 
         curVideoCashFile = when (storeFileRes) {
@@ -322,18 +324,18 @@ class VideoCashService : SuspendService(), ReceiverManager, LifecycleNotificatio
             fileUrl = mediaUrl,
             storeFile = curVideoCashFile!!,
             progressState = videoCashProgressState,
-            downloadingState = cashingStatusState,
+            downloadingState = cachingStatusState,
         )
 
         if (statusCode?.isSuccess() != true) {
             onCashingError(errorStatus = DownloadingStatus.ERR)
-            return statusCode?.let(CashingResult.DownloadResult::Error)
-                ?: CashingResult.DownloadResult.Canceled
+            return statusCode?.let(CachingResult.DownloadResult::Error)
+                ?: CachingResult.DownloadResult.Canceled
         }
 
         isVideoCashingCondVar.notify()
         Log.d(TAG, "Status code is received")
-        return CashingResult.DownloadResult.Success(curVideoCashFile!!)
+        return CachingResult.DownloadResult.Success(curVideoCashFile!!)
     }
 
     /**
@@ -344,9 +346,9 @@ class VideoCashService : SuspendService(), ReceiverManager, LifecycleNotificatio
      * @param videoUrl url to the initial video mp4 file
      * @param audioFileStore file to store downloaded audio mp4 file
      * @param videoFileStore file to store downloaded video mp4 file
-     * @return [CashingResult.DownloadResult.Success] with file if conversion was successful,
-     * [CashingResult.DownloadResult.Error] with [HttpStatusCode] if error has occurred,
-     * [CashingResult.DownloadResult.Canceled] if cashing was canceled by the user
+     * @return [CachingResult.DownloadResult.Success] with file if conversion was successful,
+     * [CachingResult.DownloadResult.Error] with [HttpStatusCode] if error has occurred,
+     * [CachingResult.DownloadResult.Canceled] if caching was canceled by the user
      */
 
     private suspend inline fun downloadAudioAndVideoFilesOrNotifyError(
@@ -354,22 +356,22 @@ class VideoCashService : SuspendService(), ReceiverManager, LifecycleNotificatio
         videoUrl: String,
         audioFileStore: MediaFile,
         videoFileStore: MediaFile.VideoFile
-    ): CashingResult.DownloadResult {
+    ): CachingResult.DownloadResult {
         val statusCode = ktorClient.downloadFiles(
-            cashingStatusState,
+            cachingStatusState,
             videoCashProgressState,
             audioUrl to audioFileStore, videoUrl to videoFileStore
         )
 
         if (statusCode?.isSuccess() != true) {
             onCashingError(errorStatus = DownloadingStatus.ERR)
-            return statusCode?.let(CashingResult.DownloadResult::Error)
-                ?: CashingResult.DownloadResult.Canceled
+            return statusCode?.let(CachingResult.DownloadResult::Error)
+                ?: CachingResult.DownloadResult.Canceled
         }
 
         isVideoCashingCondVar.notify()
         Log.d(TAG, "Status code is received")
-        return CashingResult.DownloadResult.Success(audioFileStore)
+        return CachingResult.DownloadResult.Success(audioFileStore)
     }
 
     /**
@@ -377,12 +379,12 @@ class VideoCashService : SuspendService(), ReceiverManager, LifecycleNotificatio
      * Provides error message handling, no need to do it further
      * @param desiredFilename filename chosen by the user
      * @return audio [MediaFile] and [MediaFile.VideoFile] or
-     * [CashingResult.DownloadResult.Error] with [HttpStatusCode] if error has occurred
+     * [CachingResult.DownloadResult.Error] with [HttpStatusCode] if error has occurred
      */
 
     private suspend inline fun prepareMediaFilesForMP4MergingOrNotifyErrors(
         desiredFilename: String,
-    ): Either<CashingResult.DownloadResult.FileCreationError, Pair<MediaFile, MediaFile.VideoFile>> {
+    ): Either<CachingResult.DownloadResult.FileCreationError, Pair<MediaFile, MediaFile.VideoFile>> {
         val audioFileStoreRes = initMediaFileOrNotifyError(
             desiredFilename,
             isAudio = true
@@ -420,18 +422,18 @@ class VideoCashService : SuspendService(), ReceiverManager, LifecycleNotificatio
      * @param audioUrl url to the audio mp4 file
      * @param videoUrl url to the video mp4 file
      * @param videoMetadata metadata to set as tags
-     * @return [CashingResult.DownloadResult.Success] with file if conversion was successful,
-     * [CashingResult.DownloadResult.Error] with [HttpStatusCode] if error has occurred,
-     * [CashingResult.DownloadResult.Canceled] if cashing was canceled by the user,
-     * [CashingResult.ConversionError] if conversion to .aac audio file has failed
+     * @return [CachingResult.DownloadResult.Success] with file if conversion was successful,
+     * [CachingResult.DownloadResult.Error] with [HttpStatusCode] if error has occurred,
+     * [CachingResult.DownloadResult.Canceled] if caching was canceled by the user,
+     * [CachingResult.ConversionError] if conversion to .aac audio file has failed
      */
 
-    private suspend inline fun cashVideoFileOrNotifyError(
+    private suspend inline fun cacheVideoFileOrNotifyError(
         desiredFilename: String,
         audioUrl: String,
         videoUrl: String,
         videoMetadata: VideoMetadata
-    ): CashingResult {
+    ): CachingResult {
         val mediaFilesInitResult = prepareMediaFilesForMP4MergingOrNotifyErrors(desiredFilename)
 
         val (audioFileStore, videoFileStore) = when (mediaFilesInitResult) {
@@ -451,7 +453,7 @@ class VideoCashService : SuspendService(), ReceiverManager, LifecycleNotificatio
             audioFileStore,
             videoFileStore
         ).let { result ->
-            if (result !is CashingResult.DownloadResult.Success)
+            if (result !is CachingResult.DownloadResult.Success)
                 return result
         }
 
@@ -479,22 +481,22 @@ class VideoCashService : SuspendService(), ReceiverManager, LifecycleNotificatio
      * @param audioUrl url to the audio mp4 file
      * @param videoMetadata metadata to set as tags
      * @param audioFormat audio file format
-     * @return [CashingResult.DownloadResult.Success] with file if conversion was successful,
-     * [CashingResult.DownloadResult.Error] with [HttpStatusCode] if error has occurred,
-     * [CashingResult.DownloadResult.Canceled] if cashing was canceled by the user,
-     * [CashingResult.ConversionError] if conversion to .aac audio file has failed
+     * @return [CachingResult.DownloadResult.Success] with file if conversion was successful,
+     * [CachingResult.DownloadResult.Error] with [HttpStatusCode] if error has occurred,
+     * [CachingResult.DownloadResult.Canceled] if caching was canceled by the user,
+     * [CachingResult.ConversionError] if conversion to .aac audio file has failed
      */
 
-    private suspend inline fun cashAudioFileOrNotifyError(
+    private suspend inline fun cacheAudioFileOrNotifyError(
         desiredFilename: String,
         audioUrl: String,
         videoMetadata: VideoMetadata,
         audioFormat: Formats,
-        trimRange: CashTrimRange
-    ): CashingResult {
+        trimRange: CacheTrimRange
+    ): CachingResult {
         val result = downloadMediaFileOrNotifyError(desiredFilename, audioUrl, isAudio = true)
 
-        if (result !is CashingResult.DownloadResult.Success)
+        if (result !is CachingResult.DownloadResult.Success)
             return result
 
         return when (val audioConversionResult =
@@ -507,36 +509,36 @@ class VideoCashService : SuspendService(), ReceiverManager, LifecycleNotificatio
         ) {
             null -> {
                 onCashingError(errorStatus = DownloadingStatus.ERR)
-                CashingResult.ConversionError
+                CachingResult.ConversionError
             }
 
-            else -> CashingResult.DownloadResult.Success(audioConversionResult)
+            else -> CachingResult.DownloadResult.Success(audioConversionResult)
         }
     }
 
     /**
-     * Cashes either with [cashAudioFileOrNotifyError] if [videoUrl] is null,
-     * or with [cashVideoFileOrNotifyError] otherwise
+     * Cashes either with [cacheAudioFileOrNotifyError] if [videoUrl] is null,
+     * or with [cacheVideoFileOrNotifyError] otherwise
      * @param desiredFilename filename chosen by the user
      * @param audioUrl url to the audio mp4 file
      * @param videoUrl url to the video mp4 file
      * @param videoMetadata metadata to set as tags
      * @param format required media file format
-     * @return [CashingResult.DownloadResult.Success] with file if conversion was successful,
-     * [CashingResult.DownloadResult.Error] with [HttpStatusCode] if error has occurred,
-     * [CashingResult.DownloadResult.Canceled] if cashing was canceled by the user,
-     * [CashingResult.ConversionError] if conversion to .aac audio file has failed
+     * @return [CachingResult.DownloadResult.Success] with file if conversion was successful,
+     * [CachingResult.DownloadResult.Error] with [HttpStatusCode] if error has occurred,
+     * [CachingResult.DownloadResult.Canceled] if caching was canceled by the user,
+     * [CachingResult.ConversionError] if conversion to .aac audio file has failed
      */
 
-    internal suspend inline fun mCashMediaFileOrNotifyError(
+    private suspend inline fun cacheMediaFileOrNotifyError(
         desiredFilename: String,
         audioUrl: String,
         videoUrl: String?,
         videoMetadata: VideoMetadata,
         format: Formats,
-        trimRange: CashTrimRange
+        trimRange: CacheTrimRange
     ) = when (videoUrl) {
-        null -> cashAudioFileOrNotifyError(
+        null -> cacheAudioFileOrNotifyError(
             desiredFilename,
             audioUrl,
             videoMetadata,
@@ -544,7 +546,7 @@ class VideoCashService : SuspendService(), ReceiverManager, LifecycleNotificatio
             trimRange
         )
 
-        else -> cashVideoFileOrNotifyError(
+        else -> cacheVideoFileOrNotifyError(
             desiredFilename,
             audioUrl,
             videoUrl,
@@ -552,7 +554,7 @@ class VideoCashService : SuspendService(), ReceiverManager, LifecycleNotificatio
         )
     }
 
-    /** Runs loop that cashes files from the [videoCashQueue] */
+    /** Runs loop that caches files from the [videoCashQueue] */
 
     private suspend inline fun launchCashing() {
         while (true) {
@@ -563,42 +565,48 @@ class VideoCashService : SuspendService(), ReceiverManager, LifecycleNotificatio
                 Log.d(TAG, "Video Cash Queue Cond Var Awake")
             }
 
-            while (cashingStatusState.value == DownloadingStatus.DOWNLOADING) {
+            while (cachingStatusState.value == DownloadingStatus.DOWNLOADING) {
                 isVideoCashingCondVar.wait()
                 Log.d(TAG, "Is Video Cashing Cond Var Awake")
             }
 
-            videoCashQueue.poll()?.let { (url, desiredFilename, isSaveAsVideo, trimRange) ->
-                Log.d(TAG, "Prepare for cashing")
+            videoCashQueue.poll()?.let { (url, desiredFilename, format, trimRange) ->
+                Log.d(TAG, "Prepare for caching")
                 videoCashProgressState.update { 0L to 0L }
-                cashingStatusState.update { DownloadingStatus.DOWNLOADING }
+                cachingStatusState.update { DownloadingStatus.DOWNLOADING }
                 videoCashQueueLenState.update { videoCashQueue.size }
-                YoutubeUrlExtractor(desiredFilename, isSaveAsVideo, trimRange).extract(url)
+
+                extractMediaFilesAndStartCaching(
+                    ytUrl = url,
+                    desiredFilename = desiredFilename,
+                    format = format,
+                    trimRange = trimRange
+                )
             }
         }
     }
 
     private fun resetCashingJobIfCanceled() {
-        Log.d(TAG, "Cashing loop status: ${cashingLoopJob?.isActive}")
+        Log.d(TAG, "Cashing loop status: ${cachingLoopJob?.isActive}")
 
-        cashingStatusState.update {
+        cachingStatusState.update {
             when (it) {
                 DownloadingStatus.CANCELED -> DownloadingStatus.NONE
                 else -> it
             }
         }
 
-        if (cashingLoopJob?.isActive != true)
-            cashingLoopJob = scope.launch(Dispatchers.IO) { launchCashing() }
+        if (cachingLoopJob?.isActive != true)
+            cachingLoopJob = scope.launch(Dispatchers.IO) { launchCashing() }
     }
 
     internal suspend inline fun mCancelCurVideoCashing() {
-        cashingStatusState.update { DownloadingStatus.CANCELED }
+        cachingStatusState.update { DownloadingStatus.CANCELED }
         isVideoCashingCondVar.notify()
 
         Log.d(TAG, "File is deleted ${curVideoCashFile?.delete()}")
         Log.d(TAG, "Cashing is canceled")
-        clearVideoCashStates()
+        clearVideoCacheStates()
     }
 
     internal suspend inline fun mCancelAllVideosCashing() {
@@ -607,41 +615,41 @@ class VideoCashService : SuspendService(), ReceiverManager, LifecycleNotificatio
         mCancelCurVideoCashing()
     }
 
-    private fun clearVideoCashStates() {
+    private fun clearVideoCacheStates() {
         curVideoCashFile = null
     }
 
     // --------------------- Cashing Response Handling ---------------------
 
-    /** Sends broadcasts according to the [cashingResult] */
+    /** Sends broadcasts according to the [cachingResult] */
 
-    internal fun mOnVideoCashStatusReceived(cashingResult: CashingResult) {
-        Log.d(TAG, "Cashing result handling")
-        clearVideoCashStates()
+    private fun onVideoCacheStatusReceived(cachingResult: CachingResult) {
+        Log.d(TAG, "Caching result handling")
+        clearVideoCacheStates()
 
-        when (cashingResult) {
-            CashingResult.ConversionError -> onAudioConversionError()
+        when (cachingResult) {
+            CachingResult.ConversionError -> onAudioConversionError()
 
-            CashingResult.DownloadResult.Canceled -> onVideoCashCanceled()
+            CachingResult.DownloadResult.Canceled -> onVideoCashCanceled()
 
-            is CashingResult.DownloadResult.Error -> onDownloadError(
-                code = cashingResult.statusCode.value,
-                description = cashingResult.statusCode.description
+            is CachingResult.DownloadResult.Error -> onDownloadError(
+                code = cachingResult.statusCode.value,
+                description = cachingResult.statusCode.description
             )
 
-            is CashingResult.DownloadResult.Success -> onVideoCashSuccessful()
+            is CachingResult.DownloadResult.Success -> onVideoCashSuccessful()
 
-            CashingResult.DownloadResult.FileCreationError -> onFileCreationError()
+            CachingResult.DownloadResult.FileCreationError -> onFileCreationError()
 
-            CashingResult.DownloadResult.ConnectionLostError -> onConnectionLostError()
+            CachingResult.DownloadResult.ConnectionLostError -> onConnectionLostError()
         }
 
-        Log.d(TAG, "Cashing result $cashingResult handled")
+        Log.d(TAG, "Cashing result $cachingResult handled")
     }
 
     private fun onVideoCashSuccessful() = sendBroadcast(
         Intent(MainActivity.Broadcast_VIDEO_CASH_COMPLETED)
-            .putExtra(VIDEO_CASH_STATUS_ARG, VideoCashResponse.Success)
+            .putExtra(VIDEO_CASH_STATUS_ARG, VideoCacheResponse.Success)
     )
 
     private fun onDownloadError(code: Int, description: String) {
@@ -649,37 +657,37 @@ class VideoCashService : SuspendService(), ReceiverManager, LifecycleNotificatio
 
         sendBroadcast(
             Intent(MainActivity.Broadcast_VIDEO_CASH_COMPLETED)
-                .putExtra(VIDEO_CASH_STATUS_ARG, VideoCashResponse.Error(code, description))
+                .putExtra(VIDEO_CASH_STATUS_ARG, VideoCacheResponse.Error(code, description))
         )
     }
 
     private fun onVideoCashCanceled() = sendBroadcast(
         Intent(MainActivity.Broadcast_VIDEO_CASH_COMPLETED)
-            .putExtra(VIDEO_CASH_STATUS_ARG, VideoCashResponse.Canceled)
+            .putExtra(VIDEO_CASH_STATUS_ARG, VideoCacheResponse.Canceled)
     )
 
     private fun onAudioConversionError() = sendBroadcast(
         Intent(MainActivity.Broadcast_VIDEO_CASH_COMPLETED)
-            .putExtra(VIDEO_CASH_STATUS_ARG, VideoCashResponse.AudioConversionError)
+            .putExtra(VIDEO_CASH_STATUS_ARG, VideoCacheResponse.AudioConversionError)
     )
 
     private fun onFileCreationError() = sendBroadcast(
         Intent(MainActivity.Broadcast_VIDEO_CASH_COMPLETED)
-            .putExtra(VIDEO_CASH_STATUS_ARG, VideoCashResponse.FileCreationError)
+            .putExtra(VIDEO_CASH_STATUS_ARG, VideoCacheResponse.FileCreationError)
     )
 
     private fun onConnectionLostError() = sendBroadcast(
         Intent(MainActivity.Broadcast_VIDEO_CASH_COMPLETED)
-            .putExtra(VIDEO_CASH_STATUS_ARG, VideoCashResponse.ConnectionLostError)
+            .putExtra(VIDEO_CASH_STATUS_ARG, VideoCacheResponse.ConnectionLostError)
     )
 
     private suspend inline fun onCashingError(errorStatus: DownloadingStatus) {
-        cashingStatusState.update { errorStatus }
+        cachingStatusState.update { errorStatus }
         isVideoCashingCondVar.notify()
 
         Log.d(TAG, "File is deleted ${curVideoCashFile?.delete()}")
         Log.d(TAG, "Cashing was interrupted by an error")
-        clearVideoCashStates()
+        clearVideoCacheStates()
     }
 
     // --------------------------- Notification Actions ---------------------------
@@ -770,8 +778,8 @@ class VideoCashService : SuspendService(), ReceiverManager, LifecycleNotificatio
     private fun finishedNotificationBuilder(@StringRes message: Int) =
         finishedNotificationBuilder(resources.getString(message))
 
-    private inline val cashedNotificationBuilder
-        get() = finishedNotificationBuilder(R.string.video_cashed)
+    private inline val cachedNotificationBuilder
+        get() = finishedNotificationBuilder(R.string.video_cached)
 
     private inline val canceledNotificationBuilder
         get() = finishedNotificationBuilder(R.string.video_canceled)
@@ -783,7 +791,7 @@ class VideoCashService : SuspendService(), ReceiverManager, LifecycleNotificatio
         get() = finishedNotificationBuilder(R.string.connection_lost)
 
     private data class CashingNotificationData(
-        val cashingState: DownloadingStatus,
+        val cachingState: DownloadingStatus,
         val metadata: VideoMetadata,
         val videoCashQueueLen: Int,
         val downloadedBytes: Long,
@@ -800,15 +808,15 @@ class VideoCashService : SuspendService(), ReceiverManager, LifecycleNotificatio
     override suspend fun startNotificationObserving() =
         lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
             combine(
-                cashingStatusState,
+                cachingStatusState,
                 curVideoMetadataState,
                 videoCashQueueLenState,
                 videoCashProgressState,
                 videoCashErrorState
-            ) { cashingState, videoMetadata, videoCashQueueLen,
+            ) { cachingState, videoMetadata, videoCashQueueLen,
                 (downloadedBytes, totalBytes), (errorCode, errorDescription) ->
                 CashingNotificationData(
-                    cashingState,
+                    cachingState,
                     videoMetadata ?: VideoMetadata(),
                     videoCashQueueLen,
                     downloadedBytes,
@@ -816,10 +824,10 @@ class VideoCashService : SuspendService(), ReceiverManager, LifecycleNotificatio
                     errorCode,
                     errorDescription
                 )
-            }.collectLatest { (cashingState, videoMetadata, videoCashQueueLen,
+            }.collectLatest { (cachingState, videoMetadata, videoCashQueueLen,
                                   downloadedBytes, totalBytes, errorCode, errorDescription) ->
                 updateNotification(
-                    cashingState,
+                    cachingState,
                     videoMetadata,
                     videoCashQueueLen,
                     downloadedBytes,
@@ -866,7 +874,7 @@ class VideoCashService : SuspendService(), ReceiverManager, LifecycleNotificatio
 
     private fun showCashedNotification() = notificationManager.notify(
         NOTIFICATION_ID,
-        cashedNotificationBuilder.build()
+        cachedNotificationBuilder.build()
     )
 
     private fun showCanceledNotification() = notificationManager.notify(
@@ -885,7 +893,7 @@ class VideoCashService : SuspendService(), ReceiverManager, LifecycleNotificatio
     )
 
     private fun updateNotification(
-        cashingState: DownloadingStatus,
+        cachingState: DownloadingStatus,
         videoMetadata: VideoMetadata,
         videoCashQueueLen: Int,
         downloadedBytes: Long,
@@ -904,7 +912,7 @@ class VideoCashService : SuspendService(), ReceiverManager, LifecycleNotificatio
             )
         }
 
-        else -> when (cashingState) {
+        else -> when (cachingState) {
             DownloadingStatus.DOWNLOADING -> updateCashingNotification(
                 videoMetadata,
                 videoCashQueueLen,
@@ -913,7 +921,7 @@ class VideoCashService : SuspendService(), ReceiverManager, LifecycleNotificatio
             )
 
             else -> {
-                when (cashingState) {
+                when (cachingState) {
                     DownloadingStatus.DOWNLOADED -> {
                         scope.launch {
                             // Delay for NotificationManager in order

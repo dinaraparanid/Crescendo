@@ -15,7 +15,7 @@ import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Modifier
 import androidx.navigation.compose.rememberNavController
 import com.paranid5.crescendo.R
-import com.paranid5.crescendo.domain.services.video_cash_service.VideoCashResponse
+import com.paranid5.crescendo.domain.services.video_cache_service.VideoCacheResponse
 import com.paranid5.crescendo.domain.utils.extensions.registerReceiverCompat
 import com.paranid5.crescendo.presentation.NavHostController
 import com.paranid5.crescendo.presentation.composition_locals.LocalActivity
@@ -44,7 +44,7 @@ class MainActivity : ComponentActivity() {
                 Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU ->
                     intent!!.getParcelableExtra(
                         VIDEO_CASH_STATUS_ARG,
-                        VideoCashResponse::class.java
+                        VideoCacheResponse::class.java
                     )
 
                 else -> intent!!.getParcelableExtra(VIDEO_CASH_STATUS_ARG)
@@ -83,28 +83,28 @@ class MainActivity : ComponentActivity() {
         unregisterReceiver(cashStatusReceiver)
     }
 
-    internal fun mOnVideoCashCompleted(status: VideoCashResponse, context: Context) =
+    internal fun mOnVideoCashCompleted(status: VideoCacheResponse, context: Context) =
         Toast.makeText(
             context,
             when (status) {
-                is VideoCashResponse.Error -> {
+                is VideoCacheResponse.Error -> {
                     val (httpCode, description) = status
                     "${context.getString(R.string.error)} $httpCode: $description"
                 }
 
-                VideoCashResponse.Success ->
-                    context.getString(R.string.video_cashed)
+                VideoCacheResponse.Success ->
+                    context.getString(R.string.video_cached)
 
-                VideoCashResponse.Canceled ->
+                VideoCacheResponse.Canceled ->
                     context.getString(R.string.video_canceled)
 
-                VideoCashResponse.AudioConversionError ->
+                VideoCacheResponse.AudioConversionError ->
                     context.getString(R.string.audio_conversion_error)
 
-                VideoCashResponse.FileCreationError ->
+                VideoCacheResponse.FileCreationError ->
                     context.getString(R.string.file_creation_error)
 
-                VideoCashResponse.ConnectionLostError ->
+                VideoCacheResponse.ConnectionLostError ->
                     context.getString(R.string.connection_lost)
             },
             Toast.LENGTH_LONG

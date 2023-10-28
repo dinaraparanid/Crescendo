@@ -174,7 +174,7 @@ private fun DownloadButton(
         }
 
         if (isCashPropertiesDialogShownState.value && areStoragePermissionsGranted)
-            CashPropertiesDialog(
+            CachePropertiesDialog(
                 isDialogShownState = isCashPropertiesDialogShownState,
                 playingPresenter = playingPresenter,
                 modifier = Modifier.align(Alignment.Center)

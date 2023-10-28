@@ -9,7 +9,7 @@ import com.paranid5.crescendo.domain.StorageHandler
 import com.paranid5.crescendo.domain.ktor_client.KtorClient
 import com.paranid5.crescendo.domain.services.stream_service.StreamServiceAccessor
 import com.paranid5.crescendo.domain.services.track_service.TrackServiceAccessor
-import com.paranid5.crescendo.domain.services.video_cash_service.VideoCashServiceAccessor
+import com.paranid5.crescendo.domain.services.video_cache_service.VideoCacheServiceAccessor
 import com.paranid5.crescendo.presentation.audio_effects.AudioEffectsPresenter
 import com.paranid5.crescendo.presentation.audio_effects.AudioEffectsUIHandler
 import com.paranid5.crescendo.presentation.audio_effects.AudioEffectsViewModel
@@ -64,7 +64,7 @@ private val resourcesModule = module {
 private val serviceAccessorsModule = module {
     singleOf(::StreamServiceAccessor)
     singleOf(::TrackServiceAccessor)
-    singleOf(::VideoCashServiceAccessor)
+    singleOf(::VideoCacheServiceAccessor)
 }
 
 private val serviceConnectionsModule = module {
