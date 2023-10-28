@@ -103,5 +103,9 @@ dependencies {
     implementation 'com.github.lincollincol:compose-audiowaveform:1.1.1'
     implementation 'com.github.lincollincol:amplituda:2.2.2'
 
+    implementation('com.github.evgenyneu:js-evaluator-for-android:v4.0.0') {
+        exclude module: 'appcompat-v7'
+    }
+
     implementation files('libs/jave-1.0.2.jar')
 }

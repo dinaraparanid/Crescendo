@@ -208,7 +208,7 @@ class StreamService : SuspendService(), ReceiverManager, LifecycleNotificationMa
 
     private val startIdState = MutableStateFlow(0)
 
-    private lateinit var playbackTask: Job
+    private var playbackTask: Job? = null
     private lateinit var playbackPosMonitorTask: Job
 
     @Volatile
@@ -592,7 +592,8 @@ class StreamService : SuspendService(), ReceiverManager, LifecycleNotificationMa
     private suspend inline fun onFetchVideoClicked(url: String) {
         mSendPlaybackPosition(0)
         mStoreCurrentUrl(url)
-        mStoreAndPlayNewStream(url)    }
+        mStoreAndPlayNewStream(url)
+    }
 
     private fun launchMonitoringTasks() {
         scope.launch { startNotificationObserving() }
@@ -602,7 +603,7 @@ class StreamService : SuspendService(), ReceiverManager, LifecycleNotificationMa
     override fun onDestroy() {
         super.onDestroy()
         isConnectedState.update { false }
-        playbackTask.cancel()
+        playbackTask?.cancel()
         detachNotification()
         releaseMedia()
         unregisterReceivers()
