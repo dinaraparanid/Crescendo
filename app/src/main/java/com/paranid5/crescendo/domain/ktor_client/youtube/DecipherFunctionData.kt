@@ -1,7 +1,11 @@
 package com.paranid5.crescendo.domain.ktor_client.youtube
 
+import android.os.Parcelable
+import kotlinx.parcelize.Parcelize
+
+@Parcelize
 data class DecipherFunctionData(
-    val decipherJsFileName: String? = null,
-    val decipherFunctionName: String? = null,
-    val decipherFunctions: String? = null
-)
+    @JvmField val decipherJsFileName: String? = null,
+    @JvmField val decipherFunctionName: String? = null,
+    @JvmField val decipherFunctions: String? = null
+) : Parcelable

@@ -26,12 +26,10 @@ class StreamServiceAccessor(application: MainApplication) : ServiceAccessor(appl
         val serviceIntent = Intent(appContext, StreamService::class.java)
             .putStreamUrlIfNotNull(url)
 
-        runCatching {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
-                appContext.startForegroundService(serviceIntent)
-            else
-                appContext.startService(serviceIntent)
-        }
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
+            appContext.startForegroundService(serviceIntent)
+        else
+            appContext.startService(serviceIntent)
     }
 
     private fun switchToNextStream(url: String) = sendBroadcast(

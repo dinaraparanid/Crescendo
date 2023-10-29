@@ -207,13 +207,21 @@ class VideoCacheService : SuspendService(), ReceiverManager, LifecycleNotificati
             ytUrl = ytUrl
         )
 
-        val (ytFiles, videoMeta) = when (val res = extractRes.getOrNull()) {
-            null -> {
-                extractRes.exceptionOrNull()!!.printStackTrace()
-                return
+        val (ytFiles, _, videoMetaRes) =
+            when (val res = extractRes.getOrNull()) {
+                null -> {
+                    extractRes.exceptionOrNull()!!.printStackTrace()
+                    return
+                }
+
+                else -> res
             }
 
-            else -> res
+        val videoMeta = videoMetaRes.getOrNull()
+
+        if (videoMeta?.isLiveStream == true) {
+            onLiveStreamCaching()
+            return
         }
 
         val audioTag = 140
@@ -679,6 +687,11 @@ class VideoCacheService : SuspendService(), ReceiverManager, LifecycleNotificati
     private fun onConnectionLostError() = sendBroadcast(
         Intent(MainActivity.Broadcast_VIDEO_CASH_COMPLETED)
             .putExtra(VIDEO_CASH_STATUS_ARG, VideoCacheResponse.ConnectionLostError)
+    )
+
+    private fun onLiveStreamCaching() = sendBroadcast(
+        Intent(MainActivity.Broadcast_VIDEO_CASH_COMPLETED)
+            .putExtra(VIDEO_CASH_STATUS_ARG, VideoCacheResponse.LiveStreamNotAllowed)
     )
 
     private suspend inline fun onCashingError(errorStatus: DownloadingStatus) {

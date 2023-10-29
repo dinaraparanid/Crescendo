@@ -1,6 +1,7 @@
 package com.paranid5.crescendo.domain.ktor_client.youtube
 
-import com.paranid5.crescendo.domain.ktor_client.youtube.Format
+import android.os.Parcelable
+import kotlinx.parcelize.Parcelize
 
-
-data class YtFile(val format: Format?, val url: String?)
+@Parcelize
+data class YtFile(val format: Format?, val url: String?) : Parcelable

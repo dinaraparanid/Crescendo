@@ -32,31 +32,41 @@ class MainActivity : ComponentActivity() {
 
         private const val BROADCAST_LOCATION = "com.paranid5.mediastreamer.presentation"
         const val Broadcast_VIDEO_CASH_COMPLETED = "$BROADCAST_LOCATION.VIDEO_CASH_COMPLETED"
+        const val Broadcast_STREAMING_ERROR = "$BROADCAST_LOCATION.STREAMING_ERROR"
 
         const val VIDEO_CASH_STATUS_ARG = "video_cash_status"
+        const val STREAMING_ERROR_ARG = "streaming_error"
     }
 
     private val cashStatusReceiver = object : BroadcastReceiver() {
-        override fun onReceive(context: Context?, intent: Intent?) {
+        override fun onReceive(context: Context?, intent: Intent) {
             Log.d(TAG, "Cashing result is received")
 
             val status = when {
                 Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU ->
-                    intent!!.getParcelableExtra(
+                    intent.getParcelableExtra(
                         VIDEO_CASH_STATUS_ARG,
                         VideoCacheResponse::class.java
                     )
 
-                else -> intent!!.getParcelableExtra(VIDEO_CASH_STATUS_ARG)
+                else -> intent.getParcelableExtra(VIDEO_CASH_STATUS_ARG)
             }!!
 
             mOnVideoCashCompleted(status, applicationContext)
         }
     }
 
+    private val streamingErrorReceiver = object : BroadcastReceiver() {
+        override fun onReceive(context: Context?, intent: Intent) {
+            Log.d(TAG, "Streaming error")
+            val error = intent.getStringExtra(STREAMING_ERROR_ARG)!!
+            Toast.makeText(this@MainActivity, error, Toast.LENGTH_LONG).show()
+        }
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        registerReceiverCompat(cashStatusReceiver, IntentFilter(Broadcast_VIDEO_CASH_COMPLETED))
+        registerReceivers()
 
         setContent {
             MediaStreamerTheme {
@@ -80,7 +90,17 @@ class MainActivity : ComponentActivity() {
 
     override fun onDestroy() {
         super.onDestroy()
+        unregisterReceivers()
+    }
+
+    private fun registerReceivers() {
+        registerReceiverCompat(cashStatusReceiver, IntentFilter(Broadcast_VIDEO_CASH_COMPLETED))
+        registerReceiverCompat(streamingErrorReceiver, IntentFilter(Broadcast_STREAMING_ERROR))
+    }
+
+    private fun unregisterReceivers() {
         unregisterReceiver(cashStatusReceiver)
+        unregisterReceiver(streamingErrorReceiver)
     }
 
     internal fun mOnVideoCashCompleted(status: VideoCacheResponse, context: Context) =
@@ -106,6 +126,9 @@ class MainActivity : ComponentActivity() {
 
                 VideoCacheResponse.ConnectionLostError ->
                     context.getString(R.string.connection_lost)
+
+                VideoCacheResponse.LiveStreamNotAllowed ->
+                    context.getString(R.string.livestream_not_cache)
             },
             Toast.LENGTH_LONG
         ).show()

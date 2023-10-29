@@ -9,6 +9,8 @@ import androidx.compose.material3.Slider
 import androidx.compose.material3.SliderDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.remember
@@ -18,9 +20,10 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.palette.graphics.Palette
 import com.paranid5.crescendo.domain.StorageHandler
-import com.paranid5.crescendo.presentation.ui.utils.BroadcastReceiver
+import com.paranid5.crescendo.presentation.ui.AudioStatus
 import com.paranid5.crescendo.presentation.ui.extensions.getLightMutedOrPrimary
 import com.paranid5.crescendo.presentation.ui.theme.TransparentUtility
+import com.paranid5.crescendo.presentation.ui.utils.BroadcastReceiver
 import org.koin.compose.koinInject
 
 @Composable
@@ -35,6 +38,15 @@ fun PlaybackSlider(
     val paletteColor = palette.getLightMutedOrPrimary()
     var curPosition by remember { mutableLongStateOf(0L) }
 
+    val audioStatus by storageHandler.audioStatusState.collectAsState()
+    val currentMetadata by storageHandler.currentMetadataState.collectAsState()
+
+    val isLiveStreaming by remember {
+        derivedStateOf {
+            audioStatus == AudioStatus.STREAMING && currentMetadata?.isLiveStream == true
+        }
+    }
+
     LaunchedEffect(key1 = true) {
         curPosition = storageHandler.playbackPositionState.value
     }
@@ -44,19 +56,20 @@ fun PlaybackSlider(
     }
 
     Column(modifier.padding(horizontal = 10.dp)) {
-        Slider(
-            value = curPosition.toFloat(),
-            valueRange = 0F..length.toFloat(),
-            colors = SliderDefaults.colors(
-                thumbColor = paletteColor,
-                activeTrackColor = paletteColor,
-                inactiveTrackColor = TransparentUtility
-            ),
-            onValueChange = { curPosition = it.toLong() },
-            onValueChangeFinished = {
-                playingUIHandler.sendSeekToBroadcast(curPosition)
-            }
-        )
+        if (!isLiveStreaming)
+            Slider(
+                value = curPosition.toFloat(),
+                valueRange = 0F..length.toFloat(),
+                colors = SliderDefaults.colors(
+                    thumbColor = paletteColor,
+                    activeTrackColor = paletteColor,
+                    inactiveTrackColor = TransparentUtility
+                ),
+                onValueChange = { curPosition = it.toLong() },
+                onValueChangeFinished = {
+                    playingUIHandler.sendSeekToBroadcast(curPosition)
+                }
+            )
 
         Row(Modifier.fillMaxWidth()) {
             content(curPosition, length, paletteColor)

@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -53,6 +54,12 @@ fun PlayingScreen(
     val currentMetadata by storageHandler.currentMetadataState.collectAsState()
     val currentTrack by storageHandler.currentTrackState.collectAsState()
 
+    val isLiveStreaming by remember {
+        derivedStateOf {
+            audioStatus == AudioStatus.STREAMING && currentMetadata?.isLiveStream == true
+        }
+    }
+
     val title = when (audioStatus) {
         AudioStatus.STREAMING -> currentMetadata?.title ?: stringResource(R.string.stream_no_name)
         AudioStatus.PLAYING -> currentTrack?.title ?: stringResource(R.string.unknown_track)
@@ -82,6 +89,7 @@ fun PlayingScreen(
             sliderLength = length,
             coverAlpha = coverAlpha,
             audioStatus = audioStatus,
+            isLiveStreaming = isLiveStreaming,
             viewModel = viewModel,
             modifier = modifier,
         )
@@ -92,6 +100,7 @@ fun PlayingScreen(
             sliderLength = length,
             coverAlpha = coverAlpha,
             audioStatus = audioStatus,
+            isLiveStreaming = isLiveStreaming,
             viewModel = viewModel,
             modifier = modifier,
         )
@@ -105,6 +114,7 @@ private fun PlayingScreenPortrait(
     sliderLength: Long,
     coverAlpha: Float,
     audioStatus: AudioStatus?,
+    isLiveStreaming: Boolean,
     viewModel: PlayingViewModel,
     modifier: Modifier,
 ) {
@@ -178,9 +188,7 @@ private fun PlayingScreenPortrait(
                 end.linkTo(parent.end, margin = 20.dp)
             }
         ) { curPosition, videoLength, color ->
-            TimeText(curPosition, color)
-            Spacer(Modifier.weight(1F))
-            TimeText(videoLength, color)
+            TimeContainer(isLiveStreaming, curPosition, videoLength, color)
         }
 
         TitleAndPropertiesButton(
@@ -226,6 +234,7 @@ private fun PlayingScreenLandscape(
     sliderLength: Long,
     coverAlpha: Float,
     audioStatus: AudioStatus?,
+    isLiveStreaming: Boolean,
     viewModel: PlayingViewModel,
     modifier: Modifier,
 ) {
@@ -308,7 +317,7 @@ private fun PlayingScreenLandscape(
                 end.linkTo(parent.end, margin = 20.dp)
             }
         ) { curPosition, videoLength, color ->
-            TimeText(curPosition, color)
+            if (isLiveStreaming) LiveText(color) else TimeText(curPosition, color)
 
             TitleAndAuthor(
                 title = title,
@@ -320,7 +329,7 @@ private fun PlayingScreenLandscape(
                     .weight(1F, fill = true),
             )
 
-            TimeText(videoLength, color)
+            if (isLiveStreaming) Unit else TimeText(videoLength, color)
         }
 
         PlaybackButtons(

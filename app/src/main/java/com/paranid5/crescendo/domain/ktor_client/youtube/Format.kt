@@ -1,16 +1,20 @@
 package com.paranid5.crescendo.domain.ktor_client.youtube
 
+import android.os.Parcelable
+import kotlinx.parcelize.Parcelize
+
+@Parcelize
 data class Format(
-    val itag: Int,
-    val ext: String,
-    val isDashContainer: Boolean,
-    val height: Int = -1,
-    val fps: Int = 30,
-    val audioBitrate: Int = -1,
-    val isHlsContent: Boolean = false,
-    var videoCodec: VCodec? = null,
-    var audioCodec: ACodec? = null
-) {
+    @JvmField val itag: Int,
+    @JvmField val ext: String,
+    @JvmField val isDashContainer: Boolean,
+    @JvmField val height: Int = -1,
+    @JvmField val fps: Int = 30,
+    @JvmField val audioBitrate: Int = -1,
+    @JvmField val isHlsContent: Boolean = false,
+    @JvmField var videoCodec: VCodec? = null,
+    @JvmField var audioCodec: ACodec? = null
+) : Parcelable {
     enum class VCodec {
         H263,
         H264,

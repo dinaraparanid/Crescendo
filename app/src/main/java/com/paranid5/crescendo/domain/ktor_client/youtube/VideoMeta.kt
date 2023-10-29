@@ -1,5 +1,9 @@
 package com.paranid5.crescendo.domain.ktor_client.youtube
 
+import android.os.Parcelable
+import kotlinx.parcelize.Parcelize
+
+@Parcelize
 data class VideoMeta(
     val videoId: String,
     val title: String,
@@ -9,7 +13,7 @@ data class VideoMeta(
     val viewCount: Long,
     val isLiveStream: Boolean,
     val shortDescription: String
-) {
+) : Parcelable {
     private companion object {
         private const val IMAGE_BASE_URL = "http://i.ytimg.com/vi/"
     }

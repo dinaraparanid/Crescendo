@@ -25,4 +25,7 @@ sealed interface VideoCacheResponse : Parcelable {
 
     @Parcelize
     data object ConnectionLostError : VideoCacheResponse
+
+    @Parcelize
+    data object LiveStreamNotAllowed : VideoCacheResponse
 }

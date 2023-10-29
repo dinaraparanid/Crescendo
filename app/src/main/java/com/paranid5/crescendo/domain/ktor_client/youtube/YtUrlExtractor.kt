@@ -17,20 +17,13 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import org.json.JSONArray
 import org.json.JSONObject
-import java.io.File
 import java.net.URLDecoder
 import java.util.SortedMap
 import java.util.regex.Pattern
 import kotlin.time.Duration.Companion.seconds
 
-private const val CACHE_FILE_NAME = "decipher_js_function"
-
-private val patYouTubePageLink = Regex(
-    "(http|https)://(www\\.|m.|)youtube\\.com/watch\\?v=(.+?)( |\\z|&)"
-)
-
-private val patYouTubeShortLink = Regex(
-    "(http|https)://(www\\.|)youtu\\.be/(.+?)( |\\z|&)"
+private val youtubeUrlRegex = Regex(
+    "https://((www\\.youtube\\.com/((watch\\?v=)|(live/)))|(youtu\\.be/))(\\S{11}).*"
 )
 
 private val patPlayerResponse = Regex(
@@ -55,6 +48,7 @@ private val patDecryptionJsFile = Regex(
 
 private val patDecryptionJsFileWithoutSlash = Regex("/s/player/([^\"]+?).js")
 
+@Suppress("LongLine")
 private val patSignatureDecFunction = Regex(
     "(?:\\b|[^a-zA-Z0-9$])([a-zA-Z0-9$]{1,4})\\s*=\\s*function\\(\\s*a\\s*\\)\\s*\\{\\s*a\\s*=\\s*a\\.split\\(\\s*\"\"\\s*\\)"
 )
@@ -125,160 +119,186 @@ suspend fun HttpClient.extractYtFilesWithMeta(
     ytUrl: String
 ) = when (val videoId = findVideoId(ytUrl)) {
     null -> YtFailure(WrongYtUrlFormatException())
-    else -> getStreamUrls(context, videoId)
+    else -> Result.success(getStreamData(context, videoId))
 }
 
 private fun findVideoId(ytUrl: String): String? {
-    val pageMatch = patYouTubePageLink.find(ytUrl)
-    if (pageMatch != null) return pageMatch.groupValues[3]
-
-    val shortMatch = patYouTubeShortLink.find(ytUrl)
-    if (shortMatch != null) return shortMatch.groupValues[3]
-
+    val pageMatch = youtubeUrlRegex.find(ytUrl)
+    if (pageMatch != null) return pageMatch.groupValues[7]
     return if (ytUrl.matches("\\p{Graph}+?".toRegex())) ytUrl else null
 }
 
 private suspend inline fun HttpClient.getYouTubePageHtml(videoId: String) =
     get("https://youtube.com/watch?v=$videoId").bodyAsText()
 
-private suspend inline fun HttpClient.getStreamUrls(
+private suspend inline fun HttpClient.getStreamData(
     context: Context,
     videoId: String,
-): Result<Pair<SortedMap<Int, YtFile>, VideoMeta?>> {
+): StreamData {
     val encSignatures = sortedMapOf<Int, String>()
     val ytFiles = sortedMapOf<Int, YtFile>()
 
     val pageHtml = getYouTubePageHtml(videoId)
-    val videoMeta = parseVideoPage(pageHtml, ytFiles, encSignatures).getOrNull()
+    val (livestreams, videoMeta) = parseVideoPage(pageHtml, ytFiles, encSignatures)
 
-    if (encSignatures.isNotEmpty()) {
-        val decipherFunDataRes = Result.success<DecipherFunctionData?>(null)
+    if (encSignatures.isNotEmpty())
+        decodeYtFileUrls(context, pageHtml, ytFiles, encSignatures)
 
-        // TODO: Fix cache
-
-        /*readDecipherFunctionFromCache(
-            cacheDirPath = context.cacheDir.absolutePath
-        )*/
-
-        var (decipherJsFileName, decipherFunctionName, decipherFunctions) =
-            when (val res = decipherFunDataRes.exceptionOrNull()) {
-                null -> decipherFunDataRes.getOrNull() ?: DecipherFunctionData()
-                else -> return Result.failure(res)
-            }
-
-        val decryptJsFileMatch = patDecryptionJsFile.find(pageHtml)
-            ?: patDecryptionJsFileWithoutSlash.find(pageHtml)
-
-        if (decryptJsFileMatch != null) {
-            val curJsFileName = decryptJsFileMatch.groupValues[0].replace("\\/", "/")
-
-            if (decipherJsFileName == null || decipherJsFileName != curJsFileName) {
-                decipherFunctions = null
-                decipherFunctionName = null
-            }
-
-            decipherJsFileName = curJsFileName
-        }
-
-        val decipherFunctionDataState = MutableStateFlow(
-            DecipherFunctionData(
-                decipherJsFileName = decipherJsFileName,
-                decipherFunctionName = decipherFunctionName,
-                decipherFunctions = decipherFunctions,
-            )
-        )
-
-        var signatureRes = Result.failure<String>(Exception())
-        val decipheredSignatureChannel = Channel<Result<String>>(Channel.CONFLATED)
-
-        if (
-            decipherSignature(
-                context,
-                decipherFunctionDataState,
-                encSignatures,
-                decipheredSignatureChannel
-            )
-        )
-            signatureRes = decipheredSignatureChannel
-                .receiveTimeout(7.seconds)
-                .getOrDefault(Result.failure(Exception()))
-
-        if (signatureRes.isFailure)
-            return Result.failure(signatureRes.exceptionOrNull()!!)
-
-        val sigs = signatureRes
-            .getOrNull()!!
-            .split("\n")
-            .asSequence()
-            .filter(String::isNotEmpty)
-
-        encSignatures.keys
-            .asSequence()
-            .zip(sigs)
-            .map { (itag, sig) -> itag to "${ytFiles[itag]!!.url!!}&sig=${sig}" }
-            .map { (itag, url) -> itag to YtFile(formatMapState.value[itag], url) }
-            .forEach { (itag, file) -> ytFiles[itag] = file }
-    }
-
-    if (ytFiles.size == 0)
-        return YtFailure(YtFilesNotFoundException())
-
-    return Result.success(ytFiles to videoMeta)
+    return StreamData(ytFiles, livestreams, videoMeta)
 }
 
 private fun parseVideoPage(
     pageHtml: String,
     ytFiles: SortedMap<Int, YtFile>,
     encSignatures: SortedMap<Int, String>
-): Result<VideoMeta> {
-    val playerResponseJson = patPlayerResponse.find(pageHtml)
-        ?: return YtFailure(YtPlayerResponseNotFoundException())
+): Pair<Result<LiveStreamManifests>, Result<VideoMeta>> {
+    val playerResponseJson = patPlayerResponse.find(pageHtml) ?: return run {
+        val e = YtPlayerResponseNotFoundException()
+        Pair(YtFailure(e), YtFailure(e))
+    }
 
     val ytPlayerResponse = playerResponseJson.groupValues
         .getOrNull(1)
         ?.let { JSONObject(it) }
-        ?: return YtFailure(YtPlayerResponseStructureChangedException())
+        ?: return run {
+            val e = YtPlayerResponseStructureChangedException()
+            Pair(YtFailure(e), YtFailure(e))
+        }
 
     val streamingData = when {
         ytPlayerResponse.has("streamingData") ->
             ytPlayerResponse.getJSONObject("streamingData")
 
-        else -> return YtFailure(YtPlayerResponseStructureChangedException())
+        else -> {
+            val e = YtPlayerResponseStructureChangedException()
+            return Pair(YtFailure(e), YtFailure(e))
+        }
     }
 
     if (streamingData.has("formats"))
-        parseFormats(
-            formats = streamingData.getJSONArray("formats"),
-            ytFiles = ytFiles,
-            encSignatures = encSignatures
-        )
+        streamingData
+            .getJSONArray("formats")
+            .storeFormats(
+                ytFiles = ytFiles,
+                encSignatures = encSignatures
+            )
 
     if (streamingData.has("adaptiveFormats"))
-        parseFormats(
-            formats = streamingData.getJSONArray("adaptiveFormats"),
-            ytFiles = ytFiles,
-            encSignatures = encSignatures
-        )
+        streamingData
+            .getJSONArray("adaptiveFormats")
+            .storeFormats(
+                ytFiles = ytFiles,
+                encSignatures = encSignatures
+            )
 
-    val videoDetails = when {
+    val videoMeta = when {
         ytPlayerResponse.has("videoDetails") ->
-            ytPlayerResponse.getJSONObject("videoDetails")
+            ytPlayerResponse.getVideoMeta()
 
-        else -> return YtFailure(YtPlayerResponseStructureChangedException())
+        else -> YtFailure(YtPlayerResponseStructureChangedException())
     }
 
-    return runCatching {
-        VideoMeta(
-            videoDetails.getString("videoId"),
-            videoDetails.getString("title"),
-            videoDetails.getString("author"),
-            videoDetails.getString("channelId"),
-            videoDetails.getString("lengthSeconds").toLong(),
-            videoDetails.getString("viewCount").toLong(),
-            videoDetails.getBoolean("isLiveContent"),
-            videoDetails.getString("shortDescription")
+    return Result.success(streamingData.getLiveStreamManifests()) to videoMeta
+}
+
+private fun JSONObject.getVideoMeta(name: String = "videoDetails") =
+    getJSONObject(name).let { videoDetails ->
+        runCatching {
+            VideoMeta(
+                videoDetails.getString("videoId"),
+                videoDetails.getString("title"),
+                videoDetails.getString("author"),
+                videoDetails.getString("channelId"),
+                videoDetails.getString("lengthSeconds").toLong(),
+                videoDetails.getString("viewCount").toLong(),
+                videoDetails.getBoolean("isLiveContent"),
+                videoDetails.getString("shortDescription")
+            )
+        }
+    }
+
+private fun JSONObject.getLiveStreamManifests(
+    dashName: String = "dashManifestUrl",
+    hlsName: String = "hlsManifestUrl"
+) = LiveStreamManifests(
+    dashManifestUrl = when {
+        has(dashName) -> getString(dashName)
+        else -> null
+    },
+    hlsManifestUrl = when {
+        has(hlsName) -> getString(hlsName)
+        else -> null
+    }
+)
+
+private suspend inline fun HttpClient.decodeYtFileUrls(
+    context: Context,
+    pageHtml: String,
+    ytFiles: SortedMap<Int, YtFile>,
+    encSignatures: SortedMap<Int, String>
+): Result<Unit> {
+    val decipherFunDataRes = Result.success<DecipherFunctionData?>(null)
+
+    var (decipherJsFileName, decipherFunctionName, decipherFunctions) =
+        when (val res = decipherFunDataRes.exceptionOrNull()) {
+            null -> decipherFunDataRes.getOrNull() ?: DecipherFunctionData()
+            else -> return Result.failure(res)
+        }
+
+    val decryptJsFileMatch = patDecryptionJsFile.find(pageHtml)
+        ?: patDecryptionJsFileWithoutSlash.find(pageHtml)
+
+    if (decryptJsFileMatch != null) {
+        val curJsFileName = decryptJsFileMatch.groupValues[0].replace("\\/", "/")
+
+        if (decipherJsFileName == null || decipherJsFileName != curJsFileName) {
+            decipherFunctions = null
+            decipherFunctionName = null
+        }
+
+        decipherJsFileName = curJsFileName
+    }
+
+    val decipherFunctionDataState = MutableStateFlow(
+        DecipherFunctionData(
+            decipherJsFileName = decipherJsFileName,
+            decipherFunctionName = decipherFunctionName,
+            decipherFunctions = decipherFunctions,
         )
-    }
+    )
+
+    var signatureRes = Result.failure<String>(Exception())
+    val decipheredSignatureChannel = Channel<Result<String>>(Channel.CONFLATED)
+
+    if (
+        decipherSignature(
+            context,
+            decipherFunctionDataState,
+            encSignatures,
+            decipheredSignatureChannel
+        )
+    )
+        signatureRes = decipheredSignatureChannel
+            .receiveTimeout(7.seconds)
+            .getOrDefault(Result.failure(Exception()))
+
+    if (signatureRes.isFailure)
+        return Result.failure(signatureRes.exceptionOrNull()!!)
+
+    val sigs = signatureRes
+        .getOrNull()!!
+        .split("\n")
+        .asSequence()
+        .filter(String::isNotEmpty)
+
+    encSignatures.keys
+        .asSequence()
+        .zip(sigs)
+        .map { (itag, sig) -> itag to "${ytFiles[itag]!!.url!!}&sig=${sig}" }
+        .map { (itag, url) -> itag to YtFile(formatMapState.value[itag], url) }
+        .forEach { (itag, file) -> ytFiles[itag] = file }
+
+    return Result.success(Unit)
 }
 
 private inline val JSONArray.formatObjectsAndItags
@@ -292,11 +312,10 @@ private inline val JSONArray.formatObjectsAndItags
         .map { it to it.getInt("itag") }
         .filter { (_, itag) -> formatMapState.value[itag] != null }
 
-private fun parseFormats(
-    formats: JSONArray,
+private fun JSONArray.storeFormats(
     ytFiles: SortedMap<Int, YtFile>,
     encSignatures: SortedMap<Int, String>
-) = formats.formatObjectsAndItags.forEach { (format, itag) ->
+) = formatObjectsAndItags.forEach { (format, itag) ->
     when {
         format.has("url") -> {
             val url = format.getString("url").replace("\\u0026", "&")
@@ -370,11 +389,6 @@ private suspend fun HttpClient.decipherSignature(
         decipherFunctionData = decipherFunctionData(),
         decipheredSignatureChannel = decipheredSignatureChannel
     ).join()
-
-    writeDecipherFunctionToCache(
-        cacheDirPath = context.cacheDir.absolutePath,
-        decipherFunctionData = decipherFunctionData(),
-    )
 
     true
 }
@@ -498,44 +512,6 @@ private inline fun parseMainFunctionExtraDef(
     }
 }
 
-private fun readDecipherFunctionFromCache(cacheDirPath: String): Result<DecipherFunctionData?> {
-    val cacheFile = File("$cacheDirPath/$CACHE_FILE_NAME")
-
-    return when {
-        cacheFile.exists() && cacheFile.hasValidCache -> runCatching {
-            cacheFile.bufferedReader().use {
-                DecipherFunctionData(
-                    decipherJsFileName = it.readLine(),
-                    decipherFunctionName = it.readLine(),
-                    decipherFunctions = it.readLine()
-                )
-            }
-        }
-
-        else -> Result.success(null)
-    }
-}
-
-/** The cached functions are valid for 2 weeks */
-
-private inline val File.hasValidCache
-    get() = System.currentTimeMillis() - lastModified() < 1209600000
-
-private fun writeDecipherFunctionToCache(
-    cacheDirPath: String,
-    decipherFunctionData: DecipherFunctionData
-) {
-    val cacheFile = File("$cacheDirPath/$CACHE_FILE_NAME").also {
-        if (!it.exists()) it.createNewFile()
-    }
-
-    cacheFile.printWriter().use {
-        it.println(decipherFunctionData.decipherJsFileName)
-        it.println(decipherFunctionData.decipherFunctionName)
-        it.println(decipherFunctionData.decipherFunctions)
-    }
-}
-
 context(CoroutineScope)
 private fun decipherViaWebViewAsync(
     context: Context,
@@ -559,7 +535,6 @@ private fun decipherViaWebViewAsync(
     println(stb.toString())
 
     return launch(Dispatchers.Main) {
-
         JsEvaluator(context).evaluate(stb.toString(), object : JsCallback {
             override fun onResult(result: String) {
                 decipheredSignatureChannel.trySend(Result.success(result))

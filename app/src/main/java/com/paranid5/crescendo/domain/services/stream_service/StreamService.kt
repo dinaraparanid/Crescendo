@@ -1,6 +1,7 @@
 package com.paranid5.crescendo.domain.services.stream_service
 
-import android.app.*
+import android.app.Notification
+import android.app.PendingIntent
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
@@ -16,20 +17,22 @@ import android.support.v4.media.session.MediaControllerCompat
 import android.support.v4.media.session.MediaSessionCompat
 import android.support.v4.media.session.PlaybackStateCompat
 import android.util.Log
-import android.widget.Toast
 import androidx.annotation.OptIn
 import androidx.core.app.NotificationCompat
 import androidx.core.graphics.drawable.IconCompat
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.repeatOnLifecycle
-import androidx.media3.common.*
-import androidx.media3.common.C.*
+import androidx.media3.common.AudioAttributes
+import androidx.media3.common.C.AUDIO_CONTENT_TYPE_MOVIE
+import androidx.media3.common.C.USAGE_MEDIA
+import androidx.media3.common.C.WAKE_MODE_NETWORK
+import androidx.media3.common.MediaItem
+import androidx.media3.common.PlaybackException
+import androidx.media3.common.PlaybackParameters
+import androidx.media3.common.Player
 import androidx.media3.common.util.NotificationUtil
 import androidx.media3.common.util.UnstableApi
-import androidx.media3.datasource.DefaultHttpDataSource
 import androidx.media3.exoplayer.ExoPlayer
-import androidx.media3.exoplayer.source.ProgressiveMediaSource
-import androidx.media3.exoplayer.util.EventLogger
 import androidx.media3.ui.PlayerNotificationManager
 import com.paranid5.crescendo.AUDIO_SESSION_ID
 import com.paranid5.crescendo.EQUALIZER_DATA
@@ -42,7 +45,9 @@ import com.paranid5.crescendo.data.utils.extensions.toAndroidMetadata
 import com.paranid5.crescendo.domain.LifecycleNotificationManager
 import com.paranid5.crescendo.domain.ReceiverManager
 import com.paranid5.crescendo.domain.StorageHandler
+import com.paranid5.crescendo.domain.ktor_client.youtube.LiveStreamManifests
 import com.paranid5.crescendo.domain.ktor_client.youtube.VideoMeta
+import com.paranid5.crescendo.domain.ktor_client.youtube.YtFilesNotFoundException
 import com.paranid5.crescendo.domain.ktor_client.youtube.extractYtFilesWithMeta
 import com.paranid5.crescendo.domain.services.ServiceAction
 import com.paranid5.crescendo.domain.services.SuspendService
@@ -51,11 +56,25 @@ import com.paranid5.crescendo.domain.utils.extensions.registerReceiverCompat
 import com.paranid5.crescendo.domain.utils.extensions.sendBroadcast
 import com.paranid5.crescendo.domain.utils.extensions.setParameter
 import com.paranid5.crescendo.presentation.main_activity.MainActivity
-import com.paranid5.crescendo.presentation.playing.*
+import com.paranid5.crescendo.presentation.playing.Broadcast_CUR_POSITION_CHANGED
+import com.paranid5.crescendo.presentation.playing.CUR_POSITION_ARG
 import com.paranid5.crescendo.presentation.ui.utils.CoilUtils
 import io.ktor.client.HttpClient
-import kotlinx.coroutines.*
-import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.async
+import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.mapLatest
+import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.flow.updateAndGet
+import kotlinx.coroutines.launch
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import org.koin.core.parameter.parametersOf
@@ -67,6 +86,8 @@ class StreamService : SuspendService(),
     LifecycleNotificationManager,
     KoinComponent {
     companion object {
+        private val TAG = StreamService::class.simpleName!!
+
         private const val NOTIFICATION_ID = 101
         private const val STREAM_CHANNEL_ID = "stream_channel"
         private const val PLAYBACK_UPDATE_COOLDOWN = 500L
@@ -112,7 +133,7 @@ class StreamService : SuspendService(),
         const val URL_ARG = "url"
         const val POSITION_ARG = "position"
 
-        private val TAG = StreamService::class.simpleName!!
+        private const val DEFAULT_AUDIO_TAG = 140
 
         internal inline val Intent.mUrlArgOrNull
             get() = getStringExtra(URL_ARG)
@@ -212,7 +233,6 @@ class StreamService : SuspendService(),
     private val startIdState = MutableStateFlow(0)
 
     private var playbackTask: Job? = null
-    private var livestreamUpdateTask: Job? = null
     private lateinit var playbackPosMonitorTask: Job
 
     @Volatile
@@ -246,7 +266,6 @@ class StreamService : SuspendService(),
             .build()
             .apply {
                 addListener(playerStateChangedListener)
-                addAnalyticsListener(EventLogger())
                 audioSessionIdState.update { audioSessionId }
                 repeatMode = mGetRepeatMode(isRepeating = mIsRepeatingState.value)
                 initAudioEffects()
@@ -391,14 +410,6 @@ class StreamService : SuspendService(),
             super.onIsPlayingChanged(isPlaying)
             mIsPlayingState.update { isPlaying }
 
-            if (!isPlaying) {
-                livestreamUpdateTask?.cancel()
-                livestreamUpdateTask = null
-            } else {
-                if (currentMetadataState.value?.isLiveStream == true)
-                    livestreamUpdateTask = observeLiveStreamUpdates(currentUrlState.value)
-            }
-
             when {
                 isPlaying -> mStartPlaybackPositionMonitoring()
                 else -> mStopPlaybackPositionMonitoring()
@@ -409,12 +420,7 @@ class StreamService : SuspendService(),
             isStoppedWithError = true
             super.onPlayerError(error)
             Log.e(TAG, "onPlayerError", error)
-
-            Toast.makeText(
-                applicationContext,
-                "${getString(R.string.error)}: ${error.message ?: getString(R.string.unknown_error)}",
-                Toast.LENGTH_LONG
-            ).show()
+            mOnExtractionError(error)
         }
     }
 
@@ -620,7 +626,6 @@ class StreamService : SuspendService(),
         super.onDestroy()
         isConnectedState.update { false }
         playbackTask?.cancel()
-        livestreamUpdateTask?.cancel()
         detachNotification()
         releaseMedia()
         unregisterReceivers()
@@ -693,20 +698,49 @@ class StreamService : SuspendService(),
             ytUrl = ytUrl
         )
 
-        val (ytFiles, videoMeta) = when (val res = extractRes.getOrNull()) {
-            null -> return@launch
+        val (ytFiles, liveStreamManifestsRes, videoMetaRes) =
+            when (val res = extractRes.getOrNull()) {
+                null -> {
+                    mOnExtractionError(extractRes.exceptionOrNull()!!)
+                    return@launch
+                }
+
+                else -> res
+            }
+
+        ytFiles.forEach { println(it.value) }
+
+        val videoMeta = when (val res = videoMetaRes.getOrNull()) {
+            null -> {
+                mOnExtractionError(videoMetaRes.exceptionOrNull()!!)
+                null
+            }
+
             else -> res
         }
 
-        ytFiles.forEach {
-            println(it.value)
+        val liveStreamManifests = when (val res = liveStreamManifestsRes.getOrNull()) {
+            null -> {
+                mOnExtractionError(liveStreamManifestsRes.exceptionOrNull()!!)
+                LiveStreamManifests()
+            }
+
+            else -> res
         }
 
-        val audioTag = 140
-        val audioUrl = ytFiles[audioTag]!!.url!!
+        val audioUrl = when (videoMeta?.isLiveStream) {
+            true -> liveStreamManifests.hlsManifestUrl
+            else -> ytFiles[DEFAULT_AUDIO_TAG]?.url
+        }
+
+        if (audioUrl == null) {
+            mOnExtractionError(YtFilesNotFoundException())
+            return@launch
+        }
+
         lastAddedUrlState.update { audioUrl }
 
-        println(audioUrl)
+        Log.d(TAG, "Url: $audioUrl")
 
         playbackTask = scope.launch {
             mUpdateMediaSession(videoMeta?.let(::VideoMetadata))
@@ -721,34 +755,6 @@ class StreamService : SuspendService(),
             }
 
             mSetAudioEffectsEnabled(isEnabled = areAudioEffectsEnabledState.value)
-        }
-
-        if (videoMeta?.isLiveStream == true)
-            livestreamUpdateTask = observeLiveStreamUpdates(ytUrl)
-    }
-
-    private fun observeLiveStreamUpdates(ytUrl: String) = scope.launch(Dispatchers.IO) {
-        while (currentUrlState.value == ytUrl) {
-            delay(500)
-
-            val extractRes = ktorClient.extractYtFilesWithMeta(
-                context = applicationContext,
-                ytUrl = ytUrl
-            )
-
-            val (ytFiles, videoMeta) = when (val res = extractRes.getOrNull()) {
-                null -> return@launch
-                else -> res
-            }
-
-            val audioTag = 140
-            val audioUrl = ytFiles[audioTag]!!.url!!
-
-            if (audioUrl != lastAddedUrlState.value) {
-                lastAddedUrlState.update { audioUrl }
-                val mediaItem = MediaItem.fromUri(audioUrl)
-                launch(Dispatchers.Main) { mPlayer.addMediaItem(mediaItem) }
-            }
         }
     }
 
@@ -1072,4 +1078,13 @@ class StreamService : SuspendService(),
             else -> stopForeground(true)
         }
     }
+
+    // --------------------------- Error Handle ---------------------------
+
+    internal fun mOnExtractionError(error: Throwable) = sendBroadcast(
+        Intent(MainActivity.Broadcast_STREAMING_ERROR).putExtra(
+            MainActivity.STREAMING_ERROR_ARG,
+            error.message ?: getString(R.string.unknown_error)
+        )
+    )
 }

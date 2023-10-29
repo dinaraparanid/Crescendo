@@ -5,13 +5,17 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.palette.graphics.Palette
 import com.paranid5.crescendo.R
+import com.paranid5.crescendo.domain.StorageHandler
+import com.paranid5.crescendo.presentation.ui.AudioStatus
 import com.paranid5.crescendo.presentation.ui.extensions.getLightMutedOrPrimary
 import com.paranid5.crescendo.presentation.ui.extensions.simpleShadow
 import org.koin.compose.koinInject
@@ -20,11 +24,33 @@ import org.koin.compose.koinInject
 fun PlaybackButtons(
     playingPresenter: PlayingPresenter,
     palette: Palette?,
-    modifier: Modifier = Modifier
-) = Row(modifier.fillMaxWidth()) {
-    SeekTo10SecsBackButton(modifier = Modifier.weight(2F), palette = palette)
-    PlayButton(playingPresenter, modifier = Modifier.weight(1F), palette = palette)
-    SeekTo10SecsForwardButton(modifier = Modifier.weight(2F), palette = palette)
+    modifier: Modifier = Modifier,
+    storageHandler: StorageHandler = koinInject()
+) {
+    val audioStatus by storageHandler.audioStatusState.collectAsState()
+    val currentMetadata by storageHandler.currentMetadataState.collectAsState()
+
+    val isLiveStreaming by remember {
+        derivedStateOf {
+            audioStatus == AudioStatus.STREAMING && currentMetadata?.isLiveStream == true
+        }
+    }
+
+    Row(modifier.fillMaxWidth()) {
+        PrevButton(
+            isLiveStreaming = isLiveStreaming,
+            modifier = Modifier.weight(2F),
+            palette = palette
+        )
+
+        PlayButton(playingPresenter, modifier = Modifier.weight(1F), palette = palette)
+
+        NextButton(
+            isLiveStreaming = isLiveStreaming,
+            modifier = Modifier.weight(2F),
+            palette = palette
+        )
+    }
 }
 
 @Composable
@@ -65,14 +91,16 @@ private fun PlayButton(
 }
 
 @Composable
-private fun SeekTo10SecsBackButton(
+private fun PrevButton(
     palette: Palette?,
+    isLiveStreaming: Boolean,
     modifier: Modifier = Modifier,
     playingUIHandler: PlayingUIHandler = koinInject()
 ) {
     val paletteColor = palette.getLightMutedOrPrimary()
 
     IconButton(
+        enabled = !isLiveStreaming,
         modifier = modifier.simpleShadow(color = paletteColor),
         onClick = { playingUIHandler.sendOnPrevButtonClickedBroadcast() }
     ) {
@@ -86,14 +114,16 @@ private fun SeekTo10SecsBackButton(
 }
 
 @Composable
-private fun SeekTo10SecsForwardButton(
+private fun NextButton(
     palette: Palette?,
+    isLiveStreaming: Boolean,
     modifier: Modifier = Modifier,
     playingUIHandler: PlayingUIHandler = koinInject()
 ) {
     val paletteColor = palette.getLightMutedOrPrimary()
 
     IconButton(
+        enabled = !isLiveStreaming,
         modifier = modifier.simpleShadow(color = paletteColor),
         onClick = { playingUIHandler.sendOnNextButtonClickedBroadcast() }
     ) {

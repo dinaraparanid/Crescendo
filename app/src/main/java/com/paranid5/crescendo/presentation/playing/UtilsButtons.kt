@@ -9,6 +9,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -132,9 +133,22 @@ private fun PlaylistOrDownloadButton(
     storageHandler: StorageHandler = koinInject()
 ) {
     val audioStatus by storageHandler.audioStatusState.collectAsState()
+    val currentMetadata by storageHandler.currentMetadataState.collectAsState()
+
+    val isLiveStreaming by remember {
+        derivedStateOf {
+            audioStatus == AudioStatus.STREAMING && currentMetadata?.isLiveStream == true
+        }
+    }
 
     when (audioStatus) {
-        AudioStatus.STREAMING -> DownloadButton(palette, playingPresenter, modifier)
+        AudioStatus.STREAMING -> DownloadButton(
+            palette,
+            isLiveStreaming,
+            playingPresenter,
+            modifier
+        )
+
         else -> CurrentPlaylistButton(palette, modifier)
     }
 }
@@ -142,6 +156,7 @@ private fun PlaylistOrDownloadButton(
 @Composable
 private fun DownloadButton(
     palette: Palette?,
+    isLiveStreaming: Boolean,
     playingPresenter: PlayingPresenter,
     modifier: Modifier = Modifier
 ) {
@@ -155,6 +170,7 @@ private fun DownloadButton(
         )
 
         IconButton(
+            enabled = !isLiveStreaming,
             modifier = modifier.simpleShadow(color = paletteColor),
             onClick = {
                 if (!areStoragePermissionsGranted) {
