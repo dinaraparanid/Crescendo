@@ -281,6 +281,7 @@ class TrackService : SuspendService(), ReceiverManager, LifecycleNotificationMan
             .setAudioAttributes(newAudioAttributes, true)
             .setHandleAudioBecomingNoisy(true)
             .setWakeMode(WAKE_MODE_NETWORK)
+            .setPauseAtEndOfMediaItems(false)
             .build()
             .apply {
                 addListener(playerStateChangedListener)

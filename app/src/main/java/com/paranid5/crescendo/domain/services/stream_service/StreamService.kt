@@ -29,6 +29,7 @@ import androidx.media3.common.util.UnstableApi
 import androidx.media3.datasource.DefaultHttpDataSource
 import androidx.media3.exoplayer.ExoPlayer
 import androidx.media3.exoplayer.source.ProgressiveMediaSource
+import androidx.media3.exoplayer.util.EventLogger
 import androidx.media3.ui.PlayerNotificationManager
 import com.paranid5.crescendo.AUDIO_SESSION_ID
 import com.paranid5.crescendo.EQUALIZER_DATA
@@ -121,7 +122,7 @@ class StreamService : SuspendService(),
 
         internal fun mGetRepeatMode(isRepeating: Boolean) = when {
             isRepeating -> Player.REPEAT_MODE_ONE
-            else -> Player.REPEAT_MODE_ALL
+            else -> Player.REPEAT_MODE_OFF
         }
     }
 
@@ -178,6 +179,7 @@ class StreamService : SuspendService(),
     private val ktorClient by inject<HttpClient>()
 
     private val currentUrlState = storageHandler.currentUrlState
+    private val lastAddedUrlState = MutableStateFlow("")
     private val currentMetadataState = MutableStateFlow<VideoMetadata?>(null)
 
     private val playbackPositionState = storageHandler.playbackPositionState
@@ -210,6 +212,7 @@ class StreamService : SuspendService(),
     private val startIdState = MutableStateFlow(0)
 
     private var playbackTask: Job? = null
+    private var livestreamUpdateTask: Job? = null
     private lateinit var playbackPosMonitorTask: Job
 
     @Volatile
@@ -239,9 +242,11 @@ class StreamService : SuspendService(),
             .setAudioAttributes(newAudioAttributes, true)
             .setHandleAudioBecomingNoisy(true)
             .setWakeMode(WAKE_MODE_NETWORK)
+            .setPauseAtEndOfMediaItems(false)
             .build()
             .apply {
                 addListener(playerStateChangedListener)
+                addAnalyticsListener(EventLogger())
                 audioSessionIdState.update { audioSessionId }
                 repeatMode = mGetRepeatMode(isRepeating = mIsRepeatingState.value)
                 initAudioEffects()
@@ -372,9 +377,11 @@ class StreamService : SuspendService(),
             super.onPlaybackStateChanged(playbackState)
 
             when (playbackState) {
-                Player.STATE_IDLE -> {
+                Player.STATE_IDLE ->
                     mRestartPlayer(initialPosition = mCurrentPlaybackPosition)
-                }
+
+                Player.STATE_BUFFERING ->
+                    mPlayer.seekToNextMediaItem()
 
                 else -> Unit
             }
@@ -383,6 +390,14 @@ class StreamService : SuspendService(),
         override fun onIsPlayingChanged(isPlaying: Boolean) {
             super.onIsPlayingChanged(isPlaying)
             mIsPlayingState.update { isPlaying }
+
+            if (!isPlaying) {
+                livestreamUpdateTask?.cancel()
+                livestreamUpdateTask = null
+            } else {
+                if (currentMetadataState.value?.isLiveStream == true)
+                    livestreamUpdateTask = observeLiveStreamUpdates(currentUrlState.value)
+            }
 
             when {
                 isPlaying -> mStartPlaybackPositionMonitoring()
@@ -605,6 +620,7 @@ class StreamService : SuspendService(),
         super.onDestroy()
         isConnectedState.update { false }
         playbackTask?.cancel()
+        livestreamUpdateTask?.cancel()
         detachNotification()
         releaseMedia()
         unregisterReceivers()
@@ -688,10 +704,9 @@ class StreamService : SuspendService(),
 
         val audioTag = 140
         val audioUrl = ytFiles[audioTag]!!.url!!
+        lastAddedUrlState.update { audioUrl }
 
-        val audioSource = ProgressiveMediaSource
-            .Factory(DefaultHttpDataSource.Factory())
-            .createMediaSource(MediaItem.fromUri(audioUrl))
+        println(audioUrl)
 
         playbackTask = scope.launch {
             mUpdateMediaSession(videoMeta?.let(::VideoMetadata))
@@ -699,13 +714,41 @@ class StreamService : SuspendService(),
             launch(Dispatchers.IO) { storeMetadata(videoMeta) }
 
             mPlayer.run {
-                setMediaSource(audioSource)
+                setMediaItem(MediaItem.fromUri(audioUrl))
                 playWhenReady = true
                 prepare()
                 seekTo(initialPosition)
             }
 
             mSetAudioEffectsEnabled(isEnabled = areAudioEffectsEnabledState.value)
+        }
+
+        if (videoMeta?.isLiveStream == true)
+            livestreamUpdateTask = observeLiveStreamUpdates(ytUrl)
+    }
+
+    private fun observeLiveStreamUpdates(ytUrl: String) = scope.launch(Dispatchers.IO) {
+        while (currentUrlState.value == ytUrl) {
+            delay(500)
+
+            val extractRes = ktorClient.extractYtFilesWithMeta(
+                context = applicationContext,
+                ytUrl = ytUrl
+            )
+
+            val (ytFiles, videoMeta) = when (val res = extractRes.getOrNull()) {
+                null -> return@launch
+                else -> res
+            }
+
+            val audioTag = 140
+            val audioUrl = ytFiles[audioTag]!!.url!!
+
+            if (audioUrl != lastAddedUrlState.value) {
+                lastAddedUrlState.update { audioUrl }
+                val mediaItem = MediaItem.fromUri(audioUrl)
+                launch(Dispatchers.Main) { mPlayer.addMediaItem(mediaItem) }
+            }
         }
     }
 

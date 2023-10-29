@@ -18,7 +18,8 @@ data class VideoMetadata(
     @JvmField val title: String = get(named(STREAM_WITH_NO_NAME)),
     @JvmField val author: String = get(named(UNKNOWN_STREAMER)),
     @JvmField val covers: List<String> = listOf(),
-    @JvmField val lenInMillis: Long = 0
+    @JvmField val lenInMillis: Long = 0,
+    @JvmField val isLiveStream: Boolean = false
 ) : Parcelable {
     internal companion object : KoinComponent
 
@@ -26,6 +27,7 @@ data class VideoMetadata(
         title = youtubeMeta.title,
         author = youtubeMeta.author,
         lenInMillis = youtubeMeta.videoLengthSecs * 1000,
+        isLiveStream = youtubeMeta.isLiveStream,
         covers = youtubeMeta.run {
             listOf(maxResImageUrl, hqImageUrl, mqImageUrl, sdImageUrl, thumbnailUrl)
         }

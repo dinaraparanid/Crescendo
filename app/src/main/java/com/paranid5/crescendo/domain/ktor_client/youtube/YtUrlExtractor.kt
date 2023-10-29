@@ -15,7 +15,6 @@ import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
 import org.json.JSONArray
 import org.json.JSONObject
 import java.io.File
@@ -153,8 +152,6 @@ private suspend inline fun HttpClient.getStreamUrls(
     val videoMeta = parseVideoPage(pageHtml, ytFiles, encSignatures).getOrNull()
 
     if (encSignatures.isNotEmpty()) {
-        println("BEBRA 0")
-
         val decipherFunDataRes = Result.success<DecipherFunctionData?>(null)
 
         // TODO: Fix cache
@@ -163,20 +160,14 @@ private suspend inline fun HttpClient.getStreamUrls(
             cacheDirPath = context.cacheDir.absolutePath
         )*/
 
-        println("BEBRA 1")
-
         var (decipherJsFileName, decipherFunctionName, decipherFunctions) =
             when (val res = decipherFunDataRes.exceptionOrNull()) {
                 null -> decipherFunDataRes.getOrNull() ?: DecipherFunctionData()
                 else -> return Result.failure(res)
             }
 
-        println("BEBRA 2")
-
         val decryptJsFileMatch = patDecryptionJsFile.find(pageHtml)
             ?: patDecryptionJsFileWithoutSlash.find(pageHtml)
-
-        println("BEBRA 3")
 
         if (decryptJsFileMatch != null) {
             val curJsFileName = decryptJsFileMatch.groupValues[0].replace("\\/", "/")
@@ -189,8 +180,6 @@ private suspend inline fun HttpClient.getStreamUrls(
             decipherJsFileName = curJsFileName
         }
 
-        println("BEBRA 4")
-
         val decipherFunctionDataState = MutableStateFlow(
             DecipherFunctionData(
                 decipherJsFileName = decipherJsFileName,
@@ -199,12 +188,8 @@ private suspend inline fun HttpClient.getStreamUrls(
             )
         )
 
-        println("BEBRA 5")
-
         var signatureRes = Result.failure<String>(Exception())
         val decipheredSignatureChannel = Channel<Result<String>>(Channel.CONFLATED)
-
-        println("BEBRA 6")
 
         if (
             decipherSignature(
@@ -218,20 +203,14 @@ private suspend inline fun HttpClient.getStreamUrls(
                 .receiveTimeout(7.seconds)
                 .getOrDefault(Result.failure(Exception()))
 
-        println("BEBRA 7 Fail: ${signatureRes.isFailure}")
-
         if (signatureRes.isFailure)
             return Result.failure(signatureRes.exceptionOrNull()!!)
-
-        println("BEBRA 8")
 
         val sigs = signatureRes
             .getOrNull()!!
             .split("\n")
             .asSequence()
             .filter(String::isNotEmpty)
-
-        println("BEBRA 9")
 
         encSignatures.keys
             .asSequence()
@@ -241,12 +220,8 @@ private suspend inline fun HttpClient.getStreamUrls(
             .forEach { (itag, file) -> ytFiles[itag] = file }
     }
 
-    println("BEBRA 11")
-
     if (ytFiles.size == 0)
         return YtFailure(YtFilesNotFoundException())
-
-    println("BEBRA 12")
 
     return Result.success(ytFiles to videoMeta)
 }
@@ -374,29 +349,20 @@ private suspend fun HttpClient.decipherSignature(
         it.copy(decipherFunctionName = funcNameMatch.groupValues[1])
     }
 
-    println("PIPISKA 0")
-
     val mainDecipherFunction = parseMainDecipherFunction(
         jsFile = jsFile,
         decipherFunctionName = decipherFunctionName()!!
     ).getOrNull() ?: return@coroutineScope false
 
-    println("PIPISKA 1")
-    println(mainDecipherFunction)
-
     decipherFunctionDataState.update {
         it.copy(decipherFunctions = mainDecipherFunction)
     }
-
-    println("PIPISKA 2")
 
     parseMainFunctionExtra(
         mainDecipherFunction = mainDecipherFunction,
         jsFile = jsFile,
         decipherFunctionDataState = decipherFunctionDataState
     )
-
-    println("PIPISKA 3")
 
     decipherViaWebViewAsync(
         context = context,
@@ -405,14 +371,10 @@ private suspend fun HttpClient.decipherSignature(
         decipheredSignatureChannel = decipheredSignatureChannel
     ).join()
 
-    println("PIPISKA 4")
-
     writeDecipherFunctionToCache(
         cacheDirPath = context.cacheDir.absolutePath,
         decipherFunctionData = decipherFunctionData(),
     )
-
-    println("PIPISKA 5")
 
     true
 }
@@ -594,21 +556,16 @@ private fun decipherViaWebViewAsync(
 
     stb.append("};decipher();")
 
-    println("HUESOS")
     println(stb.toString())
 
     return launch(Dispatchers.Main) {
-        println("PIPKA RUN")
 
         JsEvaluator(context).evaluate(stb.toString(), object : JsCallback {
             override fun onResult(result: String) {
-                println("PISTON OK")
                 decipheredSignatureChannel.trySend(Result.success(result))
-                println("PISTON OK Sent")
             }
 
             override fun onError(errorMessage: String?) {
-                println("PISTON ERR")
                 decipheredSignatureChannel.trySend(Result.failure(YtException(errorMessage)))
             }
         })
