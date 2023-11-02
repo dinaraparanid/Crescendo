@@ -30,6 +30,7 @@ import org.koin.compose.koinInject
 fun PlaybackSlider(
     length: Long,
     palette: Palette?,
+    audioStatus: AudioStatus?,
     modifier: Modifier = Modifier,
     playingUIHandler: PlayingUIHandler = koinInject(),
     storageHandler: StorageHandler = koinInject(),
@@ -38,21 +39,31 @@ fun PlaybackSlider(
     val paletteColor = palette.getLightMutedOrPrimary()
     var curPosition by remember { mutableLongStateOf(0L) }
 
-    val audioStatus by storageHandler.audioStatusState.collectAsState()
     val currentMetadata by storageHandler.currentMetadataState.collectAsState()
+    val actualAudioStatus by storageHandler.audioStatusState.collectAsState()
 
-    val isLiveStreaming by remember {
+    val isLiveStreaming by remember(audioStatus, currentMetadata?.isLiveStream) {
         derivedStateOf {
             audioStatus == AudioStatus.STREAMING && currentMetadata?.isLiveStream == true
         }
     }
 
+    val isSliderEnabled by remember(actualAudioStatus, audioStatus) {
+        derivedStateOf { actualAudioStatus == audioStatus }
+    }
+
     LaunchedEffect(key1 = true) {
-        curPosition = storageHandler.playbackPositionState.value
+        curPosition = when {
+            isSliderEnabled -> storageHandler.playbackPositionState.value
+            else -> 0
+        }
     }
 
     BroadcastReceiver(action = Broadcast_CUR_POSITION_CHANGED) { _, intent ->
-        curPosition = intent!!.getLongExtra(CUR_POSITION_ARG, 0)
+        curPosition = when {
+            isSliderEnabled -> intent!!.getLongExtra(CUR_POSITION_ARG, 0)
+            else -> 0
+        }
     }
 
     Column(modifier.padding(horizontal = 10.dp)) {
@@ -60,6 +71,7 @@ fun PlaybackSlider(
             Slider(
                 value = curPosition.toFloat(),
                 valueRange = 0F..length.toFloat(),
+                enabled = isSliderEnabled,
                 colors = SliderDefaults.colors(
                     thumbColor = paletteColor,
                     activeTrackColor = paletteColor,
@@ -67,11 +79,15 @@ fun PlaybackSlider(
                 ),
                 onValueChange = { curPosition = it.toLong() },
                 onValueChangeFinished = {
-                    playingUIHandler.sendSeekToBroadcast(curPosition)
+                    playingUIHandler.sendSeekToBroadcast(audioStatus, curPosition)
                 }
             )
 
-        Row(Modifier.fillMaxWidth()) {
+        Row(
+            Modifier
+                .fillMaxWidth()
+                .padding(top = if (isLiveStreaming) 10.dp else 0.dp)
+        ) {
             content(curPosition, length, paletteColor)
         }
     }

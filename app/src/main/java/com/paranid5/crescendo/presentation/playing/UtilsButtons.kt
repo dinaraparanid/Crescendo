@@ -38,13 +38,30 @@ import org.koin.compose.koinInject
 @Composable
 fun UtilsButtons(
     palette: Palette?,
+    audioStatus: AudioStatus?,
     playingPresenter: PlayingPresenter,
     modifier: Modifier = Modifier
 ) = Row(modifier.fillMaxWidth()) {
-    EqualizerButton(palette, Modifier.weight(1F))
-    RepeatButton(palette, Modifier.weight(1F))
-    LikeButton(palette, Modifier.weight(1F))
-    PlaylistOrDownloadButton(palette, playingPresenter, Modifier.weight(1F))
+    EqualizerButton(
+        palette = palette,
+        modifier = Modifier.weight(1F)
+    )
+
+    RepeatButton(
+        palette = palette,
+        modifier = Modifier.weight(1F)
+    )
+
+    LikeButton(
+        palette = palette,
+        modifier = Modifier.weight(1F)
+    )
+
+    PlaylistOrDownloadButton(
+        palette = palette, audioStatus = audioStatus,
+        playingPresenter = playingPresenter,
+        modifier = Modifier.weight(1F)
+    )
 }
 
 @OptIn(ExperimentalMaterialApi::class)
@@ -128,11 +145,11 @@ private fun LikeButton(palette: Palette?, modifier: Modifier = Modifier) {
 @Composable
 private fun PlaylistOrDownloadButton(
     palette: Palette?,
+    audioStatus: AudioStatus?,
     playingPresenter: PlayingPresenter,
     modifier: Modifier = Modifier,
     storageHandler: StorageHandler = koinInject()
 ) {
-    val audioStatus by storageHandler.audioStatusState.collectAsState()
     val currentMetadata by storageHandler.currentMetadataState.collectAsState()
 
     val isLiveStreaming by remember {

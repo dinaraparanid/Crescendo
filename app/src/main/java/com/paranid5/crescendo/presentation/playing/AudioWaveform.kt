@@ -3,6 +3,7 @@ package com.paranid5.crescendo.presentation.playing
 import android.content.Context
 import android.util.Log
 import android.view.LayoutInflater
+import android.view.View
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.collectAsState
@@ -22,6 +23,7 @@ import org.koin.core.qualifier.named
 
 @Composable
 fun AudioWaveform(
+    enabled: Boolean,
     modifier: Modifier = Modifier,
     palette: Palette? = null,
     audioSessionIdState: MutableStateFlow<Int> = koinInject(named(AUDIO_SESSION_ID))
@@ -30,16 +32,25 @@ fun AudioWaveform(
     val audioSessionId by audioSessionIdState.collectAsState()
     var visualizer: WaveVisualizer? = null
 
-    AndroidView(
-        modifier = modifier,
-        factory = { context ->
-            context
-                .findWaveVisualizer()
-                .also { visualizer = it }
-                .apply { recompose(color, audioSessionId) }
-        },
-        update = { it.recompose(color, audioSessionId) }
-    )
+    enabled.let {
+        AndroidView(
+            modifier = modifier,
+            factory = { context ->
+                when {
+                    enabled -> context
+                        .findWaveVisualizer()
+                        .also { visualizer = it }
+                        .apply { recompose(color, audioSessionId) }
+
+                    else -> View(context)
+                }
+            },
+            update = {
+                if (it is WaveVisualizer)
+                    it.recompose(color, audioSessionId)
+            }
+        )
+    }
 
     DisposableEffect(Unit) {
         onDispose {

@@ -243,8 +243,11 @@ class StreamService : SuspendService(),
         .mapLatest { it?.lenInMillis ?: 0 }
         .stateIn(scope, SharingStarted.Eagerly, 0)
 
-    internal inline val mCurrentPlaybackPosition
+    private inline val currentPlaybackPosition
         get() = mPlayer.currentPosition
+
+    private inline val savedPlaybackPosition
+        get() = playbackPositionState.value
 
     @Volatile
     private var isNotificationShown = false
@@ -396,12 +399,8 @@ class StreamService : SuspendService(),
             super.onPlaybackStateChanged(playbackState)
 
             when (playbackState) {
-                Player.STATE_IDLE ->
-                    mRestartPlayer(initialPosition = mCurrentPlaybackPosition)
-
-                Player.STATE_BUFFERING ->
-                    mPlayer.seekToNextMediaItem()
-
+                Player.STATE_IDLE -> mRestartPlayer()
+                Player.STATE_BUFFERING -> mPlayer.seekToNextMediaItem()
                 else -> Unit
             }
         }
@@ -439,7 +438,7 @@ class StreamService : SuspendService(),
 
             when {
                 isStoppedWithError -> {
-                    mRestartPlayer(initialPosition = mCurrentPlaybackPosition)
+                    mRestartPlayer()
                     isStoppedWithError = false
                 }
 
@@ -633,7 +632,7 @@ class StreamService : SuspendService(),
 
     // ----------------------- Playback Handle -----------------------
 
-    internal fun mSendPlaybackPosition(curPosition: Long = mCurrentPlaybackPosition) =
+    internal fun mSendPlaybackPosition(curPosition: Long = currentPlaybackPosition) =
         sendBroadcast(
             Intent(Broadcast_CUR_POSITION_CHANGED)
                 .putExtra(CUR_POSITION_ARG, curPosition)
@@ -668,7 +667,7 @@ class StreamService : SuspendService(),
     // ----------------------- Storage Handler Utils -----------------------
 
     private suspend inline fun storePlaybackPosition() =
-        storageHandler.storePlaybackPosition(mCurrentPlaybackPosition)
+        storageHandler.storePlaybackPosition(currentPlaybackPosition)
 
     internal suspend inline fun mStoreIsRepeating(isRepeating: Boolean) =
         storageHandler.storeIsRepeating(isRepeating)
@@ -741,6 +740,7 @@ class StreamService : SuspendService(),
         lastAddedUrlState.update { audioUrl }
 
         Log.d(TAG, "Url: $audioUrl")
+        Log.d(TAG, "Position: $initialPosition")
 
         playbackTask = scope.launch {
             mUpdateMediaSession(videoMeta?.let(::VideoMetadata))
@@ -769,8 +769,8 @@ class StreamService : SuspendService(),
         playStream(url, initialPosition)
     }
 
-    internal fun mRestartPlayer(initialPosition: Long = 0) =
-        playStream(ytUrl = currentUrlState.value, initialPosition)
+    internal fun mRestartPlayer() =
+        playStream(ytUrl = currentUrlState.value, initialPosition = savedPlaybackPosition)
 
     internal fun mSeekTo(position: Long) {
         mResetAudioSessionId()
@@ -779,12 +779,12 @@ class StreamService : SuspendService(),
 
     internal fun mSeekTo10SecsBack() {
         mResetAudioSessionId()
-        mPlayer.seekTo(maxOf(mCurrentPlaybackPosition - TEN_SECS_AS_MILLIS, 0))
+        mPlayer.seekTo(maxOf(currentPlaybackPosition - TEN_SECS_AS_MILLIS, 0))
     }
 
     internal fun mSeekTo10SecsForward() {
         mResetAudioSessionId()
-        mPlayer.seekTo(minOf(mCurrentPlaybackPosition + TEN_SECS_AS_MILLIS, videoLength.value))
+        mPlayer.seekTo(minOf(currentPlaybackPosition + TEN_SECS_AS_MILLIS, videoLength.value))
     }
 
     /**
@@ -951,7 +951,7 @@ class StreamService : SuspendService(),
             .setCustomActions()
             .setState(
                 if (isPlaying) PlaybackStateCompat.STATE_PLAYING else PlaybackStateCompat.STATE_PAUSED,
-                mCurrentPlaybackPosition,
+                currentPlaybackPosition,
                 speedState.value,
                 SystemClock.elapsedRealtime()
             )

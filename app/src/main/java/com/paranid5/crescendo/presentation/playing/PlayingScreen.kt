@@ -3,7 +3,6 @@ package com.paranid5.crescendo.presentation.playing
 import android.content.res.Configuration
 import android.graphics.Bitmap
 import android.os.Build
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -32,6 +31,7 @@ import com.paranid5.crescendo.R
 import com.paranid5.crescendo.data.utils.extensions.artistAlbum
 import com.paranid5.crescendo.domain.StorageHandler
 import com.paranid5.crescendo.presentation.ui.AudioStatus
+import com.paranid5.crescendo.presentation.ui.extensions.getLightMutedOrPrimary
 import com.paranid5.crescendo.presentation.ui.extensions.increaseDarkness
 import com.paranid5.crescendo.presentation.ui.getCurrentTrackCoverModel
 import com.paranid5.crescendo.presentation.ui.getCurrentTrackCoverModelWithPalette
@@ -47,10 +47,10 @@ const val CUR_POSITION_ARG = "cur_position"
 fun PlayingScreen(
     coverAlpha: Float,
     viewModel: PlayingViewModel,
+    audioStatus: AudioStatus?,
     modifier: Modifier = Modifier,
     storageHandler: StorageHandler = koinInject()
 ) {
-    val audioStatus by storageHandler.audioStatusState.collectAsState()
     val currentMetadata by storageHandler.currentMetadataState.collectAsState()
     val currentTrack by storageHandler.currentTrackState.collectAsState()
 
@@ -117,7 +117,14 @@ private fun PlayingScreenPortrait(
     isLiveStreaming: Boolean,
     viewModel: PlayingViewModel,
     modifier: Modifier,
+    storageHandler: StorageHandler = koinInject()
 ) {
+    val actualAudioStatus by storageHandler.audioStatusState.collectAsState()
+
+    val isWaveformEnabled by remember(actualAudioStatus, audioStatus) {
+        derivedStateOf { actualAudioStatus == audioStatus }
+    }
+
     var coverSize by remember { mutableStateOf(1 to 1) }
 
     val (coverModel, palette) = when (audioStatus) {
@@ -143,7 +150,8 @@ private fun PlayingScreenPortrait(
         ) = createRefs()
 
         BackgroundImage(
-            Modifier
+            audioStatus = audioStatus,
+            modifier = Modifier
                 .fillMaxSize()
                 .alpha(coverAlpha)
         )
@@ -167,6 +175,7 @@ private fun PlayingScreenPortrait(
         )
 
         AudioWaveform(
+            enabled = isWaveformEnabled,
             palette = palette,
             modifier = Modifier
                 .padding(horizontal = 20.dp)
@@ -182,6 +191,7 @@ private fun PlayingScreenPortrait(
         PlaybackSlider(
             length = sliderLength,
             palette = palette,
+            audioStatus = audioStatus,
             modifier = Modifier.constrainAs(slider) {
                 bottom.linkTo(titleAndPropertiesButton.top, margin = 15.dp)
                 start.linkTo(parent.start, margin = 20.dp)
@@ -195,6 +205,7 @@ private fun PlayingScreenPortrait(
             title = title,
             author = author,
             palette = palette,
+            audioStatus = audioStatus,
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(horizontal = 10.dp)
@@ -208,6 +219,7 @@ private fun PlayingScreenPortrait(
         PlaybackButtons(
             playingPresenter = viewModel.presenter,
             palette = palette,
+            audioStatus = audioStatus,
             modifier = Modifier.constrainAs(playbackButtons) {
                 bottom.linkTo(utilsButtons.top, margin = 5.dp)
                 start.linkTo(parent.start, margin = 20.dp)
@@ -217,6 +229,7 @@ private fun PlayingScreenPortrait(
 
         UtilsButtons(
             palette = palette,
+            audioStatus = audioStatus,
             playingPresenter = viewModel.presenter,
             modifier = Modifier.constrainAs(utilsButtons) {
                 bottom.linkTo(parent.bottom, margin = 20.dp)
@@ -237,7 +250,14 @@ private fun PlayingScreenLandscape(
     isLiveStreaming: Boolean,
     viewModel: PlayingViewModel,
     modifier: Modifier,
+    storageHandler: StorageHandler = koinInject()
 ) {
+    val actualAudioStatus by storageHandler.audioStatusState.collectAsState()
+
+    val isWaveformEnabled by remember(actualAudioStatus, audioStatus) {
+        derivedStateOf { actualAudioStatus == audioStatus }
+    }
+
     var coverSize by remember { mutableStateOf(1 to 1) }
 
     val (coverModel, palette) = when (audioStatus) {
@@ -257,18 +277,21 @@ private fun PlayingScreenLandscape(
             cover,
             audioWave,
             propertiesButton,
+            liveSeeker,
             slider,
             playbackButtons,
             utilsButtons
         ) = createRefs()
 
         BackgroundImage(
-            Modifier
+            audioStatus = audioStatus,
+            modifier = Modifier
                 .fillMaxSize()
                 .alpha(coverAlpha)
         )
 
         AudioWaveform(
+            enabled = isWaveformEnabled,
             palette = palette,
             modifier = Modifier
                 .fillMaxWidth()
@@ -301,15 +324,25 @@ private fun PlayingScreenLandscape(
 
         PropertiesButton(
             palette = palette,
+            audioStatus = audioStatus,
             modifier = Modifier.constrainAs(propertiesButton) {
                 top.linkTo(parent.top, margin = 8.dp)
                 end.linkTo(parent.end, margin = 5.dp)
             },
         )
 
+        LiveSeeker(
+            color = palette.getLightMutedOrPrimary(),
+            modifier = Modifier.constrainAs(liveSeeker) {
+                top.linkTo(parent.top, margin = 8.dp)
+                start.linkTo(parent.start, margin = 5.dp)
+            }
+        )
+
         PlaybackSlider(
             length = sliderLength,
             palette = palette,
+            audioStatus = audioStatus,
             modifier = Modifier.constrainAs(slider) {
                 top.linkTo(parent.top, margin = 20.dp)
                 bottom.linkTo(parent.bottom)
@@ -317,7 +350,7 @@ private fun PlayingScreenLandscape(
                 end.linkTo(parent.end, margin = 20.dp)
             }
         ) { curPosition, videoLength, color ->
-            if (isLiveStreaming) LiveText(color) else TimeText(curPosition, color)
+            if (isLiveStreaming) Unit else TimeText(curPosition, color)
 
             TitleAndAuthor(
                 title = title,
@@ -335,6 +368,7 @@ private fun PlayingScreenLandscape(
         PlaybackButtons(
             playingPresenter = viewModel.presenter,
             palette = palette,
+            audioStatus = audioStatus,
             modifier = Modifier.constrainAs(playbackButtons) {
                 top.linkTo(slider.bottom, margin = 5.dp)
                 start.linkTo(parent.start, margin = 20.dp)
@@ -344,6 +378,7 @@ private fun PlayingScreenLandscape(
 
         UtilsButtons(
             palette = palette,
+            audioStatus = audioStatus,
             playingPresenter = viewModel.presenter,
             modifier = Modifier.constrainAs(utilsButtons) {
                 top.linkTo(playbackButtons.bottom, margin = 2.dp)
@@ -355,12 +390,8 @@ private fun PlayingScreenLandscape(
 }
 
 @Composable
-private fun BackgroundImage(
-    modifier: Modifier = Modifier,
-    storageHandler: StorageHandler = koinInject()
-) {
+private fun BackgroundImage(audioStatus: AudioStatus?, modifier: Modifier = Modifier) {
     val config = LocalConfiguration.current
-    val audioStatus by storageHandler.audioStatusState.collectAsState()
 
     val coverModel = when (audioStatus) {
         AudioStatus.STREAMING -> getVideoCoverModel(

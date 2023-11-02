@@ -13,6 +13,7 @@ import com.paranid5.crescendo.domain.services.video_cache_service.VideoCacheServ
 import com.paranid5.crescendo.presentation.NavHostController
 import com.paranid5.crescendo.presentation.Screens
 import com.paranid5.crescendo.presentation.UIHandler
+import com.paranid5.crescendo.presentation.ui.AudioStatus
 import com.paranid5.crescendo.presentation.ui.handleOrIgnore
 import kotlinx.coroutines.flow.MutableStateFlow
 import org.koin.core.component.KoinComponent
@@ -26,43 +27,42 @@ class PlayingUIHandler(
     private val videoCacheServiceAccessor: VideoCacheServiceAccessor
 ) : UIHandler, KoinComponent {
     private val audioSessionIdState by inject<MutableStateFlow<Int>>(named(AUDIO_SESSION_ID))
-    private val audioStatusState = storageHandler.audioStatusState
 
-    private inline val audioStatus
-        get() = audioStatusState.value
-
-    fun sendOnPrevButtonClickedBroadcast() = audioStatus.handleOrIgnore(
+    fun sendOnPrevButtonClickedBroadcast(audioStatus: AudioStatus?) = audioStatus.handleOrIgnore(
         streamAction = streamServiceAccessor::sendSeekTo10SecsBackBroadcast,
         trackAction = trackServiceAccessor::sendSwitchToPrevTrackBroadcast
     )
 
-    fun sendOnNextButtonClickedBroadcast() = audioStatus.handleOrIgnore(
+    fun sendOnNextButtonClickedBroadcast(audioStatus: AudioStatus?) = audioStatus.handleOrIgnore(
         streamAction = streamServiceAccessor::sendSeekTo10SecsForwardBroadcast,
         trackAction = trackServiceAccessor::sendSwitchToNextTrackBroadcast
     )
 
-    fun sendSeekToBroadcast(position: Long) = audioStatus.handleOrIgnore(
+    fun sendSeekToBroadcast(audioStatus: AudioStatus?, position: Long) = audioStatus.handleOrIgnore(
         streamAction = { streamServiceAccessor.sendSeekToBroadcast(position) },
         trackAction = { trackServiceAccessor.sendSeekToBroadcast(position) }
     )
 
-    fun sendPauseBroadcast() = audioStatus.handleOrIgnore(
+    fun sendPauseBroadcast(audioStatus: AudioStatus?) = audioStatus.handleOrIgnore(
         streamAction = streamServiceAccessor::sendPauseBroadcast,
         trackAction = trackServiceAccessor::sendPauseBroadcast
     )
 
-    fun startStreamingOrSendResumeBroadcast() = audioStatus.handleOrIgnore(
+    fun startStreamingOrSendResumeBroadcast(audioStatus: AudioStatus?) = audioStatus.handleOrIgnore(
         streamAction = streamServiceAccessor::startStreamingOrSendResumeBroadcast,
         trackAction = trackServiceAccessor::startStreamingOrSendResumeBroadcast
     )
 
-    fun launchVideoCashService(desiredFilename: String, format: Formats, trimRange: CacheTrimRange) =
-        videoCacheServiceAccessor.startCashingOrAddToQueue(
-            videoUrl = storageHandler.currentUrlState.value,
-            desiredFilename = desiredFilename,
-            format = format,
-            trimRange = trimRange
-        )
+    fun launchVideoCashService(
+        desiredFilename: String,
+        format: Formats,
+        trimRange: CacheTrimRange
+    ) = videoCacheServiceAccessor.startCashingOrAddToQueue(
+        videoUrl = storageHandler.currentUrlState.value,
+        desiredFilename = desiredFilename,
+        format = format,
+        trimRange = trimRange
+    )
 
     fun navigateToAudioEffects(context: Context, navHostController: NavHostController) {
         when (audioSessionIdState.value) {

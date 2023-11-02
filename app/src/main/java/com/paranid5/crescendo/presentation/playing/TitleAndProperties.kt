@@ -67,10 +67,10 @@ fun TitleAndAuthor(
 @Composable
 fun PropertiesButton(
     palette: Palette?,
+    audioStatus: AudioStatus?,
     modifier: Modifier = Modifier,
     storageHandler: StorageHandler = koinInject()
 ) {
-    val audioStatus by storageHandler.audioStatusState.collectAsState()
     val currentTrackMb by storageHandler.currentTrackState.collectAsState()
 
     when (audioStatus) {
@@ -111,6 +111,7 @@ fun TitleAndPropertiesButton(
     title: String,
     author: String,
     palette: Palette?,
+    audioStatus: AudioStatus?,
     modifier: Modifier = Modifier,
     textAlignment: Alignment.Horizontal = Alignment.Start
 ) = Row(modifier) {
@@ -123,5 +124,5 @@ fun TitleAndPropertiesButton(
     )
 
     Spacer(Modifier.width(10.dp))
-    PropertiesButton(palette)
+    PropertiesButton(palette, audioStatus)
 }

@@ -166,7 +166,7 @@ class StorageHandler(context: Context) :
         dataStore.edit { preferences -> preferences[IS_REPEATING] = isRepeating }
     }
 
-    @OptIn(ExperimentalCoroutinesApi::class, ExperimentalStdlibApi::class)
+    @OptIn(ExperimentalCoroutinesApi::class)
     val audioStatusFlow = dataStore.data
         .mapLatest { preferences -> preferences[AUDIO_STATUS] }
         .mapLatest { audioStatusInd -> audioStatusInd?.let { AudioStatus.entries[it] } }
@@ -245,7 +245,7 @@ class StorageHandler(context: Context) :
     @OptIn(ExperimentalCoroutinesApi::class)
     val equalizerParamFlow = dataStore.data
         .mapLatest { preferences -> preferences[EQ_PARAM] }
-        .mapLatest { param -> EqualizerParameters.values()[param ?: 0] }
+        .mapLatest { param -> EqualizerParameters.entries[param ?: 0] }
 
     val equalizerParamState = equalizerParamFlow
         .stateIn(this, SharingStarted.Eagerly, EqualizerParameters.NIL)
