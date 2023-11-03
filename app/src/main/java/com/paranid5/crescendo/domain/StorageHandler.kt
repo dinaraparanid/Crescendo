@@ -38,7 +38,9 @@ class StorageHandler(context: Context) :
 
         private val TRACK_ORDER = byteArrayPreferencesKey("track_order")
 
-        private val PLAYBACK_POSITION = longPreferencesKey("playback_position")
+        private val TRACKS_PLAYBACK_POSITION = longPreferencesKey("tracks_playback_position")
+        private val STREAM_PLAYBACK_POSITION = longPreferencesKey("stream_playback_position")
+
         private val IS_REPEATING = booleanPreferencesKey("is_repeating")
         private val AUDIO_STATUS = intPreferencesKey("audio_status")
 
@@ -143,15 +145,27 @@ class StorageHandler(context: Context) :
     }
 
     @OptIn(ExperimentalCoroutinesApi::class)
-    val playbackPositionFlow = dataStore.data
-        .mapLatest { preferences -> preferences[PLAYBACK_POSITION] }
+    val tracksPlaybackPositionFlow = dataStore.data
+        .mapLatest { preferences -> preferences[TRACKS_PLAYBACK_POSITION] }
         .mapLatest { it ?: 0 }
 
-    val playbackPositionState = playbackPositionFlow
+    val tracksPlaybackPositionState = tracksPlaybackPositionFlow
         .stateIn(this, SharingStarted.Eagerly, 0)
 
-    internal suspend inline fun storePlaybackPosition(position: Long) {
-        dataStore.edit { preferences -> preferences[PLAYBACK_POSITION] = position }
+    internal suspend inline fun storeTracksPlaybackPosition(position: Long) {
+        dataStore.edit { preferences -> preferences[TRACKS_PLAYBACK_POSITION] = position }
+    }
+
+    @OptIn(ExperimentalCoroutinesApi::class)
+    val streamPlaybackPositionFlow = dataStore.data
+        .mapLatest { preferences -> preferences[STREAM_PLAYBACK_POSITION] }
+        .mapLatest { it ?: 0 }
+
+    val streamPlaybackPositionState = streamPlaybackPositionFlow
+        .stateIn(this, SharingStarted.Eagerly, 0)
+
+    internal suspend inline fun storeStreamPlaybackPosition(position: Long) {
+        dataStore.edit { preferences -> preferences[STREAM_PLAYBACK_POSITION] = position }
     }
 
     @OptIn(ExperimentalCoroutinesApi::class)

@@ -121,7 +121,7 @@ private fun PlayingScreenPortrait(
 ) {
     val actualAudioStatus by storageHandler.audioStatusState.collectAsState()
 
-    val isWaveformEnabled by remember(actualAudioStatus, audioStatus) {
+    val isWaveformEnabled by remember {
         derivedStateOf { actualAudioStatus == audioStatus }
     }
 
@@ -129,7 +129,7 @@ private fun PlayingScreenPortrait(
 
     val (coverModel, palette) = when (audioStatus) {
         AudioStatus.STREAMING -> getVideoCoverModelWithPalette(
-            isPlaceholderRequired = true,
+            isPlaceholderRequired = false,
             size = coverSize
         )
 
@@ -254,7 +254,7 @@ private fun PlayingScreenLandscape(
 ) {
     val actualAudioStatus by storageHandler.audioStatusState.collectAsState()
 
-    val isWaveformEnabled by remember(actualAudioStatus, audioStatus) {
+    val isWaveformEnabled by remember {
         derivedStateOf { actualAudioStatus == audioStatus }
     }
 

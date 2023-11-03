@@ -77,19 +77,23 @@ private fun EqualizerButton(
     val paletteColor = palette.getLightMutedOrPrimary()
     val scope = rememberCoroutineScope()
 
-    IconButton(
-        modifier = modifier.simpleShadow(color = paletteColor),
-        onClick = {
-            playingUIHandler.navigateToAudioEffects(context, navHostController)
-            scope.launch { playingSheetState?.bottomSheetState?.collapse() }
+    Box(modifier) {
+        IconButton(
+            modifier = Modifier
+                .simpleShadow(color = paletteColor)
+                .align(Alignment.Center),
+            onClick = {
+                playingUIHandler.navigateToAudioEffects(context, navHostController)
+                scope.launch { playingSheetState?.bottomSheetState?.collapse() }
+            }
+        ) {
+            Icon(
+                modifier = Modifier.size(30.dp),
+                painter = painterResource(R.drawable.equalizer),
+                contentDescription = stringResource(R.string.equalizer),
+                tint = paletteColor
+            )
         }
-    ) {
-        Icon(
-            modifier = Modifier.size(30.dp),
-            painter = painterResource(R.drawable.equalizer),
-            contentDescription = stringResource(R.string.equalizer),
-            tint = paletteColor
-        )
     }
 }
 
@@ -105,22 +109,26 @@ private fun RepeatButton(
     val isRepeating by storageHandler.isRepeatingState.collectAsState()
     val audioStatus by storageHandler.audioStatusState.collectAsState()
 
-    IconButton(
-        modifier = modifier.simpleShadow(color = paletteColor),
-        onClick = {
-            when (audioStatus) {
-                AudioStatus.STREAMING -> streamServiceAccessor.sendChangeRepeatBroadcast()
-                AudioStatus.PLAYING -> trackServiceAccessor.sendChangeRepeatBroadcast()
-                else -> Unit
+    Box(modifier) {
+        IconButton(
+            modifier = Modifier
+                .simpleShadow(color = paletteColor)
+                .align(Alignment.Center),
+            onClick = {
+                when (audioStatus) {
+                    AudioStatus.STREAMING -> streamServiceAccessor.sendChangeRepeatBroadcast()
+                    AudioStatus.PLAYING -> trackServiceAccessor.sendChangeRepeatBroadcast()
+                    else -> Unit
+                }
             }
+        ) {
+            Icon(
+                modifier = Modifier.size(30.dp),
+                painter = painterResource(if (isRepeating) R.drawable.repeat else R.drawable.no_repeat),
+                contentDescription = stringResource(R.string.change_repeat),
+                tint = paletteColor
+            )
         }
-    ) {
-        Icon(
-            modifier = Modifier.size(30.dp),
-            painter = painterResource(if (isRepeating) R.drawable.repeat else R.drawable.no_repeat),
-            contentDescription = stringResource(R.string.change_repeat),
-            tint = paletteColor
-        )
     }
 }
 
@@ -129,16 +137,20 @@ private fun LikeButton(palette: Palette?, modifier: Modifier = Modifier) {
     val paletteColor = palette.getLightMutedOrPrimary()
     val isLiked by remember { mutableStateOf(false) }
 
-    IconButton(
-        modifier = modifier.simpleShadow(color = paletteColor),
-        onClick = { /** TODO: favourite database */ }
-    ) {
-        Icon(
-            modifier = Modifier.size(30.dp),
-            painter = painterResource(if (isLiked) R.drawable.like_filled else R.drawable.like),
-            contentDescription = stringResource(R.string.favourites),
-            tint = paletteColor
-        )
+    Box(modifier) {
+        IconButton(
+            modifier = Modifier
+                .simpleShadow(color = paletteColor)
+                .align(Alignment.Center),
+            onClick = { /** TODO: favourite database */ }
+        ) {
+            Icon(
+                modifier = Modifier.size(30.dp),
+                painter = painterResource(if (isLiked) R.drawable.like_filled else R.drawable.like),
+                contentDescription = stringResource(R.string.favourites),
+                tint = paletteColor
+            )
+        }
     }
 }
 
@@ -188,7 +200,9 @@ private fun DownloadButton(
 
         IconButton(
             enabled = !isLiveStreaming,
-            modifier = modifier.simpleShadow(color = paletteColor),
+            modifier = Modifier
+                .simpleShadow(color = paletteColor)
+                .align(Alignment.Center),
             onClick = {
                 if (!areStoragePermissionsGranted) {
                     launchStoragePermissions()
@@ -225,15 +239,19 @@ private fun CurrentPlaylistButton(
     val scope = rememberCoroutineScope()
     val curPlaylistSheetState = LocalCurrentPlaylistSheetState.current
 
-    IconButton(
-        modifier = modifier.simpleShadow(color = paletteColor),
-        onClick = { scope.launch { curPlaylistSheetState?.show() } }
-    ) {
-        Icon(
-            modifier = Modifier.size(30.dp),
-            painter = painterResource(R.drawable.playlists),
-            contentDescription = stringResource(R.string.current_playlist),
-            tint = paletteColor
-        )
+    Box(modifier) {
+        IconButton(
+            onClick = { scope.launch { curPlaylistSheetState?.show() } },
+            modifier = Modifier
+                .simpleShadow(color = paletteColor)
+                .align(Alignment.Center),
+        ) {
+            Icon(
+                modifier = Modifier.size(30.dp),
+                painter = painterResource(R.drawable.playlists),
+                contentDescription = stringResource(R.string.current_playlist),
+                tint = paletteColor
+            )
+        }
     }
 }

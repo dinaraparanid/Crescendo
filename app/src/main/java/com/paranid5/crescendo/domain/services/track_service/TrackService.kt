@@ -213,7 +213,7 @@ class TrackService : SuspendService(), ReceiverManager, LifecycleNotificationMan
     private val currentPlaylistState = storageHandler.currentPlaylistState
     private val currentTrackState = storageHandler.currentTrackState
 
-    private val playbackPositionState = storageHandler.playbackPositionState
+    private val playbackPositionState = storageHandler.tracksPlaybackPositionState
     internal val mIsRepeatingState = storageHandler.isRepeatingState
     internal val mIsPlayingState by inject<MutableStateFlow<Boolean>>(named(IS_PLAYING))
 
@@ -800,7 +800,7 @@ class TrackService : SuspendService(), ReceiverManager, LifecycleNotificationMan
     // ----------------------- Storage Handler Utils -----------------------
 
     private suspend inline fun storePlaybackPosition() =
-        storageHandler.storePlaybackPosition(mExoPlaybackPosition)
+        storageHandler.storeTracksPlaybackPosition(mExoPlaybackPosition)
 
     internal suspend inline fun mStoreIsRepeating(isRepeating: Boolean) =
         storageHandler.storeIsRepeating(isRepeating)

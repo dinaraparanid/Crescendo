@@ -42,27 +42,29 @@ fun PlaybackSlider(
     val currentMetadata by storageHandler.currentMetadataState.collectAsState()
     val actualAudioStatus by storageHandler.audioStatusState.collectAsState()
 
-    val isLiveStreaming by remember(audioStatus, currentMetadata?.isLiveStream) {
+    val isLiveStreaming by remember {
         derivedStateOf {
             audioStatus == AudioStatus.STREAMING && currentMetadata?.isLiveStream == true
         }
     }
 
-    val isSliderEnabled by remember(actualAudioStatus, audioStatus) {
+    val isSliderEnabled by remember {
         derivedStateOf { actualAudioStatus == audioStatus }
     }
 
+    fun getDefaultPlaybackPosition() = when (audioStatus) {
+        AudioStatus.STREAMING -> storageHandler.streamPlaybackPositionState.value
+        else -> storageHandler.tracksPlaybackPositionState.value
+    }
+
     LaunchedEffect(key1 = true) {
-        curPosition = when {
-            isSliderEnabled -> storageHandler.playbackPositionState.value
-            else -> 0
-        }
+        curPosition = getDefaultPlaybackPosition()
     }
 
     BroadcastReceiver(action = Broadcast_CUR_POSITION_CHANGED) { _, intent ->
         curPosition = when {
             isSliderEnabled -> intent!!.getLongExtra(CUR_POSITION_ARG, 0)
-            else -> 0
+            else -> getDefaultPlaybackPosition()
         }
     }
 

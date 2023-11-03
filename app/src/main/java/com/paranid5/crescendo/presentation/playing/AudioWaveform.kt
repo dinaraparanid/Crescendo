@@ -21,6 +21,8 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import org.koin.compose.koinInject
 import org.koin.core.qualifier.named
 
+private const val TAG = "AudioWaveform"
+
 @Composable
 fun AudioWaveform(
     enabled: Boolean,
@@ -33,6 +35,8 @@ fun AudioWaveform(
     var visualizer: WaveVisualizer? = null
 
     enabled.let {
+        Log.d(TAG, "enabled: $enabled")
+
         AndroidView(
             modifier = modifier,
             factory = { context ->
@@ -73,7 +77,7 @@ private fun WaveVisualizer.recompose(color: Color, audioSessionId: Int) {
 
 private fun WaveVisualizer.updateAudioSessionId(audioSessionId: Int) {
     try {
-        Log.d("AudioWaveform", "Audio Session Id: $audioSessionId")
+        Log.d(TAG, "Audio Session Id: $audioSessionId")
         setAudioSessionId(audioSessionId)
     } catch (ignored: Exception) {
         // playback is not yet started

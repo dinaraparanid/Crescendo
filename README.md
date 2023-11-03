@@ -7,10 +7,10 @@
 [Paranid5](https://github.com/dinaraparanid)
 
 ## **About App**
-**Crescendo** is a music player Android app that
-**plays both local files and audio from YouTube.**
-Application provides multiple features to move
-your music experience to a new level!
+**Crescendo** is a music player Android app that **plays audio from the YouTube (including livestreams)!**
+Additionally, it supports caching of videos to multiple audio and video formats.
+Application allows to play both networked audio and local files with multiple audio effects.
+Crescendo provides multiple features to move your music experience to a new level!
 
 ### **Preview**
 
@@ -32,17 +32,19 @@ your music experience to a new level!
 
 <img src="https://i.ibb.co/cQyxngv/current-playlist.jpg" alt="cur_playlist" width="100">
 
-**Stream tracks from the YouTube**
+**Stream tracks and live streams from the YouTube**
 
 <p>
     <img src="https://i.ibb.co/vL6GqhD/fetch-youtube.jpg" alt="fetch_youtube" width="100">
     &nbsp;
     <img src="https://i.ibb.co/bBFTvP5/playing-youtube.jpg" alt="playing_youtube" width="100">
+    &nbsp;
+    <img src="https://i.ibb.co/7k4MV6s/livestreaming.jpg" alt="live_streaming" width="100">
 </p>
 
-**Cash video to the preferred format**
+**Cache video to the preferred format**
 
-<img src="https://i.ibb.co/jk1PB6m/cash-youtube.jpg" alt="cash_video" width="100">
+<img src="https://i.ibb.co/WK042D4/cache-youtube.jpg" alt="cache_video" width="100">
 
 **Control playback and cashing with notifications**
 
@@ -99,27 +101,29 @@ your music experience to a new level!
 
 ## **Current Status:**
 
-**Alpha V 0.1.1.0**
+**Alpha V 0.2.0.0**
 
 ### **Implemented features:**
-1. Media playback with local tracks and youtube videos
-2. Audio and Video cashing to multiple formats
-3. Current playlist system (add and remove tracks)
-4. Audio Effects: EQ, Bass Boost, Reverb, Pitch and Speed shifters
-5. Updates notifications
+1. Media playback of YouTube videos and live streams
+2. Media playback of local tracks
+3. Audio and Video caching to multiple formats
+4. Current playlist system (add and remove tracks)
+5. Audio Effects: EQ, Bass Boost, Reverb, Pitch and Speed shifters
+6. Updates notifications
 
 ### **TODO:**
-1. Artists, albums and playlists
-2. Favourites
-3. Track trimming
-4. Tags changing
-5. Lyrics
-6. App customization and settings
+1. Track trimming
+2. Recently listened videos/livestreams
+3. Artists, albums and custom playlists
+4. Favourites
+5. Tags changing
+6. Lyrics
+7. App customization and settings
 
 ## **System Requirements**
 **Android 5.0** or higher
 
-Stable internet connection to play audio and cash videos is required
+Stable internet connection to play audio from YouTube and cash video is required
 
 ## **License**
 *GNU Public License V 3.0*

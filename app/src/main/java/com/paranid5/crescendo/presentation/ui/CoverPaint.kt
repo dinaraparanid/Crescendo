@@ -7,6 +7,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.palette.graphics.Palette
 import coil.compose.AsyncImagePainter
 import coil.compose.rememberAsyncImagePainter
+import coil.request.CachePolicy
 import coil.request.ImageRequest
 import coil.size.Precision
 import coil.size.Scale
@@ -57,6 +58,9 @@ internal inline fun getVideoCoverModel(
 
             size?.run { size(first, second) }
         }
+        .networkCachePolicy(CachePolicy.ENABLED)
+        .diskCachePolicy(CachePolicy.ENABLED)
+        .memoryCachePolicy(CachePolicy.ENABLED)
         .precision(Precision.EXACT)
         .scale(Scale.FILL)
         .crossfade(animationMillis)
@@ -125,6 +129,9 @@ internal inline fun getVideoCoverModelWithPalette(
 
             size?.run { size(first, second) }
         }
+        .networkCachePolicy(CachePolicy.ENABLED)
+        .diskCachePolicy(CachePolicy.ENABLED)
+        .memoryCachePolicy(CachePolicy.ENABLED)
         .precision(Precision.EXACT)
         .scale(Scale.FILL)
         .crossfade(animationMillis)

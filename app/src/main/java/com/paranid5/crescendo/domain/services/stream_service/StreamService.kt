@@ -47,7 +47,9 @@ import com.paranid5.crescendo.domain.ReceiverManager
 import com.paranid5.crescendo.domain.StorageHandler
 import com.paranid5.crescendo.domain.ktor_client.youtube.LiveStreamManifests
 import com.paranid5.crescendo.domain.ktor_client.youtube.VideoMeta
+import com.paranid5.crescendo.domain.ktor_client.youtube.YtFailure
 import com.paranid5.crescendo.domain.ktor_client.youtube.YtFilesNotFoundException
+import com.paranid5.crescendo.domain.ktor_client.youtube.YtRequestTimeoutException
 import com.paranid5.crescendo.domain.ktor_client.youtube.extractYtFilesWithMeta
 import com.paranid5.crescendo.domain.services.ServiceAction
 import com.paranid5.crescendo.domain.services.SuspendService
@@ -75,6 +77,7 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.flow.updateAndGet
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withTimeoutOrNull
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import org.koin.core.parameter.parametersOf
@@ -203,7 +206,7 @@ class StreamService : SuspendService(),
     private val lastAddedUrlState = MutableStateFlow("")
     private val currentMetadataState = MutableStateFlow<VideoMetadata?>(null)
 
-    private val playbackPositionState = storageHandler.playbackPositionState
+    private val playbackPositionState = storageHandler.streamPlaybackPositionState
     internal val mIsRepeatingState = storageHandler.isRepeatingState
     internal val mIsPlayingState by inject<MutableStateFlow<Boolean>>(named(IS_PLAYING))
 
@@ -667,7 +670,7 @@ class StreamService : SuspendService(),
     // ----------------------- Storage Handler Utils -----------------------
 
     private suspend inline fun storePlaybackPosition() =
-        storageHandler.storePlaybackPosition(currentPlaybackPosition)
+        storageHandler.storeStreamPlaybackPosition(currentPlaybackPosition)
 
     internal suspend inline fun mStoreIsRepeating(isRepeating: Boolean) =
         storageHandler.storeIsRepeating(isRepeating)
@@ -692,10 +695,12 @@ class StreamService : SuspendService(),
         ytUrl: String,
         initialPosition: Long
     ) = scope.launch(Dispatchers.IO) {
-        val extractRes = ktorClient.extractYtFilesWithMeta(
-            context = applicationContext,
-            ytUrl = ytUrl
-        )
+        val extractRes = withTimeoutOrNull(timeMillis = 4500) {
+            ktorClient.extractYtFilesWithMeta(
+                context = applicationContext,
+                ytUrl = ytUrl
+            )
+        } ?: YtFailure(YtRequestTimeoutException())
 
         val (ytFiles, liveStreamManifestsRes, videoMetaRes) =
             when (val res = extractRes.getOrNull()) {
@@ -1081,10 +1086,36 @@ class StreamService : SuspendService(),
 
     // --------------------------- Error Handle ---------------------------
 
-    internal fun mOnExtractionError(error: Throwable) = sendBroadcast(
-        Intent(MainActivity.Broadcast_STREAMING_ERROR).putExtra(
-            MainActivity.STREAMING_ERROR_ARG,
-            error.message ?: getString(R.string.unknown_error)
+    private fun ErrorNotification(message: String) = when {
+        Build.VERSION.SDK_INT >= Build.VERSION_CODES.O ->
+            Notification.Builder(applicationContext, STREAM_CHANNEL_ID)
+
+        else -> Notification.Builder(applicationContext)
+    }
+        .setSmallIcon(R.drawable.save_icon)
+        .setContentIntent(
+            PendingIntent.getActivity(
+                applicationContext,
+                0,
+                Intent(applicationContext, MainActivity::class.java),
+                PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+            )
         )
-    )
+        .setContentTitle(message)
+        .setAutoCancel(true)
+        .setShowWhen(false)
+        .build()
+
+    internal fun mOnExtractionError(error: Throwable) {
+        val errorMessage = error.message ?: getString(R.string.unknown_error)
+        startForeground(NOTIFICATION_ID, ErrorNotification(errorMessage))
+        isStoppedWithError = true
+
+        sendBroadcast(
+            Intent(MainActivity.Broadcast_STREAMING_ERROR).putExtra(
+                MainActivity.STREAMING_ERROR_ARG,
+                errorMessage
+            )
+        )
+    }
 }

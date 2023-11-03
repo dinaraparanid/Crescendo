@@ -75,7 +75,7 @@ private fun PlayButton(
     val isPlayerPlaying by playingPresenter.isPlayingState.collectAsState()
     val actualAudioStatus by storageHandler.audioStatusState.collectAsState()
 
-    val isPlaying by remember(isPlayerPlaying, actualAudioStatus, audioStatus) {
+    val isPlaying by remember {
         derivedStateOf { isPlayerPlaying && actualAudioStatus == audioStatus }
     }
 

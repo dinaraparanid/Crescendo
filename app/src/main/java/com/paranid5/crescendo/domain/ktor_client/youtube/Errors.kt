@@ -10,4 +10,6 @@ class YtPlayerResponseStructureChangedException : YtException("ytPlayerResponse 
 
 class YtFilesNotFoundException : YtException("Yt files not found")
 
+class YtRequestTimeoutException : YtException("Timeout for the request has expired")
+
 fun <T> YtFailure(exception: YtException) = Result.failure<T>(exception)
