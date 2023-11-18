@@ -4,7 +4,7 @@ import android.os.Parcelable
 import androidx.compose.runtime.Immutable
 import com.paranid5.crescendo.STREAM_WITH_NO_NAME
 import com.paranid5.crescendo.UNKNOWN_STREAMER
-import com.paranid5.crescendo.domain.ktor_client.youtube.VideoMeta
+import com.paranid5.yt_url_extractor_kt.VideoMeta
 import kotlinx.parcelize.Parcelize
 import kotlinx.serialization.Serializable
 import org.koin.core.component.KoinComponent

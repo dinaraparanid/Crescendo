@@ -23,8 +23,6 @@ import com.paranid5.crescendo.domain.services.ServiceAction
 import com.paranid5.crescendo.domain.services.SuspendService
 import com.paranid5.crescendo.domain.ktor_client.downloadFile
 import com.paranid5.crescendo.domain.ktor_client.downloadFiles
-import com.paranid5.crescendo.domain.ktor_client.youtube.YtFile
-import com.paranid5.crescendo.domain.ktor_client.youtube.extractYtFilesWithMeta
 import com.paranid5.crescendo.domain.media_scanner.MediaScannerReceiver
 import com.paranid5.crescendo.domain.utils.AsyncCondVar
 import com.paranid5.crescendo.domain.utils.extensions.registerReceiverCompat
@@ -35,6 +33,8 @@ import com.paranid5.crescendo.domain.utils.media.getInitialMediaDirectory
 import com.paranid5.crescendo.domain.utils.media.mergeToMP4AndSetTagsAsync
 import com.paranid5.crescendo.presentation.main_activity.MainActivity
 import com.paranid5.crescendo.presentation.main_activity.MainActivity.Companion.VIDEO_CASH_STATUS_ARG
+import com.paranid5.yt_url_extractor_kt.YtFile
+import com.paranid5.yt_url_extractor_kt.extractYtFilesWithMeta
 import io.ktor.client.*
 import io.ktor.http.*
 import kotlinx.coroutines.*
