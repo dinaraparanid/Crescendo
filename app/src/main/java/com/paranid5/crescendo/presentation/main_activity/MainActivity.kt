@@ -42,6 +42,7 @@ class MainActivity : ComponentActivity() {
         override fun onReceive(context: Context?, intent: Intent) {
             Log.d(TAG, "Cashing result is received")
 
+            @Suppress("DEPRECATION")
             val status = when {
                 Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU ->
                     intent.getParcelableExtra(

@@ -1,5 +1,6 @@
 package com.paranid5.crescendo.presentation.audio_effects
 
+import android.annotation.SuppressLint
 import android.util.Log
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.Image
@@ -45,6 +46,7 @@ import kotlin.math.atan2
 
 private const val TAG = "BassAndReverbView"
 
+@SuppressLint("LogConditional")
 @Composable
 fun BassAndReverb(
     modifier: Modifier = Modifier,
@@ -89,6 +91,7 @@ fun BassAndReverb(
     }
 }
 
+@SuppressLint("LogConditional")
 @Composable
 private fun AudioController(
     initialValue: Float,

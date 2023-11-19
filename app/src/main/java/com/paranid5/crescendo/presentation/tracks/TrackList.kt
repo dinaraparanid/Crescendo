@@ -1,5 +1,6 @@
 package com.paranid5.crescendo.presentation.tracks
 
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.lazy.LazyColumn
@@ -12,6 +13,7 @@ import androidx.compose.ui.unit.dp
 import com.paranid5.crescendo.data.tracks.Track
 import com.paranid5.crescendo.domain.StorageHandler
 import com.paranid5.crescendo.domain.services.track_service.TrackServiceAccessor
+import com.paranid5.crescendo.presentation.composition_locals.LocalPlayingPagerState
 import kotlinx.coroutines.CoroutineScope
 import org.koin.compose.koinInject
 
@@ -57,6 +59,7 @@ fun TrackList(
     }
 }
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun TrackList(
     tracks: List<Track>,
@@ -65,20 +68,27 @@ fun TrackList(
     trackItemModifier: Modifier = Modifier,
     storageHandler: StorageHandler = koinInject(),
     trackServiceAccessor: TrackServiceAccessor = koinInject()
-) = TrackList(
-    tracks = tracks,
-    scrollingState = scrollingState,
-    modifier = modifier,
-    trackItemView = { _, trackInd, scope, _, _, trackModifier ->
-        DefaultTrackItem(
-            modifier = trackModifier.then(trackItemModifier),
-            tracks = tracks,
-            trackInd = trackInd,
-            scope = scope,
-            storageHandler = storageHandler,
-            trackServiceAccessor = trackServiceAccessor,
-        )
-    },
-    storageHandler = storageHandler,
-    trackServiceAccessor = trackServiceAccessor
-)
+) {
+    val playingPagerState = LocalPlayingPagerState.current
+
+    TrackList(
+        tracks = tracks,
+        scrollingState = scrollingState,
+        modifier = modifier,
+        trackItemView = { _, trackInd, scope, _, _, trackModifier ->
+            DefaultTrackItem(
+                modifier = trackModifier.then(trackItemModifier),
+                tracks = tracks,
+                trackInd = trackInd,
+                scope = scope,
+                storageHandler = storageHandler,
+                trackServiceAccessor = trackServiceAccessor,
+            ) {
+                playingPagerState?.animateScrollToPage(0)
+                startPlaylistPlayback(tracks, trackInd, storageHandler, trackServiceAccessor)
+            }
+        },
+        storageHandler = storageHandler,
+        trackServiceAccessor = trackServiceAccessor
+    )
+}

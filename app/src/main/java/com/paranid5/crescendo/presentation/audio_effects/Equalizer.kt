@@ -1,5 +1,6 @@
 package com.paranid5.crescendo.presentation.audio_effects
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.util.Log
 import androidx.compose.foundation.Canvas
@@ -81,9 +82,18 @@ private fun PresetSpinner(
     val primaryColor = LocalAppColors.current.value.primary
 
     val equalizerData by equalizerDataState.collectAsState()
-    val customPresetIndex by remember { derivedStateOf { equalizerData!!.presets.size } }
-    val equalizerParam by remember { derivedStateOf { equalizerData!!.currentParameter } }
-    val isEQParamBands by remember { derivedStateOf { equalizerParam == EqualizerParameters.BANDS } }
+
+    val customPresetIndex by remember {
+        derivedStateOf { equalizerData!!.presets.size }
+    }
+
+    val equalizerParam by remember {
+        derivedStateOf { equalizerData!!.currentParameter }
+    }
+
+    val isEQParamBands by remember {
+        derivedStateOf { equalizerParam == EqualizerParameters.BANDS }
+    }
 
     var selectedItemInd by remember {
         mutableIntStateOf(
@@ -182,13 +192,15 @@ private fun Bands(
     }
 }
 
+@Suppress("UnnecessaryVariable")
+@SuppressLint("LogConditional")
 @Composable
 private fun BandsCurve(
     pointsState: SnapshotStateList<Offset>,
     modifier: Modifier = Modifier
 ) {
     val primaryColor = LocalAppColors.current.value.primary
-    Log.d(TAG, "${pointsState.toList()}")
+    Log.d(TAG, "Bands: ${pointsState.toList()}")
 
     val path = Path().apply {
         moveTo(pointsState[0].x, pointsState[0].y)

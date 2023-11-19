@@ -12,16 +12,10 @@ class MainActivityViewModel(savedStateHandle: SavedStateHandle) : ViewModel() {
     }
 
     val curScreenState = MutableStateFlow(
-        savedStateHandle.getStateFlow<Screens>(
-            CUR_SCREEN_STATE,
-            Screens.Tracks
-        ).value
+        savedStateHandle.get<Screens>(CUR_SCREEN_STATE) ?: Screens.Tracks
     )
 
     val screensStack = MutableStateFlow(
-        savedStateHandle.getStateFlow(
-            SCREENS_STACK_STATE,
-            mutableListOf<Screens>()
-        ).value
+        savedStateHandle[SCREENS_STACK_STATE] ?: mutableListOf<Screens>()
     )
 }

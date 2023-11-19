@@ -14,22 +14,14 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.unit.dp
-import com.paranid5.crescendo.presentation.Screens
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.update
 
 @Composable
 fun AudioEffectsScreen(
     viewModel: AudioEffectsViewModel,
-    curScreenState: MutableStateFlow<Screens>,
     modifier: Modifier = Modifier,
-) {
-    curScreenState.update { Screens.Audio.AudioEffects }
-
-    when (LocalConfiguration.current.orientation) {
-        Configuration.ORIENTATION_LANDSCAPE -> AudioEffectsScreenLandscape(viewModel, modifier)
-        else -> AudioEffectsScreenPortrait(viewModel, modifier)
-    }
+) = when (LocalConfiguration.current.orientation) {
+    Configuration.ORIENTATION_LANDSCAPE -> AudioEffectsScreenLandscape(viewModel, modifier)
+    else -> AudioEffectsScreenPortrait(viewModel, modifier)
 }
 
 @Composable

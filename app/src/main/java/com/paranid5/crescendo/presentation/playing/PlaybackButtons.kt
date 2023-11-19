@@ -14,17 +14,19 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.palette.graphics.Palette
+import com.paranid5.crescendo.IS_PLAYING
 import com.paranid5.crescendo.R
 import com.paranid5.crescendo.domain.StorageHandler
 import com.paranid5.crescendo.presentation.ui.AudioStatus
 import com.paranid5.crescendo.presentation.ui.extensions.getLightMutedOrPrimary
 import com.paranid5.crescendo.presentation.ui.extensions.simpleShadow
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
 import org.koin.compose.koinInject
+import org.koin.core.qualifier.named
 
 @Composable
 fun PlaybackButtons(
-    playingPresenter: PlayingPresenter,
     palette: Palette?,
     audioStatus: AudioStatus?,
     modifier: Modifier = Modifier,
@@ -47,7 +49,6 @@ fun PlaybackButtons(
         )
 
         PlayButton(
-            playingPresenter,
             modifier = Modifier.weight(1F),
             palette = palette,
             audioStatus = audioStatus
@@ -64,15 +65,15 @@ fun PlaybackButtons(
 
 @Composable
 private fun PlayButton(
-    playingPresenter: PlayingPresenter,
     palette: Palette?,
     audioStatus: AudioStatus?,
     modifier: Modifier = Modifier,
+    isPlayingState: MutableStateFlow<Boolean> = koinInject(named(IS_PLAYING)),
     playingUIHandler: PlayingUIHandler = koinInject(),
     storageHandler: StorageHandler = koinInject()
 ) {
     val paletteColor = palette.getLightMutedOrPrimary()
-    val isPlayerPlaying by playingPresenter.isPlayingState.collectAsState()
+    val isPlayerPlaying by isPlayingState.collectAsState()
     val actualAudioStatus by storageHandler.audioStatusState.collectAsState()
 
     val isPlaying by remember {
@@ -147,10 +148,12 @@ private fun PrevButton(
         }
     ) {
         Icon(
-            modifier = Modifier.width(100.dp).height(50.dp),
             painter = painterResource(R.drawable.prev_track),
             contentDescription = stringResource(R.string.ten_secs_back),
-            tint = paletteColor
+            tint = paletteColor,
+            modifier = Modifier
+                .width(100.dp)
+                .height(50.dp)
         )
     }
 }
@@ -180,10 +183,12 @@ private fun NextButton(
         }
     ) {
         Icon(
-            modifier = Modifier.width(100.dp).height(50.dp),
             painter = painterResource(R.drawable.next_track),
             contentDescription = stringResource(R.string.ten_secs_forward),
-            tint = paletteColor
+            tint = paletteColor,
+            modifier = Modifier
+                .width(100.dp)
+                .height(50.dp)
         )
     }
 }

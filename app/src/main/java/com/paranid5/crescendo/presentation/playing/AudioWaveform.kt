@@ -1,5 +1,6 @@
 package com.paranid5.crescendo.presentation.playing
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.util.Log
 import android.view.LayoutInflater
@@ -23,6 +24,7 @@ import org.koin.core.qualifier.named
 
 private const val TAG = "AudioWaveform"
 
+@SuppressLint("LogConditional")
 @Composable
 fun AudioWaveform(
     enabled: Boolean,
@@ -64,6 +66,7 @@ fun AudioWaveform(
     }
 }
 
+@SuppressLint("InflateParams")
 private fun Context.findWaveVisualizer() =
     LayoutInflater
         .from(this)
@@ -75,6 +78,7 @@ private fun WaveVisualizer.recompose(color: Color, audioSessionId: Int) {
     updateAudioSessionId(audioSessionId)
 }
 
+@SuppressLint("LogConditional")
 private fun WaveVisualizer.updateAudioSessionId(audioSessionId: Int) {
     try {
         Log.d(TAG, "Audio Session Id: $audioSessionId")

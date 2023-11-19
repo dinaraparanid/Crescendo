@@ -1,40 +1,29 @@
 package com.paranid5.crescendo.presentation.fetch_stream
 
 import androidx.lifecycle.SavedStateHandle
+import androidx.lifecycle.ViewModel
 import com.paranid5.crescendo.domain.StorageHandler
-import com.paranid5.crescendo.presentation.ObservableViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import org.koin.core.component.inject
-import org.koin.core.parameter.parametersOf
+import kotlinx.coroutines.flow.updateAndGet
 
 class FetchStreamViewModel(
-    savedStateHandle: SavedStateHandle,
+    private val savedStateHandle: SavedStateHandle,
     private val storageHandler: StorageHandler,
-) : ObservableViewModel<FetchStreamPresenter, FetchStreamUIHandler>() {
+) : ViewModel() {
     private companion object {
         private const val CURRENT_TEXT = "current_text"
     }
 
-    override val presenter by inject<FetchStreamPresenter> {
-        val savedByStateHandle = savedStateHandle
-            .getStateFlow<String?>(CURRENT_TEXT, null)
-            .value
-
+    private val _currentTextState by lazy {
+        val savedByStateHandle = savedStateHandle.get<String>(CURRENT_TEXT)
         val savedByStorageHandler = storageHandler.currentUrlState.value
-        parametersOf(savedByStateHandle ?: savedByStorageHandler)
+        MutableStateFlow(savedByStateHandle ?: savedByStorageHandler)
     }
 
-    override val handler by inject<FetchStreamUIHandler>()
+    val currentTextState = _currentTextState.asStateFlow()
 
-    private val _isConfirmButtonPressedState = MutableStateFlow(false)
-    val isConfirmButtonPressedState = _isConfirmButtonPressedState.asStateFlow()
-
-    fun onConfirmUrlButtonPressed() {
-        _isConfirmButtonPressedState.value = true
-    }
-
-    fun finishUrlSetting() {
-        _isConfirmButtonPressedState.value = false
+    fun setCurrentText(currentText: String) {
+        savedStateHandle[CURRENT_TEXT] = _currentTextState.updateAndGet { currentText }
     }
 }

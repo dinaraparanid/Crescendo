@@ -20,21 +20,15 @@ import androidx.compose.ui.unit.dp
 import com.paranid5.crescendo.data.tracks.Track
 import com.paranid5.crescendo.data.tracks.sortedBy
 import com.paranid5.crescendo.domain.StorageHandler
-import com.paranid5.crescendo.presentation.Screens
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.update
 import org.koin.compose.koinInject
 
 @Composable
 fun TracksScreen(
     tracksViewModel: TracksViewModel,
-    curScreenState: MutableStateFlow<Screens>,
     modifier: Modifier = Modifier,
     storageHandler: StorageHandler = koinInject()
 ) {
-    curScreenState.update { Screens.Tracks }
-
-    val allTracks by tracksViewModel.presenter.tracksState.collectAsState()
+    val allTracks by tracksViewModel.tracksState.collectAsState()
     val filterTracksState = remember { mutableStateOf(listOf<Track>()) }
     var showsTracks by remember { mutableStateOf(listOf<Track>()) }
 
@@ -45,9 +39,7 @@ fun TracksScreen(
     val context = LocalContext.current
 
     LaunchedEffect(Unit) {
-        tracksViewModel.presenter.tracksState.update {
-            context.allTracksFromMediaStore
-        }
+        tracksViewModel.setTracks(context.allTracksFromMediaStore)
     }
 
     LaunchedEffect(key1 = allTracks, key2 = filterTracksState.value, key3 = trackOrder) {
@@ -59,8 +51,9 @@ fun TracksScreen(
 
     Column(modifier) {
         TrackSearcher(
-            tracksState = tracksViewModel.presenter.tracksState,
-            queryState = tracksViewModel.presenter.queryState,
+            tracksState = tracksViewModel.tracksState,
+            queryState = tracksViewModel.queryState,
+            setQuery = tracksViewModel::setQueryState,
             isSearchBarActiveState = isSearchBarActiveState,
             modifier = Modifier
                 .fillMaxWidth()

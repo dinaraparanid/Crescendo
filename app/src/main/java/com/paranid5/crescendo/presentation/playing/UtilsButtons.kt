@@ -39,7 +39,6 @@ import org.koin.compose.koinInject
 fun UtilsButtons(
     palette: Palette?,
     audioStatus: AudioStatus?,
-    playingPresenter: PlayingPresenter,
     modifier: Modifier = Modifier
 ) = Row(modifier.fillMaxWidth()) {
     EqualizerButton(
@@ -58,8 +57,8 @@ fun UtilsButtons(
     )
 
     PlaylistOrDownloadButton(
-        palette = palette, audioStatus = audioStatus,
-        playingPresenter = playingPresenter,
+        palette = palette,
+        audioStatus = audioStatus,
         modifier = Modifier.weight(1F)
     )
 }
@@ -124,7 +123,12 @@ private fun RepeatButton(
         ) {
             Icon(
                 modifier = Modifier.size(30.dp),
-                painter = painterResource(if (isRepeating) R.drawable.repeat else R.drawable.no_repeat),
+                painter = painterResource(
+                    when {
+                        isRepeating -> R.drawable.repeat
+                        else -> R.drawable.no_repeat
+                    }
+                ),
                 contentDescription = stringResource(R.string.change_repeat),
                 tint = paletteColor
             )
@@ -158,7 +162,6 @@ private fun LikeButton(palette: Palette?, modifier: Modifier = Modifier) {
 private fun PlaylistOrDownloadButton(
     palette: Palette?,
     audioStatus: AudioStatus?,
-    playingPresenter: PlayingPresenter,
     modifier: Modifier = Modifier,
     storageHandler: StorageHandler = koinInject()
 ) {
@@ -174,7 +177,6 @@ private fun PlaylistOrDownloadButton(
         AudioStatus.STREAMING -> DownloadButton(
             palette,
             isLiveStreaming,
-            playingPresenter,
             modifier
         )
 
@@ -186,17 +188,17 @@ private fun PlaylistOrDownloadButton(
 private fun DownloadButton(
     palette: Palette?,
     isLiveStreaming: Boolean,
-    playingPresenter: PlayingPresenter,
     modifier: Modifier = Modifier
 ) {
     val paletteColor = palette.getLightMutedOrPrimary()
     val isCashPropertiesDialogShownState = remember { mutableStateOf(false) }
 
     Box(modifier) {
-        val (areStoragePermissionsGranted, launchStoragePermissions) = externalStoragePermissionsRequestLauncher(
-            isCashPropertiesDialogShownState,
-            modifier = Modifier.align(Alignment.Center)
-        )
+        val (areStoragePermissionsGranted, launchStoragePermissions) =
+            externalStoragePermissionsRequestLauncher(
+                isCashPropertiesDialogShownState,
+                modifier = Modifier.align(Alignment.Center)
+            )
 
         IconButton(
             enabled = !isLiveStreaming,
@@ -223,7 +225,6 @@ private fun DownloadButton(
         if (isCashPropertiesDialogShownState.value && areStoragePermissionsGranted)
             CachePropertiesDialog(
                 isDialogShownState = isCashPropertiesDialogShownState,
-                playingPresenter = playingPresenter,
                 modifier = Modifier.align(Alignment.Center)
             )
     }

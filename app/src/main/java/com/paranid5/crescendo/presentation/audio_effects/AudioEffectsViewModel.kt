@@ -1,38 +1,43 @@
 package com.paranid5.crescendo.presentation.audio_effects
 
 import androidx.lifecycle.SavedStateHandle
+import androidx.lifecycle.ViewModel
 import com.paranid5.crescendo.domain.StorageHandler
-import com.paranid5.crescendo.presentation.ObservableViewModel
-import org.koin.core.component.inject
-import org.koin.core.parameter.parametersOf
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.updateAndGet
+import org.koin.core.component.KoinComponent
 
-class AudioEffectsViewModel(savedStateHandle: SavedStateHandle) :
-    ObservableViewModel<AudioEffectsPresenter, AudioEffectsUIHandler>() {
+class AudioEffectsViewModel(
+    private val savedStateHandle: SavedStateHandle,
+    private val storageHandler: StorageHandler
+) : ViewModel() {
     private companion object {
         private const val PITCH_TEXT = "pitch_text"
         private const val SPEED_TEXT = "speed_text"
     }
 
-    private val storageHandler by inject<StorageHandler>()
-
-    override val presenter by inject<AudioEffectsPresenter> {
-        val savedByStateHandlerPitchText = savedStateHandle
-            .getStateFlow<String?>(PITCH_TEXT, null)
-            .value
-
+    private val _pitchTextState by lazy {
+        val savedByStateHandlerPitchText = savedStateHandle.get<String>(PITCH_TEXT)
         val savedByStorageHandlerPitch = storageHandler.pitchState.value
-
-        val savedByStateHandlerSpeedText = savedStateHandle
-            .getStateFlow<String?>(SPEED_TEXT, null)
-            .value
-
-        val savedByStorageHandlerSpeed = storageHandler.speedState.value
-
-        parametersOf(
-            savedByStateHandlerPitchText ?: savedByStorageHandlerPitch.toString(),
-            savedByStateHandlerSpeedText ?: savedByStorageHandlerSpeed.toString()
-        )
+        MutableStateFlow(savedByStateHandlerPitchText ?: savedByStorageHandlerPitch.toString())
     }
 
-    override val handler by inject<AudioEffectsUIHandler>()
+    private val _speedTextState by lazy {
+        val savedByStateHandlerSpeedText = savedStateHandle.get<String>(SPEED_TEXT)
+        val savedByStorageHandlerSpeed = storageHandler.speedState.value
+        MutableStateFlow(savedByStateHandlerSpeedText ?: savedByStorageHandlerSpeed.toString())
+    }
+
+    val pitchTextState = _pitchTextState.asStateFlow()
+
+    fun setPitchText(pitchText: String) {
+        savedStateHandle[PITCH_TEXT] = _pitchTextState.updateAndGet { pitchText }
+    }
+
+    val speedTextState = _speedTextState.asStateFlow()
+
+    fun setSpeedText(pitchText: String) {
+        savedStateHandle[SPEED_TEXT] = _speedTextState.updateAndGet { pitchText }
+    }
 }

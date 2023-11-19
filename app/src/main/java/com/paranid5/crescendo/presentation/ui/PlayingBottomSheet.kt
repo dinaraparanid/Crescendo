@@ -8,7 +8,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.pager.HorizontalPager
-import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.BottomSheetValue
 import androidx.compose.material.ExperimentalMaterialApi
@@ -21,10 +20,10 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
 import com.paranid5.crescendo.presentation.appbar.AppBar
 import com.paranid5.crescendo.presentation.composition_locals.LocalCurrentPlaylistSheetState
+import com.paranid5.crescendo.presentation.composition_locals.LocalPlayingPagerState
 import com.paranid5.crescendo.presentation.composition_locals.LocalPlayingSheetState
 import com.paranid5.crescendo.presentation.current_playlist.CurrentPlaylistScreen
 import com.paranid5.crescendo.presentation.playing.PlayingScreen
-import com.paranid5.crescendo.presentation.playing.PlayingViewModel
 import com.paranid5.crescendo.presentation.ui.theme.LocalAppColors
 import com.paranid5.crescendo.presentation.ui.theme.TransparentUtility
 import org.koin.androidx.compose.koinViewModel
@@ -34,11 +33,10 @@ import org.koin.androidx.compose.koinViewModel
 fun PlayingBottomSheet(
     alpha: Float,
     modifier: Modifier = Modifier,
-    playingViewModel: PlayingViewModel = koinViewModel()
 ) {
     val backgroundColor = LocalAppColors.current.value.background
     val curPlaylistSheetState = LocalCurrentPlaylistSheetState.current
-    val playingPagerState = rememberPagerState { 2 }
+    val playingPagerState = LocalPlayingPagerState.current
 
     val playingSheetState = LocalPlayingSheetState.current
     val sheetState = playingSheetState?.bottomSheetState
@@ -56,17 +54,15 @@ fun PlayingBottomSheet(
             sheetShape = RoundedCornerShape(topStart = 20.dp, topEnd = 20.dp)
         ) {
             Box {
-                HorizontalPager(state = playingPagerState) { page ->
+                HorizontalPager(state = playingPagerState!!) { page ->
                     when (page) {
                         0 -> PlayingScreen(
                             coverAlpha = 1 - alpha,
-                            viewModel = playingViewModel,
                             audioStatus = AudioStatus.PLAYING,
                         )
 
                         else -> PlayingScreen(
                             coverAlpha = 1 - alpha,
-                            viewModel = playingViewModel,
                             audioStatus = AudioStatus.STREAMING,
                         )
                     }

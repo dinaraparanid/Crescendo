@@ -1,7 +1,9 @@
 package com.paranid5.crescendo.presentation.ui
 
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.material.BottomSheetScaffold
 import androidx.compose.material.BottomSheetValue
 import androidx.compose.material.ExperimentalMaterialApi
@@ -19,6 +21,7 @@ import com.paranid5.crescendo.presentation.Screens
 import com.paranid5.crescendo.presentation.UpdateCheckerDialog
 import com.paranid5.crescendo.presentation.appbar.appBarHeight
 import com.paranid5.crescendo.presentation.composition_locals.LocalCurrentPlaylistSheetState
+import com.paranid5.crescendo.presentation.composition_locals.LocalPlayingPagerState
 import com.paranid5.crescendo.presentation.composition_locals.LocalPlayingSheetState
 import com.paranid5.crescendo.presentation.ui.permissions.requests.externalStoragePermissionsRequestLauncher
 import com.paranid5.crescendo.presentation.ui.theme.LocalAppColors
@@ -48,7 +51,7 @@ fun App(curScreenState: MutableStateFlow<Screens>, modifier: Modifier = Modifier
     }
 }
 
-@OptIn(ExperimentalMaterialApi::class)
+@OptIn(ExperimentalMaterialApi::class, ExperimentalFoundationApi::class)
 @Composable
 private fun ScreenScaffold(
     curScreenState: MutableStateFlow<Screens>,
@@ -66,6 +69,8 @@ private fun ScreenScaffold(
         initialValue = ModalBottomSheetValue.Hidden,
     )
 
+    val playingPagerState = rememberPagerState { 2 }
+
     val alpha = when {
         currentValue == BottomSheetValue.Collapsed && targetValue == BottomSheetValue.Collapsed -> 1F
         currentValue == BottomSheetValue.Expanded && targetValue == BottomSheetValue.Expanded -> 0F
@@ -75,7 +80,8 @@ private fun ScreenScaffold(
 
     CompositionLocalProvider(
         LocalPlayingSheetState provides playingScaffoldState,
-        LocalCurrentPlaylistSheetState provides curPlaylistScaffoldState
+        LocalCurrentPlaylistSheetState provides curPlaylistScaffoldState,
+        LocalPlayingPagerState provides playingPagerState
     ) {
         BottomSheetScaffold(
             modifier = modifier,

@@ -47,7 +47,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.paranid5.crescendo.R
 import com.paranid5.crescendo.presentation.ui.theme.LocalAppColors
-import kotlinx.coroutines.flow.update
 import org.koin.compose.koinInject
 
 @Composable
@@ -56,12 +55,10 @@ fun PitchAndSpeed(
     modifier: Modifier = Modifier,
 ) {
     val pitchInputText by viewModel
-        .presenter
         .pitchTextState
         .collectAsState()
 
     val speedInputText by viewModel
-        .presenter
         .speedTextState
         .collectAsState()
 
@@ -92,7 +89,7 @@ private fun PitchEditor(
     effectTitleRes = R.string.pitch,
     onValueChanged = { newPitch ->
         storePitchAsync(newPitch)
-        viewModel.presenter.pitchTextState.update { newPitch.toString().take(MAX_INPUT_LENGTH) }
+        viewModel.setPitchText(newPitch.toString().take(MAX_INPUT_LENGTH))
     },
     modifier = modifier
 )
@@ -107,7 +104,7 @@ private fun SpeedEditor(
     effectTitleRes = R.string.speed,
     onValueChanged = { newSpeed ->
         storeSpeedAsync(newSpeed)
-        viewModel.presenter.speedTextState.update { newSpeed.toString().take(MAX_INPUT_LENGTH) }
+        viewModel.setSpeedText(newSpeed.toString().take(MAX_INPUT_LENGTH))
     },
     modifier = modifier
 )

@@ -1,28 +1,25 @@
+@file:Suppress("LongLine")
+
 package com.paranid5.crescendo
 
 import android.content.Context
 import android.os.Build
 import androidx.annotation.StringRes
 import com.paranid5.crescendo.data.eq.EqualizerData
-import com.paranid5.crescendo.data.tracks.Track
 import com.paranid5.crescendo.domain.StorageHandler
 import com.paranid5.crescendo.domain.ktor_client.KtorClient
 import com.paranid5.crescendo.domain.services.stream_service.StreamServiceAccessor
 import com.paranid5.crescendo.domain.services.track_service.TrackServiceAccessor
 import com.paranid5.crescendo.domain.services.video_cache_service.VideoCacheServiceAccessor
-import com.paranid5.crescendo.presentation.audio_effects.AudioEffectsPresenter
 import com.paranid5.crescendo.presentation.audio_effects.AudioEffectsUIHandler
 import com.paranid5.crescendo.presentation.audio_effects.AudioEffectsViewModel
-import com.paranid5.crescendo.presentation.fetch_stream.FetchStreamPresenter
 import com.paranid5.crescendo.presentation.fetch_stream.FetchStreamUIHandler
 import com.paranid5.crescendo.presentation.fetch_stream.FetchStreamViewModel
 import com.paranid5.crescendo.presentation.main_activity.MainActivityViewModel
-import com.paranid5.crescendo.presentation.playing.PlayingPresenter
 import com.paranid5.crescendo.presentation.playing.PlayingUIHandler
-import com.paranid5.crescendo.presentation.playing.PlayingViewModel
-import com.paranid5.crescendo.presentation.tracks.TracksPresenter
 import com.paranid5.crescendo.presentation.tracks.TracksUIHandler
 import com.paranid5.crescendo.presentation.tracks.TracksViewModel
+import com.paranid5.crescendo.presentation.trimmer.TrimmerViewModel
 import com.paranid5.crescendo.presentation.ui.permissions.audioRecordingPermissionQueue
 import com.paranid5.crescendo.presentation.ui.permissions.description_providers.AudioRecordingDescriptionProvider
 import com.paranid5.crescendo.presentation.ui.permissions.description_providers.ExternalStorageDescriptionProvider
@@ -114,7 +111,7 @@ private val globalsModule = module {
 
     singleOf(::StorageHandler)
     single { androidApplication() as MainApplication }
-    factory { (context: Context) -> CoilUtils(context) }
+    factory { (context: Context, _: Boolean?) -> CoilUtils(context) }
     singleOf(::KtorClient)
 
     single(named(IS_PLAYING)) { MutableStateFlow(false) }
@@ -124,38 +121,33 @@ private val globalsModule = module {
 
 private val searchStreamModule = module {
     singleOf(::FetchStreamUIHandler)
-    factory { (currentText: String?) -> FetchStreamPresenter(currentText) }
     viewModelOf(::FetchStreamViewModel)
 }
 
 private val playingModule = module {
     singleOf(::PlayingUIHandler)
-
-    factory { (amplitudes: List<Int>, audioUrl: String?) ->
-        PlayingPresenter(get(named(IS_PLAYING)), amplitudes, audioUrl)
-    }
-
-    viewModelOf(::PlayingViewModel)
 }
 
 private val audioEffectsModule = module {
     singleOf(::AudioEffectsUIHandler)
-
-    factory { (pitchText: String?, speedText: String?) ->
-        AudioEffectsPresenter(pitchText, speedText)
-    }
-
     viewModelOf(::AudioEffectsViewModel)
+}
+
+private val trimmerModule = module {
+    viewModelOf(::TrimmerViewModel)
 }
 
 private val tracksModule = module {
     singleOf(::TracksUIHandler)
-    factory { (tracks: List<Track>, query: String?) -> TracksPresenter(tracks, query) }
     viewModelOf(::TracksViewModel)
 }
 
 private val uiMainModule = module {
-    includes(searchStreamModule, playingModule, audioEffectsModule, tracksModule)
+    includes(
+        searchStreamModule, playingModule,
+        audioEffectsModule, trimmerModule,
+        tracksModule
+    )
 }
 
 private val uiModule = module {

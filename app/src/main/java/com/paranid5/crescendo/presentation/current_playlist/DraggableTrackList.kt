@@ -1,5 +1,6 @@
 package com.paranid5.crescendo.presentation.current_playlist
 
+import android.annotation.SuppressLint
 import android.util.Log
 import androidx.compose.foundation.gestures.detectDragGesturesAfterLongPress
 import androidx.compose.foundation.lazy.LazyListState
@@ -46,6 +47,7 @@ typealias TrackItemView = @Composable (
     modifier: Modifier
 ) -> Unit
 
+@Suppress("NAME_SHADOWING", "LongLine")
 @Composable
 internal inline fun DraggableTrackList(
     tracks: List<Track>,
@@ -149,6 +151,7 @@ internal inline fun DraggableTrackList(
     )
 }
 
+@Suppress("NAME_SHADOWING", "LongLine")
 @Composable
 internal inline fun DraggableTrackList(
     tracks: List<Track>,
@@ -228,6 +231,7 @@ private fun LaunchDraggingHandling(
     }
 }
 
+@SuppressLint("LogConditional")
 private fun getMoveForCurTrack(
     currentTrackDragIndexState: MutableIntState,
     fromIdx: Int,

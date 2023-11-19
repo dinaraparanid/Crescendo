@@ -1,4 +1,4 @@
-package com.paranid5.crescendo.presentation.ui.utils
+package com.paranid5.crescendo.presentation.trimmer
 
 import androidx.compose.animation.core.AnimationSpec
 import androidx.compose.animation.core.animateFloatAsState
@@ -24,11 +24,9 @@ import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.graphics.drawscope.Fill
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.platform.LocalContext
-import com.paranid5.crescendo.presentation.playing.PlayingPresenter
 import com.paranid5.crescendo.presentation.ui.theme.LocalAppColors
 import com.paranid5.crescendo.presentation.ui.theme.TransparentUtility
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.withContext
 import linc.com.amplituda.Amplituda
 import linc.com.amplituda.callback.AmplitudaErrorListener
@@ -44,7 +42,7 @@ fun TrimWaveform(
     trimOffsetSecsState: MutableLongState,
     endPointSecsState: MutableLongState,
     lengthInSecs: Long,
-    playingPresenter: PlayingPresenter,
+    trimmerViewModel: TrimmerViewModel,
     modifier: Modifier = Modifier,
     spikeAnimationSpec: AnimationSpec<Float> = tween(500),
 ) {
@@ -54,8 +52,7 @@ fun TrimWaveform(
     val progressBrush = SolidColor(colors.primary)
 
     val amplituda by remember { derivedStateOf { Amplituda(context) } }
-    val amplitudesState = playingPresenter.amplitudesState
-    val amplitudes by amplitudesState.collectAsState()
+    val amplitudes by trimmerViewModel.amplitudesState.collectAsState()
 
     val trimOffsetSecs by trimOffsetSecsState
     val offset by remember { derivedStateOf { trimOffsetSecs safeDiv lengthInSecs } }
@@ -76,12 +73,12 @@ fun TrimWaveform(
 
     LaunchedEffect(key1 = url) {
         withContext(Dispatchers.IO) {
-            if (url != null) amplitudesState.update {
+            if (url != null) trimmerViewModel.setAmplitudes(
                 amplituda
                     .processAudio(url)
                     .get(AmplitudaErrorListener { it.printStackTrace() })
                     .amplitudesAsList()
-            }
+            )
         }
     }
 

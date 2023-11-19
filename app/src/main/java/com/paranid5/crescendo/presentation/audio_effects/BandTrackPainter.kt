@@ -1,5 +1,6 @@
 package com.paranid5.crescendo.presentation.audio_effects
 
+import android.annotation.SuppressLint
 import android.graphics.drawable.BitmapDrawable
 import android.util.Log
 import androidx.compose.runtime.Composable
@@ -21,6 +22,7 @@ import kotlinx.coroutines.withContext
 
 private const val TAG = "BandTrackPainter"
 
+@SuppressLint("LogConditional")
 @Composable
 fun getBandTrackModel(width: Int, height: Int): ImageRequest {
     val context = LocalContext.current
@@ -49,5 +51,5 @@ fun getBandTrackModel(width: Int, height: Int): ImageRequest {
 }
 
 @Composable
-fun rememberBandTrackPainter(width: Int, height: Int, ) =
+fun rememberBandTrackPainter(width: Int, height: Int) =
     rememberAsyncImagePainter(model = getBandTrackModel(width, height))

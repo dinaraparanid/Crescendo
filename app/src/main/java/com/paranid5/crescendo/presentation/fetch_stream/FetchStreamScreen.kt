@@ -1,6 +1,9 @@
+@file:Suppress("LongLine")
+
 package com.paranid5.crescendo.presentation.fetch_stream
 
 import android.content.res.Configuration
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -18,25 +21,19 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalConfiguration
-import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.paranid5.crescendo.R
 import com.paranid5.crescendo.domain.StorageHandler
-import com.paranid5.crescendo.presentation.Screens
-import com.paranid5.crescendo.presentation.StateChangedCallback
+import com.paranid5.crescendo.presentation.composition_locals.LocalPlayingPagerState
 import com.paranid5.crescendo.presentation.composition_locals.LocalPlayingSheetState
 import com.paranid5.crescendo.presentation.ui.AudioStatus
-import com.paranid5.crescendo.presentation.ui.OnUIStateChanged
 import com.paranid5.crescendo.presentation.ui.permissions.requests.audioRecordingPermissionsRequestLauncher
 import com.paranid5.crescendo.presentation.ui.permissions.requests.foregroundServicePermissionsRequestLauncher
 import com.paranid5.crescendo.presentation.ui.theme.LocalAppColors
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import org.koin.compose.koinInject
 
@@ -47,45 +44,27 @@ private val youtubeUrlRegex = Regex(
 @Composable
 fun SearchStreamScreen(
     viewModel: FetchStreamViewModel,
-    curScreenState: MutableStateFlow<Screens>,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
-    curScreenState.update { Screens.StreamFetching }
-
     val orientation = LocalConfiguration.current.orientation
 
     val inputText by viewModel
-        .presenter
         .currentTextState
         .collectAsState(initial = "")
 
     val isConfirmButtonActive by remember {
-        derivedStateOf { inputText?.matches(youtubeUrlRegex) == true }
+        derivedStateOf { inputText.matches(youtubeUrlRegex) }
     }
-
-    val lifecycleOwnerState by rememberUpdatedState(LocalLifecycleOwner.current)
-
-    OnUIStateChanged(
-        lifecycleOwner = lifecycleOwnerState,
-        StateChangedCallback(
-            uiHandler = viewModel.handler,
-            state = viewModel.isConfirmButtonPressedState,
-            onDispose = { viewModel.finishUrlSetting() }
-        ) {
-            startStreaming(url = inputText!!)
-            viewModel.finishUrlSetting()
-        }
-    )
 
     Box(
         modifier = modifier
             .fillMaxSize()
-            .let { mod ->
+            .then(
                 when (orientation) {
-                    Configuration.ORIENTATION_LANDSCAPE -> mod.padding(bottom = 15.dp)
-                    else -> mod
+                    Configuration.ORIENTATION_LANDSCAPE -> Modifier.padding(bottom = 15.dp)
+                    else -> Modifier
                 }
-            }
+            )
     ) {
         Column(Modifier.align(Alignment.Center)) {
             Label(Modifier.padding(bottom = 10.dp))
@@ -99,8 +78,8 @@ fun SearchStreamScreen(
             )
 
             ConfirmButton(
-                isConfirmButtonActive,
-                viewModel,
+                isConfirmButtonActive = isConfirmButtonActive,
+                inputText = inputText,
                 modifier = Modifier
                     .wrapContentWidth()
                     .align(Alignment.CenterHorizontally)
@@ -122,39 +101,42 @@ private fun UrlEditor(
     viewModel: FetchStreamViewModel,
     modifier: Modifier = Modifier,
     hint: String = stringResource(R.string.your_url),
-) {
-    TextField(
-        value = inputText ?: "",
-        singleLine = true,
-        placeholder = { Text(hint) },
-        onValueChange = { query -> viewModel.presenter.currentTextState.update { query } },
-        modifier = modifier.width(300.dp),
-    )
-}
+) = TextField(
+    value = inputText ?: "",
+    singleLine = true,
+    placeholder = { Text(hint) },
+    onValueChange = { query -> viewModel.setCurrentText(query) },
+    modifier = modifier.width(300.dp),
+)
 
-@OptIn(ExperimentalMaterialApi::class)
+@OptIn(ExperimentalMaterialApi::class, ExperimentalFoundationApi::class)
 @Composable
 private fun ConfirmButton(
     isConfirmButtonActive: Boolean,
-    viewModel: FetchStreamViewModel,
+    inputText: String,
     modifier: Modifier = Modifier,
-    storageHandler: StorageHandler = koinInject()
+    storageHandler: StorageHandler = koinInject(),
+    fetchStreamUIHandler: FetchStreamUIHandler = koinInject()
 ) {
     val playingSheetState = LocalPlayingSheetState.current
+    val playingPagerState = LocalPlayingPagerState.current
+
     val isForegroundServicePermissionDialogShownState = remember { mutableStateOf(false) }
     val isAudioRecordingPermissionDialogShownState = remember { mutableStateOf(false) }
     val scope = rememberCoroutineScope()
 
     Box(modifier) {
-        val (areForegroundPermissionsGranted, launchFSPermissions) = foregroundServicePermissionsRequestLauncher(
-            isForegroundServicePermissionDialogShownState,
-            modifier = Modifier.align(Alignment.Center)
-        )
+        val (areForegroundPermissionsGranted, launchFSPermissions) =
+            foregroundServicePermissionsRequestLauncher(
+                isForegroundServicePermissionDialogShownState,
+                modifier = Modifier.align(Alignment.Center)
+            )
 
-        val (isRecordingPermissionGranted, launchRecordPermissions) = audioRecordingPermissionsRequestLauncher(
-            isAudioRecordingPermissionDialogShownState,
-            modifier = Modifier.align(Alignment.Center)
-        )
+        val (isRecordingPermissionGranted, launchRecordPermissions) =
+            audioRecordingPermissionsRequestLauncher(
+                isAudioRecordingPermissionDialogShownState,
+                modifier = Modifier.align(Alignment.Center)
+            )
 
         Button(
             enabled = isConfirmButtonActive,
@@ -172,7 +154,8 @@ private fun ConfirmButton(
 
                 scope.launch {
                     storageHandler.storeAudioStatus(AudioStatus.STREAMING)
-                    viewModel.onConfirmUrlButtonPressed()
+                    fetchStreamUIHandler.startStreaming(inputText)
+                    playingPagerState?.animateScrollToPage(1)
                     playingSheetState?.bottomSheetState?.expand()
                 }
             }

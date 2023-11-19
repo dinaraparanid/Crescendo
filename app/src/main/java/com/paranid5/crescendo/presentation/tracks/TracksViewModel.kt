@@ -1,29 +1,35 @@
 package com.paranid5.crescendo.presentation.tracks
 
 import androidx.lifecycle.SavedStateHandle
-import com.googlecode.mp4parser.authoring.Track
-import com.paranid5.crescendo.presentation.ObservableViewModel
-import org.koin.core.component.inject
-import org.koin.core.parameter.parametersOf
+import androidx.lifecycle.ViewModel
+import com.paranid5.crescendo.data.tracks.Track
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.updateAndGet
 
-class TracksViewModel(savedStateHandle: SavedStateHandle) :
-    ObservableViewModel<TracksPresenter, TracksUIHandler>() {
+class TracksViewModel(private val savedStateHandle: SavedStateHandle) : ViewModel() {
     private companion object {
         private const val TRACKS = "tracks"
         private const val QUERY = "query"
     }
 
-    override val presenter by inject<TracksPresenter> {
-        val trackSavedByStateHandle = savedStateHandle
-            .getStateFlow<List<Track>>(TRACKS, listOf())
-            .value
-
-        val querySavedByStateHandle = savedStateHandle
-            .getStateFlow<String?>(QUERY, null)
-            .value
-
-        parametersOf(trackSavedByStateHandle, querySavedByStateHandle)
+    private val _tracksState by lazy {
+        MutableStateFlow(savedStateHandle[TRACKS] ?: listOf<Track>())
     }
 
-    override val handler by inject<TracksUIHandler>()
+    val tracksState = _tracksState.asStateFlow()
+
+    fun setTracks(tracks: List<Track>) {
+        savedStateHandle[TRACKS] = _tracksState.updateAndGet { tracks }
+    }
+
+    private val _queryState by lazy {
+        MutableStateFlow(savedStateHandle.get<String>(QUERY))
+    }
+
+    val queryState = _queryState.asStateFlow()
+
+    fun setQueryState(query: String?) {
+        savedStateHandle[QUERY] = _queryState.updateAndGet { query }
+    }
 }

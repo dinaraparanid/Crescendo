@@ -10,7 +10,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.BasicAlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
@@ -46,7 +46,6 @@ import org.koin.compose.koinInject
 @Composable
 fun CachePropertiesDialog(
     isDialogShownState: MutableState<Boolean>,
-    playingPresenter: PlayingPresenter,
     modifier: Modifier = Modifier,
     storageHandler: StorageHandler = koinInject()
 ) {
@@ -86,7 +85,7 @@ fun CachePropertiesDialog(
     }
 
     if (isDialogShownState.value)
-        AlertDialog(onDismissRequest = { isDialogShownState.value = false }) {
+        BasicAlertDialog(onDismissRequest = { isDialogShownState.value = false }) {
             Card(
                 modifier = modifier.fillMaxWidth(),
                 shape = RoundedCornerShape(20.dp),

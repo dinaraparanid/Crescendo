@@ -29,16 +29,15 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.paranid5.crescendo.R
 import com.paranid5.crescendo.presentation.ui.theme.LocalAppColors
-import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun <T> Searcher(
     allItemsState: StateFlow<List<T>>,
-    queryState: MutableStateFlow<String?>,
+    queryState: StateFlow<String?>,
+    setQuery: (String?) -> Unit,
     modifier: Modifier = Modifier,
     isSearchBarActiveState: MutableState<Boolean> = remember { mutableStateOf(false) },
     filter: (query: String, item: T) -> Boolean,
@@ -63,6 +62,7 @@ fun <T> Searcher(
             if (isSearchBarActiveState.value)
                 CancelSearchIcon(
                     queryState = queryState,
+                    setQuery = setQuery,
                     isSearchBarActiveState = isSearchBarActiveState,
                     modifier = Modifier.size(20.dp)
                 )
@@ -71,7 +71,7 @@ fun <T> Searcher(
         colors = searcherColors,
         windowInsets = WindowInsets(0.dp),
         onQueryChange = { query ->
-            queryState.update { query }
+            setQuery(query)
             scrollListScope.launch { trackListState.scrollToItem(0) }
         },
         active = isSearchBarActiveState.value,
@@ -96,10 +96,11 @@ private fun SearchIcon(modifier: Modifier = Modifier) {
 }
 
 @Composable
-private fun CancelSearchIcon(
-    queryState: MutableStateFlow<String?>,
+private inline fun CancelSearchIcon(
+    queryState: StateFlow<String?>,
     isSearchBarActiveState: MutableState<Boolean>,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    crossinline setQuery: (String?) -> Unit
 ) {
     val primaryColor = LocalAppColors.current.value.primary
 
@@ -110,7 +111,7 @@ private fun CancelSearchIcon(
         modifier = modifier.clickable {
             when {
                 queryState.value.isNullOrEmpty() -> isSearchBarActiveState.value = false
-                else -> queryState.update { null }
+                else -> setQuery(null)
             }
         }
     )

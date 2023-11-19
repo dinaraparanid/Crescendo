@@ -87,4 +87,5 @@
     <string name="duration">Duration</string>
     <string name="livestream_not_cache">Live streams cannot be cached</string>
     <string name="live">Live</string>
+    <string name="trim_track">Trim track</string>
 </resources>

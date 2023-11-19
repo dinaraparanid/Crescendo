@@ -46,7 +46,6 @@ const val CUR_POSITION_ARG = "cur_position"
 @Composable
 fun PlayingScreen(
     coverAlpha: Float,
-    viewModel: PlayingViewModel,
     audioStatus: AudioStatus?,
     modifier: Modifier = Modifier,
     storageHandler: StorageHandler = koinInject()
@@ -90,7 +89,6 @@ fun PlayingScreen(
             coverAlpha = coverAlpha,
             audioStatus = audioStatus,
             isLiveStreaming = isLiveStreaming,
-            viewModel = viewModel,
             modifier = modifier,
         )
 
@@ -101,7 +99,6 @@ fun PlayingScreen(
             coverAlpha = coverAlpha,
             audioStatus = audioStatus,
             isLiveStreaming = isLiveStreaming,
-            viewModel = viewModel,
             modifier = modifier,
         )
     }
@@ -115,7 +112,6 @@ private fun PlayingScreenPortrait(
     coverAlpha: Float,
     audioStatus: AudioStatus?,
     isLiveStreaming: Boolean,
-    viewModel: PlayingViewModel,
     modifier: Modifier,
     storageHandler: StorageHandler = koinInject()
 ) {
@@ -217,7 +213,6 @@ private fun PlayingScreenPortrait(
         )
 
         PlaybackButtons(
-            playingPresenter = viewModel.presenter,
             palette = palette,
             audioStatus = audioStatus,
             modifier = Modifier.constrainAs(playbackButtons) {
@@ -230,7 +225,6 @@ private fun PlayingScreenPortrait(
         UtilsButtons(
             palette = palette,
             audioStatus = audioStatus,
-            playingPresenter = viewModel.presenter,
             modifier = Modifier.constrainAs(utilsButtons) {
                 bottom.linkTo(parent.bottom, margin = 20.dp)
                 start.linkTo(parent.start, margin = 20.dp)
@@ -248,7 +242,6 @@ private fun PlayingScreenLandscape(
     coverAlpha: Float,
     audioStatus: AudioStatus?,
     isLiveStreaming: Boolean,
-    viewModel: PlayingViewModel,
     modifier: Modifier,
     storageHandler: StorageHandler = koinInject()
 ) {
@@ -366,7 +359,6 @@ private fun PlayingScreenLandscape(
         }
 
         PlaybackButtons(
-            playingPresenter = viewModel.presenter,
             palette = palette,
             audioStatus = audioStatus,
             modifier = Modifier.constrainAs(playbackButtons) {
@@ -379,7 +371,6 @@ private fun PlayingScreenLandscape(
         UtilsButtons(
             palette = palette,
             audioStatus = audioStatus,
-            playingPresenter = viewModel.presenter,
             modifier = Modifier.constrainAs(utilsButtons) {
                 top.linkTo(playbackButtons.bottom, margin = 2.dp)
                 start.linkTo(parent.start, margin = 20.dp)

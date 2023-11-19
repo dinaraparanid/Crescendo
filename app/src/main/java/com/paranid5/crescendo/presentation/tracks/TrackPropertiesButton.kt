@@ -78,6 +78,11 @@ private fun TrackPropertiesMenu(
             storageHandler = storageHandler,
             trackServiceAccessor = trackServiceAccessor
         )
+
+        TrimTrackItem(
+            track = track,
+            modifier = itemModifier
+        )
     }
 }
 
@@ -101,6 +106,20 @@ private fun AddToCurrentPlaylistItem(
                 val currentPlaylist = storageHandler.currentPlaylistState.value ?: listOf()
                 storageHandler.storeCurrentPlaylist(currentPlaylist + defaultTrack)
             }
+        }
+    )
+}
+
+@Composable
+private fun TrimTrackItem(
+    track: Track,
+    modifier: Modifier = Modifier,
+) {
+    DropdownMenuItem(
+        modifier = modifier,
+        text = { Text(stringResource(R.string.trim_track)) },
+        onClick = {
+            // TODO: trim track
         }
     )
 }

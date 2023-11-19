@@ -5,5 +5,4 @@ import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.runtime.compositionLocalOf
 
 @OptIn(ExperimentalMaterialApi::class)
-@JvmField
 val LocalPlayingSheetState = compositionLocalOf<BottomSheetScaffoldState?> { null }

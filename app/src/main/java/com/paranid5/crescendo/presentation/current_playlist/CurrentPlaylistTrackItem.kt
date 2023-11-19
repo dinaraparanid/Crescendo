@@ -1,3 +1,5 @@
+@file:Suppress("LongLine")
+
 package com.paranid5.crescendo.presentation.current_playlist
 
 import androidx.compose.foundation.clickable
