@@ -8,7 +8,7 @@ import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material3.DismissValue
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.SwipeToDismissBox
+import androidx.compose.material3.SwipeToDismiss
 import androidx.compose.material3.rememberDismissState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.rememberCoroutineScope
@@ -58,19 +58,20 @@ internal inline fun DismissableTrackList(
                 }
             )
 
-            SwipeToDismissBox(
+            SwipeToDismiss(
                 state = dismissState,
-                backgroundContent = {}
-            ) {
-                trackItemView(
-                    tracks,
-                    ind,
-                    scope,
-                    storageHandler,
-                    trackServiceAccessor,
-                    trackItemModifier.fillMaxWidth()
-                )
-            }
+                background = {},
+                dismissContent = {
+                    trackItemView(
+                        tracks,
+                        ind,
+                        scope,
+                        storageHandler,
+                        trackServiceAccessor,
+                        trackItemModifier.fillMaxWidth()
+                    )
+                }
+            )
         }
     }
 }

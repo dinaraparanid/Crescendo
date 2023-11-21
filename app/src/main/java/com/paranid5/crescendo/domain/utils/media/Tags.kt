@@ -155,12 +155,15 @@ fun Context.insertMediaFileToMediaStore(
                 put(MediaStore.MediaColumns.AUTHOR, videoMetadata.author)
 
             put(MediaStore.MediaColumns.DURATION, videoMetadata.lenInMillis)
-            put(MediaStore.MediaColumns.DATA, absoluteFilePath)
             put(MediaStore.MediaColumns.DISPLAY_NAME, videoMetadata.title)
             put(MediaStore.MediaColumns.MIME_TYPE, mimeType)
 
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q)
-                put(MediaStore.MediaColumns.RELATIVE_PATH, relativeFilePath)
+            when {
+                Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q ->
+                    put(MediaStore.MediaColumns.RELATIVE_PATH, relativeFilePath)
+
+                else -> put(MediaStore.MediaColumns.DATA, absoluteFilePath)
+            }
         }
     )!!
 
