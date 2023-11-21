@@ -1,6 +1,7 @@
 package com.paranid5.crescendo.presentation.tracks
 
 import androidx.compose.foundation.layout.Box
+import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
@@ -20,7 +21,13 @@ import com.paranid5.crescendo.data.tracks.DefaultTrack
 import com.paranid5.crescendo.data.tracks.Track
 import com.paranid5.crescendo.domain.StorageHandler
 import com.paranid5.crescendo.domain.services.track_service.TrackServiceAccessor
+import com.paranid5.crescendo.presentation.Screens
+import com.paranid5.crescendo.presentation.composition_locals.LocalActivity
+import com.paranid5.crescendo.presentation.composition_locals.LocalNavController
+import com.paranid5.crescendo.presentation.composition_locals.LocalPlayingSheetState
+import com.paranid5.crescendo.presentation.trimmer.TrimmerViewModel
 import kotlinx.coroutines.launch
+import org.koin.androidx.compose.koinViewModel
 import org.koin.compose.koinInject
 
 @Composable
@@ -41,7 +48,7 @@ fun TrackPropertiesButton(
             isPropertiesMenuShown = isPropertiesMenuShown,
             itemModifier = itemModifier,
             storageHandler = storageHandler,
-            trackServiceAccessor = trackServiceAccessor
+            trackServiceAccessor = trackServiceAccessor,
         )
 
         IconButton(
@@ -110,16 +117,26 @@ private fun AddToCurrentPlaylistItem(
     )
 }
 
+@OptIn(ExperimentalMaterialApi::class)
 @Composable
 private fun TrimTrackItem(
     track: Track,
     modifier: Modifier = Modifier,
 ) {
+    val activity = LocalActivity.current!!
+    val navController = LocalNavController.current
+    val playingSheetState = LocalPlayingSheetState.current
+
+    val trimmerViewModel = koinViewModel<TrimmerViewModel>(viewModelStoreOwner = activity)
+    val coroutineScope = rememberCoroutineScope()
+
     DropdownMenuItem(
         modifier = modifier,
         text = { Text(stringResource(R.string.trim_track)) },
         onClick = {
-            // TODO: trim track
+            trimmerViewModel.setTrack(track)
+            navController.navigateIfNotSame(Screens.Audio.Trimmer)
+            coroutineScope.launch { playingSheetState?.bottomSheetState?.collapse() }
         }
     )
 }

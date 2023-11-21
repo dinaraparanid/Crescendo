@@ -21,7 +21,7 @@ class FetchStreamViewModel(
         MutableStateFlow(savedByStateHandle ?: savedByStorageHandler)
     }
 
-    val currentTextState = _currentTextState.asStateFlow()
+    val currentTextState by lazy { _currentTextState.asStateFlow() }
 
     fun setCurrentText(currentText: String) {
         savedStateHandle[CURRENT_TEXT] = _currentTextState.updateAndGet { currentText }

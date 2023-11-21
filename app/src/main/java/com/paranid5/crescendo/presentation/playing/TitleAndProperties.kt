@@ -46,7 +46,7 @@ fun TitleAndAuthor(
             maxLines = 1,
             color = paletteColor,
             modifier = Modifier
-                .basicMarquee()
+                .basicMarquee(iterations = Int.MAX_VALUE)
                 .align(textAlignment)
         )
 
@@ -58,7 +58,7 @@ fun TitleAndAuthor(
             maxLines = 1,
             color = paletteColor,
             modifier = Modifier
-                .basicMarquee()
+                .basicMarquee(iterations = Int.MAX_VALUE)
                 .align(textAlignment)
         )
     }

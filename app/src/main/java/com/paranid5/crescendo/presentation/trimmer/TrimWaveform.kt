@@ -5,9 +5,9 @@ import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.width
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.MutableLongState
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
@@ -24,6 +24,7 @@ import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.graphics.drawscope.Fill
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.unit.dp
 import com.paranid5.crescendo.presentation.ui.theme.LocalAppColors
 import com.paranid5.crescendo.presentation.ui.theme.TransparentUtility
 import kotlinx.coroutines.Dispatchers
@@ -38,13 +39,12 @@ private const val DefaultGraphicsLayerAlpha = 0.99F
 
 @Composable
 fun TrimWaveform(
-    url: String?,
-    trimOffsetSecsState: MutableLongState,
-    endPointSecsState: MutableLongState,
-    lengthInSecs: Long,
-    trimmerViewModel: TrimmerViewModel,
+    model: String?,
+    durationInMillis: Long,
+    viewModel: TrimmerViewModel,
     modifier: Modifier = Modifier,
     spikeAnimationSpec: AnimationSpec<Float> = tween(500),
+    spikeWidthRatio: Int = 5
 ) {
     val context = LocalContext.current
     val colors = LocalAppColors.current.value
@@ -52,39 +52,46 @@ fun TrimWaveform(
     val progressBrush = SolidColor(colors.primary)
 
     val amplituda by remember { derivedStateOf { Amplituda(context) } }
-    val amplitudes by trimmerViewModel.amplitudesState.collectAsState()
+    val amplitudes by viewModel.amplitudesState.collectAsState()
+    var drawableAmplitudes by remember { mutableStateOf(listOf<Float>()) }
 
-    val trimOffsetSecs by trimOffsetSecsState
-    val offset by remember { derivedStateOf { trimOffsetSecs safeDiv lengthInSecs } }
+    val startMillis by viewModel.startPosInMillisState.collectAsState()
+    val offset by remember { derivedStateOf { startMillis safeDiv durationInMillis } }
 
-    val endPointSecs by endPointSecsState
-    val endPoint by remember { derivedStateOf { endPointSecs safeDiv lengthInSecs } }
+    val endMillis by viewModel.endPosInMillisState.collectAsState()
+    val endPoint by remember { derivedStateOf { endMillis safeDiv durationInMillis } }
 
     var canvasSize by remember { mutableStateOf(Size(0F, 0F)) }
     var spikes by remember { mutableFloatStateOf(0F) }
 
-    val spikesAmplitudes = remember(amplitudes, spikes) {
-        amplitudes.toDrawableAmplitudes(
-            spikes = spikes.toInt(),
-            minHeight = MinSpikeHeight,
-            maxHeight = canvasSize.height.coerceAtLeast(MinSpikeHeight)
-        )
-    }.map { animateFloatAsState(it, spikeAnimationSpec, label = "").value }
+    val spikesAmplitudes = drawableAmplitudes.map {
+        animateFloatAsState(it, spikeAnimationSpec, label = "").value
+    }
 
-    LaunchedEffect(key1 = url) {
+    LaunchedEffect(key1 = model) {
         withContext(Dispatchers.IO) {
-            if (url != null) trimmerViewModel.setAmplitudes(
+            if (model != null) viewModel.setAmplitudes(
                 amplituda
-                    .processAudio(url)
+                    .processAudio(model)
                     .get(AmplitudaErrorListener { it.printStackTrace() })
                     .amplitudesAsList()
             )
         }
     }
 
+    LaunchedEffect(key1 = amplitudes) {
+        withContext(Dispatchers.IO) {
+            drawableAmplitudes = amplitudes.toDrawableAmplitudes(
+                spikes = spikes.toInt(),
+                minHeight = MinSpikeHeight,
+                maxHeight = canvasSize.height.coerceAtLeast(MinSpikeHeight)
+            )
+        }
+    }
+
     Canvas(
         modifier
-            .fillMaxWidth()
+            .width((durationInMillis / 1000 * spikeWidthRatio).toInt().dp)
             .graphicsLayer(alpha = DefaultGraphicsLayerAlpha)
     ) {
         canvasSize = size

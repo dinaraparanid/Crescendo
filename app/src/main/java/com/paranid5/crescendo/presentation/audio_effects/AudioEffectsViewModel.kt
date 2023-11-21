@@ -29,13 +29,13 @@ class AudioEffectsViewModel(
         MutableStateFlow(savedByStateHandlerSpeedText ?: savedByStorageHandlerSpeed.toString())
     }
 
-    val pitchTextState = _pitchTextState.asStateFlow()
+    val pitchTextState by lazy { _pitchTextState.asStateFlow() }
 
     fun setPitchText(pitchText: String) {
         savedStateHandle[PITCH_TEXT] = _pitchTextState.updateAndGet { pitchText }
     }
 
-    val speedTextState = _speedTextState.asStateFlow()
+    val speedTextState by lazy { _speedTextState.asStateFlow() }
 
     fun setSpeedText(pitchText: String) {
         savedStateHandle[SPEED_TEXT] = _speedTextState.updateAndGet { pitchText }

@@ -11,6 +11,8 @@ class TrimmerViewModel(private val savedStateHandle: SavedStateHandle) : ViewMod
     private companion object {
         private const val TRACK = "track"
         private const val AMPLITUDES = "amplitudes"
+        private const val START_MILLIS = "start_millis"
+        private const val END_MILLIS = "end_millis"
     }
 
     private val _trackState by lazy {
@@ -31,5 +33,25 @@ class TrimmerViewModel(private val savedStateHandle: SavedStateHandle) : ViewMod
 
     fun setAmplitudes(amplitudes: List<Int>) {
         savedStateHandle[AMPLITUDES] = _amplitudesState.updateAndGet { amplitudes }
+    }
+
+    private val _startPosInMillisState by lazy {
+        MutableStateFlow(savedStateHandle[START_MILLIS] ?: 0L)
+    }
+
+    val startPosInMillisState by lazy { _startPosInMillisState.asStateFlow() }
+
+    fun setStartPosInMillis(startMillis: Long) {
+        savedStateHandle[START_MILLIS] = _startPosInMillisState.updateAndGet { startMillis }
+    }
+
+    private val _endPosInMillisState by lazy {
+        MutableStateFlow(savedStateHandle[END_MILLIS] ?: 0L)
+    }
+
+    val endPosInMillisState by lazy { _endPosInMillisState.asStateFlow() }
+
+    fun setEndPosInMillis(endMillis: Long) {
+        savedStateHandle[END_MILLIS] = _endPosInMillisState.updateAndGet { endMillis }
     }
 }

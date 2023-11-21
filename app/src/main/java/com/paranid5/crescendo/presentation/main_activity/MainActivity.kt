@@ -81,7 +81,7 @@ class MainActivity : ComponentActivity() {
                     LocalActivity provides this,
                 ) {
                     App(
-                        curScreenState = viewModel.curScreenState,
+                        viewModel = viewModel,
                         modifier = Modifier.fillMaxSize()
                     )
                 }

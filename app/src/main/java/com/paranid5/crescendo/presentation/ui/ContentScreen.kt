@@ -22,6 +22,7 @@ import com.paranid5.crescendo.presentation.composition_locals.LocalPlayingSheetS
 import com.paranid5.crescendo.presentation.favourites.FavouritesScreen
 import com.paranid5.crescendo.presentation.fetch_stream.FetchStreamViewModel
 import com.paranid5.crescendo.presentation.fetch_stream.SearchStreamScreen
+import com.paranid5.crescendo.presentation.main_activity.MainActivityViewModel
 import com.paranid5.crescendo.presentation.settings.SettingsScreen
 import com.paranid5.crescendo.presentation.track_collections.AlbumsScreen
 import com.paranid5.crescendo.presentation.tracks.TracksScreen
@@ -30,8 +31,6 @@ import com.paranid5.crescendo.presentation.trimmer.TrimmerScreen
 import com.paranid5.crescendo.presentation.trimmer.TrimmerViewModel
 import com.paranid5.crescendo.presentation.ui.utils.OnBackPressedHandler
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.update
 import org.koin.androidx.compose.koinViewModel
 import java.util.concurrent.atomic.AtomicInteger
 
@@ -39,7 +38,7 @@ import java.util.concurrent.atomic.AtomicInteger
 @Composable
 fun ContentScreen(
     padding: PaddingValues,
-    curScreenState: MutableStateFlow<Screens>,
+    viewModel: MainActivityViewModel,
     fetchStreamViewModel: FetchStreamViewModel = koinViewModel(),
     audioEffectsViewModel: AudioEffectsViewModel = koinViewModel(),
     trimmerViewModel: TrimmerViewModel = koinViewModel(),
@@ -88,7 +87,7 @@ fun ContentScreen(
         )
     ) {
         composable(route = Screens.Tracks.title) {
-            curScreenState.update { Screens.Tracks }
+            viewModel.setCurScreen(Screens.Tracks)
 
             TracksScreen(
                 tracksViewModel = tracksViewModel,
@@ -99,37 +98,43 @@ fun ContentScreen(
         }
 
         composable(route = Screens.TrackCollections.Albums.title) {
-            curScreenState.update { Screens.TrackCollections.Albums }
+            viewModel.setCurScreen(Screens.TrackCollections.Albums)
             AlbumsScreen()
         }
 
         composable(route = Screens.StreamFetching.title) {
-            curScreenState.update { Screens.StreamFetching }
+            viewModel.setCurScreen(Screens.StreamFetching)
             SearchStreamScreen(fetchStreamViewModel)
         }
 
         composable(route = Screens.Audio.AudioEffects.title) {
-            curScreenState.update { Screens.Audio.AudioEffects }
+            viewModel.setCurScreen(Screens.Audio.AudioEffects)
             AudioEffectsScreen(audioEffectsViewModel)
         }
 
         composable(route = Screens.Audio.Trimmer.title) {
-            curScreenState.update { Screens.Audio.Trimmer }
-            TrimmerScreen(trimmerViewModel)
+            viewModel.setCurScreen(Screens.Audio.Trimmer)
+
+            TrimmerScreen(
+                trimmerViewModel = trimmerViewModel,
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(top = 16.dp, start = 8.dp, end = 8.dp)
+            )
         }
 
         composable(route = Screens.AboutApp.title) {
-            curScreenState.update { Screens.AboutApp }
+            viewModel.setCurScreen(Screens.AboutApp)
             AboutApp()
         }
 
         composable(route = Screens.Favourites.title) {
-            curScreenState.update { Screens.Favourites }
+            viewModel.setCurScreen(Screens.Favourites)
             FavouritesScreen()
         }
 
         composable(route = Screens.Settings.title) {
-            curScreenState.update { Screens.Settings }
+            viewModel.setCurScreen(Screens.Settings)
             SettingsScreen()
         }
     }

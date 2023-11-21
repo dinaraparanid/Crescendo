@@ -17,18 +17,17 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import com.paranid5.crescendo.presentation.Screens
 import com.paranid5.crescendo.presentation.UpdateCheckerDialog
 import com.paranid5.crescendo.presentation.appbar.appBarHeight
 import com.paranid5.crescendo.presentation.composition_locals.LocalCurrentPlaylistSheetState
 import com.paranid5.crescendo.presentation.composition_locals.LocalPlayingPagerState
 import com.paranid5.crescendo.presentation.composition_locals.LocalPlayingSheetState
+import com.paranid5.crescendo.presentation.main_activity.MainActivityViewModel
 import com.paranid5.crescendo.presentation.ui.permissions.requests.externalStoragePermissionsRequestLauncher
 import com.paranid5.crescendo.presentation.ui.theme.LocalAppColors
-import kotlinx.coroutines.flow.MutableStateFlow
 
 @Composable
-fun App(curScreenState: MutableStateFlow<Screens>, modifier: Modifier = Modifier) {
+fun App(viewModel: MainActivityViewModel, modifier: Modifier = Modifier) {
     val isExternalStoragePermissionDialogShownState = remember { mutableStateOf(true) }
 
     Box(modifier) {
@@ -45,7 +44,7 @@ fun App(curScreenState: MutableStateFlow<Screens>, modifier: Modifier = Modifier
         }
 
         ScreenScaffold(
-            curScreenState = curScreenState,
+            viewModel = viewModel,
             modifier = Modifier.fillMaxSize()
         )
     }
@@ -54,7 +53,7 @@ fun App(curScreenState: MutableStateFlow<Screens>, modifier: Modifier = Modifier
 @OptIn(ExperimentalMaterialApi::class, ExperimentalFoundationApi::class)
 @Composable
 private fun ScreenScaffold(
-    curScreenState: MutableStateFlow<Screens>,
+    viewModel: MainActivityViewModel,
     modifier: Modifier = Modifier,
 ) {
     val backgroundColor = LocalAppColors.current.value.background
@@ -90,7 +89,7 @@ private fun ScreenScaffold(
             backgroundColor = backgroundColor,
             sheetBackgroundColor = backgroundColor,
             sheetContent = { PlayingBottomSheet(alpha) },
-            content = { ContentScreen(padding = it, curScreenState) }
+            content = { ContentScreen(padding = it, viewModel = viewModel) }
         )
     }
 }
