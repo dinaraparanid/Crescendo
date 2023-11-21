@@ -46,7 +46,11 @@ class TrimmerViewModel(private val savedStateHandle: SavedStateHandle) : ViewMod
     }
 
     private val _endPosInMillisState by lazy {
-        MutableStateFlow(savedStateHandle[END_MILLIS] ?: 0L)
+        MutableStateFlow(
+            savedStateHandle[END_MILLIS]
+                ?: trackState.value?.duration
+                ?: 0L
+        )
     }
 
     val endPosInMillisState by lazy { _endPosInMillisState.asStateFlow() }

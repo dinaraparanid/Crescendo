@@ -4,7 +4,6 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.util.Log
 import android.view.LayoutInflater
-import android.view.View
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.collectAsState
@@ -42,17 +41,12 @@ fun AudioWaveform(
         AndroidView(
             modifier = modifier,
             factory = { context ->
-                when {
-                    enabled -> context
-                        .findWaveVisualizer()
-                        .also { visualizer = it }
-                        .apply { recompose(color, audioSessionId) }
-
-                    else -> View(context)
-                }
+                context
+                    .findWaveVisualizer()
+                    .also { visualizer = it }
             },
             update = {
-                if (it is WaveVisualizer)
+                if (enabled)
                     it.recompose(color, audioSessionId)
             }
         )

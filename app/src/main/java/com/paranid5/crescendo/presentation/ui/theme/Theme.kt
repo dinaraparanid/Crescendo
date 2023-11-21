@@ -8,6 +8,7 @@ import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import org.koin.compose.KoinContext
 
 private val DarkColorScheme = darkColorScheme(
     primary = Purple80,
@@ -46,11 +47,13 @@ fun MediaStreamerTheme(
         }
     )
 
-    CompositionLocalProvider(LocalAppColors provides appColors) {
-        MaterialTheme(
-            colorScheme = appColors.value,
-            typography = Typography,
-            content = content
-        )
+    KoinContext {
+        CompositionLocalProvider(LocalAppColors provides appColors) {
+            MaterialTheme(
+                colorScheme = appColors.value,
+                typography = Typography,
+                content = content
+            )
+        }
     }
 }

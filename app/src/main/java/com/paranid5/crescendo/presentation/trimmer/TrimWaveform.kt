@@ -4,7 +4,11 @@ import androidx.compose.animation.core.AnimationSpec
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Canvas
-import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.gestures.detectHorizontalDragGestures
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.offset
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -20,13 +24,17 @@ import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.BlendMode
+import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.graphics.drawscope.Fill
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.zIndex
 import com.paranid5.crescendo.presentation.ui.theme.LocalAppColors
 import com.paranid5.crescendo.presentation.ui.theme.TransparentUtility
+import com.paranid5.crescendo.presentation.ui.utils.ext.pxToDp
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import linc.com.amplituda.Amplituda
@@ -48,6 +56,7 @@ fun TrimWaveform(
 ) {
     val context = LocalContext.current
     val colors = LocalAppColors.current.value
+
     val waveformBrush = SolidColor(TransparentUtility)
     val progressBrush = SolidColor(colors.primary)
 
@@ -67,6 +76,9 @@ fun TrimWaveform(
     val spikesAmplitudes = drawableAmplitudes.map {
         animateFloatAsState(it, spikeAnimationSpec, label = "").value
     }
+
+    val canvasWidth = durationInMillis / 1000 * spikeWidthRatio
+    val canvasWidthDp = (durationInMillis / 1000 * spikeWidthRatio).toInt().dp
 
     LaunchedEffect(key1 = model) {
         withContext(Dispatchers.IO) {
@@ -89,37 +101,130 @@ fun TrimWaveform(
         }
     }
 
-    Canvas(
-        modifier
-            .width((durationInMillis / 1000 * spikeWidthRatio).toInt().dp)
-            .graphicsLayer(alpha = DefaultGraphicsLayerAlpha)
-    ) {
-        canvasSize = size
-        spikes = size.width
+    Box(modifier) {
+        Canvas(
+            Modifier
+                .width(canvasWidthDp)
+                .padding(horizontal = 25.pxToDp())
+                .fillMaxHeight()
+                .graphicsLayer(alpha = DefaultGraphicsLayerAlpha)
+        ) {
+            canvasSize = size
+            spikes = size.width
 
-        spikesAmplitudes.forEachIndexed { index, amplitude ->
+            spikesAmplitudes.forEachIndexed { index, amplitude ->
+                drawRect(
+                    brush = waveformBrush,
+                    topLeft = Offset(
+                        x = index.toFloat(),
+                        y = size.height / 2F - amplitude / 2F
+                    ),
+                    size = Size(
+                        width = 1F,
+                        height = amplitude
+                    ),
+                    style = Fill
+                )
+
+                drawRect(
+                    brush = progressBrush,
+                    topLeft = Offset(offset * size.width, 0F),
+                    size = Size(
+                        width = (endPoint - offset) * size.width,
+                        height = size.height
+                    ),
+                    blendMode = BlendMode.SrcAtop
+                )
+            }
+        }
+
+        Canvas(
+            Modifier
+                .offset(x = (offset * canvasWidth).toInt().dp)
+                .fillMaxHeight()
+                .zIndex(10F)
+                .pointerInput(Unit) {
+                    detectHorizontalDragGestures { change, dragAmount ->
+                        change.consume()
+                        viewModel.setStartPosInMillis(
+                            (startMillis + (dragAmount * 200 / spikeWidthRatio))
+                                .toLong()
+                                .coerceAtLeast(0)
+                        )
+                    }
+                }
+        ) {
             drawRoundRect(
-                brush = waveformBrush,
-                topLeft = Offset(
-                    x = index.toFloat(),
-                    y = size.height / 2F - amplitude / 2F
-                ),
+                color = colors.primary,
+                topLeft = Offset(25F - 7F, 0F),
                 size = Size(
-                    width = 1F,
-                    height = amplitude
+                    width = 15F,
+                    height = size.height
                 ),
-                cornerRadius = CornerRadius(0F, 0F),
+                cornerRadius = CornerRadius(10F, 10F),
                 style = Fill
             )
 
-            drawRect(
+            drawCircle(
                 brush = progressBrush,
-                topLeft = Offset(offset * size.width, 0F),
+                radius = 25F,
+                center = Offset(25F, size.height - 16F)
+            )
+
+            drawPath(
+                path = Path().apply {
+                    moveTo(25F + 8F, size.height - 16F - 12F)
+                    lineTo(25F - 10F, size.height - 16F)
+                    lineTo(25F + 8F, size.height - 16F + 12F)
+                    close()
+                },
+                color = colors.inverseSurface,
+                style = Fill
+            )
+        }
+
+        Canvas(
+            Modifier
+                .offset(x = (endPoint * canvasWidth).toInt().dp)
+                .fillMaxHeight()
+                .zIndex(10F)
+                .pointerInput(Unit) {
+                    detectHorizontalDragGestures { change, dragAmount ->
+                        change.consume()
+                        viewModel.setEndPosInMillis(
+                            (endMillis + (dragAmount * 200 / spikeWidthRatio))
+                                .toLong()
+                                .coerceIn(startMillis + 1..durationInMillis)
+                        )
+                    }
+                }
+        ) {
+            drawRoundRect(
+                color = colors.primary,
+                topLeft = Offset(-25F - 7F, 0F),
                 size = Size(
-                    width = (endPoint - offset) * size.width,
+                    width = 15F,
                     height = size.height
                 ),
-                blendMode = BlendMode.SrcAtop
+                cornerRadius = CornerRadius(10F, 10F),
+                style = Fill
+            )
+
+            drawCircle(
+                brush = progressBrush,
+                radius = 25F,
+                center = Offset(-25F, size.height - 16F)
+            )
+
+            drawPath(
+                path = Path().apply {
+                    moveTo(-25F - 8F, size.height - 16F - 12F)
+                    lineTo(-25F + 10F, size.height - 16F)
+                    lineTo(-25F - 8F, size.height - 16F + 12F)
+                    close()
+                },
+                color = colors.inverseSurface,
+                style = Fill,
             )
         }
     }
