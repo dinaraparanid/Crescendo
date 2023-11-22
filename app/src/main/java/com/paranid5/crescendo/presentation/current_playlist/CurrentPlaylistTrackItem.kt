@@ -20,7 +20,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import com.paranid5.crescendo.data.tracks.Track
 import com.paranid5.crescendo.domain.StorageHandler
@@ -59,7 +58,7 @@ fun CurrentPlaylistTrackItem(
     }
 
     val textColor by remember {
-        derivedStateOf { if (isTrackCurrent) colors.primary else Color.White }
+        derivedStateOf { if (isTrackCurrent) colors.primary else colors.inverseSurface }
     }
 
     val isForegroundServicePermissionDialogShownState = remember { mutableStateOf(false) }

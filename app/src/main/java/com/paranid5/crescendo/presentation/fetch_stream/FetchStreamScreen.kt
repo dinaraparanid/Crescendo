@@ -14,6 +14,8 @@ import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material3.Button
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
+import androidx.compose.material3.TextFieldColors
+import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.derivedStateOf
@@ -25,7 +27,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.paranid5.crescendo.R
 import com.paranid5.crescendo.domain.StorageHandler
 import com.paranid5.crescendo.presentation.composition_locals.LocalPlayingPagerState
@@ -75,6 +79,7 @@ fun SearchStreamScreen(
                 modifier = Modifier
                     .align(Alignment.CenterHorizontally)
                     .padding(bottom = 10.dp)
+                    .width(300.dp)
             )
 
             ConfirmButton(
@@ -92,6 +97,8 @@ fun SearchStreamScreen(
 private fun Label(modifier: Modifier = Modifier) = Text(
     text = "${stringResource(R.string.enter_stream_url)}:",
     color = LocalAppColors.current.value.primary,
+    fontWeight = FontWeight.Bold,
+    fontSize = 16.sp,
     modifier = modifier
 )
 
@@ -101,13 +108,25 @@ private fun UrlEditor(
     viewModel: FetchStreamViewModel,
     modifier: Modifier = Modifier,
     hint: String = stringResource(R.string.your_url),
-) = TextField(
-    value = inputText ?: "",
-    singleLine = true,
-    placeholder = { Text(hint) },
-    onValueChange = { query -> viewModel.setCurrentText(query) },
-    modifier = modifier.width(300.dp),
-)
+) {
+    val colors = LocalAppColors.current.value
+
+    TextField(
+        value = inputText ?: "",
+        singleLine = true,
+        placeholder = { Text(hint) },
+        onValueChange = { query -> viewModel.setCurrentText(query) },
+        modifier = modifier,
+        colors = TextFieldDefaults.colors(
+            focusedTextColor = colors.inverseSurface,
+            unfocusedTextColor = colors.inverseSurface,
+            focusedContainerColor = colors.primary,
+            unfocusedContainerColor = colors.primary,
+            disabledContainerColor = colors.primary,
+            errorContainerColor = colors.primary,
+        )
+    )
+}
 
 @OptIn(ExperimentalMaterialApi::class, ExperimentalFoundationApi::class)
 @Composable
@@ -118,6 +137,7 @@ private fun ConfirmButton(
     storageHandler: StorageHandler = koinInject(),
     fetchStreamUIHandler: FetchStreamUIHandler = koinInject()
 ) {
+    val colors = LocalAppColors.current.value
     val playingSheetState = LocalPlayingSheetState.current
     val playingPagerState = LocalPlayingPagerState.current
 
@@ -160,7 +180,12 @@ private fun ConfirmButton(
                 }
             }
         ) {
-            Text(stringResource(R.string.confirm))
+            Text(
+                text = stringResource(R.string.confirm),
+                color = colors.inverseSurface,
+                fontSize = 14.sp,
+                fontWeight = FontWeight.Bold
+            )
         }
     }
 }

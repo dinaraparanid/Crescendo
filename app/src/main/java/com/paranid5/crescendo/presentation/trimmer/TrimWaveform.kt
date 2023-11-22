@@ -1,8 +1,5 @@
 package com.paranid5.crescendo.presentation.trimmer
 
-import androidx.compose.animation.core.AnimationSpec
-import androidx.compose.animation.core.animateFloatAsState
-import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.gestures.detectHorizontalDragGestures
 import androidx.compose.foundation.layout.Box
@@ -12,6 +9,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.MutableFloatState
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
@@ -42,8 +41,19 @@ import linc.com.amplituda.callback.AmplitudaErrorListener
 import kotlin.math.ceil
 import kotlin.math.roundToInt
 
-private const val MinSpikeHeight = 1F
-private const val DefaultGraphicsLayerAlpha = 0.99F
+private const val MIN_SPIKE_HEIGHT = 1F
+private const val DEFAULT_GRAPHICS_LAYER_ALPHA = 0.99F
+
+private const val CONTROLLER_RECT_WIDTH = 15F
+private const val CONTROLLER_RECT_OFFSET = 7F
+
+private const val CONTROLLER_CIRCLE_RADIUS = 25F
+private const val CONTROLLER_CIRCLE_CENTER = 16F
+private const val CONTROLLER_HEIGHT_OFFSET = CONTROLLER_CIRCLE_RADIUS + CONTROLLER_CIRCLE_CENTER
+
+private const val CONTROLLER_ARROW_CORNER_BACK_OFFSET = 8F
+private const val CONTROLLER_ARROW_CORNER_FRONT_OFFSET = 10F
+private const val CONTROLLER_ARROW_CORNER_OFFSET = 12F
 
 @Composable
 fun TrimWaveform(
@@ -51,18 +61,13 @@ fun TrimWaveform(
     durationInMillis: Long,
     viewModel: TrimmerViewModel,
     modifier: Modifier = Modifier,
-    spikeAnimationSpec: AnimationSpec<Float> = tween(500),
-    spikeWidthRatio: Int = 5
+    spikeWidthRatio: Int = 5,
 ) {
     val context = LocalContext.current
-    val colors = LocalAppColors.current.value
-
-    val waveformBrush = SolidColor(TransparentUtility)
-    val progressBrush = SolidColor(colors.primary)
 
     val amplituda by remember { derivedStateOf { Amplituda(context) } }
     val amplitudes by viewModel.amplitudesState.collectAsState()
-    var drawableAmplitudes by remember { mutableStateOf(listOf<Float>()) }
+    var spikesAmplitudes by remember { mutableStateOf(listOf<Float>()) }
 
     val startMillis by viewModel.startPosInMillisState.collectAsState()
     val offset by remember { derivedStateOf { startMillis safeDiv durationInMillis } }
@@ -70,15 +75,11 @@ fun TrimWaveform(
     val endMillis by viewModel.endPosInMillisState.collectAsState()
     val endPoint by remember { derivedStateOf { endMillis safeDiv durationInMillis } }
 
-    var canvasSize by remember { mutableStateOf(Size(0F, 0F)) }
-    var spikes by remember { mutableFloatStateOf(0F) }
-
-    val spikesAmplitudes = drawableAmplitudes.map {
-        animateFloatAsState(it, spikeAnimationSpec, label = "").value
-    }
+    val canvasSizeState = remember { mutableStateOf(Size(1F, 1F)) }
+    val spikesState = remember { mutableFloatStateOf(1F) }
 
     val canvasWidth = durationInMillis / 1000 * spikeWidthRatio
-    val canvasWidthDp = (durationInMillis / 1000 * spikeWidthRatio).toInt().dp
+    val canvasWidthDp = canvasWidth.toInt().dp
 
     LaunchedEffect(key1 = model) {
         withContext(Dispatchers.IO) {
@@ -93,140 +94,245 @@ fun TrimWaveform(
 
     LaunchedEffect(key1 = amplitudes) {
         withContext(Dispatchers.IO) {
-            drawableAmplitudes = amplitudes.toDrawableAmplitudes(
-                spikes = spikes.toInt(),
-                minHeight = MinSpikeHeight,
-                maxHeight = canvasSize.height.coerceAtLeast(MinSpikeHeight)
+            spikesAmplitudes = amplitudes.toDrawableAmplitudes(
+                spikes = spikesState.floatValue.toInt(),
+                minHeight = MIN_SPIKE_HEIGHT,
+                maxHeight = canvasSizeState.value.height
+                    .coerceAtLeast(MIN_SPIKE_HEIGHT) - CONTROLLER_HEIGHT_OFFSET
             )
         }
     }
 
     Box(modifier) {
-        Canvas(
-            Modifier
+        Waveform(
+            viewModel = viewModel,
+            durationInMillis = durationInMillis,
+            canvasSizeState = canvasSizeState,
+            spikesState = spikesState,
+            spikesAmplitudes = spikesAmplitudes,
+            modifier = Modifier
                 .width(canvasWidthDp)
-                .padding(horizontal = 25.pxToDp())
-                .fillMaxHeight()
-                .graphicsLayer(alpha = DefaultGraphicsLayerAlpha)
-        ) {
-            canvasSize = size
-            spikes = size.width
-
-            spikesAmplitudes.forEachIndexed { index, amplitude ->
-                drawRect(
-                    brush = waveformBrush,
-                    topLeft = Offset(
-                        x = index.toFloat(),
-                        y = size.height / 2F - amplitude / 2F
-                    ),
-                    size = Size(
-                        width = 1F,
-                        height = amplitude
-                    ),
-                    style = Fill
+                .padding(
+                    horizontal = CONTROLLER_CIRCLE_RADIUS
+                        .toInt()
+                        .pxToDp()
                 )
+                .fillMaxHeight()
+        )
 
-                drawRect(
-                    brush = progressBrush,
-                    topLeft = Offset(offset * size.width, 0F),
-                    size = Size(
-                        width = (endPoint - offset) * size.width,
-                        height = size.height
-                    ),
-                    blendMode = BlendMode.SrcAtop
+        StartBorder(
+            viewModel = viewModel,
+            spikeWidthRatio = spikeWidthRatio,
+            modifier = Modifier
+                .offset(x = (offset * (canvasWidth - CONTROLLER_CIRCLE_CENTER)).toInt().dp)
+                .fillMaxHeight()
+                .zIndex(10F)
+        )
+
+        EndBorder(
+            viewModel = viewModel,
+            spikeWidthRatio = spikeWidthRatio,
+            durationInMillis = durationInMillis,
+            modifier = Modifier
+                .offset(x = (endPoint * (canvasWidth) + (1 - endPoint) * CONTROLLER_CIRCLE_CENTER).toInt().dp)
+                .fillMaxHeight()
+                .zIndex(10F)
+        )
+    }
+}
+
+@Composable
+private fun Waveform(
+    viewModel: TrimmerViewModel,
+    durationInMillis: Long,
+    canvasSizeState: MutableState<Size>,
+    spikesState: MutableFloatState,
+    spikesAmplitudes: List<Float>,
+    modifier: Modifier = Modifier
+) {
+    val colors = LocalAppColors.current.value
+    val waveformBrush = SolidColor(colors.inverseSurface)
+    val progressBrush = SolidColor(colors.primary.copy(alpha = 0.25F))
+    val progressWaveformBrush = SolidColor(colors.onBackground)
+
+    val startMillis by viewModel.startPosInMillisState.collectAsState()
+    val offset by remember(startMillis) { derivedStateOf { startMillis safeDiv durationInMillis } }
+
+    val endMillis by viewModel.endPosInMillisState.collectAsState()
+    val endPoint by remember(endMillis) { derivedStateOf { endMillis safeDiv durationInMillis } }
+
+    Canvas(modifier.graphicsLayer(alpha = DEFAULT_GRAPHICS_LAYER_ALPHA)) {
+        canvasSizeState.value = size
+        spikesState.floatValue = size.width
+
+        spikesAmplitudes.forEachIndexed { index, amplitude ->
+            drawRect(
+                brush = waveformBrush,
+                topLeft = Offset(
+                    x = index.toFloat(),
+                    y = (size.height - CONTROLLER_HEIGHT_OFFSET) / 2F - amplitude / 2F
+                ),
+                size = Size(
+                    width = 1F,
+                    height = amplitude
+                ),
+                style = Fill
+            )
+        }
+
+        drawRect(
+            brush = progressWaveformBrush,
+            topLeft = Offset(offset * size.width, 0F),
+            size = Size(
+                width = (endPoint - offset) * size.width,
+                height = size.height - CONTROLLER_HEIGHT_OFFSET
+            ),
+            blendMode = BlendMode.SrcAtop
+        )
+    }
+
+    Canvas(modifier.graphicsLayer(alpha = DEFAULT_GRAPHICS_LAYER_ALPHA)) {
+        drawRect(
+            brush = progressBrush,
+            topLeft = Offset(offset * size.width, 0F),
+            size = Size(
+                width = (endPoint - offset) * size.width,
+                height = size.height - CONTROLLER_HEIGHT_OFFSET
+            )
+        )
+    }
+}
+
+@Composable
+private fun StartBorder(
+    viewModel: TrimmerViewModel,
+    spikeWidthRatio: Int,
+    modifier: Modifier = Modifier,
+) {
+    val colors = LocalAppColors.current.value
+    val progressBrush = SolidColor(colors.primary)
+
+    val startMillis by viewModel.startPosInMillisState.collectAsState()
+    val endMillis by viewModel.endPosInMillisState.collectAsState()
+
+    Canvas(
+        modifier.pointerInput(Unit) {
+            detectHorizontalDragGestures { change, dragAmount ->
+                change.consume()
+                viewModel.setStartPosInMillis(
+                    (startMillis + (dragAmount * 200 / spikeWidthRatio))
+                        .toLong()
+                        .coerceIn(0 until endMillis)
                 )
             }
         }
+    ) {
+        drawRoundRect(
+            color = colors.primary,
+            topLeft = Offset(CONTROLLER_CIRCLE_CENTER - CONTROLLER_RECT_OFFSET, 0F),
+            size = Size(
+                width = CONTROLLER_RECT_WIDTH,
+                height = size.height
+            ),
+            cornerRadius = CornerRadius(10F, 10F),
+            style = Fill
+        )
 
-        Canvas(
-            Modifier
-                .offset(x = (offset * canvasWidth).toInt().dp)
-                .fillMaxHeight()
-                .zIndex(10F)
-                .pointerInput(Unit) {
-                    detectHorizontalDragGestures { change, dragAmount ->
-                        change.consume()
-                        viewModel.setStartPosInMillis(
-                            (startMillis + (dragAmount * 200 / spikeWidthRatio))
-                                .toLong()
-                                .coerceAtLeast(0)
-                        )
-                    }
-                }
-        ) {
-            drawRoundRect(
-                color = colors.primary,
-                topLeft = Offset(25F - 7F, 0F),
-                size = Size(
-                    width = 15F,
-                    height = size.height
-                ),
-                cornerRadius = CornerRadius(10F, 10F),
-                style = Fill
-            )
+        drawCircle(
+            brush = progressBrush,
+            radius = CONTROLLER_CIRCLE_RADIUS,
+            center = Offset(CONTROLLER_CIRCLE_CENTER, size.height - CONTROLLER_CIRCLE_CENTER)
+        )
 
-            drawCircle(
-                brush = progressBrush,
-                radius = 25F,
-                center = Offset(25F, size.height - 16F)
-            )
+        drawPath(
+            path = Path().apply {
+                moveTo(
+                    x = CONTROLLER_CIRCLE_CENTER + CONTROLLER_ARROW_CORNER_BACK_OFFSET,
+                    y = size.height - CONTROLLER_CIRCLE_CENTER - CONTROLLER_ARROW_CORNER_OFFSET
+                )
 
-            drawPath(
-                path = Path().apply {
-                    moveTo(25F + 8F, size.height - 16F - 12F)
-                    lineTo(25F - 10F, size.height - 16F)
-                    lineTo(25F + 8F, size.height - 16F + 12F)
-                    close()
-                },
-                color = colors.inverseSurface,
-                style = Fill
-            )
+                lineTo(
+                    x = CONTROLLER_CIRCLE_CENTER - CONTROLLER_ARROW_CORNER_FRONT_OFFSET,
+                    size.height - CONTROLLER_CIRCLE_CENTER
+                )
+
+                lineTo(
+                    CONTROLLER_CIRCLE_CENTER + CONTROLLER_ARROW_CORNER_BACK_OFFSET,
+                    size.height - CONTROLLER_CIRCLE_CENTER + CONTROLLER_ARROW_CORNER_OFFSET
+                )
+
+                close()
+            },
+            color = colors.inverseSurface,
+            style = Fill
+        )
+    }
+}
+
+@Composable
+private fun EndBorder(
+    viewModel: TrimmerViewModel,
+    spikeWidthRatio: Int,
+    durationInMillis: Long,
+    modifier: Modifier = Modifier,
+) {
+    val colors = LocalAppColors.current.value
+    val progressBrush = SolidColor(colors.primary)
+
+    val startMillis by viewModel.startPosInMillisState.collectAsState()
+    val endMillis by viewModel.endPosInMillisState.collectAsState()
+
+    Canvas(
+        modifier.pointerInput(Unit) {
+            detectHorizontalDragGestures { change, dragAmount ->
+                change.consume()
+                viewModel.setEndPosInMillis(
+                    (endMillis + (dragAmount * 200 / spikeWidthRatio))
+                        .toLong()
+                        .coerceIn(startMillis + 1..durationInMillis)
+                )
+            }
         }
+    ) {
+        drawRoundRect(
+            color = colors.primary,
+            topLeft = Offset(-CONTROLLER_CIRCLE_CENTER - CONTROLLER_RECT_OFFSET, 0F),
+            size = Size(
+                width = CONTROLLER_RECT_WIDTH,
+                height = size.height
+            ),
+            cornerRadius = CornerRadius(10F, 10F),
+            style = Fill
+        )
 
-        Canvas(
-            Modifier
-                .offset(x = (endPoint * canvasWidth).toInt().dp)
-                .fillMaxHeight()
-                .zIndex(10F)
-                .pointerInput(Unit) {
-                    detectHorizontalDragGestures { change, dragAmount ->
-                        change.consume()
-                        viewModel.setEndPosInMillis(
-                            (endMillis + (dragAmount * 200 / spikeWidthRatio))
-                                .toLong()
-                                .coerceIn(startMillis + 1..durationInMillis)
-                        )
-                    }
-                }
-        ) {
-            drawRoundRect(
-                color = colors.primary,
-                topLeft = Offset(-25F - 7F, 0F),
-                size = Size(
-                    width = 15F,
-                    height = size.height
-                ),
-                cornerRadius = CornerRadius(10F, 10F),
-                style = Fill
-            )
+        drawCircle(
+            brush = progressBrush,
+            radius = CONTROLLER_CIRCLE_RADIUS,
+            center = Offset(-CONTROLLER_CIRCLE_CENTER, size.height - CONTROLLER_CIRCLE_CENTER)
+        )
 
-            drawCircle(
-                brush = progressBrush,
-                radius = 25F,
-                center = Offset(-25F, size.height - 16F)
-            )
+        drawPath(
+            path = Path().apply {
+                moveTo(
+                    x = -CONTROLLER_CIRCLE_CENTER - CONTROLLER_ARROW_CORNER_BACK_OFFSET,
+                    y = size.height - CONTROLLER_CIRCLE_CENTER - CONTROLLER_ARROW_CORNER_OFFSET
+                )
 
-            drawPath(
-                path = Path().apply {
-                    moveTo(-25F - 8F, size.height - 16F - 12F)
-                    lineTo(-25F + 10F, size.height - 16F)
-                    lineTo(-25F - 8F, size.height - 16F + 12F)
-                    close()
-                },
-                color = colors.inverseSurface,
-                style = Fill,
-            )
-        }
+                lineTo(
+                    x = -CONTROLLER_CIRCLE_CENTER + CONTROLLER_ARROW_CORNER_FRONT_OFFSET,
+                    size.height - CONTROLLER_CIRCLE_CENTER
+                )
+
+                lineTo(
+                    x = -CONTROLLER_CIRCLE_CENTER - CONTROLLER_ARROW_CORNER_BACK_OFFSET,
+                    y = size.height - CONTROLLER_CIRCLE_CENTER + CONTROLLER_ARROW_CORNER_OFFSET
+                )
+
+                close()
+            },
+            color = colors.inverseSurface,
+            style = Fill,
+        )
     }
 }
 

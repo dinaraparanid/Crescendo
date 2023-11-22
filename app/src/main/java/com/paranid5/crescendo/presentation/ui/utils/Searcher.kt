@@ -43,6 +43,8 @@ fun <T> Searcher(
     filter: (query: String, item: T) -> Boolean,
     filteredContent: @Composable (ColumnScope.(List<T>, LazyListState) -> Unit)
 ) {
+    val colors = LocalAppColors.current.value
+
     val queryText by queryState.collectAsState()
     val allItems by allItemsState.collectAsState()
     val shownItems = remember { mutableStateOf(listOf<T>()) }
@@ -67,7 +69,12 @@ fun <T> Searcher(
                     modifier = Modifier.size(20.dp)
                 )
         },
-        placeholder = { Text(stringResource(R.string.track_input_filter_hint)) },
+        placeholder = {
+            Text(
+                text = stringResource(R.string.track_input_filter_hint),
+                color = colors.inverseSurface
+            )
+        },
         colors = searcherColors,
         windowInsets = WindowInsets(0.dp),
         onQueryChange = { query ->

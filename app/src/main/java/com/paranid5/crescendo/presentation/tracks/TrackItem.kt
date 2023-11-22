@@ -65,7 +65,7 @@ fun DefaultTrackItem(
     }
 
     val textColor by remember {
-        derivedStateOf { if (isTrackCurrent) colors.primary else Color.White }
+        derivedStateOf { if (isTrackCurrent) colors.primary else colors.inverseSurface }
     }
 
     val isForegroundServicePermissionDialogShownState = remember { mutableStateOf(false) }
