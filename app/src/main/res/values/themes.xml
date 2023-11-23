@@ -1,5 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-
-    <style name="Theme.MediaStreamer" parent="android:Theme.Material.Light.NoActionBar" />
+    <style name="Theme.MediaStreamer" parent="Theme.MaterialComponents.DayNight.NoActionBar" >
+        <item name="android:colorPrimary">@color/crescendo_primary</item>
+        <item name="android:colorBackground">@color/crescendo_background</item>
+        <item name="android:statusBarColor">@color/crescendo_background</item>
+    </style>
 </resources>

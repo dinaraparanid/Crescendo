@@ -13,9 +13,6 @@ import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material3.Button
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextField
-import androidx.compose.material3.TextFieldColors
-import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.derivedStateOf
@@ -38,6 +35,7 @@ import com.paranid5.crescendo.presentation.ui.AudioStatus
 import com.paranid5.crescendo.presentation.ui.permissions.requests.audioRecordingPermissionsRequestLauncher
 import com.paranid5.crescendo.presentation.ui.permissions.requests.foregroundServicePermissionsRequestLauncher
 import com.paranid5.crescendo.presentation.ui.theme.LocalAppColors
+import com.paranid5.crescendo.presentation.ui.utils.DefaultOutlinedTextField
 import kotlinx.coroutines.launch
 import org.koin.compose.koinInject
 
@@ -71,8 +69,6 @@ fun SearchStreamScreen(
             )
     ) {
         Column(Modifier.align(Alignment.Center)) {
-            Label(Modifier.padding(bottom = 10.dp))
-
             UrlEditor(
                 inputText = inputText,
                 viewModel = viewModel,
@@ -95,10 +91,9 @@ fun SearchStreamScreen(
 
 @Composable
 private fun Label(modifier: Modifier = Modifier) = Text(
-    text = "${stringResource(R.string.enter_stream_url)}:",
+    text = stringResource(R.string.enter_stream_url),
     color = LocalAppColors.current.value.primary,
-    fontWeight = FontWeight.Bold,
-    fontSize = 16.sp,
+    fontSize = 12.sp,
     modifier = modifier
 )
 
@@ -108,25 +103,13 @@ private fun UrlEditor(
     viewModel: FetchStreamViewModel,
     modifier: Modifier = Modifier,
     hint: String = stringResource(R.string.your_url),
-) {
-    val colors = LocalAppColors.current.value
-
-    TextField(
-        value = inputText ?: "",
-        singleLine = true,
-        placeholder = { Text(hint) },
-        onValueChange = { query -> viewModel.setCurrentText(query) },
-        modifier = modifier,
-        colors = TextFieldDefaults.colors(
-            focusedTextColor = colors.inverseSurface,
-            unfocusedTextColor = colors.inverseSurface,
-            focusedContainerColor = colors.primary,
-            unfocusedContainerColor = colors.primary,
-            disabledContainerColor = colors.primary,
-            errorContainerColor = colors.primary,
-        )
-    )
-}
+) = DefaultOutlinedTextField(
+    value = inputText ?: "",
+    onValueChange = { query -> viewModel.setCurrentText(query) },
+    placeholder = { Text(hint) },
+    label = { Label() },
+    modifier = modifier
+)
 
 @OptIn(ExperimentalMaterialApi::class, ExperimentalFoundationApi::class)
 @Composable

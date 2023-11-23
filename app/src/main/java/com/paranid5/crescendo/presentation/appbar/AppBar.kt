@@ -25,7 +25,7 @@ fun AppBar(modifier: Modifier = Modifier) {
     val colors = LocalAppColors.current.value
 
     BottomAppBar(
-        containerColor = colors.onBackground,
+        containerColor = colors.primary,
         modifier = modifier
             .fillMaxWidth()
             .height(appBarHeight)

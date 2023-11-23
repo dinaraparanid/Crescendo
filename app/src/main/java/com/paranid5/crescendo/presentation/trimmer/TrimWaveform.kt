@@ -32,7 +32,6 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
 import com.paranid5.crescendo.presentation.ui.theme.LocalAppColors
-import com.paranid5.crescendo.presentation.ui.theme.TransparentUtility
 import com.paranid5.crescendo.presentation.ui.utils.ext.pxToDp
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -113,7 +112,7 @@ fun TrimWaveform(
             modifier = Modifier
                 .width(canvasWidthDp)
                 .padding(
-                    horizontal = CONTROLLER_CIRCLE_RADIUS
+                    horizontal = (CONTROLLER_CIRCLE_RADIUS + CONTROLLER_CIRCLE_CENTER / 2)
                         .toInt()
                         .pxToDp()
                 )
@@ -124,7 +123,11 @@ fun TrimWaveform(
             viewModel = viewModel,
             spikeWidthRatio = spikeWidthRatio,
             modifier = Modifier
-                .offset(x = (offset * (canvasWidth - CONTROLLER_CIRCLE_CENTER)).toInt().dp)
+                .offset(
+                    x = (CONTROLLER_CIRCLE_CENTER / 2 + offset * (canvasWidth - CONTROLLER_CIRCLE_RADIUS))
+                        .toInt()
+                        .dp
+                )
                 .fillMaxHeight()
                 .zIndex(10F)
         )
@@ -134,7 +137,11 @@ fun TrimWaveform(
             spikeWidthRatio = spikeWidthRatio,
             durationInMillis = durationInMillis,
             modifier = Modifier
-                .offset(x = (endPoint * (canvasWidth) + (1 - endPoint) * CONTROLLER_CIRCLE_CENTER).toInt().dp)
+                .offset(
+                    x = (endPoint * (canvasWidth) + (1 - endPoint) * CONTROLLER_CIRCLE_RADIUS - CONTROLLER_CIRCLE_CENTER / 2)
+                        .toInt()
+                        .dp
+                )
                 .fillMaxHeight()
                 .zIndex(10F)
         )
@@ -151,9 +158,9 @@ private fun Waveform(
     modifier: Modifier = Modifier
 ) {
     val colors = LocalAppColors.current.value
-    val waveformBrush = SolidColor(colors.inverseSurface)
+    val waveformBrush = SolidColor(colors.onBackground)
     val progressBrush = SolidColor(colors.primary.copy(alpha = 0.25F))
-    val progressWaveformBrush = SolidColor(colors.onBackground)
+    val progressWaveformBrush = SolidColor(colors.secondary)
 
     val startMillis by viewModel.startPosInMillisState.collectAsState()
     val offset by remember(startMillis) { derivedStateOf { startMillis safeDiv durationInMillis } }

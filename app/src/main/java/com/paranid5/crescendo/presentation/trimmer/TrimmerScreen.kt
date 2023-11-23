@@ -20,42 +20,21 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.paranid5.crescendo.data.utils.extensions.timeString
 import com.paranid5.crescendo.presentation.ui.theme.LocalAppColors
 
-@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun TrimmerScreen(trimmerViewModel: TrimmerViewModel, modifier: Modifier = Modifier) {
-    val colors = LocalAppColors.current.value
     val track by trimmerViewModel.trackState.collectAsState()
     val waveformScrollState = rememberScrollState()
 
     Column(modifier) {
-        Column(
-            Modifier
+        TitleArtistColumn(
+            trimmerViewModel = trimmerViewModel,
+            modifier = Modifier
                 .padding(top = 24.dp)
                 .fillMaxWidth()
-        ) {
-            Text(
-                text = track!!.title,
-                fontSize = 20.sp,
-                color = colors.inverseSurface,
-                fontWeight = FontWeight.Bold,
-                modifier = Modifier
-                    .basicMarquee(iterations = Int.MAX_VALUE)
-                    .align(Alignment.CenterHorizontally)
-            )
-
-            Spacer(Modifier.height(8.dp))
-
-            Text(
-                text = track!!.artist,
-                fontSize = 16.sp,
-                color = colors.inverseSurface,
-                modifier = Modifier
-                    .basicMarquee(iterations = Int.MAX_VALUE)
-                    .align(Alignment.CenterHorizontally)
-            )
-        }
+        )
 
         Spacer(Modifier.height(20.dp))
 
@@ -74,5 +53,62 @@ fun TrimmerScreen(trimmerViewModel: TrimmerViewModel, modifier: Modifier = Modif
                     .align(Alignment.Center)
             )
         }
+
+        Spacer(Modifier.height(20.dp))
+
+        TrimmedDuration(
+            trimmerViewModel = trimmerViewModel,
+            modifier = Modifier.align(Alignment.CenterHorizontally)
+        )
     }
+}
+
+@OptIn(ExperimentalFoundationApi::class)
+@Composable
+private fun TitleArtistColumn(
+    trimmerViewModel: TrimmerViewModel,
+    modifier: Modifier = Modifier
+) {
+    val colors = LocalAppColors.current.value
+    val track by trimmerViewModel.trackState.collectAsState()
+
+    Column(modifier) {
+        Text(
+            text = track!!.title,
+            fontSize = 20.sp,
+            color = colors.inverseSurface,
+            fontWeight = FontWeight.Bold,
+            modifier = Modifier
+                .basicMarquee(iterations = Int.MAX_VALUE)
+                .align(Alignment.CenterHorizontally)
+        )
+
+        Spacer(Modifier.height(8.dp))
+
+        Text(
+            text = track!!.artist,
+            fontSize = 16.sp,
+            color = colors.inverseSurface,
+            modifier = Modifier
+                .basicMarquee(iterations = Int.MAX_VALUE)
+                .align(Alignment.CenterHorizontally)
+        )
+    }
+}
+
+@Composable
+private fun TrimmedDuration(
+    trimmerViewModel: TrimmerViewModel,
+    modifier: Modifier = Modifier
+) {
+    val colors = LocalAppColors.current.value
+    val duration by trimmerViewModel.trimmedDurationFlow.collectAsState(initial = 0L)
+
+    Text(
+        text = duration.timeString,
+        fontSize = 16.sp,
+        fontWeight = FontWeight.Bold,
+        color = colors.primary,
+        modifier = modifier
+    )
 }

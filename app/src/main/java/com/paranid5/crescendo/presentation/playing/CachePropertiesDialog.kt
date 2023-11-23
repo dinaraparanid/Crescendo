@@ -42,6 +42,7 @@ import com.paranid5.crescendo.domain.StorageHandler
 import com.paranid5.crescendo.domain.services.video_cache_service.CacheTrimRange
 import com.paranid5.crescendo.domain.services.video_cache_service.Formats
 import com.paranid5.crescendo.presentation.ui.theme.LocalAppColors
+import com.paranid5.crescendo.presentation.ui.utils.DefaultOutlinedTextField
 import org.koin.compose.koinInject
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -134,37 +135,21 @@ private fun Title(modifier: Modifier = Modifier) {
 private fun FilenameInput(filenameState: MutableState<String>, modifier: Modifier = Modifier) {
     val colors = LocalAppColors.current.value
 
-    Row(
-        modifier
+    DefaultOutlinedTextField(
+        value = filenameState.value,
+        onValueChange = { filenameState.value = it },
+        placeholder = { Text(stringResource(R.string.filename_placeholder)) },
+        label = {
+            Text(
+                text = stringResource(R.string.filename),
+                color = colors.primary,
+                fontSize = 12.sp,
+            )
+        },
+        modifier = modifier
             .fillMaxWidth()
             .padding(horizontal = 10.dp)
-    ) {
-        Text(
-            text = "${stringResource(R.string.filename)}:",
-            modifier = Modifier.align(Alignment.CenterVertically),
-            color = colors.inverseSurface,
-            fontSize = 14.sp,
-            fontWeight = FontWeight.Bold
-        )
-
-        Spacer(Modifier.width(10.dp))
-
-        TextField(
-            value = filenameState.value,
-            onValueChange = { filenameState.value = it },
-            maxLines = 1,
-            placeholder = { Text(stringResource(R.string.filename_placeholder)) },
-            modifier = Modifier.align(Alignment.CenterVertically),
-            colors = TextFieldDefaults.colors(
-                focusedTextColor = colors.inverseSurface,
-                unfocusedTextColor = colors.inverseSurface,
-                focusedContainerColor = colors.primary,
-                unfocusedContainerColor = colors.primary,
-                disabledContainerColor = colors.primary,
-                errorContainerColor = colors.primary,
-            )
-        )
-    }
+    )
 }
 
 @Composable
@@ -176,45 +161,33 @@ private fun SaveOptionsMenu(
     val colors = LocalAppColors.current.value
     var isDropdownShown by remember { mutableStateOf(false) }
 
-    Row(
+    Box(
         modifier
             .fillMaxWidth()
             .padding(horizontal = 10.dp)
     ) {
         Text(
-            text = "${stringResource(R.string.save_as)}:",
-            modifier = Modifier.align(Alignment.CenterVertically),
-            color = colors.inverseSurface,
-            fontSize = 14.sp,
-            fontWeight = FontWeight.Bold
+            text = fileSaveOptions[selectedSaveOptionIndexState.value],
+            color = colors.primary,
+            modifier = Modifier
+                .align(Alignment.Center)
+                .clickable { isDropdownShown = true },
         )
 
-        Spacer(Modifier.width(10.dp))
-
-        Box(Modifier.fillMaxWidth()) {
-            Text(
-                text = fileSaveOptions[selectedSaveOptionIndexState.value],
-                color = colors.primary,
-                modifier = Modifier
-                    .align(Alignment.Center)
-                    .clickable { isDropdownShown = true },
-            )
-
-            DropdownMenu(
-                expanded = isDropdownShown,
-                onDismissRequest = { isDropdownShown = false }
-            ) {
-                fileSaveOptions.forEachIndexed { index, item ->
-                    DropdownMenuItem(
-                        text = {
-                            Text(
-                                text = item,
-                                color = colors.inverseSurface
-                            )
-                        },
-                        onClick = { selectedSaveOptionIndexState.value = index },
-                    )
-                }
+        DropdownMenu(
+            expanded = isDropdownShown,
+            onDismissRequest = { isDropdownShown = false }
+        ) {
+            fileSaveOptions.forEachIndexed { index, item ->
+                DropdownMenuItem(
+                    text = {
+                        Text(
+                            text = item,
+                            color = colors.inverseSurface
+                        )
+                    },
+                    onClick = { selectedSaveOptionIndexState.value = index },
+                )
             }
         }
     }
