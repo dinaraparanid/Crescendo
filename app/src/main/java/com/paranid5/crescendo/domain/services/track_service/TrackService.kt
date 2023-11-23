@@ -53,9 +53,9 @@ import com.paranid5.crescendo.domain.utils.extensions.registerReceiverCompat
 import com.paranid5.crescendo.domain.utils.extensions.sendBroadcast
 import com.paranid5.crescendo.domain.utils.extensions.setParameter
 import com.paranid5.crescendo.domain.utils.extensions.toMediaItemList
-import com.paranid5.crescendo.presentation.main_activity.MainActivity
-import com.paranid5.crescendo.presentation.playing.Broadcast_CUR_POSITION_CHANGED
-import com.paranid5.crescendo.presentation.playing.CUR_POSITION_ARG
+import com.paranid5.crescendo.presentation.main.MainActivity
+import com.paranid5.crescendo.presentation.main.playing.Broadcast_CUR_POSITION_CHANGED
+import com.paranid5.crescendo.presentation.main.playing.CUR_POSITION_ARG
 import com.paranid5.crescendo.presentation.ui.utils.CoilUtils
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job

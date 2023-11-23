@@ -31,8 +31,8 @@ import com.paranid5.crescendo.domain.utils.media.convertToAudioFileAndSetTagsAsy
 import com.paranid5.crescendo.domain.utils.media.createMediaFileCatching
 import com.paranid5.crescendo.domain.utils.media.getInitialMediaDirectory
 import com.paranid5.crescendo.domain.utils.media.mergeToMP4AndSetTagsAsync
-import com.paranid5.crescendo.presentation.main_activity.MainActivity
-import com.paranid5.crescendo.presentation.main_activity.MainActivity.Companion.VIDEO_CASH_STATUS_ARG
+import com.paranid5.crescendo.presentation.main.MainActivity
+import com.paranid5.crescendo.presentation.main.MainActivity.Companion.VIDEO_CASH_STATUS_ARG
 import com.paranid5.yt_url_extractor_kt.YtFile
 import com.paranid5.yt_url_extractor_kt.extractYtFilesWithMeta
 import io.ktor.client.*

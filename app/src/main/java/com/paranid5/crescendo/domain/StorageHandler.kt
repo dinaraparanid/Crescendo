@@ -14,7 +14,7 @@ import com.paranid5.crescendo.data.eq.EqualizerData
 import com.paranid5.crescendo.data.eq.EqualizerParameters
 import com.paranid5.crescendo.data.tracks.DefaultTrack
 import com.paranid5.crescendo.data.tracks.TrackOrder
-import com.paranid5.crescendo.presentation.ui.AudioStatus
+import com.paranid5.crescendo.presentation.main.AudioStatus
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi

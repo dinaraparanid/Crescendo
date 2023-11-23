@@ -39,7 +39,7 @@
                 android:authorities="${applicationId}.androidx-startup"
                 tools:node="remove" />
         <activity
-                android:name=".presentation.main_activity.MainActivity"
+                android:name=".presentation.splash.SplashActivity"
                 android:exported="true"
                 android:theme="@style/Theme.MediaStreamer">
             <intent-filter>
@@ -50,6 +50,11 @@
             <meta-data
                     android:name="android.app.lib_name"
                     android:value="" />
+        </activity>
+        <activity
+                android:name="com.paranid5.crescendo.presentation.main.MainActivity"
+                android:exported="false"
+                android:theme="@style/Theme.MediaStreamer">
         </activity>
         <service
                 android:name="com.paranid5.crescendo.domain.services.stream_service.StreamService"

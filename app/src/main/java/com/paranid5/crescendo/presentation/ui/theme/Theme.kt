@@ -23,7 +23,7 @@ private val LightColorScheme = lightColorScheme(
     onSecondary = SecondaryAlternative,
     background = Background,
     onBackground = BackgroundAlternative,
-    inverseSurface = Color.Black
+    inverseSurface = Color.White
 )
 
 @JvmInline
