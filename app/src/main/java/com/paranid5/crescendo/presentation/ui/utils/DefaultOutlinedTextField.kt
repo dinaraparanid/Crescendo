@@ -2,6 +2,7 @@ package com.paranid5.crescendo.presentation.ui.utils
 
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.text.BasicTextField
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.runtime.Composable
@@ -19,7 +20,8 @@ fun DefaultOutlinedTextField(
     onValueChange: (String) -> Unit,
     modifier: Modifier = Modifier,
     placeholder: @Composable (() -> Unit)? = null,
-    label: @Composable (() -> Unit)? = null
+    label: @Composable (() -> Unit)? = null,
+    keyboardOptions: KeyboardOptions = KeyboardOptions.Default,
 ) {
     val colors = LocalAppColors.current.value
 
@@ -29,6 +31,7 @@ fun DefaultOutlinedTextField(
         onValueChange = onValueChange,
         modifier = modifier,
         textStyle = TextStyle(color = colors.inverseSurface),
+        keyboardOptions = keyboardOptions,
         decorationBox = @Composable { innerTextField ->
             OutlinedTextFieldDefaults.DecorationBox(
                 value = value,

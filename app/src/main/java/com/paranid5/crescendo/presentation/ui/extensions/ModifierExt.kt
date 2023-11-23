@@ -9,7 +9,7 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.paranid5.crescendo.presentation.ui.theme.LocalAppColors
 
-fun Modifier.simpleShadow(elevation: Dp = 60.dp, color: Color? = null): Modifier = composed {
+fun Modifier.simpleShadow(elevation: Dp = 60.dp, color: Color? = null) = this.composed {
     val colors = LocalAppColors.current.value
 
     shadow(

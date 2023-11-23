@@ -14,6 +14,7 @@ class TrimmerViewModel(private val savedStateHandle: SavedStateHandle) : ViewMod
         private const val AMPLITUDES = "amplitudes"
         private const val START_MILLIS = "start_millis"
         private const val END_MILLIS = "end_millis"
+        private const val IS_PLAYING_STATE = "is_playing"
     }
 
     private val _trackState by lazy {
@@ -65,5 +66,13 @@ class TrimmerViewModel(private val savedStateHandle: SavedStateHandle) : ViewMod
             startPosInMillisState,
             endPosInMillisState
         ) { startMillis, endMillis -> endMillis - startMillis }
+    }
+
+    private val _isPlayingState by lazy { MutableStateFlow(false) }
+
+    val isPlayingState by lazy { _isPlayingState.asStateFlow() }
+
+    fun setPlaying(isPlaying: Boolean) {
+        savedStateHandle[IS_PLAYING_STATE] = _isPlayingState.updateAndGet { isPlaying }
     }
 }

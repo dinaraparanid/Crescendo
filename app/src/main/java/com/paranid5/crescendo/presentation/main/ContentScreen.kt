@@ -114,7 +114,7 @@ fun ContentScreen(
             viewModel.setCurScreen(Screens.Audio.Trimmer)
 
             TrimmerScreen(
-                trimmerViewModel = trimmerViewModel,
+                viewModel = trimmerViewModel,
                 modifier = Modifier
                     .fillMaxSize()
                     .padding(top = 16.dp, start = 8.dp, end = 8.dp)

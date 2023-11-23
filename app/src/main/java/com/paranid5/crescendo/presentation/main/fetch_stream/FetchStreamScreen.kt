@@ -90,24 +90,20 @@ fun SearchStreamScreen(
 }
 
 @Composable
-private fun Label(modifier: Modifier = Modifier) = Text(
-    text = stringResource(R.string.enter_stream_url),
-    color = LocalAppColors.current.value.primary,
-    fontSize = 12.sp,
-    modifier = modifier
-)
-
-@Composable
 private fun UrlEditor(
     inputText: String?,
     viewModel: FetchStreamViewModel,
     modifier: Modifier = Modifier,
-    hint: String = stringResource(R.string.your_url),
 ) = DefaultOutlinedTextField(
     value = inputText ?: "",
     onValueChange = { query -> viewModel.setCurrentText(query) },
-    placeholder = { Text(hint) },
-    label = { Label() },
+    label = {
+        Text(
+            text = stringResource(R.string.enter_stream_url),
+            color = LocalAppColors.current.value.primary,
+            fontSize = 12.sp,
+        )
+    },
     modifier = modifier
 )
 

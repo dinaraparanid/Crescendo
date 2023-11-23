@@ -133,7 +133,6 @@ private fun FilenameInput(filenameState: MutableState<String>, modifier: Modifie
     DefaultOutlinedTextField(
         value = filenameState.value,
         onValueChange = { filenameState.value = it },
-        placeholder = { Text(stringResource(R.string.filename_placeholder)) },
         label = {
             Text(
                 text = stringResource(R.string.filename),
