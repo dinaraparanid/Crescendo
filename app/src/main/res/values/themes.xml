@@ -6,4 +6,10 @@
         <item name="android:statusBarColor">@color/crescendo_background</item>
         <item name="android:navigationBarColor">@color/crescendo_primary</item>
     </style>
+    <style name="Theme.MediaStreamerSplash" parent="Theme.MaterialComponents.DayNight.NoActionBar" >
+        <item name="android:colorPrimary">@color/splash_background</item>
+        <item name="android:colorBackground">@color/splash_background</item>
+        <item name="android:statusBarColor">@color/splash_background</item>
+        <item name="android:navigationBarColor">@color/splash_background</item>
+    </style>
 </resources>

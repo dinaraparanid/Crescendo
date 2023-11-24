@@ -82,7 +82,7 @@ fun TrimWaveform(
 
     LaunchedEffect(key1 = model) {
         withContext(Dispatchers.IO) {
-            if (model != null) viewModel.setAmplitudes(
+            if (model != null) viewModel.setAmplitudesAsync(
                 amplituda
                     .processAudio(model)
                     .get(AmplitudaErrorListener { it.printStackTrace() })
@@ -354,7 +354,7 @@ private fun List<Int>.toDrawableAmplitudes(
         return List(spikes) { minHeight }
 
     val transform = { data: List<Float> ->
-        data.average().toFloat().coerceIn(minHeight, maxHeight)
+        data.average().toFloat().coerceIn(minHeight, maxOf(minHeight, maxHeight))
     }
 
     return when {

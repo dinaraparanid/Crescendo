@@ -1,5 +1,6 @@
 package com.paranid5.crescendo.presentation.main
 
+import android.content.res.Configuration
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.Box
@@ -17,11 +18,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.unit.dp
-import com.paranid5.crescendo.presentation.main.appbar.AppBar
 import com.paranid5.crescendo.presentation.composition_locals.LocalCurrentPlaylistSheetState
 import com.paranid5.crescendo.presentation.composition_locals.LocalPlayingPagerState
 import com.paranid5.crescendo.presentation.composition_locals.LocalPlayingSheetState
+import com.paranid5.crescendo.presentation.main.appbar.AppBar
 import com.paranid5.crescendo.presentation.main.current_playlist.CurrentPlaylistScreen
 import com.paranid5.crescendo.presentation.main.playing.PlayingScreen
 import com.paranid5.crescendo.presentation.ui.theme.LocalAppColors
@@ -48,7 +50,7 @@ fun PlayingBottomSheet(
         ModalBottomSheetLayout(
             modifier = modifier,
             sheetState = curPlaylistScaffoldState,
-            sheetContent = { CurrentPlaylistBottomSheet() },
+            sheetContent = { CurrentPlaylistBottomSheet(alpha) },
             sheetBackgroundColor = backgroundColor,
             sheetShape = RoundedCornerShape(topStart = 20.dp, topEnd = 20.dp)
         ) {
@@ -75,8 +77,14 @@ fun PlayingBottomSheet(
                     )
 
                 PushUpButton(
-                    Modifier
-                        .padding(top = 12.dp)
+                    alpha = alpha,
+                    modifier = Modifier
+                        .padding(
+                            top = when (LocalConfiguration.current.orientation) {
+                                Configuration.ORIENTATION_LANDSCAPE -> 6.dp
+                                else -> 12.dp
+                            }
+                        )
                         .align(Alignment.TopCenter)
                 )
             }
@@ -85,7 +93,7 @@ fun PlayingBottomSheet(
 }
 
 @Composable
-private fun CurrentPlaylistBottomSheet(modifier: Modifier = Modifier) =
+private fun CurrentPlaylistBottomSheet(alpha: Float, modifier: Modifier = Modifier) =
     Box(modifier) {
         CurrentPlaylistScreen(
             Modifier
@@ -94,15 +102,16 @@ private fun CurrentPlaylistBottomSheet(modifier: Modifier = Modifier) =
         )
 
         PushUpButton(
-            Modifier
+            alpha = alpha,
+            modifier = Modifier
                 .padding(top = 12.dp)
                 .align(Alignment.TopCenter)
         )
     }
 
 @Composable
-private fun PushUpButton(modifier: Modifier = Modifier) = Canvas(
-    onDraw = { drawRect(TransparentUtility.copy(alpha = 0.5F)) },
+private fun PushUpButton(alpha: Float, modifier: Modifier = Modifier) = Canvas(
+    onDraw = { drawRect(TransparentUtility.copy(alpha = 0.25F + alpha / 2)) },
     modifier = modifier
         .width(35.dp)
         .height(4.dp)

@@ -2,16 +2,22 @@ package com.paranid5.crescendo.presentation.main.trimmer
 
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.paranid5.crescendo.data.tracks.Track
+import com.paranid5.crescendo.domain.StorageHandler
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.updateAndGet
+import kotlinx.coroutines.launch
 
-class TrimmerViewModel(private val savedStateHandle: SavedStateHandle) : ViewModel() {
+class TrimmerViewModel(
+    private val savedStateHandle: SavedStateHandle,
+    private val storageHandler: StorageHandler
+) : ViewModel() {
     private companion object {
         private const val TRACK = "track"
-        private const val AMPLITUDES = "amplitudes"
         private const val START_MILLIS = "start_millis"
         private const val END_MILLIS = "end_millis"
         private const val IS_PLAYING_STATE = "is_playing"
@@ -27,14 +33,10 @@ class TrimmerViewModel(private val savedStateHandle: SavedStateHandle) : ViewMod
         savedStateHandle[TRACK] = _trackState.updateAndGet { track }
     }
 
-    private val _amplitudesState by lazy {
-        MutableStateFlow(savedStateHandle[AMPLITUDES] ?: listOf<Int>())
-    }
+    val amplitudesState by lazy { storageHandler.amplitudesState }
 
-    val amplitudesState = _amplitudesState.asStateFlow()
-
-    fun setAmplitudes(amplitudes: List<Int>) {
-        savedStateHandle[AMPLITUDES] = _amplitudesState.updateAndGet { amplitudes }
+    fun setAmplitudesAsync(amplitudes: List<Int>) = viewModelScope.launch(Dispatchers.IO) {
+        storageHandler.storeAmplitudes(amplitudes)
     }
 
     private val _startPosInMillisState by lazy {
@@ -74,5 +76,10 @@ class TrimmerViewModel(private val savedStateHandle: SavedStateHandle) : ViewMod
 
     fun setPlaying(isPlaying: Boolean) {
         savedStateHandle[IS_PLAYING_STATE] = _isPlayingState.updateAndGet { isPlaying }
+    }
+
+    override fun onCleared() {
+        super.onCleared()
+        setAmplitudesAsync(emptyList())
     }
 }

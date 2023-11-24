@@ -5,13 +5,14 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.size
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontStyle
@@ -29,18 +30,20 @@ fun SplashScreen(modifier: Modifier = Modifier) {
         modifier = modifier,
         color = colors.background
     ) {
-        Box(Modifier.fillMaxSize()) {
-            Column(Modifier.align(Alignment.Center)) {
-                Image(
-                    painter = painterResource(id = R.drawable.crescendo),
-                    contentDescription = stringResource(id = R.string.app_name),
-                    modifier = Modifier
-                        .align(Alignment.CenterHorizontally)
-                        .size(140.dp)
-                )
+        Box(Modifier.fillMaxWidth()) {
+            Image(
+                painter = painterResource(R.drawable.splash),
+                contentDescription = null,
+                modifier = Modifier.fillMaxSize(),
+                contentScale = ContentScale.FillBounds,
+                alignment = Alignment.Center,
+            )
+        }
 
-                Spacer(Modifier.height(2.dp))
+        Column(Modifier.fillMaxSize()) {
+            Spacer(Modifier.weight(6F))
 
+            Column(Modifier.align(Alignment.CenterHorizontally)) {
                 Text(
                     text = stringResource(id = R.string.app_name),
                     color = colors.primary,
@@ -50,6 +53,8 @@ fun SplashScreen(modifier: Modifier = Modifier) {
                     modifier = Modifier.align(Alignment.CenterHorizontally)
                 )
 
+                Spacer(Modifier.height(4.dp))
+
                 Text(
                     text = stringResource(id = R.string.version),
                     color = colors.primary,
@@ -58,6 +63,8 @@ fun SplashScreen(modifier: Modifier = Modifier) {
                     modifier = Modifier.align(Alignment.CenterHorizontally)
                 )
             }
+
+            Spacer(Modifier.weight(17F))
         }
     }
 }

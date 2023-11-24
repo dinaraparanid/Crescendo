@@ -9,4 +9,5 @@
     <color name="white">#FFFFFFFF</color>
     <color name="crescendo_primary">#FFBCEDF6</color>
     <color name="crescendo_background">#FF6B7FD7</color>
+    <color name="splash_background">#FF020203</color>
 </resources>

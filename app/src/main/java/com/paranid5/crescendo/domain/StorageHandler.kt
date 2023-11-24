@@ -28,8 +28,6 @@ import kotlinx.serialization.json.Json
 class StorageHandler(context: Context) :
     CoroutineScope by CoroutineScope(Dispatchers.IO) {
     companion object {
-        private val TAG = StorageHandler::class.simpleName!!
-
         private val CURRENT_URL = stringPreferencesKey("current_url")
         private val CURRENT_METADATA = stringPreferencesKey("current_metadata")
 
@@ -54,6 +52,8 @@ class StorageHandler(context: Context) :
 
         private val BASS_STRENGTH = intPreferencesKey("bass_strength")
         private val REVERB_PRESET = intPreferencesKey("reverb_preset")
+
+        private val AMPLITUDES = stringPreferencesKey("amplitudes")
     }
 
     private val Context.dataStore by preferencesDataStore("params")
@@ -288,5 +288,20 @@ class StorageHandler(context: Context) :
 
     internal suspend inline fun storeReverbPreset(reverbPreset: Short) {
         dataStore.edit { preferences -> preferences[REVERB_PRESET] = reverbPreset.toInt() }
+    }
+
+    @OptIn(ExperimentalCoroutinesApi::class)
+    val amplitudesFlow = dataStore.data
+        .mapLatest { preferences -> preferences[AMPLITUDES] }
+        .mapLatest { bandsStr -> bandsStr?.let { Json.decodeFromString<List<Int>>(it) } }
+        .mapLatest { it ?: emptyList() }
+
+    val amplitudesState = amplitudesFlow
+        .stateIn(this, SharingStarted.Eagerly, emptyList())
+
+    internal suspend inline fun storeAmplitudes(amplitudes: List<Int>) {
+        dataStore.edit { preferences ->
+            preferences[AMPLITUDES] = Json.encodeToString(amplitudes)
+        }
     }
 }
