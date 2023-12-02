@@ -7,7 +7,6 @@ import com.paranid5.crescendo.MainApplication
 import com.paranid5.crescendo.TRACK_SERVICE_CONNECTION
 import com.paranid5.crescendo.data.tracks.DefaultTrack
 import com.paranid5.crescendo.domain.services.ServiceAccessor
-import com.paranid5.crescendo.domain.services.stream_service.StreamService
 import kotlinx.coroutines.flow.MutableStateFlow
 import org.koin.core.component.inject
 import org.koin.core.qualifier.named
@@ -86,7 +85,7 @@ class TrackServiceAccessor(application: MainApplication) : ServiceAccessor(appli
         else -> startTrackService(playlist, trackInd)
     }
 
-    private fun stopStreamService() = sendBroadcast(StreamService.Broadcast_STOP)
+    private fun stopStreamService() = sendBroadcast(TrackService.Broadcast_STOP)
 
     fun startPlaying(playlist: List<DefaultTrack>, trackInd: Int) {
         stopStreamService()

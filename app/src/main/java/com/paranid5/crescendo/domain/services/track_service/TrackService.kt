@@ -72,9 +72,13 @@ import org.koin.core.parameter.parametersOf
 import org.koin.core.qualifier.named
 
 @OptIn(androidx.media3.common.util.UnstableApi::class)
-class TrackService : SuspendService(), ReceiverManager, LifecycleNotificationManager, KoinComponent {
+class TrackService : SuspendService(),
+    ReceiverManager,
+    LifecycleNotificationManager,
+    KoinComponent {
+    @Suppress("IncorrectFormatting")
     companion object {
-        private const val NOTIFICATION_ID = 102
+        internal const val NOTIFICATION_ID = 102
         private const val AUDIO_CHANNEL_ID = "stream_channel"
         private const val PLAYBACK_UPDATE_COOLDOWN = 500L
 
@@ -126,6 +130,7 @@ class TrackService : SuspendService(), ReceiverManager, LifecycleNotificationMan
 
         private val TAG = TrackService::class.simpleName!!
 
+        @Suppress("DEPRECATION")
         internal inline val Intent.mTrackArgOrNull
             get() = when {
                 Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU ->
@@ -134,6 +139,7 @@ class TrackService : SuspendService(), ReceiverManager, LifecycleNotificationMan
                 else -> getParcelableExtra(TRACK_ARG)
             }
 
+        @Suppress("DEPRECATION")
         internal inline val Intent.mPlaylistArgOrNull
             @Suppress("UNCHECKED_CAST")
             get() = when {
@@ -156,46 +162,6 @@ class TrackService : SuspendService(), ReceiverManager, LifecycleNotificationMan
             isRepeating -> Player.REPEAT_MODE_ONE
             else -> Player.REPEAT_MODE_ALL
         }
-    }
-
-    sealed class Actions(
-        override val requestCode: Int,
-        override val playbackAction: String
-    ) : ServiceAction {
-        data object Pause : Actions(
-            requestCode = NOTIFICATION_ID + 1,
-            playbackAction = Broadcast_PAUSE
-        )
-
-        data object Resume : Actions(
-            requestCode = NOTIFICATION_ID + 2,
-            playbackAction = Broadcast_RESUME
-        )
-
-        data object PrevTrack : Actions(
-            requestCode = NOTIFICATION_ID + 3,
-            playbackAction = Broadcast_PREV_TRACK
-        )
-
-        data object NextTrack : Actions(
-            requestCode = NOTIFICATION_ID + 4,
-            playbackAction = Broadcast_NEXT_TRACK
-        )
-
-        data object Repeat : Actions(
-            requestCode = NOTIFICATION_ID + 7,
-            playbackAction = Broadcast_CHANGE_REPEAT
-        )
-
-        data object Unrepeat : Actions(
-            requestCode = NOTIFICATION_ID + 8,
-            playbackAction = Broadcast_CHANGE_REPEAT
-        )
-
-        data object Dismiss : Actions(
-            requestCode = NOTIFICATION_ID + 9,
-            playbackAction = Broadcast_DISMISS_NOTIFICATION
-        )
     }
 
     private inline val Actions.playbackIntent: PendingIntent
@@ -608,6 +574,7 @@ class TrackService : SuspendService(), ReceiverManager, LifecycleNotificationMan
         }
     }
 
+    @Suppress("IncorrectFormatting")
     override fun registerReceivers() {
         registerReceiverCompat(pauseReceiver, Broadcast_PAUSE)
         registerReceiverCompat(resumeReceiver, Broadcast_RESUME)
@@ -781,9 +748,9 @@ class TrackService : SuspendService(), ReceiverManager, LifecycleNotificationMan
     }
 
     private fun ExoPlayer.initAudioEffects() {
-        initEqualizer(audioSessionId)
-        initBassBoost(audioSessionId)
-        initReverb(audioSessionId)
+        initEqualizerCatching(audioSessionId)
+        initBassBoostCatching(audioSessionId)
+        initReverbCatching(audioSessionId)
 
         if (areAudioEffectsEnabledState.value)
             playbackParameters = PlaybackParameters(speedState.value, pitchState.value)
@@ -980,6 +947,10 @@ class TrackService : SuspendService(), ReceiverManager, LifecycleNotificationMan
         }
     }
 
+    private fun initEqualizerCatching(audioSessionId: Int) = runCatching {
+        initEqualizer(audioSessionId)
+    }
+
     private fun initBassBoost(audioSessionId: Int) {
         bassBoost = BassBoost(0, audioSessionId).apply {
             try {
@@ -990,6 +961,10 @@ class TrackService : SuspendService(), ReceiverManager, LifecycleNotificationMan
         }
     }
 
+    private fun initBassBoostCatching(audioSessionId: Int) = runCatching {
+        initBassBoost(audioSessionId)
+    }
+
     private fun initReverb(audioSessionId: Int) {
         reverb = PresetReverb(0, audioSessionId).apply {
             try {
@@ -998,6 +973,10 @@ class TrackService : SuspendService(), ReceiverManager, LifecycleNotificationMan
                 // Invalid preset
             }
         }
+    }
+
+    private fun initReverbCatching(audioSessionId: Int) = runCatching {
+        initReverb(audioSessionId)
     }
 
     internal fun mSetAudioEffectsEnabled(areEnabled: Boolean) {
@@ -1113,6 +1092,7 @@ class TrackService : SuspendService(), ReceiverManager, LifecycleNotificationMan
         mediaSession.run {
             isActive = true
 
+            @Suppress("DEPRECATION")
             if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) setFlags(
                 MediaSessionCompat.FLAG_HANDLES_TRANSPORT_CONTROLS
                         or MediaSessionCompat.FLAG_HANDLES_MEDIA_BUTTONS
@@ -1193,6 +1173,7 @@ class TrackService : SuspendService(), ReceiverManager, LifecycleNotificationMan
         Log.d(TAG, "Notification is removed")
         isNotificationShown = false
 
+        @Suppress("DEPRECATION")
         when {
             Build.VERSION.SDK_INT >= Build.VERSION_CODES.N -> stopForeground(STOP_FOREGROUND_REMOVE)
             else -> stopForeground(true)

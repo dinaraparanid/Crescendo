@@ -7,7 +7,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
 
-private const val CUR_VERSION = "V0.2.0.0"
+private const val CUR_VERSION = "V0.2.1.0"
 
 private suspend inline fun HttpClient.getLatestRelease() =
     get("https://api.github.com/repos/dinaraparanid/MediaStreamer/releases")
