@@ -6,7 +6,6 @@ import com.paranid5.crescendo.IS_PLAYING
 import com.paranid5.crescendo.data.VideoMetadata
 import com.paranid5.crescendo.data.tracks.DefaultTrack
 import com.paranid5.crescendo.domain.StorageHandler
-import com.paranid5.crescendo.presentation.main.AudioStatus
 import com.paranid5.crescendo.presentation.ui.utils.CoilUtils
 import com.paranid5.yt_url_extractor_kt.extractYtFilesWithMeta
 import io.ktor.client.HttpClient
@@ -42,7 +41,7 @@ class MediaRetrieverController(context: Context) : KoinComponent {
     inline val tracksPlaybackPosition get() = tracksPlaybackPositionState.value
 
     val isRepeatingState = storageHandler.isRepeatingState
-    inline val isRepeating get() = isPlayingState.value
+    inline val isRepeating get() = isRepeatingState.value
 
     val areAudioEffectsEnabledState = storageHandler.areAudioEffectsEnabledState
     inline val areAudioEffectsEnabled get() = areAudioEffectsEnabledState.value
@@ -95,9 +94,6 @@ class MediaRetrieverController(context: Context) : KoinComponent {
 
     suspend fun storeCurrentPlaylist(playlist: List<DefaultTrack>) =
         storageHandler.storeCurrentPlaylist(playlist)
-
-    suspend fun storeAudioStatus(audioStatus: AudioStatus) =
-        storageHandler.storeAudioStatus(audioStatus)
 
     suspend fun extractYtFilesWithMeta(context: Context, ytUrl: String) =
         ktorClient.extractYtFilesWithMeta(
