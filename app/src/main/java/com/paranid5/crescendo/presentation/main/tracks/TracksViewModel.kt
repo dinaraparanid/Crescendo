@@ -9,18 +9,17 @@ import kotlinx.coroutines.flow.updateAndGet
 
 class TracksViewModel(private val savedStateHandle: SavedStateHandle) : ViewModel() {
     private companion object {
-        private const val TRACKS = "tracks"
         private const val QUERY = "query"
     }
 
     private val _tracksState by lazy {
-        MutableStateFlow(savedStateHandle[TRACKS] ?: listOf<Track>())
+        MutableStateFlow(listOf<Track>())
     }
 
     val tracksState = _tracksState.asStateFlow()
 
     fun setTracks(tracks: List<Track>) {
-        savedStateHandle[TRACKS] = _tracksState.updateAndGet { tracks }
+        _tracksState.updateAndGet { tracks }
     }
 
     private val _queryState by lazy {

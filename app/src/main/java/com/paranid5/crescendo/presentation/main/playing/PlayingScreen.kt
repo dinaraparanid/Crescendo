@@ -322,13 +322,14 @@ private fun PlayingScreenLandscape(
             },
         )
 
-        LiveSeeker(
-            color = palette.getLightMutedOrPrimary(),
-            modifier = Modifier.constrainAs(liveSeeker) {
-                top.linkTo(parent.top, margin = 8.dp)
-                start.linkTo(parent.start, margin = 5.dp)
-            }
-        )
+        if (isLiveStreaming)
+            LiveSeeker(
+                color = palette.getLightMutedOrPrimary(),
+                modifier = Modifier.constrainAs(liveSeeker) {
+                    top.linkTo(parent.top, margin = 8.dp)
+                    start.linkTo(parent.start, margin = 5.dp)
+                }
+            )
 
         PlaybackSlider(
             length = sliderLength,
