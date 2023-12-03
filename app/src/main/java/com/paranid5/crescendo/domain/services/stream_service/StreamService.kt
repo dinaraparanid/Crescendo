@@ -6,14 +6,9 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.graphics.Bitmap
-import android.media.audiofx.BassBoost
-import android.media.audiofx.Equalizer
-import android.media.audiofx.PresetReverb
-import android.media.session.MediaSessionManager
 import android.os.Build
 import android.os.Bundle
 import android.os.SystemClock
-import android.support.v4.media.session.MediaControllerCompat
 import android.support.v4.media.session.MediaSessionCompat
 import android.support.v4.media.session.PlaybackStateCompat
 import android.util.Log
@@ -22,42 +17,32 @@ import androidx.core.app.NotificationCompat
 import androidx.core.graphics.drawable.IconCompat
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.repeatOnLifecycle
-import androidx.media3.common.AudioAttributes
-import androidx.media3.common.C
 import androidx.media3.common.MediaItem
 import androidx.media3.common.PlaybackException
 import androidx.media3.common.PlaybackParameters
 import androidx.media3.common.Player
 import androidx.media3.common.util.NotificationUtil
 import androidx.media3.common.util.UnstableApi
-import androidx.media3.exoplayer.ExoPlayer
 import androidx.media3.ui.PlayerNotificationManager
-import com.paranid5.crescendo.AUDIO_SESSION_ID
-import com.paranid5.crescendo.EQUALIZER_DATA
-import com.paranid5.crescendo.IS_PLAYING
 import com.paranid5.crescendo.R
 import com.paranid5.crescendo.STREAM_SERVICE_CONNECTION
 import com.paranid5.crescendo.data.VideoMetadata
-import com.paranid5.crescendo.data.eq.EqualizerData
-import com.paranid5.crescendo.data.eq.EqualizerParameters
 import com.paranid5.crescendo.data.utils.extensions.toAndroidMetadata
 import com.paranid5.crescendo.domain.LifecycleNotificationManager
 import com.paranid5.crescendo.domain.ReceiverManager
-import com.paranid5.crescendo.domain.StorageHandler
 import com.paranid5.crescendo.domain.services.SuspendService
+import com.paranid5.crescendo.domain.services.service_controllers.MediaRetrieverController
+import com.paranid5.crescendo.domain.services.service_controllers.MediaSessionController
+import com.paranid5.crescendo.domain.services.service_controllers.PlaybackController
 import com.paranid5.crescendo.domain.utils.extensions.registerReceiverCompat
 import com.paranid5.crescendo.domain.utils.extensions.sendBroadcast
-import com.paranid5.crescendo.domain.utils.extensions.setParameter
 import com.paranid5.crescendo.presentation.main.MainActivity
 import com.paranid5.crescendo.presentation.main.playing.Broadcast_CUR_POSITION_CHANGED
 import com.paranid5.crescendo.presentation.main.playing.CUR_POSITION_ARG
-import com.paranid5.crescendo.presentation.ui.utils.CoilUtils
 import com.paranid5.yt_url_extractor_kt.VideoMeta
 import com.paranid5.yt_url_extractor_kt.YtFailure
 import com.paranid5.yt_url_extractor_kt.YtFilesNotFoundException
 import com.paranid5.yt_url_extractor_kt.YtRequestTimeoutException
-import com.paranid5.yt_url_extractor_kt.extractYtFilesWithMeta
-import io.ktor.client.HttpClient
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.Job
@@ -76,7 +61,6 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withTimeoutOrNull
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
-import org.koin.core.parameter.parametersOf
 import org.koin.core.qualifier.named
 
 @OptIn(UnstableApi::class)
@@ -91,7 +75,6 @@ class StreamService : SuspendService(),
         private const val NOTIFICATION_ID = 101
         private const val STREAM_CHANNEL_ID = "stream_channel"
         private const val PLAYBACK_UPDATE_COOLDOWN = 500L
-        private const val TEN_SECS_AS_MILLIS = 10000
 
         private const val SERVICE_LOCATION = "com.paranid5.crescendo.domain.services.stream_service"
 
@@ -110,6 +93,7 @@ class StreamService : SuspendService(),
         const val Broadcast_EQUALIZER_PARAM_UPDATE = "$SERVICE_LOCATION.EQUALIZER_PARAM_UPDATE"
         const val Broadcast_BASS_STRENGTH_UPDATE = "$SERVICE_LOCATION.BASS_STRENGTH_UPDATE"
         const val Broadcast_REVERB_PRESET_UPDATE = "$SERVICE_LOCATION.REVERB_PRESET_UPDATE"
+        const val Broadcast_STOP = "$SERVICE_LOCATION.STOP"
 
         private const val ACTION_PAUSE = "pause"
         private const val ACTION_RESUME = "resume"
@@ -124,34 +108,14 @@ class StreamService : SuspendService(),
 
         private const val DEFAULT_AUDIO_TAG = 140
 
-        internal inline val Intent.mUrlArgOrNull
+        private inline val Intent.urlArgOrNull
             get() = getStringExtra(URL_ARG)
 
-        internal inline val Intent.mUrlArg
-            get() = mUrlArgOrNull!!
+        private inline val Intent.urlArg
+            get() = urlArgOrNull!!
     }
 
-    private val storageHandler by inject<StorageHandler>()
-    private val coilUtils by inject<CoilUtils> { parametersOf(this) }
-    private val ktorClient by inject<HttpClient>()
-
-    private val currentUrlState = storageHandler.currentUrlState
     private val currentMetadataState = MutableStateFlow<VideoMetadata?>(null)
-
-    private val playbackPositionState = storageHandler.streamPlaybackPositionState
-    private val isRepeatingState = storageHandler.isRepeatingState
-    private val isPlayingState by inject<MutableStateFlow<Boolean>>(named(IS_PLAYING))
-
-    private val areAudioEffectsEnabledState = storageHandler.areAudioEffectsEnabledState
-    private val pitchState = storageHandler.pitchState
-    private val speedState = storageHandler.speedState
-
-    private val equalizerParamState = storageHandler.equalizerParamState
-    private val equalizerBandsState = storageHandler.equalizerBandsState
-    private val equalizerPresetState = storageHandler.equalizerPresetState
-
-    private val bassStrengthState = storageHandler.bassStrengthState
-    private val reverbPresetState = storageHandler.reverbPresetState
 
     private val isConnectedState by inject<MutableStateFlow<Boolean>>(
         named(STREAM_SERVICE_CONNECTION)
@@ -159,36 +123,22 @@ class StreamService : SuspendService(),
 
     // ----------------------- Media Session Management -----------------------
 
-    private lateinit var mediaSessionManager: MediaSessionManager
-    private lateinit var mediaSession: MediaSessionCompat
-    private lateinit var transportControls: MediaControllerCompat.TransportControls
-
-    private fun initMediaSession() {
-        mediaSessionManager = getSystemService(MEDIA_SESSION_SERVICE)!! as MediaSessionManager
-        mediaSession = MediaSessionCompat(applicationContext, TAG)
-        transportControls = mediaSession.controller.transportControls
-
-        mediaSession.run {
-            isActive = true
-
-            @Suppress("DEPRECATION")
-            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) setFlags(
-                MediaSessionCompat.FLAG_HANDLES_TRANSPORT_CONTROLS
-                        or MediaSessionCompat.FLAG_HANDLES_MEDIA_BUTTONS
-            )
-
-            setCallback(newMediaSessionCallback)
-            setPlaybackState(newPlaybackState)
-        }
-
-        playerNotificationManager.setPlayer(player)
+    private val mediaRetrieverController by lazy {
+        MediaRetrieverController(context = this)
     }
+
+    private val mediaSessionController by lazy {
+        MediaSessionController(context = this, tag = TAG)
+    }
+
+    private inline val mediaSession
+        get() = mediaSessionController.mediaSession
 
     private inline val newMediaSessionCallback
         get() = object : MediaSessionCompat.Callback() {
             override fun onPlay() {
                 super.onPlay()
-                resumePlayback()
+                playbackController.resumePlayback()
             }
 
             override fun onPause() {
@@ -198,17 +148,17 @@ class StreamService : SuspendService(),
 
             override fun onSeekTo(pos: Long) {
                 super.onSeekTo(pos)
-                seekTo(pos)
+                playbackController.seekTo(pos)
             }
 
             override fun onSkipToNext() {
                 super.onSkipToNext()
-                seekTo10SecsForward()
+                playbackController.seekTo10SecsForward(videoLengthState.value)
             }
 
             override fun onSkipToPrevious() {
                 super.onSkipToPrevious()
-                seekTo10SecsBack()
+                playbackController.seekTo10SecsBack()
             }
 
             override fun onCustomAction(action: String, extras: Bundle?) {
@@ -230,18 +180,18 @@ class StreamService : SuspendService(),
             .setCustomActions()
             .setState(
                 when {
-                    isPlayingState.value -> PlaybackStateCompat.STATE_PLAYING
+                    mediaRetrieverController.isPlaying -> PlaybackStateCompat.STATE_PLAYING
                     else -> PlaybackStateCompat.STATE_PAUSED
                 },
                 currentPlaybackPosition,
-                speedState.value,
+                mediaRetrieverController.speed,
                 SystemClock.elapsedRealtime()
             )
             .build()
 
     private fun PlaybackStateCompat.Builder.setCustomActions(): PlaybackStateCompat.Builder {
         val repeatAction = when {
-            isRepeatingState.value -> PlaybackStateCompat.CustomAction.Builder(
+            mediaRetrieverController.isRepeating -> PlaybackStateCompat.CustomAction.Builder(
                 ACTION_REPEAT,
                 getString(R.string.change_repeat),
                 R.drawable.repeat
@@ -265,64 +215,46 @@ class StreamService : SuspendService(),
             .addCustomAction(cancelAction)
     }
 
-    private suspend fun mUpdateMediaSession(
-        videoMetadata: VideoMetadata? = currentMetadataState.value
-    ) = mediaSession.run {
-        setPlaybackState(newPlaybackState)
-        setMetadata(
-            currentMetadataState
-                .updateAndGet { videoMetadata }
-                ?.toAndroidMetadata(getVideoCoverAsync().await())
+    private fun initMediaSession() {
+        mediaSessionController.initMediaSession(
+            mediaSessionCallback = newMediaSessionCallback,
+            playbackState = newPlaybackState
         )
+
+        playerNotificationManager.setPlayer(playbackController.player)
     }
+
+    private suspend fun updateMediaSession(
+        videoMetadata: VideoMetadata? = currentMetadataState.value
+    ) = mediaSessionController.updateMediaSession(
+        playbackState = newPlaybackState,
+        metadata = currentMetadataState
+            .updateAndGet { videoMetadata }
+            ?.toAndroidMetadata(getVideoCoverAsync().await())
+    )
 
     private suspend inline fun getVideoCoverAsync() =
         currentMetadataState
             .value
-            ?.let { coilUtils.getVideoCoverBitmapAsync(it) }
-            ?: coroutineScope { async(Dispatchers.IO) { coilUtils.getThumbnailBitmap() } }
+            ?.let { mediaRetrieverController.getVideoCoverBitmapAsync(it) }
+            ?: coroutineScope {
+                async(Dispatchers.IO) {
+                    mediaRetrieverController.getThumbnailBitmap()
+                }
+            }
 
     // ----------------------- Player Management -----------------------
 
-    private val audioSessionIdState by inject<MutableStateFlow<Int>>(
-        named(AUDIO_SESSION_ID)
-    )
+    @Volatile
+    private var isStoppedWithError = false
 
-    private val equalizerDataState by inject<MutableStateFlow<EqualizerData?>>(
-        named(EQUALIZER_DATA)
-    )
-
-    private lateinit var equalizer: Equalizer
-    private lateinit var bassBoost: BassBoost
-    private lateinit var reverb: PresetReverb
-
-    private var playbackTask: Job? = null
-    private var playbackPosMonitorTask: Job? = null
-
-    private val player by lazy {
-        ExoPlayer.Builder(this)
-            .setAudioAttributes(newAudioAttributes, true)
-            .setHandleAudioBecomingNoisy(true)
-            .setWakeMode(C.WAKE_MODE_NETWORK)
-            .setPauseAtEndOfMediaItems(false)
-            .build()
-            .apply {
-                addListener(playerStateChangedListener)
-                repeatMode = getRepeatMode(isRepeatingState.value)
-                initAudioEffects(audioSessionIdState.updateAndGet { audioSessionId })
-            }
+    private val playbackController by lazy {
+        PlaybackController(
+            context = this,
+            playerStateChangedListener = playerStateChangedListener,
+            mediaRetrieverController = mediaRetrieverController
+        )
     }
-
-    private fun getRepeatMode(isRepeating: Boolean) = when {
-        isRepeating -> Player.REPEAT_MODE_ONE
-        else -> Player.REPEAT_MODE_OFF
-    }
-
-    private inline val newAudioAttributes
-        get() = AudioAttributes.Builder()
-            .setContentType(C.AUDIO_CONTENT_TYPE_MOVIE)
-            .setUsage(C.USAGE_MEDIA)
-            .build()
 
     private inline val playerStateChangedListener: Player.Listener
         get() = object : Player.Listener {
@@ -342,14 +274,14 @@ class StreamService : SuspendService(),
 
                 when (playbackState) {
                     Player.STATE_IDLE -> restartPlayer()
-                    Player.STATE_BUFFERING -> player.seekToNextMediaItem()
+                    Player.STATE_BUFFERING -> playbackController.seekToNextMediaItem()
                     else -> Unit
                 }
             }
 
             override fun onIsPlayingChanged(isPlaying: Boolean) {
                 super.onIsPlayingChanged(isPlaying)
-                isPlayingState.update { isPlaying }
+                mediaRetrieverController.setPlaying(isPlaying)
 
                 when {
                     isPlaying -> startPlaybackPositionMonitoring()
@@ -370,112 +302,12 @@ class StreamService : SuspendService(),
             }
         }
 
-    // ----------------------- Audio Effects -----------------------
-
-    private fun initAudioEffects(audioSessionId: Int) {
-        initEqualizer(audioSessionId)
-        initBassBoost(audioSessionId)
-        initReverb(audioSessionId)
-    }
-
-    private fun EqualizerWithData(
-        audioSessionId: Int,
-        bandLevels: List<Short>?,
-        currentPreset: Short,
-        currentParameter: EqualizerParameters
-    ): Pair<Equalizer, EqualizerData> {
-        val eq = Equalizer(0, audioSessionId)
-
-        val data = EqualizerData(
-            eq = eq,
-            bandLevels = bandLevels,
-            currentPreset = currentPreset,
-            currentParameter = currentParameter
-        )
-
-        eq.setParameter(
-            currentParameter = data.currentParameter,
-            bandLevels = data.bandLevels,
-            preset = data.currentPreset
-        )
-
-        return eq to data
-    }
-
-    private fun BassBoost(audioSessionId: Int, bassStrength: Short) =
-        BassBoost(0, audioSessionId).apply {
-            try {
-                setStrength(bassStrength)
-            } catch (ignored: IllegalArgumentException) {
-                // Invalid strength
-            }
-        }
-
-    private fun Reverb(audioSessionId: Int, reverbPreset: Short) =
-        PresetReverb(0, audioSessionId).apply {
-            try {
-                preset = reverbPreset
-            } catch (ignored: IllegalArgumentException) {
-                // Invalid preset
-            }
-        }
-
-    private fun initEqualizer(audioSessionId: Int) {
-        val (eq, eqData) = EqualizerWithData(
-            audioSessionId = audioSessionId,
-            bandLevels = equalizerBandsState.value,
-            currentPreset = equalizerPresetState.value,
-            currentParameter = equalizerParamState.value
-        )
-
-        equalizer = eq
-        equalizerDataState.updateAndGet { eqData }
-    }
-
-    private fun initBassBoost(audioSessionId: Int) {
-        bassBoost = BassBoost(
-            audioSessionId = audioSessionId,
-            bassStrength = bassStrengthState.value
-        )
-    }
-
-    private fun initReverb(audioSessionId: Int) {
-        reverb = Reverb(
-            audioSessionId = audioSessionId,
-            reverbPreset = reverbPresetState.value
-        )
-    }
-
-    private suspend inline fun startAudioEffectsMonitoring() =
-        lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
-            combine(
-                areAudioEffectsEnabledState,
-                speedState,
-                pitchState
-            ) { enabled, speed, pitch ->
-                Triple(enabled, speed, pitch)
-            }.collectLatest { (enabled, speed, pitch) ->
-                player.playbackParameters = when {
-                    enabled -> PlaybackParameters(speed, pitch)
-                    else -> PlaybackParameters(1F, 1F)
-                }
-
-                updateNotification()
-            }
-        }
-
-    private fun releaseAudioEffects() {
-        setAudioEffectsEnabled(isEnabled = false)
-        equalizer.release()
-        bassBoost.release()
-        reverb.release()
-        equalizerDataState.update { null }
-    }
-
     // ----------------------- Playback Handle -----------------------
 
+    private var playbackTask: Job? = null
+
     private inline val currentPlaybackPosition
-        get() = player.currentPosition
+        get() = playbackController.currentPosition
 
     @kotlin.OptIn(ExperimentalCoroutinesApi::class)
     private val videoLengthState = currentMetadataState
@@ -495,7 +327,7 @@ class StreamService : SuspendService(),
 
     private suspend fun extractAudioUrlWithMeta(ytUrl: String): Result<Pair<String, VideoMeta?>> {
         val extractRes = withTimeoutOrNull(timeMillis = 4500) {
-            ktorClient.extractYtFilesWithMeta(
+            mediaRetrieverController.extractYtFilesWithMeta(
                 context = applicationContext,
                 ytUrl = ytUrl
             )
@@ -534,24 +366,27 @@ class StreamService : SuspendService(),
         Log.d(TAG, "Position: $initialPosition")
 
         playbackTask = scope.launch {
-            mUpdateMediaSession(videoMeta?.let(::VideoMetadata))
+            updateMediaSession(videoMeta?.let(::VideoMetadata))
             playerNotificationManager.invalidate()
             launch(Dispatchers.IO) { storeMetadata(videoMeta) }
 
-            player.run {
+            playbackController.player.run {
                 setMediaItem(MediaItem.fromUri(audioUrl))
                 playWhenReady = true
                 prepare()
                 seekTo(initialPosition)
             }
 
-            setAudioEffectsEnabled(isEnabled = areAudioEffectsEnabledState.value)
+            playbackController.setAudioEffectsEnabled(
+                isEnabled = mediaRetrieverController.areAudioEffectsEnabled,
+                mediaRetrieverController = mediaRetrieverController
+            )
         }
     }
 
     @OptIn(UnstableApi::class)
     private fun playStream(ytUrl: String, initialPosition: Long = 0) {
-        resetAudioSessionId()
+        playbackController.resetAudioSessionId()
 
         scope.launch(Dispatchers.IO) {
             extractMediaFilesAndStartPlaying(
@@ -567,68 +402,25 @@ class StreamService : SuspendService(),
     }
 
     private fun restartPlayer() = playStream(
-        ytUrl = currentUrlState.value,
-        initialPosition = playbackPositionState.value
+        ytUrl = mediaRetrieverController.currentUrl,
+        initialPosition = mediaRetrieverController.playbackPosition
     )
-
-    private fun seekTo(position: Long) {
-        resetAudioSessionId()
-        player.seekTo(position)
-    }
-
-    private fun seekTo10SecsBack() {
-        resetAudioSessionId()
-        player.seekTo(maxOf(currentPlaybackPosition - TEN_SECS_AS_MILLIS, 0))
-    }
-
-    private fun seekTo10SecsForward() {
-        resetAudioSessionId()
-        player.seekTo(minOf(currentPlaybackPosition + TEN_SECS_AS_MILLIS, videoLengthState.value))
-    }
 
     private fun releaseMedia() {
         playerNotificationManager.setPlayer(null)
-        releaseAudioEffects()
-        player.stop()
-        player.release()
-        mediaSession.release()
-        transportControls.stop()
-        audioSessionIdState.update { 0 }
+        playbackController.releaseAudioEffects()
+        playbackController.releasePlayer()
+        mediaSessionController.releaseMediaSession()
     }
 
     private fun pausePlayback() {
         scope.launch { sendAndStorePlaybackPosition() }
-        player.pause()
-        //setAudioEffectsEnabled(isEnabled = false)
-    }
-
-    private fun resumePlayback() {
-        resetAudioSessionId()
-        player.playWhenReady = true
-        //setAudioEffectsEnabled(isEnabled = areAudioEffectsEnabledState.value)
-    }
-
-    private fun setAudioEffectsEnabled(isEnabled: Boolean) {
-        player.playbackParameters = when {
-            isEnabled -> PlaybackParameters(speedState.value, pitchState.value)
-            else -> PlaybackParameters(1F, 1F)
-        }
-
-        // For some reason, it requires multiple tries to enable...
-        repeat(3) {
-            try {
-                equalizer.enabled = isEnabled
-                bassBoost.enabled = isEnabled
-                reverb.enabled = isEnabled
-            } catch (ignored: IllegalStateException) {
-                // not initialized
-            }
-        }
+        playbackController.pause()
     }
 
     // --------------------------- Playback Monitoring ---------------------------
 
-    private fun resetAudioSessionId() = audioSessionIdState.update { player.audioSessionId }
+    private var playbackPosMonitorTask: Job? = null
 
     private fun startPlaybackPositionMonitoring() {
         playbackPosMonitorTask = scope.launch {
@@ -641,10 +433,25 @@ class StreamService : SuspendService(),
 
     private fun stopPlaybackPositionMonitoring() = playbackPosMonitorTask?.cancel()
 
-    // --------------------------- Broadcast Receivers ---------------------------
+    private suspend inline fun startAudioEffectsMonitoring() =
+        lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
+            combine(
+                mediaRetrieverController.areAudioEffectsEnabledState,
+                mediaRetrieverController.speedState,
+                mediaRetrieverController.pitchState
+            ) { enabled, speed, pitch ->
+                Triple(enabled, speed, pitch)
+            }.collectLatest { (enabled, speed, pitch) ->
+                playbackController.playbackParameters = when {
+                    enabled -> PlaybackParameters(speed, pitch)
+                    else -> PlaybackParameters(1F, 1F)
+                }
 
-    @Volatile
-    private var isStoppedWithError = false
+                updateNotification()
+            }
+        }
+
+    // --------------------------- Broadcast Receivers ---------------------------
 
     private val pauseReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context?, intent: Intent?) {
@@ -663,7 +470,7 @@ class StreamService : SuspendService(),
                     isStoppedWithError = false
                 }
 
-                else -> resumePlayback()
+                else -> playbackController.resumePlayback()
             }
         }
     }
@@ -671,7 +478,7 @@ class StreamService : SuspendService(),
     private val switchVideoReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context?, intent: Intent) {
             sendPlaybackPosition(0)
-            val url = intent.mUrlArg
+            val url = intent.urlArg
             scope.launch { storeCurrentUrl(url) }
             storeAndPlayNewStream(url)
         }
@@ -680,14 +487,14 @@ class StreamService : SuspendService(),
     private val tenSecsBackReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context?, intent: Intent?) {
             Log.d(TAG, "10 secs back")
-            seekTo10SecsBack()
+            playbackController.seekTo10SecsBack()
         }
     }
 
     private val tenSecsForwardReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context?, intent: Intent?) {
             Log.d(TAG, "10 secs forward")
-            seekTo10SecsForward()
+            playbackController.seekTo10SecsForward(videoLengthState.value)
         }
     }
 
@@ -695,17 +502,17 @@ class StreamService : SuspendService(),
         override fun onReceive(context: Context, intent: Intent) {
             val position = intent.getLongExtra(POSITION_ARG, 0)
             Log.d(TAG, "seek to $position")
-            resetAudioSessionId()
-            seekTo(position)
+            playbackController.resetAudioSessionId()
+            playbackController.seekTo(position)
         }
     }
 
     private val repeatChangedReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context?, intent: Intent?) {
             scope.launch {
-                val newRepeatMode = !isRepeatingState.value
+                val newRepeatMode = !mediaRetrieverController.isRepeating
                 storeIsRepeating(newRepeatMode)
-                player.repeatMode = getRepeatMode(newRepeatMode)
+                playbackController.repeatMode = PlaybackController.getRepeatMode(newRepeatMode)
                 playerNotificationManager.invalidate()
                 Log.d(TAG, "Repeating changed: $newRepeatMode")
             }
@@ -720,41 +527,45 @@ class StreamService : SuspendService(),
     }
 
     private val audioEffectsEnabledUpdateReceiver = object : BroadcastReceiver() {
-        override fun onReceive(context: Context?, intent: Intent?) {
-            val isEnabled = areAudioEffectsEnabledState.value
-            setAudioEffectsEnabled(isEnabled)
-        }
+        override fun onReceive(context: Context?, intent: Intent?) =
+            playbackController.setAudioEffectsEnabled(
+                isEnabled = mediaRetrieverController.areAudioEffectsEnabled,
+                mediaRetrieverController = mediaRetrieverController
+            )
     }
 
     private val equalizerParameterUpdateReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context?, intent: Intent?) {
-            val currentParameter = equalizerParamState.value
-            val bandLevels = equalizerBandsState.value
-            val preset = equalizerPresetState.value
+            val currentParameter = mediaRetrieverController.equalizerParams
+            val bandLevels = mediaRetrieverController.equalizerBands
+            val preset = mediaRetrieverController.equalizerPreset
 
-            equalizer.setParameter(currentParameter, bandLevels, preset)
+            playbackController.setEqParameter(currentParameter, bandLevels, preset)
             Log.d(TAG, "EQ Params Set: $currentParameter; EQ: $bandLevels")
 
-            equalizerDataState.update {
-                EqualizerData(
-                    eq = equalizer,
-                    bandLevels = bandLevels,
-                    currentPreset = preset,
-                    currentParameter = currentParameter
-                )
-            }
+            playbackController.updateEqData(
+                bandLevels = bandLevels,
+                currentPreset = preset,
+                currentParameter = currentParameter
+            )
         }
     }
 
     private val bassStrengthUpdateReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context?, intent: Intent?) {
-            bassBoost.setStrength(bassStrengthState.value)
+            playbackController.bassStrength = mediaRetrieverController.bassStrength
         }
     }
 
     private val reverbPresetUpdateReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context?, intent: Intent?) {
-            reverb.preset = reverbPresetState.value
+            playbackController.reverbPreset = mediaRetrieverController.reverbPreset
+        }
+    }
+
+    private val stopReceiver = object : BroadcastReceiver() {
+        override fun onReceive(context: Context?, intent: Intent?) {
+            Log.d(TAG, "Stopped after stop receive: ${stopSelfResult(startIdState.value)}")
         }
     }
 
@@ -772,6 +583,7 @@ class StreamService : SuspendService(),
         registerReceiverCompat(equalizerParameterUpdateReceiver, Broadcast_EQUALIZER_PARAM_UPDATE)
         registerReceiverCompat(bassStrengthUpdateReceiver, Broadcast_BASS_STRENGTH_UPDATE)
         registerReceiverCompat(reverbPresetUpdateReceiver, Broadcast_REVERB_PRESET_UPDATE)
+        registerReceiverCompat(stopReceiver, Broadcast_STOP)
     }
 
     override fun unregisterReceivers() {
@@ -787,9 +599,12 @@ class StreamService : SuspendService(),
         unregisterReceiver(equalizerParameterUpdateReceiver)
         unregisterReceiver(bassStrengthUpdateReceiver)
         unregisterReceiver(reverbPresetUpdateReceiver)
+        unregisterReceiver(stopReceiver)
     }
 
     // --------------------------- Service Impl ---------------------------
+
+    private val startIdState = MutableStateFlow(0)
 
     override fun onCreate() {
         super.onCreate()
@@ -798,13 +613,14 @@ class StreamService : SuspendService(),
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         super.onStartCommand(intent, flags, startId)
+        startIdState.update { startId }
         Log.d(TAG, "onStart called with id $startId")
 
         isConnectedState.update { true }
         initMediaSession()
 
         scope.launch {
-            when (val url = intent?.mUrlArgOrNull) {
+            when (val url = intent?.urlArgOrNull) {
                 // Continue with previous stream
                 null -> onResumeClicked()
 
@@ -819,8 +635,8 @@ class StreamService : SuspendService(),
     }
 
     private fun onResumeClicked() = storeAndPlayNewStream(
-        url = currentUrlState.value,
-        initialPosition = playbackPositionState.value
+        url = mediaRetrieverController.currentUrl,
+        initialPosition = mediaRetrieverController.playbackPosition
     )
 
     private suspend inline fun onFetchVideoClicked(url: String) {
@@ -943,7 +759,7 @@ class StreamService : SuspendService(),
     private inline val newCustomActions
         get() = mutableListOf(
             when {
-                isRepeatingState.value -> ACTION_REPEAT
+                mediaRetrieverController.isRepeating -> ACTION_REPEAT
                 else -> ACTION_UNREPEAT
             },
             ACTION_DISMISS
@@ -968,7 +784,10 @@ class StreamService : SuspendService(),
 
     override suspend fun startNotificationObserving() =
         lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
-            combine(isPlayingState, isRepeatingState) { isPlaying, isRepeating ->
+            combine(
+                mediaRetrieverController.isPlayingState,
+                mediaRetrieverController.isRepeatingState
+            ) { isPlaying, isRepeating ->
                 isPlaying to isRepeating
             }.collectLatest {
                 scope.launch { updateNotification() }
@@ -976,7 +795,7 @@ class StreamService : SuspendService(),
         }
 
     private suspend inline fun updateNotification() {
-        mUpdateMediaSession()
+        updateMediaSession()
         playerNotificationManager.invalidate()
     }
 
@@ -1022,16 +841,16 @@ class StreamService : SuspendService(),
     // ----------------------- Storage Handler Utils -----------------------
 
     private suspend inline fun storePlaybackPosition() =
-        storageHandler.storeStreamPlaybackPosition(currentPlaybackPosition)
+        mediaRetrieverController.storeStreamPlaybackPosition(currentPlaybackPosition)
 
     private suspend inline fun storeIsRepeating(isRepeating: Boolean) =
-        storageHandler.storeIsRepeating(isRepeating)
+        mediaRetrieverController.storeIsRepeating(isRepeating)
 
     private suspend inline fun storeCurrentUrl(url: String) =
-        storageHandler.storeCurrentUrl(url)
+        mediaRetrieverController.storeCurrentUrl(url)
 
     private suspend inline fun storeMetadata(videoMeta: VideoMeta?) =
-        storageHandler.storeCurrentMetadata(videoMeta?.let(::VideoMetadata))
+        mediaRetrieverController.storeCurrentMetadata(videoMeta?.let(::VideoMetadata))
 
     // --------------------------- Error Handle ---------------------------
 
