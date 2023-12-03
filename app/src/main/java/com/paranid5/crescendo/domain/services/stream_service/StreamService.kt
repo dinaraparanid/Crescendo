@@ -38,7 +38,7 @@ import com.paranid5.crescendo.domain.utils.extensions.registerReceiverCompat
 import com.paranid5.crescendo.domain.utils.extensions.sendBroadcast
 import com.paranid5.crescendo.presentation.main.MainActivity
 import com.paranid5.crescendo.presentation.main.playing.Broadcast_CUR_POSITION_CHANGED
-import com.paranid5.crescendo.presentation.main.playing.CUR_POSITION_ARG
+import com.paranid5.crescendo.presentation.main.playing.CUR_POSITION_STREAMING_ARG
 import com.paranid5.yt_url_extractor_kt.VideoMeta
 import com.paranid5.yt_url_extractor_kt.YtFailure
 import com.paranid5.yt_url_extractor_kt.YtFilesNotFoundException
@@ -317,7 +317,7 @@ class StreamService : SuspendService(),
     private fun sendPlaybackPosition(curPosition: Long = currentPlaybackPosition) =
         sendBroadcast(
             Intent(Broadcast_CUR_POSITION_CHANGED)
-                .putExtra(CUR_POSITION_ARG, curPosition)
+                .putExtra(CUR_POSITION_STREAMING_ARG, curPosition)
         )
 
     private suspend fun sendAndStorePlaybackPosition() {
@@ -386,7 +386,7 @@ class StreamService : SuspendService(),
 
     @OptIn(UnstableApi::class)
     private fun playStream(ytUrl: String, initialPosition: Long = 0) {
-        playbackController.resetAudioSessionId()
+        playbackController.resetAudioSessionIdIfNotPlaying()
 
         scope.launch(Dispatchers.IO) {
             extractMediaFilesAndStartPlaying(
@@ -403,7 +403,7 @@ class StreamService : SuspendService(),
 
     private fun restartPlayer() = playStream(
         ytUrl = mediaRetrieverController.currentUrl,
-        initialPosition = mediaRetrieverController.playbackPosition
+        initialPosition = mediaRetrieverController.streamPlaybackPosition
     )
 
     private fun releaseMedia() {
@@ -502,7 +502,7 @@ class StreamService : SuspendService(),
         override fun onReceive(context: Context, intent: Intent) {
             val position = intent.getLongExtra(POSITION_ARG, 0)
             Log.d(TAG, "seek to $position")
-            playbackController.resetAudioSessionId()
+            playbackController.resetAudioSessionIdIfNotPlaying()
             playbackController.seekTo(position)
         }
     }
@@ -636,7 +636,7 @@ class StreamService : SuspendService(),
 
     private fun onResumeClicked() = storeAndPlayNewStream(
         url = mediaRetrieverController.currentUrl,
-        initialPosition = mediaRetrieverController.playbackPosition
+        initialPosition = mediaRetrieverController.streamPlaybackPosition
     )
 
     private suspend inline fun onFetchVideoClicked(url: String) {

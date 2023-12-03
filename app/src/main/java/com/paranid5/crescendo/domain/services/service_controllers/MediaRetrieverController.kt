@@ -6,8 +6,8 @@ import com.paranid5.crescendo.IS_PLAYING
 import com.paranid5.crescendo.data.VideoMetadata
 import com.paranid5.crescendo.data.tracks.DefaultTrack
 import com.paranid5.crescendo.domain.StorageHandler
+import com.paranid5.crescendo.presentation.main.AudioStatus
 import com.paranid5.crescendo.presentation.ui.utils.CoilUtils
-import com.paranid5.yt_url_extractor_kt.VideoMeta
 import com.paranid5.yt_url_extractor_kt.extractYtFilesWithMeta
 import io.ktor.client.HttpClient
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -35,8 +35,11 @@ class MediaRetrieverController(context: Context) : KoinComponent {
     val currentTrackState = storageHandler.currentTrackState
     inline val currentTrack get() = currentTrackState.value
 
-    val playbackPositionState = storageHandler.streamPlaybackPositionState
-    inline val playbackPosition get() = playbackPositionState.value
+    val streamPlaybackPositionState = storageHandler.streamPlaybackPositionState
+    inline val streamPlaybackPosition get() = streamPlaybackPositionState.value
+
+    val tracksPlaybackPositionState = storageHandler.tracksPlaybackPositionState
+    inline val tracksPlaybackPosition get() = tracksPlaybackPositionState.value
 
     val isRepeatingState = storageHandler.isRepeatingState
     inline val isRepeating get() = isPlayingState.value
@@ -92,6 +95,9 @@ class MediaRetrieverController(context: Context) : KoinComponent {
 
     suspend fun storeCurrentPlaylist(playlist: List<DefaultTrack>) =
         storageHandler.storeCurrentPlaylist(playlist)
+
+    suspend fun storeAudioStatus(audioStatus: AudioStatus) =
+        storageHandler.storeAudioStatus(audioStatus)
 
     suspend fun extractYtFilesWithMeta(context: Context, ytUrl: String) =
         ktorClient.extractYtFilesWithMeta(

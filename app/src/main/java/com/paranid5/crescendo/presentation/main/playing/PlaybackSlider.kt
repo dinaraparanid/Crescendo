@@ -30,7 +30,7 @@ import org.koin.compose.koinInject
 fun PlaybackSlider(
     length: Long,
     palette: Palette?,
-    audioStatus: AudioStatus?,
+    audioStatus: AudioStatus,
     modifier: Modifier = Modifier,
     playingUIHandler: PlayingUIHandler = koinInject(),
     storageHandler: StorageHandler = koinInject(),
@@ -54,17 +54,24 @@ fun PlaybackSlider(
 
     fun getDefaultPlaybackPosition() = when (audioStatus) {
         AudioStatus.STREAMING -> storageHandler.streamPlaybackPositionState.value
-        else -> storageHandler.tracksPlaybackPositionState.value
+        AudioStatus.PLAYING -> storageHandler.tracksPlaybackPositionState.value
     }
 
-    LaunchedEffect(key1 = true) {
+    LaunchedEffect(Unit) {
         curPosition = getDefaultPlaybackPosition()
     }
 
     BroadcastReceiver(action = Broadcast_CUR_POSITION_CHANGED) { _, intent ->
-        curPosition = when {
-            isSliderEnabled -> intent!!.getLongExtra(CUR_POSITION_ARG, 0)
-            else -> getDefaultPlaybackPosition()
+        curPosition = when (audioStatus) {
+            AudioStatus.STREAMING -> intent!!.getLongExtra(
+                CUR_POSITION_STREAMING_ARG,
+                getDefaultPlaybackPosition()
+            )
+
+            AudioStatus.PLAYING -> intent!!.getLongExtra(
+                CUR_POSITION_PLAYING_ARG,
+                getDefaultPlaybackPosition()
+            )
         }
     }
 

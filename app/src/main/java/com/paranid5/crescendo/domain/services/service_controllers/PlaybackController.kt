@@ -121,7 +121,11 @@ class PlaybackController(
     }
 
     @OptIn(UnstableApi::class)
-    fun resetAudioSessionId() = audioSessionIdState.update { player.audioSessionId }
+    private fun resetAudioSessionId() = audioSessionIdState.update { player.audioSessionId }
+
+    fun resetAudioSessionIdIfNotPlaying() {
+        if (!isPlaying) resetAudioSessionId()
+    }
 
     private fun EqualizerWithData(
         audioSessionId: Int,

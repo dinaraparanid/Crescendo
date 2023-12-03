@@ -67,7 +67,7 @@ fun TitleAndAuthor(
 @Composable
 fun PropertiesButton(
     palette: Palette?,
-    audioStatus: AudioStatus?,
+    audioStatus: AudioStatus,
     modifier: Modifier = Modifier,
     storageHandler: StorageHandler = koinInject()
 ) {
@@ -79,7 +79,7 @@ fun PropertiesButton(
             modifier = modifier
         )
 
-        else -> currentTrackMb?.let { currentTrack ->
+        AudioStatus.PLAYING -> currentTrackMb?.let { currentTrack ->
             TrackPropertiesButton(
                 track = currentTrack,
                 tint = palette.getLightMutedOrPrimary(),
@@ -111,7 +111,7 @@ fun TitleAndPropertiesButton(
     title: String,
     author: String,
     palette: Palette?,
-    audioStatus: AudioStatus?,
+    audioStatus: AudioStatus,
     modifier: Modifier = Modifier,
     textAlignment: Alignment.Horizontal = Alignment.Start
 ) = Row(modifier) {

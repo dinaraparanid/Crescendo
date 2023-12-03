@@ -38,7 +38,7 @@ import org.koin.compose.koinInject
 @Composable
 fun UtilsButtons(
     palette: Palette?,
-    audioStatus: AudioStatus?,
+    audioStatus: AudioStatus,
     modifier: Modifier = Modifier
 ) = Row(modifier.fillMaxWidth()) {
     EqualizerButton(
@@ -161,7 +161,7 @@ private fun LikeButton(palette: Palette?, modifier: Modifier = Modifier) {
 @Composable
 private fun PlaylistOrDownloadButton(
     palette: Palette?,
-    audioStatus: AudioStatus?,
+    audioStatus: AudioStatus,
     modifier: Modifier = Modifier,
     storageHandler: StorageHandler = koinInject()
 ) {
@@ -180,7 +180,7 @@ private fun PlaylistOrDownloadButton(
             modifier
         )
 
-        else -> CurrentPlaylistButton(palette, modifier)
+        AudioStatus.PLAYING -> CurrentPlaylistButton(palette, modifier)
     }
 }
 

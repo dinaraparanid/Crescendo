@@ -28,7 +28,7 @@ import org.koin.core.qualifier.named
 @Composable
 fun PlaybackButtons(
     palette: Palette?,
-    audioStatus: AudioStatus?,
+    audioStatus: AudioStatus,
     modifier: Modifier = Modifier,
     storageHandler: StorageHandler = koinInject()
 ) {
@@ -66,7 +66,7 @@ fun PlaybackButtons(
 @Composable
 private fun PlayButton(
     palette: Palette?,
-    audioStatus: AudioStatus?,
+    audioStatus: AudioStatus,
     modifier: Modifier = Modifier,
     isPlayingState: MutableStateFlow<Boolean> = koinInject(named(IS_PLAYING)),
     playingUIHandler: PlayingUIHandler = koinInject(),
@@ -87,8 +87,7 @@ private fun PlayButton(
             modifier = modifier.simpleShadow(color = paletteColor),
             onClick = {
                 coroutineScope.launch {
-                    if (audioStatus != null)
-                        storageHandler.storeAudioStatus(audioStatus)
+                    storageHandler.storeAudioStatus(audioStatus)
                 }
 
                 playingUIHandler.sendPauseBroadcast(audioStatus)
@@ -106,8 +105,7 @@ private fun PlayButton(
             modifier = modifier.simpleShadow(color = paletteColor),
             onClick = {
                 coroutineScope.launch {
-                    if (audioStatus != null)
-                        storageHandler.storeAudioStatus(audioStatus)
+                    storageHandler.storeAudioStatus(audioStatus)
                 }
 
                 playingUIHandler.startStreamingOrSendResumeBroadcast(audioStatus)
@@ -126,7 +124,7 @@ private fun PlayButton(
 @Composable
 private fun PrevButton(
     palette: Palette?,
-    audioStatus: AudioStatus?,
+    audioStatus: AudioStatus,
     enabled: Boolean,
     modifier: Modifier = Modifier,
     playingUIHandler: PlayingUIHandler = koinInject(),
@@ -140,8 +138,7 @@ private fun PrevButton(
         modifier = modifier.simpleShadow(color = paletteColor),
         onClick = {
             coroutineScope.launch {
-                if (audioStatus != null)
-                    storageHandler.storeAudioStatus(audioStatus)
+                storageHandler.storeAudioStatus(audioStatus)
             }
 
             playingUIHandler.sendOnPrevButtonClickedBroadcast(audioStatus)
@@ -161,7 +158,7 @@ private fun PrevButton(
 @Composable
 private fun NextButton(
     palette: Palette?,
-    audioStatus: AudioStatus?,
+    audioStatus: AudioStatus,
     enabled: Boolean,
     modifier: Modifier = Modifier,
     playingUIHandler: PlayingUIHandler = koinInject(),
@@ -175,8 +172,7 @@ private fun NextButton(
         modifier = modifier.simpleShadow(color = paletteColor),
         onClick = {
             coroutineScope.launch {
-                if (audioStatus != null)
-                    storageHandler.storeAudioStatus(audioStatus)
+                storageHandler.storeAudioStatus(audioStatus)
             }
 
             playingUIHandler.sendOnNextButtonClickedBroadcast(audioStatus)

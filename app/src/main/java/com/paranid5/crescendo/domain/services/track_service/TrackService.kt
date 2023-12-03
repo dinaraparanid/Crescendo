@@ -40,7 +40,7 @@ import com.paranid5.crescendo.domain.utils.extensions.sendBroadcast
 import com.paranid5.crescendo.domain.utils.extensions.toMediaItemList
 import com.paranid5.crescendo.presentation.main.MainActivity
 import com.paranid5.crescendo.presentation.main.playing.Broadcast_CUR_POSITION_CHANGED
-import com.paranid5.crescendo.presentation.main.playing.CUR_POSITION_ARG
+import com.paranid5.crescendo.presentation.main.playing.CUR_POSITION_PLAYING_ARG
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
@@ -330,10 +330,6 @@ class TrackService : SuspendService(),
             addMediaItems(playlist.toMediaItemList())
         }
 
-    private fun resetAudioSessionIdIfNotPlaying() {
-        if (!playbackController.isPlaying) playbackController.resetAudioSessionId()
-    }
-
     // ----------------------- Playback Handle -----------------------
 
     private inline val exoPlaybackPosition
@@ -358,10 +354,11 @@ class TrackService : SuspendService(),
         get() = mediaRetrieverController.currentTrackIndex
 
     private inline val savedPlaybackPosition
-        get() = mediaRetrieverController.playbackPosition
+        get() = mediaRetrieverController.tracksPlaybackPosition
 
     private fun sendPlaybackPosition(curPosition: Long = exoPlaybackPosition) = sendBroadcast(
-        Intent(Broadcast_CUR_POSITION_CHANGED).putExtra(CUR_POSITION_ARG, curPosition)
+        Intent(Broadcast_CUR_POSITION_CHANGED)
+            .putExtra(CUR_POSITION_PLAYING_ARG, curPosition)
     )
 
     private suspend fun sendAndStorePlaybackPosition() {
@@ -388,7 +385,7 @@ class TrackService : SuspendService(),
     ) {
         Log.d(TAG, "Playing track with index $curTrackInd: ${playlist[curTrackInd]}")
 
-        resetAudioSessionIdIfNotPlaying()
+        playbackController.resetAudioSessionIdIfNotPlaying()
         updateMediaSession(track = playlist[curTrackInd])
         playerNotificationManager.invalidate()
 
@@ -411,13 +408,13 @@ class TrackService : SuspendService(),
         }
 
     private fun seekTo(position: Long) {
-        resetAudioSessionIdIfNotPlaying()
+        playbackController.resetAudioSessionIdIfNotPlaying()
         playbackController.player.seekTo(position)
     }
 
     private suspend fun storeAndSwitchToTrackAt(index: Int) {
         storeCurrentTrackIndex(index)
-        resetAudioSessionIdIfNotPlaying()
+        playbackController.resetAudioSessionIdIfNotPlaying()
         playbackController.seekToTrackAtDefaultPosition(index)
     }
 

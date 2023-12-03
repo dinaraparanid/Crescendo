@@ -35,8 +35,18 @@ fun AudioWaveform(
     val audioSessionId by audioSessionIdState.collectAsState()
     var visualizer: WaveVisualizer? = null
 
+    DisposableEffect(enabled, color, audioSessionId) {
+        if (enabled)
+            visualizer?.recompose(color, audioSessionId)
+
+        onDispose {
+            visualizer?.release()
+            visualizer = null
+        }
+    }
+
     enabled.let {
-        Log.d(TAG, "enabled: $enabled")
+        Log.d(TAG, "Waveform enabled: $enabled")
 
         AndroidView(
             modifier = modifier,
@@ -46,17 +56,12 @@ fun AudioWaveform(
                     .also { visualizer = it }
             },
             update = {
+                visualizer = it
+
                 if (enabled)
                     it.recompose(color, audioSessionId)
             }
         )
-    }
-
-    DisposableEffect(Unit) {
-        onDispose {
-            visualizer?.release()
-            visualizer = null
-        }
     }
 }
 
@@ -70,6 +75,7 @@ private fun Context.findWaveVisualizer() =
 private fun WaveVisualizer.recompose(color: Color, audioSessionId: Int) {
     setColor(color.toArgb())
     updateAudioSessionId(audioSessionId)
+    invalidate()
 }
 
 @SuppressLint("LogConditional")

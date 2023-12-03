@@ -41,12 +41,14 @@ import org.koin.compose.koinInject
 
 private const val BROADCAST_LOCATION = "com.paranid5.mediastreamer.presentation.playing"
 const val Broadcast_CUR_POSITION_CHANGED = "$BROADCAST_LOCATION.CUR_POSITION_CHANGED"
-const val CUR_POSITION_ARG = "cur_position"
+
+const val CUR_POSITION_STREAMING_ARG = "cur_position_streaming"
+const val CUR_POSITION_PLAYING_ARG = "cur_position_playing"
 
 @Composable
 fun PlayingScreen(
     coverAlpha: Float,
-    audioStatus: AudioStatus?,
+    audioStatus: AudioStatus,
     modifier: Modifier = Modifier,
     storageHandler: StorageHandler = koinInject()
 ) {
@@ -62,7 +64,6 @@ fun PlayingScreen(
     val title = when (audioStatus) {
         AudioStatus.STREAMING -> currentMetadata?.title ?: stringResource(R.string.stream_no_name)
         AudioStatus.PLAYING -> currentTrack?.title ?: stringResource(R.string.unknown_track)
-        else -> stringResource(R.string.unknown_track)
     }
 
     val author = when (audioStatus) {
@@ -71,14 +72,11 @@ fun PlayingScreen(
 
         AudioStatus.PLAYING ->
             currentTrack?.artistAlbum ?: stringResource(R.string.unknown_artist)
-
-        else -> stringResource(R.string.unknown_artist)
     }
 
     val length = when (audioStatus) {
         AudioStatus.STREAMING -> currentMetadata?.lenInMillis ?: 0
         AudioStatus.PLAYING -> currentTrack?.duration ?: 0
-        else -> 0
     }
 
     when (LocalConfiguration.current.orientation) {
@@ -110,7 +108,7 @@ private fun PlayingScreenPortrait(
     author: String,
     sliderLength: Long,
     coverAlpha: Float,
-    audioStatus: AudioStatus?,
+    audioStatus: AudioStatus,
     isLiveStreaming: Boolean,
     modifier: Modifier,
     storageHandler: StorageHandler = koinInject()
@@ -129,7 +127,7 @@ private fun PlayingScreenPortrait(
             size = coverSize
         )
 
-        else -> getCurrentTrackCoverModelWithPalette(
+        AudioStatus.PLAYING -> getCurrentTrackCoverModelWithPalette(
             isPlaceholderRequired = true,
             size = coverSize
         )
@@ -240,7 +238,7 @@ private fun PlayingScreenLandscape(
     author: String,
     sliderLength: Long,
     coverAlpha: Float,
-    audioStatus: AudioStatus?,
+    audioStatus: AudioStatus,
     isLiveStreaming: Boolean,
     modifier: Modifier,
     storageHandler: StorageHandler = koinInject()
@@ -259,7 +257,7 @@ private fun PlayingScreenLandscape(
             size = coverSize
         )
 
-        else -> getCurrentTrackCoverModelWithPalette(
+        AudioStatus.PLAYING -> getCurrentTrackCoverModelWithPalette(
             isPlaceholderRequired = true,
             size = coverSize
         )
@@ -381,7 +379,7 @@ private fun PlayingScreenLandscape(
 }
 
 @Composable
-private fun BackgroundImage(audioStatus: AudioStatus?, modifier: Modifier = Modifier) {
+private fun BackgroundImage(audioStatus: AudioStatus, modifier: Modifier = Modifier) {
     val config = LocalConfiguration.current
 
     val coverModel = when (audioStatus) {
@@ -392,7 +390,7 @@ private fun BackgroundImage(audioStatus: AudioStatus?, modifier: Modifier = Modi
             bitmapSettings = Bitmap::increaseDarkness,
         )
 
-        else -> getCurrentTrackCoverModel(
+        AudioStatus.PLAYING -> getCurrentTrackCoverModel(
             isPlaceholderRequired = true,
             size = config.screenWidthDp to config.screenHeightDp,
             isBlured = Build.VERSION.SDK_INT < Build.VERSION_CODES.S,
