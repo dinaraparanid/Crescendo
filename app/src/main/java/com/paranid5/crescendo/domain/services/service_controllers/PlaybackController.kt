@@ -26,17 +26,15 @@ import org.koin.core.qualifier.named
 
 class PlaybackController(
     context: Context,
+    private val playbackType: PlaybackType,
     playerStateChangedListener: Player.Listener,
-    mediaRetrieverController: MediaRetrieverController
+    mediaRetrieverController: MediaRetrieverController,
 ) : KoinComponent {
     companion object {
         private const val TEN_SECS_AS_MILLIS = 10000
-
-        fun getRepeatMode(isRepeating: Boolean) = when {
-            isRepeating -> Player.REPEAT_MODE_ONE
-            else -> Player.REPEAT_MODE_OFF
-        }
     }
+
+    enum class PlaybackType { STREAM, TRACKS }
 
     private val audioSessionIdState by inject<MutableStateFlow<Int>>(
         named(AUDIO_SESSION_ID)
@@ -64,7 +62,7 @@ class PlaybackController(
             .build()
             .apply {
                 addListener(playerStateChangedListener)
-                repeatMode = getRepeatMode(mediaRetrieverController.isRepeating)
+                repeatMode = getRepeatMode(isRepeating = mediaRetrieverController.isRepeating)
 
                 initAudioEffects(
                     audioSessionId = audioSessionIdState.updateAndGet { audioSessionId },
@@ -341,5 +339,13 @@ class PlaybackController(
         bassBoost.release()
         reverb.release()
         equalizerDataState.update { null }
+    }
+
+    fun getRepeatMode(isRepeating: Boolean) = when {
+        isRepeating -> Player.REPEAT_MODE_ONE
+        else -> when (playbackType) {
+            PlaybackType.STREAM -> Player.REPEAT_MODE_OFF
+            PlaybackType.TRACKS -> Player.REPEAT_MODE_ALL
+        }
     }
 }

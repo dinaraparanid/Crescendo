@@ -255,7 +255,8 @@ class TrackService : SuspendService(),
         PlaybackController(
             context = this,
             playerStateChangedListener = playerStateChangedListener,
-            mediaRetrieverController = mediaRetrieverController
+            mediaRetrieverController = mediaRetrieverController,
+            playbackType = PlaybackController.PlaybackType.TRACKS
         )
     }
 
@@ -565,7 +566,7 @@ class TrackService : SuspendService(),
             scope.launch {
                 val newRepeatMode = !mediaRetrieverController.isRepeating
                 storeIsRepeating(newRepeatMode)
-                playbackController.repeatMode = PlaybackController.getRepeatMode(newRepeatMode)
+                playbackController.repeatMode = playbackController.getRepeatMode(newRepeatMode)
                 playerNotificationManager.invalidate()
                 Log.d(TAG, "Repeating changed: $newRepeatMode")
             }
