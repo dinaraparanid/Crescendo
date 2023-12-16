@@ -2,7 +2,7 @@ package com.paranid5.crescendo.presentation.main.audio_effects
 
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
-import com.paranid5.crescendo.domain.StorageHandler
+import com.paranid5.crescendo.data.StorageHandler
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.updateAndGet

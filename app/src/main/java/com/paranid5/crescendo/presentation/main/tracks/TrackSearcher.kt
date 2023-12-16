@@ -5,7 +5,7 @@ import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
 import androidx.compose.ui.Modifier
-import com.paranid5.crescendo.data.tracks.Track
+import com.paranid5.crescendo.domain.tracks.Track
 import com.paranid5.crescendo.presentation.ui.utils.Searcher
 import kotlinx.coroutines.flow.StateFlow
 

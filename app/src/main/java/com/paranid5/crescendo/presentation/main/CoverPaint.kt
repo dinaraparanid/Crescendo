@@ -12,9 +12,9 @@ import coil.request.ImageRequest
 import coil.size.Precision
 import coil.size.Scale
 import com.paranid5.crescendo.R
-import com.paranid5.crescendo.domain.StorageHandler
+import com.paranid5.crescendo.data.StorageHandler
 import com.paranid5.crescendo.presentation.ui.utils.BlurTransformation
-import com.paranid5.crescendo.presentation.ui.utils.CoilUtils
+import com.paranid5.crescendo.media.CoilUtils
 import org.koin.compose.koinInject
 
 @Composable

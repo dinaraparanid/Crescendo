@@ -15,6 +15,7 @@ import androidx.compose.ui.viewinterop.AndroidView
 import androidx.palette.graphics.Palette
 import com.gauravk.audiovisualizer.visualizer.WaveVisualizer
 import com.paranid5.crescendo.AUDIO_SESSION_ID
+import com.paranid5.crescendo.IS_PLAYING
 import com.paranid5.crescendo.R
 import com.paranid5.crescendo.presentation.ui.extensions.getLightMutedOrPrimary
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -29,15 +30,19 @@ fun AudioWaveform(
     enabled: Boolean,
     modifier: Modifier = Modifier,
     palette: Palette? = null,
-    audioSessionIdState: MutableStateFlow<Int> = koinInject(named(AUDIO_SESSION_ID))
+    audioSessionIdState: MutableStateFlow<Int> = koinInject(named(AUDIO_SESSION_ID)),
+    isPlayingState: MutableStateFlow<Boolean> = koinInject(named(IS_PLAYING))
 ) {
     val color = palette.getLightMutedOrPrimary()
     val audioSessionId by audioSessionIdState.collectAsState()
+    val isPlaying by isPlayingState.collectAsState()
     var visualizer: WaveVisualizer? = null
 
-    DisposableEffect(enabled, color, audioSessionId) {
-        if (enabled)
-            visualizer?.recompose(color, audioSessionId)
+    DisposableEffect(enabled, color, audioSessionId, isPlaying) {
+        when {
+            enabled && isPlaying -> visualizer?.recompose(color, audioSessionId)
+            !isPlaying -> visualizer?.stop()
+        }
 
         onDispose {
             visualizer?.release()
@@ -76,6 +81,10 @@ private fun WaveVisualizer.recompose(color: Color, audioSessionId: Int) {
     setColor(color.toArgb())
     updateAudioSessionId(audioSessionId)
     invalidate()
+}
+
+private fun WaveVisualizer.stop() {
+    updateAudioSessionId(0)
 }
 
 @SuppressLint("LogConditional")

@@ -19,8 +19,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.palette.graphics.Palette
-import com.paranid5.crescendo.domain.StorageHandler
-import com.paranid5.crescendo.presentation.main.AudioStatus
+import com.paranid5.crescendo.data.StorageHandler
+import com.paranid5.crescendo.domain.media.AudioStatus
 import com.paranid5.crescendo.presentation.ui.extensions.getLightMutedOrPrimary
 import com.paranid5.crescendo.presentation.ui.theme.TransparentUtility
 import com.paranid5.crescendo.presentation.ui.utils.BroadcastReceiver

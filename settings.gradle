@@ -15,3 +15,5 @@ dependencyResolutionManagement {
 }
 rootProject.name = 'MediaStreamer'
 include ':app'
+include ':data'
+include ':domain'

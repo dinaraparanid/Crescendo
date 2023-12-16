@@ -35,8 +35,8 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.paranid5.crescendo.R
-import com.paranid5.crescendo.data.utils.extensions.timeString
-import com.paranid5.crescendo.data.utils.extensions.toTimeOrNull
+import com.paranid5.crescendo.domain.utils.extensions.timeString
+import com.paranid5.crescendo.domain.utils.extensions.toTimeOrNull
 import com.paranid5.crescendo.presentation.ui.theme.LocalAppColors
 import com.paranid5.crescendo.presentation.ui.utils.DefaultOutlinedTextField
 

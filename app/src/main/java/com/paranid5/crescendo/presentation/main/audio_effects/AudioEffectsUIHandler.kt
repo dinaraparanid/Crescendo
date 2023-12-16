@@ -1,13 +1,13 @@
 package com.paranid5.crescendo.presentation.main.audio_effects
 
 import android.content.Context
-import com.paranid5.crescendo.data.eq.EqualizerParameters
-import com.paranid5.crescendo.domain.StorageHandler
-import com.paranid5.crescendo.domain.services.stream_service.StreamService
-import com.paranid5.crescendo.domain.services.track_service.TrackService
+import com.paranid5.crescendo.data.StorageHandler
+import com.paranid5.crescendo.domain.eq.EqualizerParameters
 import com.paranid5.crescendo.domain.utils.extensions.sendBroadcast
 import com.paranid5.crescendo.presentation.UIHandler
-import com.paranid5.crescendo.presentation.main.handleOrIgnore
+import com.paranid5.crescendo.domain.media.handleOrIgnore
+import com.paranid5.crescendo.services.stream_service.StreamService
+import com.paranid5.crescendo.services.track_service.TrackService
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch

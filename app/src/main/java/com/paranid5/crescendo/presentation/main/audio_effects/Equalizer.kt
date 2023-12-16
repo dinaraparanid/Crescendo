@@ -54,8 +54,8 @@ import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import com.paranid5.crescendo.EQUALIZER_DATA
 import com.paranid5.crescendo.R
-import com.paranid5.crescendo.data.eq.EqualizerData
-import com.paranid5.crescendo.data.eq.EqualizerParameters
+import com.paranid5.crescendo.domain.eq.EqualizerData
+import com.paranid5.crescendo.domain.eq.EqualizerParameters
 import com.paranid5.crescendo.presentation.ui.theme.LocalAppColors
 import com.paranid5.crescendo.presentation.ui.utils.Spinner
 import kotlinx.coroutines.Job

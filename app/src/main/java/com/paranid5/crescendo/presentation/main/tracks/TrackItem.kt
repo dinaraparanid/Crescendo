@@ -29,16 +29,16 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
 import com.paranid5.crescendo.R
-import com.paranid5.crescendo.data.tracks.Track
-import com.paranid5.crescendo.data.utils.extensions.artistAlbum
-import com.paranid5.crescendo.data.utils.extensions.toDefaultTrackList
-import com.paranid5.crescendo.domain.StorageHandler
-import com.paranid5.crescendo.domain.services.track_service.TrackServiceAccessor
-import com.paranid5.crescendo.presentation.main.AudioStatus
+import com.paranid5.crescendo.data.StorageHandler
+import com.paranid5.crescendo.domain.tracks.Track
+import com.paranid5.crescendo.domain.utils.extensions.artistAlbum
+import com.paranid5.crescendo.domain.utils.extensions.toDefaultTrackList
+import com.paranid5.crescendo.domain.media.AudioStatus
 import com.paranid5.crescendo.presentation.main.getTrackCoverModel
 import com.paranid5.crescendo.presentation.ui.permissions.requests.audioRecordingPermissionsRequestLauncher
 import com.paranid5.crescendo.presentation.ui.permissions.requests.foregroundServicePermissionsRequestLauncher
 import com.paranid5.crescendo.presentation.ui.theme.LocalAppColors
+import com.paranid5.crescendo.services.track_service.TrackServiceAccessor
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 

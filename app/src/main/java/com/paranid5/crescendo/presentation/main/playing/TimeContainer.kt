@@ -18,9 +18,9 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.paranid5.crescendo.R
-import com.paranid5.crescendo.data.utils.extensions.timeString
-import com.paranid5.crescendo.domain.services.stream_service.StreamServiceAccessor
+import com.paranid5.crescendo.domain.utils.extensions.timeString
 import com.paranid5.crescendo.presentation.ui.theme.LocalAppColors
+import com.paranid5.crescendo.services.stream_service.StreamServiceAccessor
 import org.koin.compose.koinInject
 
 context(RowScope)

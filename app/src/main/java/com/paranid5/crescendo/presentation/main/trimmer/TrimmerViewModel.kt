@@ -3,8 +3,8 @@ package com.paranid5.crescendo.presentation.main.trimmer
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.paranid5.crescendo.data.tracks.Track
-import com.paranid5.crescendo.domain.StorageHandler
+import com.paranid5.crescendo.data.StorageHandler
+import com.paranid5.crescendo.domain.tracks.Track
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow

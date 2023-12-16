@@ -16,7 +16,7 @@ import coil.request.ImageRequest
 import coil.size.Precision
 import coil.size.Scale
 import com.paranid5.crescendo.R
-import com.paranid5.crescendo.presentation.ui.utils.CoilUtils
+import com.paranid5.crescendo.media.CoilUtils
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 

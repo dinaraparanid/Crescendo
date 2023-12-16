@@ -22,16 +22,16 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.palette.graphics.Palette
 import com.paranid5.crescendo.R
-import com.paranid5.crescendo.domain.StorageHandler
-import com.paranid5.crescendo.domain.services.stream_service.StreamServiceAccessor
-import com.paranid5.crescendo.domain.services.track_service.TrackServiceAccessor
+import com.paranid5.crescendo.data.StorageHandler
 import com.paranid5.crescendo.presentation.composition_locals.LocalCurrentPlaylistSheetState
 import com.paranid5.crescendo.presentation.composition_locals.LocalNavController
 import com.paranid5.crescendo.presentation.composition_locals.LocalPlayingSheetState
-import com.paranid5.crescendo.presentation.main.AudioStatus
+import com.paranid5.crescendo.domain.media.AudioStatus
 import com.paranid5.crescendo.presentation.ui.extensions.getLightMutedOrPrimary
 import com.paranid5.crescendo.presentation.ui.extensions.simpleShadow
 import com.paranid5.crescendo.presentation.ui.permissions.requests.externalStoragePermissionsRequestLauncher
+import com.paranid5.crescendo.services.stream_service.StreamServiceAccessor
+import com.paranid5.crescendo.services.track_service.TrackServiceAccessor
 import kotlinx.coroutines.launch
 import org.koin.compose.koinInject
 

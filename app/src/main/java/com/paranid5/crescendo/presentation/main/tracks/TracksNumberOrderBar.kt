@@ -23,9 +23,9 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.paranid5.crescendo.R
-import com.paranid5.crescendo.data.tracks.TrackOrder
-import com.paranid5.crescendo.data.tracks.toString
-import com.paranid5.crescendo.domain.StorageHandler
+import com.paranid5.crescendo.data.StorageHandler
+import com.paranid5.crescendo.domain.tracks.TrackOrder
+import com.paranid5.crescendo.presentation.ui.extensions.toString
 import com.paranid5.crescendo.presentation.ui.theme.LocalAppColors
 import com.paranid5.crescendo.presentation.ui.utils.Spinner
 import kotlinx.coroutines.launch

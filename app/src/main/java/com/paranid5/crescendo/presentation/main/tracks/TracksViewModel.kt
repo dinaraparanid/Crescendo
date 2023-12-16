@@ -2,7 +2,7 @@ package com.paranid5.crescendo.presentation.main.tracks
 
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
-import com.paranid5.crescendo.data.tracks.Track
+import com.paranid5.crescendo.domain.tracks.Track
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.updateAndGet

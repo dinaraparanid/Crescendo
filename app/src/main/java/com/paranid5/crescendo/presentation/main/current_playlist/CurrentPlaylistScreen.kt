@@ -19,13 +19,13 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.paranid5.crescendo.R
-import com.paranid5.crescendo.data.tracks.DefaultTrack
-import com.paranid5.crescendo.data.utils.extensions.timeString
-import com.paranid5.crescendo.data.utils.extensions.totalDuration
-import com.paranid5.crescendo.domain.StorageHandler
-import com.paranid5.crescendo.domain.services.track_service.TrackServiceAccessor
+import com.paranid5.crescendo.data.StorageHandler
+import com.paranid5.crescendo.domain.tracks.DefaultTrack
+import com.paranid5.crescendo.domain.utils.extensions.totalDuration
+import com.paranid5.crescendo.domain.utils.extensions.timeString
 import com.paranid5.crescendo.presentation.ui.theme.LocalAppColors
 import com.paranid5.crescendo.presentation.ui.theme.TransparentUtility
+import com.paranid5.crescendo.services.track_service.TrackServiceAccessor
 import org.koin.compose.koinInject
 
 @Composable

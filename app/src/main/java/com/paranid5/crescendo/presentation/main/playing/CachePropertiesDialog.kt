@@ -33,11 +33,11 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.paranid5.crescendo.R
-import com.paranid5.crescendo.domain.StorageHandler
-import com.paranid5.crescendo.domain.services.video_cache_service.CacheTrimRange
-import com.paranid5.crescendo.domain.services.video_cache_service.Formats
+import com.paranid5.crescendo.data.StorageHandler
 import com.paranid5.crescendo.presentation.ui.theme.LocalAppColors
 import com.paranid5.crescendo.presentation.ui.utils.DefaultOutlinedTextField
+import com.paranid5.crescendo.domain.caching.CacheTrimRange
+import com.paranid5.crescendo.domain.caching.Formats
 import org.koin.compose.koinInject
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -63,7 +63,7 @@ fun CachePropertiesDialog(
     val endPointSecs by endPointSecsState
 
     val trimRange by remember {
-        derivedStateOf { CacheTrimRange(trimOffsetSecs, endPointSecs) }
+        derivedStateOf { CacheTrimRange(offset = trimOffsetSecs, endPoint = endPointSecs) }
     }
 
     val filenameState = remember { mutableStateOf("") }

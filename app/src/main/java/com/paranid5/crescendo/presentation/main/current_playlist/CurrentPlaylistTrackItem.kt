@@ -21,9 +21,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
-import com.paranid5.crescendo.data.tracks.Track
-import com.paranid5.crescendo.domain.StorageHandler
-import com.paranid5.crescendo.domain.services.track_service.TrackServiceAccessor
+import com.paranid5.crescendo.data.StorageHandler
+import com.paranid5.crescendo.domain.tracks.Track
 import com.paranid5.crescendo.presentation.main.tracks.TrackCover
 import com.paranid5.crescendo.presentation.main.tracks.TrackInfo
 import com.paranid5.crescendo.presentation.main.tracks.TrackPropertiesButton
@@ -31,6 +30,7 @@ import com.paranid5.crescendo.presentation.main.tracks.startPlaylistPlayback
 import com.paranid5.crescendo.presentation.ui.permissions.requests.audioRecordingPermissionsRequestLauncher
 import com.paranid5.crescendo.presentation.ui.permissions.requests.foregroundServicePermissionsRequestLauncher
 import com.paranid5.crescendo.presentation.ui.theme.LocalAppColors
+import com.paranid5.crescendo.services.track_service.TrackServiceAccessor
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 

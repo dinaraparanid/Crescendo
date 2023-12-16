@@ -24,10 +24,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.zIndex
-import com.paranid5.crescendo.data.tracks.Track
-import com.paranid5.crescendo.data.utils.extensions.move
-import com.paranid5.crescendo.domain.StorageHandler
-import com.paranid5.crescendo.domain.services.track_service.TrackServiceAccessor
+import com.paranid5.crescendo.data.StorageHandler
+import com.paranid5.crescendo.domain.tracks.Track
+import com.paranid5.crescendo.domain.utils.extensions.move
+import com.paranid5.crescendo.services.track_service.TrackServiceAccessor
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged

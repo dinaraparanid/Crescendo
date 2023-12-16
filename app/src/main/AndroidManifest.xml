@@ -57,10 +57,10 @@
                 android:theme="@style/Theme.MediaStreamer">
         </activity>
         <service
-                android:name="com.paranid5.crescendo.domain.services.stream_service.StreamService"
+                android:name=".services.stream_service.StreamService"
                 android:foregroundServiceType="mediaPlayback" />
-        <service android:name="com.paranid5.crescendo.domain.services.track_service.TrackService"
+        <service android:name=".services.track_service.TrackService"
                 android:foregroundServiceType="mediaPlayback" />
-        <service android:name="com.paranid5.crescendo.domain.services.video_cache_service.VideoCacheService" />
+        <service android:name=".services.video_cache_service.VideoCacheService" />
     </application>
 </manifest>

@@ -22,9 +22,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.palette.graphics.Palette
 import com.paranid5.crescendo.R
-import com.paranid5.crescendo.domain.StorageHandler
+import com.paranid5.crescendo.data.StorageHandler
+import com.paranid5.crescendo.domain.media.AudioStatus
 import com.paranid5.crescendo.presentation.main.tracks.TrackPropertiesButton
-import com.paranid5.crescendo.presentation.main.AudioStatus
 import com.paranid5.crescendo.presentation.ui.extensions.getLightMutedOrPrimary
 import org.koin.compose.koinInject
 

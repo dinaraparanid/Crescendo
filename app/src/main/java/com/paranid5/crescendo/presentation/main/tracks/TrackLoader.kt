@@ -5,7 +5,7 @@ import android.database.Cursor
 import android.os.Build
 import android.provider.MediaStore
 import com.paranid5.crescendo.R
-import com.paranid5.crescendo.data.tracks.DefaultTrack
+import com.paranid5.crescendo.domain.tracks.DefaultTrack
 
 private inline val selection
     get() = when {

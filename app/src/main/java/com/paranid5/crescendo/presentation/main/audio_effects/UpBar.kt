@@ -15,7 +15,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.sp
 import com.paranid5.crescendo.R
-import com.paranid5.crescendo.domain.StorageHandler
+import com.paranid5.crescendo.data.StorageHandler
 import com.paranid5.crescendo.presentation.ui.extensions.decreaseBrightness
 import com.paranid5.crescendo.presentation.ui.extensions.simpleShadow
 import com.paranid5.crescendo.presentation.ui.theme.LocalAppColors

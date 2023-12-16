@@ -17,9 +17,9 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
-import com.paranid5.crescendo.data.tracks.Track
-import com.paranid5.crescendo.data.tracks.sortedBy
-import com.paranid5.crescendo.domain.StorageHandler
+import com.paranid5.crescendo.data.StorageHandler
+import com.paranid5.crescendo.domain.tracks.Track
+import com.paranid5.crescendo.domain.tracks.sortedBy
 import org.koin.compose.koinInject
 
 @Composable

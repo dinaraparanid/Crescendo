@@ -28,9 +28,9 @@ import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.constraintlayout.compose.Dimension
 import coil.compose.AsyncImage
 import com.paranid5.crescendo.R
-import com.paranid5.crescendo.data.utils.extensions.artistAlbum
-import com.paranid5.crescendo.domain.StorageHandler
-import com.paranid5.crescendo.presentation.main.AudioStatus
+import com.paranid5.crescendo.data.StorageHandler
+import com.paranid5.crescendo.domain.utils.extensions.artistAlbum
+import com.paranid5.crescendo.domain.media.AudioStatus
 import com.paranid5.crescendo.presentation.ui.extensions.getLightMutedOrPrimary
 import com.paranid5.crescendo.presentation.ui.extensions.increaseDarkness
 import com.paranid5.crescendo.presentation.main.getCurrentTrackCoverModel

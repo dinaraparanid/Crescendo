@@ -14,11 +14,11 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.paranid5.crescendo.data.tracks.Track
-import com.paranid5.crescendo.domain.StorageHandler
-import com.paranid5.crescendo.domain.services.track_service.TrackServiceAccessor
+import com.paranid5.crescendo.data.StorageHandler
+import com.paranid5.crescendo.domain.tracks.Track
 import com.paranid5.crescendo.presentation.main.tracks.DefaultTrackItem
 import com.paranid5.crescendo.presentation.main.tracks.TrackItemView
+import com.paranid5.crescendo.services.track_service.TrackServiceAccessor
 import kotlinx.coroutines.runBlocking
 import org.koin.compose.koinInject
 
