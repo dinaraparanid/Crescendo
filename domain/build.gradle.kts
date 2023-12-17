@@ -35,22 +35,22 @@ android {
 }
 
 dependencies {
-    implementation("androidx.core:core-ktx:1.12.0")
-    implementation("androidx.appcompat:appcompat:1.6.1")
-    implementation("androidx.media:media:1.7.0")
-    implementation("androidx.media3:media3-common:1.2.0")
-    implementation("com.google.android.material:material:1.11.0")
+    implementation(libs.androidx.core.ktx)
+    implementation(libs.androidx.appcompat)
+    implementation(libs.androidx.media)
+    implementation(libs.androidx.media3.common)
+    implementation(libs.material)
 
-    implementation("io.ktor:ktor-client-core:2.3.6")
-    implementation("io.ktor:ktor-client-okhttp:2.3.6")
-    implementation("io.ktor:ktor-client-logging:2.3.6")
-    implementation("io.ktor:ktor-serialization-kotlinx-json:2.3.6")
-    implementation("io.ktor:ktor-client-content-negotiation:2.3.6")
+    implementation(libs.ktor.client.core)
+    implementation(libs.ktor.client.okhttp)
+    implementation(libs.ktor.client.logging)
+    implementation(libs.ktor.serialization.kotlinx.json)
+    implementation(libs.ktor.client.content.negotiation)
 
-    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.1")
-    implementation("io.insert-koin:koin-androidx-compose:3.5.0")
+    implementation(libs.kotlinx.serialization.json)
+    implementation(libs.koin.androidx.compose)
 
-    implementation("com.arthenica:mobile-ffmpeg-full:4.4.LTS")
-    implementation("org.bitbucket.ijabz:jaudiotagger:v3.0.1")
-    implementation("com.github.dinaraparanid:yt-url-extractor-kt:0.1.0.2")
+    implementation(libs.mobile.ffmpeg.full)
+    implementation(libs.jaudiotagger)
+    implementation(libs.yt.url.extractor.kt)
 }
