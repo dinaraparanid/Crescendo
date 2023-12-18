@@ -34,6 +34,7 @@ import com.paranid5.crescendo.domain.tracks.Track
 import com.paranid5.crescendo.domain.utils.extensions.artistAlbum
 import com.paranid5.crescendo.domain.utils.extensions.toDefaultTrackList
 import com.paranid5.crescendo.domain.media.AudioStatus
+import com.paranid5.crescendo.media.images.ImageSize
 import com.paranid5.crescendo.presentation.main.getTrackCoverModel
 import com.paranid5.crescendo.presentation.ui.permissions.requests.audioRecordingPermissionsRequestLauncher
 import com.paranid5.crescendo.presentation.ui.permissions.requests.foregroundServicePermissionsRequestLauncher
@@ -149,7 +150,7 @@ fun TrackCover(trackPath: String, modifier: Modifier = Modifier) {
     val trackCover = getTrackCoverModel(
         path = trackPath,
         isPlaceholderRequired = true,
-        size = 200 to 200,
+        size = ImageSize(200, 200),
         animationMillis = 250
     )
 

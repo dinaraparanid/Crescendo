@@ -13,7 +13,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
 
-internal suspend inline fun mergeToMP4AndSetTagsAsync(
+suspend fun mergeToMP4AndSetTagsAsync(
     context: Context,
     audioTrack: MediaFile,
     videoTrack: MediaFile.VideoFile,

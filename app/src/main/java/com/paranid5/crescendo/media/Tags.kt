@@ -10,6 +10,7 @@ import com.paranid5.crescendo.domain.VideoMetadata
 import com.paranid5.crescendo.domain.media_scanner.scanNextFile
 import com.paranid5.crescendo.domain.caching.Formats
 import com.paranid5.crescendo.domain.media.MediaFile
+import com.paranid5.crescendo.media.images.getImageBinaryDataCatching
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
@@ -37,7 +38,7 @@ private fun setVideoTagsToFileCatching(
     setVideoTagsToFile(file, videoMetadata)
 }
 
-internal suspend inline fun setVideoTagsAsync(
+suspend fun setVideoTagsAsync(
     context: Context,
     videoFile: MediaFile.VideoFile,
     videoMetadata: VideoMetadata
@@ -79,12 +80,7 @@ private fun setAudioTagsToFile(
         videoMetadata
             .covers
             .asSequence()
-            .map {
-                getImageBinaryDataCatching(
-                    context,
-                    it
-                )
-            }
+            .map { getImageBinaryDataCatching(context, it) }
             .firstOrNull { it.isSuccess }
             ?.getOrNull()
             ?.let { ArtworkFactory.getNew().apply { binaryData = it } }
@@ -102,7 +98,7 @@ private fun setAudioTagsToFileCatching(
     setAudioTagsToFile(context, file, videoMetadata)
 }
 
-internal suspend inline fun setAudioTagsAsync(
+suspend fun setAudioTagsAsync(
     context: Context,
     audioFile: MediaFile.AudioFile,
     videoMetadata: VideoMetadata,
@@ -141,7 +137,7 @@ internal suspend inline fun setAudioTagsAsync(
     }
 }
 
-fun Context.insertMediaFileToMediaStore(
+private fun Context.insertMediaFileToMediaStore(
     externalContentUri: Uri,
     absoluteFilePath: String,
     relativeFilePath: String,
@@ -150,27 +146,7 @@ fun Context.insertMediaFileToMediaStore(
 ): Uri {
     val uri = applicationContext.contentResolver.insert(
         externalContentUri,
-        ContentValues().apply {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q)
-                put(MediaStore.MediaColumns.IS_PENDING, 1)
-
-            put(MediaStore.MediaColumns.TITLE, videoMetadata.title)
-            put(MediaStore.MediaColumns.ARTIST, videoMetadata.author)
-
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R)
-                put(MediaStore.MediaColumns.AUTHOR, videoMetadata.author)
-
-            put(MediaStore.MediaColumns.DURATION, videoMetadata.lenInMillis)
-            put(MediaStore.MediaColumns.DISPLAY_NAME, videoMetadata.title)
-            put(MediaStore.MediaColumns.MIME_TYPE, mimeType)
-
-            when {
-                Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q ->
-                    put(MediaStore.MediaColumns.RELATIVE_PATH, relativeFilePath)
-
-                else -> put(MediaStore.MediaColumns.DATA, absoluteFilePath)
-            }
-        }
+        ContentValues(absoluteFilePath, relativeFilePath, videoMetadata, mimeType)
     )!!
 
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q)
@@ -180,4 +156,31 @@ fun Context.insertMediaFileToMediaStore(
         )
 
     return uri
+}
+
+private fun ContentValues(
+    absoluteFilePath: String,
+    relativeFilePath: String,
+    videoMetadata: VideoMetadata,
+    mimeType: String,
+) = ContentValues().apply {
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q)
+        put(MediaStore.MediaColumns.IS_PENDING, 1)
+
+    put(MediaStore.MediaColumns.TITLE, videoMetadata.title)
+    put(MediaStore.MediaColumns.ARTIST, videoMetadata.author)
+
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R)
+        put(MediaStore.MediaColumns.AUTHOR, videoMetadata.author)
+
+    put(MediaStore.MediaColumns.DURATION, videoMetadata.lenInMillis)
+    put(MediaStore.MediaColumns.DISPLAY_NAME, videoMetadata.title)
+    put(MediaStore.MediaColumns.MIME_TYPE, mimeType)
+
+    when {
+        Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q ->
+            put(MediaStore.MediaColumns.RELATIVE_PATH, relativeFilePath)
+
+        else -> put(MediaStore.MediaColumns.DATA, absoluteFilePath)
+    }
 }

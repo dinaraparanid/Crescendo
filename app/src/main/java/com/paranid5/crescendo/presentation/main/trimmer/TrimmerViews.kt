@@ -267,7 +267,7 @@ fun BorderControllers(
         Spacer(Modifier.weight(1F))
 
         DefaultOutlinedTextField(
-            value = endMillis.timeString,
+            value = endMillisStr,
             onValueChange = {
                 endMillisStr = it.take(8)
                 it.toTimeOrNull()?.let(viewModel::setEndPosInMillis)

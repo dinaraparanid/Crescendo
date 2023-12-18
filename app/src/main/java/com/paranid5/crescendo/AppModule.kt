@@ -2,17 +2,16 @@
 
 package com.paranid5.crescendo
 
-import android.content.Context
 import android.os.Build
 import androidx.annotation.StringRes
 import com.paranid5.crescendo.data.StorageHandler
 import com.paranid5.crescendo.domain.eq.EqualizerData
 import com.paranid5.crescendo.domain.ktor_client.KtorClient
+import com.paranid5.crescendo.presentation.main.MainActivityViewModel
 import com.paranid5.crescendo.presentation.main.audio_effects.AudioEffectsUIHandler
 import com.paranid5.crescendo.presentation.main.audio_effects.AudioEffectsViewModel
 import com.paranid5.crescendo.presentation.main.fetch_stream.FetchStreamUIHandler
 import com.paranid5.crescendo.presentation.main.fetch_stream.FetchStreamViewModel
-import com.paranid5.crescendo.presentation.main.MainActivityViewModel
 import com.paranid5.crescendo.presentation.main.playing.PlayingUIHandler
 import com.paranid5.crescendo.presentation.main.tracks.TracksUIHandler
 import com.paranid5.crescendo.presentation.main.tracks.TracksViewModel
@@ -23,7 +22,6 @@ import com.paranid5.crescendo.presentation.ui.permissions.description_providers.
 import com.paranid5.crescendo.presentation.ui.permissions.description_providers.ForegroundServiceDescriptionProvider
 import com.paranid5.crescendo.presentation.ui.permissions.externalStoragePermissionQueue
 import com.paranid5.crescendo.presentation.ui.permissions.foregroundServicePermissionQueue
-import com.paranid5.crescendo.media.CoilUtils
 import com.paranid5.crescendo.services.stream_service.StreamServiceAccessor
 import com.paranid5.crescendo.services.track_service.TrackServiceAccessor
 import com.paranid5.crescendo.services.video_cache_service.VideoCacheServiceAccessor
@@ -111,7 +109,6 @@ private val globalsModule = module {
 
     singleOf(::StorageHandler)
     single { androidApplication() as MainApplication }
-    factory { (context: Context, _: Boolean?) -> CoilUtils(context) }
     singleOf(::KtorClient)
 
     single(named(IS_PLAYING)) { MutableStateFlow(false) }

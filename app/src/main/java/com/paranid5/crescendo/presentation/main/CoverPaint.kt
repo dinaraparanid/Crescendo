@@ -1,5 +1,6 @@
 package com.paranid5.crescendo.presentation.main
 
+import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.drawable.BitmapDrawable
 import androidx.compose.runtime.*
@@ -13,31 +14,33 @@ import coil.size.Precision
 import coil.size.Scale
 import com.paranid5.crescendo.R
 import com.paranid5.crescendo.data.StorageHandler
+import com.paranid5.crescendo.media.images.ImageSize
+import com.paranid5.crescendo.media.images.getTrackCoverAsync
+import com.paranid5.crescendo.media.images.getTrackCoverWithPaletteAsync
+import com.paranid5.crescendo.media.images.getVideoCoverAsync
+import com.paranid5.crescendo.media.images.getVideoCoverWithPaletteAsync
 import com.paranid5.crescendo.presentation.ui.utils.BlurTransformation
-import com.paranid5.crescendo.media.CoilUtils
 import org.koin.compose.koinInject
 
 @Composable
-internal inline fun getVideoCoverModel(
+fun getVideoCoverModel(
     isPlaceholderRequired: Boolean,
-    size: Pair<Int, Int>? = null,
+    size: ImageSize? = null,
     isBlured: Boolean = false,
     usePrevCoverAsPlaceholder: Boolean = true,
     animationMillis: Int = 400,
     storageHandler: StorageHandler = koinInject(),
-    crossinline bitmapSettings: (Bitmap) -> Unit = {}
+    bitmapSettings: (Bitmap) -> Unit = {}
 ): ImageRequest {
     val metadata by storageHandler.currentMetadataState.collectAsState()
     val context = LocalContext.current
-    val coilUtils = CoilUtils(context)
 
     var coverModel by remember { mutableStateOf<BitmapDrawable?>(null) }
     var prevCoverModel by remember { mutableStateOf<BitmapDrawable?>(null) }
 
     LaunchedEffect(key1 = metadata) {
         val newModel = metadata?.let {
-            coilUtils
-                .getVideoCoverAsync(it, size, bitmapSettings)
+            getVideoCoverAsync(context, it, size, bitmapSettings)
                 .await()
         }
 
@@ -49,15 +52,14 @@ internal inline fun getVideoCoverModel(
         .data(coverModel)
         .prevCoverErrorOrDefault(usePrevCoverAsPlaceholder, prevCoverModel)
         .prevCoverFallbackOrDefault(usePrevCoverAsPlaceholder, prevCoverModel)
-        .apply {
-            if (isPlaceholderRequired)
-                prevCoverPlaceholderOrDefault(usePrevCoverAsPlaceholder, prevCoverModel)
-
-            if (isBlured)
-                transformations(BlurTransformation(context))
-
-            size?.run { size(first, second) }
-        }
+        .applyTransformations(
+            context = context,
+            isPlaceholderRequired = isPlaceholderRequired,
+            size = size,
+            isBlured = isBlured,
+            usePrevCoverAsPlaceholder = usePrevCoverAsPlaceholder,
+            prevCoverModel = prevCoverModel
+        )
         .networkCachePolicy(CachePolicy.ENABLED)
         .diskCachePolicy(CachePolicy.ENABLED)
         .memoryCachePolicy(CachePolicy.ENABLED)
@@ -68,14 +70,14 @@ internal inline fun getVideoCoverModel(
 }
 
 @Composable
-internal inline fun rememberVideoCoverPainter(
+fun rememberVideoCoverPainter(
     isPlaceholderRequired: Boolean,
-    size: Pair<Int, Int>? = null,
+    size: ImageSize? = null,
     isBlured: Boolean = false,
     usePrevCoverAsPlaceholder: Boolean = true,
     animationMillis: Int = 400,
     storageHandler: StorageHandler = koinInject(),
-    crossinline bitmapSettings: (Bitmap) -> Unit = {}
+    bitmapSettings: (Bitmap) -> Unit = {}
 ) = rememberAsyncImagePainter(
     model = getVideoCoverModel(
         isPlaceholderRequired = isPlaceholderRequired,
@@ -89,18 +91,17 @@ internal inline fun rememberVideoCoverPainter(
 )
 
 @Composable
-internal inline fun getVideoCoverModelWithPalette(
+fun getVideoCoverModelWithPalette(
     isPlaceholderRequired: Boolean,
-    size: Pair<Int, Int>? = null,
+    size: ImageSize? = null,
     isBlured: Boolean = false,
     usePrevCoverAsPlaceholder: Boolean = true,
     animationMillis: Int = 400,
     storageHandler: StorageHandler = koinInject(),
-    crossinline bitmapSettings: (Bitmap) -> Unit = {}
+    bitmapSettings: (Bitmap) -> Unit = {}
 ): Pair<ImageRequest, Palette?> {
     val metadata by storageHandler.currentMetadataState.collectAsState()
     val context = LocalContext.current
-    val coilUtils = CoilUtils(context)
 
     var coverModel by remember { mutableStateOf<BitmapDrawable?>(null) }
     var prevCoverModel by remember { mutableStateOf<BitmapDrawable?>(null) }
@@ -108,7 +109,7 @@ internal inline fun getVideoCoverModelWithPalette(
 
     LaunchedEffect(key1 = metadata, key2 = size) {
         val newPaletteAndModel = metadata?.let {
-            coilUtils.getVideoCoverWithPaletteAsync(it, size, bitmapSettings).await()
+            getVideoCoverWithPaletteAsync(context, it, size, bitmapSettings).await()
         }
 
         prevCoverModel = coverModel ?: newPaletteAndModel?.second
@@ -120,15 +121,14 @@ internal inline fun getVideoCoverModelWithPalette(
         .data(coverModel)
         .prevCoverErrorOrDefault(usePrevCoverAsPlaceholder, prevCoverModel)
         .prevCoverFallbackOrDefault(usePrevCoverAsPlaceholder, prevCoverModel)
-        .apply {
-            if (isPlaceholderRequired)
-                prevCoverPlaceholderOrDefault(usePrevCoverAsPlaceholder, prevCoverModel)
-
-            if (isBlured)
-                transformations(BlurTransformation(context))
-
-            size?.run { size(first, second) }
-        }
+        .applyTransformations(
+            context = context,
+            isPlaceholderRequired = isPlaceholderRequired,
+            size = size,
+            isBlured = isBlured,
+            usePrevCoverAsPlaceholder = usePrevCoverAsPlaceholder,
+            prevCoverModel = prevCoverModel
+        )
         .networkCachePolicy(CachePolicy.ENABLED)
         .diskCachePolicy(CachePolicy.ENABLED)
         .memoryCachePolicy(CachePolicy.ENABLED)
@@ -139,14 +139,14 @@ internal inline fun getVideoCoverModelWithPalette(
 }
 
 @Composable
-internal inline fun rememberVideoCoverPainterWithPalette(
+fun rememberVideoCoverPainterWithPalette(
     isPlaceholderRequired: Boolean,
-    size: Pair<Int, Int>? = null,
+    size: ImageSize? = null,
     isBlured: Boolean = false,
     usePrevCoverAsPlaceholder: Boolean = true,
     animationMillis: Int = 400,
     storageHandler: StorageHandler = koinInject(),
-    crossinline bitmapSettings: (Bitmap) -> Unit = {}
+    bitmapSettings: (Bitmap) -> Unit = {}
 ): Pair<AsyncImagePainter, Palette?> {
     val (coverModel, palette) = getVideoCoverModelWithPalette(
         isPlaceholderRequired = isPlaceholderRequired,
@@ -162,42 +162,36 @@ internal inline fun rememberVideoCoverPainterWithPalette(
 }
 
 @Composable
-internal inline fun getTrackCoverModel(
+fun getTrackCoverModel(
     path: String?,
     isPlaceholderRequired: Boolean,
-    size: Pair<Int, Int>? = null,
+    size: ImageSize? = null,
     isBlured: Boolean = false,
     usePrevCoverAsPlaceholder: Boolean = false,
     animationMillis: Int = 400,
-    crossinline bitmapSettings: (Bitmap) -> Unit = {}
+    bitmapSettings: (Bitmap) -> Unit = {}
 ): ImageRequest {
     val context = LocalContext.current
-    val coilUtils = CoilUtils(context)
-
     var coverModel by remember { mutableStateOf<BitmapDrawable?>(null) }
     var prevCoverModel by remember { mutableStateOf<BitmapDrawable?>(null) }
 
     LaunchedEffect(key1 = path, key2 = size) {
         prevCoverModel = coverModel
-
-        coverModel = coilUtils
-            .getTrackCoverAsync(path, size, bitmapSettings)
-            .await()
+        coverModel = getTrackCoverAsync(context, path, size, bitmapSettings).await()
     }
 
     return ImageRequest.Builder(context)
         .data(coverModel)
         .prevCoverErrorOrDefault(usePrevCoverAsPlaceholder, prevCoverModel)
         .prevCoverFallbackOrDefault(usePrevCoverAsPlaceholder, prevCoverModel)
-        .apply {
-            if (isPlaceholderRequired)
-                prevCoverPlaceholderOrDefault(usePrevCoverAsPlaceholder, prevCoverModel)
-
-            if (isBlured)
-                transformations(BlurTransformation(context))
-
-            size?.run { size(first, second) }
-        }
+        .applyTransformations(
+            context = context,
+            isPlaceholderRequired = isPlaceholderRequired,
+            size = size,
+            isBlured = isBlured,
+            usePrevCoverAsPlaceholder = usePrevCoverAsPlaceholder,
+            prevCoverModel = prevCoverModel
+        )
         .precision(Precision.EXACT)
         .scale(Scale.FILL)
         .crossfade(animationMillis)
@@ -205,14 +199,14 @@ internal inline fun getTrackCoverModel(
 }
 
 @Composable
-internal inline fun rememberTrackCoverPainter(
+fun rememberTrackCoverPainter(
     path: String?,
     isPlaceholderRequired: Boolean,
-    size: Pair<Int, Int>? = null,
+    size: ImageSize? = null,
     isBlured: Boolean = false,
     usePrevCoverAsPlaceholder: Boolean = false,
     animationMillis: Int = 400,
-    crossinline bitmapSettings: (Bitmap) -> Unit = {}
+    bitmapSettings: (Bitmap) -> Unit = {}
 ) = rememberAsyncImagePainter(
     model = getTrackCoverModel(
         path = path,
@@ -226,26 +220,23 @@ internal inline fun rememberTrackCoverPainter(
 )
 
 @Composable
-internal inline fun getTrackCoverModelWithPalette(
+fun getTrackCoverModelWithPalette(
     path: String?,
     isPlaceholderRequired: Boolean,
-    size: Pair<Int, Int>? = null,
+    size: ImageSize? = null,
     isBlured: Boolean = false,
     usePrevCoverAsPlaceholder: Boolean = true,
     animationMillis: Int = 400,
-    crossinline bitmapSettings: (Bitmap) -> Unit = {}
+    bitmapSettings: (Bitmap) -> Unit = {}
 ): Pair<ImageRequest, Palette?> {
     val context = LocalContext.current
-    val coilUtils = CoilUtils(context)
-
     var coverModel by remember { mutableStateOf<BitmapDrawable?>(null) }
     var prevCoverModel by remember { mutableStateOf<BitmapDrawable?>(null) }
     var palette by remember { mutableStateOf<Palette?>(null) }
 
     LaunchedEffect(key1 = path, key2 = size) {
-        val (plt, cover) = coilUtils
-            .getTrackCoverWithPaletteAsync(path, size, bitmapSettings)
-            .await()
+        val (plt, cover) =
+            getTrackCoverWithPaletteAsync(context, path, size, bitmapSettings).await()
 
         prevCoverModel = coverModel
         coverModel = cover
@@ -256,15 +247,14 @@ internal inline fun getTrackCoverModelWithPalette(
         .data(coverModel)
         .prevCoverErrorOrDefault(usePrevCoverAsPlaceholder, prevCoverModel)
         .prevCoverFallbackOrDefault(usePrevCoverAsPlaceholder, prevCoverModel)
-        .apply {
-            if (isPlaceholderRequired)
-                prevCoverPlaceholderOrDefault(usePrevCoverAsPlaceholder, prevCoverModel)
-
-            if (isBlured)
-                transformations(BlurTransformation(context))
-
-            size?.run { size(first, second) }
-        }
+        .applyTransformations(
+            context = context,
+            isPlaceholderRequired = isPlaceholderRequired,
+            size = size,
+            isBlured = isBlured,
+            usePrevCoverAsPlaceholder = usePrevCoverAsPlaceholder,
+            prevCoverModel = prevCoverModel
+        )
         .precision(Precision.EXACT)
         .scale(Scale.FILL)
         .crossfade(animationMillis)
@@ -272,14 +262,14 @@ internal inline fun getTrackCoverModelWithPalette(
 }
 
 @Composable
-internal inline fun rememberTrackCoverPainterWithPalette(
+fun rememberTrackCoverPainterWithPalette(
     path: String?,
     isPlaceholderRequired: Boolean,
-    size: Pair<Int, Int>? = null,
+    size: ImageSize? = null,
     isBlured: Boolean = false,
     usePrevCoverAsPlaceholder: Boolean = true,
     animationMillis: Int = 400,
-    crossinline bitmapSettings: (Bitmap) -> Unit = {}
+    bitmapSettings: (Bitmap) -> Unit = {}
 ): Pair<AsyncImagePainter, Palette?> {
     val (coverModel, palette) = getTrackCoverModelWithPalette(
         path = path,
@@ -295,14 +285,14 @@ internal inline fun rememberTrackCoverPainterWithPalette(
 }
 
 @Composable
-internal inline fun getCurrentTrackCoverModel(
+fun getCurrentTrackCoverModel(
     isPlaceholderRequired: Boolean,
-    size: Pair<Int, Int>? = null,
+    size: ImageSize? = null,
     isBlured: Boolean = false,
     usePrevCoverAsPlaceholder: Boolean = true,
     animationMillis: Int = 400,
     storageHandler: StorageHandler = koinInject(),
-    crossinline bitmapSettings: (Bitmap) -> Unit = {}
+    bitmapSettings: (Bitmap) -> Unit = {}
 ): ImageRequest {
     val curTrack by storageHandler.currentTrackState.collectAsState()
     val path by remember { derivedStateOf { curTrack?.path } }
@@ -319,14 +309,14 @@ internal inline fun getCurrentTrackCoverModel(
 }
 
 @Composable
-internal inline fun rememberCurrentTrackCoverPainter(
+fun rememberCurrentTrackCoverPainter(
     isPlaceholderRequired: Boolean,
-    size: Pair<Int, Int>? = null,
+    size: ImageSize? = null,
     isBlured: Boolean = false,
     usePrevCoverAsPlaceholder: Boolean = true,
     animationMillis: Int = 400,
     storageHandler: StorageHandler = koinInject(),
-    crossinline bitmapSettings: (Bitmap) -> Unit = {}
+    bitmapSettings: (Bitmap) -> Unit = {}
 ) = rememberAsyncImagePainter(
     model = getCurrentTrackCoverModel(
         isPlaceholderRequired = isPlaceholderRequired,
@@ -340,14 +330,14 @@ internal inline fun rememberCurrentTrackCoverPainter(
 )
 
 @Composable
-internal inline fun getCurrentTrackCoverModelWithPalette(
+fun getCurrentTrackCoverModelWithPalette(
     isPlaceholderRequired: Boolean,
-    size: Pair<Int, Int>? = null,
+    size: ImageSize? = null,
     isBlured: Boolean = false,
     usePrevCoverAsPlaceholder: Boolean = true,
     animationMillis: Int = 400,
     storageHandler: StorageHandler = koinInject(),
-    crossinline bitmapSettings: (Bitmap) -> Unit = {}
+    bitmapSettings: (Bitmap) -> Unit = {}
 ): Pair<ImageRequest, Palette?> {
     val curTrack by storageHandler.currentTrackState.collectAsState()
     val path by remember { derivedStateOf { curTrack?.path } }
@@ -364,14 +354,14 @@ internal inline fun getCurrentTrackCoverModelWithPalette(
 }
 
 @Composable
-internal inline fun rememberCurrentTrackCoverPainterWithPalette(
+fun rememberCurrentTrackCoverPainterWithPalette(
     isPlaceholderRequired: Boolean,
-    size: Pair<Int, Int>? = null,
+    size: ImageSize? = null,
     isBlured: Boolean = false,
     usePrevCoverAsPlaceholder: Boolean = true,
     animationMillis: Int = 400,
     storageHandler: StorageHandler = koinInject(),
-    crossinline bitmapSettings: (Bitmap) -> Unit = {}
+    bitmapSettings: (Bitmap) -> Unit = {}
 ): Pair<AsyncImagePainter, Palette?> {
     val (coverModel, palette) = getCurrentTrackCoverModelWithPalette(
         isPlaceholderRequired = isPlaceholderRequired,
@@ -426,4 +416,21 @@ private fun ImageRequest.Builder.prevCoverFallbackOrDefault(
 ) = when {
     usePrevCoverAsPlaceholder -> prevCoverFallback(prevCoverModel)
     else -> fallback(R.drawable.cover_thumbnail)
+}
+
+private fun ImageRequest.Builder.applyTransformations(
+    context: Context,
+    isPlaceholderRequired: Boolean,
+    size: ImageSize?,
+    isBlured: Boolean,
+    usePrevCoverAsPlaceholder: Boolean,
+    prevCoverModel: BitmapDrawable?
+) = apply {
+    if (isPlaceholderRequired)
+        prevCoverPlaceholderOrDefault(usePrevCoverAsPlaceholder, prevCoverModel)
+
+    if (isBlured)
+        transformations(BlurTransformation(context))
+
+    size?.run { size(width, height) }
 }

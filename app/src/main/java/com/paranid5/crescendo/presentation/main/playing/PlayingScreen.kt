@@ -31,6 +31,7 @@ import com.paranid5.crescendo.R
 import com.paranid5.crescendo.data.StorageHandler
 import com.paranid5.crescendo.domain.utils.extensions.artistAlbum
 import com.paranid5.crescendo.domain.media.AudioStatus
+import com.paranid5.crescendo.media.images.ImageSize
 import com.paranid5.crescendo.presentation.ui.extensions.getLightMutedOrPrimary
 import com.paranid5.crescendo.presentation.ui.extensions.increaseDarkness
 import com.paranid5.crescendo.presentation.main.getCurrentTrackCoverModel
@@ -119,7 +120,7 @@ private fun PlayingScreenPortrait(
         derivedStateOf { actualAudioStatus == audioStatus }
     }
 
-    var coverSize by remember { mutableStateOf(1 to 1) }
+    var coverSize by remember { mutableStateOf(ImageSize(1, 1)) }
 
     val (coverModel, palette) = when (audioStatus) {
         AudioStatus.STREAMING -> getVideoCoverModelWithPalette(
@@ -164,7 +165,7 @@ private fun PlayingScreenPortrait(
                     width = Dimension.fillToConstraints
                 }
                 .onGloballyPositioned { coordinates ->
-                    coverSize = coordinates.size.width to coordinates.size.height
+                    coverSize = ImageSize(coordinates.size.width, coordinates.size.height)
                 },
         )
 
@@ -249,7 +250,7 @@ private fun PlayingScreenLandscape(
         derivedStateOf { actualAudioStatus == audioStatus }
     }
 
-    var coverSize by remember { mutableStateOf(1 to 1) }
+    var coverSize by remember { mutableStateOf(ImageSize(1, 1)) }
 
     val (coverModel, palette) = when (audioStatus) {
         AudioStatus.STREAMING -> getVideoCoverModelWithPalette(
@@ -309,7 +310,7 @@ private fun PlayingScreenLandscape(
                     height = Dimension.fillToConstraints
                 }
                 .onGloballyPositioned { coordinates ->
-                    coverSize = coordinates.size.width to coordinates.size.height
+                    coverSize = ImageSize(coordinates.size.width, coordinates.size.height)
                 },
         )
 
@@ -386,14 +387,14 @@ private fun BackgroundImage(audioStatus: AudioStatus, modifier: Modifier = Modif
     val coverModel = when (audioStatus) {
         AudioStatus.STREAMING -> getVideoCoverModel(
             isPlaceholderRequired = true,
-            size = config.screenWidthDp to config.screenHeightDp,
+            size = ImageSize(config.screenWidthDp, config.screenHeightDp),
             isBlured = Build.VERSION.SDK_INT < Build.VERSION_CODES.S,
             bitmapSettings = Bitmap::increaseDarkness,
         )
 
         AudioStatus.PLAYING -> getCurrentTrackCoverModel(
             isPlaceholderRequired = true,
-            size = config.screenWidthDp to config.screenHeightDp,
+            size = ImageSize(config.screenWidthDp, config.screenHeightDp),
             isBlured = Build.VERSION.SDK_INT < Build.VERSION_CODES.S,
             bitmapSettings = Bitmap::increaseDarkness,
         )

@@ -32,6 +32,7 @@ import com.paranid5.crescendo.domain.utils.extensions.registerReceiverCompat
 import com.paranid5.crescendo.domain.utils.extensions.sendBroadcast
 import com.paranid5.crescendo.domain.utils.extensions.toAndroidMetadata
 import com.paranid5.crescendo.domain.utils.extensions.toMediaItemList
+import com.paranid5.crescendo.media.images.getTrackCoverBitmapAsync
 import com.paranid5.crescendo.services.SuspendService
 import com.paranid5.crescendo.services.service_controllers.MediaRetrieverController
 import com.paranid5.crescendo.services.service_controllers.MediaSessionController
@@ -133,7 +134,7 @@ class TrackService : SuspendService(), KoinComponent {
     // ----------------------- Media Session Management -----------------------
 
     private val mediaRetrieverController by lazy {
-        MediaRetrieverController(context = this)
+        MediaRetrieverController()
     }
 
     private val mediaSessionController by lazy {
@@ -239,7 +240,7 @@ class TrackService : SuspendService(), KoinComponent {
     }
 
     private suspend fun getTrackCoverAsync(path: String?) =
-        mediaRetrieverController.getTrackCoverBitmapAsync(path)
+        getTrackCoverBitmapAsync(context = this, path = path)
 
     // ----------------------- Player Management -----------------------
 

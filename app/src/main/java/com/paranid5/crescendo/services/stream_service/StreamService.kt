@@ -30,6 +30,8 @@ import com.paranid5.crescendo.domain.VideoMetadata
 import com.paranid5.crescendo.domain.utils.extensions.registerReceiverCompat
 import com.paranid5.crescendo.domain.utils.extensions.sendBroadcast
 import com.paranid5.crescendo.domain.utils.extensions.toAndroidMetadata
+import com.paranid5.crescendo.media.images.getThumbnailBitmap
+import com.paranid5.crescendo.media.images.getVideoCoverBitmapAsync
 import com.paranid5.crescendo.services.SuspendService
 import com.paranid5.crescendo.services.service_controllers.MediaRetrieverController
 import com.paranid5.crescendo.services.service_controllers.MediaSessionController
@@ -119,7 +121,7 @@ class StreamService : SuspendService(), KoinComponent {
     // ----------------------- Media Session Management -----------------------
 
     private val mediaRetrieverController by lazy {
-        MediaRetrieverController(context = this)
+        MediaRetrieverController()
     }
 
     private val mediaSessionController by lazy {
@@ -231,10 +233,10 @@ class StreamService : SuspendService(), KoinComponent {
     private suspend inline fun getVideoCoverAsync() =
         currentMetadataState
             .value
-            ?.let { mediaRetrieverController.getVideoCoverBitmapAsync(it) }
+            ?.let { getVideoCoverBitmapAsync(context = this, videoMetadata = it) }
             ?: coroutineScope {
                 async(Dispatchers.IO) {
-                    mediaRetrieverController.getThumbnailBitmap()
+                    getThumbnailBitmap(context = this@StreamService)
                 }
             }
 

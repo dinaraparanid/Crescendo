@@ -1,11 +1,10 @@
-package com.paranid5.crescendo.media
+package com.paranid5.crescendo.media.images
 
 import android.content.Context
 import com.paranid5.crescendo.presentation.ui.extensions.byteData
 
-private fun getImageBinaryData(context: Context, url: String) =
-    CoilUtils(context)
-        .getBitmapFromUrlBlockingCatching(url)
+fun getImageBinaryData(context: Context, url: String) =
+    getBitmapFromUrlBlockingCatching(context, url)
         .getOrNull()!!
         .byteData
 
