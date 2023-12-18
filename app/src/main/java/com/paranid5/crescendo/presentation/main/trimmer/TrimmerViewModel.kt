@@ -8,7 +8,7 @@ import com.paranid5.crescendo.domain.tracks.Track
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.flow.updateAndGet
 import kotlinx.coroutines.launch
 
@@ -63,19 +63,23 @@ class TrimmerViewModel(
         savedStateHandle[END_MILLIS] = _endPosInMillisState.updateAndGet { endMillis }
     }
 
-    val trimmedDurationFlow by lazy {
-        combine(
-            startPosInMillisState,
-            endPosInMillisState
-        ) { startMillis, endMillis -> endMillis - startMillis }
+    private val _playbackPositionState by lazy {
+        MutableStateFlow(startPosInMillisState.value)
     }
+
+    val playbackPositionState by lazy { _playbackPositionState.asStateFlow() }
+
+    fun setPlaybackPosition(position: Long) = _playbackPositionState.update { position }
 
     private val _isPlayingState by lazy { MutableStateFlow(false) }
 
     val isPlayingState by lazy { _isPlayingState.asStateFlow() }
 
-    fun setPlaying(isPlaying: Boolean) {
-        savedStateHandle[IS_PLAYING_STATE] = _isPlayingState.updateAndGet { isPlaying }
+    fun setPlaying(isPlaying: Boolean) = _isPlayingState.update { isPlaying }
+
+    fun resetPlaybackStates() {
+        _isPlayingState.update { false }
+        _playbackPositionState.update { _startPosInMillisState.value }
     }
 
     override fun onCleared() {

@@ -12,8 +12,8 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableLongStateOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
@@ -56,7 +56,7 @@ fun PlaybackSlider(
     }
 
     var curPosition by remember { mutableLongStateOf(0L) }
-    var isDragging by remember { mutableIntStateOf(0) }
+    var isDragging by remember { mutableStateOf(false) }
 
     fun getDefaultPlaybackPosition() = when (audioStatus) {
         AudioStatus.STREAMING -> storageHandler.streamPlaybackPositionState.value
@@ -73,7 +73,7 @@ fun PlaybackSlider(
     }
 
     BroadcastReceiver(action = Broadcast_CUR_POSITION_CHANGED) { _, intent ->
-        if (isDragging == 0) curPosition = when (audioStatus) {
+        if (!isDragging) curPosition = when (audioStatus) {
             AudioStatus.STREAMING -> intent!!.getLongExtra(
                 CUR_POSITION_STREAMING_ARG,
                 getDefaultPlaybackPosition()
@@ -98,13 +98,13 @@ fun PlaybackSlider(
                     inactiveTrackColor = TransparentUtility
                 ),
                 onValueChange = {
-                    isDragging = 1
+                    isDragging = true
                     curPosition = it.toLong()
                 },
                 onValueChangeFinished = {
                     coroutineScope.launch { storePlaybackPosition() }
                     playingUIHandler.sendSeekToBroadcast(audioStatus, curPosition)
-                    isDragging = 0
+                    isDragging = false
                 }
             )
 

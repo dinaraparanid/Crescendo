@@ -310,6 +310,7 @@ class TrackService : SuspendService(), KoinComponent {
 
         private fun updateTrackIndexAsync() = scope.launch {
             mediaRetrieverController.storeCurrentTrackIndex(playbackController.currentMediaItemIndex)
+            updateNotification()
         }
 
         private fun storePositionAndUpdateNotificationAsync() = scope.launch {
@@ -441,7 +442,7 @@ class TrackService : SuspendService(), KoinComponent {
 
     private fun startPlaybackPositionMonitoring() {
         playbackPosMonitorTask = scope.launch {
-            while (true) {
+            while (playbackController.isPlaying) {
                 sendAndStorePlaybackPosition()
                 delay(PLAYBACK_UPDATE_COOLDOWN)
             }

@@ -69,16 +69,20 @@ fun TrimWaveform(
     var spikesAmplitudes by remember { mutableStateOf(listOf<Float>()) }
 
     val startMillis by viewModel.startPosInMillisState.collectAsState()
-    val offset by remember { derivedStateOf { startMillis safeDiv durationInMillis } }
+    val startOffset by remember { derivedStateOf { startMillis safeDiv durationInMillis } }
 
     val endMillis by viewModel.endPosInMillisState.collectAsState()
-    val endPoint by remember { derivedStateOf { endMillis safeDiv durationInMillis } }
+    val endOffset by remember { derivedStateOf { endMillis safeDiv durationInMillis } }
 
     val canvasSizeState = remember { mutableStateOf(Size(1F, 1F)) }
     val spikesState = remember { mutableFloatStateOf(1F) }
 
     val canvasWidth = durationInMillis / 1000 * spikeWidthRatio
     val canvasWidthDp = canvasWidth.toInt().dp
+
+    val playbackPos by viewModel.playbackPositionState.collectAsState()
+    val playbackOffset by remember { derivedStateOf { playbackPos safeDiv durationInMillis } }
+    val isPlaying by viewModel.isPlayingState.collectAsState()
 
     LaunchedEffect(key1 = model) {
         withContext(Dispatchers.IO) {
@@ -124,7 +128,8 @@ fun TrimWaveform(
             spikeWidthRatio = spikeWidthRatio,
             modifier = Modifier
                 .offset(
-                    x = (CONTROLLER_CIRCLE_CENTER / 2 + offset * (canvasWidth - CONTROLLER_CIRCLE_RADIUS))
+                    x = (CONTROLLER_CIRCLE_CENTER / 2 +
+                            startOffset * (canvasWidth - CONTROLLER_CIRCLE_RADIUS))
                         .toInt()
                         .dp
                 )
@@ -138,12 +143,25 @@ fun TrimWaveform(
             durationInMillis = durationInMillis,
             modifier = Modifier
                 .offset(
-                    x = (endPoint * (canvasWidth) + (1 - endPoint) * CONTROLLER_CIRCLE_RADIUS - CONTROLLER_CIRCLE_CENTER / 2)
+                    x = (endOffset * (canvasWidth) +
+                            (1 - endOffset) * CONTROLLER_CIRCLE_RADIUS - CONTROLLER_CIRCLE_CENTER / 2)
                         .toInt()
                         .dp
                 )
                 .fillMaxHeight()
                 .zIndex(10F)
+        )
+
+        if (isPlaying) PlaybackPosition(
+            modifier = Modifier
+                .offset(
+                    x = (CONTROLLER_CIRCLE_CENTER / 2 +
+                            playbackOffset * (canvasWidth - CONTROLLER_CIRCLE_RADIUS))
+                        .toInt()
+                        .dp
+                )
+                .fillMaxHeight()
+                .zIndex(8F)
         )
     }
 }
@@ -339,6 +357,24 @@ private fun EndBorder(
             },
             color = colors.inverseSurface,
             style = Fill,
+        )
+    }
+}
+
+@Composable
+private fun PlaybackPosition(modifier: Modifier = Modifier) {
+    val colors = LocalAppColors.current.value
+    val controllerBrush = SolidColor(colors.onBackground)
+
+    Canvas(modifier.graphicsLayer(alpha = DEFAULT_GRAPHICS_LAYER_ALPHA)) {
+        drawRect(
+            brush = controllerBrush,
+            topLeft = Offset(CONTROLLER_CIRCLE_CENTER - CONTROLLER_RECT_OFFSET, 0F),
+            size = Size(
+                width = 5F,
+                height = size.height - CONTROLLER_HEIGHT_OFFSET
+            ),
+            blendMode = BlendMode.SrcAtop
         )
     }
 }

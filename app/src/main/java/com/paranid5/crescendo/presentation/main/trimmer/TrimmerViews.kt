@@ -20,10 +20,13 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -39,6 +42,9 @@ import com.paranid5.crescendo.domain.utils.extensions.timeString
 import com.paranid5.crescendo.domain.utils.extensions.toTimeOrNull
 import com.paranid5.crescendo.presentation.ui.theme.LocalAppColors
 import com.paranid5.crescendo.presentation.ui.utils.DefaultOutlinedTextField
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
@@ -80,7 +86,7 @@ fun TrimmedDuration(
     modifier: Modifier = Modifier
 ) {
     val colors = LocalAppColors.current.value
-    val duration by viewModel.trimmedDurationFlow.collectAsState(initial = 0L)
+    val duration by viewModel.playbackPositionState.collectAsState(initial = 0L)
 
     Text(
         text = duration.timeString,
@@ -97,13 +103,69 @@ fun PlaybackButtons(
     modifier: Modifier = Modifier
 ) {
     val colors = LocalAppColors.current.value
+    val track by viewModel.trackState.collectAsState()
     val isPlaying by viewModel.isPlayingState.collectAsState()
+
+    val startPos by viewModel.startPosInMillisState.collectAsState()
+    val endPos by viewModel.endPosInMillisState.collectAsState()
+    val currentPos by viewModel.playbackPositionState.collectAsState()
+
+    var playbackPosMonitorTask: Job? = null
+    val coroutineScope = rememberCoroutineScope()
+
+    val player by remember { lazy { TrackPlayer(track!!) } }
+    var isInitialized by remember { mutableStateOf(false) }
+
+    suspend fun resetPlaybackPosition() {
+        delay(500)
+        viewModel.setPlaybackPosition(startPos)
+    }
+
+    fun releasePlaybackMonitorTask() {
+        playbackPosMonitorTask?.cancel()
+        playbackPosMonitorTask = null
+    }
+
+    LaunchedEffect(currentPos, startPos, endPos) {
+        if (isInitialized && currentPos !in startPos..endPos) {
+            viewModel.setPlaying(false)
+            resetPlaybackPosition()
+        }
+    }
+
+    LaunchedEffect(isPlaying) {
+        when {
+            isPlaying -> {
+                isInitialized = true
+                player.seekTo(startPos.toInt())
+                player.start()
+
+                playbackPosMonitorTask = coroutineScope.launch {
+                    PlaybackPositionMonitoringTask(player, viewModel)
+                }
+            }
+
+            isInitialized -> {
+                player.pause()
+                releasePlaybackMonitorTask()
+                resetPlaybackPosition()
+            }
+        }
+    }
+
+    DisposableEffect(Unit) {
+        onDispose {
+            if (isInitialized) {
+                releasePlaybackMonitorTask()
+                player.stopAndReleaseCatching()
+                viewModel.resetPlaybackStates()
+            }
+        }
+    }
 
     Row(modifier) {
         IconButton(
-            onClick = {
-                // TODO: skip to 10 secs back
-            },
+            onClick = { player.seekTenSecsBack(startPos.toInt()) },
             modifier = Modifier
                 .size(40.dp)
                 .padding(4.dp)
@@ -120,10 +182,7 @@ fun PlaybackButtons(
         Spacer(Modifier.width(16.dp))
 
         IconButton(
-            onClick = {
-                viewModel.setPlaying(!isPlaying)
-                // TODO: start/stop playback
-            },
+            onClick = { viewModel.setPlaying(!isPlaying) },
             modifier = Modifier
                 .size(48.dp)
                 .padding(4.dp)
@@ -151,7 +210,7 @@ fun PlaybackButtons(
 
         IconButton(
             onClick = {
-                // TODO: skip to 10 secs forward
+                player.seekTenSecsForward(track!!.duration.toInt())
             },
             modifier = Modifier
                 .size(40.dp)

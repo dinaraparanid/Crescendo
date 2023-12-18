@@ -420,7 +420,7 @@ class StreamService : SuspendService(), KoinComponent {
 
     private fun startPlaybackPositionMonitoring() {
         playbackPosMonitorTask = scope.launch {
-            while (true) {
+            while (playbackController.isPlaying) {
                 sendAndStorePlaybackPosition()
                 delay(PLAYBACK_UPDATE_COOLDOWN)
             }
