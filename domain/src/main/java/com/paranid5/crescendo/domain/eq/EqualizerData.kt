@@ -12,7 +12,7 @@ data class EqualizerData(
     val presets: List<String>,
     val currentPreset: Short,
     val bandFrequencies: List<Int>,
-    val currentParameter: EqualizerParameters,
+    val bandsPreset: EqualizerBandsPreset,
 ) {
     companion object {
         const val NO_EQ_PRESET: Short = -1
@@ -22,20 +22,20 @@ data class EqualizerData(
         eq: Equalizer,
         bandLevels: List<Short>?,
         currentPreset: Short,
-        currentParameter: EqualizerParameters
+        currentParameter: EqualizerBandsPreset
     ) : this(
         minBandLevel = eq.bandLevelRange[0],
         maxBandLevel = eq.bandLevelRange[1],
         bandLevels = when (currentParameter) {
-            EqualizerParameters.BANDS -> bandLevels!!
+            EqualizerBandsPreset.CUSTOM -> bandLevels!!
             else -> eq.bandLevels
         },
         presets = eq.presets,
         currentPreset = when (currentParameter) {
-            EqualizerParameters.BANDS -> NO_EQ_PRESET
+            EqualizerBandsPreset.CUSTOM -> NO_EQ_PRESET
             else -> currentPreset
         },
         bandFrequencies = eq.frequencies,
-        currentParameter = currentParameter
+        bandsPreset = currentParameter
     )
 }

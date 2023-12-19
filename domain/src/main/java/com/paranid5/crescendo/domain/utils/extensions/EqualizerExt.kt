@@ -2,7 +2,7 @@ package com.paranid5.crescendo.domain.utils.extensions
 
 import android.media.audiofx.Equalizer
 import com.paranid5.crescendo.domain.eq.EqualizerData
-import com.paranid5.crescendo.domain.eq.EqualizerParameters
+import com.paranid5.crescendo.domain.eq.EqualizerBandsPreset
 
 inline val Equalizer.bandIndicesRange
     get() = (0 until numberOfBands)
@@ -21,12 +21,12 @@ inline val Equalizer.presets: List<String>
 inline val Equalizer.frequencies
     get() = bandIndicesRange.map { getCenterFreq(it.toShort()) }
 
-fun Equalizer.setParameter(
-    currentParameter: EqualizerParameters,
+fun Equalizer.setPreset(
+    presetType: EqualizerBandsPreset,
     bandLevels: List<Short>?,
     preset: Short
-) = when (currentParameter) {
-    EqualizerParameters.BANDS -> this.bandLevels = bandLevels!!
-    EqualizerParameters.PRESET -> this.preset = preset
-    EqualizerParameters.NIL -> Unit
+) = when (presetType) {
+    EqualizerBandsPreset.CUSTOM -> this.bandLevels = bandLevels!!
+    EqualizerBandsPreset.BUILT_IN -> this.preset = preset
+    EqualizerBandsPreset.NIL -> Unit
 }

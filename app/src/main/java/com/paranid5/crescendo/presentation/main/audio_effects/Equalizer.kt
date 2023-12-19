@@ -55,7 +55,7 @@ import coil.request.ImageRequest
 import com.paranid5.crescendo.EQUALIZER_DATA
 import com.paranid5.crescendo.R
 import com.paranid5.crescendo.domain.eq.EqualizerData
-import com.paranid5.crescendo.domain.eq.EqualizerParameters
+import com.paranid5.crescendo.domain.eq.EqualizerBandsPreset
 import com.paranid5.crescendo.presentation.ui.theme.LocalAppColors
 import com.paranid5.crescendo.presentation.ui.utils.Spinner
 import kotlinx.coroutines.Job
@@ -87,26 +87,26 @@ private fun PresetSpinner(
         derivedStateOf { equalizerData!!.presets.size }
     }
 
-    val equalizerParam by remember {
-        derivedStateOf { equalizerData!!.currentParameter }
+    val bandsPreset by remember {
+        derivedStateOf { equalizerData!!.bandsPreset }
     }
 
-    val isEQParamBands by remember {
-        derivedStateOf { equalizerParam == EqualizerParameters.BANDS }
+    val isCustomPreset by remember {
+        derivedStateOf { bandsPreset == EqualizerBandsPreset.CUSTOM }
     }
 
     var selectedItemInd by remember {
         mutableIntStateOf(
-            when (equalizerData!!.currentParameter) {
-                EqualizerParameters.BANDS -> customPresetIndex
-                EqualizerParameters.PRESET -> equalizerData!!.currentPreset.toInt()
-                EqualizerParameters.NIL -> 0
+            when (bandsPreset) {
+                EqualizerBandsPreset.CUSTOM -> customPresetIndex
+                EqualizerBandsPreset.BUILT_IN -> equalizerData!!.currentPreset.toInt()
+                EqualizerBandsPreset.NIL -> 0
             }
         )
     }
 
     val curItemInd by remember {
-        derivedStateOf { if (isEQParamBands) customPresetIndex else selectedItemInd }
+        derivedStateOf { if (isCustomPreset) customPresetIndex else selectedItemInd }
     }
 
     Box(modifier) {

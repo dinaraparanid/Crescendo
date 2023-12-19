@@ -2,7 +2,7 @@ package com.paranid5.crescendo.presentation.main.audio_effects
 
 import android.content.Context
 import com.paranid5.crescendo.data.StorageHandler
-import com.paranid5.crescendo.domain.eq.EqualizerParameters
+import com.paranid5.crescendo.domain.eq.EqualizerBandsPreset
 import com.paranid5.crescendo.domain.utils.extensions.sendBroadcast
 import com.paranid5.crescendo.presentation.UIHandler
 import com.paranid5.crescendo.domain.media.handleOrIgnore
@@ -53,12 +53,12 @@ class AudioEffectsUIHandler :
 
     fun storeAndSwitchToPresetAsync(context: Context, preset: Short) = launch {
         storageHandler.storeEqualizerPreset(preset)
-        storageHandler.storeEqualizerParam(EqualizerParameters.PRESET)
+        storageHandler.storeEqualizerParam(EqualizerBandsPreset.BUILT_IN)
         sendEqualizerParamUpdate(context)
     }
 
     fun switchToBandsAsync(context: Context) = launch {
-        storageHandler.storeEqualizerParam(EqualizerParameters.BANDS)
+        storageHandler.storeEqualizerParam(EqualizerBandsPreset.CUSTOM)
         sendEqualizerParamUpdate(context)
     }
 

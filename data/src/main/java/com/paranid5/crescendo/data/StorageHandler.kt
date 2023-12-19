@@ -11,7 +11,7 @@ import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
 import com.paranid5.crescendo.domain.VideoMetadata
 import com.paranid5.crescendo.domain.eq.EqualizerData
-import com.paranid5.crescendo.domain.eq.EqualizerParameters
+import com.paranid5.crescendo.domain.eq.EqualizerBandsPreset
 import com.paranid5.crescendo.domain.media.AudioStatus
 import com.paranid5.crescendo.domain.tracks.DefaultTrack
 import com.paranid5.crescendo.domain.tracks.TrackOrder
@@ -259,12 +259,12 @@ class StorageHandler(context: Context) :
     @OptIn(ExperimentalCoroutinesApi::class)
     val equalizerParamFlow = dataStore.data
         .mapLatest { preferences -> preferences[EQ_PARAM] }
-        .mapLatest { param -> EqualizerParameters.entries[param ?: 0] }
+        .mapLatest { param -> EqualizerBandsPreset.entries[param ?: 0] }
 
     val equalizerParamState = equalizerParamFlow
-        .stateIn(this, SharingStarted.Eagerly, EqualizerParameters.NIL)
+        .stateIn(this, SharingStarted.Eagerly, EqualizerBandsPreset.NIL)
 
-    suspend fun storeEqualizerParam(param: EqualizerParameters) {
+    suspend fun storeEqualizerParam(param: EqualizerBandsPreset) {
         dataStore.edit { preferences -> preferences[EQ_PARAM] = param.ordinal }
     }
 

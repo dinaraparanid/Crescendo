@@ -22,6 +22,8 @@ import com.paranid5.crescendo.domain.caching.CacheTrimRange
 import com.paranid5.crescendo.domain.caching.CachingResult
 import com.paranid5.crescendo.domain.caching.Formats
 import com.paranid5.crescendo.domain.caching.VideoCacheResponse
+import com.paranid5.crescendo.domain.ktor_client.DownloadingProgress
+import com.paranid5.crescendo.domain.ktor_client.UrlWithFile
 import com.paranid5.crescendo.domain.ktor_client.downloadFile
 import com.paranid5.crescendo.domain.ktor_client.downloadFiles
 import com.paranid5.crescendo.domain.media.MediaFile
@@ -122,7 +124,7 @@ class VideoCacheService : SuspendService(), KoinComponent {
     private val videoCashQueue: Queue<VideoCacheData> = ConcurrentLinkedQueue()
     private val videoCashQueueLenState = MutableStateFlow(0)
 
-    private val videoCashProgressState = MutableStateFlow(0L to 0L)
+    private val videoCashProgressState = MutableStateFlow(DownloadingProgress(0L, 0L))
     private val videoCashErrorState = MutableStateFlow(0 to "")
 
     private val isConnectedState by inject<MutableStateFlow<Boolean>>(
@@ -382,7 +384,7 @@ class VideoCacheService : SuspendService(), KoinComponent {
         val statusCode = ktorClient.downloadFiles(
             cachingStatusState,
             videoCashProgressState,
-            audioUrl to audioFileStore, videoUrl to videoFileStore
+            UrlWithFile(audioUrl, audioFileStore), UrlWithFile(videoUrl, videoFileStore)
         )
 
         if (statusCode?.isSuccess() != true) {
@@ -594,7 +596,7 @@ class VideoCacheService : SuspendService(), KoinComponent {
 
             videoCashQueue.poll()?.let { (url, desiredFilename, format, trimRange) ->
                 Log.d(TAG, "Prepare for caching")
-                videoCashProgressState.update { 0L to 0L }
+                videoCashProgressState.update { DownloadingProgress(0L, 0L) }
                 cachingStatusState.update { DownloadingStatus.DOWNLOADING }
                 videoCashQueueLenState.update { videoCashQueue.size }
 

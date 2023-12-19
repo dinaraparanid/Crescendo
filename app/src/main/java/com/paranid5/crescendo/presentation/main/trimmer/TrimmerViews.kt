@@ -38,12 +38,12 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.paranid5.crescendo.R
+import com.paranid5.crescendo.domain.utils.AsyncCondVar
 import com.paranid5.crescendo.domain.utils.extensions.timeString
 import com.paranid5.crescendo.domain.utils.extensions.toTimeOrNull
 import com.paranid5.crescendo.presentation.ui.theme.LocalAppColors
 import com.paranid5.crescendo.presentation.ui.utils.DefaultOutlinedTextField
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalFoundationApi::class)
@@ -114,11 +114,22 @@ fun PlaybackButtons(
     val coroutineScope = rememberCoroutineScope()
 
     val player by remember { lazy { TrackPlayer(track!!) } }
+    val resetPlaybackPosCondVar by remember { lazy { AsyncCondVar() } }
+
     var isInitialized by remember { mutableStateOf(false) }
+    var isPlaybackTaskFinished by remember { mutableStateOf(false) }
 
     suspend fun resetPlaybackPosition() {
-        delay(500)
+        while (!isPlaybackTaskFinished)
+            resetPlaybackPosCondVar.wait()
+
         viewModel.setPlaybackPosition(startPos)
+        isPlaybackTaskFinished = false
+    }
+
+    suspend fun notifyPlaybackTaskFinished() {
+        isPlaybackTaskFinished = true
+        resetPlaybackPosCondVar.notify()
     }
 
     fun releasePlaybackMonitorTask() {
@@ -142,12 +153,12 @@ fun PlaybackButtons(
 
                 playbackPosMonitorTask = coroutineScope.launch {
                     PlaybackPositionMonitoringTask(player, viewModel)
+                    notifyPlaybackTaskFinished()
                 }
             }
 
             isInitialized -> {
                 player.pause()
-                releasePlaybackMonitorTask()
                 resetPlaybackPosition()
             }
         }

@@ -15,8 +15,8 @@ import androidx.media3.exoplayer.ExoPlayer
 import com.paranid5.crescendo.AUDIO_SESSION_ID
 import com.paranid5.crescendo.EQUALIZER_DATA
 import com.paranid5.crescendo.domain.eq.EqualizerData
-import com.paranid5.crescendo.domain.eq.EqualizerParameters
-import com.paranid5.crescendo.domain.utils.extensions.setParameter
+import com.paranid5.crescendo.domain.eq.EqualizerBandsPreset
+import com.paranid5.crescendo.domain.utils.extensions.setPreset
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.flow.updateAndGet
@@ -129,7 +129,7 @@ class PlaybackController(
         audioSessionId: Int,
         bandLevels: List<Short>?,
         currentPreset: Short,
-        currentParameter: EqualizerParameters
+        currentParameter: EqualizerBandsPreset
     ): Pair<Equalizer, EqualizerData> {
         val eq = Equalizer(0, audioSessionId)
 
@@ -140,8 +140,8 @@ class PlaybackController(
             currentParameter = currentParameter
         )
 
-        eq.setParameter(
-            currentParameter = data.currentParameter,
+        eq.setPreset(
+            presetType = data.bandsPreset,
             bandLevels = data.bandLevels,
             preset = data.currentPreset
         )
@@ -259,15 +259,15 @@ class PlaybackController(
     }
 
     fun setEqParameter(
-        currentParameter: EqualizerParameters,
+        currentParameter: EqualizerBandsPreset,
         bandLevels: List<Short>?,
         preset: Short
-    ) = equalizer.setParameter(currentParameter, bandLevels, preset)
+    ) = equalizer.setPreset(currentParameter, bandLevels, preset)
 
     fun updateEqData(
         bandLevels: List<Short>?,
         currentPreset: Short,
-        currentParameter: EqualizerParameters
+        currentParameter: EqualizerBandsPreset
     ) = equalizerDataState.update {
         EqualizerData(
             equalizer,
