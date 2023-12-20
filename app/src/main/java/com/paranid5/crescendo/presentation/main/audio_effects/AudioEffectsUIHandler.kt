@@ -5,7 +5,6 @@ import com.paranid5.crescendo.data.StorageHandler
 import com.paranid5.crescendo.domain.eq.EqualizerBandsPreset
 import com.paranid5.crescendo.domain.utils.extensions.sendBroadcast
 import com.paranid5.crescendo.presentation.UIHandler
-import com.paranid5.crescendo.domain.media.handleOrIgnore
 import com.paranid5.crescendo.services.stream_service.StreamService
 import com.paranid5.crescendo.services.track_service.TrackService
 import kotlinx.coroutines.CoroutineScope
@@ -25,7 +24,7 @@ class AudioEffectsUIHandler :
     private fun Context.sendAudioEffectsBroadcast(
         streamBroadcastAction: String,
         trackBroadcastAction: String
-    ) = audioStatus.handleOrIgnore(
+    ) = audioStatus?.handle(
         streamAction = { sendBroadcast(streamBroadcastAction) },
         trackAction = { sendBroadcast(trackBroadcastAction) }
     )

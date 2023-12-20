@@ -127,11 +127,7 @@ suspend fun HttpClient.downloadFiles(
     val totalBytes = bytesPerFiles.sum()
     getRequests.downloadFilesUntilError(downloadingState, progressState, totalBytes)
 
-    val status = when (downloadingState.updatedToFinished) {
-        DownloadingStatus.CANCELED -> null
-        else -> HttpStatusCode.OK
-    }
-
+    val status = downloadingState.updatedToFinished.httpStatusCode
     Log.d(TAG, "Done, status: ${status?.value}")
     status
 }
@@ -203,4 +199,10 @@ private inline val MutableStateFlow<DownloadingStatus>.updatedToFinished
             DownloadingStatus.CANCELED -> it
             else -> DownloadingStatus.DOWNLOADED
         }
+    }
+
+private inline val DownloadingStatus.httpStatusCode
+    get() = when (this) {
+        DownloadingStatus.CANCELED -> null
+        else -> HttpStatusCode.OK
     }

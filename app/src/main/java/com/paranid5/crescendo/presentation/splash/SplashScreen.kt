@@ -24,7 +24,7 @@ import com.paranid5.crescendo.presentation.ui.theme.LocalAppColors
 
 @Composable
 fun SplashScreen(modifier: Modifier = Modifier) {
-    val colors = LocalAppColors.current.value
+    val colors = LocalAppColors.current.colorScheme
 
     Surface(
         modifier = modifier,

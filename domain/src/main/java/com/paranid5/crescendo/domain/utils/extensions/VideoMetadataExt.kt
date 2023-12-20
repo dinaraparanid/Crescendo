@@ -4,7 +4,7 @@ import android.graphics.Bitmap
 import android.support.v4.media.MediaMetadataCompat
 import com.paranid5.crescendo.domain.VideoMetadata
 
-fun com.paranid5.crescendo.domain.VideoMetadata.toAndroidMetadata(cover: Bitmap? = null): MediaMetadataCompat =
+fun VideoMetadata.toAndroidMetadata(cover: Bitmap? = null): MediaMetadataCompat =
     MediaMetadataCompat.Builder()
         .putText(MediaMetadataCompat.METADATA_KEY_TITLE, title)
         .putText(MediaMetadataCompat.METADATA_KEY_ARTIST, author)

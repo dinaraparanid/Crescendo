@@ -1,20 +1,19 @@
 package com.paranid5.crescendo.domain.utils.extensions
 
+import android.annotation.SuppressLint
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import android.os.Build
 
+@SuppressLint("UnspecifiedRegisterReceiverFlag")
 fun Context.registerReceiverCompat(
     receiver: BroadcastReceiver,
     filter: IntentFilter,
 ) = when {
-    Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU -> registerReceiver(
-        receiver,
-        filter,
-        Context.RECEIVER_NOT_EXPORTED
-    )
+    Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU ->
+        registerReceiver(receiver, filter, Context.RECEIVER_NOT_EXPORTED)
 
     else -> registerReceiver(receiver, filter)
 }

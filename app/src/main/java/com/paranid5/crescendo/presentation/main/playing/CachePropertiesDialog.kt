@@ -47,7 +47,7 @@ fun CachePropertiesDialog(
     modifier: Modifier = Modifier,
     storageHandler: StorageHandler = koinInject()
 ) {
-    val colors = LocalAppColors.current.value
+    val colors = LocalAppColors.current.colorScheme
     val currentMetadata by storageHandler.currentMetadataState.collectAsState()
 
     val lengthInSecs by remember {
@@ -63,7 +63,7 @@ fun CachePropertiesDialog(
     val endPointSecs by endPointSecsState
 
     val trimRange by remember {
-        derivedStateOf { CacheTrimRange(offset = trimOffsetSecs, endPoint = endPointSecs) }
+        derivedStateOf { CacheTrimRange(startPoint = trimOffsetSecs, endPoint = endPointSecs) }
     }
 
     val filenameState = remember { mutableStateOf("") }
@@ -114,7 +114,7 @@ fun CachePropertiesDialog(
 
 @Composable
 private fun Title(modifier: Modifier = Modifier) {
-    val colors = LocalAppColors.current.value
+    val colors = LocalAppColors.current.colorScheme
 
     Text(
         text = stringResource(R.string.cache_properties),
@@ -128,7 +128,7 @@ private fun Title(modifier: Modifier = Modifier) {
 
 @Composable
 private fun FilenameInput(filenameState: MutableState<String>, modifier: Modifier = Modifier) {
-    val colors = LocalAppColors.current.value
+    val colors = LocalAppColors.current.colorScheme
 
     DefaultOutlinedTextField(
         value = filenameState.value,
@@ -152,7 +152,7 @@ private fun SaveOptionsMenu(
     selectedSaveOptionIndexState: MutableState<Int>,
     modifier: Modifier = Modifier
 ) {
-    val colors = LocalAppColors.current.value
+    val colors = LocalAppColors.current.colorScheme
     var isDropdownShown by remember { mutableStateOf(false) }
 
     Box(
@@ -197,7 +197,7 @@ private fun ConfirmButton(
     modifier: Modifier = Modifier,
     playingUIHandler: PlayingUIHandler = koinInject()
 ) {
-    val colors = LocalAppColors.current.value
+    val colors = LocalAppColors.current.colorScheme
 
     Button(
         modifier = modifier.padding(vertical = 10.dp),

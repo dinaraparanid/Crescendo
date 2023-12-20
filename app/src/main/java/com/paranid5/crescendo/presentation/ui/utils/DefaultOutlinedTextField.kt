@@ -23,7 +23,7 @@ fun DefaultOutlinedTextField(
     label: @Composable (() -> Unit)? = null,
     keyboardOptions: KeyboardOptions = KeyboardOptions.Default,
 ) {
-    val colors = LocalAppColors.current.value
+    val colors = LocalAppColors.current.colorScheme
 
     BasicTextField(
         value = value,

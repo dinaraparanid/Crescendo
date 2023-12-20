@@ -79,7 +79,7 @@ private fun PresetSpinner(
     audioEffectsUIHandler: AudioEffectsUIHandler = koinInject()
 ) {
     val context = LocalContext.current
-    val primaryColor = LocalAppColors.current.value.primary
+    val primaryColor = LocalAppColors.current.colorScheme.primary
 
     val equalizerData by equalizerDataState.collectAsState()
 
@@ -199,7 +199,7 @@ private fun BandsCurve(
     pointsState: SnapshotStateList<Offset>,
     modifier: Modifier = Modifier
 ) {
-    val primaryColor = LocalAppColors.current.value.primary
+    val primaryColor = LocalAppColors.current.colorScheme.primary
     Log.d(TAG, "Bands: ${pointsState.toList()}")
 
     val path = Path().apply {
@@ -269,7 +269,7 @@ private fun BandDbLabel(
     modifier: Modifier = Modifier,
     equalizerDataState: MutableStateFlow<EqualizerData?> = koinInject(named(EQUALIZER_DATA)),
 ) {
-    val primaryColor = LocalAppColors.current.value.primary
+    val primaryColor = LocalAppColors.current.colorScheme.primary
     val equalizerData by equalizerDataState.collectAsState()
     val realLvlDb by remember { derivedStateOf { equalizerData!!.bandLevels[index] / 1000F } }
 
@@ -366,7 +366,7 @@ private fun BandSlider(
     audioEffectsUIHandler: AudioEffectsUIHandler = koinInject()
 ) {
     val context = LocalContext.current
-    val primaryColor = LocalAppColors.current.value.primary
+    val primaryColor = LocalAppColors.current.colorScheme.primary
 
     Slider(
         value = presentLvlsDbState[index],
@@ -461,7 +461,7 @@ private fun BandHzLabel(
     modifier: Modifier = Modifier,
     equalizerDataState: MutableStateFlow<EqualizerData?> = koinInject(named(EQUALIZER_DATA)),
 ) {
-    val primaryColor = LocalAppColors.current.value.primary
+    val primaryColor = LocalAppColors.current.colorScheme.primary
     val equalizerData by equalizerDataState.collectAsState()
 
     Text(

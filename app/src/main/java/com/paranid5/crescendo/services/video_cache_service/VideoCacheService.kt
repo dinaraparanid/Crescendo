@@ -28,7 +28,7 @@ import com.paranid5.crescendo.domain.ktor_client.downloadFile
 import com.paranid5.crescendo.domain.ktor_client.downloadFiles
 import com.paranid5.crescendo.domain.media.MediaFile
 import com.paranid5.crescendo.domain.media.createMediaFileCatching
-import com.paranid5.crescendo.domain.media.getInitialMediaDirectory
+import com.paranid5.crescendo.domain.media.getInitialVideoDirectory
 import com.paranid5.crescendo.domain.media_scanner.MediaScannerReceiver
 import com.paranid5.crescendo.domain.utils.AsyncCondVar
 import com.paranid5.crescendo.domain.utils.extensions.registerReceiverCompat
@@ -174,7 +174,7 @@ class VideoCacheService : SuspendService(), KoinComponent {
         registerReceiverCompat(cacheNextVideoReceiver, Broadcast_CASH_NEXT_VIDEO)
         registerReceiverCompat(cancelCurVideoReceiver, Broadcast_CANCEL_CUR_VIDEO)
         registerReceiverCompat(cancelAllReceiver, Broadcast_CANCEL_ALL)
-        registerReceiverCompat(mediaScannerReceiver, MediaScannerReceiver.Broadcast_SCAN_NEXT_FILE)
+        registerReceiverCompat(mediaScannerReceiver, MediaScannerReceiver.Broadcast_SCAN_FILE)
     }
 
     private fun unregisterReceivers() {
@@ -291,7 +291,7 @@ class VideoCacheService : SuspendService(), KoinComponent {
         isAudio: Boolean
     ) = either {
         val storeFileRes = createMediaFileCatching(
-            mediaDirectory = getInitialMediaDirectory(isAudio),
+            mediaDirectory = getInitialVideoDirectory(isAudio),
             filename = desiredFilename.replace(Regex("\\W+"), "_"),
             ext = "mp4"
         )

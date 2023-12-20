@@ -2,6 +2,7 @@ package com.paranid5.crescendo.domain.utils.extensions
 
 import android.graphics.Bitmap
 import android.support.v4.media.MediaMetadataCompat
+import androidx.media3.common.MediaItem
 import com.paranid5.crescendo.domain.tracks.DefaultTrack
 import com.paranid5.crescendo.domain.tracks.Track
 
@@ -18,6 +19,8 @@ fun Track.toAndroidMetadata(cover: Bitmap? = null): MediaMetadataCompat =
         .build()
 
 fun Iterable<Track>.toDefaultTrackList() = map(::DefaultTrack)
+
+fun Iterable<Track>.toMediaItemList() = map { MediaItem.fromUri(it.path) }
 
 inline val Iterable<Track>.totalDuration
     get() = fold(0L) { acc, track -> acc + track.duration }

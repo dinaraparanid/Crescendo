@@ -7,7 +7,10 @@ import com.paranid5.crescendo.data.StorageHandler
 import com.paranid5.crescendo.domain.tracks.Track
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.flow.updateAndGet
 import kotlinx.coroutines.launch
@@ -61,6 +64,12 @@ class TrimmerViewModel(
 
     fun setEndPosInMillis(endMillis: Long) {
         savedStateHandle[END_MILLIS] = _endPosInMillisState.updateAndGet { endMillis }
+    }
+
+    val trimmedDurationFlow by lazy {
+        combine(startPosInMillisState, endPosInMillisState) { start, end ->
+            end - start
+        }
     }
 
     private val _playbackPositionState by lazy {

@@ -5,7 +5,6 @@ appcompat = "1.6.1"
 arrowFxCoroutines = "1.2.1"
 audiovisualizer = "0.9.2"
 coilCompose = "2.5.0"
-composeAudiowaveform = "1.1.1"
 composeMarkdown = "0.3.3"
 constraintlayoutCompose = "1.0.1"
 coreKtx = "1.12.0"
@@ -13,6 +12,7 @@ datastorePreferences = "1.1.0-alpha07"
 isoparser = "1.1.22"
 jaudiotagger = "v3.0.1"
 koinAndroidxCompose = "3.5.0"
+kotlinxCollectionsImmutable = "0.3.6"
 kotlinxSerializationJson = "1.6.2"
 ktorClientCore = "2.3.7"
 lifecycleExtensions = "2.2.0"
@@ -25,7 +25,6 @@ media3Exoplayer = "1.2.0"
 mobileFfmpegFull = "4.4.LTS"
 navigationCompose = "2.7.6"
 paletteKtx = "1.0.0"
-storage = "1.5.5"
 ui = "1.5.4"
 ytUrlExtractorKt = "0.1.0.2"
 
@@ -57,11 +56,11 @@ androidx-ui-tooling-preview = { module = "androidx.compose.ui:ui-tooling-preview
 arrow-fx-coroutines = { module = "io.arrow-kt:arrow-fx-coroutines", version.ref = "arrowFxCoroutines" }
 audiovisualizer = { module = "com.gauravk.audiovisualizer:audiovisualizer", version.ref = "audiovisualizer" }
 coil-compose = { module = "io.coil-kt:coil-compose", version.ref = "coilCompose" }
-compose-audiowaveform = { module = "com.github.lincollincol:compose-audiowaveform", version.ref = "composeAudiowaveform" }
 compose-markdown = { module = "com.github.jeziellago:compose-markdown", version.ref = "composeMarkdown" }
 isoparser = { module = "com.googlecode.mp4parser:isoparser", version.ref = "isoparser" }
 jaudiotagger = { module = "org.bitbucket.ijabz:jaudiotagger", version.ref = "jaudiotagger" }
 koin-androidx-compose = { module = "io.insert-koin:koin-androidx-compose", version.ref = "koinAndroidxCompose" }
+kotlinx-collections-immutable = { module = "org.jetbrains.kotlinx:kotlinx-collections-immutable", version.ref = "kotlinxCollectionsImmutable" }
 kotlinx-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "kotlinxSerializationJson" }
 ktor-client-content-negotiation = { module = "io.ktor:ktor-client-content-negotiation", version.ref = "ktorClientCore" }
 ktor-client-core = { module = "io.ktor:ktor-client-core", version.ref = "ktorClientCore" }
@@ -70,7 +69,6 @@ ktor-client-okhttp = { module = "io.ktor:ktor-client-okhttp", version.ref = "kto
 ktor-serialization-kotlinx-json = { module = "io.ktor:ktor-serialization-kotlinx-json", version.ref = "ktorClientCore" }
 material = { module = "com.google.android.material:material", version.ref = "materialVersion" }
 mobile-ffmpeg-full = { module = "com.arthenica:mobile-ffmpeg-full", version.ref = "mobileFfmpegFull" }
-storage = { module = "com.anggrayudi:storage", version.ref = "storage" }
 yt-url-extractor-kt = { module = "com.github.dinaraparanid:yt-url-extractor-kt", version.ref = "ytUrlExtractorKt" }
 
 [plugins]

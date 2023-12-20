@@ -2,7 +2,7 @@ package com.paranid5.crescendo.domain.utils.extensions
 
 import android.media.audiofx.PresetReverb
 
-object PresetReverbExt {
+object PresetReverb {
     inline val presets
         get() = listOf(
             PresetReverb.PRESET_NONE,

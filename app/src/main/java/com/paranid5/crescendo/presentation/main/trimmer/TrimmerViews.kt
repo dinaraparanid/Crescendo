@@ -53,7 +53,7 @@ fun TitleArtistColumn(
     modifier: Modifier = Modifier,
     spacerHeight: Dp = 8.dp
 ) {
-    val colors = LocalAppColors.current.value
+    val colors = LocalAppColors.current.colorScheme
     val track by viewModel.trackState.collectAsState()
 
     Column(modifier) {
@@ -85,8 +85,8 @@ fun TrimmedDuration(
     viewModel: TrimmerViewModel,
     modifier: Modifier = Modifier
 ) {
-    val colors = LocalAppColors.current.value
-    val duration by viewModel.playbackPositionState.collectAsState(initial = 0L)
+    val colors = LocalAppColors.current.colorScheme
+    val duration by viewModel.trimmedDurationFlow.collectAsState(initial = 0L)
 
     Text(
         text = duration.timeString,
@@ -102,7 +102,7 @@ fun PlaybackButtons(
     viewModel: TrimmerViewModel,
     modifier: Modifier = Modifier
 ) {
-    val colors = LocalAppColors.current.value
+    val colors = LocalAppColors.current.colorScheme
     val track by viewModel.trackState.collectAsState()
     val isPlaying by viewModel.isPlayingState.collectAsState()
 
@@ -243,7 +243,7 @@ fun BorderControllers(
     viewModel: TrimmerViewModel,
     modifier: Modifier = Modifier
 ) {
-    val colors = LocalAppColors.current.value
+    val colors = LocalAppColors.current.colorScheme
 
     val startMillis by viewModel.startPosInMillisState.collectAsState()
     val endMillis by viewModel.endPosInMillisState.collectAsState()
@@ -303,7 +303,7 @@ fun SaveButton(
     modifier: Modifier = Modifier,
     textModifier: Modifier = Modifier
 ) {
-    val colors = LocalAppColors.current.value
+    val colors = LocalAppColors.current.colorScheme
 
     Button(
         modifier = modifier,

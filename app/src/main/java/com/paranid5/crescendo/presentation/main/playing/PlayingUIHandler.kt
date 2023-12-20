@@ -5,15 +5,14 @@ import android.widget.Toast
 import com.paranid5.crescendo.AUDIO_SESSION_ID
 import com.paranid5.crescendo.R
 import com.paranid5.crescendo.data.StorageHandler
-import com.paranid5.crescendo.presentation.main.NavHostController
-import com.paranid5.crescendo.presentation.main.Screens
-import com.paranid5.crescendo.presentation.UIHandler
-import com.paranid5.crescendo.domain.media.AudioStatus
-import com.paranid5.crescendo.domain.media.handleOrIgnore
-import com.paranid5.crescendo.services.stream_service.StreamServiceAccessor
-import com.paranid5.crescendo.services.track_service.TrackServiceAccessor
 import com.paranid5.crescendo.domain.caching.CacheTrimRange
 import com.paranid5.crescendo.domain.caching.Formats
+import com.paranid5.crescendo.domain.media.AudioStatus
+import com.paranid5.crescendo.presentation.UIHandler
+import com.paranid5.crescendo.presentation.main.NavHostController
+import com.paranid5.crescendo.presentation.main.Screens
+import com.paranid5.crescendo.services.stream_service.StreamServiceAccessor
+import com.paranid5.crescendo.services.track_service.TrackServiceAccessor
 import com.paranid5.crescendo.services.video_cache_service.VideoCacheServiceAccessor
 import kotlinx.coroutines.flow.MutableStateFlow
 import org.koin.core.component.KoinComponent
@@ -28,27 +27,27 @@ class PlayingUIHandler(
 ) : UIHandler, KoinComponent {
     private val audioSessionIdState by inject<MutableStateFlow<Int>>(named(AUDIO_SESSION_ID))
 
-    fun sendOnPrevButtonClickedBroadcast(audioStatus: AudioStatus?) = audioStatus.handleOrIgnore(
+    fun sendOnPrevButtonClickedBroadcast(audioStatus: AudioStatus) = audioStatus.handle(
         streamAction = streamServiceAccessor::sendSeekTo10SecsBackBroadcast,
         trackAction = trackServiceAccessor::sendSwitchToPrevTrackBroadcast
     )
 
-    fun sendOnNextButtonClickedBroadcast(audioStatus: AudioStatus?) = audioStatus.handleOrIgnore(
+    fun sendOnNextButtonClickedBroadcast(audioStatus: AudioStatus) = audioStatus.handle(
         streamAction = streamServiceAccessor::sendSeekTo10SecsForwardBroadcast,
         trackAction = trackServiceAccessor::sendSwitchToNextTrackBroadcast
     )
 
-    fun sendSeekToBroadcast(audioStatus: AudioStatus?, position: Long) = audioStatus.handleOrIgnore(
+    fun sendSeekToBroadcast(audioStatus: AudioStatus, position: Long) = audioStatus.handle(
         streamAction = { streamServiceAccessor.sendSeekToBroadcast(position) },
         trackAction = { trackServiceAccessor.sendSeekToBroadcast(position) }
     )
 
-    fun sendPauseBroadcast(audioStatus: AudioStatus?) = audioStatus.handleOrIgnore(
+    fun sendPauseBroadcast(audioStatus: AudioStatus) = audioStatus.handle(
         streamAction = streamServiceAccessor::sendPauseBroadcast,
         trackAction = trackServiceAccessor::sendPauseBroadcast
     )
 
-    fun startStreamingOrSendResumeBroadcast(audioStatus: AudioStatus?) = audioStatus.handleOrIgnore(
+    fun startStreamingOrSendResumeBroadcast(audioStatus: AudioStatus) = audioStatus.handle(
         streamAction = streamServiceAccessor::startStreamingOrSendResumeBroadcast,
         trackAction = trackServiceAccessor::startStreamingOrSendResumeBroadcast
     )

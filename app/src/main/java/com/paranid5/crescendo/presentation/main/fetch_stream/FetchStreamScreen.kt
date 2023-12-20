@@ -100,7 +100,7 @@ private fun UrlEditor(
     label = {
         Text(
             text = stringResource(R.string.enter_stream_url),
-            color = LocalAppColors.current.value.primary,
+            color = LocalAppColors.current.colorScheme.primary,
             fontSize = 12.sp,
         )
     },
@@ -116,7 +116,7 @@ private fun ConfirmButton(
     storageHandler: StorageHandler = koinInject(),
     fetchStreamUIHandler: FetchStreamUIHandler = koinInject()
 ) {
-    val colors = LocalAppColors.current.value
+    val colors = LocalAppColors.current.colorScheme
     val playingSheetState = LocalPlayingSheetState.current
     val playingPagerState = LocalPlayingPagerState.current
 

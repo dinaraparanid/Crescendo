@@ -48,7 +48,7 @@ fun LiveSeeker(
     modifier: Modifier = Modifier,
     streamServiceAccessor: StreamServiceAccessor = koinInject()
 ) {
-    val colors = LocalAppColors.current.value
+    val colors = LocalAppColors.current.colorScheme
 
     Button(
         modifier = modifier,

@@ -63,7 +63,7 @@ fun Spinner(
 
 @Composable
 private fun DefaultSelectedItem(text: String, modifier: Modifier = Modifier) {
-    val primaryColor = LocalAppColors.current.value.primary
+    val primaryColor = LocalAppColors.current.colorScheme.primary
     Text(text, modifier, primaryColor)
 }
 

@@ -36,7 +36,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.paranid5.crescendo.R
 import com.paranid5.crescendo.data.StorageHandler
-import com.paranid5.crescendo.domain.utils.extensions.PresetReverbExt
+import com.paranid5.crescendo.domain.utils.extensions.PresetReverb
 import com.paranid5.crescendo.domain.utils.extensions.toAngle
 import com.paranid5.crescendo.presentation.ui.theme.Disabled
 import com.paranid5.crescendo.presentation.ui.theme.LocalAppColors
@@ -56,7 +56,7 @@ fun BassAndReverb(
     val context = LocalContext.current
     var bassInitialValue by remember { mutableFloatStateOf(0F) }
     var reverbInitialPreset by remember { mutableFloatStateOf(0F) }
-    val reverbPresets = PresetReverbExt.presets
+    val reverbPresets = PresetReverb.presets
 
     LaunchedEffect(Unit) {
         bassInitialValue = storageHandler.bassStrengthState.value.toFloat()
@@ -101,7 +101,7 @@ private fun AudioController(
     angleRange: ClosedFloatingPointRange<Float> = -135F..135F,
     onValueChange: (Float) -> Unit
 ) {
-    val primaryColor = LocalAppColors.current.value.primary
+    val primaryColor = LocalAppColors.current.colorScheme.primary
 
     var inputValue by remember { mutableFloatStateOf(initialValue) }
 
@@ -215,7 +215,7 @@ private fun AudioControllerWithLabel(
     angleRange: ClosedFloatingPointRange<Float> = -135F..135F,
     onValueChange: (Float) -> Unit
 ) {
-    val primaryColor = LocalAppColors.current.value.primary
+    val primaryColor = LocalAppColors.current.colorScheme.primary
 
     Column(modifier) {
         AudioController(

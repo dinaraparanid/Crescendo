@@ -8,7 +8,7 @@ import com.paranid5.crescendo.domain.caching.CacheTrimRange
 import com.paranid5.crescendo.domain.caching.CachingResult
 import com.paranid5.crescendo.domain.caching.Formats
 import com.paranid5.crescendo.domain.media.MediaFile
-import com.paranid5.crescendo.domain.media.convertToAudioFileAsync
+import com.paranid5.crescendo.domain.media.toAudioFileAsync
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
@@ -62,7 +62,7 @@ suspend fun MediaFile.VideoFile.convertToAudioFileAndSetTagsAsync(
     trimRange: CacheTrimRange
 ) = coroutineScope {
     async(Dispatchers.IO) {
-        val audioFile = convertToAudioFileAsync(audioFormat, trimRange).await()
+        val audioFile = toAudioFileAsync(audioFormat, trimRange).await()
             ?: return@async null
 
         setAudioTagsAsync(

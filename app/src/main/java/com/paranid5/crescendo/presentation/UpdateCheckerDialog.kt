@@ -42,7 +42,7 @@ import org.koin.compose.koinInject
 @Composable
 fun UpdateCheckerDialog(modifier: Modifier = Modifier, ktorClient: HttpClient = koinInject()) {
     val activity = LocalActivity.current
-    val colors = LocalAppColors.current.value
+    val colors = LocalAppColors.current.colorScheme
 
     var newVersion by remember { mutableStateOf<Release?>(null) }
     val isUpdateAvailable by remember { derivedStateOf { newVersion != null } }

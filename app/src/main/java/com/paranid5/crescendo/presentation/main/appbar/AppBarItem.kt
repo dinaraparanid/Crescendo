@@ -26,7 +26,7 @@ fun AppBarItem(
         Icon(
             imageVector = image,
             contentDescription = stringResource(id = title),
-            tint = LocalAppColors.current.value.onBackground
+            tint = LocalAppColors.current.colorScheme.onBackground
         )
     },
     screen = screen,
@@ -44,7 +44,7 @@ fun AppBarItem(
         Icon(
             painter = image,
             contentDescription = stringResource(id = title),
-            tint = LocalAppColors.current.value.onBackground
+            tint = LocalAppColors.current.colorScheme.onBackground
         )
     },
     screen = screen,

@@ -18,7 +18,7 @@ data class TrackOrder(val contentOrder: TrackContentOrder, val orderType: TrackO
     }
 }
 
-fun Iterable<Track>.sortedBy(trackOrder: TrackOrder) = when (trackOrder.orderType) {
+fun <T : Track> Iterable<T>.sortedBy(trackOrder: TrackOrder) = when (trackOrder.orderType) {
     TrackOrder.TrackOrderType.ASC -> when (trackOrder.contentOrder) {
         TrackOrder.TrackContentOrder.TITLE -> sortedBy(Track::title)
         TrackOrder.TrackContentOrder.ARTIST -> sortedBy(Track::artist)

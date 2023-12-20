@@ -87,7 +87,7 @@ private fun CurrentPlaylistBar(
     tracksNumber: Int,
     totalDuration: Long
 ) {
-    val colors = LocalAppColors.current.value
+    val colors = LocalAppColors.current.colorScheme
 
     Row(modifier.fillMaxWidth()) {
         Text(

@@ -1,5 +1,6 @@
 package com.paranid5.crescendo.presentation.main.trimmer
 
+import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.gestures.detectHorizontalDragGestures
 import androidx.compose.foundation.layout.Box
@@ -19,6 +20,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
@@ -31,8 +33,9 @@ import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
-import com.paranid5.crescendo.presentation.ui.theme.LocalAppColors
 import com.paranid5.crescendo.presentation.ui.extensions.pxToDp
+import com.paranid5.crescendo.presentation.ui.extensions.safeDiv
+import com.paranid5.crescendo.presentation.ui.theme.LocalAppColors
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import linc.com.amplituda.Amplituda
@@ -40,27 +43,13 @@ import linc.com.amplituda.callback.AmplitudaErrorListener
 import kotlin.math.ceil
 import kotlin.math.roundToInt
 
-private const val MIN_SPIKE_HEIGHT = 1F
-private const val DEFAULT_GRAPHICS_LAYER_ALPHA = 0.99F
-
-private const val CONTROLLER_RECT_WIDTH = 15F
-private const val CONTROLLER_RECT_OFFSET = 7F
-
-private const val CONTROLLER_CIRCLE_RADIUS = 25F
-private const val CONTROLLER_CIRCLE_CENTER = 16F
-private const val CONTROLLER_HEIGHT_OFFSET = CONTROLLER_CIRCLE_RADIUS + CONTROLLER_CIRCLE_CENTER
-
-private const val CONTROLLER_ARROW_CORNER_BACK_OFFSET = 8F
-private const val CONTROLLER_ARROW_CORNER_FRONT_OFFSET = 10F
-private const val CONTROLLER_ARROW_CORNER_OFFSET = 12F
-
 @Composable
 fun TrimWaveform(
     model: String?,
     durationInMillis: Long,
     viewModel: TrimmerViewModel,
     modifier: Modifier = Modifier,
-    spikeWidthRatio: Int = 5,
+    spikeWidthRatio: Int = WAVEFORM_SPIKE_WIDTH_RATIO,
 ) {
     val context = LocalContext.current
 
@@ -83,6 +72,7 @@ fun TrimWaveform(
     val playbackPos by viewModel.playbackPositionState.collectAsState()
     val playbackOffset by remember { derivedStateOf { playbackPos safeDiv durationInMillis } }
     val isPlaying by viewModel.isPlayingState.collectAsState()
+    val playbackPositionAlpha by animateFloatAsState(if (isPlaying) 1F else 0F, label = "")
 
     LaunchedEffect(key1 = model) {
         withContext(Dispatchers.IO) {
@@ -152,7 +142,7 @@ fun TrimWaveform(
                 .zIndex(10F)
         )
 
-        if (isPlaying) PlaybackPosition(
+        PlaybackPosition(
             modifier = Modifier
                 .offset(
                     x = (CONTROLLER_CIRCLE_CENTER / 2 +
@@ -160,6 +150,7 @@ fun TrimWaveform(
                         .toInt()
                         .dp
                 )
+                .alpha(playbackPositionAlpha)
                 .fillMaxHeight()
                 .zIndex(8F)
         )
@@ -175,7 +166,7 @@ private fun Waveform(
     spikesAmplitudes: List<Float>,
     modifier: Modifier = Modifier
 ) {
-    val colors = LocalAppColors.current.value
+    val colors = LocalAppColors.current.colorScheme
     val waveformBrush = SolidColor(colors.onBackground)
     val progressBrush = SolidColor(colors.primary.copy(alpha = 0.25F))
     val progressWaveformBrush = SolidColor(colors.secondary)
@@ -234,7 +225,7 @@ private fun StartBorder(
     spikeWidthRatio: Int,
     modifier: Modifier = Modifier,
 ) {
-    val colors = LocalAppColors.current.value
+    val colors = LocalAppColors.current.colorScheme
     val progressBrush = SolidColor(colors.primary)
 
     val startMillis by viewModel.startPosInMillisState.collectAsState()
@@ -301,7 +292,7 @@ private fun EndBorder(
     durationInMillis: Long,
     modifier: Modifier = Modifier,
 ) {
-    val colors = LocalAppColors.current.value
+    val colors = LocalAppColors.current.colorScheme
     val progressBrush = SolidColor(colors.primary)
 
     val startMillis by viewModel.startPosInMillisState.collectAsState()
@@ -363,18 +354,31 @@ private fun EndBorder(
 
 @Composable
 private fun PlaybackPosition(modifier: Modifier = Modifier) {
-    val colors = LocalAppColors.current.value
-    val controllerBrush = SolidColor(colors.onBackground)
+    val colors = LocalAppColors.current.colorScheme
+    val playbackBrush = SolidColor(colors.onBackground)
 
     Canvas(modifier.graphicsLayer(alpha = DEFAULT_GRAPHICS_LAYER_ALPHA)) {
-        drawRect(
-            brush = controllerBrush,
-            topLeft = Offset(CONTROLLER_CIRCLE_CENTER - CONTROLLER_RECT_OFFSET, 0F),
+        drawCircle(
+            brush = playbackBrush,
+            radius = PLAYBACK_CIRCLE_RADIUS,
+            center = Offset(PLAYBACK_CIRCLE_CENTER, 0F)
+        )
+
+        drawRoundRect(
+            brush = playbackBrush,
+            topLeft = Offset(PLAYBACK_CIRCLE_CENTER - PLAYBACK_RECT_OFFSET, 0F),
             size = Size(
-                width = 5F,
-                height = size.height - CONTROLLER_HEIGHT_OFFSET
+                width = PLAYBACK_RECT_WIDTH,
+                height = size.height - PLAYBACK_HEIGHT_OFFSET
             ),
+            cornerRadius = CornerRadius(2F, 2F),
             blendMode = BlendMode.SrcAtop
+        )
+
+        drawCircle(
+            brush = playbackBrush,
+            radius = PLAYBACK_CIRCLE_RADIUS,
+            center = Offset(PLAYBACK_CIRCLE_CENTER, size.height - PLAYBACK_CIRCLE_CENTER)
         )
     }
 }
@@ -421,18 +425,3 @@ private fun <T> Iterable<T>.chunkToSize(size: Int, transform: (List<T>) -> T): L
 
 private fun Iterable<Float>.normalize(min: Float, max: Float) =
     map { (max - min) * ((it - min()) safeDiv (max() - min())) + min }
-
-private infix fun Int.safeDiv(value: Int) = when (value) {
-    0 -> 0F
-    else -> this / value.toFloat()
-}
-
-private infix fun Long.safeDiv(value: Long) = when (value) {
-    0L -> 0F
-    else -> this / value.toFloat()
-}
-
-private infix fun Float.safeDiv(value: Float) = when (value) {
-    0F -> 0F
-    else -> this / value
-}

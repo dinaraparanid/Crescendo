@@ -39,7 +39,7 @@ fun getFullMediaDirectory(mediaDirectory: MediaDirectory) =
  * for older models it is either [Environment.DIRECTORY_MUSIC] or [Environment.DIRECTORY_MOVIES]
  */
 
-fun getInitialMediaDirectory(isAudio: Boolean) = MediaDirectory(
+fun getInitialVideoDirectory(isAudio: Boolean) = MediaDirectory(
     when {
         Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q -> Environment.DIRECTORY_MOVIES
         isAudio -> Environment.DIRECTORY_MUSIC
@@ -52,18 +52,30 @@ suspend fun generateMediaFile(
     filename: String,
     ext: String
 ) = withContext(Dispatchers.IO) {
-    "$fullPath/$filename.$ext"
-        .takeIf { !File(it).exists() }
-        ?.let(::File)
-        ?.also { Log.d(TAG, "New file ${it.absolutePath}") }
-        ?.let(MediaFile::VideoFile)
-        ?: generateSequence(1) { it + 1 }
-            .map { num -> "$fullPath/$filename($num).$ext" }
-            .map(::File)
-            .first { !it.exists() }
-            .also { Log.d(TAG, "New file ${it.absolutePath}") }
-            .let(MediaFile::VideoFile)
+    tryGenerateMediaFile(fullPath, filename, ext)
+        ?: generateRepeatedMediaFile(fullPath, filename, ext)
 }
+
+private fun tryGenerateMediaFile(
+    fullPath: String,
+    filename: String,
+    ext: String
+) = "$fullPath/$filename.$ext"
+    .takeIf { !File(it).exists() }
+    ?.let(::File)
+    ?.also { Log.d(TAG, "New file ${it.absolutePath}") }
+    ?.let(MediaFile::VideoFile)
+
+private fun generateRepeatedMediaFile(
+    fullPath: String,
+    filename: String,
+    ext: String
+) = generateSequence(1) { it + 1 }
+    .map { num -> "$fullPath/$filename($num).$ext" }
+    .map(::File)
+    .first { !it.exists() }
+    .also { Log.d(TAG, "New file ${it.absolutePath}") }
+    .let(MediaFile::VideoFile)
 
 suspend fun generateMediaFile(
     mediaDirectory: MediaDirectory,

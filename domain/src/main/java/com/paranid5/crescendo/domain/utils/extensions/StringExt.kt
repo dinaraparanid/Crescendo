@@ -1,6 +1,6 @@
 package com.paranid5.crescendo.domain.utils.extensions
 
-fun String.toTime() = split(':').map(String::toInt).sumTime
+fun String.toTime() = split(':').map(String::toInt).totalTimeMs
 
 @Suppress("UNCHECKED_CAST")
 fun String.toTimeOrNull() = split(':')
@@ -8,9 +8,9 @@ fun String.toTimeOrNull() = split(':')
     ?.map(String::toIntOrNull)
     ?.takeIf { units -> units.all { it != null } }
     ?.let { it as List<Int> }
-    ?.sumTime
+    ?.totalTimeMs
 
-private inline val List<Int>.sumTime
+private inline val List<Int>.totalTimeMs
     get() = asReversed()
         .zip(arrayOf(1000L, 60000L, 3600000L))
         .sumOf { (units, unitWeight) -> units * unitWeight }

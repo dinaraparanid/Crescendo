@@ -55,7 +55,7 @@ fun DefaultTrackItem(
         startPlaylistPlayback(tracks, trackInd, storageHandler, trackServiceAccessor)
     }
 ) {
-    val colors = LocalAppColors.current.value
+    val colors = LocalAppColors.current.colorScheme
     val currentTrack by storageHandler.currentTrackState.collectAsState()
 
     val trackMb by remember { derivedStateOf { tracks.getOrNull(trackInd) } }

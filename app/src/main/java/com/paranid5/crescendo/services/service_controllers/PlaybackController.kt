@@ -16,7 +16,7 @@ import com.paranid5.crescendo.AUDIO_SESSION_ID
 import com.paranid5.crescendo.EQUALIZER_DATA
 import com.paranid5.crescendo.domain.eq.EqualizerData
 import com.paranid5.crescendo.domain.eq.EqualizerBandsPreset
-import com.paranid5.crescendo.domain.utils.extensions.setPreset
+import com.paranid5.crescendo.domain.utils.extensions.usePreset
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.flow.updateAndGet
@@ -140,7 +140,7 @@ class PlaybackController(
             currentParameter = currentParameter
         )
 
-        eq.setPreset(
+        eq.usePreset(
             presetType = data.bandsPreset,
             bandLevels = data.bandLevels,
             preset = data.currentPreset
@@ -262,7 +262,7 @@ class PlaybackController(
         currentParameter: EqualizerBandsPreset,
         bandLevels: List<Short>?,
         preset: Short
-    ) = equalizer.setPreset(currentParameter, bandLevels, preset)
+    ) = equalizer.usePreset(currentParameter, bandLevels, preset)
 
     fun updateEqData(
         bandLevels: List<Short>?,

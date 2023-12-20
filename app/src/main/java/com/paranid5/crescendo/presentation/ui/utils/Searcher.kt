@@ -43,7 +43,7 @@ fun <T> Searcher(
     filter: (query: String, item: T) -> Boolean,
     filteredContent: @Composable (ColumnScope.(List<T>, LazyListState) -> Unit)
 ) {
-    val colors = LocalAppColors.current.value
+    val colors = LocalAppColors.current.colorScheme
 
     val queryText by queryState.collectAsState()
     val allItems by allItemsState.collectAsState()
@@ -92,7 +92,7 @@ fun <T> Searcher(
 
 @Composable
 private fun SearchIcon(modifier: Modifier = Modifier) {
-    val primaryColor = LocalAppColors.current.value.primary
+    val primaryColor = LocalAppColors.current.colorScheme.primary
 
     Icon(
         painter = painterResource(R.drawable.search_icon),
@@ -109,7 +109,7 @@ private inline fun CancelSearchIcon(
     modifier: Modifier = Modifier,
     crossinline setQuery: (String?) -> Unit
 ) {
-    val primaryColor = LocalAppColors.current.value.primary
+    val primaryColor = LocalAppColors.current.colorScheme.primary
 
     Icon(
         painter = painterResource(R.drawable.cross),

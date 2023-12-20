@@ -27,7 +27,25 @@ private val LightColorScheme = lightColorScheme(
 )
 
 @JvmInline
-value class AppColors(val value: ColorScheme = DarkColorScheme)
+value class AppColors(val colorScheme: ColorScheme = DarkColorScheme) {
+    val primary
+        get() = colorScheme.primary
+
+    val secondary
+        get() = colorScheme.secondary
+
+    val secondaryAlternative
+        get() = colorScheme.onSecondary
+
+    val background
+        get() = colorScheme.background
+
+    val backgroundAlternative
+        get() = colorScheme.onBackground
+
+    val fontColor
+        get() = colorScheme.inverseSurface
+}
 
 val LocalAppColors = staticCompositionLocalOf { AppColors() }
 
@@ -41,7 +59,7 @@ fun MediaStreamerTheme(
     KoinContext {
         CompositionLocalProvider(LocalAppColors provides appColors) {
             MaterialTheme(
-                colorScheme = appColors.value,
+                colorScheme = appColors.colorScheme,
                 typography = Typography,
                 content = content
             )

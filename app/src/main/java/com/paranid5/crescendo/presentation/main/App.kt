@@ -55,7 +55,7 @@ private fun ScreenScaffold(
     viewModel: MainActivityViewModel,
     modifier: Modifier = Modifier,
 ) {
-    val backgroundColor = LocalAppColors.current.value.background
+    val backgroundColor = LocalAppColors.current.colorScheme.background
 
     val playingScaffoldState = rememberBottomSheetScaffoldState()
     val sheetState = playingScaffoldState.bottomSheetState

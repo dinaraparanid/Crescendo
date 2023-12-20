@@ -163,7 +163,7 @@ private fun Label(
     @StringRes effectTitleRes: Int,
     modifier: Modifier = Modifier
 ) {
-    val primaryColor = LocalAppColors.current.value.primary
+    val primaryColor = LocalAppColors.current.colorScheme.primary
 
     Text(
         text = stringResource(effectTitleRes),
@@ -185,7 +185,7 @@ private fun AudioEffectSlider(
     modifier: Modifier = Modifier,
     audioEffectsUIHandler: AudioEffectsUIHandler = koinInject(),
 ) {
-    val primaryColor = LocalAppColors.current.value.primary
+    val primaryColor = LocalAppColors.current.colorScheme.primary
     var effectVal by effectValState
     var effectInput by effectInputState
 
@@ -240,7 +240,7 @@ private fun AudioEffectTextField(
     modifier: Modifier = Modifier,
     audioEffectsUIHandler: AudioEffectsUIHandler = koinInject()
 ) {
-    val primaryColor = LocalAppColors.current.value.primary
+    val primaryColor = LocalAppColors.current.colorScheme.primary
     var effectInput by effectInputState
     var effectVal by effectValState
     val textFieldInteractionSource = remember { MutableInteractionSource() }

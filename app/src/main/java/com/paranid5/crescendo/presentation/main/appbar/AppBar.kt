@@ -21,7 +21,7 @@ import com.paranid5.crescendo.presentation.ui.theme.LocalAppColors
 
 @Composable
 fun AppBar(modifier: Modifier = Modifier) {
-    val colors = LocalAppColors.current.value
+    val colors = LocalAppColors.current.colorScheme
 
     BottomAppBar(
         containerColor = colors.primary,

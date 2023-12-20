@@ -28,7 +28,7 @@ internal inline fun PermissionDialog(
     crossinline onGoToAppSettingsClicked: () -> Unit = {},
     noinline onDismiss: () -> Unit = {},
 ) {
-    val colors = LocalAppColors.current.value
+    val colors = LocalAppColors.current.colorScheme
 
     AlertDialog(
         onDismissRequest = {
@@ -61,7 +61,7 @@ internal inline fun PermissionDialog(
 
 @Composable
 private fun Title(modifier: Modifier = Modifier) {
-    val colors = LocalAppColors.current.value
+    val colors = LocalAppColors.current.colorScheme
 
     Text(
         text = stringResource(R.string.permission_required),
@@ -90,7 +90,7 @@ private inline fun GrantPermissionButton(
     crossinline onGoToAppSettingsClicked: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    val colors = LocalAppColors.current.value
+    val colors = LocalAppColors.current.colorScheme
 
     Button(
         modifier = modifier.padding(vertical = 10.dp),

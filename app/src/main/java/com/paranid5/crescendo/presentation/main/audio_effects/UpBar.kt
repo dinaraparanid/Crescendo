@@ -28,7 +28,7 @@ fun UpBar(
     storageHandler: StorageHandler = koinInject(),
 ) {
     val context = LocalContext.current
-    val primaryColor = LocalAppColors.current.value.primary
+    val primaryColor = LocalAppColors.current.colorScheme.primary
     val argbPrimaryColor = primaryColor.toArgb()
     val areAudioEffectsEnabled by storageHandler.areAudioEffectsEnabledState.collectAsState()
 

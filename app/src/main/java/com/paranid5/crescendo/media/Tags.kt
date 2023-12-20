@@ -7,7 +7,7 @@ import android.os.Build
 import android.os.Environment
 import android.provider.MediaStore
 import com.paranid5.crescendo.domain.VideoMetadata
-import com.paranid5.crescendo.domain.media_scanner.scanNextFile
+import com.paranid5.crescendo.domain.media_scanner.sendScanFile
 import com.paranid5.crescendo.domain.caching.Formats
 import com.paranid5.crescendo.domain.media.MediaFile
 import com.paranid5.crescendo.media.images.getImageBinaryDataCatching
@@ -64,7 +64,7 @@ suspend fun setVideoTagsAsync(
         )
 
         setVideoTagsToFileCatching(videoFile, videoMetadata)
-        context.scanNextFile(absoluteFilePath)
+        context.sendScanFile(absoluteFilePath)
     }
 }
 
@@ -133,7 +133,7 @@ suspend fun setAudioTagsAsync(
         if (audioFormat == Formats.MP3)
             setAudioTagsToFileCatching(context, audioFile, videoMetadata)
 
-        context.scanNextFile(absoluteFilePath)
+        context.sendScanFile(absoluteFilePath)
     }
 }
 

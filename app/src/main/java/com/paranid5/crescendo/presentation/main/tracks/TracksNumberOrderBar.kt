@@ -36,7 +36,7 @@ fun TracksNumberOrderBar(
     tracksNumber: Int,
     modifier: Modifier = Modifier,
 ) {
-    val colors = LocalAppColors.current.value
+    val colors = LocalAppColors.current.colorScheme
 
     Row(modifier) {
         Text(
@@ -61,7 +61,7 @@ private fun TrackOrderSpinner(
     storageHandler: StorageHandler = koinInject()
 ) {
     val context = LocalContext.current
-    val colors = LocalAppColors.current.value
+    val colors = LocalAppColors.current.colorScheme
     val scope = rememberCoroutineScope()
     val trackOrder by storageHandler.trackOrderState.collectAsState()
 
@@ -115,7 +115,7 @@ private fun TrackOrderSpinner(
 
 @Composable
 private fun SelectedOrderItem(item: String, modifier: Modifier = Modifier) {
-    val colors = LocalAppColors.current.value
+    val colors = LocalAppColors.current.colorScheme
     val primaryColor = colors.primary
     val backgroundColor = colors.background
 

@@ -36,7 +36,7 @@ fun PlayingBottomSheet(
     alpha: Float,
     modifier: Modifier = Modifier,
 ) {
-    val backgroundColor = LocalAppColors.current.value.background
+    val backgroundColor = LocalAppColors.current.colorScheme.background
     val curPlaylistSheetState = LocalCurrentPlaylistSheetState.current
     val playingPagerState = LocalPlayingPagerState.current
 
