@@ -25,6 +25,7 @@ import com.paranid5.crescendo.presentation.composition_locals.LocalActivity
 import com.paranid5.crescendo.presentation.composition_locals.LocalNavController
 import com.paranid5.crescendo.presentation.composition_locals.LocalPlayingSheetState
 import com.paranid5.crescendo.presentation.main.trimmer.TrimmerViewModel
+import com.paranid5.crescendo.presentation.main.trimmer.properties.setTrack
 import com.paranid5.crescendo.services.track_service.TrackServiceAccessor
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel

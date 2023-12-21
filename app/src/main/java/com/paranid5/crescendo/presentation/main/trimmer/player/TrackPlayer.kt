@@ -1,13 +1,15 @@
-package com.paranid5.crescendo.presentation.main.trimmer
+package com.paranid5.crescendo.presentation.main.trimmer.player
 
 import android.media.AudioAttributes
 import android.media.AudioManager
 import android.media.MediaPlayer
+import androidx.lifecycle.viewModelScope
 import com.paranid5.crescendo.domain.tracks.Track
-import kotlinx.coroutines.coroutineScope
-import kotlinx.coroutines.delay
+import com.paranid5.crescendo.presentation.main.trimmer.TrimmerViewModel
+import com.paranid5.crescendo.presentation.main.trimmer.effects.playback.pausePlayback
+import com.paranid5.crescendo.presentation.main.trimmer.properties.trackOrNullState
+import kotlinx.coroutines.launch
 
-private const val PLAYBACK_UPDATE_COOLDOWN = 500L
 private const val TRANSITION_DURATION = 10_000
 
 inline fun TrackPlayer(track: Track, crossinline onCompletion: (MediaPlayer) -> Unit) =
@@ -26,25 +28,23 @@ inline fun TrackPlayer(track: Track, crossinline onCompletion: (MediaPlayer) -> 
         prepare()
     }
 
-fun MediaPlayer.seekTenSecsBack(startPosition: Int) {
-    seekTo(maxOf(currentPosition - TRANSITION_DURATION, startPosition))
-}
+fun TrackPlayer(viewModel: TrimmerViewModel): MediaPlayer =
+    TrackPlayer(
+        track = viewModel.trackOrNullState.value!!,
+        onCompletion = {
+            viewModel.viewModelScope.launch {
+                viewModel.pausePlayback()
+            }
+        }
+    )
 
-fun MediaPlayer.seekTenSecsForward(totalDuration: Int) {
+fun MediaPlayer.seekTenSecsBack(startPosition: Int) =
+    seekTo(maxOf(currentPosition - TRANSITION_DURATION, startPosition))
+
+fun MediaPlayer.seekTenSecsForward(totalDuration: Int) =
     seekTo(minOf(currentPosition + TRANSITION_DURATION, totalDuration))
-}
 
 fun MediaPlayer.stopAndReleaseCatching() = runCatching {
     stop()
     release()
-}
-
-suspend fun PlaybackPositionMonitoringTask(
-    player: MediaPlayer,
-    trimmerViewModel: TrimmerViewModel
-) = coroutineScope {
-    while (player.isPlaying) {
-        trimmerViewModel.setPlaybackPosition(player.currentPosition.toLong())
-        delay(PLAYBACK_UPDATE_COOLDOWN)
-    }
 }

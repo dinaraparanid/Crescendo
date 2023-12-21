@@ -293,7 +293,7 @@ class StorageHandler(context: Context) :
     @OptIn(ExperimentalCoroutinesApi::class)
     val amplitudesFlow = dataStore.data
         .mapLatest { preferences -> preferences[AMPLITUDES] }
-        .mapLatest { bandsStr -> bandsStr?.let { Json.decodeFromString<List<Int>>(it) } }
+        .mapLatest { amplitudesStr -> amplitudesStr?.let { Json.decodeFromString<List<Int>>(it) } }
         .mapLatest { it ?: emptyList() }
 
     val amplitudesState = amplitudesFlow
