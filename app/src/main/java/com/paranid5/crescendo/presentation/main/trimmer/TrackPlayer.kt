@@ -10,18 +10,21 @@ import kotlinx.coroutines.delay
 private const val PLAYBACK_UPDATE_COOLDOWN = 500L
 private const val TRANSITION_DURATION = 10_000
 
-fun TrackPlayer(track: Track) = MediaPlayer().apply {
-    setDataSource(track.path)
+inline fun TrackPlayer(track: Track, crossinline onCompletion: (MediaPlayer) -> Unit) =
+    MediaPlayer().apply {
+        setDataSource(track.path)
 
-    setAudioAttributes(
-        AudioAttributes.Builder()
-            .setContentType(AudioAttributes.CONTENT_TYPE_MUSIC)
-            .setLegacyStreamType(AudioManager.STREAM_MUSIC)
-            .build()
-    )
+        setAudioAttributes(
+            AudioAttributes.Builder()
+                .setContentType(AudioAttributes.CONTENT_TYPE_MUSIC)
+                .setLegacyStreamType(AudioManager.STREAM_MUSIC)
+                .build()
+        )
 
-    prepare()
-}
+        setOnCompletionListener { onCompletion(this) }
+
+        prepare()
+    }
 
 fun MediaPlayer.seekTenSecsBack(startPosition: Int) {
     seekTo(maxOf(currentPosition - TRANSITION_DURATION, startPosition))

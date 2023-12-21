@@ -51,7 +51,7 @@ import kotlinx.coroutines.launch
 fun TitleArtistColumn(
     viewModel: TrimmerViewModel,
     modifier: Modifier = Modifier,
-    spacerHeight: Dp = 8.dp
+    spaceBetween: Dp = 8.dp
 ) {
     val colors = LocalAppColors.current.colorScheme
     val track by viewModel.trackState.collectAsState()
@@ -67,7 +67,7 @@ fun TitleArtistColumn(
                 .align(Alignment.CenterHorizontally)
         )
 
-        Spacer(Modifier.height(spacerHeight))
+        Spacer(Modifier.height(spaceBetween))
 
         Text(
             text = track!!.artist,
@@ -113,7 +113,6 @@ fun PlaybackButtons(
     var playbackPosMonitorTask: Job? = null
     val coroutineScope = rememberCoroutineScope()
 
-    val player by remember { lazy { TrackPlayer(track!!) } }
     val resetPlaybackPosCondVar by remember { lazy { AsyncCondVar() } }
 
     var isInitialized by remember { mutableStateOf(false) }
@@ -137,11 +136,22 @@ fun PlaybackButtons(
         playbackPosMonitorTask = null
     }
 
-    LaunchedEffect(currentPos, startPos, endPos) {
-        if (isInitialized && currentPos !in startPos..endPos) {
-            viewModel.setPlaying(false)
-            resetPlaybackPosition()
+    suspend fun pause() {
+        viewModel.setPlaying(false)
+        resetPlaybackPosition()
+    }
+
+    val player by remember {
+        lazy {
+            TrackPlayer(track!!) {
+                coroutineScope.launch { pause() }
+            }
         }
+    }
+
+    LaunchedEffect(currentPos, startPos, endPos) {
+        if (isInitialized && currentPos !in startPos..endPos)
+            pause()
     }
 
     LaunchedEffect(isPlaying) {
@@ -169,8 +179,9 @@ fun PlaybackButtons(
             if (isInitialized) {
                 releasePlaybackMonitorTask()
                 player.stopAndReleaseCatching()
-                viewModel.resetPlaybackStates()
             }
+
+            viewModel.resetPlaybackStates()
         }
     }
 

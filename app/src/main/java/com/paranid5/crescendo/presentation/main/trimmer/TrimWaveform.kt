@@ -66,8 +66,7 @@ fun TrimWaveform(
     val canvasSizeState = remember { mutableStateOf(Size(1F, 1F)) }
     val spikesState = remember { mutableFloatStateOf(1F) }
 
-    val canvasWidth = durationInMillis / 1000 * spikeWidthRatio
-    val canvasWidthDp = canvasWidth.toInt().dp
+    val canvasWidth = (durationInMillis / 1000 * spikeWidthRatio).toInt()
 
     val playbackPos by viewModel.playbackPositionState.collectAsState()
     val playbackOffset by remember { derivedStateOf { playbackPos safeDiv durationInMillis } }
@@ -104,9 +103,9 @@ fun TrimWaveform(
             spikesState = spikesState,
             spikesAmplitudes = spikesAmplitudes,
             modifier = Modifier
-                .width(canvasWidthDp)
+                .width(canvasWidth.dp)
                 .padding(
-                    horizontal = (CONTROLLER_CIRCLE_RADIUS + CONTROLLER_CIRCLE_CENTER / 2)
+                    horizontal = WAVEFORM_PADDING
                         .toInt()
                         .pxToDp()
                 )
@@ -119,7 +118,7 @@ fun TrimWaveform(
             modifier = Modifier
                 .offset(
                     x = (CONTROLLER_CIRCLE_CENTER / 2 +
-                            startOffset * (canvasWidth - CONTROLLER_CIRCLE_RADIUS))
+                            startOffset * (canvasWidth - CONTROLLER_CIRCLE_RADIUS - CONTROLLER_RECT_OFFSET))
                         .toInt()
                         .dp
                 )
@@ -133,8 +132,9 @@ fun TrimWaveform(
             durationInMillis = durationInMillis,
             modifier = Modifier
                 .offset(
-                    x = (endOffset * (canvasWidth) +
-                            (1 - endOffset) * CONTROLLER_CIRCLE_RADIUS - CONTROLLER_CIRCLE_CENTER / 2)
+                    x = (endOffset * canvasWidth +
+                            (1 - endOffset) * (CONTROLLER_CIRCLE_RADIUS + CONTROLLER_RECT_OFFSET) -
+                            CONTROLLER_CIRCLE_CENTER / 2)
                         .toInt()
                         .dp
                 )
@@ -146,7 +146,8 @@ fun TrimWaveform(
             modifier = Modifier
                 .offset(
                     x = (CONTROLLER_CIRCLE_CENTER / 2 +
-                            playbackOffset * (canvasWidth - CONTROLLER_CIRCLE_RADIUS))
+                            playbackOffset * (canvasWidth - CONTROLLER_CIRCLE_RADIUS - CONTROLLER_RECT_OFFSET) +
+                            CONTROLLER_RECT_OFFSET)
                         .toInt()
                         .dp
                 )
@@ -166,8 +167,8 @@ private fun Waveform(
     spikesAmplitudes: List<Float>,
     modifier: Modifier = Modifier
 ) {
-    val colors = LocalAppColors.current.colorScheme
-    val waveformBrush = SolidColor(colors.onBackground)
+    val colors = LocalAppColors.current
+    val waveformBrush = SolidColor(colors.backgroundAlternative)
     val progressBrush = SolidColor(colors.primary.copy(alpha = 0.25F))
     val progressWaveformBrush = SolidColor(colors.secondary)
 
@@ -369,7 +370,7 @@ private fun PlaybackPosition(modifier: Modifier = Modifier) {
             topLeft = Offset(PLAYBACK_CIRCLE_CENTER - PLAYBACK_RECT_OFFSET, 0F),
             size = Size(
                 width = PLAYBACK_RECT_WIDTH,
-                height = size.height - PLAYBACK_HEIGHT_OFFSET
+                height = size.height - CONTROLLER_HEIGHT_OFFSET
             ),
             cornerRadius = CornerRadius(2F, 2F),
             blendMode = BlendMode.SrcAtop
@@ -378,7 +379,7 @@ private fun PlaybackPosition(modifier: Modifier = Modifier) {
         drawCircle(
             brush = playbackBrush,
             radius = PLAYBACK_CIRCLE_RADIUS,
-            center = Offset(PLAYBACK_CIRCLE_CENTER, size.height - PLAYBACK_CIRCLE_CENTER)
+            center = Offset(PLAYBACK_CIRCLE_CENTER, size.height - CONTROLLER_HEIGHT_OFFSET)
         )
     }
 }

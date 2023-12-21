@@ -4,10 +4,8 @@ import android.content.res.Configuration
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.animateIntAsState
 import androidx.compose.foundation.horizontalScroll
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
@@ -29,6 +27,7 @@ import androidx.compose.ui.unit.sp
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.constraintlayout.compose.Dimension
 import com.paranid5.crescendo.domain.utils.extensions.timeString
+import com.paranid5.crescendo.presentation.ui.extensions.pxToDp
 import com.paranid5.crescendo.presentation.ui.extensions.safeDiv
 import com.paranid5.crescendo.presentation.ui.theme.LocalAppColors
 
@@ -51,9 +50,12 @@ internal const val PLAYBACK_RECT_OFFSET = 2F
 
 internal const val PLAYBACK_CIRCLE_RADIUS = 12F
 internal const val PLAYBACK_CIRCLE_CENTER = 8F
-internal const val PLAYBACK_HEIGHT_OFFSET = PLAYBACK_CIRCLE_RADIUS + PLAYBACK_CIRCLE_CENTER
 
 internal const val WAVEFORM_SPIKE_WIDTH_RATIO = 5
+
+internal const val WAVEFORM_PADDING = CONTROLLER_CIRCLE_RADIUS +
+        CONTROLLER_CIRCLE_CENTER / 2 +
+        CONTROLLER_RECT_WIDTH
 
 @Composable
 fun TrimmerScreen(
@@ -74,7 +76,7 @@ private fun TrimmerScreenPortrait(viewModel: TrimmerViewModel, modifier: Modifie
     val playbackPosition by viewModel.playbackPositionState.collectAsState()
     val playbackText by remember { derivedStateOf { playbackPosition.timeString } }
     val playbackOffset by remember { derivedStateOf { playbackPosition safeDiv durationInMillis } }
-    val waveformWidth by remember { derivedStateOf { durationInMillis / 1000 * WAVEFORM_SPIKE_WIDTH_RATIO } }
+    val canvasWidth by remember { derivedStateOf { durationInMillis / 1000 * WAVEFORM_SPIKE_WIDTH_RATIO } }
 
     val isPlaying by viewModel.isPlayingState.collectAsState()
     val playbackTimeAlpha by animateFloatAsState(if (isPlaying) 1F else 0F, label = "")
@@ -87,16 +89,22 @@ private fun TrimmerScreenPortrait(viewModel: TrimmerViewModel, modifier: Modifie
         style = TextStyle(fontSize = 10.sp)
     )
 
-    val playbackTextWidth by remember {
+    val playbackTextWidthPx by remember {
         derivedStateOf { playbackPositionMeasure.size.width }
     }
+
+    val playbackTextWidth = playbackTextWidthPx.pxToDp().value
 
     val playbackTextHalfWidth by remember {
         derivedStateOf { playbackTextWidth / 2 }
     }
 
     val playbackControllerOffset by remember {
-        derivedStateOf { playbackOffset * (waveformWidth - PLAYBACK_CIRCLE_RADIUS) }
+        derivedStateOf {
+            CONTROLLER_CIRCLE_CENTER / 2 +
+                    playbackOffset * (canvasWidth - CONTROLLER_CIRCLE_RADIUS - CONTROLLER_RECT_OFFSET) +
+                    CONTROLLER_RECT_OFFSET
+        }
     }
 
     val playbackTextOffset by remember {
@@ -104,15 +112,13 @@ private fun TrimmerScreenPortrait(viewModel: TrimmerViewModel, modifier: Modifie
             when {
                 playbackControllerOffset < playbackTextHalfWidth -> 0F
 
-                playbackControllerOffset + playbackTextHalfWidth > waveformWidth ->
-                    waveformWidth.toFloat() - playbackTextWidth
+                playbackControllerOffset + playbackTextHalfWidth + PLAYBACK_CIRCLE_CENTER > canvasWidth ->
+                    canvasWidth.toFloat() - playbackTextWidth - PLAYBACK_CIRCLE_CENTER
 
                 else -> playbackControllerOffset - playbackTextHalfWidth
             }
         }
     }
-
-    println("$playbackTextWidth $playbackControllerOffset $playbackTextOffset $waveformWidth")
 
     val playbackTextOffsetAnim by animateIntAsState(
         targetValue = playbackTextOffset.toInt(), label = ""
@@ -158,7 +164,7 @@ private fun TrimmerScreenPortrait(viewModel: TrimmerViewModel, modifier: Modifie
                         .align(Alignment.CenterHorizontally)
                 )
 
-                Spacer(Modifier.height(4.dp))
+                Spacer(Modifier.height(2.dp))
 
                 Text(
                     text = playbackText,
@@ -204,8 +210,61 @@ private fun TrimmerScreenPortrait(viewModel: TrimmerViewModel, modifier: Modifie
 
 @Composable
 private fun TrimmerScreenLandscape(viewModel: TrimmerViewModel, modifier: Modifier = Modifier) {
+    val colors = LocalAppColors.current
+
     val track by viewModel.trackState.collectAsState()
+    val durationInMillis by remember { derivedStateOf { track!!.duration } }
+
+    val playbackPosition by viewModel.playbackPositionState.collectAsState()
+    val playbackText by remember { derivedStateOf { playbackPosition.timeString } }
+    val playbackOffset by remember { derivedStateOf { playbackPosition safeDiv durationInMillis } }
+    val canvasWidth by remember { derivedStateOf { durationInMillis / 1000 * WAVEFORM_SPIKE_WIDTH_RATIO } }
+
+    val isPlaying by viewModel.isPlayingState.collectAsState()
+    val playbackTimeAlpha by animateFloatAsState(if (isPlaying) 1F else 0F, label = "")
+
     val waveformScrollState = rememberScrollState()
+    val playbackTextMeasurer = rememberTextMeasurer()
+
+    val playbackPositionMeasure = playbackTextMeasurer.measure(
+        text = playbackText,
+        style = TextStyle(fontSize = 10.sp)
+    )
+
+    val playbackTextWidthPx by remember {
+        derivedStateOf { playbackPositionMeasure.size.width }
+    }
+
+    val playbackTextWidth = playbackTextWidthPx.pxToDp().value
+
+    val playbackTextHalfWidth by remember {
+        derivedStateOf { playbackTextWidth / 2 }
+    }
+
+    val playbackControllerOffset by remember {
+        derivedStateOf {
+            CONTROLLER_CIRCLE_CENTER / 2 +
+                    playbackOffset * (canvasWidth - CONTROLLER_CIRCLE_RADIUS - CONTROLLER_RECT_OFFSET) +
+                    CONTROLLER_RECT_OFFSET
+        }
+    }
+
+    val playbackTextOffset by remember {
+        derivedStateOf {
+            when {
+                playbackControllerOffset < playbackTextHalfWidth -> 0F
+
+                playbackControllerOffset + playbackTextHalfWidth + PLAYBACK_CIRCLE_CENTER > canvasWidth ->
+                    canvasWidth.toFloat() - playbackTextWidth - PLAYBACK_CIRCLE_CENTER
+
+                else -> playbackControllerOffset - playbackTextHalfWidth
+            }
+        }
+    }
+
+    val playbackTextOffsetAnim by animateIntAsState(
+        targetValue = playbackTextOffset.toInt(), label = ""
+    )
 
     ConstraintLayout(modifier) {
         val (
@@ -219,14 +278,14 @@ private fun TrimmerScreenLandscape(viewModel: TrimmerViewModel, modifier: Modifi
 
         TitleArtistColumn(
             viewModel = viewModel,
-            spacerHeight = 2.dp,
+            spaceBetween = 2.dp,
             modifier = Modifier.constrainAs(titleArtist) {
                 start.linkTo(parent.start)
                 centerHorizontallyTo(parent)
             }
         )
 
-        Box(
+        Column(
             Modifier
                 .horizontalScroll(waveformScrollState)
                 .constrainAs(waveform) {
@@ -241,8 +300,19 @@ private fun TrimmerScreenLandscape(viewModel: TrimmerViewModel, modifier: Modifi
                 durationInMillis = track!!.duration,
                 viewModel = viewModel,
                 modifier = Modifier
-                    .fillMaxHeight()
-                    .align(Alignment.Center)
+                    .weight(1F)
+                    .align(Alignment.CenterHorizontally)
+            )
+
+            Spacer(Modifier.height(2.dp))
+
+            Text(
+                text = playbackText,
+                color = colors.fontColor,
+                fontSize = 10.sp,
+                modifier = Modifier
+                    .alpha(playbackTimeAlpha)
+                    .offset(x = playbackTextOffsetAnim.dp)
             )
         }
 
