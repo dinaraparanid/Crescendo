@@ -5,6 +5,9 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -15,26 +18,26 @@ import com.paranid5.crescendo.presentation.main.trimmer.TrimmerViewModel
 import com.paranid5.crescendo.presentation.ui.theme.LocalAppColors
 
 @Composable
-fun SaveButton(
+fun FileSaveButton(
     viewModel: TrimmerViewModel,
+    isFileSaveDialogShownState: MutableState<Boolean>,
     modifier: Modifier = Modifier,
     textModifier: Modifier = Modifier
 ) {
-    val colors = LocalAppColors.current.colorScheme
+    val colors = LocalAppColors.current
+    var isFileSaveDialogShown by isFileSaveDialogShownState
 
     Button(
         modifier = modifier,
         shape = RoundedCornerShape(24.dp),
         colors = ButtonDefaults.buttonColors(
-            containerColor = colors.onBackground
+            containerColor = colors.backgroundAlternative
         ),
-        onClick = {
-            // TODO: start trimming
-        }
+        onClick = { isFileSaveDialogShown = true }
     ) {
         Text(
             text = stringResource(R.string.save),
-            color = colors.inverseSurface,
+            color = colors.fontColor,
             fontSize = 16.sp,
             fontWeight = FontWeight.Bold,
             modifier = textModifier

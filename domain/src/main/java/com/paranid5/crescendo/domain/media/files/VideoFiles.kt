@@ -1,35 +1,25 @@
-package com.paranid5.crescendo.domain.media
+package com.paranid5.crescendo.domain.media.files
 
 import android.os.Environment
 import android.util.Log
 import com.arthenica.mobileffmpeg.FFmpeg
 import com.paranid5.crescendo.domain.caching.CacheTrimRange
 import com.paranid5.crescendo.domain.caching.Formats
+import com.paranid5.crescendo.domain.caching.audioFileExt
 import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
 import java.io.File
 
-private const val TAG = "Audio"
+private const val TAG = "VideoFiles"
 
-sealed class MediaFile(value: File) : File(value.absolutePath) {
-    companion object {
-        private const val serialVersionUID: Long = -4175671868438928438L
-    }
-
-    class VideoFile(value: File) : MediaFile(value) {
-        companion object {
-            private const val serialVersionUID: Long = 6914322109341150479L
-        }
-    }
-
-    class AudioFile(value: File) : MediaFile(value) {
-        companion object {
-            private const val serialVersionUID: Long = 2578824723183659601L
-        }
-    }
-}
+suspend fun createVideoFileCatching(
+    filename: String,
+    ext: String,
+    mediaDirectory: MediaDirectory = MediaDirectory(Environment.DIRECTORY_MOVIES)
+) = createFileCatching(mediaDirectory, filename, ext)
+    .map { MediaFile.VideoFile(it) }
 
 /**
  * Converts video file to an audio file with ffmpeg
@@ -45,7 +35,7 @@ private suspend inline fun MediaFile.VideoFile.toAudioFileImplAsync(
     async(Dispatchers.IO) {
         val ext = audioFormat.audioFileExt
 
-        val newFile = createMediaFileCatching(
+        val newFile = createFileCatching(
             mediaDirectory = MediaDirectory(Environment.DIRECTORY_MUSIC),
             filename = nameWithoutExtension,
             ext = ext
@@ -56,16 +46,8 @@ private suspend inline fun MediaFile.VideoFile.toAudioFileImplAsync(
     }
 }
 
-private inline val Formats.audioFileExt
-    get() = when (this) {
-        Formats.MP3 -> "mp3"
-        Formats.AAC -> "aac"
-        Formats.WAV -> "wav"
-        Formats.MP4 -> throw IllegalArgumentException("MP4 passed as an audio format")
-    }
-
 private inline fun MediaFile.VideoFile.toAudioFile(
-    newFile: MediaFile.VideoFile,
+    newFile: File,
     crossinline ffmpegCmd: (File) -> String
 ) = when (FFmpeg.execute(ffmpegCmd(newFile))) {
     0 -> {
@@ -86,7 +68,7 @@ private inline fun MediaFile.VideoFile.toAudioFile(
 
 suspend fun MediaFile.VideoFile.toMP3Async(trimRange: CacheTrimRange) =
     toAudioFileImplAsync(audioFormat = Formats.MP3) { newFile ->
-        "-y -i $absolutePath -ss ${trimRange.startPoint} -to ${trimRange.endPoint} -vn -acodec libmp3lame -qscale:a 2 ${newFile.absolutePath}"
+        "-y -i $absolutePath -ss ${trimRange.startPointSecs} -to ${trimRange.totalDurationSecs} -vn -acodec libmp3lame -qscale:a 2 ${newFile.absolutePath}"
     }
 
 /**
@@ -96,7 +78,7 @@ suspend fun MediaFile.VideoFile.toMP3Async(trimRange: CacheTrimRange) =
 
 suspend fun MediaFile.VideoFile.toWAVAsync(trimRange: CacheTrimRange) =
     toAudioFileImplAsync(audioFormat = Formats.WAV) { newFile ->
-        "-y -i $absolutePath -ss ${trimRange.startPoint} -to ${trimRange.endPoint} -vn -acodec pcm_s16le -ar 44100 ${newFile.absolutePath}"
+        "-y -i $absolutePath -ss ${trimRange.startPointSecs} -to ${trimRange.totalDurationSecs} -vn -acodec pcm_s16le -ar 44100 ${newFile.absolutePath}"
     }
 
 /**
@@ -106,7 +88,7 @@ suspend fun MediaFile.VideoFile.toWAVAsync(trimRange: CacheTrimRange) =
 
 suspend fun MediaFile.VideoFile.toAACAsync(trimRange: CacheTrimRange) =
     toAudioFileImplAsync(audioFormat = Formats.AAC) { newFile ->
-        "-y -i $absolutePath -ss ${trimRange.startPoint} -to ${trimRange.endPoint} -vn -c:a aac -b:a 256k ${newFile.absolutePath}"
+        "-y -i $absolutePath -ss ${trimRange.startPointSecs} -to ${trimRange.totalDurationSecs} -vn -c:a aac -b:a 256k ${newFile.absolutePath}"
     }
 
 /**

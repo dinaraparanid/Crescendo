@@ -9,7 +9,7 @@ import android.provider.MediaStore
 import com.paranid5.crescendo.domain.VideoMetadata
 import com.paranid5.crescendo.domain.media_scanner.sendScanFile
 import com.paranid5.crescendo.domain.caching.Formats
-import com.paranid5.crescendo.domain.media.MediaFile
+import com.paranid5.crescendo.domain.media.files.MediaFile
 import com.paranid5.crescendo.media.images.getImageBinaryDataCatching
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.coroutineScope

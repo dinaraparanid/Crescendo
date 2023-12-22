@@ -1,6 +1,5 @@
-package com.paranid5.crescendo.domain.media
+package com.paranid5.crescendo.domain.media.files
 
-import android.os.Build
 import android.os.Environment
 import android.util.Log
 import kotlinx.coroutines.Dispatchers
@@ -10,53 +9,16 @@ import java.io.File
 
 private const val TAG = "Files"
 
-@JvmInline
-value class MediaDirectory(val value: String) : CharSequence {
-    override val length
-        get() = value.length
-
-    override fun get(index: Int) = value[index]
-
-    override fun subSequence(startIndex: Int, endIndex: Int) =
-        value.subSequence(startIndex, endIndex)
-}
-
-/** @return absolute path of the media directory */
-
-fun getFullMediaDirectory(mediaDirectory: String) = MediaDirectory(
-    Environment
-        .getExternalStoragePublicDirectory(mediaDirectory)
-        .absolutePath
-)
-
-/** @return absolute path of the media directory */
-
-fun getFullMediaDirectory(mediaDirectory: MediaDirectory) =
-    getFullMediaDirectory(mediaDirectory.value)
-
-/**
- * For [Build.VERSION_CODES.Q]+ it is [Environment.DIRECTORY_MOVIES],
- * for older models it is either [Environment.DIRECTORY_MUSIC] or [Environment.DIRECTORY_MOVIES]
- */
-
-fun getInitialVideoDirectory(isAudio: Boolean) = MediaDirectory(
-    when {
-        Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q -> Environment.DIRECTORY_MOVIES
-        isAudio -> Environment.DIRECTORY_MUSIC
-        else -> Environment.DIRECTORY_MOVIES
-    }
-)
-
-suspend fun generateMediaFile(
+private suspend inline fun generateFile(
     fullPath: String,
     filename: String,
     ext: String
 ) = withContext(Dispatchers.IO) {
-    tryGenerateMediaFile(fullPath, filename, ext)
-        ?: generateRepeatedMediaFile(fullPath, filename, ext)
+    tryGenerateFile(fullPath, filename, ext)
+        ?: generateRepeatedFile(fullPath, filename, ext)
 }
 
-private fun tryGenerateMediaFile(
+private fun tryGenerateFile(
     fullPath: String,
     filename: String,
     ext: String
@@ -64,9 +26,8 @@ private fun tryGenerateMediaFile(
     .takeIf { !File(it).exists() }
     ?.let(::File)
     ?.also { Log.d(TAG, "New file ${it.absolutePath}") }
-    ?.let(MediaFile::VideoFile)
 
-private fun generateRepeatedMediaFile(
+private fun generateRepeatedFile(
     fullPath: String,
     filename: String,
     ext: String
@@ -75,29 +36,28 @@ private fun generateRepeatedMediaFile(
     .map(::File)
     .first { !it.exists() }
     .also { Log.d(TAG, "New file ${it.absolutePath}") }
-    .let(MediaFile::VideoFile)
 
-suspend fun generateMediaFile(
+private suspend inline fun generateFile(
     mediaDirectory: MediaDirectory,
     filename: String,
     ext: String
-) = generateMediaFile(
+) = generateFile(
     fullPath = getFullMediaDirectory(mediaDirectory).value,
     filename = filename,
     ext = ext
 )
 
-private suspend inline fun createMediaFile(
+private suspend inline fun createFile(
     fullPath: String,
     filename: String,
     ext: String
-) = generateMediaFile(fullPath, filename, ext).also(File::createNewFile)
+) = generateFile(fullPath, filename, ext).also(File::createNewFile)
 
-private suspend inline fun createMediaFile(
+private suspend inline fun createFile(
     mediaDirectory: MediaDirectory,
     filename: String,
     ext: String
-) = generateMediaFile(mediaDirectory, filename, ext).also(File::createNewFile)
+) = generateFile(mediaDirectory, filename, ext).also(File::createNewFile)
 
 /**
  * Creates new media file by given parameters.
@@ -110,12 +70,12 @@ private suspend inline fun createMediaFile(
  * @return created empty media file
  */
 
-suspend fun createMediaFileCatching(
+suspend fun createFileCatching(
     fullPath: String,
     filename: String,
     ext: String
 ) = coroutineScope {
-    runCatching { createMediaFile(fullPath, filename, ext) }
+    runCatching { createFile(fullPath, filename, ext) }
 }
 
 /**
@@ -131,10 +91,10 @@ suspend fun createMediaFileCatching(
  * @return created empty media file
  */
 
-suspend fun createMediaFileCatching(
+suspend fun createFileCatching(
     mediaDirectory: MediaDirectory,
     filename: String,
     ext: String
 ) = coroutineScope {
-    runCatching { createMediaFile(mediaDirectory, filename, ext) }
+    runCatching { createFile(mediaDirectory, filename, ext) }
 }

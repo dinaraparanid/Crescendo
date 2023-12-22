@@ -1,5 +1,6 @@
 package com.paranid5.crescendo.presentation.main.trimmer.properties
 
+import com.paranid5.crescendo.domain.caching.CacheTrimRange
 import com.paranid5.crescendo.domain.utils.extensions.timeString
 import com.paranid5.crescendo.presentation.main.trimmer.CONTROLLER_CIRCLE_CENTER
 import com.paranid5.crescendo.presentation.main.trimmer.CONTROLLER_CIRCLE_RADIUS
@@ -40,12 +41,23 @@ inline val TrimmerViewModel.endOffsetFlow
         endMillis safeDiv durationInMillis
     }
 
-inline val TrimmerViewModel.trimmedDurationFlow
+inline val TrimmerViewModel.trimmedDurationInMillisFlow
     get() = combine(
         startPosInMillisState,
         endPosInMillisState
-    ) { start, end ->
-        end - start
+    ) { startMillis, endMillis ->
+        endMillis - startMillis
+    }
+
+inline val TrimmerViewModel.cacheTrimRangeFlow
+    get() = combine(
+        startPosInMillisState,
+        trimmedDurationInMillisFlow
+    ) { startMillis, trimmedDurationMillis ->
+        CacheTrimRange(
+            startPointSecs = startMillis / 1000,
+            totalDurationSecs = trimmedDurationMillis / 1000
+        )
     }
 
 inline val TrimmerViewModel.playbackOffsetFlow

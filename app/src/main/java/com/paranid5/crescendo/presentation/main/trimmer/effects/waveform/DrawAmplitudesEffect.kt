@@ -40,8 +40,6 @@ fun DrawAmplitudesEffect(
                     .coerceAtLeast(MIN_SPIKE_HEIGHT) - CONTROLLER_HEIGHT_OFFSET
             )
         }
-
-        println("Spikes: $spikes Canvas $canvasSize")
     }
 }
 

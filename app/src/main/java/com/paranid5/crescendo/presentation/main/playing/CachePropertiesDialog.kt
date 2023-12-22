@@ -57,13 +57,18 @@ fun CachePropertiesDialog(
     }
 
     val trimOffsetSecsState = remember { mutableLongStateOf(0) }
-    val endPointSecsState = remember { mutableLongStateOf(lengthInSecs) }
+    val totalDurationSecsState = remember { mutableLongStateOf(lengthInSecs) }
 
     val trimOffsetSecs by trimOffsetSecsState
-    val endPointSecs by endPointSecsState
+    val totalDurationSecs by totalDurationSecsState
 
     val trimRange by remember {
-        derivedStateOf { CacheTrimRange(startPoint = trimOffsetSecs, endPoint = endPointSecs) }
+        derivedStateOf {
+            CacheTrimRange(
+                startPointSecs = trimOffsetSecs,
+                totalDurationSecs = totalDurationSecs
+            )
+        }
     }
 
     val filenameState = remember { mutableStateOf("") }

@@ -7,8 +7,8 @@ import com.paranid5.crescendo.domain.VideoMetadata
 import com.paranid5.crescendo.domain.caching.CacheTrimRange
 import com.paranid5.crescendo.domain.caching.CachingResult
 import com.paranid5.crescendo.domain.caching.Formats
-import com.paranid5.crescendo.domain.media.MediaFile
-import com.paranid5.crescendo.domain.media.toAudioFileAsync
+import com.paranid5.crescendo.domain.media.files.MediaFile
+import com.paranid5.crescendo.domain.media.files.toAudioFileAsync
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope

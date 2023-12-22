@@ -4,4 +4,4 @@ import android.os.Parcelable
 import kotlinx.parcelize.Parcelize
 
 @Parcelize
-data class CacheTrimRange(val startPoint: Long, val endPoint: Long) : Parcelable
+data class CacheTrimRange(val startPointSecs: Long, val totalDurationSecs: Long) : Parcelable

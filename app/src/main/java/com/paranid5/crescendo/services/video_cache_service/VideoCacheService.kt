@@ -1,6 +1,9 @@
 package com.paranid5.crescendo.services.video_cache_service
 
-import android.app.*
+import android.app.Notification
+import android.app.NotificationChannel
+import android.app.NotificationManager
+import android.app.PendingIntent
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
@@ -17,33 +20,40 @@ import arrow.core.raise.ensure
 import com.paranid5.crescendo.R
 import com.paranid5.crescendo.VIDEO_CASH_SERVICE_CONNECTION
 import com.paranid5.crescendo.domain.VideoMetadata
-import com.paranid5.crescendo.domain.caching.DownloadingStatus
 import com.paranid5.crescendo.domain.caching.CacheTrimRange
 import com.paranid5.crescendo.domain.caching.CachingResult
+import com.paranid5.crescendo.domain.caching.DownloadingStatus
 import com.paranid5.crescendo.domain.caching.Formats
 import com.paranid5.crescendo.domain.caching.VideoCacheResponse
 import com.paranid5.crescendo.domain.ktor_client.DownloadingProgress
 import com.paranid5.crescendo.domain.ktor_client.UrlWithFile
 import com.paranid5.crescendo.domain.ktor_client.downloadFile
 import com.paranid5.crescendo.domain.ktor_client.downloadFiles
-import com.paranid5.crescendo.domain.media.MediaFile
-import com.paranid5.crescendo.domain.media.createMediaFileCatching
-import com.paranid5.crescendo.domain.media.getInitialVideoDirectory
+import com.paranid5.crescendo.domain.media.files.MediaFile
+import com.paranid5.crescendo.domain.media.files.createVideoFileCatching
+import com.paranid5.crescendo.domain.media.files.getInitialVideoDirectory
 import com.paranid5.crescendo.domain.media_scanner.MediaScannerReceiver
 import com.paranid5.crescendo.domain.utils.AsyncCondVar
 import com.paranid5.crescendo.domain.utils.extensions.registerReceiverCompat
 import com.paranid5.crescendo.media.convertToAudioFileAndSetTagsAsync
 import com.paranid5.crescendo.media.mergeToMP4AndSetTagsAsync
-import com.paranid5.crescendo.services.ServiceAction
-import com.paranid5.crescendo.services.SuspendService
 import com.paranid5.crescendo.presentation.main.MainActivity
 import com.paranid5.crescendo.presentation.main.MainActivity.Companion.VIDEO_CASH_STATUS_ARG
+import com.paranid5.crescendo.services.ServiceAction
+import com.paranid5.crescendo.services.SuspendService
 import com.paranid5.yt_url_extractor_kt.YtFile
 import com.paranid5.yt_url_extractor_kt.extractYtFilesWithMeta
-import io.ktor.client.*
-import io.ktor.http.*
-import kotlinx.coroutines.*
-import kotlinx.coroutines.flow.*
+import io.ktor.client.HttpClient
+import io.ktor.http.HttpStatusCode
+import io.ktor.http.isSuccess
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import org.koin.core.qualifier.named
@@ -290,7 +300,7 @@ class VideoCacheService : SuspendService(), KoinComponent {
         desiredFilename: String,
         isAudio: Boolean
     ) = either {
-        val storeFileRes = createMediaFileCatching(
+        val storeFileRes = createVideoFileCatching(
             mediaDirectory = getInitialVideoDirectory(isAudio),
             filename = desiredFilename.replace(Regex("\\W+"), "_"),
             ext = "mp4"

@@ -46,8 +46,6 @@ fun WaveformSpikes(
         canvasSize = size
         spikes = size.width
 
-        println("Upd size: $canvasSize; Upd spikes: $spikes")
-
         spikesAmplitudes.forEachIndexed { index, amplitude ->
             drawSpike(index, amplitude, waveformBrush)
         }

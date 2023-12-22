@@ -2,7 +2,7 @@ package com.paranid5.crescendo.domain.caching
 
 import android.os.Parcel
 import android.os.Parcelable
-import com.paranid5.crescendo.domain.media.MediaFile
+import com.paranid5.crescendo.domain.media.files.MediaFile
 import io.ktor.http.HttpStatusCode
 import kotlinx.parcelize.Parcelize
 
