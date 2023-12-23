@@ -5,7 +5,7 @@ import android.widget.Toast
 import com.paranid5.crescendo.AUDIO_SESSION_ID
 import com.paranid5.crescendo.R
 import com.paranid5.crescendo.data.StorageHandler
-import com.paranid5.crescendo.domain.caching.CacheTrimRange
+import com.paranid5.crescendo.domain.trimming.TrimRange
 import com.paranid5.crescendo.domain.caching.Formats
 import com.paranid5.crescendo.domain.media.AudioStatus
 import com.paranid5.crescendo.presentation.UIHandler
@@ -55,7 +55,7 @@ class PlayingUIHandler(
     fun launchVideoCashService(
         desiredFilename: String,
         format: Formats,
-        trimRange: CacheTrimRange
+        trimRange: TrimRange
     ) = videoCacheServiceAccessor.startCashingOrAddToQueue(
         videoUrl = storageHandler.currentUrlState.value,
         desiredFilename = desiredFilename,

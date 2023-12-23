@@ -15,6 +15,7 @@ import com.paranid5.crescendo.presentation.main.fetch_stream.FetchStreamViewMode
 import com.paranid5.crescendo.presentation.main.playing.PlayingUIHandler
 import com.paranid5.crescendo.presentation.main.tracks.TracksUIHandler
 import com.paranid5.crescendo.presentation.main.tracks.TracksViewModel
+import com.paranid5.crescendo.presentation.main.trimmer.TrimmerUIHandler
 import com.paranid5.crescendo.presentation.main.trimmer.TrimmerViewModel
 import com.paranid5.crescendo.presentation.ui.permissions.audioRecordingPermissionQueue
 import com.paranid5.crescendo.presentation.ui.permissions.description_providers.AudioRecordingDescriptionProvider
@@ -131,6 +132,7 @@ private val audioEffectsModule = module {
 }
 
 private val trimmerModule = module {
+    singleOf(::TrimmerUIHandler)
     viewModelOf(::TrimmerViewModel)
 }
 

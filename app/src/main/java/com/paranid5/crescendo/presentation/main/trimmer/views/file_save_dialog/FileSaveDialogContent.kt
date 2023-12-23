@@ -10,7 +10,9 @@ import androidx.compose.runtime.MutableState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.paranid5.crescendo.domain.caching.CacheTrimRange
+import com.paranid5.crescendo.domain.caching.Formats
+import com.paranid5.crescendo.domain.trimming.FadeDurations
+import com.paranid5.crescendo.domain.trimming.TrimRange
 
 @Composable
 fun FileSaveDialogContent(
@@ -19,7 +21,9 @@ fun FileSaveDialogContent(
     fileSaveOptions: Array<String>,
     selectedSaveOptionIndexState: MutableState<Int>,
     trackPath: String,
-    trimRange: CacheTrimRange,
+    audioFormat: Formats,
+    trimRange: TrimRange,
+    fadeDurations: FadeDurations,
     isSaveButtonClickable: Boolean,
     modifier: Modifier = Modifier
 ) = Column(modifier) {
@@ -40,10 +44,13 @@ fun FileSaveDialogContent(
     Spacer(Modifier.height(10.dp))
 
     ConfirmButton(
-        isDialogShownState = isDialogShownState,
-        trimRange = trimRange,
         isClickable = isSaveButtonClickable,
         trackPath = trackPath,
+        filenameState = filenameState,
+        audioFormat = audioFormat,
+        trimRange = trimRange,
+        fadeDurations = fadeDurations,
+        isDialogShownState = isDialogShownState,
         modifier = Modifier
             .padding(vertical = 10.dp)
             .align(Alignment.CenterHorizontally)

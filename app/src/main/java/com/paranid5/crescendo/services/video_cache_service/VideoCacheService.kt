@@ -20,7 +20,7 @@ import arrow.core.raise.ensure
 import com.paranid5.crescendo.R
 import com.paranid5.crescendo.VIDEO_CASH_SERVICE_CONNECTION
 import com.paranid5.crescendo.domain.VideoMetadata
-import com.paranid5.crescendo.domain.caching.CacheTrimRange
+import com.paranid5.crescendo.domain.trimming.TrimRange
 import com.paranid5.crescendo.domain.caching.CachingResult
 import com.paranid5.crescendo.domain.caching.DownloadingStatus
 import com.paranid5.crescendo.domain.caching.Formats
@@ -91,7 +91,7 @@ class VideoCacheService : SuspendService(), KoinComponent {
                 },
                 trimRange = when {
                     Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU ->
-                        getParcelableExtra(TRIM_RANGE_ARG, CacheTrimRange::class.java)!!
+                        getParcelableExtra(TRIM_RANGE_ARG, TrimRange::class.java)!!
 
                     else -> getParcelableExtra(TRIM_RANGE_ARG)!!
                 }
@@ -125,7 +125,7 @@ class VideoCacheService : SuspendService(), KoinComponent {
         val url: String,
         val desiredFilename: String,
         val format: Formats,
-        val trimRange: CacheTrimRange
+        val trimRange: TrimRange
     )
 
     private val ktorClient by inject<HttpClient>()
@@ -226,7 +226,7 @@ class VideoCacheService : SuspendService(), KoinComponent {
         ytUrl: String,
         desiredFilename: String,
         format: Formats,
-        trimRange: CacheTrimRange
+        trimRange: TrimRange
     ) {
         val extractRes = ktorClient.extractYtFilesWithMeta(
             context = this,
@@ -526,7 +526,7 @@ class VideoCacheService : SuspendService(), KoinComponent {
         audioUrl: String,
         videoMetadata: VideoMetadata,
         audioFormat: Formats,
-        trimRange: CacheTrimRange
+        trimRange: TrimRange
     ): CachingResult {
         val result = downloadMediaFileOrNotifyError(desiredFilename, audioUrl, isAudio = true)
 
@@ -570,7 +570,7 @@ class VideoCacheService : SuspendService(), KoinComponent {
         videoUrl: String?,
         videoMetadata: VideoMetadata,
         format: Formats,
-        trimRange: CacheTrimRange
+        trimRange: TrimRange
     ) = when (videoUrl) {
         null -> cacheAudioFileOrNotifyError(
             desiredFilename,

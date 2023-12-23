@@ -4,7 +4,7 @@ import android.content.Intent
 import android.os.Build
 import com.paranid5.crescendo.MainApplication
 import com.paranid5.crescendo.VIDEO_CASH_SERVICE_CONNECTION
-import com.paranid5.crescendo.domain.caching.CacheTrimRange
+import com.paranid5.crescendo.domain.trimming.TrimRange
 import com.paranid5.crescendo.domain.caching.Formats
 import com.paranid5.crescendo.services.ServiceAccessor
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -23,7 +23,7 @@ class VideoCacheServiceAccessor(application: MainApplication) : ServiceAccessor(
         videoUrl: String,
         desiredFilename: String,
         format: Formats,
-        trimRange: CacheTrimRange
+        trimRange: TrimRange
     ) = apply {
         putExtra(VideoCacheService.URL_ARG, videoUrl)
         putExtra(VideoCacheService.FILENAME_ARG, desiredFilename)
@@ -35,7 +35,7 @@ class VideoCacheServiceAccessor(application: MainApplication) : ServiceAccessor(
         videoUrl: String,
         desiredFilename: String,
         format: Formats,
-        trimRange: CacheTrimRange
+        trimRange: TrimRange
     ) {
         val serviceIntent = Intent(appContext, VideoCacheService::class.java)
             .putVideoCashDataArgs(videoUrl, desiredFilename, format, trimRange)
@@ -50,7 +50,7 @@ class VideoCacheServiceAccessor(application: MainApplication) : ServiceAccessor(
         videoUrl: String,
         desiredFilename: String,
         format: Formats,
-        trimRange: CacheTrimRange
+        trimRange: TrimRange
     ) = sendBroadcast(
         Intent(VideoCacheService.Broadcast_CASH_NEXT_VIDEO)
             .putVideoCashDataArgs(videoUrl, desiredFilename, format, trimRange)
@@ -60,14 +60,14 @@ class VideoCacheServiceAccessor(application: MainApplication) : ServiceAccessor(
         videoUrl: String,
         desiredFilename: String,
         format: Formats,
-        trimRange: CacheTrimRange
+        trimRange: TrimRange
     ) = startVideoCashService(videoUrl, desiredFilename, format, trimRange)
 
     fun startCashingOrAddToQueue(
         videoUrl: String,
         desiredFilename: String,
         format: Formats,
-        trimRange: CacheTrimRange
+        trimRange: TrimRange
     ) = when {
         isVideoCashServiceConnected -> cashNextVideo(
             videoUrl,

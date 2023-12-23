@@ -3,7 +3,7 @@ package com.paranid5.crescendo.domain.media.files
 import android.os.Environment
 import android.util.Log
 import com.arthenica.mobileffmpeg.FFmpeg
-import com.paranid5.crescendo.domain.caching.CacheTrimRange
+import com.paranid5.crescendo.domain.trimming.TrimRange
 import com.paranid5.crescendo.domain.caching.Formats
 import com.paranid5.crescendo.domain.caching.audioFileExt
 import kotlinx.coroutines.Deferred
@@ -66,9 +66,9 @@ private inline fun MediaFile.VideoFile.toAudioFile(
  * @return .mp3 file if conversion was successful, otherwise null
  */
 
-suspend fun MediaFile.VideoFile.toMP3Async(trimRange: CacheTrimRange) =
+suspend fun MediaFile.VideoFile.toMP3Async(trimRange: TrimRange) =
     toAudioFileImplAsync(audioFormat = Formats.MP3) { newFile ->
-        "-y -i $absolutePath -ss ${trimRange.startPointSecs} -to ${trimRange.totalDurationSecs} -vn -acodec libmp3lame -qscale:a 2 ${newFile.absolutePath}"
+        "-y -i \"$absolutePath\" -ss ${trimRange.startPointSecs} -to ${trimRange.totalDurationSecs} -vn -acodec libmp3lame -qscale:a 2 \"${newFile.absolutePath}\""
     }
 
 /**
@@ -76,9 +76,9 @@ suspend fun MediaFile.VideoFile.toMP3Async(trimRange: CacheTrimRange) =
  * @return .wav file if conversion was successful, otherwise null
  */
 
-suspend fun MediaFile.VideoFile.toWAVAsync(trimRange: CacheTrimRange) =
+suspend fun MediaFile.VideoFile.toWAVAsync(trimRange: TrimRange) =
     toAudioFileImplAsync(audioFormat = Formats.WAV) { newFile ->
-        "-y -i $absolutePath -ss ${trimRange.startPointSecs} -to ${trimRange.totalDurationSecs} -vn -acodec pcm_s16le -ar 44100 ${newFile.absolutePath}"
+        "-y -i \"$absolutePath\" -ss ${trimRange.startPointSecs} -to ${trimRange.totalDurationSecs} -vn -acodec pcm_s16le -ar 44100 \"${newFile.absolutePath}\""
     }
 
 /**
@@ -86,9 +86,9 @@ suspend fun MediaFile.VideoFile.toWAVAsync(trimRange: CacheTrimRange) =
  * @return .aac file if conversion was successful, otherwise null
  */
 
-suspend fun MediaFile.VideoFile.toAACAsync(trimRange: CacheTrimRange) =
+suspend fun MediaFile.VideoFile.toAACAsync(trimRange: TrimRange) =
     toAudioFileImplAsync(audioFormat = Formats.AAC) { newFile ->
-        "-y -i $absolutePath -ss ${trimRange.startPointSecs} -to ${trimRange.totalDurationSecs} -vn -c:a aac -b:a 256k ${newFile.absolutePath}"
+        "-y -i \"$absolutePath\" -ss ${trimRange.startPointSecs} -to ${trimRange.totalDurationSecs} -vn -c:a aac -b:a 256k \"${newFile.absolutePath}\""
     }
 
 /**
@@ -99,7 +99,7 @@ suspend fun MediaFile.VideoFile.toAACAsync(trimRange: CacheTrimRange) =
 
 suspend fun MediaFile.VideoFile.toAudioFileAsync(
     audioFormat: Formats,
-    trimRange: CacheTrimRange
+    trimRange: TrimRange
 ): Deferred<MediaFile.AudioFile?> {
     Log.d(TAG, "Audio conversion to $audioFormat")
 

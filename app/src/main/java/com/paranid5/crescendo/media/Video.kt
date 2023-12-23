@@ -4,7 +4,7 @@ import android.content.Context
 import android.provider.MediaStore
 import com.arthenica.mobileffmpeg.FFmpeg
 import com.paranid5.crescendo.domain.VideoMetadata
-import com.paranid5.crescendo.domain.caching.CacheTrimRange
+import com.paranid5.crescendo.domain.trimming.TrimRange
 import com.paranid5.crescendo.domain.caching.CachingResult
 import com.paranid5.crescendo.domain.caching.Formats
 import com.paranid5.crescendo.domain.media.files.MediaFile
@@ -59,7 +59,7 @@ suspend fun MediaFile.VideoFile.convertToAudioFileAndSetTagsAsync(
     context: Context,
     videoMetadata: VideoMetadata,
     audioFormat: Formats,
-    trimRange: CacheTrimRange
+    trimRange: TrimRange
 ) = coroutineScope {
     async(Dispatchers.IO) {
         val audioFile = toAudioFileAsync(audioFormat, trimRange).await()

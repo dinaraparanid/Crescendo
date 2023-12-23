@@ -10,6 +10,8 @@ class PlaybackPositionsStateHolder(private val savedStateHandle: SavedStateHandl
     private companion object {
         private const val START_MILLIS = "start_millis"
         private const val END_MILLIS = "end_millis"
+        private const val FADE_IN_SECS = "fade_in_secs"
+        private const val FADE_OUT_SECS = "fade_out_secs"
     }
 
     private val _startPosInMillisState by lazy {
@@ -39,4 +41,20 @@ class PlaybackPositionsStateHolder(private val savedStateHandle: SavedStateHandl
     val playbackPosInMillisState by lazy { _playbackPosInMillisState.asStateFlow() }
 
     fun setPlaybackPosInMillis(position: Long) = _playbackPosInMillisState.update { position }
+
+    private val _fadeInSecsState by lazy { MutableStateFlow(0L) }
+
+    val fadeInSecsState by lazy { _fadeInSecsState.asStateFlow() }
+
+    fun setFadeInSecs(fadeInSecs: Long) {
+        savedStateHandle[FADE_IN_SECS] = _fadeInSecsState.updateAndGet { fadeInSecs }
+    }
+
+    private val _fadeOutSecsState by lazy { MutableStateFlow(0L) }
+
+    val fadeOutSecsState by lazy { _fadeOutSecsState.asStateFlow() }
+
+    fun setFadeOutSecs(fadeOutSecs: Long) {
+        savedStateHandle[FADE_OUT_SECS] = _fadeOutSecsState.updateAndGet { fadeOutSecs }
+    }
 }

@@ -19,8 +19,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.paranid5.crescendo.R
+import com.paranid5.crescendo.domain.caching.Formats
+import com.paranid5.crescendo.domain.trimming.FadeDurations
+import com.paranid5.crescendo.domain.trimming.TrimRange
 import com.paranid5.crescendo.presentation.main.trimmer.TrimmerViewModel
-import com.paranid5.crescendo.presentation.main.trimmer.properties.cacheTrimRangeFlow
+import com.paranid5.crescendo.presentation.main.trimmer.properties.fadeDurationsFlow
+import com.paranid5.crescendo.presentation.main.trimmer.properties.trimRangeFlow
 import com.paranid5.crescendo.presentation.main.trimmer.properties.trackPathOrNullFlow
 import com.paranid5.crescendo.presentation.main.trimmer.views.file_save_dialog.FileSaveDialogContent
 import com.paranid5.crescendo.presentation.ui.theme.LocalAppColors
@@ -36,20 +40,26 @@ fun FileSaveDialog(
     val colors = LocalAppColors.current
 
     val trackPath by viewModel.trackPathOrNullFlow.collectAsState(initial = null)
-    val trimRange by viewModel.cacheTrimRangeFlow.collectAsState(initial = null)
+    val trimRange by viewModel.trimRangeFlow.collectAsState(initial = TrimRange())
+    val fadeDurations by viewModel.fadeDurationsFlow.collectAsState(initial = FadeDurations())
 
     var isDialogShown by isDialogShownState
 
     val filenameState = rememberInitialFilename(trackPath)
     val filename by filenameState
 
-    val isSaveButtonClickable by remember(filename) {
-        derivedStateOf(filename::isNotEmpty)
+    val isSaveButtonClickable by remember(filename, trimRange) {
+        derivedStateOf { filename.isNotEmpty() && trimRange.totalDurationSecs > 0 }
     }
 
     val fileSaveOptions = audioFileSaveOptions()
 
     val selectedSaveOptionIndexState = remember { mutableIntStateOf(0) }
+    val selectedSaveOptionIndex by selectedSaveOptionIndexState
+
+    val audioFormat by remember(selectedSaveOptionIndex) {
+        derivedStateOf { Formats.entries[selectedSaveOptionIndex] }
+    }
 
     if (isDialogShown)
         AlertDialog(onDismissRequest = { isDialogShown = false }) {
@@ -64,7 +74,9 @@ fun FileSaveDialog(
                     fileSaveOptions = fileSaveOptions,
                     selectedSaveOptionIndexState = selectedSaveOptionIndexState,
                     trackPath = trackPath!!,
-                    trimRange = trimRange!!,
+                    audioFormat = audioFormat,
+                    trimRange = trimRange,
+                    fadeDurations = fadeDurations,
                     isSaveButtonClickable = isSaveButtonClickable
                 )
             }

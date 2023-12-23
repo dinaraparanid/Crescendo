@@ -36,7 +36,7 @@ import com.paranid5.crescendo.R
 import com.paranid5.crescendo.data.StorageHandler
 import com.paranid5.crescendo.presentation.ui.theme.LocalAppColors
 import com.paranid5.crescendo.presentation.ui.utils.DefaultOutlinedTextField
-import com.paranid5.crescendo.domain.caching.CacheTrimRange
+import com.paranid5.crescendo.domain.trimming.TrimRange
 import com.paranid5.crescendo.domain.caching.Formats
 import org.koin.compose.koinInject
 
@@ -64,7 +64,7 @@ fun CachePropertiesDialog(
 
     val trimRange by remember {
         derivedStateOf {
-            CacheTrimRange(
+            TrimRange(
                 startPointSecs = trimOffsetSecs,
                 totalDurationSecs = totalDurationSecs
             )
@@ -196,7 +196,7 @@ private fun SaveOptionsMenu(
 private fun ConfirmButton(
     isDialogShownState: MutableState<Boolean>,
     format: Formats,
-    trimRange: CacheTrimRange,
+    trimRange: TrimRange,
     isButtonClickable: Boolean,
     filename: String,
     modifier: Modifier = Modifier,

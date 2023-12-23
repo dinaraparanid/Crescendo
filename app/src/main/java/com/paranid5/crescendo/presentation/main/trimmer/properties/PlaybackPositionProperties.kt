@@ -1,6 +1,7 @@
 package com.paranid5.crescendo.presentation.main.trimmer.properties
 
-import com.paranid5.crescendo.domain.caching.CacheTrimRange
+import com.paranid5.crescendo.domain.trimming.FadeDurations
+import com.paranid5.crescendo.domain.trimming.TrimRange
 import com.paranid5.crescendo.domain.utils.extensions.timeString
 import com.paranid5.crescendo.presentation.main.trimmer.CONTROLLER_CIRCLE_CENTER
 import com.paranid5.crescendo.presentation.main.trimmer.CONTROLLER_CIRCLE_RADIUS
@@ -28,6 +29,18 @@ inline val TrimmerViewModel.playbackPosInMillisState
 fun TrimmerViewModel.setPlaybackPosInMillis(position: Long) =
     playbackPositionStateHolder.setPlaybackPosInMillis(position)
 
+inline val TrimmerViewModel.fadeInSecsState
+    get() = playbackPositionStateHolder.fadeInSecsState
+
+fun TrimmerViewModel.setFadeInSecs(fadeInSecs: Long) =
+    playbackPositionStateHolder.setFadeInSecs(fadeInSecs)
+
+inline val TrimmerViewModel.fadeOutSecsState
+    get() = playbackPositionStateHolder.fadeOutSecsState
+
+fun TrimmerViewModel.setFadeOutSecs(fadeOutSecs: Long) =
+    playbackPositionStateHolder.setFadeOutSecs(fadeOutSecs)
+
 inline val TrimmerViewModel.startOffsetFlow
     get() = combine(startPosInMillisState, durationInMillisFlow) { startMillis, durationInMillis ->
         startMillis safeDiv durationInMillis
@@ -49,14 +62,25 @@ inline val TrimmerViewModel.trimmedDurationInMillisFlow
         endMillis - startMillis
     }
 
-inline val TrimmerViewModel.cacheTrimRangeFlow
+inline val TrimmerViewModel.trimRangeFlow
     get() = combine(
         startPosInMillisState,
         trimmedDurationInMillisFlow
     ) { startMillis, trimmedDurationMillis ->
-        CacheTrimRange(
+        TrimRange(
             startPointSecs = startMillis / 1000,
             totalDurationSecs = trimmedDurationMillis / 1000
+        )
+    }
+
+inline val TrimmerViewModel.fadeDurationsFlow
+    get() = combine(
+        fadeInSecsState,
+        fadeOutSecsState
+    ) { fadeInSecs, fadeOutSecs ->
+        FadeDurations(
+            fadeInSecs = fadeInSecs,
+            fadeOutSecs = fadeOutSecs
         )
     }
 
