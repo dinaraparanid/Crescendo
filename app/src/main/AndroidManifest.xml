@@ -62,5 +62,33 @@
         <service android:name=".services.track_service.TrackService"
                 android:foregroundServiceType="mediaPlayback" />
         <service android:name=".services.video_cache_service.VideoCacheService" />
+        <receiver
+                android:name=".receivers.CacheStatusReceiver"
+                android:exported="false">
+            <intent-filter>
+                <action android:name="com.paranid5.crescendo.receivers.VIDEO_CASH_COMPLETED"/>
+            </intent-filter>
+        </receiver>
+        <receiver
+                android:name=".domain.media_scanner.MediaScannerReceiver"
+                android:exported="false">
+            <intent-filter>
+                <action android:name="com.paranid5.crescendo.domain.media_scanner.SCAN_FILE"/>
+            </intent-filter>
+        </receiver>
+        <receiver
+                android:name=".receivers.StreamingErrorReceiver"
+                android:exported="false">
+            <intent-filter>
+                <action android:name="com.paranid5.crescendo.receivers.STREAMING_ERROR"/>
+            </intent-filter>
+        </receiver>
+        <receiver
+                android:name=".receivers.TrimmingStatusReceiver"
+                android:exported="false">
+            <intent-filter>
+                <action android:name="com.paranid5.crescendo.receivers.TRIMMING_COMPLETED"/>
+            </intent-filter>
+        </receiver>
     </application>
 </manifest>

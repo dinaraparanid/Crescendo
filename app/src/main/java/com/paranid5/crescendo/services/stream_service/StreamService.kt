@@ -26,7 +26,7 @@ import androidx.media3.common.util.UnstableApi
 import androidx.media3.ui.PlayerNotificationManager
 import com.paranid5.crescendo.R
 import com.paranid5.crescendo.STREAM_SERVICE_CONNECTION
-import com.paranid5.crescendo.domain.VideoMetadata
+import com.paranid5.crescendo.domain.metadata.VideoMetadata
 import com.paranid5.crescendo.domain.utils.extensions.registerReceiverCompat
 import com.paranid5.crescendo.domain.utils.extensions.sendBroadcast
 import com.paranid5.crescendo.domain.utils.extensions.toAndroidMetadata
@@ -39,6 +39,7 @@ import com.paranid5.crescendo.services.service_controllers.PlaybackController
 import com.paranid5.crescendo.presentation.main.MainActivity
 import com.paranid5.crescendo.presentation.main.playing.Broadcast_CUR_POSITION_CHANGED
 import com.paranid5.crescendo.presentation.main.playing.CUR_POSITION_STREAMING_ARG
+import com.paranid5.crescendo.receivers.StreamingErrorReceiver
 import com.paranid5.yt_url_extractor_kt.VideoMeta
 import com.paranid5.yt_url_extractor_kt.YtFailure
 import com.paranid5.yt_url_extractor_kt.YtFilesNotFoundException
@@ -309,7 +310,7 @@ class StreamService : SuspendService(), KoinComponent {
 
     @kotlin.OptIn(ExperimentalCoroutinesApi::class)
     private val videoLengthState = currentMetadataState
-        .mapLatest { it?.lenInMillis ?: 0 }
+        .mapLatest { it?.durationMillis ?: 0 }
         .stateIn(scope, SharingStarted.Eagerly, 0)
 
     private fun sendPlaybackPosition(curPosition: Long = currentPlaybackPosition) =
@@ -879,10 +880,12 @@ class StreamService : SuspendService(), KoinComponent {
         isStoppedWithError = true
 
         sendBroadcast(
-            Intent(MainActivity.Broadcast_STREAMING_ERROR).putExtra(
-                MainActivity.STREAMING_ERROR_ARG,
-                errorMessage
-            )
+            Intent(applicationContext, StreamingErrorReceiver::class.java)
+                .setAction(StreamingErrorReceiver.Broadcast_STREAMING_ERROR)
+                .putExtra(
+                    StreamingErrorReceiver.STREAMING_ERROR_ARG,
+                    errorMessage
+                )
         )
     }
 }

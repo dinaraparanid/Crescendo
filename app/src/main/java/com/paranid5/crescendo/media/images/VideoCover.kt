@@ -2,7 +2,7 @@ package com.paranid5.crescendo.media.images
 
 import android.content.Context
 import android.graphics.Bitmap
-import com.paranid5.crescendo.domain.VideoMetadata
+import com.paranid5.crescendo.domain.metadata.VideoMetadata
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope

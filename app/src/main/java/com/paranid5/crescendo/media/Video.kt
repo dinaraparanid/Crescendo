@@ -3,12 +3,14 @@ package com.paranid5.crescendo.media
 import android.content.Context
 import android.provider.MediaStore
 import com.arthenica.mobileffmpeg.FFmpeg
-import com.paranid5.crescendo.domain.VideoMetadata
+import com.paranid5.crescendo.domain.metadata.VideoMetadata
 import com.paranid5.crescendo.domain.trimming.TrimRange
 import com.paranid5.crescendo.domain.caching.CachingResult
 import com.paranid5.crescendo.domain.caching.Formats
 import com.paranid5.crescendo.domain.media.files.MediaFile
 import com.paranid5.crescendo.domain.media.files.toAudioFileAsync
+import com.paranid5.crescendo.media.tags.setAudioTags
+import com.paranid5.crescendo.media.tags.setVideoTagsAsync
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
@@ -33,7 +35,7 @@ suspend fun mergeToMP4AndSetTagsAsync(
         val tagsTask = setVideoTagsAsync(
             context = context,
             videoFile = mp4StoreFile,
-            videoMetadata = videoMetadata
+            metadata = videoMetadata
         )
 
         audioTrack.delete()
@@ -65,12 +67,13 @@ suspend fun MediaFile.VideoFile.convertToAudioFileAndSetTagsAsync(
         val audioFile = toAudioFileAsync(audioFormat, trimRange).await()
             ?: return@async null
 
-        setAudioTagsAsync(
+        setAudioTags(
             context,
             audioFile,
             videoMetadata,
             audioFormat
-        ).join()
+        )
+
         audioFile
     }
 }

@@ -76,8 +76,8 @@ fun PlayingScreen(
     }
 
     val length = when (audioStatus) {
-        AudioStatus.STREAMING -> currentMetadata?.lenInMillis ?: 0
-        AudioStatus.PLAYING -> currentTrack?.duration ?: 0
+        AudioStatus.STREAMING -> currentMetadata?.durationMillis ?: 0
+        AudioStatus.PLAYING -> currentTrack?.durationMillis ?: 0
     }
 
     when (LocalConfiguration.current.orientation) {

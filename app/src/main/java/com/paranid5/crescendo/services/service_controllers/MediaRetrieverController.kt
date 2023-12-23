@@ -3,7 +3,7 @@ package com.paranid5.crescendo.services.service_controllers
 import android.content.Context
 import com.paranid5.crescendo.IS_PLAYING
 import com.paranid5.crescendo.data.StorageHandler
-import com.paranid5.crescendo.domain.VideoMetadata
+import com.paranid5.crescendo.domain.metadata.VideoMetadata
 import com.paranid5.crescendo.domain.tracks.DefaultTrack
 import com.paranid5.yt_url_extractor_kt.extractYtFilesWithMeta
 import io.ktor.client.HttpClient

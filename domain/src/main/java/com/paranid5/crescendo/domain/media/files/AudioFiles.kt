@@ -20,7 +20,7 @@ suspend fun createAudioFileCatching(
 ) = createFileCatching(mediaDirectory, filename, ext)
     .map { MediaFile.AudioFile(it) }
 
-suspend fun MediaFile.AudioFile.trimmed(
+suspend fun MediaFile.AudioFile.trimmedCatching(
     outputFilename: String,
     audioFormat: Formats,
     trimRange: TrimRange,
@@ -64,7 +64,7 @@ private suspend inline fun trim(
         )
 
         Log.d(TAG, command)
-        FFmpeg.execute(command)
+        Log.d(TAG, "FFmpeg status: ${FFmpeg.execute(command)}")
     }
 }
 

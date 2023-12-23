@@ -9,7 +9,7 @@ import androidx.datastore.preferences.core.intPreferencesKey
 import androidx.datastore.preferences.core.longPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
-import com.paranid5.crescendo.domain.VideoMetadata
+import com.paranid5.crescendo.domain.metadata.VideoMetadata
 import com.paranid5.crescendo.domain.eq.EqualizerData
 import com.paranid5.crescendo.domain.eq.EqualizerBandsPreset
 import com.paranid5.crescendo.domain.media.AudioStatus
@@ -58,6 +58,7 @@ class StorageHandler(context: Context) :
 
     private val Context.dataStore by preferencesDataStore("params")
     private val dataStore = context.dataStore
+    private val json by lazy { Json { ignoreUnknownKeys = true } }
 
     @OptIn(ExperimentalCoroutinesApi::class)
     val currentUrlFlow = dataStore.data
@@ -74,14 +75,14 @@ class StorageHandler(context: Context) :
     @OptIn(ExperimentalCoroutinesApi::class)
     val currentMetadataFlow = dataStore.data
         .mapLatest { preferences -> preferences[CURRENT_METADATA] }
-        .mapLatest { metaString -> metaString?.let { Json.decodeFromString<VideoMetadata>(it) } }
+        .mapLatest { metaString -> metaString?.let { json.decodeFromString<VideoMetadata>(it) } }
 
     val currentMetadataState = currentMetadataFlow
         .stateIn(this, SharingStarted.Eagerly, null)
 
     suspend fun storeCurrentMetadata(metadata: VideoMetadata?) {
         dataStore.edit { preferences ->
-            preferences[CURRENT_METADATA] = Json.encodeToString(metadata)
+            preferences[CURRENT_METADATA] = json.encodeToString(metadata)
         }
     }
 
@@ -102,14 +103,19 @@ class StorageHandler(context: Context) :
     @OptIn(ExperimentalCoroutinesApi::class)
     val currentPlaylistFlow = dataStore.data
         .mapLatest { preferences -> preferences[CURRENT_PLAYLIST] }
-        .mapLatest { trackStr -> trackStr?.let { Json.decodeFromString<List<DefaultTrack>>(it) } }
+        .mapLatest { trackStr ->
+            trackStr?.let {
+                runCatching { json.decodeFromString<List<DefaultTrack>>(it) }
+                    .getOrNull()
+            }
+        }
 
     val currentPlaylistState = currentPlaylistFlow
         .stateIn(this, SharingStarted.Eagerly, null)
 
     suspend fun storeCurrentPlaylist(playlist: List<DefaultTrack>) {
         dataStore.edit { preferences ->
-            preferences[CURRENT_PLAYLIST] = Json.encodeToString(playlist)
+            preferences[CURRENT_PLAYLIST] = json.encodeToString(playlist)
         }
     }
 
@@ -233,14 +239,14 @@ class StorageHandler(context: Context) :
     @OptIn(ExperimentalCoroutinesApi::class)
     val equalizerBandsFlow = dataStore.data
         .mapLatest { preferences -> preferences[EQ_BANDS] }
-        .mapLatest { bandsStr -> bandsStr?.let { Json.decodeFromString<List<Short>?>(it) } }
+        .mapLatest { bandsStr -> bandsStr?.let { json.decodeFromString<List<Short>?>(it) } }
 
     val equalizerBandsState = equalizerBandsFlow
         .stateIn(this, SharingStarted.Eagerly, null)
 
     suspend fun storeEqualizerBands(bands: List<Short>) {
         dataStore.edit { preferences ->
-            preferences[EQ_BANDS] = Json.encodeToString(bands)
+            preferences[EQ_BANDS] = json.encodeToString(bands)
         }
     }
 
@@ -293,7 +299,7 @@ class StorageHandler(context: Context) :
     @OptIn(ExperimentalCoroutinesApi::class)
     val amplitudesFlow = dataStore.data
         .mapLatest { preferences -> preferences[AMPLITUDES] }
-        .mapLatest { amplitudesStr -> amplitudesStr?.let { Json.decodeFromString<List<Int>>(it) } }
+        .mapLatest { amplitudesStr -> amplitudesStr?.let { json.decodeFromString<List<Int>>(it) } }
         .mapLatest { it ?: emptyList() }
 
     val amplitudesState = amplitudesFlow
@@ -301,7 +307,7 @@ class StorageHandler(context: Context) :
 
     suspend fun storeAmplitudes(amplitudes: List<Int>) {
         dataStore.edit { preferences ->
-            preferences[AMPLITUDES] = Json.encodeToString(amplitudes)
+            preferences[AMPLITUDES] = json.encodeToString(amplitudes)
         }
     }
 }

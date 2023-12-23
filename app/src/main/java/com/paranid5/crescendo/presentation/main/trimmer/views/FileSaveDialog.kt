@@ -24,8 +24,8 @@ import com.paranid5.crescendo.domain.trimming.FadeDurations
 import com.paranid5.crescendo.domain.trimming.TrimRange
 import com.paranid5.crescendo.presentation.main.trimmer.TrimmerViewModel
 import com.paranid5.crescendo.presentation.main.trimmer.properties.fadeDurationsFlow
+import com.paranid5.crescendo.presentation.main.trimmer.properties.trackOrNullState
 import com.paranid5.crescendo.presentation.main.trimmer.properties.trimRangeFlow
-import com.paranid5.crescendo.presentation.main.trimmer.properties.trackPathOrNullFlow
 import com.paranid5.crescendo.presentation.main.trimmer.views.file_save_dialog.FileSaveDialogContent
 import com.paranid5.crescendo.presentation.ui.theme.LocalAppColors
 import java.io.File
@@ -39,17 +39,17 @@ fun FileSaveDialog(
 ) {
     val colors = LocalAppColors.current
 
-    val trackPath by viewModel.trackPathOrNullFlow.collectAsState(initial = null)
+    val track by viewModel.trackOrNullState.collectAsState(initial = null)
     val trimRange by viewModel.trimRangeFlow.collectAsState(initial = TrimRange())
     val fadeDurations by viewModel.fadeDurationsFlow.collectAsState(initial = FadeDurations())
 
     var isDialogShown by isDialogShownState
 
-    val filenameState = rememberInitialFilename(trackPath)
+    val filenameState = rememberInitialFilename(track?.path)
     val filename by filenameState
 
-    val isSaveButtonClickable by remember(filename, trimRange) {
-        derivedStateOf { filename.isNotEmpty() && trimRange.totalDurationSecs > 0 }
+    val isDialogSaveButtonClickable by remember(filename) {
+        derivedStateOf(filename::isNotEmpty)
     }
 
     val fileSaveOptions = audioFileSaveOptions()
@@ -69,15 +69,16 @@ fun FileSaveDialog(
                 colors = CardDefaults.cardColors(containerColor = colors.background)
             ) {
                 FileSaveDialogContent(
+                    viewModel = viewModel,
                     isDialogShownState = isDialogShownState,
                     filenameState = filenameState,
                     fileSaveOptions = fileSaveOptions,
                     selectedSaveOptionIndexState = selectedSaveOptionIndexState,
-                    trackPath = trackPath!!,
+                    track = track!!,
                     audioFormat = audioFormat,
                     trimRange = trimRange,
                     fadeDurations = fadeDurations,
-                    isSaveButtonClickable = isSaveButtonClickable
+                    isSaveButtonClickable = isDialogSaveButtonClickable
                 )
             }
         }

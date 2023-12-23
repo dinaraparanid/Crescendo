@@ -13,7 +13,7 @@ data class DefaultTrack(
     override val artist: String,
     override val album: String,
     override val path: String,
-    override val duration: Long,
+    override val durationMillis: Long,
     override val displayName: String,
     override val dateAdded: Long,
     override val numberInAlbum: Int
@@ -24,7 +24,7 @@ data class DefaultTrack(
         artist = track.artist,
         album = track.album,
         path = track.path,
-        duration = track.duration,
+        durationMillis = track.durationMillis,
         displayName = track.displayName,
         dateAdded = track.dateAdded,
         numberInAlbum = track.numberInAlbum

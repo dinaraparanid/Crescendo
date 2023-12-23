@@ -19,8 +19,6 @@ import arrow.core.raise.either
 import arrow.core.raise.ensure
 import com.paranid5.crescendo.R
 import com.paranid5.crescendo.VIDEO_CASH_SERVICE_CONNECTION
-import com.paranid5.crescendo.domain.VideoMetadata
-import com.paranid5.crescendo.domain.trimming.TrimRange
 import com.paranid5.crescendo.domain.caching.CachingResult
 import com.paranid5.crescendo.domain.caching.DownloadingStatus
 import com.paranid5.crescendo.domain.caching.Formats
@@ -32,13 +30,14 @@ import com.paranid5.crescendo.domain.ktor_client.downloadFiles
 import com.paranid5.crescendo.domain.media.files.MediaFile
 import com.paranid5.crescendo.domain.media.files.createVideoFileCatching
 import com.paranid5.crescendo.domain.media.files.getInitialVideoDirectory
-import com.paranid5.crescendo.domain.media_scanner.MediaScannerReceiver
+import com.paranid5.crescendo.domain.metadata.VideoMetadata
+import com.paranid5.crescendo.domain.trimming.TrimRange
 import com.paranid5.crescendo.domain.utils.AsyncCondVar
 import com.paranid5.crescendo.domain.utils.extensions.registerReceiverCompat
 import com.paranid5.crescendo.media.convertToAudioFileAndSetTagsAsync
 import com.paranid5.crescendo.media.mergeToMP4AndSetTagsAsync
 import com.paranid5.crescendo.presentation.main.MainActivity
-import com.paranid5.crescendo.presentation.main.MainActivity.Companion.VIDEO_CASH_STATUS_ARG
+import com.paranid5.crescendo.receivers.CacheStatusReceiver
 import com.paranid5.crescendo.services.ServiceAction
 import com.paranid5.crescendo.services.SuspendService
 import com.paranid5.yt_url_extractor_kt.YtFile
@@ -178,20 +177,16 @@ class VideoCacheService : SuspendService(), KoinComponent {
         }
     }
 
-    private val mediaScannerReceiver = MediaScannerReceiver()
-
     private fun registerReceivers() {
         registerReceiverCompat(cacheNextVideoReceiver, Broadcast_CASH_NEXT_VIDEO)
         registerReceiverCompat(cancelCurVideoReceiver, Broadcast_CANCEL_CUR_VIDEO)
         registerReceiverCompat(cancelAllReceiver, Broadcast_CANCEL_ALL)
-        registerReceiverCompat(mediaScannerReceiver, MediaScannerReceiver.Broadcast_SCAN_FILE)
     }
 
     private fun unregisterReceivers() {
         unregisterReceiver(cacheNextVideoReceiver)
         unregisterReceiver(cancelCurVideoReceiver)
         unregisterReceiver(cancelAllReceiver)
-        unregisterReceiver(mediaScannerReceiver)
     }
 
     // --------------------------- Service Impl ---------------------------
@@ -682,42 +677,57 @@ class VideoCacheService : SuspendService(), KoinComponent {
     }
 
     private fun onVideoCashSuccessful() = sendBroadcast(
-        Intent(MainActivity.Broadcast_VIDEO_CASH_COMPLETED)
-            .putExtra(VIDEO_CASH_STATUS_ARG, VideoCacheResponse.Success)
+        Intent(applicationContext, CacheStatusReceiver::class.java)
+            .setAction(CacheStatusReceiver.Broadcast_VIDEO_CASH_COMPLETED)
+            .putExtra(CacheStatusReceiver.VIDEO_CASH_STATUS_ARG, VideoCacheResponse.Success)
     )
 
     private fun onDownloadError(code: Int, description: String) {
         videoCashErrorState.update { code to description }
 
         sendBroadcast(
-            Intent(MainActivity.Broadcast_VIDEO_CASH_COMPLETED)
-                .putExtra(VIDEO_CASH_STATUS_ARG, VideoCacheResponse.Error(code, description))
+            Intent(applicationContext, CacheStatusReceiver::class.java)
+                .setAction(CacheStatusReceiver.Broadcast_VIDEO_CASH_COMPLETED)
+                .putExtra(
+                    CacheStatusReceiver.VIDEO_CASH_STATUS_ARG,
+                    VideoCacheResponse.Error(code, description)
+                )
         )
     }
 
     private fun onVideoCashCanceled() = sendBroadcast(
-        Intent(MainActivity.Broadcast_VIDEO_CASH_COMPLETED)
-            .putExtra(VIDEO_CASH_STATUS_ARG, VideoCacheResponse.Canceled)
+        Intent(CacheStatusReceiver.Broadcast_VIDEO_CASH_COMPLETED).putExtra(
+            CacheStatusReceiver.VIDEO_CASH_STATUS_ARG,
+            VideoCacheResponse.Canceled
+        )
     )
 
     private fun onAudioConversionError() = sendBroadcast(
-        Intent(MainActivity.Broadcast_VIDEO_CASH_COMPLETED)
-            .putExtra(VIDEO_CASH_STATUS_ARG, VideoCacheResponse.AudioConversionError)
+        Intent(CacheStatusReceiver.Broadcast_VIDEO_CASH_COMPLETED).putExtra(
+            CacheStatusReceiver.VIDEO_CASH_STATUS_ARG,
+            VideoCacheResponse.AudioConversionError
+        )
     )
 
     private fun onFileCreationError() = sendBroadcast(
-        Intent(MainActivity.Broadcast_VIDEO_CASH_COMPLETED)
-            .putExtra(VIDEO_CASH_STATUS_ARG, VideoCacheResponse.FileCreationError)
+        Intent(CacheStatusReceiver.Broadcast_VIDEO_CASH_COMPLETED).putExtra(
+            CacheStatusReceiver.VIDEO_CASH_STATUS_ARG,
+            VideoCacheResponse.FileCreationError
+        )
     )
 
     private fun onConnectionLostError() = sendBroadcast(
-        Intent(MainActivity.Broadcast_VIDEO_CASH_COMPLETED)
-            .putExtra(VIDEO_CASH_STATUS_ARG, VideoCacheResponse.ConnectionLostError)
+        Intent(CacheStatusReceiver.Broadcast_VIDEO_CASH_COMPLETED).putExtra(
+            CacheStatusReceiver.VIDEO_CASH_STATUS_ARG,
+            VideoCacheResponse.ConnectionLostError
+        )
     )
 
     private fun onLiveStreamCaching() = sendBroadcast(
-        Intent(MainActivity.Broadcast_VIDEO_CASH_COMPLETED)
-            .putExtra(VIDEO_CASH_STATUS_ARG, VideoCacheResponse.LiveStreamNotAllowed)
+        Intent(CacheStatusReceiver.Broadcast_VIDEO_CASH_COMPLETED).putExtra(
+            CacheStatusReceiver.VIDEO_CASH_STATUS_ARG,
+            VideoCacheResponse.LiveStreamNotAllowed
+        )
     )
 
     private suspend inline fun onCashingError(errorStatus: DownloadingStatus) {

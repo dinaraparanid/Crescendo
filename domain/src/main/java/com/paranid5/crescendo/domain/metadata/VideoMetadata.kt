@@ -1,6 +1,5 @@
-package com.paranid5.crescendo.domain
+package com.paranid5.crescendo.domain.metadata
 
-import android.os.Parcelable
 import androidx.compose.runtime.Immutable
 import com.paranid5.yt_url_extractor_kt.VideoMeta
 import kotlinx.parcelize.Parcelize
@@ -11,18 +10,18 @@ import org.koin.core.component.KoinComponent
 @Parcelize
 @Immutable
 data class VideoMetadata(
-    @JvmField val title: String? = null,
-    @JvmField val author: String? = null,
-    @JvmField val covers: List<String> = listOf(),
-    @JvmField val lenInMillis: Long = 0,
+    override val title: String? = null,
+    override val author: String? = null,
+    override val covers: List<String> = listOf(),
+    override val durationMillis: Long = 0,
     @JvmField val isLiveStream: Boolean = false
-) : Parcelable {
+) : Metadata {
     internal companion object : KoinComponent
 
     constructor(youtubeMeta: VideoMeta) : this(
         title = youtubeMeta.title,
         author = youtubeMeta.author,
-        lenInMillis = youtubeMeta.videoLengthSecs * 1000,
+        durationMillis = youtubeMeta.videoLengthSecs * 1000,
         isLiveStream = youtubeMeta.isLiveStream,
         covers = youtubeMeta.run {
             listOf(maxResImageUrl, hqImageUrl, mqImageUrl, sdImageUrl, thumbnailUrl)

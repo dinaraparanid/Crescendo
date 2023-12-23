@@ -52,7 +52,7 @@ fun CachePropertiesDialog(
 
     val lengthInSecs by remember {
         derivedStateOf {
-            currentMetadata?.lenInMillis?.let { it / 1000 } ?: 0
+            currentMetadata?.durationMillis?.let { it / 1000 } ?: 0
         }
     }
 

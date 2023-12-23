@@ -7,25 +7,29 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.State
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewModelScope
 import com.paranid5.crescendo.R
 import com.paranid5.crescendo.domain.caching.Formats
+import com.paranid5.crescendo.domain.tracks.Track
 import com.paranid5.crescendo.domain.trimming.FadeDurations
 import com.paranid5.crescendo.domain.trimming.TrimRange
 import com.paranid5.crescendo.presentation.main.trimmer.TrimmerUIHandler
+import com.paranid5.crescendo.presentation.main.trimmer.TrimmerViewModel
 import com.paranid5.crescendo.presentation.ui.theme.LocalAppColors
 import kotlinx.coroutines.launch
 import org.koin.compose.koinInject
 
 @Composable
 fun ConfirmButton(
-    isClickable: Boolean,
-    trackPath: String,
+    viewModel: TrimmerViewModel,
+    isSaveButtonClickable: Boolean,
+    track: Track,
     filenameState: State<String>,
     audioFormat: Formats,
     trimRange: TrimRange,
@@ -34,10 +38,11 @@ fun ConfirmButton(
     modifier: Modifier = Modifier,
     trimmerUIHandler: TrimmerUIHandler = koinInject()
 ) {
+    val context = LocalContext.current
     val colors = LocalAppColors.current
+
     var isDialogShown by isDialogShownState
     val outputFilename by filenameState
-    val coroutineScope = rememberCoroutineScope()
 
     Button(
         modifier = modifier,
@@ -45,9 +50,10 @@ fun ConfirmButton(
             containerColor = colors.backgroundAlternative
         ),
         onClick = {
-            coroutineScope.launch {
-                trimmerUIHandler.trimTrack(
-                    trackPath = trackPath,
+            viewModel.viewModelScope.launch {
+                trimmerUIHandler.trimTrackAndSendBroadcast(
+                    context = context.applicationContext,
+                    track = track,
                     outputFilename = outputFilename,
                     audioFormat = audioFormat,
                     trimRange = trimRange,
@@ -57,7 +63,7 @@ fun ConfirmButton(
 
             isDialogShown = false
         },
-        enabled = isClickable,
+        enabled = isSaveButtonClickable,
         content = { TrimLabel() }
     )
 }

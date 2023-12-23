@@ -4,7 +4,7 @@ import android.content.Context
 import android.content.Intent
 
 fun Context.sendScanFile(filePath: String) = sendBroadcast(
-    Intent(MediaScannerReceiver.Broadcast_SCAN_FILE).apply {
-        putExtra(MediaScannerReceiver.FILE_PATH_ARG, filePath)
-    }
+    Intent(applicationContext, MediaScannerReceiver::class.java)
+        .setAction(MediaScannerReceiver.Broadcast_SCAN_FILE)
+        .putExtra(MediaScannerReceiver.FILE_PATH_ARG, filePath)
 )

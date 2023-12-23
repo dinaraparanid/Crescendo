@@ -23,6 +23,6 @@ class TrackStateHolder(private val savedStateHandle: SavedStateHandle) {
     fun setTrack(track: Track, viewModel: TrimmerViewModel) {
         savedStateHandle[TRACK] = _trackState.updateAndGet { track }
         viewModel.setStartPosInMillis(0)
-        viewModel.setEndPosInMillis(track.duration)
+        viewModel.setEndPosInMillis(track.durationMillis)
     }
 }

@@ -11,7 +11,7 @@ fun TrimmerViewModel.setTrack(track: Track) =
     trackStateHolder.setTrack(track, this)
 
 inline val TrimmerViewModel.durationInMillisFlow
-    get() = trackOrNullState.map { it?.duration ?: 0L }
+    get() = trackOrNullState.map { it?.durationMillis ?: 0L }
 
 inline val TrimmerViewModel.trackPathOrNullFlow
     get() = trackOrNullState.map { it?.path }

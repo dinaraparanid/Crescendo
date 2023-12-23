@@ -8,7 +8,7 @@ interface Track : Parcelable {
     val artist: String
     val album: String
     val path: String
-    val duration: Long
+    val durationMillis: Long
     val displayName: String
     val dateAdded: Long
     val numberInAlbum: Int
