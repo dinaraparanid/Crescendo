@@ -1,13 +1,10 @@
 package com.paranid5.crescendo.presentation.main
 
 import android.content.res.Configuration
-import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.BottomSheetValue
@@ -17,7 +14,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.unit.dp
 import com.paranid5.crescendo.domain.media.AudioStatus
@@ -28,7 +24,7 @@ import com.paranid5.crescendo.presentation.main.appbar.AppBar
 import com.paranid5.crescendo.presentation.main.current_playlist.CurrentPlaylistScreen
 import com.paranid5.crescendo.presentation.main.playing.PlayingScreen
 import com.paranid5.crescendo.presentation.ui.theme.LocalAppColors
-import com.paranid5.crescendo.presentation.ui.theme.TransparentUtility
+import com.paranid5.crescendo.presentation.ui.utils.PushUpButton
 
 @OptIn(ExperimentalMaterialApi::class, ExperimentalFoundationApi::class)
 @Composable
@@ -36,7 +32,7 @@ fun PlayingBottomSheet(
     alpha: Float,
     modifier: Modifier = Modifier,
 ) {
-    val backgroundColor = LocalAppColors.current.colorScheme.background
+    val backgroundColor = LocalAppColors.current.background
     val curPlaylistSheetState = LocalCurrentPlaylistSheetState.current
     val playingPagerState = LocalPlayingPagerState.current
 
@@ -96,25 +92,16 @@ fun PlayingBottomSheet(
 @Composable
 private fun CurrentPlaylistBottomSheet(alpha: Float, modifier: Modifier = Modifier) =
     Box(modifier) {
-        CurrentPlaylistScreen(
-            Modifier
-                .fillMaxSize()
-                .padding(top = 25.dp)
-        )
-
         PushUpButton(
             alpha = alpha,
             modifier = Modifier
                 .padding(top = 12.dp)
                 .align(Alignment.TopCenter)
         )
-    }
 
-@Composable
-private fun PushUpButton(alpha: Float, modifier: Modifier = Modifier) = Canvas(
-    onDraw = { drawRect(TransparentUtility.copy(alpha = 0.25F + alpha / 2)) },
-    modifier = modifier
-        .width(35.dp)
-        .height(4.dp)
-        .clip(RoundedCornerShape(10.dp))
-)
+        CurrentPlaylistScreen(
+            Modifier
+                .fillMaxSize()
+                .padding(top = 25.dp)
+        )
+    }

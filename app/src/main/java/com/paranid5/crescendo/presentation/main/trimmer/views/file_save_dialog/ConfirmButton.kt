@@ -18,6 +18,7 @@ import com.paranid5.crescendo.R
 import com.paranid5.crescendo.domain.caching.Formats
 import com.paranid5.crescendo.domain.tracks.Track
 import com.paranid5.crescendo.domain.trimming.FadeDurations
+import com.paranid5.crescendo.domain.trimming.PitchAndSpeed
 import com.paranid5.crescendo.domain.trimming.TrimRange
 import com.paranid5.crescendo.presentation.main.trimmer.TrimmerUIHandler
 import com.paranid5.crescendo.presentation.main.trimmer.TrimmerViewModel
@@ -33,6 +34,7 @@ fun ConfirmButton(
     filenameState: State<String>,
     audioFormat: Formats,
     trimRange: TrimRange,
+    pitchAndSpeed: PitchAndSpeed,
     fadeDurations: FadeDurations,
     isDialogShownState: MutableState<Boolean>,
     modifier: Modifier = Modifier,
@@ -57,6 +59,7 @@ fun ConfirmButton(
                     outputFilename = outputFilename,
                     audioFormat = audioFormat,
                     trimRange = trimRange,
+                    pitchAndSpeed = pitchAndSpeed,
                     fadeDurations = fadeDurations
                 )
             }

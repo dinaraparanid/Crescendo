@@ -1,13 +1,23 @@
 package com.paranid5.crescendo.presentation.main.trimmer.states
 
+import androidx.lifecycle.SavedStateHandle
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.flow.updateAndGet
 import kotlinx.coroutines.launch
 
-class PlaybackStateHolder(scope: CoroutineScope) : CoroutineScope by scope {
+class PlaybackStateHolder(
+    private val savedStateHandle: SavedStateHandle,
+    scope: CoroutineScope
+) : CoroutineScope by scope {
+    companion object {
+        private const val PITCH = "pitch"
+        private const val SPEED = "speed"
+    }
+
     private val _isPlayerInitializedState by lazy { MutableStateFlow(false) }
 
     val isPlayerInitializedState by lazy { _isPlayerInitializedState.asStateFlow() }
@@ -20,6 +30,22 @@ class PlaybackStateHolder(scope: CoroutineScope) : CoroutineScope by scope {
     val isPlayingState by lazy { _isPlayingState.asStateFlow() }
 
     fun setPlaying(isPlaying: Boolean) = _isPlayingState.update { isPlaying }
+
+    private val _pitchState by lazy { MutableStateFlow(1F) }
+
+    val pitchState by lazy { _pitchState.asStateFlow() }
+
+    fun setPitch(pitch: Float) {
+        savedStateHandle[PITCH] = _pitchState.updateAndGet { pitch }
+    }
+
+    private val _speedState by lazy { MutableStateFlow(1F) }
+
+    val speedState by lazy { _speedState.asStateFlow() }
+
+    fun setSpeed(speed: Float) {
+        savedStateHandle[SPEED] = _speedState.updateAndGet { speed }
+    }
 
     private val playbackPosMonitorTaskState by lazy { MutableStateFlow<Job?>(null) }
 

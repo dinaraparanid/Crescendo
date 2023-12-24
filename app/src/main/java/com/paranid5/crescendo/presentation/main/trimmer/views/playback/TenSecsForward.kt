@@ -1,6 +1,5 @@
 package com.paranid5.crescendo.presentation.main.trimmer.views.playback
 
-import android.media.MediaPlayer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.Icon
@@ -12,23 +11,24 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import androidx.media3.common.Player
 import com.paranid5.crescendo.R
 import com.paranid5.crescendo.presentation.main.trimmer.TrimmerViewModel
 import com.paranid5.crescendo.presentation.main.trimmer.player.seekTenSecsForward
-import com.paranid5.crescendo.presentation.main.trimmer.properties.durationInMillisFlow
+import com.paranid5.crescendo.presentation.main.trimmer.properties.trackDurationInMillisFlow
 import com.paranid5.crescendo.presentation.ui.theme.LocalAppColors
 
 @Composable
 fun TenSecsForwardButton(
-    player: MediaPlayer,
+    player: Player,
     viewModel: TrimmerViewModel,
     modifier: Modifier = Modifier
 ) {
     val colors = LocalAppColors.current
-    val durationInMillis by viewModel.durationInMillisFlow.collectAsState(initial = 0L)
+    val durationInMillis by viewModel.trackDurationInMillisFlow.collectAsState(initial = 0L)
 
     IconButton(
-        onClick = { player.seekTenSecsForward(durationInMillis.toInt()) },
+        onClick = { player.seekTenSecsForward(durationInMillis) },
         modifier = modifier.size(40.dp)
     ) {
         Icon(

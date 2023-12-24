@@ -42,14 +42,14 @@ fun TrimmerViewModel.setFadeOutSecs(fadeOutSecs: Long) =
     playbackPositionStateHolder.setFadeOutSecs(fadeOutSecs)
 
 inline val TrimmerViewModel.startOffsetFlow
-    get() = combine(startPosInMillisState, durationInMillisFlow) { startMillis, durationInMillis ->
+    get() = combine(startPosInMillisState, trackDurationInMillisFlow) { startMillis, durationInMillis ->
         startMillis safeDiv durationInMillis
     }
 
 inline val TrimmerViewModel.endOffsetFlow
     get() = combine(
         endPosInMillisState,
-        durationInMillisFlow
+        trackDurationInMillisFlow
     ) { endMillis, durationInMillis ->
         endMillis safeDiv durationInMillis
     }
@@ -87,7 +87,7 @@ inline val TrimmerViewModel.fadeDurationsFlow
 inline val TrimmerViewModel.playbackOffsetFlow
     get() = combine(
         playbackPosInMillisState,
-        durationInMillisFlow
+        trackDurationInMillisFlow
     ) { playbackMillis, durationInMillis ->
         playbackMillis safeDiv durationInMillis
     }
@@ -96,7 +96,7 @@ inline val TrimmerViewModel.playbackTextFlow
     get() = playbackPosInMillisState.map { it.timeString }
 
 fun TrimmerViewModel.waveformWidthFlow(spikeWidthRatio: Int) =
-    durationInMillisFlow.map { (it / 1000 * spikeWidthRatio).toInt() }
+    trackDurationInMillisFlow.map { (it / 1000 * spikeWidthRatio).toInt() }
 
 fun TrimmerViewModel.playbackControllerOffsetFlow(spikeWidthRatio: Int) =
     combine(

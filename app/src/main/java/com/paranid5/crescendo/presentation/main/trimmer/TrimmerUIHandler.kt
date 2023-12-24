@@ -9,6 +9,7 @@ import com.paranid5.crescendo.domain.media.files.trimmedCatching
 import com.paranid5.crescendo.domain.metadata.AudioMetadata
 import com.paranid5.crescendo.domain.tracks.Track
 import com.paranid5.crescendo.domain.trimming.FadeDurations
+import com.paranid5.crescendo.domain.trimming.PitchAndSpeed
 import com.paranid5.crescendo.domain.trimming.TrimRange
 import com.paranid5.crescendo.media.tags.setAudioTags
 import com.paranid5.crescendo.presentation.UIHandler
@@ -22,6 +23,7 @@ class TrimmerUIHandler : UIHandler {
         outputFilename: String,
         audioFormat: Formats,
         trimRange: TrimRange,
+        pitchAndSpeed: PitchAndSpeed,
         fadeDurations: FadeDurations
     ) = context.sendTrimmingStatusBroadcast(
         trimTrackResult(
@@ -30,6 +32,7 @@ class TrimmerUIHandler : UIHandler {
             outputFilename = outputFilename,
             audioFormat = audioFormat,
             trimRange = trimRange,
+            pitchAndSpeed = pitchAndSpeed,
             fadeDurations = fadeDurations
         )
     )
@@ -40,9 +43,10 @@ class TrimmerUIHandler : UIHandler {
         outputFilename: String,
         audioFormat: Formats,
         trimRange: TrimRange,
+        pitchAndSpeed: PitchAndSpeed,
         fadeDurations: FadeDurations
     ) = MediaFile.AudioFile(File(track.path))
-        .trimmedCatching(outputFilename, audioFormat, trimRange, fadeDurations)
+        .trimmedCatching(outputFilename, audioFormat, trimRange, pitchAndSpeed, fadeDurations)
         .onSuccess { file ->
             setAudioTags(
                 context = context,

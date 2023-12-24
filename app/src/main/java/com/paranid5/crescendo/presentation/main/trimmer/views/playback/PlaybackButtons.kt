@@ -8,25 +8,30 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import com.paranid5.crescendo.presentation.main.trimmer.player.TrackPlayer
 import com.paranid5.crescendo.presentation.main.trimmer.TrimmerViewModel
 import com.paranid5.crescendo.presentation.main.trimmer.effects.playback.CleanUpEffect
 import com.paranid5.crescendo.presentation.main.trimmer.effects.playback.OutOfBordersEffect
 import com.paranid5.crescendo.presentation.main.trimmer.effects.playback.PlayPauseEffect
+import com.paranid5.crescendo.presentation.main.trimmer.effects.playback.PlaybackParamsEffect
 
 @Composable
 fun PlaybackButtons(
     viewModel: TrimmerViewModel,
     modifier: Modifier = Modifier
 ) {
+    val context = LocalContext.current
+
     val player by remember {
-        lazy { TrackPlayer(viewModel) }
+        lazy { TrackPlayer(context, viewModel) }
     }
 
     OutOfBordersEffect(viewModel)
     PlayPauseEffect(player, viewModel)
     CleanUpEffect(player, viewModel)
+    PlaybackParamsEffect(player, viewModel)
 
     Row(modifier) {
         TenSecsBackButton(

@@ -1,36 +1,48 @@
 package com.paranid5.crescendo.presentation.main.trimmer.player
 
-import android.media.AudioAttributes
-import android.media.AudioManager
-import android.media.MediaPlayer
+import android.content.Context
+import androidx.annotation.OptIn
 import androidx.lifecycle.viewModelScope
+import androidx.media3.common.AudioAttributes
+import androidx.media3.common.C
+import androidx.media3.common.Player
+import androidx.media3.common.util.UnstableApi
+import androidx.media3.exoplayer.ExoPlayer
 import com.paranid5.crescendo.domain.tracks.Track
+import com.paranid5.crescendo.domain.utils.extensions.toMediaItem
 import com.paranid5.crescendo.presentation.main.trimmer.TrimmerViewModel
+import com.paranid5.crescendo.presentation.main.trimmer.effects.playback.notifyPlaybackTaskFinished
 import com.paranid5.crescendo.presentation.main.trimmer.effects.playback.pausePlayback
+import com.paranid5.crescendo.presentation.main.trimmer.properties.launchPlaybackPosMonitorTask
 import com.paranid5.crescendo.presentation.main.trimmer.properties.trackOrNullState
 import kotlinx.coroutines.launch
 
-private const val TRANSITION_DURATION = 10_000
+private const val TRANSITION_DURATION = 10_000L
 
-inline fun TrackPlayer(track: Track, crossinline onCompletion: (MediaPlayer) -> Unit) =
-    MediaPlayer().apply {
-        setDataSource(track.path)
-
-        setAudioAttributes(
-            AudioAttributes.Builder()
-                .setContentType(AudioAttributes.CONTENT_TYPE_MUSIC)
-                .setLegacyStreamType(AudioManager.STREAM_MUSIC)
-                .build()
-        )
-
-        setOnCompletionListener { onCompletion(this) }
-
+@OptIn(UnstableApi::class)
+fun TrackPlayer(
+    context: Context,
+    track: Track,
+    viewModel: TrimmerViewModel,
+    onCompletion: (Player) -> Unit
+) = ExoPlayer.Builder(context)
+    .setAudioAttributes(newAudioAttributes, true)
+    .setHandleAudioBecomingNoisy(true)
+    .setWakeMode(C.WAKE_MODE_NETWORK)
+    .setPauseAtEndOfMediaItems(false)
+    .build()
+    .apply {
+        addListener(playerStateChangedListener(this, viewModel, onCompletion))
+        repeatMode = ExoPlayer.REPEAT_MODE_OFF
+        setMediaItem(track.toMediaItem())
         prepare()
     }
 
-fun TrackPlayer(viewModel: TrimmerViewModel): MediaPlayer =
+fun TrackPlayer(context: Context, viewModel: TrimmerViewModel) =
     TrackPlayer(
+        context = context,
         track = viewModel.trackOrNullState.value!!,
+        viewModel = viewModel,
         onCompletion = {
             viewModel.viewModelScope.launch {
                 viewModel.pausePlayback()
@@ -38,13 +50,42 @@ fun TrackPlayer(viewModel: TrimmerViewModel): MediaPlayer =
         }
     )
 
-fun MediaPlayer.seekTenSecsBack(startPosition: Int) =
+@OptIn(UnstableApi::class)
+private inline val newAudioAttributes
+    get() = AudioAttributes.Builder()
+        .setContentType(C.AUDIO_CONTENT_TYPE_MOVIE)
+        .setUsage(C.USAGE_MEDIA)
+        .build()
+
+private fun playerStateChangedListener(
+    player: Player,
+    viewModel: TrimmerViewModel,
+    onCompletion: (Player) -> Unit
+) = object : Player.Listener {
+    override fun onIsPlayingChanged(isPlaying: Boolean) {
+        super.onIsPlayingChanged(isPlaying)
+
+        if (isPlaying) viewModel.launchPlaybackPosMonitorTask {
+            PlaybackPositionMonitoringTask(player, viewModel)
+            viewModel.notifyPlaybackTaskFinished()
+        }
+    }
+
+    override fun onPlaybackStateChanged(playbackState: Int) {
+        super.onPlaybackStateChanged(playbackState)
+
+        if (playbackState == ExoPlayer.STATE_ENDED)
+            onCompletion(player)
+    }
+}
+
+fun Player.seekTenSecsBack(startPosition: Long) =
     seekTo(maxOf(currentPosition - TRANSITION_DURATION, startPosition))
 
-fun MediaPlayer.seekTenSecsForward(totalDuration: Int) =
+fun Player.seekTenSecsForward(totalDuration: Long) =
     seekTo(minOf(currentPosition + TRANSITION_DURATION, totalDuration))
 
-fun MediaPlayer.stopAndReleaseCatching() = runCatching {
+fun Player.stopAndReleaseCatching() = runCatching {
     stop()
     release()
 }

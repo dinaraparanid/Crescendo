@@ -23,7 +23,7 @@ import com.paranid5.crescendo.presentation.main.trimmer.CONTROLLER_RECT_OFFSET
 import com.paranid5.crescendo.presentation.main.trimmer.CONTROLLER_RECT_WIDTH
 import com.paranid5.crescendo.presentation.main.trimmer.TrimmerViewModel
 import com.paranid5.crescendo.presentation.main.trimmer.WAVEFORM_SPIKE_WIDTH_RATIO
-import com.paranid5.crescendo.presentation.main.trimmer.properties.durationInMillisFlow
+import com.paranid5.crescendo.presentation.main.trimmer.properties.trackDurationInMillisFlow
 import com.paranid5.crescendo.presentation.main.trimmer.properties.endPosInMillisState
 import com.paranid5.crescendo.presentation.main.trimmer.properties.setEndPosInMillis
 import com.paranid5.crescendo.presentation.main.trimmer.properties.startPosInMillisState
@@ -41,7 +41,7 @@ fun EndBorder(
 
     val startMillis by viewModel.startPosInMillisState.collectAsState()
     val endMillis by viewModel.endPosInMillisState.collectAsState()
-    val durationInMillis by viewModel.durationInMillisFlow.collectAsState(initial = 0L)
+    val durationInMillis by viewModel.trackDurationInMillisFlow.collectAsState(initial = 0L)
 
     Canvas(
         modifier.pointerInput(Unit) {

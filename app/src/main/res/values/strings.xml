@@ -94,4 +94,7 @@
     <string name="save">Save</string>
     <string name="trim">Trim</string>
     <string name="file_trimmed">File is successfully trimmed!</string>
+    <string name="fade">Fade</string>
+    <string name="fade_in">Fade In</string>
+    <string name="fade_out">Fade Out</string>
 </resources>

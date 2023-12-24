@@ -13,6 +13,7 @@ import androidx.compose.ui.unit.dp
 import com.paranid5.crescendo.domain.caching.Formats
 import com.paranid5.crescendo.domain.tracks.Track
 import com.paranid5.crescendo.domain.trimming.FadeDurations
+import com.paranid5.crescendo.domain.trimming.PitchAndSpeed
 import com.paranid5.crescendo.domain.trimming.TrimRange
 import com.paranid5.crescendo.presentation.main.trimmer.TrimmerViewModel
 
@@ -25,6 +26,7 @@ fun FileSaveDialogContent(
     selectedSaveOptionIndexState: MutableState<Int>,
     track: Track,
     audioFormat: Formats,
+    pitchAndSpeed: PitchAndSpeed,
     trimRange: TrimRange,
     fadeDurations: FadeDurations,
     isSaveButtonClickable: Boolean,
@@ -54,6 +56,7 @@ fun FileSaveDialogContent(
         audioFormat = audioFormat,
         trimRange = trimRange,
         fadeDurations = fadeDurations,
+        pitchAndSpeed = pitchAndSpeed,
         isDialogShownState = isDialogShownState,
         modifier = Modifier
             .padding(vertical = 10.dp)

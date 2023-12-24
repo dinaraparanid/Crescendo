@@ -21,9 +21,11 @@ import androidx.compose.ui.unit.dp
 import com.paranid5.crescendo.R
 import com.paranid5.crescendo.domain.caching.Formats
 import com.paranid5.crescendo.domain.trimming.FadeDurations
+import com.paranid5.crescendo.domain.trimming.PitchAndSpeed
 import com.paranid5.crescendo.domain.trimming.TrimRange
 import com.paranid5.crescendo.presentation.main.trimmer.TrimmerViewModel
 import com.paranid5.crescendo.presentation.main.trimmer.properties.fadeDurationsFlow
+import com.paranid5.crescendo.presentation.main.trimmer.properties.pitchAndSpeedFlow
 import com.paranid5.crescendo.presentation.main.trimmer.properties.trackOrNullState
 import com.paranid5.crescendo.presentation.main.trimmer.properties.trimRangeFlow
 import com.paranid5.crescendo.presentation.main.trimmer.views.file_save_dialog.FileSaveDialogContent
@@ -42,6 +44,7 @@ fun FileSaveDialog(
     val track by viewModel.trackOrNullState.collectAsState(initial = null)
     val trimRange by viewModel.trimRangeFlow.collectAsState(initial = TrimRange())
     val fadeDurations by viewModel.fadeDurationsFlow.collectAsState(initial = FadeDurations())
+    val pitchAndSpeed by viewModel.pitchAndSpeedFlow.collectAsState(initial = PitchAndSpeed())
 
     var isDialogShown by isDialogShownState
 
@@ -77,6 +80,7 @@ fun FileSaveDialog(
                     track = track!!,
                     audioFormat = audioFormat,
                     trimRange = trimRange,
+                    pitchAndSpeed = pitchAndSpeed,
                     fadeDurations = fadeDurations,
                     isSaveButtonClickable = isDialogSaveButtonClickable
                 )

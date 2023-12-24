@@ -18,9 +18,11 @@ fun Track.toAndroidMetadata(cover: Bitmap? = null): MediaMetadataCompat =
         .putBitmap(MediaMetadataCompat.METADATA_KEY_ART, cover)
         .build()
 
+fun Track.toMediaItem() = MediaItem.fromUri(path)
+
 fun Iterable<Track>.toDefaultTrackList() = map(::DefaultTrack)
 
-fun Iterable<Track>.toMediaItemList() = map { MediaItem.fromUri(it.path) }
+fun Iterable<Track>.toMediaItemList() = map(Track::toMediaItem)
 
 inline val Iterable<Track>.totalDuration
     get() = fold(0L) { acc, track -> acc + track.durationMillis }

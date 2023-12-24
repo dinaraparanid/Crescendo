@@ -1,12 +1,12 @@
 package com.paranid5.crescendo.presentation.main.trimmer.effects.playback
 
-import android.media.MediaPlayer
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import com.paranid5.crescendo.presentation.main.trimmer.player.PlaybackPositionMonitoringTask
+import androidx.media3.common.Player
 import com.paranid5.crescendo.presentation.main.trimmer.TrimmerViewModel
+import com.paranid5.crescendo.presentation.main.trimmer.player.PlaybackPositionMonitoringTask
 import com.paranid5.crescendo.presentation.main.trimmer.properties.isPlayerInitializedState
 import com.paranid5.crescendo.presentation.main.trimmer.properties.isPlayingState
 import com.paranid5.crescendo.presentation.main.trimmer.properties.launchPlaybackPosMonitorTask
@@ -15,7 +15,7 @@ import com.paranid5.crescendo.presentation.main.trimmer.properties.startPosInMil
 
 @Composable
 fun PlayPauseEffect(
-    player: MediaPlayer,
+    player: Player,
     viewModel: TrimmerViewModel
 ) {
     val isPlayerInitialized by viewModel.isPlayerInitializedState.collectAsState()
@@ -26,13 +26,8 @@ fun PlayPauseEffect(
         when {
             isPlaying -> {
                 viewModel.setPlayerInitialized(true)
-                player.seekTo(startPos.toInt())
-                player.start()
-
-                viewModel.launchPlaybackPosMonitorTask {
-                    PlaybackPositionMonitoringTask(player, viewModel)
-                    viewModel.notifyPlaybackTaskFinished()
-                }
+                player.seekTo(startPos)
+                player.playWhenReady = true
             }
 
             isPlayerInitialized -> {
