@@ -126,7 +126,6 @@ private fun Modifier.startBorderModifier(
             if (it.isFocused)
                 coroutineScope.launch {
                     waveformScrollState.animateScrollTo(startBorderOffset)
-                    focusPoints.startBorderFocusRequester.freeFocus()
                 }
         }
         .focusTarget()
@@ -155,7 +154,6 @@ private fun Modifier.endBorderModifier(
             if (it.isFocused)
                 coroutineScope.launch {
                     waveformScrollState.animateScrollTo(endBorderOffset)
-                    focusPoints.endBorderFocusRequester.freeFocus()
                 }
         }
         .focusTarget()
@@ -188,7 +186,6 @@ private fun Modifier.playbackOffsetModifier(
             if (isPlaying && it.isFocused)
                 coroutineScope.launch {
                     waveformScrollState.animateScrollTo(playbackPositionOffset)
-                    focusPoints.playbackFocusRequester.freeFocus()
                 }
         }
         .focusTarget()

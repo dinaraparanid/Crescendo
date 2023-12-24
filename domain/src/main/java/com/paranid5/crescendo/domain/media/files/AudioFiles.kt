@@ -85,7 +85,7 @@ private fun ffmpegTrimCommand(
         "-t ${trimRange.totalDurationMillis}ms " +
         "-af asetrate=44100*${pitchAndSpeed.pitch}," +
         "aresample=44100," +
-        "atempo=${pitchAndSpeed.speed}," +
+        "atempo=${pitchAndSpeed.speed}/${pitchAndSpeed.pitch}," +
         "afade=in:0:d=${fadeDurations.fadeInSecs}," +
         "afade=out:st=${trimRange.totalDurationSecs - fadeDurations.fadeOutSecs}:d=${fadeDurations.fadeOutSecs} " +
         "\"$outputPath\""
