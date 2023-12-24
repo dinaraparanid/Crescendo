@@ -5,20 +5,27 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.MutableIntState
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.unit.dp
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.constraintlayout.compose.Dimension
+import com.paranid5.crescendo.presentation.composition_locals.LocalTrimmerFocusPoints
+import com.paranid5.crescendo.presentation.composition_locals.LocalTrimmerPositionBroadcast
+import com.paranid5.crescendo.presentation.main.trimmer.FocusPoints
 import com.paranid5.crescendo.presentation.main.trimmer.TrimmerViewModel
 import com.paranid5.crescendo.presentation.main.trimmer.WAVEFORM_SPIKE_WIDTH_RATIO
 import com.paranid5.crescendo.presentation.main.trimmer.views.playback.PlaybackButtons
 import com.paranid5.crescendo.presentation.main.trimmer.views.waveform.TrimmedDuration
+import kotlinx.coroutines.flow.MutableSharedFlow
 
 @Composable
 fun TrimmerScreenContent(
@@ -31,7 +38,46 @@ fun TrimmerScreenContent(
     }
 
     Box(modifier) {
-        when (LocalConfiguration.current.orientation) {
+        TrimmerScreenContentOriented(
+            viewModel = viewModel,
+            shownEffectsState = shownEffectsState,
+            isFileSaveDialogShownState = isFileSaveDialogShownState
+        )
+
+        FileSaveDialog(
+            viewModel = viewModel,
+            isDialogShownState = isFileSaveDialogShownState,
+            modifier = Modifier.align(Alignment.Center)
+        )
+    }
+}
+
+@OptIn(ExperimentalComposeUiApi::class)
+@Composable
+private fun TrimmerScreenContentOriented(
+    viewModel: TrimmerViewModel,
+    shownEffectsState: MutableIntState,
+    isFileSaveDialogShownState: MutableState<Boolean>
+) {
+    val config = LocalConfiguration.current
+
+    val (startBorder, playback, endBorder) = remember {
+        FocusRequester.createRefs()
+    }
+
+    val focusPoints = remember(startBorder, playback, endBorder) {
+        FocusPoints(startBorder, playback, endBorder)
+    }
+
+    val positionBroadcast = remember {
+        MutableSharedFlow<Long>()
+    }
+
+    CompositionLocalProvider(
+        LocalTrimmerFocusPoints provides focusPoints,
+        LocalTrimmerPositionBroadcast provides positionBroadcast
+    ) {
+        when (config.orientation) {
             Configuration.ORIENTATION_LANDSCAPE ->
                 TrimmerScreenContentLandscape(
                     viewModel = viewModel,
@@ -47,12 +93,6 @@ fun TrimmerScreenContent(
                 modifier = Modifier.fillMaxSize()
             )
         }
-
-        FileSaveDialog(
-            viewModel = viewModel,
-            isDialogShownState = isFileSaveDialogShownState,
-            modifier = Modifier.align(Alignment.Center)
-        )
     }
 }
 

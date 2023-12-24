@@ -10,12 +10,14 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
-import com.paranid5.crescendo.presentation.main.trimmer.player.TrackPlayer
+import androidx.media3.common.Player
 import com.paranid5.crescendo.presentation.main.trimmer.TrimmerViewModel
 import com.paranid5.crescendo.presentation.main.trimmer.effects.playback.CleanUpEffect
 import com.paranid5.crescendo.presentation.main.trimmer.effects.playback.OutOfBordersEffect
 import com.paranid5.crescendo.presentation.main.trimmer.effects.playback.PlayPauseEffect
 import com.paranid5.crescendo.presentation.main.trimmer.effects.playback.PlaybackParamsEffect
+import com.paranid5.crescendo.presentation.main.trimmer.effects.playback.PlaybackPositionTappedEffect
+import com.paranid5.crescendo.presentation.main.trimmer.player.TrackPlayer
 
 @Composable
 fun PlaybackButtons(
@@ -32,7 +34,21 @@ fun PlaybackButtons(
     PlayPauseEffect(player, viewModel)
     CleanUpEffect(player, viewModel)
     PlaybackParamsEffect(player, viewModel)
+    PlaybackPositionTappedEffect(player)
 
+    PlaybackButtonsContent(
+        player = player,
+        viewModel = viewModel,
+        modifier = modifier
+    )
+}
+
+@Composable
+private fun PlaybackButtonsContent(
+    player: Player,
+    viewModel: TrimmerViewModel,
+    modifier: Modifier = Modifier
+) {
     Row(modifier) {
         TenSecsBackButton(
             player = player,

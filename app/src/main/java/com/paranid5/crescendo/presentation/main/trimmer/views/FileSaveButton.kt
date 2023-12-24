@@ -34,7 +34,7 @@ fun FileSaveButton(
     val trimRange by viewModel.trimRangeFlow.collectAsState(initial = TrimRange())
 
     val isClickable by remember(trimRange) {
-        derivedStateOf { trimRange.totalDurationSecs > 0 }
+        derivedStateOf { trimRange.totalDurationMillis > 0 }
     }
 
     Button(

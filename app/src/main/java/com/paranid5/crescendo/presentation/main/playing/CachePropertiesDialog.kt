@@ -50,23 +50,21 @@ fun CachePropertiesDialog(
     val colors = LocalAppColors.current.colorScheme
     val currentMetadata by storageHandler.currentMetadataState.collectAsState()
 
-    val lengthInSecs by remember {
-        derivedStateOf {
-            currentMetadata?.durationMillis?.let { it / 1000 } ?: 0
-        }
+    val durationMillis by remember(currentMetadata) {
+        derivedStateOf { currentMetadata?.durationMillis ?: 0 }
     }
 
-    val trimOffsetSecsState = remember { mutableLongStateOf(0) }
-    val totalDurationSecsState = remember { mutableLongStateOf(lengthInSecs) }
+    val trimOffsetMillisState = remember { mutableLongStateOf(0) }
+    val totalDurationMillisState = remember { mutableLongStateOf(durationMillis) }
 
-    val trimOffsetSecs by trimOffsetSecsState
-    val totalDurationSecs by totalDurationSecsState
+    val trimOffsetMillis by trimOffsetMillisState
+    val totalDurationMillis by totalDurationMillisState
 
     val trimRange by remember {
         derivedStateOf {
             TrimRange(
-                startPointSecs = trimOffsetSecs,
-                totalDurationSecs = totalDurationSecs
+                startPointMillis = trimOffsetMillis,
+                totalDurationMillis = totalDurationMillis
             )
         }
     }

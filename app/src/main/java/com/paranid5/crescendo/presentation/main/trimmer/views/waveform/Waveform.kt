@@ -7,6 +7,7 @@ import androidx.compose.runtime.State
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Size
 import com.paranid5.crescendo.presentation.main.trimmer.TrimmerViewModel
+import kotlinx.coroutines.flow.MutableSharedFlow
 
 @Composable
 fun Waveform(
@@ -24,5 +25,5 @@ fun Waveform(
         modifier = modifier
     )
 
-    TrimmedZone(viewModel = viewModel, modifier = modifier)
+    TrimmedZone(viewModel, modifier)
 }

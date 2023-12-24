@@ -14,6 +14,8 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.paranid5.crescendo.R
+import com.paranid5.crescendo.presentation.composition_locals.LocalTrimmerFocusPoints
+import com.paranid5.crescendo.presentation.main.trimmer.FocusPoints
 import com.paranid5.crescendo.presentation.main.trimmer.TrimmerViewModel
 import com.paranid5.crescendo.presentation.main.trimmer.properties.isPlayingState
 import com.paranid5.crescendo.presentation.main.trimmer.properties.setPlaying
@@ -25,10 +27,11 @@ fun PlayPauseButton(
     modifier: Modifier = Modifier
 ) {
     val colors = LocalAppColors.current
+    val focusPoints = LocalTrimmerFocusPoints.current!!
     val isPlaying by viewModel.isPlayingState.collectAsState()
 
     IconButton(
-        onClick = { viewModel.setPlaying(!isPlaying) },
+        onClick = { onClick(isPlaying, viewModel, focusPoints) },
         modifier = modifier
             .size(48.dp)
             .background(color = colors.secondary, shape = CircleShape)
@@ -62,4 +65,18 @@ private fun PauseIcon(modifier: Modifier = Modifier) {
         tint = colors.background,
         modifier = modifier
     )
+}
+
+private fun onClick(
+    isPlaying: Boolean,
+    viewModel: TrimmerViewModel,
+    focusPoints: FocusPoints
+) {
+    val newPlaying = !isPlaying
+    viewModel.setPlaying(newPlaying)
+
+    if (newPlaying)
+        focusPoints
+            .playbackFocusRequester
+            .requestFocus()
 }

@@ -8,6 +8,7 @@ import com.paranid5.crescendo.domain.caching.Formats
 import com.paranid5.crescendo.domain.caching.audioFileExt
 import com.paranid5.crescendo.domain.trimming.FadeDurations
 import com.paranid5.crescendo.domain.trimming.PitchAndSpeed
+import com.paranid5.crescendo.domain.trimming.totalDurationSecs
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.withContext
@@ -79,9 +80,9 @@ private fun ffmpegTrimCommand(
     trimRange: TrimRange,
     pitchAndSpeed: PitchAndSpeed,
     fadeDurations: FadeDurations
-) = "-y -ss ${trimRange.startPointSecs} " +
+) = "-y -ss ${trimRange.startPointMillis}ms " +
         "-i \"$inputPath\" " +
-        "-t ${trimRange.totalDurationSecs} " +
+        "-t ${trimRange.totalDurationMillis}ms " +
         "-af asetrate=44100*${pitchAndSpeed.pitch}," +
         "aresample=44100," +
         "atempo=${pitchAndSpeed.speed}," +

@@ -48,6 +48,7 @@ fun WaveformWithPosition(
     Column(modifier.horizontalScroll(waveformScrollState)) {
         TrimWaveform(
             viewModel = viewModel,
+            waveformScrollState = waveformScrollState,
             modifier = Modifier
                 .weight(1F)
                 .align(Alignment.CenterHorizontally)

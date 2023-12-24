@@ -40,9 +40,10 @@ internal const val PLAYBACK_CIRCLE_CENTER = 8F
 
 internal const val WAVEFORM_SPIKE_WIDTH_RATIO = 5
 
-internal const val WAVEFORM_PADDING = CONTROLLER_CIRCLE_RADIUS +
-        CONTROLLER_CIRCLE_CENTER / 2 +
-        CONTROLLER_RECT_WIDTH
+internal const val WAVEFORM_PADDING =
+    (CONTROLLER_CIRCLE_RADIUS +
+            CONTROLLER_CIRCLE_CENTER / 2 +
+            CONTROLLER_RECT_WIDTH).toInt()
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable

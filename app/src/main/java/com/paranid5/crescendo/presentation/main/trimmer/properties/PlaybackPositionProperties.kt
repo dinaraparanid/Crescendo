@@ -42,7 +42,10 @@ fun TrimmerViewModel.setFadeOutSecs(fadeOutSecs: Long) =
     playbackPositionStateHolder.setFadeOutSecs(fadeOutSecs)
 
 inline val TrimmerViewModel.startOffsetFlow
-    get() = combine(startPosInMillisState, trackDurationInMillisFlow) { startMillis, durationInMillis ->
+    get() = combine(
+        startPosInMillisState,
+        trackDurationInMillisFlow
+    ) { startMillis, durationInMillis ->
         startMillis safeDiv durationInMillis
     }
 
@@ -68,8 +71,8 @@ inline val TrimmerViewModel.trimRangeFlow
         trimmedDurationInMillisFlow
     ) { startMillis, trimmedDurationMillis ->
         TrimRange(
-            startPointSecs = startMillis / 1000,
-            totalDurationSecs = trimmedDurationMillis / 1000
+            startPointMillis = startMillis,
+            totalDurationMillis = trimmedDurationMillis
         )
     }
 

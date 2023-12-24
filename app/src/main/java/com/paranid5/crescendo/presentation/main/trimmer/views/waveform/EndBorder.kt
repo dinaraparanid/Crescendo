@@ -23,10 +23,10 @@ import com.paranid5.crescendo.presentation.main.trimmer.CONTROLLER_RECT_OFFSET
 import com.paranid5.crescendo.presentation.main.trimmer.CONTROLLER_RECT_WIDTH
 import com.paranid5.crescendo.presentation.main.trimmer.TrimmerViewModel
 import com.paranid5.crescendo.presentation.main.trimmer.WAVEFORM_SPIKE_WIDTH_RATIO
-import com.paranid5.crescendo.presentation.main.trimmer.properties.trackDurationInMillisFlow
 import com.paranid5.crescendo.presentation.main.trimmer.properties.endPosInMillisState
 import com.paranid5.crescendo.presentation.main.trimmer.properties.setEndPosInMillis
 import com.paranid5.crescendo.presentation.main.trimmer.properties.startPosInMillisState
+import com.paranid5.crescendo.presentation.main.trimmer.properties.trackDurationInMillisFlow
 import com.paranid5.crescendo.presentation.ui.theme.LocalAppColors
 
 @Composable

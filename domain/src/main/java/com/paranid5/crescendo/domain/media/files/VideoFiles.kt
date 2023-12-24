@@ -68,7 +68,11 @@ private inline fun MediaFile.VideoFile.toAudioFile(
 
 suspend fun MediaFile.VideoFile.toMP3Async(trimRange: TrimRange) =
     toAudioFileImplAsync(audioFormat = Formats.MP3) { newFile ->
-        "-y -i \"$absolutePath\" -ss ${trimRange.startPointSecs} -to ${trimRange.totalDurationSecs} -vn -acodec libmp3lame -qscale:a 2 \"${newFile.absolutePath}\""
+        "-y -i \"$absolutePath\" " +
+                "-ss ${trimRange.startPointMillis}ms " +
+                "-to ${trimRange.totalDurationMillis}ms " +
+                "-vn -acodec libmp3lame " +
+                "-qscale:a 2 \"${newFile.absolutePath}\""
     }
 
 /**
@@ -78,7 +82,11 @@ suspend fun MediaFile.VideoFile.toMP3Async(trimRange: TrimRange) =
 
 suspend fun MediaFile.VideoFile.toWAVAsync(trimRange: TrimRange) =
     toAudioFileImplAsync(audioFormat = Formats.WAV) { newFile ->
-        "-y -i \"$absolutePath\" -ss ${trimRange.startPointSecs} -to ${trimRange.totalDurationSecs} -vn -acodec pcm_s16le -ar 44100 \"${newFile.absolutePath}\""
+        "-y -i \"$absolutePath\" " +
+                "-ss ${trimRange.startPointMillis}ms " +
+                "-to ${trimRange.totalDurationMillis}ms " +
+                "-vn -acodec pcm_s16le " +
+                "-ar 44100 \"${newFile.absolutePath}\""
     }
 
 /**
@@ -88,7 +96,11 @@ suspend fun MediaFile.VideoFile.toWAVAsync(trimRange: TrimRange) =
 
 suspend fun MediaFile.VideoFile.toAACAsync(trimRange: TrimRange) =
     toAudioFileImplAsync(audioFormat = Formats.AAC) { newFile ->
-        "-y -i \"$absolutePath\" -ss ${trimRange.startPointSecs} -to ${trimRange.totalDurationSecs} -vn -c:a aac -b:a 256k \"${newFile.absolutePath}\""
+        "-y -i \"$absolutePath\" " +
+                "-ss ${trimRange.startPointMillis}ms " +
+                "-to ${trimRange.totalDurationMillis}ms " +
+                "-vn -c:a aac " +
+                "-b:a 256k \"${newFile.absolutePath}\""
     }
 
 /**
