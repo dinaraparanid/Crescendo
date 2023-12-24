@@ -115,9 +115,7 @@ fun ContentScreen(
 
             TrimmerScreen(
                 viewModel = trimmerViewModel,
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(top = 16.dp, start = 8.dp, end = 8.dp)
+                modifier = Modifier.fillMaxSize()
             )
         }
 

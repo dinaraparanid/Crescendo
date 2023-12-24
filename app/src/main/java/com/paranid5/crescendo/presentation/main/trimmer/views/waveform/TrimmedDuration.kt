@@ -3,12 +3,15 @@ package com.paranid5.crescendo.presentation.main.trimmer.views.waveform
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
 import com.paranid5.crescendo.domain.utils.extensions.timeString
 import com.paranid5.crescendo.presentation.main.trimmer.TrimmerViewModel
+import com.paranid5.crescendo.presentation.main.trimmer.properties.speedState
 import com.paranid5.crescendo.presentation.main.trimmer.properties.trimmedDurationInMillisFlow
 import com.paranid5.crescendo.presentation.ui.theme.LocalAppColors
 
@@ -19,9 +22,14 @@ fun TrimmedDuration(
 ) {
     val colors = LocalAppColors.current
     val duration by viewModel.trimmedDurationInMillisFlow.collectAsState(initial = 0L)
+    val speed by viewModel.speedState.collectAsState()
+
+    val trimmedDuration by remember(duration, speed) {
+        derivedStateOf { (duration / speed).toLong() }
+    }
 
     Text(
-        text = duration.timeString,
+        text = trimmedDuration.timeString,
         fontSize = 16.sp,
         fontWeight = FontWeight.Bold,
         color = colors.primary,

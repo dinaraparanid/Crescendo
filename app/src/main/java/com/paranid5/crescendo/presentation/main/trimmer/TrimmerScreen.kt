@@ -1,5 +1,7 @@
 package com.paranid5.crescendo.presentation.main.trimmer
 
+import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.ModalBottomSheetLayout
@@ -76,14 +78,15 @@ fun TrimmerScreen(
             EffectsBottomSheet(
                 effects = shownEffects,
                 viewModel = viewModel,
-                alpha = 0F
+                alpha = 0F,
             )
         },
     ) {
         CompositionLocalProvider(LocalTrimmerEffectSheetState provides effectsScaffoldState) {
             TrimmerScreenContent(
                 viewModel = viewModel,
-                shownEffectsState = shownEffectsState
+                shownEffectsState = shownEffectsState,
+                modifier = Modifier.padding(top = 16.dp, start = 8.dp, end = 8.dp)
             )
         }
     }
