@@ -19,6 +19,7 @@ import androidx.compose.ui.unit.sp
 import com.paranid5.crescendo.R
 import com.paranid5.crescendo.domain.trimming.TrimRange
 import com.paranid5.crescendo.presentation.main.trimmer.TrimmerViewModel
+import com.paranid5.crescendo.presentation.main.trimmer.properties.trackDurationInMillisFlow
 import com.paranid5.crescendo.presentation.main.trimmer.properties.trimRangeFlow
 import com.paranid5.crescendo.presentation.ui.theme.LocalAppColors
 
@@ -32,9 +33,10 @@ fun FileSaveButton(
     val colors = LocalAppColors.current
     var isFileSaveDialogShown by isFileSaveDialogShownState
     val trimRange by viewModel.trimRangeFlow.collectAsState(initial = TrimRange())
+    val trackDurationMillis by viewModel.trackDurationInMillisFlow.collectAsState(initial = 0L)
 
-    val isClickable by remember(trimRange) {
-        derivedStateOf { trimRange.totalDurationMillis > 0 }
+    val isClickable by remember(trimRange, trackDurationMillis) {
+        derivedStateOf { trimRange.totalDurationMillis in 1..trackDurationMillis }
     }
 
     Button(

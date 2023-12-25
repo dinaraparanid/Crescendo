@@ -2,6 +2,8 @@ package com.paranid5.crescendo.presentation.main.trimmer.effects.playback
 
 import com.paranid5.crescendo.presentation.main.trimmer.TrimmerViewModel
 import com.paranid5.crescendo.presentation.main.trimmer.properties.isPlaybackTaskFinishedState
+import com.paranid5.crescendo.presentation.main.trimmer.properties.resetZoom
+import com.paranid5.crescendo.presentation.main.trimmer.properties.resetZoomSteps
 import com.paranid5.crescendo.presentation.main.trimmer.properties.setFadeInSecs
 import com.paranid5.crescendo.presentation.main.trimmer.properties.setFadeOutSecs
 import com.paranid5.crescendo.presentation.main.trimmer.properties.setPitch
@@ -28,6 +30,7 @@ suspend fun TrimmerViewModel.notifyPlaybackTaskFinished() {
 fun TrimmerViewModel.resetPlaybackStates() {
     resetPlayerStates()
     resetAudioEffects()
+    resetZoomStates()
 }
 
 private fun TrimmerViewModel.resetPlayerStates() {
@@ -42,6 +45,11 @@ private fun TrimmerViewModel.resetAudioEffects() {
     setFadeOutSecs(0)
     setPitch(1F)
     setSpeed(1F)
+}
+
+private fun TrimmerViewModel.resetZoomStates() {
+    resetZoom()
+    resetZoomSteps()
 }
 
 suspend fun TrimmerViewModel.pausePlayback() {

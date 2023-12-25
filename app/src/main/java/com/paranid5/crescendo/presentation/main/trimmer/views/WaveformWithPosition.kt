@@ -6,10 +6,8 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
@@ -40,29 +38,27 @@ fun WaveformWithPosition(
     spikeWidthRatio: Int = WAVEFORM_SPIKE_WIDTH_RATIO,
     spaceBetween: Dp = 2.dp
 ) {
-    val waveformScrollState = rememberScrollState()
+    val waveformScrollState = LocalTrimmerWaveformScrollState.current!!
 
     val playbackTextOffsetAnim = animatePlaybackTextOffsetAsState(
         viewModel = viewModel,
         spikeWidthRatio = spikeWidthRatio
     )
 
-    CompositionLocalProvider(LocalTrimmerWaveformScrollState provides waveformScrollState) {
-        Column(modifier.horizontalScroll(waveformScrollState)) {
-            TrimWaveform(
-                viewModel = viewModel,
-                modifier = Modifier
-                    .weight(1F)
-                    .align(Alignment.CenterHorizontally)
-            )
+    Column(modifier.horizontalScroll(waveformScrollState)) {
+        TrimWaveform(
+            viewModel = viewModel,
+            modifier = Modifier
+                .weight(1F)
+                .align(Alignment.CenterHorizontally)
+        )
 
-            Spacer(Modifier.height(spaceBetween))
+        Spacer(Modifier.height(spaceBetween))
 
-            PlaybackPositionText(
-                viewModel = viewModel,
-                modifier = Modifier.offset(x = playbackTextOffsetAnim.dp)
-            )
-        }
+        PlaybackPositionText(
+            viewModel = viewModel,
+            modifier = Modifier.offset(x = playbackTextOffsetAnim.dp)
+        )
     }
 }
 

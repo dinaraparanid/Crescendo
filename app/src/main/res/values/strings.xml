@@ -97,4 +97,6 @@
     <string name="fade">Fade</string>
     <string name="fade_in">Fade In</string>
     <string name="fade_out">Fade Out</string>
+    <string name="zoom_in">Zoom In</string>
+    <string name="zoom_out">Zoom Out</string>
 </resources>

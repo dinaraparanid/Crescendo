@@ -4,22 +4,28 @@ import android.content.res.Configuration
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.MutableIntState
 import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.unit.dp
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.constraintlayout.compose.Dimension
 import com.paranid5.crescendo.presentation.composition_locals.trimmer.LocalTrimmerFocusPoints
 import com.paranid5.crescendo.presentation.composition_locals.trimmer.LocalTrimmerPositionBroadcast
+import com.paranid5.crescendo.presentation.composition_locals.trimmer.LocalTrimmerWaveformScrollState
 import com.paranid5.crescendo.presentation.main.trimmer.FocusPoints
 import com.paranid5.crescendo.presentation.main.trimmer.TrimmerViewModel
 import com.paranid5.crescendo.presentation.main.trimmer.WAVEFORM_SPIKE_WIDTH_RATIO
@@ -36,10 +42,17 @@ fun TrimmerScreenContent(
         mutableStateOf(false)
     }
 
-    Box(modifier) {
+    val screenWidthPxState = remember {
+        mutableIntStateOf(1)
+    }
+
+    var screenWidthPx by screenWidthPxState
+
+    Box(modifier.onGloballyPositioned { screenWidthPx = it.size.width }) {
         TrimmerScreenContentOriented(
             viewModel = viewModel,
             shownEffectsState = shownEffectsState,
+            screenWidthPxState = screenWidthPxState,
             isFileSaveDialogShownState = isFileSaveDialogShownState
         )
 
@@ -56,6 +69,7 @@ fun TrimmerScreenContent(
 private fun TrimmerScreenContentOriented(
     viewModel: TrimmerViewModel,
     shownEffectsState: MutableIntState,
+    screenWidthPxState: MutableIntState,
     isFileSaveDialogShownState: MutableState<Boolean>
 ) {
     val config = LocalConfiguration.current
@@ -68,19 +82,20 @@ private fun TrimmerScreenContentOriented(
         FocusPoints(startBorder, playback, endBorder)
     }
 
-    val positionBroadcast = remember {
-        MutableSharedFlow<Long>()
-    }
+    val positionBroadcast = remember { MutableSharedFlow<Long>() }
+    val waveformScrollState = rememberScrollState()
 
     CompositionLocalProvider(
         LocalTrimmerFocusPoints provides focusPoints,
-        LocalTrimmerPositionBroadcast provides positionBroadcast
+        LocalTrimmerPositionBroadcast provides positionBroadcast,
+        LocalTrimmerWaveformScrollState provides waveformScrollState
     ) {
         when (config.orientation) {
             Configuration.ORIENTATION_LANDSCAPE ->
                 TrimmerScreenContentLandscape(
                     viewModel = viewModel,
                     shownEffectsState = shownEffectsState,
+                    screenWidthPxState = screenWidthPxState,
                     isFileSaveDialogShownState = isFileSaveDialogShownState,
                     modifier = Modifier.fillMaxSize()
                 )
@@ -88,6 +103,7 @@ private fun TrimmerScreenContentOriented(
             else -> TrimmerScreenContentPortrait(
                 viewModel = viewModel,
                 shownEffectsState = shownEffectsState,
+                screenWidthPxState = screenWidthPxState,
                 isFileSaveDialogShownState = isFileSaveDialogShownState,
                 modifier = Modifier.fillMaxSize()
             )
@@ -99,6 +115,7 @@ private fun TrimmerScreenContentOriented(
 private fun TrimmerScreenContentPortrait(
     viewModel: TrimmerViewModel,
     shownEffectsState: MutableIntState,
+    screenWidthPxState: MutableIntState,
     isFileSaveDialogShownState: MutableState<Boolean>,
     modifier: Modifier = Modifier
 ) = ConstraintLayout(modifier) {
@@ -107,6 +124,7 @@ private fun TrimmerScreenContentPortrait(
         waveform,
         effects,
         duration,
+        zoom,
         playbackButtons,
         controllers,
         saveButton
@@ -149,6 +167,16 @@ private fun TrimmerScreenContentPortrait(
         }
     )
 
+    ZoomControllers(
+        viewModel = viewModel,
+        screenWidthPxState = screenWidthPxState,
+        modifier = Modifier.constrainAs(zoom) {
+            top.linkTo(effects.top)
+            bottom.linkTo(effects.bottom)
+            end.linkTo(parent.end, margin = 8.dp)
+        }
+    )
+
     PlaybackButtons(
         viewModel = viewModel,
         modifier = Modifier.constrainAs(playbackButtons) { centerTo(parent) }
@@ -177,6 +205,7 @@ private fun TrimmerScreenContentPortrait(
 private fun TrimmerScreenContentLandscape(
     viewModel: TrimmerViewModel,
     shownEffectsState: MutableIntState,
+    screenWidthPxState: MutableIntState,
     isFileSaveDialogShownState: MutableState<Boolean>,
     modifier: Modifier = Modifier
 ) = ConstraintLayout(modifier) {
@@ -185,6 +214,7 @@ private fun TrimmerScreenContentLandscape(
         waveform,
         effects,
         duration,
+        zoom,
         playbackButtons,
         controllers,
         saveButton
@@ -223,6 +253,16 @@ private fun TrimmerScreenContentLandscape(
             top.linkTo(effects.top)
             bottom.linkTo(effects.bottom)
             centerHorizontallyTo(controllers)
+        }
+    )
+
+    ZoomControllers(
+        viewModel = viewModel,
+        screenWidthPxState = screenWidthPxState,
+        modifier = Modifier.constrainAs(zoom) {
+            top.linkTo(effects.top)
+            bottom.linkTo(effects.bottom)
+            end.linkTo(parent.end, margin = 8.dp)
         }
     )
 

@@ -20,6 +20,7 @@ import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.drawscope.Fill
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.unit.Dp
+import com.paranid5.crescendo.domain.utils.extensions.forEachIndexedStepped
 import com.paranid5.crescendo.presentation.composition_locals.trimmer.LocalTrimmerFocusPoints
 import com.paranid5.crescendo.presentation.composition_locals.trimmer.LocalTrimmerWaveformScrollState
 import com.paranid5.crescendo.presentation.main.trimmer.CONTROLLER_CIRCLE_RADIUS
@@ -30,6 +31,7 @@ import com.paranid5.crescendo.presentation.main.trimmer.WAVEFORM_SPIKE_WIDTH_RAT
 import com.paranid5.crescendo.presentation.main.trimmer.properties.endOffsetFlow
 import com.paranid5.crescendo.presentation.main.trimmer.properties.isPlayingState
 import com.paranid5.crescendo.presentation.main.trimmer.properties.startOffsetFlow
+import com.paranid5.crescendo.presentation.main.trimmer.properties.zoomState
 import com.paranid5.crescendo.presentation.ui.extensions.pxToDp
 import com.paranid5.crescendo.presentation.ui.theme.LocalAppColors
 
@@ -49,6 +51,7 @@ fun WaveformSpikes(
     val startOffset by viewModel.startOffsetFlow.collectAsState(initial = 0F)
     val endOffset by viewModel.endOffsetFlow.collectAsState(initial = 0F)
     val isPlaying by viewModel.isPlayingState.collectAsState()
+    val zoom by viewModel.zoomState.collectAsState()
 
     var canvasSize by canvasSizeState
     var spikes by spikesState
@@ -58,7 +61,7 @@ fun WaveformSpikes(
         canvasSize = size
         spikes = size.width
 
-        spikesAmplitudes.forEachIndexed { index, amplitude ->
+        spikesAmplitudes.forEachIndexedStepped(step = zoom + 1) { index, amplitude ->
             drawSpike(index, amplitude, waveformBrush)
         }
 
