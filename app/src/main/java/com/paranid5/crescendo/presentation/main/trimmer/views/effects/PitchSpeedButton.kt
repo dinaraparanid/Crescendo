@@ -18,7 +18,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.paranid5.crescendo.R
-import com.paranid5.crescendo.presentation.composition_locals.LocalTrimmerEffectSheetState
+import com.paranid5.crescendo.presentation.composition_locals.trimmer.LocalTrimmerEffectSheetState
 import com.paranid5.crescendo.presentation.main.trimmer.ShownEffects
 import com.paranid5.crescendo.presentation.ui.theme.LocalAppColors
 import kotlinx.coroutines.launch

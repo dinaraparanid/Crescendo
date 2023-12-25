@@ -56,7 +56,7 @@ fun ConfirmButton(
                 trimmerUIHandler.trimTrackAndSendBroadcast(
                     context = context.applicationContext,
                     track = track,
-                    outputFilename = outputFilename,
+                    outputFilename = outputFilename.trim(),
                     audioFormat = audioFormat,
                     trimRange = trimRange,
                     pitchAndSpeed = pitchAndSpeed,

@@ -70,7 +70,11 @@ fun CachePropertiesDialog(
     }
 
     val filenameState = remember { mutableStateOf("") }
-    val isButtonClickable by remember { derivedStateOf { filenameState.value.isNotEmpty() } }
+    val filename by filenameState
+
+    val isButtonClickable by remember(filename) {
+        derivedStateOf { filename.isNotBlank() }
+    }
 
     val fileSaveOptions = arrayOf(
         stringResource(R.string.mp3),
@@ -80,13 +84,16 @@ fun CachePropertiesDialog(
     )
 
     val selectedSaveOptionIndexState = remember { mutableIntStateOf(0) }
+    val selectedSaveOptionIndex by selectedSaveOptionIndexState
 
-    val format by remember {
-        derivedStateOf { Formats.entries[selectedSaveOptionIndexState.intValue] }
+    val format by remember(selectedSaveOptionIndex) {
+        derivedStateOf { Formats.entries[selectedSaveOptionIndex] }
     }
 
-    if (isDialogShownState.value)
-        AlertDialog(onDismissRequest = { isDialogShownState.value = false }) {
+    var isDialogShown by isDialogShownState
+
+    if (isDialogShown)
+        AlertDialog(onDismissRequest = { isDialogShown = false }) {
             Card(
                 modifier = modifier.fillMaxWidth(),
                 shape = RoundedCornerShape(20.dp),

@@ -153,7 +153,7 @@ private fun ConfirmButton(
 
                 scope.launch {
                     storageHandler.storeAudioStatus(AudioStatus.STREAMING)
-                    fetchStreamUIHandler.startStreaming(inputText)
+                    fetchStreamUIHandler.startStreaming(inputText.trim())
                     playingPagerState?.animateScrollToPage(1)
                     playingSheetState?.bottomSheetState?.expand()
                 }

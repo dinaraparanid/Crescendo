@@ -18,12 +18,11 @@ import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.unit.dp
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.constraintlayout.compose.Dimension
-import com.paranid5.crescendo.presentation.composition_locals.LocalTrimmerFocusPoints
-import com.paranid5.crescendo.presentation.composition_locals.LocalTrimmerPositionBroadcast
+import com.paranid5.crescendo.presentation.composition_locals.trimmer.LocalTrimmerFocusPoints
+import com.paranid5.crescendo.presentation.composition_locals.trimmer.LocalTrimmerPositionBroadcast
 import com.paranid5.crescendo.presentation.main.trimmer.FocusPoints
 import com.paranid5.crescendo.presentation.main.trimmer.TrimmerViewModel
 import com.paranid5.crescendo.presentation.main.trimmer.WAVEFORM_SPIKE_WIDTH_RATIO
-import com.paranid5.crescendo.presentation.main.trimmer.views.playback.PlaybackButtons
 import com.paranid5.crescendo.presentation.main.trimmer.views.waveform.TrimmedDuration
 import kotlinx.coroutines.flow.MutableSharedFlow
 

@@ -15,7 +15,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.sp
 import com.paranid5.crescendo.R
-import com.paranid5.crescendo.domain.utils.extensions.timeString
+import com.paranid5.crescendo.domain.utils.extensions.timeStringMs
 import com.paranid5.crescendo.domain.utils.extensions.toTimeOrNull
 import com.paranid5.crescendo.presentation.main.trimmer.TrimmerViewModel
 import com.paranid5.crescendo.presentation.main.trimmer.properties.endPosInMillisState
@@ -24,6 +24,9 @@ import com.paranid5.crescendo.presentation.main.trimmer.properties.setStartPosIn
 import com.paranid5.crescendo.presentation.main.trimmer.properties.startPosInMillisState
 import com.paranid5.crescendo.presentation.ui.theme.LocalAppColors
 import com.paranid5.crescendo.presentation.ui.utils.DefaultOutlinedTextField
+
+/** hh:mm:ss.xxx */
+private const val CORRECT_TIME_INPUT_LENGTH = 2 + 1 + 2 + 1 + 2 + 1 + 3
 
 @Composable
 fun BorderControllers(
@@ -38,63 +41,60 @@ fun BorderControllers(
 }
 
 @Composable
-private fun StartController(
-    viewModel: TrimmerViewModel,
-    modifier: Modifier = Modifier
-) {
-    val colors = LocalAppColors.current
-
+private fun StartController(viewModel: TrimmerViewModel, modifier: Modifier = Modifier) {
     val startMillis by viewModel.startPosInMillisState.collectAsState()
 
-    var startMillisStr by remember(startMillis) {
-        mutableStateOf(startMillis.timeString)
+    BorderController(
+        label = stringResource(R.string.start_time),
+        millis = startMillis,
+        setMillis = viewModel::setStartPosInMillis,
+        modifier = modifier
+    )
+}
+
+@Composable
+private fun EndController(viewModel: TrimmerViewModel, modifier: Modifier = Modifier) {
+    val endMillis by viewModel.endPosInMillisState.collectAsState()
+
+    BorderController(
+        label = stringResource(R.string.end_time),
+        millis = endMillis,
+        setMillis = viewModel::setEndPosInMillis,
+        modifier = modifier
+    )
+}
+
+@Composable
+private fun BorderController(
+    label: String,
+    millis: Long,
+    setMillis: (Long) -> Unit,
+    modifier: Modifier = Modifier
+) {
+    var millisStr by remember(millis) {
+        mutableStateOf(millis.timeStringMs)
     }
 
     DefaultOutlinedTextField(
-        value = startMillisStr,
+        value = millisStr,
         modifier = modifier,
         onValueChange = {
-            startMillisStr = it.take(8)
-            it.toTimeOrNull()?.let(viewModel::setStartPosInMillis)
+            millisStr = it.take(CORRECT_TIME_INPUT_LENGTH)
+            it.toTimeOrNull()?.let(setMillis)
         },
-        label = {
-            Text(
-                text = stringResource(R.string.start_time),
-                color = colors.primary,
-                fontSize = 12.sp,
-            )
-        },
+        label = { BorderControllerLabel(label) },
         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Ascii)
     )
 }
 
 @Composable
-private fun EndController(
-    viewModel: TrimmerViewModel,
-    modifier: Modifier = Modifier
-) {
+private fun BorderControllerLabel(text: String, modifier: Modifier = Modifier) {
     val colors = LocalAppColors.current
 
-    val endMillis by viewModel.endPosInMillisState.collectAsState()
-
-    var endMillisStr by remember(endMillis) {
-        mutableStateOf(endMillis.timeString)
-    }
-
-    DefaultOutlinedTextField(
-        value = endMillisStr,
-        modifier = modifier,
-        onValueChange = {
-            endMillisStr = it.take(8)
-            it.toTimeOrNull()?.let(viewModel::setEndPosInMillis)
-        },
-        label = {
-            Text(
-                text = stringResource(R.string.end_time),
-                color = colors.primary,
-                fontSize = 12.sp,
-            )
-        },
-        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Ascii)
+    Text(
+        text = text,
+        color = colors.primary,
+        fontSize = 12.sp,
+        modifier = modifier
     )
 }

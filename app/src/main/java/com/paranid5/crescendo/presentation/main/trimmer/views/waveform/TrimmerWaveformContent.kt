@@ -1,7 +1,7 @@
 package com.paranid5.crescendo.presentation.main.trimmer.views.waveform
 
 import androidx.compose.animation.core.animateFloatAsState
-import androidx.compose.foundation.ScrollState
+import androidx.compose.foundation.focusable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.offset
@@ -24,7 +24,9 @@ import androidx.compose.ui.focus.onFocusEvent
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
-import com.paranid5.crescendo.presentation.composition_locals.LocalTrimmerFocusPoints
+import com.paranid5.crescendo.presentation.composition_locals.trimmer.LocalTrimmerFocusPoints
+import com.paranid5.crescendo.presentation.composition_locals.trimmer.LocalTrimmerWaveformScrollState
+import com.paranid5.crescendo.presentation.main.trimmer.CONTROLLER_CIRCLE_RADIUS
 import com.paranid5.crescendo.presentation.main.trimmer.TrimmerViewModel
 import com.paranid5.crescendo.presentation.main.trimmer.WAVEFORM_PADDING
 import com.paranid5.crescendo.presentation.main.trimmer.WAVEFORM_SPIKE_WIDTH_RATIO
@@ -35,12 +37,12 @@ import com.paranid5.crescendo.presentation.main.trimmer.properties.playbackOffse
 import com.paranid5.crescendo.presentation.main.trimmer.properties.startOffsetFlow
 import com.paranid5.crescendo.presentation.main.trimmer.properties.waveformWidthFlow
 import com.paranid5.crescendo.presentation.ui.extensions.pxToDp
+import com.paranid5.crescendo.presentation.ui.extensions.toPx
 import kotlinx.coroutines.launch
 
 @Composable
 fun TrimmerWaveformContent(
     viewModel: TrimmerViewModel,
-    waveformScrollState: ScrollState,
     canvasSizeState: MutableState<Size>,
     spikesState: MutableFloatState,
     spikesAmplitudesState: State<List<Float>>,
@@ -52,6 +54,7 @@ fun TrimmerWaveformContent(
     Box(modifier) {
         Waveform(
             viewModel = viewModel,
+            spikeWidthRatio = spikeWidthRatio,
             canvasSizeState = canvasSizeState,
             spikesState = spikesState,
             spikesAmplitudesState = spikesAmplitudesState,
@@ -64,7 +67,6 @@ fun TrimmerWaveformContent(
             modifier = Modifier.startBorderModifier(
                 viewModel = viewModel,
                 waveformWidth = waveformWidth,
-                waveformScrollState = waveformScrollState
             )
         )
 
@@ -74,7 +76,6 @@ fun TrimmerWaveformContent(
             modifier = Modifier.endBorderModifier(
                 viewModel = viewModel,
                 waveformWidth = waveformWidth,
-                waveformScrollState = waveformScrollState
             )
         )
 
@@ -82,14 +83,13 @@ fun TrimmerWaveformContent(
             modifier = Modifier.playbackOffsetModifier(
                 viewModel = viewModel,
                 waveformWidth = waveformWidth,
-                waveformScrollState = waveformScrollState
             )
         )
     }
 }
 
 @Composable
-private fun collectWaveformWidthAsState(
+internal fun collectWaveformWidthAsState(
     viewModel: TrimmerViewModel,
     spikeWidthRatio: Int
 ) = viewModel
@@ -107,15 +107,18 @@ private fun Modifier.waveformModifier(waveformWidth: Int) =
 private fun Modifier.startBorderModifier(
     viewModel: TrimmerViewModel,
     waveformWidth: Int,
-    waveformScrollState: ScrollState
 ): Modifier {
     val focusPoints = LocalTrimmerFocusPoints.current!!
+    val waveformScrollState = LocalTrimmerWaveformScrollState.current!!
     val coroutineScope = rememberCoroutineScope()
 
     val startBorderOffset by rememberStartBorderOffsetAsState(
         viewModel = viewModel,
         waveformWidth = waveformWidth
     )
+
+    val controllerCircleRadiusPx = CONTROLLER_CIRCLE_RADIUS.dp.toPx().toInt()
+    val startBorderOffsetPx = startBorderOffset.dp.toPx().toInt()
 
     return this
         .offset(x = startBorderOffset.dp)
@@ -125,25 +128,31 @@ private fun Modifier.startBorderModifier(
         .onFocusEvent {
             if (it.isFocused)
                 coroutineScope.launch {
-                    waveformScrollState.animateScrollTo(startBorderOffset)
+                    waveformScrollState.animateScrollTo(
+                        startBorderOffsetPx - controllerCircleRadiusPx
+                    )
                 }
         }
-        .focusTarget()
+        .focusable()
 }
 
 @Composable
 private fun Modifier.endBorderModifier(
     viewModel: TrimmerViewModel,
     waveformWidth: Int,
-    waveformScrollState: ScrollState
 ): Modifier {
     val focusPoints = LocalTrimmerFocusPoints.current!!
+    val waveformScrollState = LocalTrimmerWaveformScrollState.current!!
     val coroutineScope = rememberCoroutineScope()
 
     val endBorderOffset by rememberEndBorderOffsetAsState(
         viewModel = viewModel,
         waveformWidth = waveformWidth
     )
+
+    val controllerCircleRadiusPx = CONTROLLER_CIRCLE_RADIUS.dp.toPx().toInt()
+    val endBorderOffsetPx = endBorderOffset.dp.toPx().toInt()
+    val waveformViewport = waveformScrollState.viewportSize
 
     return this
         .offset(x = endBorderOffset.dp)
@@ -153,19 +162,22 @@ private fun Modifier.endBorderModifier(
         .onFocusEvent {
             if (it.isFocused)
                 coroutineScope.launch {
-                    waveformScrollState.animateScrollTo(endBorderOffset)
+                    waveformScrollState.animateScrollTo(
+                        endBorderOffsetPx - waveformViewport + controllerCircleRadiusPx
+                    )
                 }
         }
-        .focusTarget()
+        .focusable()
 }
 
 @Composable
 private fun Modifier.playbackOffsetModifier(
     viewModel: TrimmerViewModel,
     waveformWidth: Int,
-    waveformScrollState: ScrollState
 ): Modifier {
     val focusPoints = LocalTrimmerFocusPoints.current!!
+    val waveformScrollState = LocalTrimmerWaveformScrollState.current!!
+
     val isPlaying by viewModel.isPlayingState.collectAsState()
     val coroutineScope = rememberCoroutineScope()
 
@@ -174,6 +186,8 @@ private fun Modifier.playbackOffsetModifier(
         waveformWidth = waveformWidth
     )
 
+    val playbackPositionOffsetPx = playbackPositionOffset.dp.toPx().toInt()
+    val waveformViewport = waveformScrollState.viewportSize
     val playbackAlphaAnim by animatePlaybackAlphaAsState(viewModel)
 
     return this
@@ -185,14 +199,16 @@ private fun Modifier.playbackOffsetModifier(
         .onFocusEvent {
             if (isPlaying && it.isFocused)
                 coroutineScope.launch {
-                    waveformScrollState.animateScrollTo(playbackPositionOffset)
+                    waveformScrollState.animateScrollTo(
+                        maxOf(playbackPositionOffsetPx - waveformViewport / 2, 0)
+                    )
                 }
         }
         .focusTarget()
 }
 
 @Composable
-private fun rememberStartBorderOffsetAsState(
+internal fun rememberStartBorderOffsetAsState(
     viewModel: TrimmerViewModel,
     waveformWidth: Int,
 ): State<Int> {
@@ -204,7 +220,7 @@ private fun rememberStartBorderOffsetAsState(
 }
 
 @Composable
-private fun rememberEndBorderOffsetAsState(
+internal fun rememberEndBorderOffsetAsState(
     viewModel: TrimmerViewModel,
     waveformWidth: Int,
 ): State<Int> {

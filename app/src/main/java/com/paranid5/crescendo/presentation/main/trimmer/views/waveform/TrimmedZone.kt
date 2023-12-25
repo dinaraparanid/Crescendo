@@ -12,7 +12,7 @@ import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.pointer.pointerInput
-import com.paranid5.crescendo.presentation.composition_locals.LocalTrimmerPositionBroadcast
+import com.paranid5.crescendo.presentation.composition_locals.trimmer.LocalTrimmerPositionBroadcast
 import com.paranid5.crescendo.presentation.main.trimmer.CONTROLLER_HEIGHT_OFFSET
 import com.paranid5.crescendo.presentation.main.trimmer.DEFAULT_GRAPHICS_LAYER_ALPHA
 import com.paranid5.crescendo.presentation.main.trimmer.TrimmerViewModel
@@ -57,7 +57,7 @@ private fun Modifier.trimmedZoneModifier(viewModel: TrimmerViewModel) =
 @Composable
 private fun Modifier.playbackPointerInput(viewModel: TrimmerViewModel): Modifier {
     val isPlaying by viewModel.isPlayingState.collectAsState()
-    return if (isPlaying) this.playbackModifier(viewModel) else this
+    return if (isPlaying) playbackModifier(viewModel) else this
 }
 
 @Composable

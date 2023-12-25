@@ -1,6 +1,9 @@
 package com.paranid5.crescendo.presentation.main.trimmer.views.waveform
 
 import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.offset
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableFloatState
 import androidx.compose.runtime.MutableState
@@ -16,11 +19,18 @@ import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.drawscope.Fill
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.unit.Dp
+import com.paranid5.crescendo.presentation.composition_locals.trimmer.LocalTrimmerFocusPoints
+import com.paranid5.crescendo.presentation.composition_locals.trimmer.LocalTrimmerWaveformScrollState
+import com.paranid5.crescendo.presentation.main.trimmer.CONTROLLER_CIRCLE_RADIUS
 import com.paranid5.crescendo.presentation.main.trimmer.CONTROLLER_HEIGHT_OFFSET
 import com.paranid5.crescendo.presentation.main.trimmer.DEFAULT_GRAPHICS_LAYER_ALPHA
 import com.paranid5.crescendo.presentation.main.trimmer.TrimmerViewModel
+import com.paranid5.crescendo.presentation.main.trimmer.WAVEFORM_SPIKE_WIDTH_RATIO
 import com.paranid5.crescendo.presentation.main.trimmer.properties.endOffsetFlow
+import com.paranid5.crescendo.presentation.main.trimmer.properties.isPlayingState
 import com.paranid5.crescendo.presentation.main.trimmer.properties.startOffsetFlow
+import com.paranid5.crescendo.presentation.ui.extensions.pxToDp
 import com.paranid5.crescendo.presentation.ui.theme.LocalAppColors
 
 @Composable
@@ -29,7 +39,8 @@ fun WaveformSpikes(
     spikesState: MutableFloatState,
     spikesAmplitudesState: State<List<Float>>,
     viewModel: TrimmerViewModel,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    spikeWidthRatio: Int = WAVEFORM_SPIKE_WIDTH_RATIO
 ) {
     val colors = LocalAppColors.current
     val waveformBrush = SolidColor(colors.backgroundAlternative)
@@ -37,6 +48,7 @@ fun WaveformSpikes(
 
     val startOffset by viewModel.startOffsetFlow.collectAsState(initial = 0F)
     val endOffset by viewModel.endOffsetFlow.collectAsState(initial = 0F)
+    val isPlaying by viewModel.isPlayingState.collectAsState()
 
     var canvasSize by canvasSizeState
     var spikes by spikesState
@@ -55,6 +67,163 @@ fun WaveformSpikes(
             endPoint = endOffset,
             progressWaveformBrush = progressWaveformBrush
         )
+    }
+
+    if (!isPlaying)
+        BorderSeekers(viewModel, spikeWidthRatio)
+}
+
+@Composable
+private fun BorderSeekers(viewModel: TrimmerViewModel, spikeWidthRatio: Int) {
+    val waveformWidth by collectWaveformWidthAsState(viewModel, spikeWidthRatio)
+    val startBorderOffset by rememberStartBorderOffsetAsState(viewModel, waveformWidth)
+    val endBorderOffset by rememberEndBorderOffsetAsState(viewModel, waveformWidth)
+
+    val waveformScrollState = LocalTrimmerWaveformScrollState.current!!
+
+    val waveformPositionDp = waveformScrollState.value.pxToDp()
+    val waveformPosition = waveformPositionDp.value
+
+    val waveformViewportDp = waveformScrollState.viewportSize.pxToDp()
+    val waveformViewport = waveformViewportDp.value
+
+    when {
+        waveformPosition < startBorderOffset ->
+            SBSOrEBSAfter(
+                waveformPosition = waveformPosition,
+                waveformPositionDp = waveformPositionDp,
+                waveformViewport = waveformViewport,
+                waveformViewportDp = waveformViewportDp,
+                startBorderOffset = startBorderOffset,
+                endBorderOffset = endBorderOffset
+            )
+
+        waveformPositionDp.value.toInt() in startBorderOffset..endBorderOffset ->
+            SBSBeforeEBSAfter(
+                waveformPosition = waveformPosition,
+                waveformPositionDp = waveformPositionDp,
+                waveformViewport = waveformViewport,
+                waveformViewportDp = waveformViewportDp,
+                startBorderOffset = startBorderOffset,
+                endBorderOffset = endBorderOffset
+            )
+
+        else -> EBSBefore(
+            waveformPosition = waveformPosition,
+            waveformPositionDp = waveformPositionDp,
+            startBorderOffset = startBorderOffset
+        )
+    }
+}
+
+@Composable
+private fun SBSOrEBSAfter(
+    waveformPosition: Float,
+    waveformPositionDp: Dp,
+    waveformViewport: Float,
+    waveformViewportDp: Dp,
+    startBorderOffset: Int,
+    endBorderOffset: Int
+) {
+    val controllerCircleRadiusDp = CONTROLLER_CIRCLE_RADIUS.toInt().pxToDp()
+    val controllerCircleRadius = controllerCircleRadiusDp.value
+
+    when {
+        waveformPosition + waveformViewport + controllerCircleRadius * 2 < startBorderOffset ->
+            StartBorderSeeker(
+                Modifier
+                    .fillMaxHeight()
+                    .offset(x = waveformPositionDp + waveformViewportDp - controllerCircleRadiusDp * 2)
+            )
+
+        waveformPosition + waveformViewport + controllerCircleRadius * 2 < endBorderOffset ->
+            EndBorderSeeker(
+                Modifier
+                    .fillMaxHeight()
+                    .offset(x = waveformPositionDp + waveformViewportDp - controllerCircleRadiusDp)
+            )
+    }
+}
+
+@Composable
+private fun SBSBeforeEBSAfter(
+    waveformPosition: Float,
+    waveformPositionDp: Dp,
+    waveformViewport: Float,
+    waveformViewportDp: Dp,
+    startBorderOffset: Int,
+    endBorderOffset: Int
+) {
+    val controllerCircleRadiusDp = CONTROLLER_CIRCLE_RADIUS.toInt().pxToDp()
+    val controllerCircleRadius = controllerCircleRadiusDp.value
+
+    if (waveformPosition - controllerCircleRadius * 2 > startBorderOffset)
+        StartBorderSeeker(
+            Modifier
+                .fillMaxHeight()
+                .offset(x = waveformPositionDp + controllerCircleRadiusDp)
+        )
+
+    if (waveformPosition + waveformViewport + controllerCircleRadius * 2 < endBorderOffset)
+        EndBorderSeeker(
+            Modifier
+                .fillMaxHeight()
+                .offset(x = waveformPositionDp + waveformViewportDp - controllerCircleRadiusDp)
+        )
+}
+
+@Composable
+private fun EBSBefore(
+    waveformPosition: Float,
+    waveformPositionDp: Dp,
+    startBorderOffset: Int
+) {
+    val controllerCircleRadiusDp = CONTROLLER_CIRCLE_RADIUS.toInt().pxToDp()
+    val controllerCircleRadius = controllerCircleRadiusDp.value
+
+    if (waveformPosition - controllerCircleRadius * 2 > startBorderOffset)
+        EndBorderSeeker(
+            Modifier
+                .fillMaxHeight()
+                .offset(x = waveformPositionDp + controllerCircleRadiusDp * 2)
+        )
+}
+
+@Composable
+private fun StartBorderSeeker(modifier: Modifier = Modifier) {
+    val colors = LocalAppColors.current
+    val focusPoints = LocalTrimmerFocusPoints.current!!
+
+    val progressBrush = SolidColor(colors.primary)
+    val iconBrush = SolidColor(colors.fontColor)
+
+    Canvas(
+        modifier.clickable {
+            focusPoints
+                .startBorderFocusRequester
+                .requestFocus()
+        }
+    ) {
+        drawStartToucher(progressBrush, iconBrush)
+    }
+}
+
+@Composable
+private fun EndBorderSeeker(modifier: Modifier = Modifier) {
+    val colors = LocalAppColors.current
+    val focusPoints = LocalTrimmerFocusPoints.current!!
+
+    val progressBrush = SolidColor(colors.primary)
+    val iconBrush = SolidColor(colors.fontColor)
+
+    Canvas(
+        modifier.clickable {
+            focusPoints
+                .endBorderFocusRequester
+                .requestFocus()
+        }
+    ) {
+        drawEndToucher(progressBrush, iconBrush)
     }
 }
 

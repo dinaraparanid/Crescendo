@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
@@ -20,6 +21,7 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.paranid5.crescendo.presentation.composition_locals.trimmer.LocalTrimmerWaveformScrollState
 import com.paranid5.crescendo.presentation.main.trimmer.PLAYBACK_CIRCLE_CENTER
 import com.paranid5.crescendo.presentation.main.trimmer.TrimmerViewModel
 import com.paranid5.crescendo.presentation.main.trimmer.WAVEFORM_SPIKE_WIDTH_RATIO
@@ -45,21 +47,22 @@ fun WaveformWithPosition(
         spikeWidthRatio = spikeWidthRatio
     )
 
-    Column(modifier.horizontalScroll(waveformScrollState)) {
-        TrimWaveform(
-            viewModel = viewModel,
-            waveformScrollState = waveformScrollState,
-            modifier = Modifier
-                .weight(1F)
-                .align(Alignment.CenterHorizontally)
-        )
+    CompositionLocalProvider(LocalTrimmerWaveformScrollState provides waveformScrollState) {
+        Column(modifier.horizontalScroll(waveformScrollState)) {
+            TrimWaveform(
+                viewModel = viewModel,
+                modifier = Modifier
+                    .weight(1F)
+                    .align(Alignment.CenterHorizontally)
+            )
 
-        Spacer(Modifier.height(spaceBetween))
+            Spacer(Modifier.height(spaceBetween))
 
-        PlaybackPositionText(
-            viewModel = viewModel,
-            modifier = Modifier.offset(x = playbackTextOffsetAnim.dp)
-        )
+            PlaybackPositionText(
+                viewModel = viewModel,
+                modifier = Modifier.offset(x = playbackTextOffsetAnim.dp)
+            )
+        }
     }
 }
 

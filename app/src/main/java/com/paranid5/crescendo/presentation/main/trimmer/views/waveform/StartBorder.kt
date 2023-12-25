@@ -3,8 +3,12 @@ package com.paranid5.crescendo.presentation.main.trimmer.views.waveform
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.gestures.detectHorizontalDragGestures
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.geometry.Offset
@@ -14,6 +18,7 @@ import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.drawscope.Fill
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.layout.onGloballyPositioned
 import com.paranid5.crescendo.presentation.main.trimmer.CONTROLLER_ARROW_CORNER_BACK_OFFSET
 import com.paranid5.crescendo.presentation.main.trimmer.CONTROLLER_ARROW_CORNER_FRONT_OFFSET
 import com.paranid5.crescendo.presentation.main.trimmer.CONTROLLER_ARROW_CORNER_OFFSET
@@ -23,6 +28,7 @@ import com.paranid5.crescendo.presentation.main.trimmer.CONTROLLER_RECT_OFFSET
 import com.paranid5.crescendo.presentation.main.trimmer.CONTROLLER_RECT_WIDTH
 import com.paranid5.crescendo.presentation.main.trimmer.TrimmerViewModel
 import com.paranid5.crescendo.presentation.main.trimmer.WAVEFORM_SPIKE_WIDTH_RATIO
+import com.paranid5.crescendo.presentation.main.trimmer.effects.waveform.RequestStartBorderFocusEffect
 import com.paranid5.crescendo.presentation.main.trimmer.properties.endPosInMillisState
 import com.paranid5.crescendo.presentation.main.trimmer.properties.setStartPosInMillis
 import com.paranid5.crescendo.presentation.main.trimmer.properties.startPosInMillisState
@@ -38,12 +44,56 @@ fun StartBorder(
     val progressBrush = SolidColor(colors.primary)
     val iconBrush = SolidColor(colors.fontColor)
 
+    Canvas(modifier.startBorderHorizontalDrag(viewModel, spikeWidthRatio)) {
+        drawBorder(progressBrush)
+
+        drawStartToucher(
+            progressBrush = progressBrush,
+            iconBrush = iconBrush
+        )
+    }
+}
+
+@Composable
+private fun Modifier.startBorderHorizontalDrag(
+    viewModel: TrimmerViewModel,
+    spikeWidthRatio: Int
+): Modifier {
+    val isDraggedState = remember { mutableStateOf(false) }
+    val isPositionedState = remember { mutableStateOf(false) }
+
+    RequestStartBorderFocusEffect(
+        isDraggedState = isDraggedState,
+        isPositionedState = isPositionedState
+    )
+
+    return this.startBorderDragInput(
+        viewModel = viewModel,
+        isDraggedState = isDraggedState,
+        isPositionedState = isPositionedState,
+        spikeWidthRatio = spikeWidthRatio
+    )
+}
+
+@Composable
+private fun Modifier.startBorderDragInput(
+    viewModel: TrimmerViewModel,
+    isDraggedState: MutableState<Boolean>,
+    isPositionedState: MutableState<Boolean>,
+    spikeWidthRatio: Int
+): Modifier {
     val startMillis by viewModel.startPosInMillisState.collectAsState()
     val endMillis by viewModel.endPosInMillisState.collectAsState()
 
-    Canvas(
-        modifier.pointerInput(Unit) {
-            detectHorizontalDragGestures { change, dragAmount ->
+    var isDragged by isDraggedState
+    var isPositioned by isPositionedState
+
+    return this
+        .onGloballyPositioned { isPositioned = true }
+        .pointerInput(Unit) {
+            detectHorizontalDragGestures(
+                onDragEnd = { isDragged = true }
+            ) { change, dragAmount ->
                 change.consume()
                 viewModel.setStartPosInMillis(
                     (startMillis + (dragAmount * 200 / spikeWidthRatio))
@@ -52,14 +102,6 @@ fun StartBorder(
                 )
             }
         }
-    ) {
-        drawBorder(progressBrush)
-
-        drawToucher(
-            progressBrush = progressBrush,
-            iconBrush = iconBrush
-        )
-    }
 }
 
 fun StartBorderOffset(startOffset: Float, waveformWidth: Int) =
@@ -78,7 +120,7 @@ private fun DrawScope.drawBorder(progressBrush: SolidColor) =
         style = Fill
     )
 
-private fun DrawScope.drawToucher(progressBrush: SolidColor, iconBrush: SolidColor) {
+internal fun DrawScope.drawStartToucher(progressBrush: SolidColor, iconBrush: SolidColor) {
     drawToucherCircle(progressBrush)
     drawToucherIcon(iconBrush)
 }

@@ -1,6 +1,5 @@
 package com.paranid5.crescendo.presentation.main.trimmer.views.waveform
 
-import androidx.compose.foundation.ScrollState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -15,7 +14,6 @@ import com.paranid5.crescendo.presentation.main.trimmer.effects.waveform.LoadAmp
 @Composable
 fun TrimWaveform(
     viewModel: TrimmerViewModel,
-    waveformScrollState: ScrollState,
     modifier: Modifier = Modifier,
     spikeWidthRatio: Int = WAVEFORM_SPIKE_WIDTH_RATIO,
 ) {
@@ -34,7 +32,6 @@ fun TrimWaveform(
 
     TrimmerWaveformContent(
         viewModel = viewModel,
-        waveformScrollState = waveformScrollState,
         canvasSizeState = canvasSizeState,
         spikesState = spikesState,
         spikesAmplitudesState = spikesAmplitudesState,

@@ -1,4 +1,4 @@
-package com.paranid5.crescendo.presentation.main.trimmer.views.playback
+package com.paranid5.crescendo.presentation.main.trimmer.views
 
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -18,6 +18,9 @@ import com.paranid5.crescendo.presentation.main.trimmer.effects.playback.PlayPau
 import com.paranid5.crescendo.presentation.main.trimmer.effects.playback.PlaybackParamsEffect
 import com.paranid5.crescendo.presentation.main.trimmer.effects.playback.PlaybackPositionTappedEffect
 import com.paranid5.crescendo.presentation.main.trimmer.player.TrackPlayer
+import com.paranid5.crescendo.presentation.main.trimmer.views.playback.PlayPauseButton
+import com.paranid5.crescendo.presentation.main.trimmer.views.playback.TenSecsBackButton
+import com.paranid5.crescendo.presentation.main.trimmer.views.playback.TenSecsForwardButton
 
 @Composable
 fun PlaybackButtons(
