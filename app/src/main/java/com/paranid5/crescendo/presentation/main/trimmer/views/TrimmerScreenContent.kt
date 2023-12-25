@@ -260,9 +260,8 @@ private fun TrimmerScreenContentLandscape(
         viewModel = viewModel,
         screenWidthPxState = screenWidthPxState,
         modifier = Modifier.constrainAs(zoom) {
-            top.linkTo(effects.top)
-            bottom.linkTo(effects.bottom)
-            end.linkTo(parent.end, margin = 8.dp)
+            bottom.linkTo(playbackButtons.top, margin = 2.dp)
+            centerHorizontallyTo(playbackButtons)
         }
     )
 
@@ -279,7 +278,7 @@ private fun TrimmerScreenContentLandscape(
     PlaybackButtons(
         viewModel = viewModel,
         modifier = Modifier.constrainAs(playbackButtons) {
-            bottom.linkTo(saveButton.top, margin = 4.dp)
+            bottom.linkTo(saveButton.top, margin = 2.dp)
             end.linkTo(parent.end, margin = 8.dp)
         }
     )

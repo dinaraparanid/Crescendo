@@ -6,6 +6,7 @@ import androidx.compose.runtime.MutableIntState
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import com.paranid5.crescendo.presentation.main.trimmer.TrimmerViewModel
+import com.paranid5.crescendo.presentation.main.trimmer.properties.setZoom
 import com.paranid5.crescendo.presentation.main.trimmer.properties.setZoomSteps
 import com.paranid5.crescendo.presentation.main.trimmer.properties.waveformMaxWidthFlow
 import com.paranid5.crescendo.presentation.ui.extensions.pxToDp
@@ -26,6 +27,7 @@ fun InitZoomStepsEffect(
     LaunchedEffect(viewport) {
         val steps = zoomSteps(waveformWidth = waveformWidth, viewport = viewport)
         viewModel.setZoomSteps(steps)
+        viewModel.setZoom(0)
     }
 }
 

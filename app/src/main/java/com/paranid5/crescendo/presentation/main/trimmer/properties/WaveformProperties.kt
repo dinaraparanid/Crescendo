@@ -21,9 +21,6 @@ inline val TrimmerViewModel.zoomState
 fun TrimmerViewModel.setZoom(zoomRatio: Int) =
     waveformStateHolder.setZoom(zoomRatio)
 
-fun TrimmerViewModel.resetZoom() =
-    waveformStateHolder.setZoom(0)
-
 inline val TrimmerViewModel.canZoomInFlow
     get() = combine(
         zoomState,
@@ -46,6 +43,3 @@ inline val TrimmerViewModel.zoomStepsState
 
 fun TrimmerViewModel.setZoomSteps(zoomSteps: Int) =
     waveformStateHolder.setZoomSteps(zoomSteps)
-
-fun TrimmerViewModel.resetZoomSteps() =
-    waveformStateHolder.setZoomSteps(0)

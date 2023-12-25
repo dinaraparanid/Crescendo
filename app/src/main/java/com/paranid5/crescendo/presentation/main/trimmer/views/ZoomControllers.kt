@@ -1,10 +1,7 @@
 package com.paranid5.crescendo.presentation.main.trimmer.views
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -49,32 +46,27 @@ fun ZoomControllers(
         spikeWidthRatio = spikeWidthRatio
     )
 
-    Column(modifier) {
-        ZoomButtons(
-            viewModel = viewModel,
-            modifier = Modifier
-                .align(Alignment.CenterHorizontally)
-                .clip(RoundedCornerShape(24.dp))
-                .background(colors.backgroundAlternative)
-        )
-
-        Spacer(Modifier.height(2.dp))
-
-        ZoomRatioLabel(
-            viewModel = viewModel,
-            modifier = Modifier.align(Alignment.CenterHorizontally)
-        )
-    }
+    ZoomControllersContent(
+        viewModel = viewModel,
+        modifier = modifier
+            .clip(RoundedCornerShape(24.dp))
+            .background(colors.backgroundAlternative)
+    )
 }
 
 @Composable
-private fun ZoomButtons(viewModel: TrimmerViewModel, modifier: Modifier = Modifier) =
+private fun ZoomControllersContent(viewModel: TrimmerViewModel, modifier: Modifier) =
     Row(modifier) {
         ZoomInButton(
             viewModel = viewModel,
             modifier = Modifier
                 .align(Alignment.CenterVertically)
                 .padding(horizontal = 4.dp)
+        )
+
+        ZoomRatioLabel(
+            viewModel = viewModel,
+            modifier = Modifier.align(Alignment.CenterVertically)
         )
 
         ZoomOutButton(
