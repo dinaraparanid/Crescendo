@@ -12,7 +12,7 @@ class MediaSessionController(context: Context, tag: String) {
         MediaSessionCompat(context.applicationContext, tag)
     }
 
-    val transportControls: MediaControllerCompat.TransportControls by lazy {
+    private val transportControls: MediaControllerCompat.TransportControls by lazy {
         mediaSession.controller.transportControls
     }
 

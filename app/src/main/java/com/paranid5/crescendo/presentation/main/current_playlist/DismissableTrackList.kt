@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.material3.DismissDirection
 import androidx.compose.material3.DismissValue
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.SwipeToDismiss
@@ -29,7 +30,7 @@ internal inline fun DismissableTrackList(
     scrollingState: LazyListState,
     modifier: Modifier = Modifier,
     trackItemModifier: Modifier = Modifier,
-    crossinline onTrackDismissed: suspend (Int, Track) -> Boolean,
+    crossinline onTrackDismissed: (Int, Track) -> Boolean,
     storageHandler: StorageHandler = koinInject(),
     trackServiceAccessor: TrackServiceAccessor = koinInject(),
     crossinline trackItemView: TrackItemView,
@@ -50,7 +51,7 @@ internal inline fun DismissableTrackList(
                     when (it) {
                         DismissValue.DismissedToEnd -> {
                             Log.d("TrackList", "Track $track is removed from the current playlist")
-                            runBlocking { onTrackDismissed(ind, track) }
+                            onTrackDismissed(ind, track)
                         }
 
                         else -> false
@@ -60,6 +61,7 @@ internal inline fun DismissableTrackList(
 
             SwipeToDismiss(
                 state = dismissState,
+                directions = setOf(DismissDirection.StartToEnd),
                 background = {},
                 dismissContent = {
                     trackItemView(
@@ -84,7 +86,7 @@ internal inline fun DismissableTrackList(
     trackItemModifier: Modifier = Modifier,
     storageHandler: StorageHandler = koinInject(),
     trackServiceAccessor: TrackServiceAccessor = koinInject(),
-    crossinline onTrackDismissed: suspend (Int, Track) -> Boolean
+    crossinline onTrackDismissed: (Int, Track) -> Boolean
 ) = DismissableTrackList(
     tracks = tracks,
     scrollingState = scrollingState,

@@ -18,6 +18,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import com.paranid5.crescendo.R
 import com.paranid5.crescendo.data.StorageHandler
+import com.paranid5.crescendo.data.properties.storeCurrentPlaylist
 import com.paranid5.crescendo.domain.tracks.DefaultTrack
 import com.paranid5.crescendo.domain.tracks.Track
 import com.paranid5.crescendo.presentation.main.Screens
@@ -111,7 +112,7 @@ private fun AddToCurrentPlaylistItem(
                 val defaultTrack = DefaultTrack(track)
                 trackServiceAccessor.addToPlaylist(defaultTrack)
 
-                val currentPlaylist = storageHandler.currentPlaylistState.value ?: listOf()
+                val currentPlaylist = storageHandler.currentPlaylistState.value
                 storageHandler.storeCurrentPlaylist(currentPlaylist + defaultTrack)
             }
         }

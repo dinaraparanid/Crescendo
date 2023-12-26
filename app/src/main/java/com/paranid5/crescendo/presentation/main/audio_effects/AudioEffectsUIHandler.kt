@@ -2,6 +2,14 @@ package com.paranid5.crescendo.presentation.main.audio_effects
 
 import android.content.Context
 import com.paranid5.crescendo.data.StorageHandler
+import com.paranid5.crescendo.data.properties.storeAudioEffectsEnabled
+import com.paranid5.crescendo.data.properties.storeBassStrength
+import com.paranid5.crescendo.data.properties.storeEqualizerBands
+import com.paranid5.crescendo.data.properties.storeEqualizerParam
+import com.paranid5.crescendo.data.properties.storeEqualizerPreset
+import com.paranid5.crescendo.data.properties.storePitch
+import com.paranid5.crescendo.data.properties.storeReverbPreset
+import com.paranid5.crescendo.data.properties.storeSpeed
 import com.paranid5.crescendo.domain.eq.EqualizerBandsPreset
 import com.paranid5.crescendo.domain.utils.extensions.sendBroadcast
 import com.paranid5.crescendo.presentation.UIHandler

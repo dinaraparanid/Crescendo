@@ -51,7 +51,7 @@ typealias TrackItemView = @Composable (
 @Composable
 internal inline fun DraggableTrackList(
     tracks: List<Track>,
-    crossinline onTrackDismissed: suspend (Int, Track) -> Boolean,
+    crossinline onTrackDismissed: (Int, Track) -> Boolean,
     crossinline onTrackDragged: suspend (List<Track>, Int) -> Unit,
     modifier: Modifier = Modifier,
     trackItemModifier: Modifier = Modifier,
@@ -155,7 +155,7 @@ internal inline fun DraggableTrackList(
 @Composable
 internal inline fun DraggableTrackList(
     tracks: List<Track>,
-    crossinline onTrackDismissed: suspend (Int, Track) -> Boolean,
+    crossinline onTrackDismissed: (Int, Track) -> Boolean,
     modifier: Modifier = Modifier,
     trackItemModifier: Modifier = Modifier,
     scrollingState: LazyListState = rememberLazyListState(),

@@ -12,7 +12,7 @@ import androidx.compose.ui.geometry.Size
 import com.paranid5.crescendo.presentation.main.trimmer.CONTROLLER_HEIGHT_OFFSET
 import com.paranid5.crescendo.presentation.main.trimmer.MIN_SPIKE_HEIGHT
 import com.paranid5.crescendo.presentation.main.trimmer.TrimmerViewModel
-import com.paranid5.crescendo.presentation.main.trimmer.properties.amplitudesState
+import com.paranid5.crescendo.presentation.main.trimmer.properties.amplitudesFlow
 import com.paranid5.crescendo.presentation.ui.extensions.safeDiv
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -26,7 +26,10 @@ fun DrawAmplitudesEffect(
     canvasSizeState: State<Size>,
     viewModel: TrimmerViewModel,
 ) {
-    val amplitudes by viewModel.amplitudesState.collectAsState()
+    val amplitudes by viewModel
+        .amplitudesFlow
+        .collectAsState(initial = emptyList())
+
     var spikesAmplitudes by spikesAmplitudesState
     val spikes by spikesState
     val canvasSize by canvasSizeState

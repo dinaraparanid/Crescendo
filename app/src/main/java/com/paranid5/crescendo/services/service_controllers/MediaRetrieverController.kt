@@ -3,6 +3,13 @@ package com.paranid5.crescendo.services.service_controllers
 import android.content.Context
 import com.paranid5.crescendo.IS_PLAYING
 import com.paranid5.crescendo.data.StorageHandler
+import com.paranid5.crescendo.data.properties.storeCurrentMetadata
+import com.paranid5.crescendo.data.properties.storeCurrentPlaylist
+import com.paranid5.crescendo.data.properties.storeCurrentTrackIndex
+import com.paranid5.crescendo.data.properties.storeCurrentUrl
+import com.paranid5.crescendo.data.properties.storeIsRepeating
+import com.paranid5.crescendo.data.properties.storeStreamPlaybackPosition
+import com.paranid5.crescendo.data.properties.storeTracksPlaybackPosition
 import com.paranid5.crescendo.domain.metadata.VideoMetadata
 import com.paranid5.crescendo.domain.tracks.DefaultTrack
 import com.paranid5.yt_url_extractor_kt.extractYtFilesWithMeta
@@ -28,7 +35,7 @@ class MediaRetrieverController : KoinComponent {
     inline val currentPlaylist get() = currentPlaylistState.value
 
     val currentTrackState = storageHandler.currentTrackState
-    inline val currentTrack get() = currentTrackState.value
+    inline val currentTrackOrNull get() = currentTrackState.value
 
     val streamPlaybackPositionState = storageHandler.streamPlaybackPositionState
     inline val streamPlaybackPosition get() = streamPlaybackPositionState.value

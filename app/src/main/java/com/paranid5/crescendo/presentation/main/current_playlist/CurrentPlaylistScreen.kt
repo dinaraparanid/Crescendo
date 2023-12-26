@@ -10,19 +10,24 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.paranid5.crescendo.R
 import com.paranid5.crescendo.data.StorageHandler
+import com.paranid5.crescendo.data.properties.storeCurrentPlaylist
+import com.paranid5.crescendo.data.properties.storeCurrentTrackIndex
 import com.paranid5.crescendo.domain.tracks.DefaultTrack
-import com.paranid5.crescendo.domain.utils.extensions.totalDuration
 import com.paranid5.crescendo.domain.utils.extensions.timeString
+import com.paranid5.crescendo.domain.utils.extensions.totalDuration
 import com.paranid5.crescendo.presentation.ui.theme.LocalAppColors
 import com.paranid5.crescendo.presentation.ui.theme.TransparentUtility
 import com.paranid5.crescendo.services.track_service.TrackServiceAccessor
@@ -34,10 +39,32 @@ fun CurrentPlaylistScreen(
     storageHandler: StorageHandler = koinInject(),
     trackServiceAccessor: TrackServiceAccessor = koinInject()
 ) {
-    val currentPlaylistMb by storageHandler.currentPlaylistState.collectAsState()
+    val currentPlaylist by storageHandler.currentPlaylistState.collectAsState()
     val currentTrackIndex by storageHandler.currentTrackIndexState.collectAsState()
-    val currentPlaylist by remember { derivedStateOf { currentPlaylistMb ?: listOf() } }
     val scrollingState = rememberLazyListState()
+
+    var playlistDismissMediator by remember {
+        mutableStateOf(emptyList<DefaultTrack>())
+    }
+
+    var trackIndexDismissMediator by remember {
+        mutableIntStateOf(0)
+    }
+
+    var trackPathDismissKey by remember {
+        mutableStateOf("")
+    }
+
+    LaunchedEffect(trackPathDismissKey) {
+        if (trackPathDismissKey.isNotBlank()) {
+            storageHandler.storeCurrentPlaylist(playlistDismissMediator)
+
+            if (trackIndexDismissMediator < currentTrackIndex)
+                storageHandler.storeCurrentTrackIndex(currentTrackIndex - 1)
+
+            trackServiceAccessor.removeFromPlaylist(trackIndexDismissMediator)
+        }
+    }
 
     Column(modifier) {
         CurrentPlaylistBar(
@@ -59,17 +86,16 @@ fun CurrentPlaylistScreen(
             tracks = currentPlaylist,
             scrollingState = scrollingState,
             modifier = modifier.padding(start = 10.dp, end = 5.dp, bottom = 10.dp),
-            onTrackDismissed = { index, _ ->
+            onTrackDismissed = { index, track ->
                 if (index == currentTrackIndex)
                     return@DraggableTrackList false
 
-                val newPlaylist = currentPlaylist.take(index) + currentPlaylist.drop(index + 1)
-                storageHandler.storeCurrentPlaylist(newPlaylist)
+                playlistDismissMediator = currentPlaylist.take(index) +
+                        currentPlaylist.drop(index + 1)
 
-                if (index < currentTrackIndex)
-                    storageHandler.storeCurrentTrackIndex(currentTrackIndex - 1)
+                trackIndexDismissMediator = index
+                trackPathDismissKey = track.path
 
-                trackServiceAccessor.removeFromPlaylist(index)
                 true
             }
         ) { newTracks, newCurTrackIndex ->

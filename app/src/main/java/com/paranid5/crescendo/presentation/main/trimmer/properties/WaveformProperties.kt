@@ -6,8 +6,8 @@ import com.paranid5.crescendo.presentation.main.trimmer.states.zoomOut
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.map
 
-inline val TrimmerViewModel.amplitudesState
-    get() = waveformStateHolder.amplitudesState
+inline val TrimmerViewModel.amplitudesFlow
+    get() = waveformStateHolder.amplitudesFlow
 
 fun TrimmerViewModel.setAmplitudesAsync(amplitudes: List<Int>) =
     waveformStateHolder.setAmplitudesAsync(amplitudes)

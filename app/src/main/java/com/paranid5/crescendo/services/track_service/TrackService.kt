@@ -337,16 +337,13 @@ class TrackService : SuspendService(), KoinComponent {
         get() = playbackController.currentMediaItemIndex
 
     private inline val currentTrackOrNull
-        get() = mediaRetrieverController.currentTrack
+        get() = mediaRetrieverController.currentTrackOrNull
 
     private inline val currentTrack
         get() = currentTrackOrNull!!
 
-    private inline val currentPlaylistOrNull
-        get() = mediaRetrieverController.currentPlaylist
-
     private inline val currentPlaylist
-        get() = currentPlaylistOrNull!!
+        get() = mediaRetrieverController.currentPlaylist
 
     private inline val savedTrackIndex
         get() = mediaRetrieverController.currentTrackIndex
@@ -394,16 +391,15 @@ class TrackService : SuspendService(), KoinComponent {
         }
     }
 
-    private suspend fun restartPlayer(initialPosition: Long = 0) =
-        currentPlaylistOrNull?.let {
-            resetPlaylistForPlayer(playlist = it)
+    private suspend fun restartPlayer(initialPosition: Long = 0) {
+        resetPlaylistForPlayer(playlist = currentPlaylist)
 
-            playPlaylist(
-                playlist = it,
-                curTrackInd = savedTrackIndex,
-                initialPosition = initialPosition
-            )
-        }
+        playPlaylist(
+            playlist = currentPlaylist,
+            curTrackInd = savedTrackIndex,
+            initialPosition = initialPosition
+        )
+    }
 
     private fun seekTo(position: Long) {
         playbackController.resetAudioSessionIdIfNotPlaying()
@@ -419,7 +415,7 @@ class TrackService : SuspendService(), KoinComponent {
     private suspend fun switchToPrevTrack() = storeAndSwitchToTrackAt(
         index = when {
             playbackController.hasPreviousMediaItem -> playbackController.previousMediaItemIndex
-            else -> currentPlaylistOrNull?.size?.let { it - 1 } ?: 0
+            else -> maxOf(currentPlaylist.size - 1, 0)
         }
     )
 
@@ -965,6 +961,7 @@ class TrackService : SuspendService(), KoinComponent {
 
     private suspend inline fun storeCurrentPlaylist(playlist: List<DefaultTrack>) =
         mediaRetrieverController.storeCurrentPlaylist(playlist)
+            .apply { println("STORE CURRENT PLAYLIST") }
 
     private suspend inline fun storeCurrentTrackIndex(index: Int) =
         mediaRetrieverController.storeCurrentTrackIndex(index)
