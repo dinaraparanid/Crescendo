@@ -3,7 +3,6 @@ package com.paranid5.crescendo.presentation.main.current_playlist.views
 import androidx.compose.foundation.layout.Row
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
@@ -14,7 +13,10 @@ import com.paranid5.crescendo.domain.tracks.DefaultTrack
 import com.paranid5.crescendo.domain.utils.extensions.timeString
 import com.paranid5.crescendo.domain.utils.extensions.totalDuration
 import com.paranid5.crescendo.presentation.main.current_playlist.CurrentPlaylistViewModel
+import com.paranid5.crescendo.presentation.ui.extensions.collectLatestAsState
 import com.paranid5.crescendo.presentation.ui.theme.LocalAppColors
+import kotlinx.collections.immutable.ImmutableList
+import kotlinx.collections.immutable.persistentListOf
 
 @Composable
 fun CurrentPlaylistBar(
@@ -23,7 +25,7 @@ fun CurrentPlaylistBar(
 ) {
     val currentPlaylist by viewModel
         .currentPlaylistFlow
-        .collectAsState(initial = emptyList())
+        .collectLatestAsState(initial = persistentListOf())
 
     Row(modifier) {
         TracksLabel(
@@ -40,7 +42,7 @@ fun CurrentPlaylistBar(
 
 @Composable
 private fun TracksLabel(
-    currentPlaylist: List<DefaultTrack>,
+    currentPlaylist: ImmutableList<DefaultTrack>,
     modifier: Modifier = Modifier
 ) {
     val colors = LocalAppColors.current
@@ -57,7 +59,7 @@ private fun TracksLabel(
 
 @Composable
 private fun CurrentPlaylistDuration(
-    currentPlaylist: List<DefaultTrack>,
+    currentPlaylist: ImmutableList<DefaultTrack>,
     modifier: Modifier = Modifier
 ) {
     val colors = LocalAppColors.current

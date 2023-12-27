@@ -33,12 +33,13 @@ import com.paranid5.crescendo.presentation.ui.permissions.requests.audioRecordin
 import com.paranid5.crescendo.presentation.ui.permissions.requests.foregroundServicePermissionsRequestLauncher
 import com.paranid5.crescendo.presentation.ui.theme.LocalAppColors
 import com.paranid5.crescendo.services.track_service.TrackServiceAccessor
+import kotlinx.collections.immutable.ImmutableList
 import kotlinx.coroutines.launch
 import org.koin.compose.koinInject
 
 @Composable
-internal inline fun DraggableTrackItem(
-    tracks: List<Track>,
+internal inline fun <T : Track> DraggableTrackItem(
+    tracks: ImmutableList<T>,
     trackIndex: Int,
     currentTrackDragIndex: Int,
     modifier: Modifier = Modifier,
@@ -71,8 +72,8 @@ internal inline fun DraggableTrackItem(
 }
 
 @Composable
-fun DraggableTrackItem(
-    tracks: List<Track>,
+fun <T : Track> DraggableTrackItem(
+    tracks: ImmutableList<T>,
     trackIndex: Int,
     currentTrackDragIndex: Int,
     modifier: Modifier = Modifier,

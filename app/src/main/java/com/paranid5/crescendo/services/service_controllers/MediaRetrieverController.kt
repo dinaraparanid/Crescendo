@@ -14,6 +14,7 @@ import com.paranid5.crescendo.domain.metadata.VideoMetadata
 import com.paranid5.crescendo.domain.tracks.DefaultTrack
 import com.paranid5.yt_url_extractor_kt.extractYtFilesWithMeta
 import io.ktor.client.HttpClient
+import kotlinx.collections.immutable.ImmutableList
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
@@ -95,7 +96,7 @@ class MediaRetrieverController : KoinComponent {
     suspend fun storeCurrentMetadata(videoMetadata: VideoMetadata?) =
         storageHandler.storeCurrentMetadata(videoMetadata)
 
-    suspend fun storeCurrentPlaylist(playlist: List<DefaultTrack>) =
+    suspend fun storeCurrentPlaylist(playlist: ImmutableList<DefaultTrack>) =
         storageHandler.storeCurrentPlaylist(playlist)
 
     suspend fun extractYtFilesWithMeta(context: Context, ytUrl: String) =

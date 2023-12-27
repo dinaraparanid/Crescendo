@@ -2,17 +2,20 @@ package com.paranid5.crescendo.presentation.main.current_playlist.views
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import com.paranid5.crescendo.domain.tracks.DefaultTrack
 import com.paranid5.crescendo.presentation.main.current_playlist.CurrentPlaylistViewModel
+import com.paranid5.crescendo.presentation.ui.extensions.collectLatestAsState
 import com.paranid5.crescendo.services.track_service.TrackServiceAccessor
+import kotlinx.collections.immutable.ImmutableList
+import kotlinx.collections.immutable.persistentListOf
+import kotlinx.collections.immutable.toImmutableList
 import org.koin.compose.koinInject
 
 @Composable
 fun CurrentPlaylistTrackList(
-    playlistDismissMediatorState: MutableState<List<DefaultTrack>>,
+    playlistDismissMediatorState: MutableState<ImmutableList<DefaultTrack>>,
     trackIndexDismissMediatorState: MutableState<Int>,
     trackPathDismissKeyState: MutableState<String>,
     viewModel: CurrentPlaylistViewModel,
@@ -21,11 +24,11 @@ fun CurrentPlaylistTrackList(
 ) {
     val currentPlaylist by viewModel
         .currentPlaylistFlow
-        .collectAsState(initial = emptyList())
+        .collectLatestAsState(initial = persistentListOf())
 
     val currentTrackIndex by viewModel
         .currentTrackIndexFlow
-        .collectAsState(initial = 0)
+        .collectLatestAsState(initial = 0)
 
     DraggableTrackList(
         tracks = currentPlaylist,
@@ -56,9 +59,9 @@ fun CurrentPlaylistTrackList(
 private fun tryDismissTrack(
     index: Int,
     track: DefaultTrack,
-    currentPlaylist: List<DefaultTrack>,
+    currentPlaylist: ImmutableList<DefaultTrack>,
     currentTrackIndex: Int,
-    playlistDismissMediatorState: MutableState<List<DefaultTrack>>,
+    playlistDismissMediatorState: MutableState<ImmutableList<DefaultTrack>>,
     trackIndexDismissMediatorState: MutableState<Int>,
     trackPathDismissKeyState: MutableState<String>,
 ): Boolean {
@@ -66,7 +69,8 @@ private fun tryDismissTrack(
         return false
 
     playlistDismissMediatorState.value =
-        currentPlaylist.take(index) + currentPlaylist.drop(index + 1)
+        (currentPlaylist.take(index) + currentPlaylist.drop(index + 1))
+            .toImmutableList()
 
     trackIndexDismissMediatorState.value = index
     trackPathDismissKeyState.value = track.path
@@ -74,7 +78,7 @@ private fun tryDismissTrack(
 }
 
 private suspend fun updateCurrentPlaylist(
-    newTracks: List<DefaultTrack>,
+    newTracks: ImmutableList<DefaultTrack>,
     newCurTrackIndex: Int,
     viewModel: CurrentPlaylistViewModel,
     trackServiceAccessor: TrackServiceAccessor

@@ -1,7 +1,6 @@
 package com.paranid5.crescendo.presentation.main.audio_effects
 
 import android.content.Context
-import androidx.compose.runtime.snapshots.SnapshotStateList
 import com.paranid5.crescendo.data.StorageHandler
 import com.paranid5.crescendo.data.properties.storeAudioEffectsEnabled
 import com.paranid5.crescendo.data.properties.storeBassStrength
@@ -16,6 +15,8 @@ import com.paranid5.crescendo.domain.utils.extensions.sendBroadcast
 import com.paranid5.crescendo.presentation.UIHandler
 import com.paranid5.crescendo.services.stream_service.StreamService
 import com.paranid5.crescendo.services.track_service.TrackService
+import kotlinx.collections.immutable.ImmutableList
+import kotlinx.collections.immutable.toImmutableList
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 
@@ -72,9 +73,9 @@ class AudioEffectsUIHandler : UIHandler, KoinComponent {
         sendEqualizerParamUpdate(context, audioStatus)
     }
 
-    suspend fun storeAndSwitchToBands(
+    private suspend inline fun storeAndSwitchToBands(
         context: Context,
-        bandLevels: List<Short>,
+        bandLevels: ImmutableList<Short>,
         audioStatus: AudioStatus
     ) {
         storageHandler.storeEqualizerBands(bandLevels)
@@ -117,10 +118,6 @@ class AudioEffectsUIHandler : UIHandler, KoinComponent {
         context: Context,
         audioStatus: AudioStatus
     ) {
-        equalizerData.bandLevels.forEachIndexed { ind, mdb ->
-            presentLvlsDbState[ind] = mdb / 1000F
-        }
-
         presentLvlsDbState[index] = level
 
         val newLevels = equalizerData.bandLevels.toMutableList().also {
@@ -129,7 +126,7 @@ class AudioEffectsUIHandler : UIHandler, KoinComponent {
 
         storeAndSwitchToBands(
             context = context,
-            bandLevels = newLevels,
+            bandLevels = newLevels.toImmutableList(),
             audioStatus = audioStatus
         )
     }

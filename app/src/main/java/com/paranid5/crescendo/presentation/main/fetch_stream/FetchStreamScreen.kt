@@ -1,5 +1,3 @@
-@file:Suppress("LongLine")
-
 package com.paranid5.crescendo.presentation.main.fetch_stream
 
 import android.content.res.Configuration

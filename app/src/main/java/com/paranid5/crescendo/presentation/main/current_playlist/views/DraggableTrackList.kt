@@ -1,27 +1,28 @@
 package com.paranid5.crescendo.presentation.main.current_playlist.views
 
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import com.paranid5.crescendo.domain.tracks.Track
 import com.paranid5.crescendo.presentation.main.current_playlist.CurrentPlaylistViewModel
+import com.paranid5.crescendo.presentation.ui.extensions.collectLatestAsState
 import com.paranid5.crescendo.presentation.ui.utils.drag.DraggableList
 import com.paranid5.crescendo.presentation.ui.utils.drag.DraggableListItemView
+import kotlinx.collections.immutable.ImmutableList
 
 @Composable
 internal inline fun <T : Track> DraggableTrackList(
-    tracks: List<T>,
+    tracks: ImmutableList<T>,
     viewModel: CurrentPlaylistViewModel,
     crossinline onTrackDismissed: (Int, T) -> Boolean,
-    crossinline onTrackDragged: suspend (List<T>, Int) -> Unit,
+    crossinline onTrackDragged: suspend (ImmutableList<T>, Int) -> Unit,
     crossinline trackItemView: DraggableListItemView<T>,
     modifier: Modifier = Modifier,
     trackItemModifier: Modifier = Modifier,
 ) {
     val currentTrackIndex by viewModel
         .currentTrackIndexFlow
-        .collectAsState(initial = 0)
+        .collectLatestAsState(initial = 0)
 
     DraggableList(
         items = tracks,
@@ -37,10 +38,10 @@ internal inline fun <T : Track> DraggableTrackList(
 
 @Composable
 internal inline fun <T : Track> DraggableTrackList(
-    tracks: List<T>,
+    tracks: ImmutableList<T>,
     viewModel: CurrentPlaylistViewModel,
     crossinline onTrackDismissed: (Int, T) -> Boolean,
-    crossinline onTrackDragged: suspend (List<T>, Int) -> Unit,
+    crossinline onTrackDragged: suspend (ImmutableList<T>, Int) -> Unit,
     modifier: Modifier = Modifier,
     trackItemModifier: Modifier = Modifier,
 ) = DraggableTrackList(

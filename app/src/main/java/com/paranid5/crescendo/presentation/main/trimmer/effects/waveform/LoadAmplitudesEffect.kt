@@ -10,6 +10,7 @@ import androidx.compose.ui.platform.LocalContext
 import com.paranid5.crescendo.presentation.main.trimmer.TrimmerViewModel
 import com.paranid5.crescendo.presentation.main.trimmer.properties.setAmplitudes
 import com.paranid5.crescendo.presentation.main.trimmer.properties.trackPathOrNullFlow
+import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import linc.com.amplituda.Amplituda
@@ -28,6 +29,7 @@ fun LoadAmplitudesEffect(viewModel: TrimmerViewModel) {
                     .processAudio(trackPath)
                     .get(AmplitudaErrorListener { it.printStackTrace() })
                     .amplitudesAsList()
+                    .toImmutableList()
             )
         }
     }

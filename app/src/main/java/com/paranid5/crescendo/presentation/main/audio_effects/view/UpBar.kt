@@ -5,7 +5,6 @@ import androidx.compose.material3.Switch
 import androidx.compose.material3.SwitchDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
@@ -20,6 +19,7 @@ import androidx.compose.ui.unit.sp
 import com.paranid5.crescendo.R
 import com.paranid5.crescendo.presentation.main.audio_effects.AudioEffectsUIHandler
 import com.paranid5.crescendo.presentation.main.audio_effects.AudioEffectsViewModel
+import com.paranid5.crescendo.presentation.ui.extensions.collectLatestAsState
 import com.paranid5.crescendo.presentation.ui.extensions.decreaseBrightness
 import com.paranid5.crescendo.presentation.ui.extensions.simpleShadow
 import com.paranid5.crescendo.presentation.ui.theme.LocalAppColors
@@ -69,11 +69,11 @@ private fun AudioEffectsSwitch(
 
     val areAudioEffectsEnabled by viewModel
         .areAudioEffectsEnabledFlow
-        .collectAsState(initial = false)
+        .collectLatestAsState(initial = false)
 
     val audioStatus by viewModel
         .audioStatusFlow
-        .collectAsState(initial = null)
+        .collectLatestAsState(initial = null)
 
     Switch(
         modifier = modifier,

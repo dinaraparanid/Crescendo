@@ -18,10 +18,11 @@ import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.zIndex
 import arrow.core.curried
+import kotlinx.collections.immutable.ImmutableList
 import kotlinx.coroutines.launch
 
 typealias DraggableListItemView<T> = @Composable (
-    items: List<T>,
+    items: ImmutableList<T>,
     index: Int,
     currentDragIndex: Int,
     modifier: Modifier
@@ -29,10 +30,10 @@ typealias DraggableListItemView<T> = @Composable (
 
 @Composable
 internal inline fun <T> DraggableList(
-    items: List<T>,
+    items: ImmutableList<T>,
     currentItemIndex: Int,
     crossinline onDismissed: (Int, T) -> Boolean,
-    crossinline onDragged: suspend (List<T>, Int) -> Unit,
+    crossinline onDragged: suspend (ImmutableList<T>, Int) -> Unit,
     crossinline itemView: DraggableListItemView<T>,
     modifier: Modifier = Modifier,
     itemModifier: Modifier = Modifier,
@@ -119,13 +120,13 @@ private fun rememberItemIndexWithOffset(
 
 @Composable
 private inline fun <T> Modifier.handleTracksMovement(
-    items: List<T>,
+    items: ImmutableList<T>,
     currentDragIndex: Int,
     scrollingState: LazyListState,
     positionState: MutableState<Float?>,
     isDraggingState: MutableState<Boolean>,
     draggedItemIndexState: MutableState<Int?>,
-    crossinline onDragged: suspend (List<T>, Int) -> Unit,
+    crossinline onDragged: suspend (ImmutableList<T>, Int) -> Unit,
 ): Modifier {
     val coroutineScope = rememberCoroutineScope()
     var position by positionState
@@ -163,7 +164,7 @@ private inline fun <T> Modifier.handleTracksMovement(
 
 @Composable
 private inline fun <T> DraggableItemList(
-    items: List<T>,
+    items: ImmutableList<T>,
     index: Int,
     indexWithOffset: Pair<Int, Float>?,
     crossinline itemView: ListItemView<T>,

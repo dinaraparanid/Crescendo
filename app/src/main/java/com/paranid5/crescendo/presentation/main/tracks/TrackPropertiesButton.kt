@@ -28,6 +28,7 @@ import com.paranid5.crescendo.presentation.composition_locals.playing.LocalPlayi
 import com.paranid5.crescendo.presentation.main.trimmer.TrimmerViewModel
 import com.paranid5.crescendo.presentation.main.trimmer.properties.setTrack
 import com.paranid5.crescendo.services.track_service.TrackServiceAccessor
+import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
 import org.koin.compose.koinInject
@@ -113,7 +114,7 @@ private fun AddToCurrentPlaylistItem(
                 trackServiceAccessor.addToPlaylist(defaultTrack)
 
                 val currentPlaylist = storageHandler.currentPlaylistState.value
-                storageHandler.storeCurrentPlaylist(currentPlaylist + defaultTrack)
+                storageHandler.storeCurrentPlaylist((currentPlaylist + defaultTrack).toImmutableList())
             }
         }
     )

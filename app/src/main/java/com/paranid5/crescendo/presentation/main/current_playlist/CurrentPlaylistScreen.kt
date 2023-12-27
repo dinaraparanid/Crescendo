@@ -19,14 +19,16 @@ import com.paranid5.crescendo.presentation.main.current_playlist.effects.TrackDi
 import com.paranid5.crescendo.presentation.main.current_playlist.views.CurrentPlaylistBar
 import com.paranid5.crescendo.presentation.main.current_playlist.views.CurrentPlaylistTrackList
 import com.paranid5.crescendo.presentation.ui.theme.TransparentUtility
+import kotlinx.collections.immutable.ImmutableList
+import kotlinx.collections.immutable.persistentListOf
 
 @Composable
 fun CurrentPlaylistScreen(
     viewModel: CurrentPlaylistViewModel,
     modifier: Modifier = Modifier,
 ) {
-    val playlistDismissMediatorState = remember {
-        mutableStateOf(emptyList<DefaultTrack>())
+    val playlistDismissMediatorState: MutableState<ImmutableList<DefaultTrack>> = remember {
+        mutableStateOf(persistentListOf())
     }
 
     val playlistDismissMediator by playlistDismissMediatorState
@@ -61,7 +63,7 @@ fun CurrentPlaylistScreen(
 
 @Composable
 private fun CurrentPlaylistScreenContent(
-    playlistDismissMediatorState: MutableState<List<DefaultTrack>>,
+    playlistDismissMediatorState: MutableState<ImmutableList<DefaultTrack>>,
     trackIndexDismissMediatorState: MutableState<Int>,
     trackPathDismissKeyState: MutableState<String>,
     viewModel: CurrentPlaylistViewModel,

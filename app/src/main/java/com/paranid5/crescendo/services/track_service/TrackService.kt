@@ -40,6 +40,8 @@ import com.paranid5.crescendo.services.service_controllers.PlaybackController
 import com.paranid5.crescendo.presentation.main.MainActivity
 import com.paranid5.crescendo.presentation.main.playing.Broadcast_CUR_POSITION_CHANGED
 import com.paranid5.crescendo.presentation.main.playing.CUR_POSITION_PLAYING_ARG
+import kotlinx.collections.immutable.ImmutableList
+import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
@@ -115,7 +117,7 @@ class TrackService : SuspendService(), KoinComponent {
                     getParcelableArrayExtra(PLAYLIST_ARG, DefaultTrack::class.java)
 
                 else -> getParcelableArrayExtra(PLAYLIST_ARG) as Array<DefaultTrack>
-            }?.toList()
+            }?.toList()?.toImmutableList()
 
         private inline val Intent.trackArg
             get() = trackArgOrNull!!
@@ -700,7 +702,7 @@ class TrackService : SuspendService(), KoinComponent {
         )
     }
 
-    private suspend fun onTrackClicked(playlist: List<DefaultTrack>, trackInd: Int) {
+    private suspend fun onTrackClicked(playlist: ImmutableList<DefaultTrack>, trackInd: Int) {
         val newCurTrackPath = playlist[trackInd].path
         val prevCurTrackPath = currentTrackOrNull?.path
 
@@ -959,7 +961,7 @@ class TrackService : SuspendService(), KoinComponent {
     private suspend inline fun storeIsRepeating(isRepeating: Boolean) =
         mediaRetrieverController.storeIsRepeating(isRepeating)
 
-    private suspend inline fun storeCurrentPlaylist(playlist: List<DefaultTrack>) =
+    private suspend inline fun storeCurrentPlaylist(playlist: ImmutableList<DefaultTrack>) =
         mediaRetrieverController.storeCurrentPlaylist(playlist)
             .apply { println("STORE CURRENT PLAYLIST") }
 

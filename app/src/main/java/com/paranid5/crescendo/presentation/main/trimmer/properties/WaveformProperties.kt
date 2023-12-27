@@ -3,16 +3,17 @@ package com.paranid5.crescendo.presentation.main.trimmer.properties
 import com.paranid5.crescendo.presentation.main.trimmer.TrimmerViewModel
 import com.paranid5.crescendo.presentation.main.trimmer.states.zoomIn
 import com.paranid5.crescendo.presentation.main.trimmer.states.zoomOut
+import kotlinx.collections.immutable.ImmutableList
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.map
 
 inline val TrimmerViewModel.amplitudesFlow
     get() = waveformStateHolder.amplitudesFlow
 
-fun TrimmerViewModel.setAmplitudesAsync(amplitudes: List<Int>) =
+fun TrimmerViewModel.setAmplitudesAsync(amplitudes: ImmutableList<Int>) =
     waveformStateHolder.setAmplitudesAsync(amplitudes)
 
-suspend inline fun TrimmerViewModel.setAmplitudes(amplitudes: List<Int>) =
+suspend inline fun TrimmerViewModel.setAmplitudes(amplitudes: ImmutableList<Int>) =
     waveformStateHolder.setAmplitudesAsync(amplitudes).join()
 
 inline val TrimmerViewModel.zoomState

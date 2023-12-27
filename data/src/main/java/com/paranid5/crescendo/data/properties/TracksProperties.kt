@@ -3,6 +3,7 @@ package com.paranid5.crescendo.data.properties
 import com.paranid5.crescendo.data.StorageHandler
 import com.paranid5.crescendo.domain.tracks.DefaultTrack
 import com.paranid5.crescendo.domain.tracks.TrackOrder
+import kotlinx.collections.immutable.ImmutableList
 import kotlinx.coroutines.flow.combine
 
 inline val StorageHandler.currentTrackIndexFlow
@@ -14,7 +15,7 @@ suspend inline fun StorageHandler.storeCurrentTrackIndex(index: Int) =
 inline val StorageHandler.currentPlaylistFlow
     get() = tracksStateProvider.currentPlaylistFlow
 
-suspend inline fun StorageHandler.storeCurrentPlaylist(playlist: List<DefaultTrack>) =
+suspend inline fun StorageHandler.storeCurrentPlaylist(playlist: ImmutableList<DefaultTrack>) =
     tracksStateProvider.storeCurrentPlaylist(playlist)
 
 inline val StorageHandler.trackOrderFlow

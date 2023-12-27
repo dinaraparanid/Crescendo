@@ -82,7 +82,7 @@ private fun rememberFixedRotationAngle(
 @Composable
 private fun rememberArcStartAngle(
     angleRange: ClosedFloatingPointRange<Float>
-) = remember(angleRange) {
+) = remember(angleRange.start) {
     derivedStateOf { angleRange.start + 270 }
 }
 

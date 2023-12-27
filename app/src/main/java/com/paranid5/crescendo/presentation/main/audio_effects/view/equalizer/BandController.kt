@@ -3,7 +3,6 @@ package com.paranid5.crescendo.presentation.main.audio_effects.view.equalizer
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
@@ -27,6 +26,7 @@ import com.paranid5.crescendo.R
 import com.paranid5.crescendo.domain.eq.EqualizerData
 import com.paranid5.crescendo.presentation.main.audio_effects.AudioEffectsViewModel
 import com.paranid5.crescendo.presentation.main.audio_effects.view.getBandTrackModel
+import com.paranid5.crescendo.presentation.ui.extensions.collectLatestAsState
 import kotlinx.coroutines.flow.MutableStateFlow
 import org.koin.compose.koinInject
 import org.koin.core.qualifier.named
@@ -40,14 +40,14 @@ fun BandController(
     modifier: Modifier = Modifier,
     equalizerDataState: MutableStateFlow<EqualizerData?> = koinInject(named(EQUALIZER_DATA)),
 ) {
-    val equalizerData by equalizerDataState.collectAsState()
+    val equalizerData by equalizerDataState.collectLatestAsState()
 
-    val minDb by remember(equalizerData) {
-        derivedStateOf { equalizerData!!.minBandLevel / 1000F }
+    val minDb by remember(equalizerData?.minBandLevel) {
+        derivedStateOf { (equalizerData?.minBandLevel ?: 0) / 1000F }
     }
 
-    val maxDb by remember(equalizerData) {
-        derivedStateOf { equalizerData!!.maxBandLevel / 1000F }
+    val maxDb by remember(equalizerData?.maxBandLevel) {
+        derivedStateOf { (equalizerData?.maxBandLevel ?: 0) / 1000F }
     }
 
     val sliderYPosState = remember { mutableFloatStateOf(0F) }

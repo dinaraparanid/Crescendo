@@ -8,6 +8,9 @@ import androidx.datastore.preferences.core.intPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
 import com.paranid5.crescendo.domain.tracks.DefaultTrack
 import com.paranid5.crescendo.domain.tracks.TrackOrder
+import kotlinx.collections.immutable.ImmutableList
+import kotlinx.collections.immutable.persistentListOf
+import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.mapLatest
 import kotlinx.serialization.encodeToString
@@ -40,12 +43,12 @@ class TracksStateProvider(private val dataStore: DataStore<Preferences>) {
         dataStore.data
             .mapLatest { preferences -> preferences[CURRENT_PLAYLIST] }
             .mapLatest { playlistStr -> playlistStr?.let(json::decodePlaylist) }
-            .mapLatest { it ?: emptyList() }
+            .mapLatest { it ?: persistentListOf() }
     }
 
-    suspend fun storeCurrentPlaylist(playlist: List<DefaultTrack>) {
+    suspend fun storeCurrentPlaylist(playlist: ImmutableList<DefaultTrack>) {
         dataStore.edit { preferences ->
-            preferences[CURRENT_PLAYLIST] = json.encodeToString(playlist)
+            preferences[CURRENT_PLAYLIST] = json.encodeToString(playlist.toList())
         }
     }
 
@@ -65,7 +68,7 @@ class TracksStateProvider(private val dataStore: DataStore<Preferences>) {
 }
 
 private fun Json.decodePlaylist(playlistStr: String) =
-    decodeFromString<List<DefaultTrack>>(playlistStr)
+    decodeFromString<List<DefaultTrack>>(playlistStr).toImmutableList()
 
 private fun decodeTrackOrder(bytes: ByteArray): TrackOrder {
     val (contentOrder, orderType) = bytes

@@ -5,7 +5,6 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
@@ -14,6 +13,7 @@ import androidx.lifecycle.viewModelScope
 import com.paranid5.crescendo.R
 import com.paranid5.crescendo.presentation.main.audio_effects.AudioEffectsViewModel
 import com.paranid5.crescendo.presentation.main.audio_effects.view.pitch_speed.AudioEffectEditor
+import com.paranid5.crescendo.presentation.ui.extensions.collectLatestAsState
 import kotlinx.coroutines.launch
 
 @Composable
@@ -45,7 +45,7 @@ private fun PitchEditor(
 ) {
     val pitchText by viewModel
         .pitchTextFlow
-        .collectAsState(initial = null)
+        .collectLatestAsState(initial = null)
 
     if (pitchText != null)
         AudioEffectEditor(
@@ -67,7 +67,7 @@ private fun SpeedEditor(
 ) {
     val speedText by viewModel
         .speedTextState
-        .collectAsState(initial = null)
+        .collectLatestAsState(initial = null)
 
     if (speedText != null)
         AudioEffectEditor(

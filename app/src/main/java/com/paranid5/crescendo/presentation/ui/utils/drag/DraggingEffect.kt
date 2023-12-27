@@ -12,6 +12,8 @@ import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
 import arrow.core.curried
 import com.paranid5.crescendo.domain.utils.extensions.move
+import kotlinx.collections.immutable.ImmutableList
+import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlin.math.absoluteValue
@@ -21,7 +23,7 @@ fun <T> DraggingEffect(
     position: Float?,
     scrollingState: LazyListState,
     isDragging: Boolean,
-    itemsState: MutableState<List<T>>,
+    itemsState: MutableState<ImmutableList<T>>,
     currentDragIndexState: MutableIntState,
     draggedItemIndexState: MutableState<Int?>,
 ) {
@@ -62,7 +64,7 @@ private fun nearestVisibleItem(
 private fun <T> nextDragItemIndex(
     near: Int?,
     draggedItemIndex: Int?,
-    itemsState: MutableState<List<T>>,
+    itemsState: MutableState<ImmutableList<T>>,
     currentDragIndexState: MutableIntState,
 ) = when {
     near == null -> null
@@ -79,8 +81,10 @@ private fun <T> nextDragItemIndex(
     }
 }
 
-private fun <T> List<T>.movedItems(draggedItemIndex: Int, toIndex: Int, ) =
-    toMutableList().apply { move(fromIdx = draggedItemIndex, toIdx = toIndex) }
+private fun <T> ImmutableList<T>.movedItems(draggedItemIndex: Int, toIndex: Int) =
+    toMutableList()
+        .apply { move(fromIdx = draggedItemIndex, toIdx = toIndex) }
+        .toImmutableList()
 
 private fun getMoveForCurItem(
     fromIndex: Int,

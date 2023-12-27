@@ -11,6 +11,7 @@ import com.paranid5.crescendo.presentation.main.trimmer.states.WaveformStateHold
 import com.paranid5.crescendo.presentation.main.trimmer.states.PlaybackPositionsStateHolder
 import com.paranid5.crescendo.presentation.main.trimmer.states.PlaybackStateHolder
 import com.paranid5.crescendo.presentation.main.trimmer.states.TrackStateHolder
+import kotlinx.collections.immutable.persistentListOf
 
 class TrimmerViewModel(
     private val savedStateHandle: SavedStateHandle,
@@ -36,7 +37,7 @@ class TrimmerViewModel(
 
     override fun onCleared() {
         super.onCleared()
-        setAmplitudesAsync(emptyList())
+        setAmplitudesAsync(persistentListOf())
         releasePlaybackPosMonitorTask()
     }
 }

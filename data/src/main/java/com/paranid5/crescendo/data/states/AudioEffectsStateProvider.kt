@@ -9,6 +9,9 @@ import androidx.datastore.preferences.core.intPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
 import com.paranid5.crescendo.domain.eq.EqualizerBandsPreset
 import com.paranid5.crescendo.domain.eq.EqualizerData
+import kotlinx.collections.immutable.ImmutableList
+import kotlinx.collections.immutable.persistentListOf
+import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.mapLatest
 import kotlinx.serialization.encodeToString
@@ -74,12 +77,12 @@ class AudioEffectsStateProvider(private val dataStore: DataStore<Preferences>) {
         dataStore.data
             .mapLatest { preferences -> preferences[EQ_BANDS] }
             .mapLatest { bandsStr -> bandsStr?.let(json::decodeEqBands) }
-            .mapLatest { it ?: emptyList() }
+            .mapLatest { it ?: persistentListOf() }
     }
 
-    suspend fun storeEqualizerBands(bands: List<Short>) {
+    suspend fun storeEqualizerBands(bands: ImmutableList<Short>) {
         dataStore.edit { preferences ->
-            preferences[EQ_BANDS] = json.encodeToString(bands)
+            preferences[EQ_BANDS] = json.encodeToString(bands.toList())
         }
     }
 
@@ -138,4 +141,4 @@ class AudioEffectsStateProvider(private val dataStore: DataStore<Preferences>) {
 }
 
 private fun Json.decodeEqBands(bandsStr: String) =
-    decodeFromString<List<Short>?>(bandsStr)
+    decodeFromString<List<Short>?>(bandsStr)?.toImmutableList()

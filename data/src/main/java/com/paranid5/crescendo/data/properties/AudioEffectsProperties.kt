@@ -2,6 +2,7 @@ package com.paranid5.crescendo.data.properties
 
 import com.paranid5.crescendo.data.StorageHandler
 import com.paranid5.crescendo.domain.eq.EqualizerBandsPreset
+import kotlinx.collections.immutable.ImmutableList
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.mapLatest
 
@@ -34,7 +35,7 @@ suspend inline fun StorageHandler.storeSpeed(speed: Float) =
 inline val StorageHandler.equalizerBandsFlow
     get() = audioEffectsStateProvider.equalizerBandsFlow
 
-suspend inline fun StorageHandler.storeEqualizerBands(bands: List<Short>) =
+suspend inline fun StorageHandler.storeEqualizerBands(bands: ImmutableList<Short>) =
     audioEffectsStateProvider.storeEqualizerBands(bands)
 
 inline val StorageHandler.equalizerPresetFlow

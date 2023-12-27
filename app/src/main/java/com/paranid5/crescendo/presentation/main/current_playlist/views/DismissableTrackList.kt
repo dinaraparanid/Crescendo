@@ -7,10 +7,11 @@ import com.paranid5.crescendo.domain.tracks.Track
 import com.paranid5.crescendo.presentation.main.tracks.DefaultTrackItem
 import com.paranid5.crescendo.presentation.ui.utils.drag.DismissableList
 import com.paranid5.crescendo.presentation.ui.utils.drag.ListItemView
+import kotlinx.collections.immutable.ImmutableList
 
 @Composable
 internal inline fun <T : Track> DismissableTrackList(
-    tracks: List<T>,
+    tracks: ImmutableList<T>,
     scrollingState: LazyListState,
     crossinline onDismissed: (Int, T) -> Boolean,
     crossinline trackItemView: ListItemView<T>,
@@ -32,7 +33,7 @@ internal inline fun <T : Track> DismissableTrackList(
 
 @Composable
 internal inline fun <T : Track> DismissableTrackList(
-    tracks: List<T>,
+    tracks: ImmutableList<T>,
     scrollingState: LazyListState,
     crossinline onDismissed: (Int, T) -> Boolean,
     modifier: Modifier = Modifier,

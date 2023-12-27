@@ -3,6 +3,7 @@ package com.paranid5.crescendo.presentation.main.trimmer.states
 import com.paranid5.crescendo.data.StorageHandler
 import com.paranid5.crescendo.data.properties.amplitudesFlow
 import com.paranid5.crescendo.data.properties.storeAmplitudes
+import kotlinx.collections.immutable.ImmutableList
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -16,7 +17,7 @@ class WaveformStateHolder(
 ) : CoroutineScope by scope {
     val amplitudesFlow by lazy { storageHandler.amplitudesFlow }
 
-    fun setAmplitudesAsync(amplitudes: List<Int>) = launch(Dispatchers.IO) {
+    fun setAmplitudesAsync(amplitudes: ImmutableList<Int>) = launch(Dispatchers.IO) {
         storageHandler.storeAmplitudes(amplitudes)
     }
 

@@ -4,6 +4,9 @@ import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.stringPreferencesKey
+import kotlinx.collections.immutable.ImmutableList
+import kotlinx.collections.immutable.persistentListOf
+import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.mapLatest
 import kotlinx.serialization.encodeToString
@@ -21,15 +24,15 @@ class WaveformStateProvider(private val dataStore: DataStore<Preferences>) {
         dataStore.data
             .mapLatest { preferences -> preferences[AMPLITUDES] }
             .mapLatest { amplitudesStr -> amplitudesStr?.let(json::decodeAmplitudes) }
-            .mapLatest { it ?: emptyList() }
+            .mapLatest { it ?: persistentListOf() }
     }
 
-    suspend fun storeAmplitudes(amplitudes: List<Int>) {
+    suspend fun storeAmplitudes(amplitudes: ImmutableList<Int>) {
         dataStore.edit { preferences ->
-            preferences[AMPLITUDES] = json.encodeToString(amplitudes)
+            preferences[AMPLITUDES] = json.encodeToString(amplitudes.toList())
         }
     }
 }
 
 private fun Json.decodeAmplitudes(amplitudesStr: String) =
-    decodeFromString<List<Int>>(amplitudesStr)
+    decodeFromString<List<Int>>(amplitudesStr).toImmutableList()

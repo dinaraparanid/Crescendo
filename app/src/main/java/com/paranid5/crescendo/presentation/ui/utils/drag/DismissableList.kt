@@ -13,10 +13,11 @@ import androidx.compose.material3.rememberDismissState
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import kotlinx.collections.immutable.ImmutableList
 
 @Composable
 internal inline fun <T> DismissableList(
-    items: List<T>,
+    items: ImmutableList<T>,
     scrollingState: LazyListState,
     crossinline onDismissed: (Int, T) -> Boolean,
     crossinline itemView: ListItemView<T>,
@@ -42,7 +43,7 @@ internal inline fun <T> DismissableList(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private inline fun <T> DismissableItem(
-    items: List<T>,
+    items: ImmutableList<T>,
     index: Int,
     crossinline onDismissed: (Int, T) -> Boolean,
     crossinline itemView: ListItemView<T>,

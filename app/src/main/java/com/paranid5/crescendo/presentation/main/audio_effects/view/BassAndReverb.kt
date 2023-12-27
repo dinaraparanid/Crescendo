@@ -5,7 +5,6 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.width
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.State
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
@@ -19,6 +18,7 @@ import com.paranid5.crescendo.domain.utils.extensions.PresetReverb
 import com.paranid5.crescendo.presentation.main.audio_effects.AudioEffectsUIHandler
 import com.paranid5.crescendo.presentation.main.audio_effects.AudioEffectsViewModel
 import com.paranid5.crescendo.presentation.main.audio_effects.view.bass_reverb.AudioControllerWithLabel
+import com.paranid5.crescendo.presentation.ui.extensions.collectLatestAsState
 import kotlinx.coroutines.launch
 import org.koin.compose.koinInject
 
@@ -47,8 +47,12 @@ private fun BassController(
     audioEffectsUIHandler: AudioEffectsUIHandler = koinInject()
 ) {
     val context = LocalContext.current
+
     val bassValue by rememberBassValue(viewModel)
-    val audioStatus by viewModel.audioStatusFlow.collectAsState(initial = null)
+
+    val audioStatus by viewModel
+        .audioStatusFlow
+        .collectLatestAsState(initial = null)
 
     if (bassValue != null)
         AudioControllerWithLabel(
@@ -79,7 +83,7 @@ private fun ReverbController(
 
     val audioStatus by viewModel
         .audioStatusFlow
-        .collectAsState(initial = null)
+        .collectLatestAsState(initial = null)
 
     if (reverbValue != null)
         AudioControllerWithLabel(
@@ -102,7 +106,7 @@ private fun ReverbController(
 private fun rememberBassValue(viewModel: AudioEffectsViewModel): State<Float?> {
     val bassStrength by viewModel
         .bassStrengthFlow
-        .collectAsState(initial = null)
+        .collectLatestAsState(initial = null)
 
     return remember(bassStrength) {
         derivedStateOf { bassStrength?.toFloat() }
@@ -113,7 +117,7 @@ private fun rememberBassValue(viewModel: AudioEffectsViewModel): State<Float?> {
 private fun rememberReverbValue(viewModel: AudioEffectsViewModel): State<Float?> {
     val reverbPreset by viewModel
         .reverbPresetFlow
-        .collectAsState(initial = null)
+        .collectLatestAsState(initial = null)
 
     return remember(reverbPreset) {
         derivedStateOf { reverbPreset?.toFloat() }
