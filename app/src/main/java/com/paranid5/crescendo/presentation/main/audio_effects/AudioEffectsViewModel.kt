@@ -1,42 +1,46 @@
 package com.paranid5.crescendo.presentation.main.audio_effects
 
-import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import com.paranid5.crescendo.data.StorageHandler
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.updateAndGet
+import com.paranid5.crescendo.data.properties.areAudioEffectsEnabledFlow
+import com.paranid5.crescendo.data.properties.audioStatusFlow
+import com.paranid5.crescendo.data.properties.bassStrengthFlow
+import com.paranid5.crescendo.data.properties.pitchTextFlow
+import com.paranid5.crescendo.data.properties.reverbPresetFlow
+import com.paranid5.crescendo.data.properties.speedTextFlow
+import com.paranid5.crescendo.data.properties.storePitch
+import com.paranid5.crescendo.data.properties.storeSpeed
 
-class AudioEffectsViewModel(
-    private val savedStateHandle: SavedStateHandle,
-    private val storageHandler: StorageHandler
-) : ViewModel() {
-    private companion object {
-        private const val PITCH_TEXT = "pitch_text"
-        private const val SPEED_TEXT = "speed_text"
+class AudioEffectsViewModel(private val storageHandler: StorageHandler) : ViewModel() {
+    val areAudioEffectsEnabledFlow by lazy {
+        storageHandler.areAudioEffectsEnabledFlow
     }
 
-    private val _pitchTextState by lazy {
-        val savedByStateHandlerPitchText = savedStateHandle.get<String>(PITCH_TEXT)
-        val savedByStorageHandlerPitch = storageHandler.pitchState.value
-        MutableStateFlow(savedByStateHandlerPitchText ?: savedByStorageHandlerPitch.toString())
+    val audioStatusFlow by lazy {
+        storageHandler.audioStatusFlow
     }
 
-    private val _speedTextState by lazy {
-        val savedByStateHandlerSpeedText = savedStateHandle.get<String>(SPEED_TEXT)
-        val savedByStorageHandlerSpeed = storageHandler.speedState.value
-        MutableStateFlow(savedByStateHandlerSpeedText ?: savedByStorageHandlerSpeed.toString())
+    val bassStrengthFlow by lazy {
+        storageHandler.bassStrengthFlow
     }
 
-    val pitchTextState by lazy { _pitchTextState.asStateFlow() }
-
-    fun setPitchText(pitchText: String) {
-        savedStateHandle[PITCH_TEXT] = _pitchTextState.updateAndGet { pitchText }
+    val reverbPresetFlow by lazy {
+        storageHandler.reverbPresetFlow
     }
 
-    val speedTextState by lazy { _speedTextState.asStateFlow() }
+    val pitchTextFlow by lazy {
+        storageHandler.pitchTextFlow
+    }
 
-    fun setSpeedText(pitchText: String) {
-        savedStateHandle[SPEED_TEXT] = _speedTextState.updateAndGet { pitchText }
+    val speedTextState by lazy {
+        storageHandler.speedTextFlow
+    }
+
+    suspend fun storePitch(pitch: Float) {
+        storageHandler.storePitch(pitch)
+    }
+
+    suspend fun storeSpeed(speed: Float) {
+        storageHandler.storeSpeed(speed)
     }
 }

@@ -17,7 +17,7 @@ import com.paranid5.crescendo.presentation.main.audio_effects.AudioEffectsViewMo
 import com.paranid5.crescendo.presentation.composition_locals.LocalActivity
 import com.paranid5.crescendo.presentation.composition_locals.LocalCurrentPlaylistSheetState
 import com.paranid5.crescendo.presentation.composition_locals.LocalNavController
-import com.paranid5.crescendo.presentation.composition_locals.LocalPlayingSheetState
+import com.paranid5.crescendo.presentation.composition_locals.playing.LocalPlayingSheetState
 import com.paranid5.crescendo.presentation.main.favourites.FavouritesScreen
 import com.paranid5.crescendo.presentation.main.fetch_stream.FetchStreamViewModel
 import com.paranid5.crescendo.presentation.main.fetch_stream.SearchStreamScreen
@@ -107,7 +107,11 @@ fun ContentScreen(
 
         composable(route = Screens.Audio.AudioEffects.title) {
             viewModel.setCurScreen(Screens.Audio.AudioEffects)
-            AudioEffectsScreen(audioEffectsViewModel)
+
+            AudioEffectsScreen(
+                viewModel = audioEffectsViewModel,
+                modifier = Modifier.padding(horizontal = 10.dp)
+            )
         }
 
         composable(route = Screens.Audio.Trimmer.title) {

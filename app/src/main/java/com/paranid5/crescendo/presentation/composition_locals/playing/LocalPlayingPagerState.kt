@@ -1,4 +1,4 @@
-package com.paranid5.crescendo.presentation.composition_locals
+package com.paranid5.crescendo.presentation.composition_locals.playing
 
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.pager.PagerState

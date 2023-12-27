@@ -20,8 +20,8 @@ import androidx.compose.ui.Modifier
 import com.paranid5.crescendo.presentation.UpdateCheckerDialog
 import com.paranid5.crescendo.presentation.main.appbar.appBarHeight
 import com.paranid5.crescendo.presentation.composition_locals.LocalCurrentPlaylistSheetState
-import com.paranid5.crescendo.presentation.composition_locals.LocalPlayingPagerState
-import com.paranid5.crescendo.presentation.composition_locals.LocalPlayingSheetState
+import com.paranid5.crescendo.presentation.composition_locals.playing.LocalPlayingPagerState
+import com.paranid5.crescendo.presentation.composition_locals.playing.LocalPlayingSheetState
 import com.paranid5.crescendo.presentation.ui.permissions.requests.externalStoragePermissionsRequestLauncher
 import com.paranid5.crescendo.presentation.ui.theme.LocalAppColors
 

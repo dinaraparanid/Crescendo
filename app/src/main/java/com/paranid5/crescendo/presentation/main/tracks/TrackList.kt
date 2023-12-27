@@ -12,7 +12,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.paranid5.crescendo.data.StorageHandler
 import com.paranid5.crescendo.domain.tracks.Track
-import com.paranid5.crescendo.presentation.composition_locals.LocalPlayingPagerState
+import com.paranid5.crescendo.presentation.composition_locals.playing.LocalPlayingPagerState
 import com.paranid5.crescendo.services.track_service.TrackServiceAccessor
 import kotlinx.coroutines.CoroutineScope
 import org.koin.compose.koinInject

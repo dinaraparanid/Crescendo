@@ -1,4 +1,4 @@
-package com.paranid5.crescendo.presentation.composition_locals
+package com.paranid5.crescendo.presentation.composition_locals.playing
 
 import androidx.compose.material.BottomSheetScaffoldState
 import androidx.compose.material.ExperimentalMaterialApi

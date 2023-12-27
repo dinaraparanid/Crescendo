@@ -25,7 +25,7 @@ import com.paranid5.crescendo.R
 import com.paranid5.crescendo.data.StorageHandler
 import com.paranid5.crescendo.presentation.composition_locals.LocalCurrentPlaylistSheetState
 import com.paranid5.crescendo.presentation.composition_locals.LocalNavController
-import com.paranid5.crescendo.presentation.composition_locals.LocalPlayingSheetState
+import com.paranid5.crescendo.presentation.composition_locals.playing.LocalPlayingSheetState
 import com.paranid5.crescendo.domain.media.AudioStatus
 import com.paranid5.crescendo.presentation.ui.extensions.getLightMutedOrPrimary
 import com.paranid5.crescendo.presentation.ui.extensions.simpleShadow

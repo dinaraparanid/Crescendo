@@ -13,4 +13,7 @@ object PresetReverb {
             PresetReverb.PRESET_LARGEHALL,
             PresetReverb.PRESET_PLATE,
         )
+
+    inline val presetsNumber
+        get() = presets.size
 }

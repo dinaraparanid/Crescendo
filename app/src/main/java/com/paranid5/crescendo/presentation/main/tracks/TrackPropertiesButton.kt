@@ -24,7 +24,7 @@ import com.paranid5.crescendo.domain.tracks.Track
 import com.paranid5.crescendo.presentation.main.Screens
 import com.paranid5.crescendo.presentation.composition_locals.LocalActivity
 import com.paranid5.crescendo.presentation.composition_locals.LocalNavController
-import com.paranid5.crescendo.presentation.composition_locals.LocalPlayingSheetState
+import com.paranid5.crescendo.presentation.composition_locals.playing.LocalPlayingSheetState
 import com.paranid5.crescendo.presentation.main.trimmer.TrimmerViewModel
 import com.paranid5.crescendo.presentation.main.trimmer.properties.setTrack
 import com.paranid5.crescendo.services.track_service.TrackServiceAccessor
