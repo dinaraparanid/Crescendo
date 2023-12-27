@@ -2,132 +2,98 @@ package com.paranid5.crescendo.presentation.main.current_playlist
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import com.paranid5.crescendo.R
-import com.paranid5.crescendo.data.StorageHandler
-import com.paranid5.crescendo.data.properties.storeCurrentPlaylist
-import com.paranid5.crescendo.data.properties.storeCurrentTrackIndex
 import com.paranid5.crescendo.domain.tracks.DefaultTrack
-import com.paranid5.crescendo.domain.utils.extensions.timeString
-import com.paranid5.crescendo.domain.utils.extensions.totalDuration
-import com.paranid5.crescendo.presentation.ui.theme.LocalAppColors
+import com.paranid5.crescendo.presentation.main.current_playlist.effects.TrackDismissEffect
+import com.paranid5.crescendo.presentation.main.current_playlist.views.CurrentPlaylistBar
+import com.paranid5.crescendo.presentation.main.current_playlist.views.CurrentPlaylistTrackList
 import com.paranid5.crescendo.presentation.ui.theme.TransparentUtility
-import com.paranid5.crescendo.services.track_service.TrackServiceAccessor
-import org.koin.compose.koinInject
 
 @Composable
 fun CurrentPlaylistScreen(
+    viewModel: CurrentPlaylistViewModel,
     modifier: Modifier = Modifier,
-    storageHandler: StorageHandler = koinInject(),
-    trackServiceAccessor: TrackServiceAccessor = koinInject()
 ) {
-    val currentPlaylist by storageHandler.currentPlaylistState.collectAsState()
-    val currentTrackIndex by storageHandler.currentTrackIndexState.collectAsState()
-    val scrollingState = rememberLazyListState()
-
-    var playlistDismissMediator by remember {
+    val playlistDismissMediatorState = remember {
         mutableStateOf(emptyList<DefaultTrack>())
     }
 
-    var trackIndexDismissMediator by remember {
+    val playlistDismissMediator by playlistDismissMediatorState
+
+    val trackIndexDismissMediatorState = remember {
         mutableIntStateOf(0)
     }
 
-    var trackPathDismissKey by remember {
+    val trackIndexDismissMediator by trackIndexDismissMediatorState
+
+    val trackPathDismissKeyState = remember {
         mutableStateOf("")
     }
 
-    LaunchedEffect(trackPathDismissKey) {
-        if (trackPathDismissKey.isNotBlank()) {
-            storageHandler.storeCurrentPlaylist(playlistDismissMediator)
+    val trackPathDismissKey by trackPathDismissKeyState
 
-            if (trackIndexDismissMediator < currentTrackIndex)
-                storageHandler.storeCurrentTrackIndex(currentTrackIndex - 1)
+    TrackDismissEffect(
+        viewModel = viewModel,
+        trackPathDismissKey = trackPathDismissKey,
+        playlistDismissMediator = playlistDismissMediator,
+        trackIndexDismissMediator = trackIndexDismissMediator
+    )
 
-            trackServiceAccessor.removeFromPlaylist(trackIndexDismissMediator)
-        }
-    }
-
-    Column(modifier) {
-        CurrentPlaylistBar(
-            tracksNumber = currentPlaylist.size,
-            totalDuration = currentPlaylist.totalDuration,
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(start = 10.dp, end = 10.dp, bottom = 10.dp)
-        )
-
-        Spacer(
-            Modifier
-                .fillMaxWidth()
-                .height(2.dp)
-                .background(TransparentUtility)
-        )
-
-        DraggableTrackList(
-            tracks = currentPlaylist,
-            scrollingState = scrollingState,
-            modifier = modifier.padding(start = 10.dp, end = 5.dp, bottom = 10.dp),
-            onTrackDismissed = { index, track ->
-                if (index == currentTrackIndex)
-                    return@DraggableTrackList false
-
-                playlistDismissMediator = currentPlaylist.take(index) +
-                        currentPlaylist.drop(index + 1)
-
-                trackIndexDismissMediator = index
-                trackPathDismissKey = track.path
-
-                true
-            }
-        ) { newTracks, newCurTrackIndex ->
-            @Suppress("UNCHECKED_CAST")
-            storageHandler.storeCurrentPlaylist(newTracks as List<DefaultTrack>)
-            storageHandler.storeCurrentTrackIndex(newCurTrackIndex)
-            trackServiceAccessor.updatePlaylistAfterDrag(newTracks, newCurTrackIndex)
-        }
-    }
+    CurrentPlaylistScreenContent(
+        playlistDismissMediatorState = playlistDismissMediatorState,
+        trackIndexDismissMediatorState = trackIndexDismissMediatorState,
+        trackPathDismissKeyState = trackPathDismissKeyState,
+        viewModel = viewModel,
+        modifier = modifier
+    )
 }
 
 @Composable
-private fun CurrentPlaylistBar(
+private fun CurrentPlaylistScreenContent(
+    playlistDismissMediatorState: MutableState<List<DefaultTrack>>,
+    trackIndexDismissMediatorState: MutableState<Int>,
+    trackPathDismissKeyState: MutableState<String>,
+    viewModel: CurrentPlaylistViewModel,
     modifier: Modifier = Modifier,
-    tracksNumber: Int,
-    totalDuration: Long
-) {
-    val colors = LocalAppColors.current.colorScheme
+) = Column(modifier) {
+    CurrentPlaylistBar(
+        viewModel = viewModel,
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(start = 10.dp, end = 10.dp, bottom = 10.dp)
+    )
 
-    Row(modifier.fillMaxWidth()) {
-        Text(
-            text = "${stringResource(R.string.tracks)}: $tracksNumber",
-            color = colors.primary,
-            textAlign = TextAlign.Start,
-            modifier = Modifier.weight(1F)
-        )
+    CurrentPlaylistBarSeparator(Modifier.height(2.dp))
 
-        Text(
-            text = "${stringResource(R.string.duration)}: ${totalDuration.timeString}",
-            color = colors.primary,
-            textAlign = TextAlign.Start,
-            modifier = Modifier.weight(1F)
-        )
-    }
+    CurrentPlaylistTrackList(
+        playlistDismissMediatorState = playlistDismissMediatorState,
+        trackIndexDismissMediatorState = trackIndexDismissMediatorState,
+        trackPathDismissKeyState = trackPathDismissKeyState,
+        viewModel = viewModel,
+        modifier = Modifier.padding(
+            top = 16.dp,
+            start = 8.dp,
+            end = 4.dp,
+            bottom = 8.dp
+        ),
+    )
 }
+
+@Composable
+private fun CurrentPlaylistBarSeparator(modifier: Modifier = Modifier) =
+    Spacer(
+        modifier
+            .fillMaxWidth()
+            .background(TransparentUtility)
+    )

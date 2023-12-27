@@ -17,6 +17,7 @@ import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -31,30 +32,26 @@ import coil.compose.AsyncImage
 import com.paranid5.crescendo.R
 import com.paranid5.crescendo.data.StorageHandler
 import com.paranid5.crescendo.data.properties.storeAudioStatus
+import com.paranid5.crescendo.domain.media.AudioStatus
 import com.paranid5.crescendo.domain.tracks.Track
 import com.paranid5.crescendo.domain.utils.extensions.artistAlbum
 import com.paranid5.crescendo.domain.utils.extensions.toDefaultTrackList
-import com.paranid5.crescendo.domain.media.AudioStatus
 import com.paranid5.crescendo.media.images.ImageSize
 import com.paranid5.crescendo.presentation.main.getTrackCoverModel
 import com.paranid5.crescendo.presentation.ui.permissions.requests.audioRecordingPermissionsRequestLauncher
 import com.paranid5.crescendo.presentation.ui.permissions.requests.foregroundServicePermissionsRequestLauncher
 import com.paranid5.crescendo.presentation.ui.theme.LocalAppColors
 import com.paranid5.crescendo.services.track_service.TrackServiceAccessor
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
+import org.koin.compose.koinInject
 
 @Composable
 fun DefaultTrackItem(
     tracks: List<Track>,
     trackInd: Int,
-    scope: CoroutineScope,
-    storageHandler: StorageHandler,
-    trackServiceAccessor: TrackServiceAccessor,
     modifier: Modifier = Modifier,
-    onClick: suspend () -> Unit = suspend {
-        startPlaylistPlayback(tracks, trackInd, storageHandler, trackServiceAccessor)
-    }
+    storageHandler: StorageHandler = koinInject(),
+    onClick: () -> Unit
 ) {
     val colors = LocalAppColors.current.colorScheme
     val currentTrack by storageHandler.currentTrackState.collectAsState()
@@ -72,6 +69,8 @@ fun DefaultTrackItem(
 
     val isForegroundServicePermissionDialogShownState = remember { mutableStateOf(false) }
     val isAudioRecordingPermissionDialogShownState = remember { mutableStateOf(false) }
+
+    val coroutineScope = rememberCoroutineScope()
 
     trackMb?.let { track ->
         Box(modifier) {
@@ -97,7 +96,7 @@ fun DefaultTrackItem(
                         return@clickable
                     }
 
-                    scope.launch { onClick() }
+                    coroutineScope.launch { onClick() }
                 }
             ) {
                 TrackCover(
@@ -124,12 +123,37 @@ fun DefaultTrackItem(
                 TrackPropertiesButton(
                     track = track,
                     iconModifier = Modifier.height(20.dp),
-                    storageHandler = storageHandler,
-                    trackServiceAccessor = trackServiceAccessor
                 )
             }
         }
     }
+}
+
+@Composable
+fun DefaultTrackItem(
+    tracks: List<Track>,
+    trackInd: Int,
+    modifier: Modifier = Modifier,
+    storageHandler: StorageHandler = koinInject(),
+    trackServiceAccessor: TrackServiceAccessor = koinInject(),
+) {
+    val coroutineScope = rememberCoroutineScope()
+
+    DefaultTrackItem(
+        tracks = tracks,
+        trackInd = trackInd,
+        modifier = modifier,
+        onClick = {
+            coroutineScope.launch {
+                startPlaylistPlayback(
+                    tracks,
+                    trackInd,
+                    storageHandler,
+                    trackServiceAccessor
+                )
+            }
+        }
+    )
 }
 
 internal suspend inline fun startPlaylistPlayback(

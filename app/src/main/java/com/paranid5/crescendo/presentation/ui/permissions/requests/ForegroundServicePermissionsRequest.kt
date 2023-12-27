@@ -11,8 +11,8 @@ import java.util.Queue
 
 @Composable
 fun foregroundServicePermissionsRequestLauncher(
-    isForegroundServicePermissionDialogShownState: MutableState<Boolean>,
-    modifier: Modifier = Modifier
+    isFGPermissionDialogShownState: MutableState<Boolean>,
+    modifier: Modifier = Modifier,
 ): Pair<Boolean, () -> Unit> {
     val foregroundServicePermissionQueue = koinInject<Queue<String>>(
         named(FOREGROUND_SERVICE_PERMISSION_QUEUE)
@@ -24,6 +24,6 @@ fun foregroundServicePermissionsRequestLauncher(
         modifier = modifier,
         permissionQueue = foregroundServicePermissionQueue,
         descriptionProvider = foregroundServiceDescriptionProvider,
-        isPermissionDialogShownState = isForegroundServicePermissionDialogShownState,
+        isPermissionDialogShownState = isFGPermissionDialogShownState,
     )
 }

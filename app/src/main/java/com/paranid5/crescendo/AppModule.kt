@@ -10,6 +10,7 @@ import com.paranid5.crescendo.domain.ktor_client.KtorClient
 import com.paranid5.crescendo.presentation.main.MainActivityViewModel
 import com.paranid5.crescendo.presentation.main.audio_effects.AudioEffectsUIHandler
 import com.paranid5.crescendo.presentation.main.audio_effects.AudioEffectsViewModel
+import com.paranid5.crescendo.presentation.main.current_playlist.CurrentPlaylistViewModel
 import com.paranid5.crescendo.presentation.main.fetch_stream.FetchStreamUIHandler
 import com.paranid5.crescendo.presentation.main.fetch_stream.FetchStreamViewModel
 import com.paranid5.crescendo.presentation.main.playing.PlayingUIHandler
@@ -131,6 +132,10 @@ private val audioEffectsModule = module {
     viewModelOf(::AudioEffectsViewModel)
 }
 
+private val currentPlaylistModule = module {
+    viewModelOf(::CurrentPlaylistViewModel)
+}
+
 private val trimmerModule = module {
     singleOf(::TrimmerUIHandler)
     viewModelOf(::TrimmerViewModel)
@@ -145,7 +150,7 @@ private val uiMainModule = module {
     includes(
         searchStreamModule, playingModule,
         audioEffectsModule, trimmerModule,
-        tracksModule
+        tracksModule, currentPlaylistModule
     )
 }
 

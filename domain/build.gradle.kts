@@ -49,6 +49,7 @@ dependencies {
     implementation(libs.ktor.client.content.negotiation)
 
     implementation(libs.kotlinx.serialization.json)
+    implementation(libs.kotlinx.collections.immutable)
     implementation(libs.koin.androidx.compose)
 
     implementation(libs.mobile.ffmpeg.full)

@@ -1,17 +1,21 @@
 package com.paranid5.crescendo.domain.eq
 
 import android.media.audiofx.Equalizer
+import androidx.compose.runtime.Immutable
 import com.paranid5.crescendo.domain.utils.extensions.bandLevels
 import com.paranid5.crescendo.domain.utils.extensions.frequencies
 import com.paranid5.crescendo.domain.utils.extensions.presets
+import kotlinx.collections.immutable.ImmutableList
+import kotlinx.collections.immutable.toImmutableList
 
+@Immutable
 data class EqualizerData(
     val minBandLevel: Short,
     val maxBandLevel: Short,
-    val bandLevels: List<Short>,
-    val presets: List<String>,
+    val bandLevels: ImmutableList<Short>,
+    val presets: ImmutableList<String>,
     val currentPreset: Short,
-    val bandFrequencies: List<Int>,
+    val bandFrequencies: ImmutableList<Int>,
     val bandsPreset: EqualizerBandsPreset,
 ) {
     companion object {
@@ -29,13 +33,13 @@ data class EqualizerData(
         bandLevels = when (currentParameter) {
             EqualizerBandsPreset.CUSTOM -> bandLevels!!
             else -> eq.bandLevels
-        },
-        presets = eq.presets,
+        }.toImmutableList(),
+        presets = eq.presets.toImmutableList(),
         currentPreset = when (currentParameter) {
             EqualizerBandsPreset.CUSTOM -> NO_EQ_PRESET
             else -> currentPreset
         },
-        bandFrequencies = eq.frequencies,
+        bandFrequencies = eq.frequencies.toImmutableList(),
         bandsPreset = currentParameter
     )
 }

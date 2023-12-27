@@ -22,9 +22,11 @@ import com.paranid5.crescendo.presentation.composition_locals.playing.LocalPlayi
 import com.paranid5.crescendo.presentation.composition_locals.playing.LocalPlayingSheetState
 import com.paranid5.crescendo.presentation.main.appbar.AppBar
 import com.paranid5.crescendo.presentation.main.current_playlist.CurrentPlaylistScreen
+import com.paranid5.crescendo.presentation.main.current_playlist.CurrentPlaylistViewModel
 import com.paranid5.crescendo.presentation.main.playing.PlayingScreen
 import com.paranid5.crescendo.presentation.ui.theme.LocalAppColors
 import com.paranid5.crescendo.presentation.ui.utils.PushUpButton
+import org.koin.androidx.compose.koinViewModel
 
 @OptIn(ExperimentalMaterialApi::class, ExperimentalFoundationApi::class)
 @Composable
@@ -90,18 +92,22 @@ fun PlayingBottomSheet(
 }
 
 @Composable
-private fun CurrentPlaylistBottomSheet(alpha: Float, modifier: Modifier = Modifier) =
-    Box(modifier) {
-        PushUpButton(
-            alpha = alpha,
-            modifier = Modifier
-                .padding(top = 12.dp)
-                .align(Alignment.TopCenter)
-        )
+private fun CurrentPlaylistBottomSheet(
+    alpha: Float,
+    modifier: Modifier = Modifier,
+    currentPlaylistViewModel: CurrentPlaylistViewModel = koinViewModel()
+) = Box(modifier) {
+    PushUpButton(
+        alpha = alpha,
+        modifier = Modifier
+            .padding(top = 12.dp)
+            .align(Alignment.TopCenter)
+    )
 
-        CurrentPlaylistScreen(
-            Modifier
-                .fillMaxSize()
-                .padding(top = 25.dp)
-        )
-    }
+    CurrentPlaylistScreen(
+        viewModel = currentPlaylistViewModel,
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(top = 24.dp)
+    )
+}

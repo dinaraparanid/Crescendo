@@ -14,15 +14,12 @@ import com.paranid5.crescendo.data.StorageHandler
 import com.paranid5.crescendo.domain.tracks.Track
 import com.paranid5.crescendo.presentation.composition_locals.playing.LocalPlayingPagerState
 import com.paranid5.crescendo.services.track_service.TrackServiceAccessor
-import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
 import org.koin.compose.koinInject
 
 typealias TrackItemView = @Composable (
     tracks: List<Track>,
     trackInd: Int,
-    scope: CoroutineScope,
-    storageHandler: StorageHandler,
-    trackServiceAccessor: TrackServiceAccessor,
     modifier: Modifier
 ) -> Unit
 
@@ -33,11 +30,7 @@ fun TrackList(
     modifier: Modifier = Modifier,
     trackItemModifier: Modifier = Modifier,
     trackItemView: TrackItemView,
-    storageHandler: StorageHandler = koinInject(),
-    trackServiceAccessor: TrackServiceAccessor = koinInject()
 ) {
-    val scope = rememberCoroutineScope()
-
     LazyColumn(
         verticalArrangement = Arrangement.spacedBy(10.dp),
         state = scrollingState,
@@ -50,9 +43,6 @@ fun TrackList(
             trackItemView(
                 tracks,
                 ind,
-                scope,
-                storageHandler,
-                trackServiceAccessor,
                 trackItemModifier.fillMaxWidth()
             )
         }
@@ -70,25 +60,23 @@ fun TrackList(
     trackServiceAccessor: TrackServiceAccessor = koinInject()
 ) {
     val playingPagerState = LocalPlayingPagerState.current
+    val coroutineScope = rememberCoroutineScope()
 
     TrackList(
         tracks = tracks,
         scrollingState = scrollingState,
         modifier = modifier,
-        trackItemView = { _, trackInd, scope, _, _, trackModifier ->
+        trackItemView = { trackList, trackInd, trackModifier ->
             DefaultTrackItem(
-                modifier = trackModifier.then(trackItemModifier),
-                tracks = tracks,
-                trackInd = trackInd,
-                scope = scope,
-                storageHandler = storageHandler,
-                trackServiceAccessor = trackServiceAccessor,
+                modifier = trackModifier then trackItemModifier,
+                tracks = trackList,
+                trackInd = trackInd
             ) {
-                playingPagerState?.animateScrollToPage(0)
-                startPlaylistPlayback(tracks, trackInd, storageHandler, trackServiceAccessor)
+                coroutineScope.launch {
+                    playingPagerState?.animateScrollToPage(0)
+                    startPlaylistPlayback(tracks, trackInd, storageHandler, trackServiceAccessor)
+                }
             }
-        },
-        storageHandler = storageHandler,
-        trackServiceAccessor = trackServiceAccessor
+        }
     )
 }
