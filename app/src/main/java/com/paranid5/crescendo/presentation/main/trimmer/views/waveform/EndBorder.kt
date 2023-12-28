@@ -4,7 +4,6 @@ import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.gestures.detectHorizontalDragGestures
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -29,10 +28,10 @@ import com.paranid5.crescendo.presentation.main.trimmer.CONTROLLER_RECT_WIDTH
 import com.paranid5.crescendo.presentation.main.trimmer.TrimmerViewModel
 import com.paranid5.crescendo.presentation.main.trimmer.WAVEFORM_SPIKE_WIDTH_RATIO
 import com.paranid5.crescendo.presentation.main.trimmer.effects.waveform.RequestEndBorderFocusEffect
-import com.paranid5.crescendo.presentation.main.trimmer.properties.endPosInMillisState
+import com.paranid5.crescendo.presentation.main.trimmer.properties.compose.collectEndPosInMillisAsState
+import com.paranid5.crescendo.presentation.main.trimmer.properties.compose.collectStartPosInMillisAsState
+import com.paranid5.crescendo.presentation.main.trimmer.properties.compose.collectTrackDurationInMillisAsState
 import com.paranid5.crescendo.presentation.main.trimmer.properties.setEndPosInMillis
-import com.paranid5.crescendo.presentation.main.trimmer.properties.startPosInMillisState
-import com.paranid5.crescendo.presentation.main.trimmer.properties.trackDurationInMillisFlow
 import com.paranid5.crescendo.presentation.ui.theme.LocalAppColors
 
 @Composable
@@ -83,9 +82,9 @@ private fun Modifier.endBorderDragInput(
     isPositionedState: MutableState<Boolean>,
     spikeWidthRatio: Int
 ): Modifier {
-    val startMillis by viewModel.startPosInMillisState.collectAsState()
-    val endMillis by viewModel.endPosInMillisState.collectAsState()
-    val durationInMillis by viewModel.trackDurationInMillisFlow.collectAsState(initial = 0L)
+    val startMillis by viewModel.collectStartPosInMillisAsState()
+    val endMillis by viewModel.collectEndPosInMillisAsState()
+    val durationInMillis by viewModel.collectTrackDurationInMillisAsState()
 
     var isDragged by isDraggedState
     var isPositioned by isPositionedState

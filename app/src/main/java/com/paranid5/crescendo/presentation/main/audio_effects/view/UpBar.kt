@@ -19,7 +19,8 @@ import androidx.compose.ui.unit.sp
 import com.paranid5.crescendo.R
 import com.paranid5.crescendo.presentation.main.audio_effects.AudioEffectsUIHandler
 import com.paranid5.crescendo.presentation.main.audio_effects.AudioEffectsViewModel
-import com.paranid5.crescendo.presentation.ui.extensions.collectLatestAsState
+import com.paranid5.crescendo.presentation.main.audio_effects.properties.compose.collectAreAudioEffectsEnabledAsState
+import com.paranid5.crescendo.presentation.main.audio_effects.properties.compose.collectAudioStatusAsState
 import com.paranid5.crescendo.presentation.ui.extensions.decreaseBrightness
 import com.paranid5.crescendo.presentation.ui.extensions.simpleShadow
 import com.paranid5.crescendo.presentation.ui.theme.LocalAppColors
@@ -67,13 +68,8 @@ private fun AudioEffectsSwitch(
         derivedStateOf { primaryColor.toArgb() }
     }
 
-    val areAudioEffectsEnabled by viewModel
-        .areAudioEffectsEnabledFlow
-        .collectLatestAsState(initial = false)
-
-    val audioStatus by viewModel
-        .audioStatusFlow
-        .collectLatestAsState(initial = null)
+    val areAudioEffectsEnabled by viewModel.collectAreAudioEffectsEnabledAsState()
+    val audioStatus by viewModel.collectAudioStatusAsState()
 
     Switch(
         modifier = modifier,

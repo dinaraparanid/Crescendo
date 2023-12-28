@@ -20,7 +20,7 @@ class TrimmerViewModel(
     val resetPlaybackPosCondVar by lazy { AsyncCondVar() }
 
     val playbackStateHolder by lazy {
-        PlaybackStateHolder(savedStateHandle, viewModelScope)
+        PlaybackStateHolder(savedStateHandle)
     }
 
     val playbackPositionStateHolder by lazy {
@@ -32,7 +32,7 @@ class TrimmerViewModel(
     }
 
     val waveformStateHolder by lazy {
-        WaveformStateHolder(storageHandler, viewModelScope)
+        WaveformStateHolder(storageHandler)
     }
 
     override fun onCleared() {

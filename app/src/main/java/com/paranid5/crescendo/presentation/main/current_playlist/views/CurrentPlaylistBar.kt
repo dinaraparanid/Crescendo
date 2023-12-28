@@ -13,19 +13,16 @@ import com.paranid5.crescendo.domain.tracks.DefaultTrack
 import com.paranid5.crescendo.domain.utils.extensions.timeString
 import com.paranid5.crescendo.domain.utils.extensions.totalDuration
 import com.paranid5.crescendo.presentation.main.current_playlist.CurrentPlaylistViewModel
-import com.paranid5.crescendo.presentation.ui.extensions.collectLatestAsState
+import com.paranid5.crescendo.presentation.main.current_playlist.properties.compose.collectCurrentPlaylistAsState
 import com.paranid5.crescendo.presentation.ui.theme.LocalAppColors
 import kotlinx.collections.immutable.ImmutableList
-import kotlinx.collections.immutable.persistentListOf
 
 @Composable
 fun CurrentPlaylistBar(
     viewModel: CurrentPlaylistViewModel,
     modifier: Modifier = Modifier
 ) {
-    val currentPlaylist by viewModel
-        .currentPlaylistFlow
-        .collectLatestAsState(initial = persistentListOf())
+    val currentPlaylist by viewModel.collectCurrentPlaylistAsState()
 
     Row(modifier) {
         TracksLabel(

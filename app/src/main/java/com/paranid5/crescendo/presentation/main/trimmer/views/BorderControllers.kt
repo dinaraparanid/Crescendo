@@ -5,7 +5,6 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -18,10 +17,10 @@ import com.paranid5.crescendo.R
 import com.paranid5.crescendo.domain.utils.extensions.timeStringMs
 import com.paranid5.crescendo.domain.utils.extensions.toTimeOrNull
 import com.paranid5.crescendo.presentation.main.trimmer.TrimmerViewModel
-import com.paranid5.crescendo.presentation.main.trimmer.properties.endPosInMillisState
+import com.paranid5.crescendo.presentation.main.trimmer.properties.compose.collectEndPosInMillisAsState
+import com.paranid5.crescendo.presentation.main.trimmer.properties.compose.collectStartPosInMillisAsState
 import com.paranid5.crescendo.presentation.main.trimmer.properties.setEndPosInMillis
 import com.paranid5.crescendo.presentation.main.trimmer.properties.setStartPosInMillis
-import com.paranid5.crescendo.presentation.main.trimmer.properties.startPosInMillisState
 import com.paranid5.crescendo.presentation.ui.theme.LocalAppColors
 import com.paranid5.crescendo.presentation.ui.utils.DefaultOutlinedTextField
 
@@ -42,7 +41,7 @@ fun BorderControllers(
 
 @Composable
 private fun StartController(viewModel: TrimmerViewModel, modifier: Modifier = Modifier) {
-    val startMillis by viewModel.startPosInMillisState.collectAsState()
+    val startMillis by viewModel.collectStartPosInMillisAsState()
 
     BorderController(
         label = stringResource(R.string.start_time),
@@ -54,7 +53,7 @@ private fun StartController(viewModel: TrimmerViewModel, modifier: Modifier = Mo
 
 @Composable
 private fun EndController(viewModel: TrimmerViewModel, modifier: Modifier = Modifier) {
-    val endMillis by viewModel.endPosInMillisState.collectAsState()
+    val endMillis by viewModel.collectEndPosInMillisAsState()
 
     BorderController(
         label = stringResource(R.string.end_time),

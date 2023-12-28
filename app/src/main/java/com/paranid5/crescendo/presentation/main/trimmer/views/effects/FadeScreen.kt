@@ -5,7 +5,6 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
@@ -15,11 +14,11 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.paranid5.crescendo.R
 import com.paranid5.crescendo.presentation.main.trimmer.TrimmerViewModel
-import com.paranid5.crescendo.presentation.main.trimmer.properties.fadeInSecsState
-import com.paranid5.crescendo.presentation.main.trimmer.properties.fadeOutSecsState
+import com.paranid5.crescendo.presentation.main.trimmer.properties.compose.collectFadeInSecsAsState
+import com.paranid5.crescendo.presentation.main.trimmer.properties.compose.collectFadeOutAsState
+import com.paranid5.crescendo.presentation.main.trimmer.properties.compose.collectTrackDurationInMillisAsState
 import com.paranid5.crescendo.presentation.main.trimmer.properties.setFadeInSecs
 import com.paranid5.crescendo.presentation.main.trimmer.properties.setFadeOutSecs
-import com.paranid5.crescendo.presentation.main.trimmer.properties.trackDurationInMillisFlow
 
 @Composable
 fun FadeScreen(
@@ -36,8 +35,8 @@ private fun FadeInController(
     viewModel: TrimmerViewModel,
     modifier: Modifier = Modifier
 ) {
-    val fadeInSecs by viewModel.fadeInSecsState.collectAsState()
-    val trackDurationMillis by viewModel.trackDurationInMillisFlow.collectAsState(initial = 0L)
+    val fadeInSecs by viewModel.collectFadeInSecsAsState()
+    val trackDurationMillis by viewModel.collectTrackDurationInMillisAsState()
 
     val trackDurationSecs by remember(trackDurationMillis) {
         derivedStateOf { trackDurationMillis / 1000 }
@@ -68,8 +67,8 @@ private fun FadeOutController(
     viewModel: TrimmerViewModel,
     modifier: Modifier = Modifier
 ) {
-    val fadeOutSecs by viewModel.fadeOutSecsState.collectAsState()
-    val trackDurationMillis by viewModel.trackDurationInMillisFlow.collectAsState(initial = 0L)
+    val fadeOutSecs by viewModel.collectFadeOutAsState()
+    val trackDurationMillis by viewModel.collectTrackDurationInMillisAsState()
 
     val trackDurationSecs by remember(trackDurationMillis) {
         derivedStateOf { trackDurationMillis / 1000 }

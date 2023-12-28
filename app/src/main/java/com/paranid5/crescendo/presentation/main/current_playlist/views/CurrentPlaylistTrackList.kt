@@ -6,29 +6,26 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import com.paranid5.crescendo.domain.tracks.DefaultTrack
 import com.paranid5.crescendo.presentation.main.current_playlist.CurrentPlaylistViewModel
-import com.paranid5.crescendo.presentation.ui.extensions.collectLatestAsState
+import com.paranid5.crescendo.presentation.main.current_playlist.properties.compose.collectCurrentPlaylistAsState
+import com.paranid5.crescendo.presentation.main.current_playlist.properties.compose.collectCurrentTrackIndexAsState
+import com.paranid5.crescendo.presentation.main.current_playlist.properties.storeCurrentPlaylist
+import com.paranid5.crescendo.presentation.main.current_playlist.properties.storeCurrentTrackIndex
 import com.paranid5.crescendo.services.track_service.TrackServiceAccessor
 import kotlinx.collections.immutable.ImmutableList
-import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.toImmutableList
 import org.koin.compose.koinInject
 
 @Composable
 fun CurrentPlaylistTrackList(
+    viewModel: CurrentPlaylistViewModel,
     playlistDismissMediatorState: MutableState<ImmutableList<DefaultTrack>>,
     trackIndexDismissMediatorState: MutableState<Int>,
     trackPathDismissKeyState: MutableState<String>,
-    viewModel: CurrentPlaylistViewModel,
     modifier: Modifier = Modifier,
     trackServiceAccessor: TrackServiceAccessor = koinInject()
 ) {
-    val currentPlaylist by viewModel
-        .currentPlaylistFlow
-        .collectLatestAsState(initial = persistentListOf())
-
-    val currentTrackIndex by viewModel
-        .currentTrackIndexFlow
-        .collectLatestAsState(initial = 0)
+    val currentPlaylist by viewModel.collectCurrentPlaylistAsState()
+    val currentTrackIndex by viewModel.collectCurrentTrackIndexAsState()
 
     DraggableTrackList(
         tracks = currentPlaylist,

@@ -34,6 +34,7 @@ fun AudioControllerContent(
     anglePercent: Float,
     valuePercent: Float,
     contentDescription: String,
+    angleRange: ClosedFloatingPointRange<Float>,
     inputValueState: MutableState<Float>,
     rotationAngleState: MutableState<Float>,
     touchXState: MutableState<Float>,
@@ -41,7 +42,6 @@ fun AudioControllerContent(
     touchOffsetState: MutableState<Offset>,
     centerXState: MutableState<Float>,
     centerYState: MutableState<Float>,
-    angleRange: ClosedFloatingPointRange<Float>,
     onValueChange: (Float) -> Unit,
     modifier: Modifier = Modifier,
 ) = Box(modifier) {
@@ -158,12 +158,12 @@ private inline fun Modifier.controllerDragInput(
     centerY: Float,
     anglePercent: Float,
     valuePercent: Float,
+    angleRange: ClosedFloatingPointRange<Float>,
     inputValueState: MutableState<Float>,
     rotationAngleState: MutableState<Float>,
     touchXState: MutableState<Float>,
     touchYState: MutableState<Float>,
     touchOffsetState: MutableState<Offset>,
-    angleRange: ClosedFloatingPointRange<Float>,
     crossinline onValueChange: (Float) -> Unit,
 ): Modifier {
     var inputValue by inputValueState

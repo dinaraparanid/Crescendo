@@ -2,20 +2,19 @@ package com.paranid5.crescendo.presentation.main.trimmer.effects.playback
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import com.paranid5.crescendo.presentation.main.trimmer.TrimmerViewModel
-import com.paranid5.crescendo.presentation.main.trimmer.properties.endPosInMillisState
-import com.paranid5.crescendo.presentation.main.trimmer.properties.isPlayerInitializedState
-import com.paranid5.crescendo.presentation.main.trimmer.properties.playbackPosInMillisState
-import com.paranid5.crescendo.presentation.main.trimmer.properties.startPosInMillisState
+import com.paranid5.crescendo.presentation.main.trimmer.properties.compose.collectEndPosInMillisAsState
+import com.paranid5.crescendo.presentation.main.trimmer.properties.compose.collectIsPlayerInitializedAsState
+import com.paranid5.crescendo.presentation.main.trimmer.properties.compose.collectPlaybackPosInMillisAsState
+import com.paranid5.crescendo.presentation.main.trimmer.properties.compose.collectStartPosInMillisAsState
 
 @Composable
 fun OutOfBordersEffect(viewModel: TrimmerViewModel) {
-    val isPlayerInitialized by viewModel.isPlayerInitializedState.collectAsState()
-    val startPos by viewModel.startPosInMillisState.collectAsState()
-    val endPos by viewModel.endPosInMillisState.collectAsState()
-    val currentPos by viewModel.playbackPosInMillisState.collectAsState()
+    val isPlayerInitialized by viewModel.collectIsPlayerInitializedAsState()
+    val startPos by viewModel.collectStartPosInMillisAsState()
+    val endPos by viewModel.collectEndPosInMillisAsState()
+    val currentPos by viewModel.collectPlaybackPosInMillisAsState()
 
     LaunchedEffect(currentPos, startPos, endPos) {
         if (isPlayerInitialized && currentPos !in startPos..endPos)

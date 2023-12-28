@@ -4,7 +4,6 @@ import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.gestures.detectHorizontalDragGestures
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -29,9 +28,9 @@ import com.paranid5.crescendo.presentation.main.trimmer.CONTROLLER_RECT_WIDTH
 import com.paranid5.crescendo.presentation.main.trimmer.TrimmerViewModel
 import com.paranid5.crescendo.presentation.main.trimmer.WAVEFORM_SPIKE_WIDTH_RATIO
 import com.paranid5.crescendo.presentation.main.trimmer.effects.waveform.RequestStartBorderFocusEffect
-import com.paranid5.crescendo.presentation.main.trimmer.properties.endPosInMillisState
+import com.paranid5.crescendo.presentation.main.trimmer.properties.compose.collectEndPosInMillisAsState
+import com.paranid5.crescendo.presentation.main.trimmer.properties.compose.collectStartPosInMillisAsState
 import com.paranid5.crescendo.presentation.main.trimmer.properties.setStartPosInMillis
-import com.paranid5.crescendo.presentation.main.trimmer.properties.startPosInMillisState
 import com.paranid5.crescendo.presentation.ui.theme.LocalAppColors
 
 @Composable
@@ -82,8 +81,8 @@ private fun Modifier.startBorderDragInput(
     isPositionedState: MutableState<Boolean>,
     spikeWidthRatio: Int
 ): Modifier {
-    val startMillis by viewModel.startPosInMillisState.collectAsState()
-    val endMillis by viewModel.endPosInMillisState.collectAsState()
+    val startMillis by viewModel.collectStartPosInMillisAsState()
+    val endMillis by viewModel.collectEndPosInMillisAsState()
 
     var isDragged by isDraggedState
     var isPositioned by isPositionedState

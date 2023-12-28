@@ -3,7 +3,6 @@ package com.paranid5.crescendo.presentation.main.trimmer.views.waveform
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
@@ -16,10 +15,10 @@ import com.paranid5.crescendo.presentation.composition_locals.trimmer.LocalTrimm
 import com.paranid5.crescendo.presentation.main.trimmer.CONTROLLER_HEIGHT_OFFSET
 import com.paranid5.crescendo.presentation.main.trimmer.DEFAULT_GRAPHICS_LAYER_ALPHA
 import com.paranid5.crescendo.presentation.main.trimmer.TrimmerViewModel
-import com.paranid5.crescendo.presentation.main.trimmer.properties.endOffsetFlow
-import com.paranid5.crescendo.presentation.main.trimmer.properties.isPlayingState
-import com.paranid5.crescendo.presentation.main.trimmer.properties.startOffsetFlow
-import com.paranid5.crescendo.presentation.main.trimmer.properties.trackDurationInMillisFlow
+import com.paranid5.crescendo.presentation.main.trimmer.properties.compose.collectEndOffsetAsState
+import com.paranid5.crescendo.presentation.main.trimmer.properties.compose.collectIsPlayingAsState
+import com.paranid5.crescendo.presentation.main.trimmer.properties.compose.collectStartOffsetAsState
+import com.paranid5.crescendo.presentation.main.trimmer.properties.compose.collectTrackDurationInMillisAsState
 import com.paranid5.crescendo.presentation.ui.theme.LocalAppColors
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -33,8 +32,8 @@ fun TrimmedZone(
     val colors = LocalAppColors.current
     val progressBrush = SolidColor(colors.primary.copy(alpha = 0.25F))
 
-    val startOffset by viewModel.startOffsetFlow.collectAsState(initial = 0F)
-    val endOffset by viewModel.endOffsetFlow.collectAsState(initial = 0F)
+    val startOffset by viewModel.collectStartOffsetAsState()
+    val endOffset by viewModel.collectEndOffsetAsState()
 
     Canvas(modifier.trimmedZoneModifier(viewModel)) {
         drawRect(
@@ -56,14 +55,14 @@ private fun Modifier.trimmedZoneModifier(viewModel: TrimmerViewModel) =
 
 @Composable
 private fun Modifier.playbackPointerInput(viewModel: TrimmerViewModel): Modifier {
-    val isPlaying by viewModel.isPlayingState.collectAsState()
+    val isPlaying by viewModel.collectIsPlayingAsState()
     return if (isPlaying) playbackModifier(viewModel) else this
 }
 
 @Composable
 private fun Modifier.playbackModifier(viewModel: TrimmerViewModel): Modifier {
     val positionBroadcast = LocalTrimmerPositionBroadcast.current
-    val durationMillis by viewModel.trackDurationInMillisFlow.collectAsState(initial = 0L)
+    val durationMillis by viewModel.collectTrackDurationInMillisAsState()
     val coroutineScope = rememberCoroutineScope()
 
     return this.pointerInput(Unit) {

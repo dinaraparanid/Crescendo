@@ -6,15 +6,14 @@ import com.paranid5.crescendo.data.properties.storeAmplitudes
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
-class WaveformStateHolder(
-    private val storageHandler: StorageHandler,
-    scope: CoroutineScope
-) : CoroutineScope by scope {
+class WaveformStateHolder(private val storageHandler: StorageHandler) :
+    CoroutineScope by MainScope() {
     val amplitudesFlow by lazy { storageHandler.amplitudesFlow }
 
     fun setAmplitudesAsync(amplitudes: ImmutableList<Int>) = launch(Dispatchers.IO) {

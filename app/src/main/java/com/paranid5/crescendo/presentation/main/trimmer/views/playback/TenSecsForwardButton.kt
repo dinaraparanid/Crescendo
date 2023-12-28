@@ -5,7 +5,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
@@ -15,7 +14,7 @@ import androidx.media3.common.Player
 import com.paranid5.crescendo.R
 import com.paranid5.crescendo.presentation.main.trimmer.TrimmerViewModel
 import com.paranid5.crescendo.presentation.main.trimmer.player.seekTenSecsForward
-import com.paranid5.crescendo.presentation.main.trimmer.properties.trackDurationInMillisFlow
+import com.paranid5.crescendo.presentation.main.trimmer.properties.compose.collectTrackDurationInMillisAsState
 import com.paranid5.crescendo.presentation.ui.theme.LocalAppColors
 
 @Composable
@@ -25,7 +24,7 @@ fun TenSecsForwardButton(
     modifier: Modifier = Modifier
 ) {
     val colors = LocalAppColors.current
-    val durationInMillis by viewModel.trackDurationInMillisFlow.collectAsState(initial = 0L)
+    val durationInMillis by viewModel.collectTrackDurationInMillisAsState()
 
     IconButton(
         onClick = { player.seekTenSecsForward(durationInMillis) },

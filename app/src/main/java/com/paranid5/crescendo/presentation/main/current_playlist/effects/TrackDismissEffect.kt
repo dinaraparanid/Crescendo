@@ -5,7 +5,9 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import com.paranid5.crescendo.domain.tracks.DefaultTrack
 import com.paranid5.crescendo.presentation.main.current_playlist.CurrentPlaylistViewModel
-import com.paranid5.crescendo.presentation.ui.extensions.collectLatestAsState
+import com.paranid5.crescendo.presentation.main.current_playlist.properties.compose.collectCurrentTrackIndexAsState
+import com.paranid5.crescendo.presentation.main.current_playlist.properties.storeCurrentPlaylist
+import com.paranid5.crescendo.presentation.main.current_playlist.properties.storeCurrentTrackIndex
 import com.paranid5.crescendo.services.track_service.TrackServiceAccessor
 import kotlinx.collections.immutable.ImmutableList
 import org.koin.compose.koinInject
@@ -18,9 +20,7 @@ fun TrackDismissEffect(
     trackIndexDismissMediator: Int,
     trackServiceAccessor: TrackServiceAccessor = koinInject()
 ) {
-    val currentTrackIndex by viewModel
-        .currentTrackIndexFlow
-        .collectLatestAsState(initial = 0)
+    val currentTrackIndex by viewModel.collectCurrentTrackIndexAsState()
 
     LaunchedEffect(trackPathDismissKey) {
         if (trackPathDismissKey.isNotEmpty()) {

@@ -22,8 +22,8 @@ import com.paranid5.crescendo.presentation.ui.utils.PushUpButton
 
 @Composable
 fun EffectsBottomSheet(
-    effects: ShownEffects,
     viewModel: TrimmerViewModel,
+    effects: ShownEffects,
     alpha: Float,
     modifier: Modifier = Modifier
 ) {

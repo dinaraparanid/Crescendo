@@ -63,10 +63,10 @@ fun CurrentPlaylistScreen(
 
 @Composable
 private fun CurrentPlaylistScreenContent(
+    viewModel: CurrentPlaylistViewModel,
     playlistDismissMediatorState: MutableState<ImmutableList<DefaultTrack>>,
     trackIndexDismissMediatorState: MutableState<Int>,
     trackPathDismissKeyState: MutableState<String>,
-    viewModel: CurrentPlaylistViewModel,
     modifier: Modifier = Modifier,
 ) = Column(modifier) {
     CurrentPlaylistBar(

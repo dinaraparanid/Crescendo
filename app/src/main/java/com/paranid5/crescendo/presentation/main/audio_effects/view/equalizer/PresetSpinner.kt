@@ -26,6 +26,7 @@ import com.paranid5.crescendo.domain.eq.EqualizerBandsPreset
 import com.paranid5.crescendo.domain.eq.EqualizerData
 import com.paranid5.crescendo.presentation.main.audio_effects.AudioEffectsUIHandler
 import com.paranid5.crescendo.presentation.main.audio_effects.AudioEffectsViewModel
+import com.paranid5.crescendo.presentation.main.audio_effects.properties.compose.collectAudioStatusAsState
 import com.paranid5.crescendo.presentation.ui.extensions.collectLatestAsState
 import com.paranid5.crescendo.presentation.ui.theme.LocalAppColors
 import com.paranid5.crescendo.presentation.ui.utils.Spinner
@@ -63,10 +64,7 @@ private fun PresetSpinnerImpl(
 ) {
     val context = LocalContext.current
 
-    val audioStatus by viewModel
-        .audioStatusFlow
-        .collectLatestAsState(initial = null)
-
+    val audioStatus by viewModel.collectAudioStatusAsState()
     val equalizerData by equalizerDataState.collectLatestAsState()
 
     val customPresetIndex by rememberCustomPresetIndex(equalizerData)

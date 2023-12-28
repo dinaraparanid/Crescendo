@@ -9,11 +9,9 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.updateAndGet
 
-class TrackStateHolder(private val savedStateHandle: SavedStateHandle) {
-    private companion object {
-        private const val TRACK = "track"
-    }
+private const val TRACK = "track"
 
+class TrackStateHolder(private val savedStateHandle: SavedStateHandle) {
     private val _trackState by lazy {
         MutableStateFlow(savedStateHandle.get<Track>(TRACK))
     }

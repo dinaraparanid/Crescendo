@@ -20,7 +20,7 @@ import com.paranid5.crescendo.presentation.composition_locals.LocalNavController
 import com.paranid5.crescendo.presentation.composition_locals.playing.LocalPlayingSheetState
 import com.paranid5.crescendo.presentation.main.favourites.FavouritesScreen
 import com.paranid5.crescendo.presentation.main.fetch_stream.FetchStreamViewModel
-import com.paranid5.crescendo.presentation.main.fetch_stream.SearchStreamScreen
+import com.paranid5.crescendo.presentation.main.fetch_stream.FetchStreamScreen
 import com.paranid5.crescendo.presentation.main.settings.SettingsScreen
 import com.paranid5.crescendo.presentation.main.track_collections.AlbumsScreen
 import com.paranid5.crescendo.presentation.main.tracks.TracksScreen
@@ -102,7 +102,11 @@ fun ContentScreen(
 
         composable(route = Screens.StreamFetching.title) {
             viewModel.setCurScreen(Screens.StreamFetching)
-            SearchStreamScreen(fetchStreamViewModel)
+
+            FetchStreamScreen(
+                viewModel = fetchStreamViewModel,
+                modifier = Modifier.fillMaxSize()
+            )
         }
 
         composable(route = Screens.Audio.AudioEffects.title) {

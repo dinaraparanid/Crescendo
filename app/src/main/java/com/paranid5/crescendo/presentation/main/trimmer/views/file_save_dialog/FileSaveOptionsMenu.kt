@@ -7,7 +7,6 @@ import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
-import androidx.compose.runtime.State
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -24,11 +23,12 @@ fun FileSaveOptionsMenu(
     modifier: Modifier = Modifier
 ) {
     val isDropdownShownState = remember { mutableStateOf(false) }
+    val selectedSaveOptionIndex by selectedSaveOptionIndexState
 
     Box(modifier) {
         OptionLabel(
             fileSaveOptions = fileSaveOptions,
-            selectedSaveOptionIndexState = selectedSaveOptionIndexState,
+            selectedSaveOptionIndex = selectedSaveOptionIndex,
             isDropdownShownState = isDropdownShownState,
             modifier = Modifier.align(Alignment.Center)
         )
@@ -44,12 +44,11 @@ fun FileSaveOptionsMenu(
 @Composable
 private fun OptionLabel(
     fileSaveOptions: Array<String>,
-    selectedSaveOptionIndexState: State<Int>,
+    selectedSaveOptionIndex: Int,
     isDropdownShownState: MutableState<Boolean>,
     modifier: Modifier = Modifier
 ) {
     val colors = LocalAppColors.current
-    val selectedSaveOptionIndex by selectedSaveOptionIndexState
     var isDropdownShown by isDropdownShownState
 
     val label by remember(fileSaveOptions, selectedSaveOptionIndex) {

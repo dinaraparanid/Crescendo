@@ -7,7 +7,6 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
@@ -17,7 +16,7 @@ import com.paranid5.crescendo.R
 import com.paranid5.crescendo.presentation.composition_locals.trimmer.LocalTrimmerFocusPoints
 import com.paranid5.crescendo.presentation.main.trimmer.FocusPoints
 import com.paranid5.crescendo.presentation.main.trimmer.TrimmerViewModel
-import com.paranid5.crescendo.presentation.main.trimmer.properties.isPlayingState
+import com.paranid5.crescendo.presentation.main.trimmer.properties.compose.collectIsPlayingAsState
 import com.paranid5.crescendo.presentation.main.trimmer.properties.setPlaying
 import com.paranid5.crescendo.presentation.ui.theme.LocalAppColors
 
@@ -28,7 +27,7 @@ fun PlayPauseButton(
 ) {
     val colors = LocalAppColors.current
     val focusPoints = LocalTrimmerFocusPoints.current!!
-    val isPlaying by viewModel.isPlayingState.collectAsState()
+    val isPlaying by viewModel.collectIsPlayingAsState()
 
     IconButton(
         onClick = { onClick(isPlaying, viewModel, focusPoints) },

@@ -7,8 +7,6 @@ import androidx.compose.foundation.layout.offset
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableFloatState
 import androidx.compose.runtime.MutableState
-import androidx.compose.runtime.State
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
@@ -28,19 +26,20 @@ import com.paranid5.crescendo.presentation.main.trimmer.CONTROLLER_HEIGHT_OFFSET
 import com.paranid5.crescendo.presentation.main.trimmer.DEFAULT_GRAPHICS_LAYER_ALPHA
 import com.paranid5.crescendo.presentation.main.trimmer.TrimmerViewModel
 import com.paranid5.crescendo.presentation.main.trimmer.WAVEFORM_SPIKE_WIDTH_RATIO
-import com.paranid5.crescendo.presentation.main.trimmer.properties.endOffsetFlow
-import com.paranid5.crescendo.presentation.main.trimmer.properties.isPlayingState
-import com.paranid5.crescendo.presentation.main.trimmer.properties.startOffsetFlow
-import com.paranid5.crescendo.presentation.main.trimmer.properties.zoomState
+import com.paranid5.crescendo.presentation.main.trimmer.properties.compose.collectEndOffsetAsState
+import com.paranid5.crescendo.presentation.main.trimmer.properties.compose.collectIsPlayingAsState
+import com.paranid5.crescendo.presentation.main.trimmer.properties.compose.collectStartOffsetAsState
+import com.paranid5.crescendo.presentation.main.trimmer.properties.compose.collectWaveformWidthAsState
+import com.paranid5.crescendo.presentation.main.trimmer.properties.compose.collectZoomAsState
 import com.paranid5.crescendo.presentation.ui.extensions.pxToDp
 import com.paranid5.crescendo.presentation.ui.theme.LocalAppColors
 
 @Composable
 fun WaveformSpikes(
+    viewModel: TrimmerViewModel,
+    spikesAmplitudes: List<Float>,
     canvasSizeState: MutableState<Size>,
     spikesState: MutableFloatState,
-    spikesAmplitudesState: State<List<Float>>,
-    viewModel: TrimmerViewModel,
     modifier: Modifier = Modifier,
     spikeWidthRatio: Int = WAVEFORM_SPIKE_WIDTH_RATIO
 ) {
@@ -48,14 +47,13 @@ fun WaveformSpikes(
     val waveformBrush = SolidColor(colors.backgroundAlternative)
     val progressWaveformBrush = SolidColor(colors.secondary)
 
-    val startOffset by viewModel.startOffsetFlow.collectAsState(initial = 0F)
-    val endOffset by viewModel.endOffsetFlow.collectAsState(initial = 0F)
-    val isPlaying by viewModel.isPlayingState.collectAsState()
-    val zoom by viewModel.zoomState.collectAsState()
+    val startOffset by viewModel.collectStartOffsetAsState()
+    val endOffset by viewModel.collectEndOffsetAsState()
+    val isPlaying by viewModel.collectIsPlayingAsState()
+    val zoom by viewModel.collectZoomAsState()
 
     var canvasSize by canvasSizeState
     var spikes by spikesState
-    val spikesAmplitudes by spikesAmplitudesState
 
     Canvas(modifier.graphicsLayer(alpha = DEFAULT_GRAPHICS_LAYER_ALPHA)) {
         canvasSize = size
@@ -78,7 +76,7 @@ fun WaveformSpikes(
 
 @Composable
 private fun BorderSeekers(viewModel: TrimmerViewModel, spikeWidthRatio: Int) {
-    val waveformWidth by collectWaveformWidthAsState(viewModel, spikeWidthRatio)
+    val waveformWidth by viewModel.collectWaveformWidthAsState(spikeWidthRatio)
     val startBorderOffset by rememberStartBorderOffsetAsState(viewModel, waveformWidth)
     val endBorderOffset by rememberEndBorderOffsetAsState(viewModel, waveformWidth)
 

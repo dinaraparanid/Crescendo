@@ -5,7 +5,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
@@ -15,7 +14,7 @@ import androidx.media3.common.Player
 import com.paranid5.crescendo.R
 import com.paranid5.crescendo.presentation.main.trimmer.TrimmerViewModel
 import com.paranid5.crescendo.presentation.main.trimmer.player.seekTenSecsBack
-import com.paranid5.crescendo.presentation.main.trimmer.properties.startPosInMillisState
+import com.paranid5.crescendo.presentation.main.trimmer.properties.compose.collectStartPosInMillisAsState
 import com.paranid5.crescendo.presentation.ui.theme.LocalAppColors
 
 @Composable
@@ -25,7 +24,7 @@ fun TenSecsBackButton(
     modifier: Modifier = Modifier
 ) {
     val colors = LocalAppColors.current
-    val startPos by viewModel.startPosInMillisState.collectAsState()
+    val startPos by viewModel.collectStartPosInMillisAsState()
 
     IconButton(
         onClick = { player.seekTenSecsBack(startPos) },

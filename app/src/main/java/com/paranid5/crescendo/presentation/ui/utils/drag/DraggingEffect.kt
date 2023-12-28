@@ -11,9 +11,8 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
 import arrow.core.curried
-import com.paranid5.crescendo.domain.utils.extensions.move
+import com.paranid5.crescendo.domain.utils.extensions.moved
 import kotlinx.collections.immutable.ImmutableList
-import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlin.math.absoluteValue
@@ -71,7 +70,7 @@ private fun <T> nextDragItemIndex(
     draggedItemIndex == null -> near
 
     else -> near.also { toInd ->
-        itemsState.value = itemsState.value.movedItems(draggedItemIndex, toInd)
+        itemsState.value = itemsState.value.moved(draggedItemIndex, toInd)
 
         currentDragIndexState.intValue = getMoveForCurItem(
             fromIndex = draggedItemIndex,
@@ -80,11 +79,6 @@ private fun <T> nextDragItemIndex(
         )
     }
 }
-
-private fun <T> ImmutableList<T>.movedItems(draggedItemIndex: Int, toIndex: Int) =
-    toMutableList()
-        .apply { move(fromIdx = draggedItemIndex, toIdx = toIndex) }
-        .toImmutableList()
 
 private fun getMoveForCurItem(
     fromIndex: Int,

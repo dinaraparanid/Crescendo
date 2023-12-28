@@ -3,21 +3,18 @@ package com.paranid5.crescendo.presentation.main.trimmer.states
 import androidx.lifecycle.SavedStateHandle
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.flow.updateAndGet
 import kotlinx.coroutines.launch
 
-class PlaybackStateHolder(
-    private val savedStateHandle: SavedStateHandle,
-    scope: CoroutineScope
-) : CoroutineScope by scope {
-    companion object {
-        private const val PITCH = "pitch"
-        private const val SPEED = "speed"
-    }
+private const val PITCH = "pitch"
+private const val SPEED = "speed"
 
+class PlaybackStateHolder(private val savedStateHandle: SavedStateHandle) :
+    CoroutineScope by MainScope() {
     private val _isPlayerInitializedState by lazy { MutableStateFlow(false) }
 
     val isPlayerInitializedState by lazy { _isPlayerInitializedState.asStateFlow() }

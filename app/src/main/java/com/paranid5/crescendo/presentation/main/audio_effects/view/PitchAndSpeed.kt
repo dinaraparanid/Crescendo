@@ -12,6 +12,10 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewModelScope
 import com.paranid5.crescendo.R
 import com.paranid5.crescendo.presentation.main.audio_effects.AudioEffectsViewModel
+import com.paranid5.crescendo.presentation.main.audio_effects.properties.compose.collectPitchTextAsNullableState
+import com.paranid5.crescendo.presentation.main.audio_effects.properties.compose.collectSpeedTextAsNullableState
+import com.paranid5.crescendo.presentation.main.audio_effects.properties.storePitch
+import com.paranid5.crescendo.presentation.main.audio_effects.properties.storeSpeed
 import com.paranid5.crescendo.presentation.main.audio_effects.view.pitch_speed.AudioEffectEditor
 import com.paranid5.crescendo.presentation.ui.extensions.collectLatestAsState
 import kotlinx.coroutines.launch
@@ -43,9 +47,7 @@ private fun PitchEditor(
     viewModel: AudioEffectsViewModel,
     modifier: Modifier = Modifier,
 ) {
-    val pitchText by viewModel
-        .pitchTextFlow
-        .collectLatestAsState(initial = null)
+    val pitchText by viewModel.collectPitchTextAsNullableState()
 
     if (pitchText != null)
         AudioEffectEditor(
@@ -65,9 +67,7 @@ private fun SpeedEditor(
     viewModel: AudioEffectsViewModel,
     modifier: Modifier = Modifier,
 ) {
-    val speedText by viewModel
-        .speedTextState
-        .collectLatestAsState(initial = null)
+    val speedText by viewModel.collectSpeedTextAsNullableState()
 
     if (speedText != null)
         AudioEffectEditor(

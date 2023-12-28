@@ -22,6 +22,19 @@ inline val TrimmerViewModel.zoomState
 fun TrimmerViewModel.setZoom(zoomRatio: Int) =
     waveformStateHolder.setZoom(zoomRatio)
 
+fun TrimmerViewModel.waveformWidthFlow(spikeWidthRatio: Int) =
+    combine(
+        trackDurationInMillisFlow,
+        zoomState,
+        zoomStepsState
+    ) { durationMillis, zoom, zoomSteps ->
+        (durationMillis / 1000 * spikeWidthRatio / (1 shl (zoomSteps - zoom))).toInt()
+    }
+
+fun TrimmerViewModel.waveformMaxWidthFlow(spikeWidthRatio: Int) =
+    trackDurationInMillisFlow.map { (it / 1000 * spikeWidthRatio).toInt() }
+
+
 inline val TrimmerViewModel.canZoomInFlow
     get() = combine(
         zoomState,

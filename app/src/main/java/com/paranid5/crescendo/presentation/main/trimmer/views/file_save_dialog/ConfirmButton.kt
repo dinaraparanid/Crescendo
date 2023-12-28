@@ -5,7 +5,6 @@ import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
-import androidx.compose.runtime.State
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
@@ -31,7 +30,7 @@ fun ConfirmButton(
     viewModel: TrimmerViewModel,
     isSaveButtonClickable: Boolean,
     track: Track,
-    filenameState: State<String>,
+    outputFilename: String,
     audioFormat: Formats,
     trimRange: TrimRange,
     pitchAndSpeed: PitchAndSpeed,
@@ -44,7 +43,6 @@ fun ConfirmButton(
     val colors = LocalAppColors.current
 
     var isDialogShown by isDialogShownState
-    val outputFilename by filenameState
 
     Button(
         modifier = modifier,

@@ -6,14 +6,12 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.flow.updateAndGet
 
-class PlaybackPositionsStateHolder(private val savedStateHandle: SavedStateHandle) {
-    private companion object {
-        private const val START_MILLIS = "start_millis"
-        private const val END_MILLIS = "end_millis"
-        private const val FADE_IN_SECS = "fade_in_secs"
-        private const val FADE_OUT_SECS = "fade_out_secs"
-    }
+private const val START_MILLIS = "start_millis"
+private const val END_MILLIS = "end_millis"
+private const val FADE_IN_SECS = "fade_in_secs"
+private const val FADE_OUT_SECS = "fade_out_secs"
 
+class PlaybackPositionsStateHolder(private val savedStateHandle: SavedStateHandle) {
     private val _startPosInMillisState by lazy {
         MutableStateFlow(savedStateHandle[START_MILLIS] ?: 0L)
     }

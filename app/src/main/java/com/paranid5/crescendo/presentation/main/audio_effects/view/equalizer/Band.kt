@@ -27,10 +27,10 @@ import org.koin.core.qualifier.named
 
 @Composable
 fun Band(
+    viewModel: AudioEffectsViewModel,
     index: Int,
     presentLvlsDbState: SnapshotStateList<Float>,
     pointsState: SnapshotStateList<Offset>,
-    viewModel: AudioEffectsViewModel,
     modifier: Modifier = Modifier
 ) = Column(modifier) {
     BandDbLabel(

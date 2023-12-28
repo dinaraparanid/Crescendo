@@ -15,10 +15,10 @@ import com.paranid5.crescendo.presentation.ui.theme.LocalAppColors
 fun AudioControllerWithLabel(
     value: Float,
     contentDescription: String,
+    onValueChange: (Float) -> Unit,
     modifier: Modifier = Modifier,
     valueRange: ClosedFloatingPointRange<Float> = 0F..1F,
-    angleRange: ClosedFloatingPointRange<Float> = -135F..135F,
-    onValueChange: (Float) -> Unit
+    angleRange: ClosedFloatingPointRange<Float> = -135F..135F
 ) {
     val colors = LocalAppColors.current
 

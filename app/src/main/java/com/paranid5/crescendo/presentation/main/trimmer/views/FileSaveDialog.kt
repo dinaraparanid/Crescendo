@@ -8,7 +8,6 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
@@ -20,14 +19,11 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.paranid5.crescendo.R
 import com.paranid5.crescendo.domain.caching.Formats
-import com.paranid5.crescendo.domain.trimming.FadeDurations
-import com.paranid5.crescendo.domain.trimming.PitchAndSpeed
-import com.paranid5.crescendo.domain.trimming.TrimRange
 import com.paranid5.crescendo.presentation.main.trimmer.TrimmerViewModel
-import com.paranid5.crescendo.presentation.main.trimmer.properties.fadeDurationsFlow
-import com.paranid5.crescendo.presentation.main.trimmer.properties.pitchAndSpeedFlow
-import com.paranid5.crescendo.presentation.main.trimmer.properties.trackOrNullState
-import com.paranid5.crescendo.presentation.main.trimmer.properties.trimRangeFlow
+import com.paranid5.crescendo.presentation.main.trimmer.properties.compose.collectFadeDurationsAsState
+import com.paranid5.crescendo.presentation.main.trimmer.properties.compose.collectPitchAndSpeedAsState
+import com.paranid5.crescendo.presentation.main.trimmer.properties.compose.collectTrackAsState
+import com.paranid5.crescendo.presentation.main.trimmer.properties.compose.collectTrimRangeAsState
 import com.paranid5.crescendo.presentation.main.trimmer.views.file_save_dialog.FileSaveDialogContent
 import com.paranid5.crescendo.presentation.ui.theme.LocalAppColors
 import java.io.File
@@ -41,10 +37,10 @@ fun FileSaveDialog(
 ) {
     val colors = LocalAppColors.current
 
-    val track by viewModel.trackOrNullState.collectAsState(initial = null)
-    val trimRange by viewModel.trimRangeFlow.collectAsState(initial = TrimRange())
-    val fadeDurations by viewModel.fadeDurationsFlow.collectAsState(initial = FadeDurations())
-    val pitchAndSpeed by viewModel.pitchAndSpeedFlow.collectAsState(initial = PitchAndSpeed())
+    val track by viewModel.collectTrackAsState()
+    val trimRange by viewModel.collectTrimRangeAsState()
+    val fadeDurations by viewModel.collectFadeDurationsAsState()
+    val pitchAndSpeed by viewModel.collectPitchAndSpeedAsState()
 
     var isDialogShown by isDialogShownState
 

@@ -33,10 +33,10 @@ import org.koin.core.qualifier.named
 
 @Composable
 fun BandController(
+    viewModel: AudioEffectsViewModel,
     index: Int,
     presentLvlsDbState: SnapshotStateList<Float>,
     pointsState: SnapshotStateList<Offset>,
-    viewModel: AudioEffectsViewModel,
     modifier: Modifier = Modifier,
     equalizerDataState: MutableStateFlow<EqualizerData?> = koinInject(named(EQUALIZER_DATA)),
 ) {

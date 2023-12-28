@@ -98,18 +98,6 @@ inline val TrimmerViewModel.playbackOffsetFlow
 inline val TrimmerViewModel.playbackTextFlow
     get() = playbackPosInMillisState.map { it.timeString }
 
-fun TrimmerViewModel.waveformWidthFlow(spikeWidthRatio: Int) =
-    combine(
-        trackDurationInMillisFlow,
-        zoomState,
-        zoomStepsState
-    ) { durationMillis, zoom, zoomSteps ->
-        (durationMillis / 1000 * spikeWidthRatio / (1 shl (zoomSteps - zoom))).toInt()
-    }
-
-fun TrimmerViewModel.waveformMaxWidthFlow(spikeWidthRatio: Int) =
-    trackDurationInMillisFlow.map { (it / 1000 * spikeWidthRatio).toInt() }
-
 fun TrimmerViewModel.playbackControllerOffsetFlow(spikeWidthRatio: Int) =
     combine(
         playbackOffsetFlow,

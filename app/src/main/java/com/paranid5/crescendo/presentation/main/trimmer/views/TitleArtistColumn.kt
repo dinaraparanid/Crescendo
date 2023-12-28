@@ -7,7 +7,6 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.height
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -16,7 +15,7 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.paranid5.crescendo.presentation.main.trimmer.TrimmerViewModel
-import com.paranid5.crescendo.presentation.main.trimmer.properties.trackOrNullState
+import com.paranid5.crescendo.presentation.main.trimmer.properties.compose.collectTrackAsState
 import com.paranid5.crescendo.presentation.ui.theme.LocalAppColors
 
 @OptIn(ExperimentalFoundationApi::class)
@@ -27,7 +26,7 @@ fun TitleArtistColumn(
     spaceBetween: Dp = 8.dp
 ) {
     val colors = LocalAppColors.current
-    val track by viewModel.trackOrNullState.collectAsState()
+    val track by viewModel.collectTrackAsState()
 
     Column(modifier) {
         Text(

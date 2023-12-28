@@ -13,7 +13,7 @@ import com.paranid5.crescendo.presentation.ui.theme.LocalAppColors
 
 @Composable
 fun Title(modifier: Modifier = Modifier) {
-    val colors = LocalAppColors.current.colorScheme
+    val colors = LocalAppColors.current
 
     Text(
         text = stringResource(R.string.save_as),

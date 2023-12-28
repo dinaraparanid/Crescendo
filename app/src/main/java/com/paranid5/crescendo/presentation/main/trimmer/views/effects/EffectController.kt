@@ -121,7 +121,10 @@ private inline fun <V : Number> EffectSlider(
     modifier: Modifier = Modifier
 ) {
     val colors = LocalAppColors.current
-    var curPosition by remember { mutableFloatStateOf(initialValue.toFloat()) }
+
+    var curPosition by remember {
+        mutableFloatStateOf(initialValue.toFloat())
+    }
 
     Slider(
         value = curPosition,

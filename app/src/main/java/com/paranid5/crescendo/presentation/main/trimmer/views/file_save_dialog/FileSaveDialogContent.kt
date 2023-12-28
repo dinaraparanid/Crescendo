@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
@@ -20,46 +21,50 @@ import com.paranid5.crescendo.presentation.main.trimmer.TrimmerViewModel
 @Composable
 fun FileSaveDialogContent(
     viewModel: TrimmerViewModel,
-    isDialogShownState: MutableState<Boolean>,
-    filenameState: MutableState<String>,
     fileSaveOptions: Array<String>,
-    selectedSaveOptionIndexState: MutableState<Int>,
     track: Track,
     audioFormat: Formats,
     pitchAndSpeed: PitchAndSpeed,
     trimRange: TrimRange,
     fadeDurations: FadeDurations,
     isSaveButtonClickable: Boolean,
+    isDialogShownState: MutableState<Boolean>,
+    filenameState: MutableState<String>,
+    selectedSaveOptionIndexState: MutableState<Int>,
     modifier: Modifier = Modifier
-) = Column(modifier) {
-    Title(Modifier.align(Alignment.CenterHorizontally))
-    Spacer(Modifier.height(10.dp))
+) {
+    val outputFilename by filenameState
 
-    FilenameInput(filenameState = filenameState)
-    Spacer(Modifier.height(10.dp))
+    Column(modifier) {
+        Title(Modifier.align(Alignment.CenterHorizontally))
+        Spacer(Modifier.height(10.dp))
 
-    FileSaveOptionsMenu(
-        fileSaveOptions = fileSaveOptions,
-        selectedSaveOptionIndexState = selectedSaveOptionIndexState,
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(horizontal = 10.dp)
-    )
+        FilenameInput(filenameState = filenameState)
+        Spacer(Modifier.height(10.dp))
 
-    Spacer(Modifier.height(10.dp))
+        FileSaveOptionsMenu(
+            fileSaveOptions = fileSaveOptions,
+            selectedSaveOptionIndexState = selectedSaveOptionIndexState,
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 10.dp)
+        )
 
-    ConfirmButton(
-        viewModel = viewModel,
-        isSaveButtonClickable = isSaveButtonClickable,
-        track = track,
-        filenameState = filenameState,
-        audioFormat = audioFormat,
-        trimRange = trimRange,
-        fadeDurations = fadeDurations,
-        pitchAndSpeed = pitchAndSpeed,
-        isDialogShownState = isDialogShownState,
-        modifier = Modifier
-            .padding(vertical = 10.dp)
-            .align(Alignment.CenterHorizontally)
-    )
+        Spacer(Modifier.height(10.dp))
+
+        ConfirmButton(
+            viewModel = viewModel,
+            isSaveButtonClickable = isSaveButtonClickable,
+            track = track,
+            outputFilename = outputFilename,
+            audioFormat = audioFormat,
+            trimRange = trimRange,
+            fadeDurations = fadeDurations,
+            pitchAndSpeed = pitchAndSpeed,
+            isDialogShownState = isDialogShownState,
+            modifier = Modifier
+                .padding(vertical = 10.dp)
+                .align(Alignment.CenterHorizontally)
+        )
+    }
 }

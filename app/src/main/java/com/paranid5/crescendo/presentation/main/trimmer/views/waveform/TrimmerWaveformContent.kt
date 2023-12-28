@@ -11,7 +11,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableFloatState
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.State
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
@@ -30,12 +29,12 @@ import com.paranid5.crescendo.presentation.main.trimmer.CONTROLLER_CIRCLE_RADIUS
 import com.paranid5.crescendo.presentation.main.trimmer.TrimmerViewModel
 import com.paranid5.crescendo.presentation.main.trimmer.WAVEFORM_PADDING
 import com.paranid5.crescendo.presentation.main.trimmer.WAVEFORM_SPIKE_WIDTH_RATIO
-import com.paranid5.crescendo.presentation.main.trimmer.properties.endOffsetFlow
-import com.paranid5.crescendo.presentation.main.trimmer.properties.isPlayingState
-import com.paranid5.crescendo.presentation.main.trimmer.properties.playbackAlphaFlow
-import com.paranid5.crescendo.presentation.main.trimmer.properties.playbackOffsetFlow
-import com.paranid5.crescendo.presentation.main.trimmer.properties.startOffsetFlow
-import com.paranid5.crescendo.presentation.main.trimmer.properties.waveformWidthFlow
+import com.paranid5.crescendo.presentation.main.trimmer.properties.compose.collectEndOffsetAsState
+import com.paranid5.crescendo.presentation.main.trimmer.properties.compose.collectIsPlayingAsState
+import com.paranid5.crescendo.presentation.main.trimmer.properties.compose.collectPlaybackAlphaAsState
+import com.paranid5.crescendo.presentation.main.trimmer.properties.compose.collectPlaybackOffsetAsState
+import com.paranid5.crescendo.presentation.main.trimmer.properties.compose.collectStartOffsetAsState
+import com.paranid5.crescendo.presentation.main.trimmer.properties.compose.collectWaveformWidthAsState
 import com.paranid5.crescendo.presentation.ui.extensions.pxToDp
 import com.paranid5.crescendo.presentation.ui.extensions.toPx
 import kotlinx.coroutines.launch
@@ -43,13 +42,13 @@ import kotlinx.coroutines.launch
 @Composable
 fun TrimmerWaveformContent(
     viewModel: TrimmerViewModel,
+    spikesAmplitudes: List<Float>,
     canvasSizeState: MutableState<Size>,
     spikesState: MutableFloatState,
-    spikesAmplitudesState: State<List<Float>>,
     modifier: Modifier = Modifier,
     spikeWidthRatio: Int = WAVEFORM_SPIKE_WIDTH_RATIO
 ) {
-    val waveformWidth by collectWaveformWidthAsState(viewModel, spikeWidthRatio)
+    val waveformWidth by viewModel.collectWaveformWidthAsState(spikeWidthRatio)
 
     Box(modifier) {
         Waveform(
@@ -57,7 +56,7 @@ fun TrimmerWaveformContent(
             spikeWidthRatio = spikeWidthRatio,
             canvasSizeState = canvasSizeState,
             spikesState = spikesState,
-            spikesAmplitudesState = spikesAmplitudesState,
+            spikesAmplitudes = spikesAmplitudes,
             modifier = Modifier.waveformModifier(waveformWidth)
         )
 
@@ -87,14 +86,6 @@ fun TrimmerWaveformContent(
         )
     }
 }
-
-@Composable
-internal fun collectWaveformWidthAsState(
-    viewModel: TrimmerViewModel,
-    spikeWidthRatio: Int
-) = viewModel
-    .waveformWidthFlow(spikeWidthRatio)
-    .collectAsState(initial = 0)
 
 @Composable
 private fun Modifier.waveformModifier(waveformWidth: Int) =
@@ -178,7 +169,7 @@ private fun Modifier.playbackOffsetModifier(
     val focusPoints = LocalTrimmerFocusPoints.current!!
     val waveformScrollState = LocalTrimmerWaveformScrollState.current!!
 
-    val isPlaying by viewModel.isPlayingState.collectAsState()
+    val isPlaying by viewModel.collectIsPlayingAsState()
     val coroutineScope = rememberCoroutineScope()
 
     val playbackPositionOffset by rememberPlaybackPositionOffsetAsState(
@@ -212,7 +203,7 @@ internal fun rememberStartBorderOffsetAsState(
     viewModel: TrimmerViewModel,
     waveformWidth: Int,
 ): State<Int> {
-    val startOffset by viewModel.startOffsetFlow.collectAsState(initial = 0F)
+    val startOffset by viewModel.collectStartOffsetAsState()
 
     return remember(startOffset, waveformWidth) {
         derivedStateOf { StartBorderOffset(startOffset, waveformWidth) }
@@ -224,7 +215,7 @@ internal fun rememberEndBorderOffsetAsState(
     viewModel: TrimmerViewModel,
     waveformWidth: Int,
 ): State<Int> {
-    val endOffset by viewModel.endOffsetFlow.collectAsState(initial = 0F)
+    val endOffset by viewModel.collectEndOffsetAsState()
 
     return remember(endOffset, waveformWidth) {
         derivedStateOf { EndBorderOffset(endOffset, waveformWidth) }
@@ -236,7 +227,7 @@ private fun rememberPlaybackPositionOffsetAsState(
     viewModel: TrimmerViewModel,
     waveformWidth: Int,
 ): State<Int> {
-    val playbackOffset by viewModel.playbackOffsetFlow.collectAsState(initial = 0F)
+    val playbackOffset by viewModel.collectPlaybackOffsetAsState()
 
     return remember(playbackOffset, waveformWidth) {
         derivedStateOf { PlaybackPositionOffset(playbackOffset, waveformWidth) }
@@ -245,6 +236,6 @@ private fun rememberPlaybackPositionOffsetAsState(
 
 @Composable
 private fun animatePlaybackAlphaAsState(viewModel: TrimmerViewModel): State<Float> {
-    val playbackAlpha by viewModel.playbackAlphaFlow.collectAsState(initial = 0F)
+    val playbackAlpha by viewModel.collectPlaybackAlphaAsState()
     return animateFloatAsState(playbackAlpha, label = "")
 }

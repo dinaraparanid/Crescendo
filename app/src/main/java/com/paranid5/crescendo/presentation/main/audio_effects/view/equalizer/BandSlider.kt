@@ -24,7 +24,7 @@ import com.paranid5.crescendo.R
 import com.paranid5.crescendo.domain.eq.EqualizerData
 import com.paranid5.crescendo.presentation.main.audio_effects.AudioEffectsUIHandler
 import com.paranid5.crescendo.presentation.main.audio_effects.AudioEffectsViewModel
-import com.paranid5.crescendo.presentation.ui.extensions.collectLatestAsState
+import com.paranid5.crescendo.presentation.main.audio_effects.properties.compose.collectAudioStatusAsState
 import com.paranid5.crescendo.presentation.ui.theme.LocalAppColors
 import kotlinx.coroutines.launch
 import org.koin.compose.koinInject
@@ -32,6 +32,7 @@ import org.koin.compose.koinInject
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun BandSlider(
+    viewModel: AudioEffectsViewModel,
     index: Int,
     presentLvlsDbState: SnapshotStateList<Float>,
     pointsState: SnapshotStateList<Offset>,
@@ -41,17 +42,13 @@ fun BandSlider(
     sliderWidthState: MutableIntState,
     sliderHeightState: MutableIntState,
     equalizerData: EqualizerData?,
-    viewModel: AudioEffectsViewModel,
     modifier: Modifier = Modifier,
     thumbModifier: Modifier = Modifier,
     audioEffectsUIHandler: AudioEffectsUIHandler = koinInject()
 ) {
     val context = LocalContext.current
     val colors = LocalAppColors.current
-
-    val audioStatus by viewModel
-        .audioStatusFlow
-        .collectLatestAsState(initial = null)
+    val audioStatus by viewModel.collectAudioStatusAsState()
 
     Slider(
         value = presentLvlsDbState[index],

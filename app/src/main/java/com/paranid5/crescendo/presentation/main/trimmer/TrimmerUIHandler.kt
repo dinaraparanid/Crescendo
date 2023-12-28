@@ -2,6 +2,7 @@ package com.paranid5.crescendo.presentation.main.trimmer
 
 import android.content.Context
 import android.content.Intent
+import androidx.compose.runtime.Immutable
 import com.paranid5.crescendo.R
 import com.paranid5.crescendo.domain.caching.Formats
 import com.paranid5.crescendo.domain.media.files.MediaFile
@@ -16,6 +17,7 @@ import com.paranid5.crescendo.presentation.UIHandler
 import com.paranid5.crescendo.receivers.TrimmingStatusReceiver
 import java.io.File
 
+@Immutable
 class TrimmerUIHandler : UIHandler {
     suspend fun trimTrackAndSendBroadcast(
         context: Context,

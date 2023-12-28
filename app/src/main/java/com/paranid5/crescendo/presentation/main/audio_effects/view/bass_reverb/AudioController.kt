@@ -1,6 +1,5 @@
 package com.paranid5.crescendo.presentation.main.audio_effects.view.bass_reverb
 
-import android.annotation.SuppressLint
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
@@ -11,7 +10,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import com.paranid5.crescendo.domain.utils.extensions.toAngle
 
-@SuppressLint("LogConditional")
 @Composable
 fun AudioController(
     value: Float,

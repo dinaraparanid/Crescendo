@@ -5,7 +5,6 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
@@ -13,10 +12,10 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.paranid5.crescendo.R
 import com.paranid5.crescendo.presentation.main.trimmer.TrimmerViewModel
-import com.paranid5.crescendo.presentation.main.trimmer.properties.pitchState
+import com.paranid5.crescendo.presentation.main.trimmer.properties.compose.collectPitchAsState
+import com.paranid5.crescendo.presentation.main.trimmer.properties.compose.collectSpeedAsState
 import com.paranid5.crescendo.presentation.main.trimmer.properties.setPitch
 import com.paranid5.crescendo.presentation.main.trimmer.properties.setSpeed
-import com.paranid5.crescendo.presentation.main.trimmer.properties.speedState
 
 @Composable
 fun PitchSpeedScreen(
@@ -33,7 +32,7 @@ private fun PitchController(
     viewModel: TrimmerViewModel,
     modifier: Modifier = Modifier
 ) {
-    val pitch by viewModel.pitchState.collectAsState()
+    val pitch by viewModel.collectPitchAsState()
 
     EffectController(
         label = pitchLabel(pitch),
@@ -55,7 +54,7 @@ private fun SpeedController(
     viewModel: TrimmerViewModel,
     modifier: Modifier = Modifier
 ) {
-    val speed by viewModel.speedState.collectAsState()
+    val speed by viewModel.collectSpeedAsState()
 
     EffectController(
         label = speedLabel(speed),

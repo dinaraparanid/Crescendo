@@ -23,10 +23,10 @@ import com.paranid5.crescendo.presentation.composition_locals.trimmer.LocalTrimm
 import com.paranid5.crescendo.presentation.main.trimmer.PLAYBACK_CIRCLE_CENTER
 import com.paranid5.crescendo.presentation.main.trimmer.TrimmerViewModel
 import com.paranid5.crescendo.presentation.main.trimmer.WAVEFORM_SPIKE_WIDTH_RATIO
-import com.paranid5.crescendo.presentation.main.trimmer.properties.playbackAlphaFlow
+import com.paranid5.crescendo.presentation.main.trimmer.properties.compose.collectPlaybackAlphaAsState
+import com.paranid5.crescendo.presentation.main.trimmer.properties.compose.collectPlaybackTextAsState
+import com.paranid5.crescendo.presentation.main.trimmer.properties.compose.collectWaveformWidthAsState
 import com.paranid5.crescendo.presentation.main.trimmer.properties.playbackControllerOffsetFlow
-import com.paranid5.crescendo.presentation.main.trimmer.properties.playbackTextFlow
-import com.paranid5.crescendo.presentation.main.trimmer.properties.waveformWidthFlow
 import com.paranid5.crescendo.presentation.main.trimmer.views.waveform.TrimWaveform
 import com.paranid5.crescendo.presentation.ui.theme.LocalAppColors
 import com.paranid5.crescendo.presentation.ui.utils.textWidth
@@ -64,12 +64,12 @@ fun WaveformWithPosition(
 
 @Composable
 private fun PlaybackPositionText(
-    modifier: Modifier = Modifier,
-    viewModel: TrimmerViewModel
+    viewModel: TrimmerViewModel,
+    modifier: Modifier = Modifier
 ) {
     val colors = LocalAppColors.current
-    val playbackText by viewModel.playbackTextFlow.collectAsState(initial = "")
-    val playbackAlpha by viewModel.playbackAlphaFlow.collectAsState(initial = 0F)
+    val playbackText by viewModel.collectPlaybackTextAsState()
+    val playbackAlpha by viewModel.collectPlaybackAlphaAsState()
 
     Text(
         text = playbackText,
@@ -88,11 +88,8 @@ private fun animatePlaybackTextOffsetAsState(
         .playbackControllerOffsetFlow(spikeWidthRatio)
         .collectAsState(initial = 0F)
 
-    val waveformWidth by viewModel
-        .waveformWidthFlow(spikeWidthRatio)
-        .collectAsState(initial = 0)
-
-    val playbackText by viewModel.playbackTextFlow.collectAsState(initial = "")
+    val waveformWidth by viewModel.collectWaveformWidthAsState(spikeWidthRatio)
+    val playbackText by viewModel.collectPlaybackTextAsState()
 
     val playbackTextWidth = textWidth(
         text = playbackText,
