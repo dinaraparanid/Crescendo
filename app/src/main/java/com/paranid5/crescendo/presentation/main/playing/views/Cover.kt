@@ -1,6 +1,5 @@
-package com.paranid5.crescendo.presentation.main.playing
+package com.paranid5.crescendo.presentation.main.playing.views
 
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -30,7 +29,6 @@ fun Cover(
         contentScale = ContentScale.Crop,
         alignment = Alignment.Center,
         modifier = modifier
-            .fillMaxSize()
             .shadow(
                 elevation = 80.dp,
                 shape = RoundedCornerShape(5.dp),

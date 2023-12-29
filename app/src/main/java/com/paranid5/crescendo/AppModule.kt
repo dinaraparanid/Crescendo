@@ -1,5 +1,3 @@
-@file:Suppress("LongLine")
-
 package com.paranid5.crescendo
 
 import android.os.Build
@@ -14,6 +12,7 @@ import com.paranid5.crescendo.presentation.main.current_playlist.CurrentPlaylist
 import com.paranid5.crescendo.presentation.main.fetch_stream.FetchStreamUIHandler
 import com.paranid5.crescendo.presentation.main.fetch_stream.FetchStreamViewModel
 import com.paranid5.crescendo.presentation.main.playing.PlayingUIHandler
+import com.paranid5.crescendo.presentation.main.playing.PlayingViewModel
 import com.paranid5.crescendo.presentation.main.tracks.TracksUIHandler
 import com.paranid5.crescendo.presentation.main.tracks.TracksViewModel
 import com.paranid5.crescendo.presentation.main.trimmer.TrimmerUIHandler
@@ -125,6 +124,7 @@ private val searchStreamModule = module {
 
 private val playingModule = module {
     singleOf(::PlayingUIHandler)
+    viewModelOf(::PlayingViewModel)
 }
 
 private val audioEffectsModule = module {

@@ -24,6 +24,7 @@ import com.paranid5.crescendo.presentation.main.appbar.AppBar
 import com.paranid5.crescendo.presentation.main.current_playlist.CurrentPlaylistScreen
 import com.paranid5.crescendo.presentation.main.current_playlist.CurrentPlaylistViewModel
 import com.paranid5.crescendo.presentation.main.playing.PlayingScreen
+import com.paranid5.crescendo.presentation.main.playing.PlayingViewModel
 import com.paranid5.crescendo.presentation.ui.theme.LocalAppColors
 import com.paranid5.crescendo.presentation.ui.utils.PushUpButton
 import org.koin.androidx.compose.koinViewModel
@@ -33,6 +34,7 @@ import org.koin.androidx.compose.koinViewModel
 fun PlayingBottomSheet(
     alpha: Float,
     modifier: Modifier = Modifier,
+    playingViewModel: PlayingViewModel = koinViewModel()
 ) {
     val backgroundColor = LocalAppColors.current.background
     val curPlaylistSheetState = LocalCurrentPlaylistSheetState.current
@@ -57,13 +59,17 @@ fun PlayingBottomSheet(
                 HorizontalPager(state = playingPagerState!!) { page ->
                     when (page) {
                         0 -> PlayingScreen(
+                            viewModel = playingViewModel,
                             coverAlpha = 1 - alpha,
                             audioStatus = AudioStatus.PLAYING,
+                            modifier = modifier.fillMaxSize()
                         )
 
                         else -> PlayingScreen(
+                            viewModel = playingViewModel,
                             coverAlpha = 1 - alpha,
                             audioStatus = AudioStatus.STREAMING,
+                            modifier = modifier.fillMaxSize()
                         )
                     }
                 }

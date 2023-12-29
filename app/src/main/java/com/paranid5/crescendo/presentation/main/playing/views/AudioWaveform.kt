@@ -1,12 +1,10 @@
-package com.paranid5.crescendo.presentation.main.playing
+package com.paranid5.crescendo.presentation.main.playing.views
 
 import android.annotation.SuppressLint
 import android.content.Context
-import android.util.Log
 import android.view.LayoutInflater
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -17,14 +15,12 @@ import com.gauravk.audiovisualizer.visualizer.WaveVisualizer
 import com.paranid5.crescendo.AUDIO_SESSION_ID
 import com.paranid5.crescendo.IS_PLAYING
 import com.paranid5.crescendo.R
+import com.paranid5.crescendo.presentation.ui.extensions.collectLatestAsState
 import com.paranid5.crescendo.presentation.ui.extensions.getLightMutedOrPrimary
 import kotlinx.coroutines.flow.MutableStateFlow
 import org.koin.compose.koinInject
 import org.koin.core.qualifier.named
 
-private const val TAG = "AudioWaveform"
-
-@SuppressLint("LogConditional")
 @Composable
 fun AudioWaveform(
     enabled: Boolean,
@@ -34,8 +30,8 @@ fun AudioWaveform(
     isPlayingState: MutableStateFlow<Boolean> = koinInject(named(IS_PLAYING))
 ) {
     val color = palette.getLightMutedOrPrimary()
-    val audioSessionId by audioSessionIdState.collectAsState()
-    val isPlaying by isPlayingState.collectAsState()
+    val audioSessionId by audioSessionIdState.collectLatestAsState()
+    val isPlaying by isPlayingState.collectLatestAsState()
     var visualizer: WaveVisualizer? = null
 
     DisposableEffect(enabled, color, audioSessionId, isPlaying) {
@@ -50,24 +46,20 @@ fun AudioWaveform(
         }
     }
 
-    enabled.let {
-        Log.d(TAG, "Waveform enabled: $enabled")
+    AndroidView(
+        modifier = modifier,
+        factory = { context ->
+            context
+                .findWaveVisualizer()
+                .also { visualizer = it }
+        },
+        update = {
+            visualizer = it
 
-        AndroidView(
-            modifier = modifier,
-            factory = { context ->
-                context
-                    .findWaveVisualizer()
-                    .also { visualizer = it }
-            },
-            update = {
-                visualizer = it
-
-                if (enabled)
-                    it.recompose(color, audioSessionId)
-            }
-        )
-    }
+            if (enabled)
+                it.recompose(color, audioSessionId)
+        }
+    )
 }
 
 @SuppressLint("InflateParams")
@@ -83,16 +75,13 @@ private fun WaveVisualizer.recompose(color: Color, audioSessionId: Int) {
     invalidate()
 }
 
-private fun WaveVisualizer.stop() {
-    updateAudioSessionId(0)
-}
-
-@SuppressLint("LogConditional")
 private fun WaveVisualizer.updateAudioSessionId(audioSessionId: Int) {
     try {
-        Log.d(TAG, "Audio Session Id: $audioSessionId")
         setAudioSessionId(audioSessionId)
     } catch (ignored: Exception) {
         // playback is not yet started
     }
 }
+
+private fun WaveVisualizer.stop() =
+    updateAudioSessionId(0)

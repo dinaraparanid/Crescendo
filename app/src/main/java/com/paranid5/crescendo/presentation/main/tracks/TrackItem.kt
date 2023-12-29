@@ -37,7 +37,7 @@ import com.paranid5.crescendo.domain.tracks.Track
 import com.paranid5.crescendo.domain.utils.extensions.artistAlbum
 import com.paranid5.crescendo.domain.utils.extensions.toDefaultTrackList
 import com.paranid5.crescendo.media.images.ImageSize
-import com.paranid5.crescendo.presentation.main.getTrackCoverModel
+import com.paranid5.crescendo.presentation.main.trackCoverModel
 import com.paranid5.crescendo.presentation.ui.permissions.requests.audioRecordingPermissionsRequestLauncher
 import com.paranid5.crescendo.presentation.ui.permissions.requests.foregroundServicePermissionsRequestLauncher
 import com.paranid5.crescendo.presentation.ui.theme.LocalAppColors
@@ -172,7 +172,7 @@ internal suspend inline fun startPlaylistPlayback(
 
 @Composable
 fun TrackCover(trackPath: String, modifier: Modifier = Modifier) {
-    val trackCover = getTrackCoverModel(
+    val trackCover = trackCoverModel(
         path = trackPath,
         isPlaceholderRequired = true,
         size = ImageSize(200, 200),

@@ -32,14 +32,12 @@ import com.paranid5.crescendo.domain.utils.extensions.sendBroadcast
 import com.paranid5.crescendo.domain.utils.extensions.toAndroidMetadata
 import com.paranid5.crescendo.media.images.getThumbnailBitmap
 import com.paranid5.crescendo.media.images.getVideoCoverBitmapAsync
+import com.paranid5.crescendo.presentation.main.MainActivity
+import com.paranid5.crescendo.receivers.StreamingErrorReceiver
 import com.paranid5.crescendo.services.SuspendService
 import com.paranid5.crescendo.services.service_controllers.MediaRetrieverController
 import com.paranid5.crescendo.services.service_controllers.MediaSessionController
 import com.paranid5.crescendo.services.service_controllers.PlaybackController
-import com.paranid5.crescendo.presentation.main.MainActivity
-import com.paranid5.crescendo.presentation.main.playing.Broadcast_CUR_POSITION_CHANGED
-import com.paranid5.crescendo.presentation.main.playing.CUR_POSITION_STREAMING_ARG
-import com.paranid5.crescendo.receivers.StreamingErrorReceiver
 import com.paranid5.yt_url_extractor_kt.VideoMeta
 import com.paranid5.yt_url_extractor_kt.YtFailure
 import com.paranid5.yt_url_extractor_kt.YtFilesNotFoundException
@@ -280,6 +278,7 @@ class StreamService : SuspendService(), KoinComponent {
 
             override fun onIsPlayingChanged(isPlaying: Boolean) {
                 super.onIsPlayingChanged(isPlaying)
+                playbackController.isPlaying = isPlaying
                 mediaRetrieverController.setPlaying(isPlaying)
 
                 when {
@@ -296,7 +295,7 @@ class StreamService : SuspendService(), KoinComponent {
             }
 
             private fun transitToNextTrackAsync() = scope.launch {
-                sendAndStorePlaybackPosition()
+                storePlaybackPosition()
                 updateNotification()
             }
         }
@@ -306,23 +305,12 @@ class StreamService : SuspendService(), KoinComponent {
     private var playbackTask: Job? = null
 
     private inline val currentPlaybackPosition
-        get() = playbackController.currentPosition
+        get() = playbackController.currentPosition.get()
 
     @kotlin.OptIn(ExperimentalCoroutinesApi::class)
     private val videoLengthState = currentMetadataState
         .mapLatest { it?.durationMillis ?: 0 }
         .stateIn(scope, SharingStarted.Eagerly, 0)
-
-    private fun sendPlaybackPosition(curPosition: Long = currentPlaybackPosition) =
-        sendBroadcast(
-            Intent(Broadcast_CUR_POSITION_CHANGED)
-                .putExtra(CUR_POSITION_STREAMING_ARG, curPosition)
-        )
-
-    private suspend fun sendAndStorePlaybackPosition() {
-        sendPlaybackPosition()
-        storePlaybackPosition()
-    }
 
     private suspend fun extractAudioUrlWithMeta(ytUrl: String): Result<Pair<String, VideoMeta?>> {
         val extractRes = withTimeoutOrNull(timeMillis = 4500) {
@@ -413,24 +401,35 @@ class StreamService : SuspendService(), KoinComponent {
     }
 
     private fun pausePlayback() {
-        scope.launch { sendAndStorePlaybackPosition() }
+        scope.launch { storePlaybackPosition() }
         playbackController.pause()
     }
 
     // --------------------------- Playback Monitoring ---------------------------
 
-    private var playbackPosMonitorTask: Job? = null
+    private lateinit var playbackPosMonitorTask: Job
+    private lateinit var playbackPosCacheTask: Job
 
     private fun startPlaybackPositionMonitoring() {
         playbackPosMonitorTask = scope.launch {
             while (playbackController.isPlaying) {
-                sendAndStorePlaybackPosition()
+                playbackController.updateCurrentPosition()
+                delay(PLAYBACK_UPDATE_COOLDOWN)
+            }
+        }
+
+        playbackPosCacheTask = scope.launch(Dispatchers.IO) {
+            while (playbackController.isPlaying) {
+                storePlaybackPosition()
                 delay(PLAYBACK_UPDATE_COOLDOWN)
             }
         }
     }
 
-    private fun stopPlaybackPositionMonitoring() = playbackPosMonitorTask?.cancel()
+    private fun stopPlaybackPositionMonitoring() {
+        playbackPosMonitorTask.cancel()
+        playbackPosCacheTask.cancel()
+    }
 
     private suspend inline fun startAudioEffectsMonitoring() =
         lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
@@ -476,9 +475,13 @@ class StreamService : SuspendService(), KoinComponent {
 
     private val switchVideoReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context?, intent: Intent) {
-            sendPlaybackPosition(0)
             val url = intent.urlArg
-            scope.launch { storeCurrentUrl(url) }
+
+            scope.launch(Dispatchers.IO) {
+                storePlaybackPosition()
+                storeCurrentUrl(url)
+            }
+
             storeAndPlayNewStream(url)
         }
     }
@@ -639,7 +642,7 @@ class StreamService : SuspendService(), KoinComponent {
     )
 
     private suspend inline fun onFetchVideoClicked(url: String) {
-        sendPlaybackPosition(0)
+        storePlaybackPosition(0)
         storeCurrentUrl(url)
         storeAndPlayNewStream(url)
     }
@@ -839,8 +842,8 @@ class StreamService : SuspendService(), KoinComponent {
 
     // ----------------------- Storage Handler Utils -----------------------
 
-    private suspend inline fun storePlaybackPosition() =
-        mediaRetrieverController.storeStreamPlaybackPosition(currentPlaybackPosition)
+    private suspend inline fun storePlaybackPosition(position: Long = currentPlaybackPosition) =
+        mediaRetrieverController.storeStreamPlaybackPosition(position)
 
     private suspend inline fun storeIsRepeating(isRepeating: Boolean) =
         mediaRetrieverController.storeIsRepeating(isRepeating)

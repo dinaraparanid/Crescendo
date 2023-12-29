@@ -1,7 +1,6 @@
-package com.paranid5.crescendo.presentation.main.playing
+package com.paranid5.crescendo.presentation.main.playing.views
 
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -17,18 +16,36 @@ import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.palette.graphics.Palette
 import com.paranid5.crescendo.R
+import com.paranid5.crescendo.domain.media.AudioStatus
 import com.paranid5.crescendo.domain.utils.extensions.timeString
+import com.paranid5.crescendo.presentation.main.playing.PlayingViewModel
 import com.paranid5.crescendo.presentation.ui.theme.LocalAppColors
 import com.paranid5.crescendo.services.stream_service.StreamServiceAccessor
 import org.koin.compose.koinInject
 
-context(RowScope)
 @Composable
-fun TimeContainer(isLiveStreaming: Boolean, curPosition: Long, videoLength: Long, color: Color) =
+fun PlaybackSliderWithTimeContainer(
+    viewModel: PlayingViewModel,
+    durationMillis: Long,
+    palette: Palette?,
+    audioStatus: AudioStatus,
+    isLiveStreaming: Boolean,
+    modifier: Modifier = Modifier
+) = PlaybackSlider(
+    viewModel = viewModel,
+    durationMillis = durationMillis,
+    palette = palette,
+    audioStatus = audioStatus,
+    modifier = modifier
+) { curPosition, videoLength, color ->
     when {
         isLiveStreaming -> Box(Modifier.fillMaxWidth()) {
-            LiveSeeker(color = color, modifier = Modifier.align(Alignment.Center))
+            LiveSeeker(
+                color = color,
+                modifier = Modifier.align(Alignment.Center)
+            )
         }
 
         else -> {
@@ -37,6 +54,7 @@ fun TimeContainer(isLiveStreaming: Boolean, curPosition: Long, videoLength: Long
             TimeText(videoLength, color)
         }
     }
+}
 
 @Composable
 fun TimeText(time: Long, color: Color, modifier: Modifier = Modifier) =
@@ -47,21 +65,24 @@ fun LiveSeeker(
     color: Color,
     modifier: Modifier = Modifier,
     streamServiceAccessor: StreamServiceAccessor = koinInject()
-) {
-    val colors = LocalAppColors.current.colorScheme
+) = Button(
+    modifier = modifier,
+    colors = ButtonDefaults.buttonColors(containerColor = color),
+    shape = RoundedCornerShape(20.dp),
+    content = { LiveLabel() },
+    onClick = { streamServiceAccessor.sendSeekToBroadcast(0) }
+)
 
-    Button(
-        modifier = modifier,
-        colors = ButtonDefaults.buttonColors(containerColor = color),
-        shape = RoundedCornerShape(20.dp),
-        onClick = { streamServiceAccessor.sendSeekToBroadcast(0) }
-    ) {
-        Text(
-            text = stringResource(R.string.live),
-            color = colors.primary,
-            fontWeight = FontWeight.Bold,
-            fontStyle = FontStyle.Italic,
-            textAlign = TextAlign.Center
-        )
-    }
+@Composable
+private fun LiveLabel(modifier: Modifier = Modifier) {
+    val colors = LocalAppColors.current
+
+    Text(
+        text = stringResource(R.string.live),
+        color = colors.primary,
+        fontWeight = FontWeight.Bold,
+        fontStyle = FontStyle.Italic,
+        textAlign = TextAlign.Center,
+        modifier = modifier
+    )
 }

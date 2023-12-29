@@ -4,6 +4,7 @@ import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.Box
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -72,6 +73,7 @@ private inline fun ConfirmButtonImpl(
     modifier: Modifier = Modifier,
     fetchStreamUIHandler: FetchStreamUIHandler = koinInject()
 ) {
+    val colors = LocalAppColors.current
     val playingSheetState = LocalPlayingSheetState.current
     val playingPagerState = LocalPlayingPagerState.current
 
@@ -82,6 +84,9 @@ private inline fun ConfirmButtonImpl(
     Button(
         enabled = isConfirmButtonActive,
         modifier = modifier,
+        colors = ButtonDefaults.buttonColors(
+            containerColor = colors.backgroundAlternative
+        ),
         content = { ConfirmButtonLabel() },
         onClick = {
             when {

@@ -14,6 +14,7 @@ import coil.size.Precision
 import coil.size.Scale
 import com.paranid5.crescendo.R
 import com.paranid5.crescendo.data.StorageHandler
+import com.paranid5.crescendo.domain.media.AudioStatus
 import com.paranid5.crescendo.media.images.ImageSize
 import com.paranid5.crescendo.media.images.getTrackCoverAsync
 import com.paranid5.crescendo.media.images.getTrackCoverWithPaletteAsync
@@ -23,7 +24,7 @@ import com.paranid5.crescendo.presentation.ui.utils.BlurTransformation
 import org.koin.compose.koinInject
 
 @Composable
-fun getVideoCoverModel(
+fun videoCoverModel(
     isPlaceholderRequired: Boolean,
     size: ImageSize? = null,
     isBlured: Boolean = false,
@@ -79,7 +80,7 @@ fun rememberVideoCoverPainter(
     storageHandler: StorageHandler = koinInject(),
     bitmapSettings: (Bitmap) -> Unit = {}
 ) = rememberAsyncImagePainter(
-    model = getVideoCoverModel(
+    model = videoCoverModel(
         isPlaceholderRequired = isPlaceholderRequired,
         size = size,
         isBlured = isBlured,
@@ -91,7 +92,7 @@ fun rememberVideoCoverPainter(
 )
 
 @Composable
-fun getVideoCoverModelWithPalette(
+fun videoCoverModelWithPalette(
     isPlaceholderRequired: Boolean,
     size: ImageSize? = null,
     isBlured: Boolean = false,
@@ -148,7 +149,7 @@ fun rememberVideoCoverPainterWithPalette(
     storageHandler: StorageHandler = koinInject(),
     bitmapSettings: (Bitmap) -> Unit = {}
 ): Pair<AsyncImagePainter, Palette?> {
-    val (coverModel, palette) = getVideoCoverModelWithPalette(
+    val (coverModel, palette) = videoCoverModelWithPalette(
         isPlaceholderRequired = isPlaceholderRequired,
         size = size,
         isBlured = isBlured,
@@ -162,7 +163,7 @@ fun rememberVideoCoverPainterWithPalette(
 }
 
 @Composable
-fun getTrackCoverModel(
+fun trackCoverModel(
     path: String?,
     isPlaceholderRequired: Boolean,
     size: ImageSize? = null,
@@ -208,7 +209,7 @@ fun rememberTrackCoverPainter(
     animationMillis: Int = 400,
     bitmapSettings: (Bitmap) -> Unit = {}
 ) = rememberAsyncImagePainter(
-    model = getTrackCoverModel(
+    model = trackCoverModel(
         path = path,
         isPlaceholderRequired = isPlaceholderRequired,
         size = size,
@@ -220,7 +221,7 @@ fun rememberTrackCoverPainter(
 )
 
 @Composable
-fun getTrackCoverModelWithPalette(
+fun trackCoverModelWithPalette(
     path: String?,
     isPlaceholderRequired: Boolean,
     size: ImageSize? = null,
@@ -271,7 +272,7 @@ fun rememberTrackCoverPainterWithPalette(
     animationMillis: Int = 400,
     bitmapSettings: (Bitmap) -> Unit = {}
 ): Pair<AsyncImagePainter, Palette?> {
-    val (coverModel, palette) = getTrackCoverModelWithPalette(
+    val (coverModel, palette) = trackCoverModelWithPalette(
         path = path,
         isPlaceholderRequired = isPlaceholderRequired,
         size = size,
@@ -285,7 +286,7 @@ fun rememberTrackCoverPainterWithPalette(
 }
 
 @Composable
-fun getCurrentTrackCoverModel(
+fun currentTrackCoverModel(
     isPlaceholderRequired: Boolean,
     size: ImageSize? = null,
     isBlured: Boolean = false,
@@ -297,7 +298,7 @@ fun getCurrentTrackCoverModel(
     val curTrack by storageHandler.currentTrackState.collectAsState()
     val path by remember { derivedStateOf { curTrack?.path } }
 
-    return getTrackCoverModel(
+    return trackCoverModel(
         path = path,
         isPlaceholderRequired = isPlaceholderRequired,
         size = size,
@@ -318,7 +319,7 @@ fun rememberCurrentTrackCoverPainter(
     storageHandler: StorageHandler = koinInject(),
     bitmapSettings: (Bitmap) -> Unit = {}
 ) = rememberAsyncImagePainter(
-    model = getCurrentTrackCoverModel(
+    model = currentTrackCoverModel(
         isPlaceholderRequired = isPlaceholderRequired,
         size = size,
         isBlured = isBlured,
@@ -330,7 +331,7 @@ fun rememberCurrentTrackCoverPainter(
 )
 
 @Composable
-fun getCurrentTrackCoverModelWithPalette(
+fun currentTrackCoverModelWithPalette(
     isPlaceholderRequired: Boolean,
     size: ImageSize? = null,
     isBlured: Boolean = false,
@@ -342,7 +343,7 @@ fun getCurrentTrackCoverModelWithPalette(
     val curTrack by storageHandler.currentTrackState.collectAsState()
     val path by remember { derivedStateOf { curTrack?.path } }
 
-    return getTrackCoverModelWithPalette(
+    return trackCoverModelWithPalette(
         path = path,
         isPlaceholderRequired = isPlaceholderRequired,
         size = size,
@@ -363,7 +364,7 @@ fun rememberCurrentTrackCoverPainterWithPalette(
     storageHandler: StorageHandler = koinInject(),
     bitmapSettings: (Bitmap) -> Unit = {}
 ): Pair<AsyncImagePainter, Palette?> {
-    val (coverModel, palette) = getCurrentTrackCoverModelWithPalette(
+    val (coverModel, palette) = currentTrackCoverModelWithPalette(
         isPlaceholderRequired = isPlaceholderRequired,
         size = size,
         isBlured = isBlured,
@@ -374,6 +375,26 @@ fun rememberCurrentTrackCoverPainterWithPalette(
     )
 
     return rememberAsyncImagePainter(coverModel) to palette
+}
+
+@Composable
+fun coverModelWithPalette(
+    audioStatus: AudioStatus,
+    size: ImageSize
+): Pair<ImageRequest, Palette?> {
+    val (coverModel, palette) = when (audioStatus) {
+        AudioStatus.STREAMING -> videoCoverModelWithPalette(
+            isPlaceholderRequired = false,
+            size = size
+        )
+
+        AudioStatus.PLAYING -> currentTrackCoverModelWithPalette(
+            isPlaceholderRequired = true,
+            size = size
+        )
+    }
+
+    return coverModel to palette
 }
 
 private fun ImageRequest.Builder.prevCoverPlaceholder(prevCoverModel: BitmapDrawable?) =

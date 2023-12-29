@@ -4,6 +4,7 @@ import android.content.Context
 import android.media.audiofx.BassBoost
 import android.media.audiofx.Equalizer
 import android.media.audiofx.PresetReverb
+import androidx.annotation.MainThread
 import androidx.annotation.OptIn
 import androidx.media3.common.AudioAttributes
 import androidx.media3.common.C
@@ -23,6 +24,7 @@ import kotlinx.coroutines.flow.updateAndGet
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import org.koin.core.qualifier.named
+import java.util.concurrent.atomic.AtomicLong
 
 class PlaybackController(
     context: Context,
@@ -85,11 +87,14 @@ class PlaybackController(
             .setUsage(C.USAGE_MEDIA)
             .build()
 
-    inline val isPlaying
-        get() = player.isPlaying
+    @Volatile
+    var isPlaying: Boolean = false
 
-    inline val currentPosition
-        get() = player.currentPosition
+    var currentPosition = AtomicLong()
+
+    @MainThread
+    fun updateCurrentPosition() =
+        currentPosition.set(player.currentPosition)
 
     inline val currentMediaItemIndex
         get() = player.currentMediaItemIndex
@@ -293,12 +298,12 @@ class PlaybackController(
     }
 
     fun seekTo10SecsBack() = seekTo(
-        maxOf(currentPosition - TEN_SECS_AS_MILLIS, 0)
+        maxOf(currentPosition.get() - TEN_SECS_AS_MILLIS, 0)
     )
 
     fun seekTo10SecsForward(videoLength: Long) = seekTo(
         minOf(
-            currentPosition + TEN_SECS_AS_MILLIS,
+            currentPosition.get() + TEN_SECS_AS_MILLIS,
             videoLength
         )
     )

@@ -33,13 +33,11 @@ import com.paranid5.crescendo.domain.utils.extensions.sendBroadcast
 import com.paranid5.crescendo.domain.utils.extensions.toAndroidMetadata
 import com.paranid5.crescendo.domain.utils.extensions.toMediaItemList
 import com.paranid5.crescendo.media.images.getTrackCoverBitmapAsync
+import com.paranid5.crescendo.presentation.main.MainActivity
 import com.paranid5.crescendo.services.SuspendService
 import com.paranid5.crescendo.services.service_controllers.MediaRetrieverController
 import com.paranid5.crescendo.services.service_controllers.MediaSessionController
 import com.paranid5.crescendo.services.service_controllers.PlaybackController
-import com.paranid5.crescendo.presentation.main.MainActivity
-import com.paranid5.crescendo.presentation.main.playing.Broadcast_CUR_POSITION_CHANGED
-import com.paranid5.crescendo.presentation.main.playing.CUR_POSITION_PLAYING_ARG
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.Dispatchers
@@ -291,6 +289,7 @@ class TrackService : SuspendService(), KoinComponent {
 
         override fun onIsPlayingChanged(isPlaying: Boolean) {
             super.onIsPlayingChanged(isPlaying)
+            playbackController.isPlaying = isPlaying
             mediaRetrieverController.setPlaying(isPlaying)
 
             when {
@@ -317,7 +316,7 @@ class TrackService : SuspendService(), KoinComponent {
         }
 
         private fun storePositionAndUpdateNotificationAsync() = scope.launch {
-            sendAndStorePlaybackPosition()
+            storePlaybackPosition()
             updateNotification()
         }
     }
@@ -333,7 +332,7 @@ class TrackService : SuspendService(), KoinComponent {
     // ----------------------- Playback Handle -----------------------
 
     private inline val exoPlaybackPosition
-        get() = playbackController.currentPosition
+        get() = playbackController.currentPosition.get()
 
     private inline val exoTrackIndex
         get() = playbackController.currentMediaItemIndex
@@ -353,18 +352,8 @@ class TrackService : SuspendService(), KoinComponent {
     private inline val savedPlaybackPosition
         get() = mediaRetrieverController.tracksPlaybackPosition
 
-    private fun sendPlaybackPosition(curPosition: Long = exoPlaybackPosition) = sendBroadcast(
-        Intent(Broadcast_CUR_POSITION_CHANGED)
-            .putExtra(CUR_POSITION_PLAYING_ARG, curPosition)
-    )
-
-    private suspend fun sendAndStorePlaybackPosition() {
-        sendPlaybackPosition()
-        storePlaybackPosition()
-    }
-
     private fun pausePlayback() {
-        scope.launch { sendAndStorePlaybackPosition() }
+        scope.launch { storePlaybackPosition() }
         playbackController.pause()
     }
 
@@ -438,17 +427,28 @@ class TrackService : SuspendService(), KoinComponent {
     // --------------------------- Playback Monitoring ---------------------------
 
     private lateinit var playbackPosMonitorTask: Job
+    private lateinit var playbackPosCacheTask: Job
 
     private fun startPlaybackPositionMonitoring() {
         playbackPosMonitorTask = scope.launch {
             while (playbackController.isPlaying) {
-                sendAndStorePlaybackPosition()
+                playbackController.updateCurrentPosition()
+                delay(PLAYBACK_UPDATE_COOLDOWN)
+            }
+        }
+
+        playbackPosCacheTask = scope.launch(Dispatchers.IO) {
+            while (playbackController.isPlaying) {
+                storePlaybackPosition()
                 delay(PLAYBACK_UPDATE_COOLDOWN)
             }
         }
     }
 
-    private fun stopPlaybackPositionMonitoring() = playbackPosMonitorTask.cancel()
+    private fun stopPlaybackPositionMonitoring() {
+        playbackPosMonitorTask.cancel()
+        playbackPosCacheTask.cancel()
+    }
 
     private suspend fun startAudioEffectsMonitoring() =
         lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
@@ -529,7 +529,7 @@ class TrackService : SuspendService(), KoinComponent {
             playbackController.setMediaItems(
                 newPlaylist.toMediaItemList(),
                 newTrackInd,
-                playbackController.currentPosition
+                exoPlaybackPosition
             )
         }
     }
@@ -955,8 +955,8 @@ class TrackService : SuspendService(), KoinComponent {
 
     // ----------------------- Storage Handler Utils -----------------------
 
-    private suspend inline fun storePlaybackPosition() =
-        mediaRetrieverController.storeTracksPlaybackPosition(exoPlaybackPosition)
+    private suspend inline fun storePlaybackPosition(position: Long = exoPlaybackPosition) =
+        mediaRetrieverController.storeTracksPlaybackPosition(position)
 
     private suspend inline fun storeIsRepeating(isRepeating: Boolean) =
         mediaRetrieverController.storeIsRepeating(isRepeating)
