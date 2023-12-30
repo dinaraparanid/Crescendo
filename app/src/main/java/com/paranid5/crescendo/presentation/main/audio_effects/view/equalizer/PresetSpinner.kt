@@ -24,6 +24,7 @@ import com.paranid5.crescendo.EQUALIZER_DATA
 import com.paranid5.crescendo.R
 import com.paranid5.crescendo.domain.eq.EqualizerBandsPreset
 import com.paranid5.crescendo.domain.eq.EqualizerData
+import com.paranid5.crescendo.koinActivityViewModel
 import com.paranid5.crescendo.presentation.main.audio_effects.AudioEffectsUIHandler
 import com.paranid5.crescendo.presentation.main.audio_effects.AudioEffectsViewModel
 import com.paranid5.crescendo.presentation.main.audio_effects.properties.compose.collectAudioStatusAsState
@@ -37,28 +38,25 @@ import org.koin.compose.koinInject
 import org.koin.core.qualifier.named
 
 @Composable
-fun PresetSpinner(
-    viewModel: AudioEffectsViewModel,
-    modifier: Modifier = Modifier,
-) = Box(modifier) {
-    PresetSpinnerImpl(
-        viewModel = viewModel,
-        modifier = Modifier
-            .fillMaxWidth()
-            .align(Alignment.CenterStart),
-    )
+fun PresetSpinner(modifier: Modifier = Modifier) =
+    Box(modifier) {
+        PresetSpinnerImpl(
+            Modifier
+                .fillMaxWidth()
+                .align(Alignment.CenterStart),
+        )
 
-    PresetSpinnerArrow(
-        modifier = Modifier
-            .align(Alignment.CenterEnd)
-            .height(20.dp)
-    )
-}
+        PresetSpinnerArrow(
+            Modifier
+                .align(Alignment.CenterEnd)
+                .height(20.dp)
+        )
+    }
 
 @Composable
 private fun PresetSpinnerImpl(
-    viewModel: AudioEffectsViewModel,
     modifier: Modifier = Modifier,
+    viewModel: AudioEffectsViewModel = koinActivityViewModel(),
     equalizerDataState: MutableStateFlow<EqualizerData?> = koinInject(named(EQUALIZER_DATA)),
     audioEffectsUIHandler: AudioEffectsUIHandler = koinInject()
 ) {

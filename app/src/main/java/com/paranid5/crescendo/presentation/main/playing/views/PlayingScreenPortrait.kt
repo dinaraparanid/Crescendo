@@ -16,12 +16,10 @@ import androidx.constraintlayout.compose.Dimension
 import com.paranid5.crescendo.domain.media.AudioStatus
 import com.paranid5.crescendo.media.images.ImageSize
 import com.paranid5.crescendo.presentation.main.coverModelWithPalette
-import com.paranid5.crescendo.presentation.main.playing.PlayingViewModel
 import com.paranid5.crescendo.presentation.main.playing.rememberIsWaveformEnabled
 
 @Composable
 fun PlayingScreenPortrait(
-    viewModel: PlayingViewModel,
     audioStatus: AudioStatus,
     durationMillis: Long,
     coverAlpha: Float,
@@ -30,7 +28,7 @@ fun PlayingScreenPortrait(
 ) {
     var coverSize by remember { mutableStateOf(ImageSize(1, 1)) }
     val (coverModel, palette) = coverModelWithPalette(audioStatus, coverSize)
-    val isWaveformEnabled by rememberIsWaveformEnabled(viewModel, audioStatus)
+    val isWaveformEnabled by rememberIsWaveformEnabled(audioStatus)
 
     ConstraintLayout(modifier) {
         val (
@@ -86,7 +84,6 @@ fun PlayingScreenPortrait(
         )
 
         PlaybackSliderWithTimeContainer(
-            viewModel = viewModel,
             durationMillis = durationMillis,
             palette = palette,
             audioStatus = audioStatus,
@@ -100,7 +97,6 @@ fun PlayingScreenPortrait(
         )
 
         TitleAndPropertiesButton(
-            viewModel = viewModel,
             audioStatus = audioStatus,
             palette = palette,
             modifier = Modifier.constrainAs(titleAndPropertiesButton) {
@@ -112,7 +108,6 @@ fun PlayingScreenPortrait(
         )
 
         PlaybackButtons(
-            viewModel = viewModel,
             audioStatus = audioStatus,
             palette = palette,
             modifier = Modifier.constrainAs(playbackButtons) {
@@ -124,7 +119,6 @@ fun PlayingScreenPortrait(
         )
 
         UtilsButtons(
-            viewModel = viewModel,
             audioStatus = audioStatus,
             palette = palette,
             modifier = Modifier.constrainAs(utilsButtons) {

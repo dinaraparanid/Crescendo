@@ -9,14 +9,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.palette.graphics.Palette
 import com.paranid5.crescendo.domain.media.AudioStatus
-import com.paranid5.crescendo.presentation.main.playing.PlayingViewModel
-import com.paranid5.crescendo.presentation.main.playing.views.title_author.Author
-import com.paranid5.crescendo.presentation.main.playing.views.title_author.Title
 import com.paranid5.crescendo.presentation.ui.extensions.getLightMutedOrPrimary
 
 @Composable
 fun TitleAndAuthor(
-    viewModel: PlayingViewModel,
     audioStatus: AudioStatus,
     palette: Palette?,
     modifier: Modifier = Modifier,
@@ -26,7 +22,6 @@ fun TitleAndAuthor(
 
     Column(modifier) {
         Title(
-            viewModel = viewModel,
             audioStatus = audioStatus,
             paletteColor = paletteColor,
             modifier = Modifier.align(textAlignment)
@@ -35,7 +30,6 @@ fun TitleAndAuthor(
         Spacer(Modifier.height(5.dp))
 
         Author(
-            viewModel = viewModel,
             audioStatus = audioStatus,
             paletteColor = paletteColor,
             modifier = Modifier.align(textAlignment)

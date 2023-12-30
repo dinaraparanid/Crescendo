@@ -24,7 +24,6 @@ import coil.request.ImageRequest
 import com.paranid5.crescendo.EQUALIZER_DATA
 import com.paranid5.crescendo.R
 import com.paranid5.crescendo.domain.eq.EqualizerData
-import com.paranid5.crescendo.presentation.main.audio_effects.AudioEffectsViewModel
 import com.paranid5.crescendo.presentation.main.audio_effects.view.getBandTrackModel
 import com.paranid5.crescendo.presentation.ui.extensions.collectLatestAsState
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -33,7 +32,6 @@ import org.koin.core.qualifier.named
 
 @Composable
 fun BandController(
-    viewModel: AudioEffectsViewModel,
     index: Int,
     presentLvlsDbState: SnapshotStateList<Float>,
     pointsState: SnapshotStateList<Offset>,
@@ -70,7 +68,6 @@ fun BandController(
             sliderWidthState = sliderWidthState,
             sliderHeightState = sliderHeightState,
             equalizerData = equalizerData,
-            viewModel = viewModel,
             modifier = Modifier.align(Alignment.Center),
             thumbModifier = Modifier.align(Alignment.Center)
         )

@@ -48,10 +48,7 @@ internal const val WAVEFORM_PADDING =
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
-fun TrimmerScreen(
-    viewModel: TrimmerViewModel,
-    modifier: Modifier = Modifier
-) {
+fun TrimmerScreen(modifier: Modifier = Modifier) {
     val colors = LocalAppColors.current
 
     val shownEffectsState = remember {
@@ -76,14 +73,12 @@ fun TrimmerScreen(
         sheetContent = {
             EffectsBottomSheet(
                 effects = shownEffects,
-                viewModel = viewModel,
                 alpha = 0F,
             )
         },
     ) {
         CompositionLocalProvider(LocalTrimmerEffectSheetState provides effectsScaffoldState) {
             TrimmerScreenContent(
-                viewModel = viewModel,
                 shownEffectsState = shownEffectsState,
                 modifier = Modifier.padding(top = 16.dp, start = 8.dp, end = 8.dp)
             )

@@ -9,6 +9,7 @@ import androidx.compose.ui.Modifier
 import androidx.palette.graphics.Palette
 import com.paranid5.crescendo.IS_PLAYING
 import com.paranid5.crescendo.domain.media.AudioStatus
+import com.paranid5.crescendo.koinActivityViewModel
 import com.paranid5.crescendo.presentation.main.playing.PlayingViewModel
 import com.paranid5.crescendo.presentation.main.playing.properties.compose.collectAudioStatusAsState
 import com.paranid5.crescendo.presentation.ui.extensions.collectLatestAsState
@@ -19,24 +20,21 @@ import org.koin.core.qualifier.named
 
 @Composable
 fun PlayPauseButton(
-    viewModel: PlayingViewModel,
     audioStatus: AudioStatus,
     palette: Palette?,
     modifier: Modifier = Modifier,
 ) {
     val paletteColor = palette.getLightMutedOrPrimary()
-    val isPlaying by rememberIsPlaying(viewModel, audioStatus)
+    val isPlaying by rememberIsPlaying(audioStatus)
 
     when {
         isPlaying -> PauseButton(
-            viewModel = viewModel,
             audioStatus = audioStatus,
             paletteColor = paletteColor,
             modifier = modifier
         )
 
         else -> PlayButton(
-            viewModel = viewModel,
             audioStatus = audioStatus,
             paletteColor = paletteColor,
             modifier = modifier
@@ -46,8 +44,8 @@ fun PlayPauseButton(
 
 @Composable
 private fun rememberIsPlaying(
-    viewModel: PlayingViewModel,
     audioStatus: AudioStatus,
+    viewModel: PlayingViewModel = koinActivityViewModel(),
     isPlayingState: MutableStateFlow<Boolean> = koinInject(named(IS_PLAYING)),
 ): State<Boolean> {
     val actualAudioStatus by viewModel.collectAudioStatusAsState()

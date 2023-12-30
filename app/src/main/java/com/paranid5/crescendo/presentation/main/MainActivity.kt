@@ -29,10 +29,7 @@ class MainActivity : ComponentActivity() {
                     LocalNavController provides mainNavController,
                     LocalActivity provides this,
                 ) {
-                    App(
-                        viewModel = viewModel,
-                        modifier = Modifier.fillMaxSize()
-                    )
+                    App(Modifier.fillMaxSize())
                 }
             }
         }

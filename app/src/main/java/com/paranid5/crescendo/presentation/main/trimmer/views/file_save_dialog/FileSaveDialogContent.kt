@@ -16,11 +16,9 @@ import com.paranid5.crescendo.domain.tracks.Track
 import com.paranid5.crescendo.domain.trimming.FadeDurations
 import com.paranid5.crescendo.domain.trimming.PitchAndSpeed
 import com.paranid5.crescendo.domain.trimming.TrimRange
-import com.paranid5.crescendo.presentation.main.trimmer.TrimmerViewModel
 
 @Composable
 fun FileSaveDialogContent(
-    viewModel: TrimmerViewModel,
     fileSaveOptions: Array<String>,
     track: Track,
     audioFormat: Formats,
@@ -53,7 +51,6 @@ fun FileSaveDialogContent(
         Spacer(Modifier.height(10.dp))
 
         ConfirmButton(
-            viewModel = viewModel,
             isSaveButtonClickable = isSaveButtonClickable,
             track = track,
             outputFilename = outputFilename,

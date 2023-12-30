@@ -19,6 +19,7 @@ import com.paranid5.crescendo.domain.tracks.Track
 import com.paranid5.crescendo.domain.trimming.FadeDurations
 import com.paranid5.crescendo.domain.trimming.PitchAndSpeed
 import com.paranid5.crescendo.domain.trimming.TrimRange
+import com.paranid5.crescendo.koinActivityViewModel
 import com.paranid5.crescendo.presentation.main.trimmer.TrimmerUIHandler
 import com.paranid5.crescendo.presentation.main.trimmer.TrimmerViewModel
 import com.paranid5.crescendo.presentation.ui.theme.LocalAppColors
@@ -27,7 +28,6 @@ import org.koin.compose.koinInject
 
 @Composable
 fun ConfirmButton(
-    viewModel: TrimmerViewModel,
     isSaveButtonClickable: Boolean,
     track: Track,
     outputFilename: String,
@@ -37,6 +37,7 @@ fun ConfirmButton(
     fadeDurations: FadeDurations,
     isDialogShownState: MutableState<Boolean>,
     modifier: Modifier = Modifier,
+    viewModel: TrimmerViewModel = koinActivityViewModel(),
     trimmerUIHandler: TrimmerUIHandler = koinInject()
 ) {
     val context = LocalContext.current

@@ -27,14 +27,12 @@ import com.paranid5.crescendo.presentation.composition_locals.trimmer.LocalTrimm
 import com.paranid5.crescendo.presentation.composition_locals.trimmer.LocalTrimmerPositionBroadcast
 import com.paranid5.crescendo.presentation.composition_locals.trimmer.LocalTrimmerWaveformScrollState
 import com.paranid5.crescendo.presentation.main.trimmer.FocusPoints
-import com.paranid5.crescendo.presentation.main.trimmer.TrimmerViewModel
 import com.paranid5.crescendo.presentation.main.trimmer.WAVEFORM_SPIKE_WIDTH_RATIO
 import com.paranid5.crescendo.presentation.main.trimmer.views.waveform.TrimmedDuration
 import kotlinx.coroutines.flow.MutableSharedFlow
 
 @Composable
 fun TrimmerScreenContent(
-    viewModel: TrimmerViewModel,
     shownEffectsState: MutableIntState,
     modifier: Modifier = Modifier
 ) {
@@ -50,14 +48,12 @@ fun TrimmerScreenContent(
 
     Box(modifier.onGloballyPositioned { screenWidthPx = it.size.width }) {
         TrimmerScreenContentOriented(
-            viewModel = viewModel,
             shownEffectsState = shownEffectsState,
             screenWidthPxState = screenWidthPxState,
             isFileSaveDialogShownState = isFileSaveDialogShownState
         )
 
         FileSaveDialog(
-            viewModel = viewModel,
             isDialogShownState = isFileSaveDialogShownState,
             modifier = Modifier.align(Alignment.Center)
         )
@@ -67,7 +63,6 @@ fun TrimmerScreenContent(
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
 private fun TrimmerScreenContentOriented(
-    viewModel: TrimmerViewModel,
     shownEffectsState: MutableIntState,
     screenWidthPxState: MutableIntState,
     isFileSaveDialogShownState: MutableState<Boolean>
@@ -93,7 +88,6 @@ private fun TrimmerScreenContentOriented(
         when (config.orientation) {
             Configuration.ORIENTATION_LANDSCAPE ->
                 TrimmerScreenContentLandscape(
-                    viewModel = viewModel,
                     shownEffectsState = shownEffectsState,
                     screenWidthPxState = screenWidthPxState,
                     isFileSaveDialogShownState = isFileSaveDialogShownState,
@@ -101,7 +95,6 @@ private fun TrimmerScreenContentOriented(
                 )
 
             else -> TrimmerScreenContentPortrait(
-                viewModel = viewModel,
                 shownEffectsState = shownEffectsState,
                 screenWidthPxState = screenWidthPxState,
                 isFileSaveDialogShownState = isFileSaveDialogShownState,
@@ -113,7 +106,6 @@ private fun TrimmerScreenContentOriented(
 
 @Composable
 private fun TrimmerScreenContentPortrait(
-    viewModel: TrimmerViewModel,
     shownEffectsState: MutableIntState,
     screenWidthPxState: MutableIntState,
     isFileSaveDialogShownState: MutableState<Boolean>,
@@ -131,8 +123,7 @@ private fun TrimmerScreenContentPortrait(
     ) = createRefs()
 
     TitleArtistColumn(
-        viewModel = viewModel,
-        modifier = Modifier.constrainAs(titleArtist) {
+        Modifier.constrainAs(titleArtist) {
             start.linkTo(parent.start, margin = 16.dp)
             end.linkTo(parent.end, margin = 16.dp)
             centerHorizontallyTo(parent)
@@ -140,7 +131,6 @@ private fun TrimmerScreenContentPortrait(
     )
 
     WaveformWithPosition(
-        viewModel = viewModel,
         spikeWidthRatio = WAVEFORM_SPIKE_WIDTH_RATIO,
         modifier = Modifier.constrainAs(waveform) {
             top.linkTo(titleArtist.bottom, margin = 24.dp)
@@ -159,8 +149,7 @@ private fun TrimmerScreenContentPortrait(
     )
 
     TrimmedDuration(
-        viewModel = viewModel,
-        modifier = Modifier.constrainAs(duration) {
+        Modifier.constrainAs(duration) {
             top.linkTo(effects.top)
             bottom.linkTo(effects.bottom)
             centerHorizontallyTo(parent)
@@ -168,7 +157,6 @@ private fun TrimmerScreenContentPortrait(
     )
 
     ZoomControllers(
-        viewModel = viewModel,
         screenWidthPxState = screenWidthPxState,
         modifier = Modifier.constrainAs(zoom) {
             top.linkTo(effects.top)
@@ -178,20 +166,19 @@ private fun TrimmerScreenContentPortrait(
     )
 
     PlaybackButtons(
-        viewModel = viewModel,
-        modifier = Modifier.constrainAs(playbackButtons) { centerTo(parent) }
+        Modifier.constrainAs(playbackButtons) {
+            centerTo(parent)
+        }
     )
 
     BorderControllers(
-        viewModel = viewModel,
-        modifier = Modifier.constrainAs(controllers) {
+        Modifier.constrainAs(controllers) {
             top.linkTo(playbackButtons.bottom, margin = 32.dp)
             width = Dimension.matchParent
         }
     )
 
     FileSaveButton(
-        viewModel = viewModel,
         isFileSaveDialogShownState = isFileSaveDialogShownState,
         textModifier = Modifier.padding(vertical = 4.dp),
         modifier = Modifier.constrainAs(saveButton) {
@@ -203,7 +190,6 @@ private fun TrimmerScreenContentPortrait(
 
 @Composable
 private fun TrimmerScreenContentLandscape(
-    viewModel: TrimmerViewModel,
     shownEffectsState: MutableIntState,
     screenWidthPxState: MutableIntState,
     isFileSaveDialogShownState: MutableState<Boolean>,
@@ -221,7 +207,6 @@ private fun TrimmerScreenContentLandscape(
     ) = createRefs()
 
     TitleArtistColumn(
-        viewModel = viewModel,
         spaceBetween = 2.dp,
         modifier = Modifier.constrainAs(titleArtist) {
             start.linkTo(parent.start)
@@ -230,8 +215,7 @@ private fun TrimmerScreenContentLandscape(
     )
 
     WaveformWithPosition(
-        viewModel = viewModel,
-        modifier = Modifier.constrainAs(waveform) {
+        Modifier.constrainAs(waveform) {
             top.linkTo(titleArtist.bottom, margin = 4.dp)
             bottom.linkTo(playbackButtons.top, margin = 2.dp)
             centerHorizontallyTo(parent)
@@ -248,8 +232,7 @@ private fun TrimmerScreenContentLandscape(
     )
 
     TrimmedDuration(
-        viewModel = viewModel,
-        modifier = Modifier.constrainAs(duration) {
+        Modifier.constrainAs(duration) {
             top.linkTo(effects.top)
             bottom.linkTo(effects.bottom)
             centerHorizontallyTo(controllers)
@@ -257,7 +240,6 @@ private fun TrimmerScreenContentLandscape(
     )
 
     ZoomControllers(
-        viewModel = viewModel,
         screenWidthPxState = screenWidthPxState,
         modifier = Modifier.constrainAs(zoom) {
             bottom.linkTo(playbackButtons.top, margin = 2.dp)
@@ -266,8 +248,7 @@ private fun TrimmerScreenContentLandscape(
     )
 
     BorderControllers(
-        viewModel = viewModel,
-        modifier = Modifier.constrainAs(controllers) {
+        Modifier.constrainAs(controllers) {
             bottom.linkTo(parent.bottom, margin = 8.dp)
             start.linkTo(parent.start, margin = 8.dp)
             end.linkTo(playbackButtons.start, margin = 16.dp)
@@ -276,15 +257,13 @@ private fun TrimmerScreenContentLandscape(
     )
 
     PlaybackButtons(
-        viewModel = viewModel,
-        modifier = Modifier.constrainAs(playbackButtons) {
+        Modifier.constrainAs(playbackButtons) {
             bottom.linkTo(saveButton.top, margin = 2.dp)
             end.linkTo(parent.end, margin = 8.dp)
         }
     )
 
     FileSaveButton(
-        viewModel = viewModel,
         isFileSaveDialogShownState = isFileSaveDialogShownState,
         modifier = Modifier.constrainAs(saveButton) {
             bottom.linkTo(parent.bottom, margin = 4.dp)

@@ -9,6 +9,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalConfiguration
 import com.paranid5.crescendo.domain.media.AudioStatus
+import com.paranid5.crescendo.koinActivityViewModel
 import com.paranid5.crescendo.presentation.main.playing.properties.compose.collectAudioStatusAsState
 import com.paranid5.crescendo.presentation.main.playing.properties.compose.collectCurrentMetadataAsState
 import com.paranid5.crescendo.presentation.main.playing.properties.compose.collectDurationMillisAsState
@@ -17,18 +18,17 @@ import com.paranid5.crescendo.presentation.main.playing.views.PlayingScreenPortr
 
 @Composable
 fun PlayingScreen(
-    viewModel: PlayingViewModel,
     audioStatus: AudioStatus,
     coverAlpha: Float,
     modifier: Modifier = Modifier,
+    viewModel: PlayingViewModel = koinActivityViewModel(),
 ) {
     val config = LocalConfiguration.current
-    val isLiveStreaming by rememberIsLiveStreaming(viewModel, audioStatus)
+    val isLiveStreaming by rememberIsLiveStreaming(audioStatus)
     val length by viewModel.collectDurationMillisAsState(audioStatus)
 
     when (config.orientation) {
         Configuration.ORIENTATION_LANDSCAPE -> PlayingScreenLandscape(
-            viewModel = viewModel,
             audioStatus = audioStatus,
             durationMillis = length,
             coverAlpha = coverAlpha,
@@ -37,7 +37,6 @@ fun PlayingScreen(
         )
 
         else -> PlayingScreenPortrait(
-            viewModel = viewModel,
             durationMillis = length,
             coverAlpha = coverAlpha,
             audioStatus = audioStatus,
@@ -49,8 +48,8 @@ fun PlayingScreen(
 
 @Composable
 internal fun rememberIsLiveStreaming(
-    viewModel: PlayingViewModel,
-    audioStatus: AudioStatus
+    audioStatus: AudioStatus,
+    viewModel: PlayingViewModel = koinActivityViewModel(),
 ): State<Boolean> {
     val currentMetadata by viewModel.collectCurrentMetadataAsState()
 
@@ -63,8 +62,8 @@ internal fun rememberIsLiveStreaming(
 
 @Composable
 internal fun rememberIsWaveformEnabled(
-    viewModel: PlayingViewModel,
-    audioStatus: AudioStatus
+    audioStatus: AudioStatus,
+    viewModel: PlayingViewModel = koinActivityViewModel(),
 ): State<Boolean> {
     val actualAudioStatus by viewModel.collectAudioStatusAsState()
 

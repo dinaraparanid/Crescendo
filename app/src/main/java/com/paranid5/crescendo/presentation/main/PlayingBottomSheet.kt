@@ -22,7 +22,6 @@ import com.paranid5.crescendo.presentation.composition_locals.playing.LocalPlayi
 import com.paranid5.crescendo.presentation.composition_locals.playing.LocalPlayingSheetState
 import com.paranid5.crescendo.presentation.main.appbar.AppBar
 import com.paranid5.crescendo.presentation.main.current_playlist.CurrentPlaylistScreen
-import com.paranid5.crescendo.presentation.main.current_playlist.CurrentPlaylistViewModel
 import com.paranid5.crescendo.presentation.main.playing.PlayingScreen
 import com.paranid5.crescendo.presentation.main.playing.PlayingViewModel
 import com.paranid5.crescendo.presentation.ui.theme.LocalAppColors
@@ -101,7 +100,6 @@ fun PlayingBottomSheet(
 private fun CurrentPlaylistBottomSheet(
     alpha: Float,
     modifier: Modifier = Modifier,
-    currentPlaylistViewModel: CurrentPlaylistViewModel = koinViewModel()
 ) = Box(modifier) {
     PushUpButton(
         alpha = alpha,
@@ -111,8 +109,7 @@ private fun CurrentPlaylistBottomSheet(
     )
 
     CurrentPlaylistScreen(
-        viewModel = currentPlaylistViewModel,
-        modifier = Modifier
+        Modifier
             .fillMaxSize()
             .padding(top = 24.dp)
     )

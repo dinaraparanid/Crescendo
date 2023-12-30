@@ -2,11 +2,6 @@ package com.paranid5.crescendo.presentation.main.audio_effects.properties.compos
 
 import androidx.compose.runtime.Composable
 import com.paranid5.crescendo.presentation.main.audio_effects.AudioEffectsViewModel
-import com.paranid5.crescendo.presentation.main.audio_effects.properties.areAudioEffectsEnabledFlow
-import com.paranid5.crescendo.presentation.main.audio_effects.properties.bassStrengthFlow
-import com.paranid5.crescendo.presentation.main.audio_effects.properties.pitchTextFlow
-import com.paranid5.crescendo.presentation.main.audio_effects.properties.reverbPresetFlow
-import com.paranid5.crescendo.presentation.main.audio_effects.properties.speedTextState
 import com.paranid5.crescendo.presentation.ui.extensions.collectLatestAsState
 
 @Composable

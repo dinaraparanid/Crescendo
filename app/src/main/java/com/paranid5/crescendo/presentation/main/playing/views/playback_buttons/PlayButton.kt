@@ -12,19 +12,19 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.paranid5.crescendo.R
 import com.paranid5.crescendo.domain.media.AudioStatus
+import com.paranid5.crescendo.koinActivityViewModel
 import com.paranid5.crescendo.presentation.main.playing.PlayingUIHandler
 import com.paranid5.crescendo.presentation.main.playing.PlayingViewModel
-import com.paranid5.crescendo.presentation.main.playing.properties.setAudioStatus
 import com.paranid5.crescendo.presentation.ui.extensions.simpleShadow
 import kotlinx.coroutines.launch
 import org.koin.compose.koinInject
 
 @Composable
 fun PlayButton(
-    viewModel: PlayingViewModel,
     audioStatus: AudioStatus,
     paletteColor: Color,
     modifier: Modifier = Modifier,
+    viewModel: PlayingViewModel = koinActivityViewModel(),
     playingUIHandler: PlayingUIHandler = koinInject()
 ) {
     val coroutineScope = rememberCoroutineScope()

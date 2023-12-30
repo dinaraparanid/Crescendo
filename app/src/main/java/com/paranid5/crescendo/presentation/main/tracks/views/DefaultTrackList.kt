@@ -6,8 +6,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
-import com.paranid5.crescendo.data.StorageHandler
-import com.paranid5.crescendo.data.properties.storeAudioStatus
+import com.paranid5.crescendo.data.states.playback.AudioStatusStatePublisher
 import com.paranid5.crescendo.domain.media.AudioStatus
 import com.paranid5.crescendo.domain.tracks.Track
 import com.paranid5.crescendo.domain.utils.extensions.toDefaultTrackList
@@ -27,7 +26,6 @@ fun DefaultTrackList(
     modifier: Modifier = Modifier,
     trackItemModifier: Modifier = Modifier,
     viewModel: TracksViewModel = koinActivityViewModel(),
-    storageHandler: StorageHandler = koinInject(),
     trackServiceAccessor: TrackServiceAccessor = koinInject()
 ) {
     val playingPagerState = LocalPlayingPagerState.current
@@ -50,7 +48,7 @@ fun DefaultTrackList(
                     startPlaylistPlayback(
                         shownTracks,
                         trackInd,
-                        storageHandler,
+                        viewModel,
                         trackServiceAccessor
                     )
                 }
@@ -62,10 +60,10 @@ fun DefaultTrackList(
 internal suspend inline fun startPlaylistPlayback(
     tracks: ImmutableList<Track>,
     trackInd: Int,
-    storageHandler: StorageHandler,
+    viewModel: AudioStatusStatePublisher,
     trackServiceAccessor: TrackServiceAccessor,
 ) {
-    storageHandler.storeAudioStatus(AudioStatus.PLAYING)
+    viewModel.setAudioStatus(AudioStatus.PLAYING)
 
     trackServiceAccessor.startPlaying(
         playlist = tracks.toDefaultTrackList(),

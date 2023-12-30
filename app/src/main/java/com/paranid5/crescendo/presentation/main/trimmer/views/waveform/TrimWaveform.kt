@@ -8,7 +8,6 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Size
-import com.paranid5.crescendo.presentation.main.trimmer.TrimmerViewModel
 import com.paranid5.crescendo.presentation.main.trimmer.WAVEFORM_SPIKE_WIDTH_RATIO
 import com.paranid5.crescendo.presentation.main.trimmer.effects.waveform.DrawAmplitudesEffect
 import com.paranid5.crescendo.presentation.main.trimmer.effects.waveform.LoadAmplitudesEffect
@@ -17,7 +16,6 @@ import kotlinx.collections.immutable.persistentListOf
 
 @Composable
 fun TrimWaveform(
-    viewModel: TrimmerViewModel,
     modifier: Modifier = Modifier,
     spikeWidthRatio: Int = WAVEFORM_SPIKE_WIDTH_RATIO,
 ) {
@@ -39,17 +37,15 @@ fun TrimWaveform(
 
     val canvasSize by canvasSizeState
 
-    LoadAmplitudesEffect(viewModel)
+    LoadAmplitudesEffect()
 
     DrawAmplitudesEffect(
         spikes = spikes,
         canvasSize = canvasSize,
         spikesAmplitudesState = spikesAmplitudesState,
-        viewModel = viewModel
     )
 
     TrimmerWaveformContent(
-        viewModel = viewModel,
         canvasSizeState = canvasSizeState,
         spikesState = spikesState,
         spikesAmplitudes = spikesAmplitudes,

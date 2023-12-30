@@ -4,14 +4,14 @@ import com.paranid5.crescendo.domain.tracks.Track
 import com.paranid5.crescendo.presentation.main.trimmer.TrimmerViewModel
 import kotlinx.coroutines.flow.map
 
-inline val TrimmerViewModel.trackOrNullState
-    get() = trackStateHolder.trackState
-
-fun TrimmerViewModel.setTrack(track: Track) =
-    trackStateHolder.setTrack(track, this)
-
 inline val TrimmerViewModel.trackDurationInMillisFlow
-    get() = trackOrNullState.map { it?.durationMillis ?: 0L }
+    get() = trackState.map { it?.durationMillis ?: 0L }
 
 inline val TrimmerViewModel.trackPathOrNullFlow
-    get() = trackOrNullState.map { it?.path }
+    get() = trackState.map { it?.path }
+
+fun TrimmerViewModel.setTrackAndResetPositions(track: Track) {
+    setTrack(track)
+    setStartPosInMillis(0)
+    setEndPosInMillis(track.durationMillis)
+}

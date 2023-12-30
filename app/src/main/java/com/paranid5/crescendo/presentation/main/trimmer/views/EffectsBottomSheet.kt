@@ -15,14 +15,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.unit.dp
 import com.paranid5.crescendo.presentation.main.trimmer.ShownEffects
-import com.paranid5.crescendo.presentation.main.trimmer.TrimmerViewModel
 import com.paranid5.crescendo.presentation.main.trimmer.views.effects.EffectsScreen
 import com.paranid5.crescendo.presentation.ui.extensions.pxToDp
 import com.paranid5.crescendo.presentation.ui.utils.PushUpButton
 
 @Composable
 fun EffectsBottomSheet(
-    viewModel: TrimmerViewModel,
     effects: ShownEffects,
     alpha: Float,
     modifier: Modifier = Modifier
@@ -49,7 +47,6 @@ fun EffectsBottomSheet(
 
         EffectsScreen(
             effects = effects,
-            viewModel = viewModel,
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(top = 24.dp, start = 8.dp, end = 8.dp)

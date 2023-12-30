@@ -14,7 +14,7 @@ import com.paranid5.crescendo.presentation.composition_locals.LocalNavController
 import com.paranid5.crescendo.presentation.composition_locals.playing.LocalPlayingSheetState
 import com.paranid5.crescendo.presentation.main.Screens
 import com.paranid5.crescendo.presentation.main.trimmer.TrimmerViewModel
-import com.paranid5.crescendo.presentation.main.trimmer.properties.setTrack
+import com.paranid5.crescendo.presentation.main.trimmer.properties.setTrackAndResetPositions
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterialApi::class)
@@ -32,7 +32,7 @@ fun TrimTrackProperty(
         modifier = modifier,
         text = { Text(stringResource(R.string.trim_track)) },
         onClick = {
-            trimmerViewModel.setTrack(track)
+            trimmerViewModel.setTrackAndResetPositions(track)
             navController.navigateIfNotSame(Screens.Audio.Trimmer)
             coroutineScope.launch { playingSheetState?.bottomSheetState?.collapse() }
         }

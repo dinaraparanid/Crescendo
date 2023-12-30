@@ -4,17 +4,16 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableIntState
 import androidx.compose.runtime.getValue
+import com.paranid5.crescendo.koinActivityViewModel
 import com.paranid5.crescendo.presentation.main.trimmer.TrimmerViewModel
 import com.paranid5.crescendo.presentation.main.trimmer.WAVEFORM_SPIKE_WIDTH_RATIO
 import com.paranid5.crescendo.presentation.main.trimmer.properties.compose.collectWaveformMaxWidthAsState
-import com.paranid5.crescendo.presentation.main.trimmer.properties.setZoom
-import com.paranid5.crescendo.presentation.main.trimmer.properties.setZoomSteps
 import com.paranid5.crescendo.presentation.ui.extensions.pxToDp
 
 @Composable
 fun InitZoomStepsEffect(
-    viewModel: TrimmerViewModel,
     screenWidthPxState: MutableIntState,
+    viewModel: TrimmerViewModel = koinActivityViewModel(),
     spikeWidthRatio: Int = WAVEFORM_SPIKE_WIDTH_RATIO
 ) {
     val screenWidthPx by screenWidthPxState

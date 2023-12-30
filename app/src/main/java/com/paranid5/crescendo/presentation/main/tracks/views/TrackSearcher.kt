@@ -10,9 +10,6 @@ import com.paranid5.crescendo.presentation.main.tracks.properties.compose.collec
 import com.paranid5.crescendo.presentation.main.tracks.properties.compose.collectQueryAsState
 import com.paranid5.crescendo.presentation.main.tracks.properties.compose.collectShownTracksAsState
 import com.paranid5.crescendo.presentation.main.tracks.properties.compose.collectTracksAsState
-import com.paranid5.crescendo.presentation.main.tracks.properties.setFilteredTracks
-import com.paranid5.crescendo.presentation.main.tracks.properties.setQuery
-import com.paranid5.crescendo.presentation.main.tracks.properties.setSearchBarActive
 import com.paranid5.crescendo.presentation.ui.utils.FilteredContent
 import com.paranid5.crescendo.presentation.ui.utils.Searcher
 

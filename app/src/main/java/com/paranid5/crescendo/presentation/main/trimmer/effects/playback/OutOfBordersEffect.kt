@@ -3,6 +3,7 @@ package com.paranid5.crescendo.presentation.main.trimmer.effects.playback
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import com.paranid5.crescendo.koinActivityViewModel
 import com.paranid5.crescendo.presentation.main.trimmer.TrimmerViewModel
 import com.paranid5.crescendo.presentation.main.trimmer.properties.compose.collectEndPosInMillisAsState
 import com.paranid5.crescendo.presentation.main.trimmer.properties.compose.collectIsPlayerInitializedAsState
@@ -10,7 +11,7 @@ import com.paranid5.crescendo.presentation.main.trimmer.properties.compose.colle
 import com.paranid5.crescendo.presentation.main.trimmer.properties.compose.collectStartPosInMillisAsState
 
 @Composable
-fun OutOfBordersEffect(viewModel: TrimmerViewModel) {
+fun OutOfBordersEffect(viewModel: TrimmerViewModel = koinActivityViewModel()) {
     val isPlayerInitialized by viewModel.collectIsPlayerInitializedAsState()
     val startPos by viewModel.collectStartPosInMillisAsState()
     val endPos by viewModel.collectEndPosInMillisAsState()

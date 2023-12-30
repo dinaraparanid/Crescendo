@@ -12,6 +12,7 @@ import com.paranid5.crescendo.R
 import com.paranid5.crescendo.domain.tracks.DefaultTrack
 import com.paranid5.crescendo.domain.utils.extensions.timeString
 import com.paranid5.crescendo.domain.utils.extensions.totalDuration
+import com.paranid5.crescendo.koinActivityViewModel
 import com.paranid5.crescendo.presentation.main.current_playlist.CurrentPlaylistViewModel
 import com.paranid5.crescendo.presentation.main.current_playlist.properties.compose.collectCurrentPlaylistAsState
 import com.paranid5.crescendo.presentation.ui.theme.LocalAppColors
@@ -19,8 +20,8 @@ import kotlinx.collections.immutable.ImmutableList
 
 @Composable
 fun CurrentPlaylistBar(
-    viewModel: CurrentPlaylistViewModel,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    viewModel: CurrentPlaylistViewModel = koinActivityViewModel(),
 ) {
     val currentPlaylist by viewModel.collectCurrentPlaylistAsState()
 

@@ -14,6 +14,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.sp
 import com.paranid5.crescendo.R
 import com.paranid5.crescendo.domain.media.AudioStatus
+import com.paranid5.crescendo.koinActivityViewModel
 import com.paranid5.crescendo.presentation.main.playing.PlayingViewModel
 import com.paranid5.crescendo.presentation.main.playing.properties.compose.collectCurrentMetadataAsState
 import com.paranid5.crescendo.presentation.main.playing.properties.compose.collectCurrentTrackAsState
@@ -21,12 +22,11 @@ import com.paranid5.crescendo.presentation.main.playing.properties.compose.colle
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun Title(
-    viewModel: PlayingViewModel,
     audioStatus: AudioStatus,
     paletteColor: Color,
     modifier: Modifier = Modifier
 ) {
-    val title by rememberTitle(viewModel, audioStatus)
+    val title by rememberTitle(audioStatus)
 
     Text(
         text = title,
@@ -39,8 +39,8 @@ fun Title(
 
 @Composable
 private fun rememberTitle(
-    viewModel: PlayingViewModel,
-    audioStatus: AudioStatus
+    audioStatus: AudioStatus,
+    viewModel: PlayingViewModel = koinActivityViewModel(),
 ): State<String> {
     val currentMetadata by viewModel.collectCurrentMetadataAsState()
     val currentTrack by viewModel.collectCurrentTrackAsState()

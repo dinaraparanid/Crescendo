@@ -15,36 +15,27 @@ import com.paranid5.crescendo.presentation.main.fetch_stream.views.ConfirmButton
 import com.paranid5.crescendo.presentation.main.fetch_stream.views.UrlEditor
 
 @Composable
-fun FetchStreamScreen(
-    viewModel: FetchStreamViewModel,
-    modifier: Modifier = Modifier,
-) {
+fun FetchStreamScreen(modifier: Modifier = Modifier) =
     Box(modifier.orientedPadding()) {
         Column(Modifier.align(Alignment.Center)) {
             UrlEditor(
-                viewModel = viewModel,
-                modifier = Modifier
+                Modifier
                     .align(Alignment.CenterHorizontally)
                     .padding(bottom = 10.dp)
                     .width(300.dp)
             )
 
             ConfirmButton(
-                viewModel = viewModel,
-                modifier = Modifier
+                Modifier
                     .wrapContentWidth()
                     .align(Alignment.CenterHorizontally)
             )
         }
     }
-}
 
 @Composable
-private fun Modifier.orientedPadding(): Modifier {
-    val config = LocalConfiguration.current
-
-    return when (config.orientation) {
+private fun Modifier.orientedPadding() =
+    when (LocalConfiguration.current.orientation) {
         Configuration.ORIENTATION_LANDSCAPE -> this.padding(bottom = 15.dp)
         else -> this
     }
-}

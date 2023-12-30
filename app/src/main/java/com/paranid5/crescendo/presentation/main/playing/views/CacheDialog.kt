@@ -14,17 +14,17 @@ import androidx.compose.ui.res.stringResource
 import com.paranid5.crescendo.R
 import com.paranid5.crescendo.domain.caching.Formats
 import com.paranid5.crescendo.domain.trimming.TrimRange
+import com.paranid5.crescendo.koinActivityViewModel
 import com.paranid5.crescendo.presentation.main.playing.PlayingViewModel
 import com.paranid5.crescendo.presentation.main.playing.properties.compose.collectCurrentMetadataAsState
 import com.paranid5.crescendo.presentation.main.playing.views.cache.CacheDialogContent
 
 @Composable
 fun CacheDialog(
-    viewModel: PlayingViewModel,
     isDialogShownState: MutableState<Boolean>,
     modifier: Modifier = Modifier,
 ) {
-    val durationMillis by rememberDurationMillis(viewModel)
+    val durationMillis by rememberDurationMillis()
     val trimOffsetMillisState = remember { mutableLongStateOf(0) }
     val totalDurationMillisState = remember(durationMillis) { mutableLongStateOf(durationMillis) }
 
@@ -64,7 +64,9 @@ fun CacheDialog(
 }
 
 @Composable
-private fun rememberDurationMillis(viewModel: PlayingViewModel): State<Long> {
+private fun rememberDurationMillis(
+    viewModel: PlayingViewModel = koinActivityViewModel(),
+): State<Long> {
     val currentMetadata by viewModel.collectCurrentMetadataAsState()
 
     return remember(currentMetadata) {

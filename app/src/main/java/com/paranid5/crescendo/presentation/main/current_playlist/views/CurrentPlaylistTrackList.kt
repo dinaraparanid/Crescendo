@@ -5,11 +5,10 @@ import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import com.paranid5.crescendo.domain.tracks.DefaultTrack
+import com.paranid5.crescendo.koinActivityViewModel
 import com.paranid5.crescendo.presentation.main.current_playlist.CurrentPlaylistViewModel
 import com.paranid5.crescendo.presentation.main.current_playlist.properties.compose.collectCurrentPlaylistAsState
 import com.paranid5.crescendo.presentation.main.current_playlist.properties.compose.collectCurrentTrackIndexAsState
-import com.paranid5.crescendo.presentation.main.current_playlist.properties.storeCurrentPlaylist
-import com.paranid5.crescendo.presentation.main.current_playlist.properties.storeCurrentTrackIndex
 import com.paranid5.crescendo.services.track_service.TrackServiceAccessor
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.toImmutableList
@@ -17,11 +16,11 @@ import org.koin.compose.koinInject
 
 @Composable
 fun CurrentPlaylistTrackList(
-    viewModel: CurrentPlaylistViewModel,
     playlistDismissMediatorState: MutableState<ImmutableList<DefaultTrack>>,
     trackIndexDismissMediatorState: MutableState<Int>,
     trackPathDismissKeyState: MutableState<String>,
     modifier: Modifier = Modifier,
+    viewModel: CurrentPlaylistViewModel = koinActivityViewModel(),
     trackServiceAccessor: TrackServiceAccessor = koinInject()
 ) {
     val currentPlaylist by viewModel.collectCurrentPlaylistAsState()
@@ -29,8 +28,8 @@ fun CurrentPlaylistTrackList(
 
     DraggableTrackList(
         tracks = currentPlaylist,
+        currentTrackIndex = currentTrackIndex,
         modifier = modifier,
-        viewModel = viewModel,
         onTrackDismissed = { index, track ->
             tryDismissTrack(
                 index = index,
@@ -80,7 +79,7 @@ private suspend fun updateCurrentPlaylist(
     viewModel: CurrentPlaylistViewModel,
     trackServiceAccessor: TrackServiceAccessor
 ) {
-    viewModel.storeCurrentPlaylist(newTracks)
-    viewModel.storeCurrentTrackIndex(newCurTrackIndex)
+    viewModel.setCurrentPlaylist(newTracks)
+    viewModel.setCurrentTrackIndex(newCurTrackIndex)
     trackServiceAccessor.updatePlaylistAfterDrag(newTracks, newCurTrackIndex)
 }

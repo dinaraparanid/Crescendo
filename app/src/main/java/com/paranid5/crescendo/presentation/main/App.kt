@@ -26,7 +26,7 @@ import com.paranid5.crescendo.presentation.ui.permissions.requests.externalStora
 import com.paranid5.crescendo.presentation.ui.theme.LocalAppColors
 
 @Composable
-fun App(viewModel: MainActivityViewModel, modifier: Modifier = Modifier) {
+fun App(modifier: Modifier = Modifier) {
     val isExternalStoragePermissionDialogShownState = remember { mutableStateOf(true) }
 
     Box(modifier) {
@@ -42,19 +42,13 @@ fun App(viewModel: MainActivityViewModel, modifier: Modifier = Modifier) {
                 launchStoragePermissions()
         }
 
-        ScreenScaffold(
-            viewModel = viewModel,
-            modifier = Modifier.fillMaxSize()
-        )
+        ScreenScaffold(Modifier.fillMaxSize())
     }
 }
 
 @OptIn(ExperimentalMaterialApi::class, ExperimentalFoundationApi::class)
 @Composable
-private fun ScreenScaffold(
-    viewModel: MainActivityViewModel,
-    modifier: Modifier = Modifier,
-) {
+private fun ScreenScaffold(modifier: Modifier = Modifier) {
     val backgroundColor = LocalAppColors.current.colorScheme.background
 
     val playingScaffoldState = rememberBottomSheetScaffoldState()
@@ -88,7 +82,7 @@ private fun ScreenScaffold(
             backgroundColor = backgroundColor,
             sheetBackgroundColor = backgroundColor,
             sheetContent = { PlayingBottomSheet(alpha) },
-            content = { ContentScreen(padding = it, viewModel = viewModel) }
+            content = { ContentScreen(padding = it) }
         )
     }
 }

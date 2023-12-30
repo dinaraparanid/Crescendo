@@ -17,13 +17,14 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
 import com.paranid5.crescendo.R
+import com.paranid5.crescendo.domain.media.AudioStatus
+import com.paranid5.crescendo.koinActivityViewModel
 import com.paranid5.crescendo.presentation.composition_locals.playing.LocalPlayingPagerState
 import com.paranid5.crescendo.presentation.composition_locals.playing.LocalPlayingSheetState
 import com.paranid5.crescendo.presentation.main.fetch_stream.FetchStreamUIHandler
 import com.paranid5.crescendo.presentation.main.fetch_stream.FetchStreamViewModel
 import com.paranid5.crescendo.presentation.main.fetch_stream.properties.compose.collectCurrentTextAsState
 import com.paranid5.crescendo.presentation.main.fetch_stream.properties.compose.collectIsConfirmButtonActiveAsState
-import com.paranid5.crescendo.presentation.main.fetch_stream.properties.resetAudioStatusToStreaming
 import com.paranid5.crescendo.presentation.ui.permissions.requests.audioRecordingPermissionsRequestLauncher
 import com.paranid5.crescendo.presentation.ui.permissions.requests.foregroundServicePermissionsRequestLauncher
 import com.paranid5.crescendo.presentation.ui.theme.LocalAppColors
@@ -31,10 +32,7 @@ import kotlinx.coroutines.launch
 import org.koin.compose.koinInject
 
 @Composable
-fun ConfirmButton(
-    viewModel: FetchStreamViewModel,
-    modifier: Modifier = Modifier,
-) {
+fun ConfirmButton(modifier: Modifier = Modifier) {
     val isForegroundServicePermissionDialogShownState = remember { mutableStateOf(false) }
     val isAudioRecordingPermissionDialogShownState = remember { mutableStateOf(false) }
 
@@ -56,7 +54,6 @@ fun ConfirmButton(
             isRecordingPermissionGranted = isRecordingPermissionGranted,
             launchFSPermissions = launchFSPermissions,
             launchRecordPermissions = launchRecordPermissions,
-            viewModel = viewModel,
             modifier = Modifier.align(Alignment.Center),
         )
     }
@@ -69,8 +66,8 @@ private inline fun ConfirmButtonImpl(
     isRecordingPermissionGranted: Boolean,
     crossinline launchFSPermissions: () -> Unit,
     crossinline launchRecordPermissions: () -> Unit,
-    viewModel: FetchStreamViewModel,
     modifier: Modifier = Modifier,
+    viewModel: FetchStreamViewModel = koinActivityViewModel(),
     fetchStreamUIHandler: FetchStreamUIHandler = koinInject()
 ) {
     val colors = LocalAppColors.current
@@ -97,7 +94,7 @@ private inline fun ConfirmButtonImpl(
                     launchRecordPermissions()
 
                 else -> coroutineScope.launch {
-                    viewModel.resetAudioStatusToStreaming()
+                    viewModel.setAudioStatus(AudioStatus.STREAMING)
                     fetchStreamUIHandler.startStreaming(currentText.trim())
                     playingPagerState?.animateScrollToPage(1)
                     playingSheetState?.bottomSheetState?.expand()

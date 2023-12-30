@@ -15,6 +15,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewModelScope
 import com.paranid5.crescendo.R
 import com.paranid5.crescendo.domain.utils.extensions.PresetReverb
+import com.paranid5.crescendo.koinActivityViewModel
 import com.paranid5.crescendo.presentation.main.audio_effects.AudioEffectsUIHandler
 import com.paranid5.crescendo.presentation.main.audio_effects.AudioEffectsViewModel
 import com.paranid5.crescendo.presentation.main.audio_effects.properties.compose.collectAudioStatusAsState
@@ -25,32 +26,22 @@ import kotlinx.coroutines.launch
 import org.koin.compose.koinInject
 
 @Composable
-fun BassAndReverb(
-    viewModel: AudioEffectsViewModel,
-    modifier: Modifier = Modifier,
-) = Row(modifier) {
-    BassController(
-        viewModel = viewModel,
-        modifier = Modifier.weight(1F)
-    )
-
-    Spacer(Modifier.width(20.dp))
-
-    ReverbController(
-        viewModel = viewModel,
-        modifier = Modifier.weight(1F)
-    )
-}
+fun BassAndReverb(modifier: Modifier = Modifier) =
+    Row(modifier) {
+        BassController(Modifier.weight(1F))
+        Spacer(Modifier.width(20.dp))
+        ReverbController(Modifier.weight(1F))
+    }
 
 @Composable
 private fun BassController(
-    viewModel: AudioEffectsViewModel,
     modifier: Modifier = Modifier,
+    viewModel: AudioEffectsViewModel = koinActivityViewModel(),
     audioEffectsUIHandler: AudioEffectsUIHandler = koinInject()
 ) {
     val context = LocalContext.current
 
-    val bassValue by rememberBassValue(viewModel)
+    val bassValue by rememberBassValue()
     val audioStatus by viewModel.collectAudioStatusAsState()
 
     if (bassValue != null)
@@ -73,13 +64,13 @@ private fun BassController(
 
 @Composable
 private fun ReverbController(
-    viewModel: AudioEffectsViewModel,
     modifier: Modifier = Modifier,
+    viewModel: AudioEffectsViewModel = koinActivityViewModel(),
     audioEffectsUIHandler: AudioEffectsUIHandler = koinInject()
 ) {
     val context = LocalContext.current
 
-    val reverbValue by rememberReverbValue(viewModel)
+    val reverbValue by rememberReverbValue()
     val audioStatus by viewModel.collectAudioStatusAsState()
 
     if (reverbValue != null)
@@ -101,7 +92,9 @@ private fun ReverbController(
 }
 
 @Composable
-private fun rememberBassValue(viewModel: AudioEffectsViewModel): State<Float?> {
+private fun rememberBassValue(
+    viewModel: AudioEffectsViewModel = koinActivityViewModel()
+): State<Float?> {
     val bassStrength by viewModel.collectBassStrengthAsNullableState()
 
     return remember(bassStrength) {
@@ -110,7 +103,9 @@ private fun rememberBassValue(viewModel: AudioEffectsViewModel): State<Float?> {
 }
 
 @Composable
-private fun rememberReverbValue(viewModel: AudioEffectsViewModel): State<Float?> {
+private fun rememberReverbValue(
+    viewModel: AudioEffectsViewModel = koinActivityViewModel()
+): State<Float?> {
     val reverbPreset by viewModel.collectReverbPresetAsNullableState()
 
     return remember(reverbPreset) {

@@ -17,6 +17,7 @@ import androidx.compose.ui.unit.dp
 import androidx.palette.graphics.Palette
 import com.paranid5.crescendo.R
 import com.paranid5.crescendo.domain.media.AudioStatus
+import com.paranid5.crescendo.koinActivityViewModel
 import com.paranid5.crescendo.presentation.main.playing.PlayingViewModel
 import com.paranid5.crescendo.presentation.main.playing.properties.compose.collectAudioStatusAsState
 import com.paranid5.crescendo.presentation.main.playing.properties.compose.collectIsRepeatingAsState
@@ -28,9 +29,9 @@ import org.koin.compose.koinInject
 
 @Composable
 fun RepeatButton(
-    viewModel: PlayingViewModel,
     palette: Palette?,
     modifier: Modifier = Modifier,
+    viewModel: PlayingViewModel = koinActivityViewModel(),
     streamServiceAccessor: StreamServiceAccessor = koinInject(),
     trackServiceAccessor: TrackServiceAccessor = koinInject()
 ) {
@@ -61,9 +62,9 @@ fun RepeatButton(
 
 @Composable
 private fun RepeatIcon(
-    viewModel: PlayingViewModel,
     paletteColor: Color,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    viewModel: PlayingViewModel = koinActivityViewModel(),
 ) {
     val isRepeating by viewModel.collectIsRepeatingAsState()
 

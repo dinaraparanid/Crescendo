@@ -13,27 +13,24 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.paranid5.crescendo.R
+import com.paranid5.crescendo.koinActivityViewModel
 import com.paranid5.crescendo.presentation.main.trimmer.TrimmerViewModel
 import com.paranid5.crescendo.presentation.main.trimmer.properties.compose.collectFadeInSecsAsState
 import com.paranid5.crescendo.presentation.main.trimmer.properties.compose.collectFadeOutAsState
 import com.paranid5.crescendo.presentation.main.trimmer.properties.compose.collectTrackDurationInMillisAsState
-import com.paranid5.crescendo.presentation.main.trimmer.properties.setFadeInSecs
-import com.paranid5.crescendo.presentation.main.trimmer.properties.setFadeOutSecs
 
 @Composable
-fun FadeScreen(
-    viewModel: TrimmerViewModel,
-    modifier: Modifier = Modifier
-) = Column(modifier) {
-    FadeInController(viewModel, Modifier.fillMaxWidth())
-    Spacer(Modifier.height(8.dp))
-    FadeOutController(viewModel, Modifier.fillMaxWidth())
-}
+fun FadeScreen(modifier: Modifier = Modifier) =
+    Column(modifier) {
+        FadeInController(Modifier.fillMaxWidth())
+        Spacer(Modifier.height(8.dp))
+        FadeOutController(Modifier.fillMaxWidth())
+    }
 
 @Composable
 private fun FadeInController(
-    viewModel: TrimmerViewModel,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    viewModel: TrimmerViewModel = koinActivityViewModel(),
 ) {
     val fadeInSecs by viewModel.collectFadeInSecsAsState()
     val trackDurationMillis by viewModel.collectTrackDurationInMillisAsState()
@@ -64,8 +61,8 @@ private fun fadeInLabel(fadeInSecs: Long) =
 
 @Composable
 private fun FadeOutController(
-    viewModel: TrimmerViewModel,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    viewModel: TrimmerViewModel = koinActivityViewModel(),
 ) {
     val fadeOutSecs by viewModel.collectFadeOutAsState()
     val trackDurationMillis by viewModel.collectTrackDurationInMillisAsState()

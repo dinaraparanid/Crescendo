@@ -7,19 +7,16 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.palette.graphics.Palette
 import com.paranid5.crescendo.domain.media.AudioStatus
-import com.paranid5.crescendo.presentation.main.playing.PlayingViewModel
 import com.paranid5.crescendo.presentation.main.playing.views.title_author.TitleAndAuthor
 
 @Composable
 fun PlaybackSliderWithLabels(
-    viewModel: PlayingViewModel,
     audioStatus: AudioStatus,
     durationMillis: Long,
     palette: Palette?,
     isLiveStreaming: Boolean,
     modifier: Modifier = Modifier,
 ) = PlaybackSlider(
-    viewModel = viewModel,
     durationMillis = durationMillis,
     palette = palette,
     audioStatus = audioStatus,
@@ -28,7 +25,6 @@ fun PlaybackSliderWithLabels(
     if (isLiveStreaming) Unit else TimeText(curPosition, color)
 
     TitleAndAuthor(
-        viewModel = viewModel,
         audioStatus = audioStatus,
         palette = palette,
         textAlignment = Alignment.CenterHorizontally,

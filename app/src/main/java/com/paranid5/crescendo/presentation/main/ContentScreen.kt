@@ -11,36 +11,28 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import com.paranid5.crescendo.R
-import com.paranid5.crescendo.presentation.main.about_app.AboutApp
-import com.paranid5.crescendo.presentation.main.audio_effects.AudioEffectsScreen
-import com.paranid5.crescendo.presentation.main.audio_effects.AudioEffectsViewModel
+import com.paranid5.crescendo.koinActivityViewModel
 import com.paranid5.crescendo.presentation.composition_locals.LocalActivity
 import com.paranid5.crescendo.presentation.composition_locals.LocalCurrentPlaylistSheetState
 import com.paranid5.crescendo.presentation.composition_locals.LocalNavController
 import com.paranid5.crescendo.presentation.composition_locals.playing.LocalPlayingSheetState
+import com.paranid5.crescendo.presentation.main.about_app.AboutApp
+import com.paranid5.crescendo.presentation.main.audio_effects.AudioEffectsScreen
 import com.paranid5.crescendo.presentation.main.favourites.FavouritesScreen
-import com.paranid5.crescendo.presentation.main.fetch_stream.FetchStreamViewModel
 import com.paranid5.crescendo.presentation.main.fetch_stream.FetchStreamScreen
 import com.paranid5.crescendo.presentation.main.settings.SettingsScreen
 import com.paranid5.crescendo.presentation.main.track_collections.AlbumsScreen
 import com.paranid5.crescendo.presentation.main.tracks.TracksScreen
-import com.paranid5.crescendo.presentation.main.tracks.TracksViewModel
 import com.paranid5.crescendo.presentation.main.trimmer.TrimmerScreen
-import com.paranid5.crescendo.presentation.main.trimmer.TrimmerViewModel
 import com.paranid5.crescendo.presentation.ui.utils.OnBackPressedHandler
 import kotlinx.coroutines.delay
-import org.koin.androidx.compose.koinViewModel
 import java.util.concurrent.atomic.AtomicInteger
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun ContentScreen(
     padding: PaddingValues,
-    viewModel: MainActivityViewModel,
-    fetchStreamViewModel: FetchStreamViewModel = koinViewModel(),
-    audioEffectsViewModel: AudioEffectsViewModel = koinViewModel(),
-    trimmerViewModel: TrimmerViewModel = koinViewModel(),
-    tracksViewModel: TracksViewModel = koinViewModel()
+    viewModel: MainActivityViewModel = koinActivityViewModel(),
 ) {
     val backPressedCounter = AtomicInteger()
     val activity = LocalActivity.current
@@ -88,8 +80,7 @@ fun ContentScreen(
             viewModel.setCurScreen(Screens.Tracks)
 
             TracksScreen(
-                viewModel = tracksViewModel,
-                modifier = Modifier
+                Modifier
                     .fillMaxSize()
                     .padding(10.dp)
             )
@@ -102,29 +93,17 @@ fun ContentScreen(
 
         composable(route = Screens.StreamFetching.title) {
             viewModel.setCurScreen(Screens.StreamFetching)
-
-            FetchStreamScreen(
-                viewModel = fetchStreamViewModel,
-                modifier = Modifier.fillMaxSize()
-            )
+            FetchStreamScreen(Modifier.fillMaxSize())
         }
 
         composable(route = Screens.Audio.AudioEffects.title) {
             viewModel.setCurScreen(Screens.Audio.AudioEffects)
-
-            AudioEffectsScreen(
-                viewModel = audioEffectsViewModel,
-                modifier = Modifier.padding(horizontal = 10.dp)
-            )
+            AudioEffectsScreen(Modifier.padding(horizontal = 10.dp))
         }
 
         composable(route = Screens.Audio.Trimmer.title) {
             viewModel.setCurScreen(Screens.Audio.Trimmer)
-
-            TrimmerScreen(
-                viewModel = trimmerViewModel,
-                modifier = Modifier.fillMaxSize()
-            )
+            TrimmerScreen(Modifier.fillMaxSize())
         }
 
         composable(route = Screens.AboutApp.title) {

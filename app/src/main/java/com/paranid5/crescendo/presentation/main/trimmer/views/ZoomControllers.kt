@@ -20,6 +20,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.paranid5.crescendo.R
+import com.paranid5.crescendo.koinActivityViewModel
 import com.paranid5.crescendo.presentation.main.trimmer.TrimmerViewModel
 import com.paranid5.crescendo.presentation.main.trimmer.WAVEFORM_SPIKE_WIDTH_RATIO
 import com.paranid5.crescendo.presentation.main.trimmer.effects.waveform.InitZoomStepsEffect
@@ -32,7 +33,6 @@ import com.paranid5.crescendo.presentation.ui.theme.LocalAppColors
 
 @Composable
 fun ZoomControllers(
-    viewModel: TrimmerViewModel,
     screenWidthPxState: MutableIntState,
     modifier: Modifier = Modifier,
     spikeWidthRatio: Int = WAVEFORM_SPIKE_WIDTH_RATIO,
@@ -40,46 +40,40 @@ fun ZoomControllers(
     val colors = LocalAppColors.current
 
     InitZoomStepsEffect(
-        viewModel = viewModel,
         screenWidthPxState = screenWidthPxState,
         spikeWidthRatio = spikeWidthRatio
     )
 
     ZoomControllersContent(
-        viewModel = viewModel,
-        modifier = modifier
+        modifier
             .clip(RoundedCornerShape(24.dp))
             .background(colors.backgroundAlternative)
     )
 }
 
 @Composable
-private fun ZoomControllersContent(
-    viewModel: TrimmerViewModel,
-    modifier: Modifier = Modifier
-) = Row(modifier) {
-    ZoomInButton(
-        viewModel = viewModel,
-        modifier = Modifier
-            .align(Alignment.CenterVertically)
-            .padding(horizontal = 4.dp)
-    )
+private fun ZoomControllersContent(modifier: Modifier = Modifier) =
+    Row(modifier) {
+        ZoomInButton(
+            Modifier
+                .align(Alignment.CenterVertically)
+                .padding(horizontal = 4.dp)
+        )
 
-    ZoomRatioLabel(
-        viewModel = viewModel,
-        modifier = Modifier.align(Alignment.CenterVertically)
-    )
+        ZoomRatioLabel(Modifier.align(Alignment.CenterVertically))
 
-    ZoomOutButton(
-        viewModel = viewModel,
-        modifier = Modifier
-            .align(Alignment.CenterVertically)
-            .padding(horizontal = 4.dp)
-    )
-}
+        ZoomOutButton(
+            Modifier
+                .align(Alignment.CenterVertically)
+                .padding(horizontal = 4.dp)
+        )
+    }
 
 @Composable
-private fun ZoomInButton(viewModel: TrimmerViewModel, modifier: Modifier = Modifier) {
+private fun ZoomInButton(
+    modifier: Modifier = Modifier,
+    viewModel: TrimmerViewModel = koinActivityViewModel(),
+) {
     val canZoomIn by viewModel.collectCanZoomInAsState()
 
     ZoomButton(
@@ -92,7 +86,10 @@ private fun ZoomInButton(viewModel: TrimmerViewModel, modifier: Modifier = Modif
 }
 
 @Composable
-private fun ZoomOutButton(viewModel: TrimmerViewModel, modifier: Modifier = Modifier) {
+private fun ZoomOutButton(
+    modifier: Modifier = Modifier,
+    viewModel: TrimmerViewModel = koinActivityViewModel(),
+) {
     val canZoomOut by viewModel.collectCanZoomOutAsState()
 
     ZoomButton(
@@ -130,8 +127,8 @@ private fun ZoomButton(
 
 @Composable
 private fun ZoomRatioLabel(
-    viewModel: TrimmerViewModel,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    viewModel: TrimmerViewModel = koinActivityViewModel(),
 ) {
     val colors = LocalAppColors.current
     val zoom by viewModel.collectZoomAsState()

@@ -18,6 +18,7 @@ import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.drawscope.Fill
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.onGloballyPositioned
+import com.paranid5.crescendo.koinActivityViewModel
 import com.paranid5.crescendo.presentation.main.trimmer.CONTROLLER_ARROW_CORNER_BACK_OFFSET
 import com.paranid5.crescendo.presentation.main.trimmer.CONTROLLER_ARROW_CORNER_FRONT_OFFSET
 import com.paranid5.crescendo.presentation.main.trimmer.CONTROLLER_ARROW_CORNER_OFFSET
@@ -30,12 +31,10 @@ import com.paranid5.crescendo.presentation.main.trimmer.WAVEFORM_SPIKE_WIDTH_RAT
 import com.paranid5.crescendo.presentation.main.trimmer.effects.waveform.RequestStartBorderFocusEffect
 import com.paranid5.crescendo.presentation.main.trimmer.properties.compose.collectEndPosInMillisAsState
 import com.paranid5.crescendo.presentation.main.trimmer.properties.compose.collectStartPosInMillisAsState
-import com.paranid5.crescendo.presentation.main.trimmer.properties.setStartPosInMillis
 import com.paranid5.crescendo.presentation.ui.theme.LocalAppColors
 
 @Composable
 fun StartBorder(
-    viewModel: TrimmerViewModel,
     modifier: Modifier = Modifier,
     spikeWidthRatio: Int = WAVEFORM_SPIKE_WIDTH_RATIO,
 ) {
@@ -43,7 +42,7 @@ fun StartBorder(
     val progressBrush = SolidColor(colors.primary)
     val iconBrush = SolidColor(colors.fontColor)
 
-    Canvas(modifier.startBorderHorizontalDrag(viewModel, spikeWidthRatio)) {
+    Canvas(modifier.startBorderHorizontalDrag(spikeWidthRatio)) {
         drawBorder(progressBrush)
 
         drawStartToucher(
@@ -55,7 +54,6 @@ fun StartBorder(
 
 @Composable
 private fun Modifier.startBorderHorizontalDrag(
-    viewModel: TrimmerViewModel,
     spikeWidthRatio: Int
 ): Modifier {
     val isDraggedState = remember { mutableStateOf(false) }
@@ -67,7 +65,6 @@ private fun Modifier.startBorderHorizontalDrag(
     )
 
     return this.startBorderDragInput(
-        viewModel = viewModel,
         isDraggedState = isDraggedState,
         isPositionedState = isPositionedState,
         spikeWidthRatio = spikeWidthRatio
@@ -76,10 +73,10 @@ private fun Modifier.startBorderHorizontalDrag(
 
 @Composable
 private fun Modifier.startBorderDragInput(
-    viewModel: TrimmerViewModel,
     isDraggedState: MutableState<Boolean>,
     isPositionedState: MutableState<Boolean>,
-    spikeWidthRatio: Int
+    spikeWidthRatio: Int,
+    viewModel: TrimmerViewModel = koinActivityViewModel(),
 ): Modifier {
     val startMillis by viewModel.collectStartPosInMillisAsState()
     val endMillis by viewModel.collectEndPosInMillisAsState()

@@ -919,7 +919,7 @@ class TrackService : SuspendService(), KoinComponent {
 
     private suspend fun updateNotification() {
         Log.d(TAG, "Update Notification; track: $currentTrackOrNull")
-        updateMediaSession(currentTrack)
+        updateMediaSession(currentTrackOrNull ?: return)
         playerNotificationManager.invalidate()
     }
 

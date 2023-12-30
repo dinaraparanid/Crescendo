@@ -11,36 +11,6 @@ import com.paranid5.crescendo.presentation.ui.extensions.safeDiv
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.map
 
-inline val TrimmerViewModel.startPosInMillisState
-    get() = playbackPositionStateHolder.startPosInMillisState
-
-fun TrimmerViewModel.setStartPosInMillis(startMillis: Long) =
-    playbackPositionStateHolder.setStartPosInMillis(startMillis)
-
-inline val TrimmerViewModel.endPosInMillisState
-    get() = playbackPositionStateHolder.endPosInMillisState
-
-fun TrimmerViewModel.setEndPosInMillis(endMillis: Long) =
-    playbackPositionStateHolder.setEndPosInMillis(endMillis)
-
-inline val TrimmerViewModel.playbackPosInMillisState
-    get() = playbackPositionStateHolder.playbackPosInMillisState
-
-fun TrimmerViewModel.setPlaybackPosInMillis(position: Long) =
-    playbackPositionStateHolder.setPlaybackPosInMillis(position)
-
-inline val TrimmerViewModel.fadeInSecsState
-    get() = playbackPositionStateHolder.fadeInSecsState
-
-fun TrimmerViewModel.setFadeInSecs(fadeInSecs: Long) =
-    playbackPositionStateHolder.setFadeInSecs(fadeInSecs)
-
-inline val TrimmerViewModel.fadeOutSecsState
-    get() = playbackPositionStateHolder.fadeOutSecsState
-
-fun TrimmerViewModel.setFadeOutSecs(fadeOutSecs: Long) =
-    playbackPositionStateHolder.setFadeOutSecs(fadeOutSecs)
-
 inline val TrimmerViewModel.startOffsetFlow
     get() = combine(
         startPosInMillisState,

@@ -17,6 +17,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.sp
 import com.paranid5.crescendo.R
+import com.paranid5.crescendo.koinActivityViewModel
 import com.paranid5.crescendo.presentation.main.audio_effects.AudioEffectsUIHandler
 import com.paranid5.crescendo.presentation.main.audio_effects.AudioEffectsViewModel
 import com.paranid5.crescendo.presentation.main.audio_effects.properties.compose.collectAreAudioEffectsEnabledAsState
@@ -28,16 +29,9 @@ import kotlinx.coroutines.launch
 import org.koin.compose.koinInject
 
 @Composable
-fun UpBar(
-    viewModel: AudioEffectsViewModel,
-    modifier: Modifier = Modifier,
-) = Box(modifier) {
+fun UpBar(modifier: Modifier = Modifier) = Box(modifier) {
     AudioEffectsLabel(Modifier.align(Alignment.Center))
-
-    AudioEffectsSwitch(
-        viewModel = viewModel,
-        modifier = Modifier.align(Alignment.CenterEnd),
-    )
+    AudioEffectsSwitch(Modifier.align(Alignment.CenterEnd))
 }
 
 @Composable
@@ -54,8 +48,8 @@ private fun AudioEffectsLabel(modifier: Modifier = Modifier) {
 
 @Composable
 private fun AudioEffectsSwitch(
-    viewModel: AudioEffectsViewModel,
     modifier: Modifier = Modifier,
+    viewModel: AudioEffectsViewModel = koinActivityViewModel(),
     audioEffectsUIHandler: AudioEffectsUIHandler = koinInject(),
 ) {
     val context = LocalContext.current

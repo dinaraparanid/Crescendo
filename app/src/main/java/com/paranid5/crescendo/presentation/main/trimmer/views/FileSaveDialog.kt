@@ -19,6 +19,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.paranid5.crescendo.R
 import com.paranid5.crescendo.domain.caching.Formats
+import com.paranid5.crescendo.koinActivityViewModel
 import com.paranid5.crescendo.presentation.main.trimmer.TrimmerViewModel
 import com.paranid5.crescendo.presentation.main.trimmer.properties.compose.collectFadeDurationsAsState
 import com.paranid5.crescendo.presentation.main.trimmer.properties.compose.collectPitchAndSpeedAsState
@@ -31,9 +32,9 @@ import java.io.File
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun FileSaveDialog(
-    viewModel: TrimmerViewModel,
     isDialogShownState: MutableState<Boolean>,
     modifier: Modifier = Modifier,
+    viewModel: TrimmerViewModel = koinActivityViewModel(),
 ) {
     val colors = LocalAppColors.current
 
@@ -68,7 +69,6 @@ fun FileSaveDialog(
                 colors = CardDefaults.cardColors(containerColor = colors.background)
             ) {
                 FileSaveDialogContent(
-                    viewModel = viewModel,
                     isDialogShownState = isDialogShownState,
                     filenameState = filenameState,
                     fileSaveOptions = fileSaveOptions,

@@ -22,6 +22,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewModelScope
 import com.paranid5.crescendo.R
 import com.paranid5.crescendo.domain.eq.EqualizerData
+import com.paranid5.crescendo.koinActivityViewModel
 import com.paranid5.crescendo.presentation.main.audio_effects.AudioEffectsUIHandler
 import com.paranid5.crescendo.presentation.main.audio_effects.AudioEffectsViewModel
 import com.paranid5.crescendo.presentation.main.audio_effects.properties.compose.collectAudioStatusAsState
@@ -32,7 +33,6 @@ import org.koin.compose.koinInject
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun BandSlider(
-    viewModel: AudioEffectsViewModel,
     index: Int,
     presentLvlsDbState: SnapshotStateList<Float>,
     pointsState: SnapshotStateList<Offset>,
@@ -44,6 +44,7 @@ fun BandSlider(
     equalizerData: EqualizerData?,
     modifier: Modifier = Modifier,
     thumbModifier: Modifier = Modifier,
+    viewModel: AudioEffectsViewModel = koinActivityViewModel(),
     audioEffectsUIHandler: AudioEffectsUIHandler = koinInject()
 ) {
     val context = LocalContext.current

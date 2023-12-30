@@ -20,138 +20,92 @@ import com.paranid5.crescendo.presentation.main.audio_effects.view.PitchAndSpeed
 import com.paranid5.crescendo.presentation.main.audio_effects.view.UpBar
 
 @Composable
-fun AudioEffectsScreen(
-    viewModel: AudioEffectsViewModel,
-    modifier: Modifier = Modifier,
-) = when (LocalConfiguration.current.orientation) {
-    Configuration.ORIENTATION_LANDSCAPE -> AudioEffectsScreenLandscape(viewModel, modifier)
-    else -> AudioEffectsScreenPortrait(viewModel, modifier)
-}
+fun AudioEffectsScreen(modifier: Modifier = Modifier) =
+    when (LocalConfiguration.current.orientation) {
+        Configuration.ORIENTATION_LANDSCAPE -> AudioEffectsScreenLandscape(modifier)
+        else -> AudioEffectsScreenPortrait(modifier)
+    }
 
 @Composable
-private fun AudioEffectsScreenPortrait(
-    viewModel: AudioEffectsViewModel,
-    modifier: Modifier = Modifier,
-) = Column(modifier) {
-    UpBar(
-        viewModel = viewModel,
-        modifier = Modifier.fillMaxWidth()
-    )
+private fun AudioEffectsScreenPortrait(modifier: Modifier = Modifier) =
+    Column(modifier) {
+        UpBar(Modifier.fillMaxWidth())
 
-    Spacer(Modifier.height(10.dp))
-
-    PitchAndSpeed(
-        viewModel = viewModel,
-        modifier = Modifier
-            .fillMaxWidth()
-            .weight(1F)
-    )
-
-    Spacer(Modifier.height(10.dp))
-
-    Equalizer(
-        viewModel = viewModel,
-        modifier = Modifier
-            .fillMaxWidth()
-            .weight(3F)
-    )
-
-    BassAndReverbWithSpacerPortraitCompat(
-        viewModel = viewModel,
-        modifier = Modifier.fillMaxWidth()
-    )
-}
-
-@Composable
-private fun BassAndReverbWithSpacerPortraitCompat(
-    viewModel: AudioEffectsViewModel,
-    modifier: Modifier = Modifier
-) = when (Build.VERSION.SDK_INT) {
-    Build.VERSION_CODES.Q ->
-        Spacer(Modifier.height(100.dp))
-
-    else -> {
         Spacer(Modifier.height(10.dp))
 
-        BassAndReverb(
-            viewModel = viewModel,
-            modifier = modifier.fillMaxWidth()
+        PitchAndSpeed(
+            Modifier
+                .fillMaxWidth()
+                .weight(1F)
         )
 
         Spacer(Modifier.height(10.dp))
+
+        Equalizer(
+            Modifier
+                .fillMaxWidth()
+                .weight(3F)
+        )
+
+        BassAndReverbWithSpacerPortraitCompat(Modifier.fillMaxWidth())
     }
-}
 
 @Composable
-private fun AudioEffectsScreenLandscape(
-    viewModel: AudioEffectsViewModel,
-    modifier: Modifier = Modifier,
-) = Column(modifier) {
-    UpBar(
-        viewModel = viewModel,
-        modifier = Modifier.fillMaxWidth()
-    )
+private fun BassAndReverbWithSpacerPortraitCompat(modifier: Modifier = Modifier) =
+    when (Build.VERSION.SDK_INT) {
+        Build.VERSION_CODES.Q ->
+            Spacer(Modifier.height(100.dp))
 
-    Spacer(Modifier.height(10.dp))
-
-    AudioEffectsScreenLandscapeContent(
-        viewModel = viewModel,
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(bottom = 10.dp)
-    )
-}
+        else -> {
+            Spacer(Modifier.height(10.dp))
+            BassAndReverb(modifier.fillMaxWidth())
+            Spacer(Modifier.height(10.dp))
+        }
+    }
 
 @Composable
-private fun AudioEffectsScreenLandscapeContent(
-    viewModel: AudioEffectsViewModel,
-    modifier: Modifier = Modifier,
-) = Row(modifier) {
-    Equalizer(
-        viewModel = viewModel,
-        modifier = Modifier.weight(1F)
-    )
+private fun AudioEffectsScreenLandscape(modifier: Modifier = Modifier) =
+    Column(modifier) {
+        UpBar(Modifier.fillMaxWidth())
 
-    Spacer(Modifier.width(10.dp))
+        Spacer(Modifier.height(10.dp))
 
-    SubEffectsLandscape(
-        viewModel = viewModel,
-        modifier = Modifier.weight(1F)
-    )
-}
+        AudioEffectsScreenLandscapeContent(
+            Modifier
+                .fillMaxSize()
+                .padding(bottom = 10.dp)
+        )
+    }
 
 @Composable
-private fun SubEffectsLandscape(
-    viewModel: AudioEffectsViewModel,
-    modifier: Modifier = Modifier
-) = Column(modifier) {
-    PitchAndSpeed(
-        viewModel = viewModel,
-        modifier = Modifier
-            .fillMaxWidth()
-            .weight(1F)
-    )
-
-    BassAndReverbLandscapeCompat(
-        viewModel = viewModel,
-        modifier = Modifier
-            .fillMaxWidth()
-            .weight(1F)
-            .padding(end = 60.dp)
-    )
-}
+private fun AudioEffectsScreenLandscapeContent(modifier: Modifier = Modifier) =
+    Row(modifier) {
+        Equalizer(Modifier.weight(1F))
+        Spacer(Modifier.width(10.dp))
+        SubEffectsLandscape(Modifier.weight(1F))
+    }
 
 @Composable
-private fun BassAndReverbLandscapeCompat(
-    viewModel: AudioEffectsViewModel,
-    modifier: Modifier = Modifier
-) {
+private fun SubEffectsLandscape(modifier: Modifier = Modifier) =
+    Column(modifier) {
+        PitchAndSpeed(
+            Modifier
+                .fillMaxWidth()
+                .weight(1F)
+        )
+
+        BassAndReverbLandscapeCompat(
+            Modifier
+                .fillMaxWidth()
+                .weight(1F)
+                .padding(end = 60.dp)
+        )
+    }
+
+@Composable
+private fun BassAndReverbLandscapeCompat(modifier: Modifier = Modifier) {
     if (Build.VERSION.SDK_INT != Build.VERSION_CODES.Q) {
         Spacer(Modifier.height(10.dp))
-
-        BassAndReverb(
-            viewModel = viewModel,
-            modifier = modifier.fillMaxWidth()
-        )
+        BassAndReverb(modifier.fillMaxWidth())
     }
 }

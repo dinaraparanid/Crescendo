@@ -11,6 +11,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.media3.common.Player
+import com.paranid5.crescendo.koinActivityViewModel
 import com.paranid5.crescendo.presentation.main.trimmer.TrimmerViewModel
 import com.paranid5.crescendo.presentation.main.trimmer.effects.playback.CleanUpEffect
 import com.paranid5.crescendo.presentation.main.trimmer.effects.playback.OutOfBordersEffect
@@ -24,8 +25,8 @@ import com.paranid5.crescendo.presentation.main.trimmer.views.playback.TenSecsFo
 
 @Composable
 fun PlaybackButtons(
-    viewModel: TrimmerViewModel,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    viewModel: TrimmerViewModel = koinActivityViewModel(),
 ) {
     val context = LocalContext.current
 
@@ -33,15 +34,14 @@ fun PlaybackButtons(
         lazy { TrackPlayer(context, viewModel) }
     }
 
-    OutOfBordersEffect(viewModel)
-    PlayPauseEffect(player, viewModel)
-    CleanUpEffect(player, viewModel)
-    PlaybackParamsEffect(player, viewModel)
+    OutOfBordersEffect()
+    PlayPauseEffect(player)
+    CleanUpEffect(player)
+    PlaybackParamsEffect(player)
     PlaybackPositionTappedEffect(player)
 
     PlaybackButtonsContent(
         player = player,
-        viewModel = viewModel,
         modifier = modifier
     )
 }
@@ -49,35 +49,29 @@ fun PlaybackButtons(
 @Composable
 private fun PlaybackButtonsContent(
     player: Player,
-    viewModel: TrimmerViewModel,
     modifier: Modifier = Modifier
-) {
-    Row(modifier) {
-        TenSecsBackButton(
-            player = player,
-            viewModel = viewModel,
-            modifier = Modifier
-                .padding(4.dp)
-                .align(Alignment.CenterVertically)
-        )
+) = Row(modifier) {
+    TenSecsBackButton(
+        player = player,
+        modifier = Modifier
+            .padding(4.dp)
+            .align(Alignment.CenterVertically)
+    )
 
-        Spacer(Modifier.width(16.dp))
+    Spacer(Modifier.width(16.dp))
 
-        PlayPauseButton(
-            viewModel = viewModel,
-            modifier = Modifier
-                .padding(4.dp)
-                .align(Alignment.CenterVertically)
-        )
+    PlayPauseButton(
+        Modifier
+            .padding(4.dp)
+            .align(Alignment.CenterVertically)
+    )
 
-        Spacer(Modifier.width(16.dp))
+    Spacer(Modifier.width(16.dp))
 
-        TenSecsForwardButton(
-            player = player,
-            viewModel = viewModel,
-            modifier = Modifier
-                .padding(4.dp)
-                .align(Alignment.CenterVertically)
-        )
-    }
+    TenSecsForwardButton(
+        player = player,
+        modifier = Modifier
+            .padding(4.dp)
+            .align(Alignment.CenterVertically)
+    )
 }

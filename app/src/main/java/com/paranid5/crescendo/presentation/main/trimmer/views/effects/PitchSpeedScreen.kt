@@ -11,26 +11,23 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.paranid5.crescendo.R
+import com.paranid5.crescendo.koinActivityViewModel
 import com.paranid5.crescendo.presentation.main.trimmer.TrimmerViewModel
 import com.paranid5.crescendo.presentation.main.trimmer.properties.compose.collectPitchAsState
 import com.paranid5.crescendo.presentation.main.trimmer.properties.compose.collectSpeedAsState
-import com.paranid5.crescendo.presentation.main.trimmer.properties.setPitch
-import com.paranid5.crescendo.presentation.main.trimmer.properties.setSpeed
 
 @Composable
-fun PitchSpeedScreen(
-    viewModel: TrimmerViewModel,
-    modifier: Modifier = Modifier
-) = Column(modifier) {
-    PitchController(viewModel, Modifier.fillMaxWidth())
-    Spacer(Modifier.height(8.dp))
-    SpeedController(viewModel, Modifier.fillMaxWidth())
-}
+fun PitchSpeedScreen(modifier: Modifier = Modifier) =
+    Column(modifier) {
+        PitchController(Modifier.fillMaxWidth())
+        Spacer(Modifier.height(8.dp))
+        SpeedController(Modifier.fillMaxWidth())
+    }
 
 @Composable
 private fun PitchController(
-    viewModel: TrimmerViewModel,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    viewModel: TrimmerViewModel = koinActivityViewModel(),
 ) {
     val pitch by viewModel.collectPitchAsState()
 
@@ -51,8 +48,8 @@ private fun pitchLabel(pitch: Float) =
 
 @Composable
 private fun SpeedController(
-    viewModel: TrimmerViewModel,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    viewModel: TrimmerViewModel = koinActivityViewModel(),
 ) {
     val speed by viewModel.collectSpeedAsState()
 

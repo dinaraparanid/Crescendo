@@ -11,6 +11,7 @@ import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.pointer.pointerInput
+import com.paranid5.crescendo.koinActivityViewModel
 import com.paranid5.crescendo.presentation.composition_locals.trimmer.LocalTrimmerPositionBroadcast
 import com.paranid5.crescendo.presentation.main.trimmer.CONTROLLER_HEIGHT_OFFSET
 import com.paranid5.crescendo.presentation.main.trimmer.DEFAULT_GRAPHICS_LAYER_ALPHA
@@ -26,8 +27,8 @@ import kotlinx.coroutines.launch
 
 @Composable
 fun TrimmedZone(
-    viewModel: TrimmerViewModel,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    viewModel: TrimmerViewModel = koinActivityViewModel(),
 ) {
     val colors = LocalAppColors.current
     val progressBrush = SolidColor(colors.primary.copy(alpha = 0.25F))
@@ -35,7 +36,7 @@ fun TrimmedZone(
     val startOffset by viewModel.collectStartOffsetAsState()
     val endOffset by viewModel.collectEndOffsetAsState()
 
-    Canvas(modifier.trimmedZoneModifier(viewModel)) {
+    Canvas(modifier.trimmedZoneModifier()) {
         drawRect(
             brush = progressBrush,
             topLeft = Offset(startOffset * size.width, 0F),
@@ -48,19 +49,22 @@ fun TrimmedZone(
 }
 
 @Composable
-private fun Modifier.trimmedZoneModifier(viewModel: TrimmerViewModel) =
-    this
-        .graphicsLayer(alpha = DEFAULT_GRAPHICS_LAYER_ALPHA)
-        .playbackPointerInput(viewModel)
+private fun Modifier.trimmedZoneModifier() = this
+    .graphicsLayer(alpha = DEFAULT_GRAPHICS_LAYER_ALPHA)
+    .playbackPointerInput()
 
 @Composable
-private fun Modifier.playbackPointerInput(viewModel: TrimmerViewModel): Modifier {
+private fun Modifier.playbackPointerInput(
+    viewModel: TrimmerViewModel = koinActivityViewModel(),
+): Modifier {
     val isPlaying by viewModel.collectIsPlayingAsState()
-    return if (isPlaying) playbackModifier(viewModel) else this
+    return if (isPlaying) playbackModifier() else this
 }
 
 @Composable
-private fun Modifier.playbackModifier(viewModel: TrimmerViewModel): Modifier {
+private fun Modifier.playbackModifier(
+    viewModel: TrimmerViewModel = koinActivityViewModel(),
+): Modifier {
     val positionBroadcast = LocalTrimmerPositionBroadcast.current
     val durationMillis by viewModel.collectTrackDurationInMillisAsState()
     val coroutineScope = rememberCoroutineScope()

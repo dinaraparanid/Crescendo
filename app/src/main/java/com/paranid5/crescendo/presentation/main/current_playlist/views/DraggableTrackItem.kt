@@ -18,8 +18,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
-import com.paranid5.crescendo.data.StorageHandler
 import com.paranid5.crescendo.domain.tracks.Track
+import com.paranid5.crescendo.koinActivityViewModel
+import com.paranid5.crescendo.presentation.main.current_playlist.CurrentPlaylistViewModel
 import com.paranid5.crescendo.presentation.main.tracks.views.TrackPropertiesButton
 import com.paranid5.crescendo.presentation.main.tracks.views.clickableTrackWithPermissions
 import com.paranid5.crescendo.presentation.main.tracks.views.item.TrackCover
@@ -66,7 +67,7 @@ fun <T : Track> DraggableTrackItem(
     trackIndex: Int,
     currentTrackDragIndex: Int,
     modifier: Modifier = Modifier,
-    storageHandler: StorageHandler = koinInject(),
+    viewModel: CurrentPlaylistViewModel = koinActivityViewModel(),
     trackServiceAccessor: TrackServiceAccessor = koinInject()
 ) {
     val coroutineScope = rememberCoroutineScope()
@@ -81,7 +82,7 @@ fun <T : Track> DraggableTrackItem(
                 startPlaylistPlayback(
                     tracks,
                     trackIndex,
-                    storageHandler,
+                    viewModel,
                     trackServiceAccessor
                 )
             }

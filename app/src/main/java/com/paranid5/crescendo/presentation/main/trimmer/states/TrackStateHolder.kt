@@ -1,26 +1,25 @@
 package com.paranid5.crescendo.presentation.main.trimmer.states
 
-import androidx.lifecycle.SavedStateHandle
 import com.paranid5.crescendo.domain.tracks.Track
-import com.paranid5.crescendo.presentation.main.trimmer.TrimmerViewModel
-import com.paranid5.crescendo.presentation.main.trimmer.properties.setEndPosInMillis
-import com.paranid5.crescendo.presentation.main.trimmer.properties.setStartPosInMillis
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.updateAndGet
+import kotlinx.coroutines.flow.update
 
-private const val TRACK = "track"
+interface TrackStateHolder {
+    val trackState: StateFlow<Track?>
+    fun setTrack(track: Track)
+}
 
-class TrackStateHolder(private val savedStateHandle: SavedStateHandle) {
+class TrackStateHolderImpl : TrackStateHolder {
     private val _trackState by lazy {
-        MutableStateFlow(savedStateHandle.get<Track>(TRACK))
+        MutableStateFlow<Track?>(null)
     }
 
-    val trackState = _trackState.asStateFlow()
-
-    fun setTrack(track: Track, viewModel: TrimmerViewModel) {
-        savedStateHandle[TRACK] = _trackState.updateAndGet { track }
-        viewModel.setStartPosInMillis(0)
-        viewModel.setEndPosInMillis(track.durationMillis)
+    override val trackState by lazy {
+        _trackState.asStateFlow()
     }
+
+    override fun setTrack(track: Track) =
+        _trackState.update { track }
 }

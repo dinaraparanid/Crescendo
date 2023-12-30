@@ -9,20 +9,17 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.palette.graphics.Palette
 import com.paranid5.crescendo.domain.media.AudioStatus
-import com.paranid5.crescendo.presentation.main.playing.PlayingViewModel
 import com.paranid5.crescendo.presentation.main.playing.views.properties.PropertiesButton
 import com.paranid5.crescendo.presentation.main.playing.views.title_author.TitleAndAuthor
 
 @Composable
 fun TitleAndPropertiesButton(
-    viewModel: PlayingViewModel,
     audioStatus: AudioStatus,
     palette: Palette?,
     modifier: Modifier = Modifier,
     textAlignment: Alignment.Horizontal = Alignment.Start
 ) = Row(modifier) {
     TitleAndAuthor(
-        viewModel = viewModel,
         palette = palette,
         audioStatus = audioStatus,
         textAlignment = textAlignment,

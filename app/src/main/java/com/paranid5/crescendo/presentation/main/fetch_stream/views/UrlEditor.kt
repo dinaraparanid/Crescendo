@@ -7,16 +7,16 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.sp
 import com.paranid5.crescendo.R
+import com.paranid5.crescendo.koinActivityViewModel
 import com.paranid5.crescendo.presentation.main.fetch_stream.FetchStreamViewModel
 import com.paranid5.crescendo.presentation.main.fetch_stream.properties.compose.collectCurrentTextAsState
-import com.paranid5.crescendo.presentation.main.fetch_stream.properties.setCurrentText
 import com.paranid5.crescendo.presentation.ui.theme.LocalAppColors
 import com.paranid5.crescendo.presentation.ui.utils.DefaultOutlinedTextField
 
 @Composable
 fun UrlEditor(
-    viewModel: FetchStreamViewModel,
     modifier: Modifier = Modifier,
+    viewModel: FetchStreamViewModel = koinActivityViewModel(),
 ) {
     val currentText by viewModel.collectCurrentTextAsState()
 

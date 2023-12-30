@@ -31,7 +31,6 @@ import com.paranid5.crescendo.presentation.main.trimmer.effects.waveform.Request
 import com.paranid5.crescendo.presentation.main.trimmer.properties.compose.collectEndPosInMillisAsState
 import com.paranid5.crescendo.presentation.main.trimmer.properties.compose.collectStartPosInMillisAsState
 import com.paranid5.crescendo.presentation.main.trimmer.properties.compose.collectTrackDurationInMillisAsState
-import com.paranid5.crescendo.presentation.main.trimmer.properties.setEndPosInMillis
 import com.paranid5.crescendo.presentation.ui.theme.LocalAppColors
 
 @Composable

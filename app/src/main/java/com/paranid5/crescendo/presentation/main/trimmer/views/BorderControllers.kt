@@ -16,11 +16,10 @@ import androidx.compose.ui.unit.sp
 import com.paranid5.crescendo.R
 import com.paranid5.crescendo.domain.utils.extensions.timeStringMs
 import com.paranid5.crescendo.domain.utils.extensions.toTimeOrNull
+import com.paranid5.crescendo.koinActivityViewModel
 import com.paranid5.crescendo.presentation.main.trimmer.TrimmerViewModel
 import com.paranid5.crescendo.presentation.main.trimmer.properties.compose.collectEndPosInMillisAsState
 import com.paranid5.crescendo.presentation.main.trimmer.properties.compose.collectStartPosInMillisAsState
-import com.paranid5.crescendo.presentation.main.trimmer.properties.setEndPosInMillis
-import com.paranid5.crescendo.presentation.main.trimmer.properties.setStartPosInMillis
 import com.paranid5.crescendo.presentation.ui.theme.LocalAppColors
 import com.paranid5.crescendo.presentation.ui.utils.DefaultOutlinedTextField
 
@@ -28,19 +27,20 @@ import com.paranid5.crescendo.presentation.ui.utils.DefaultOutlinedTextField
 private const val CORRECT_TIME_INPUT_LENGTH = 2 + 1 + 2 + 1 + 2 + 1 + 3
 
 @Composable
-fun BorderControllers(
-    viewModel: TrimmerViewModel,
-    modifier: Modifier = Modifier
-) = Row(modifier) {
-    Spacer(Modifier.weight(1F))
-    StartController(viewModel)
-    Spacer(Modifier.weight(1F))
-    EndController(viewModel)
-    Spacer(Modifier.weight(1F))
-}
+fun BorderControllers(modifier: Modifier = Modifier) =
+    Row(modifier) {
+        Spacer(Modifier.weight(1F))
+        StartController()
+        Spacer(Modifier.weight(1F))
+        EndController()
+        Spacer(Modifier.weight(1F))
+    }
 
 @Composable
-private fun StartController(viewModel: TrimmerViewModel, modifier: Modifier = Modifier) {
+private fun StartController(
+    modifier: Modifier = Modifier,
+    viewModel: TrimmerViewModel = koinActivityViewModel(),
+) {
     val startMillis by viewModel.collectStartPosInMillisAsState()
 
     BorderController(
@@ -52,7 +52,10 @@ private fun StartController(viewModel: TrimmerViewModel, modifier: Modifier = Mo
 }
 
 @Composable
-private fun EndController(viewModel: TrimmerViewModel, modifier: Modifier = Modifier) {
+private fun EndController(
+    modifier: Modifier = Modifier,
+    viewModel: TrimmerViewModel = koinActivityViewModel(),
+) {
     val endMillis by viewModel.collectEndPosInMillisAsState()
 
     BorderController(

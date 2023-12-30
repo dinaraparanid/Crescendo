@@ -18,7 +18,6 @@ import androidx.compose.ui.unit.sp
 import com.paranid5.crescendo.EQUALIZER_DATA
 import com.paranid5.crescendo.R
 import com.paranid5.crescendo.domain.eq.EqualizerData
-import com.paranid5.crescendo.presentation.main.audio_effects.AudioEffectsViewModel
 import com.paranid5.crescendo.presentation.ui.extensions.collectLatestAsState
 import com.paranid5.crescendo.presentation.ui.theme.LocalAppColors
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -27,7 +26,6 @@ import org.koin.core.qualifier.named
 
 @Composable
 fun Band(
-    viewModel: AudioEffectsViewModel,
     index: Int,
     presentLvlsDbState: SnapshotStateList<Float>,
     pointsState: SnapshotStateList<Offset>,
@@ -45,7 +43,6 @@ fun Band(
         index = index,
         presentLvlsDbState = presentLvlsDbState,
         pointsState = pointsState,
-        viewModel = viewModel,
         modifier = Modifier
             .fillMaxWidth()
             .weight(1F)

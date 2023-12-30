@@ -2,7 +2,6 @@ package com.paranid5.crescendo.presentation.main.playing.views
 
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -17,14 +16,12 @@ import androidx.constraintlayout.compose.Dimension
 import com.paranid5.crescendo.domain.media.AudioStatus
 import com.paranid5.crescendo.media.images.ImageSize
 import com.paranid5.crescendo.presentation.main.coverModelWithPalette
-import com.paranid5.crescendo.presentation.main.playing.PlayingViewModel
 import com.paranid5.crescendo.presentation.main.playing.rememberIsWaveformEnabled
 import com.paranid5.crescendo.presentation.main.playing.views.properties.PropertiesButton
 import com.paranid5.crescendo.presentation.ui.extensions.getLightMutedOrPrimary
 
 @Composable
 fun PlayingScreenLandscape(
-    viewModel: PlayingViewModel,
     durationMillis: Long,
     coverAlpha: Float,
     audioStatus: AudioStatus,
@@ -33,7 +30,7 @@ fun PlayingScreenLandscape(
 ) {
     var coverSize by remember { mutableStateOf(ImageSize(1, 1)) }
     val (coverModel, palette) = coverModelWithPalette(audioStatus, coverSize)
-    val isWaveformEnabled by rememberIsWaveformEnabled(viewModel, audioStatus)
+    val isWaveformEnabled by rememberIsWaveformEnabled(audioStatus)
 
     ConstraintLayout(modifier) {
         val (
@@ -103,7 +100,6 @@ fun PlayingScreenLandscape(
             )
 
         PlaybackSliderWithLabels(
-            viewModel = viewModel,
             audioStatus = audioStatus,
             durationMillis = durationMillis,
             palette = palette,
@@ -118,7 +114,6 @@ fun PlayingScreenLandscape(
         )
 
         PlaybackButtons(
-            viewModel = viewModel,
             audioStatus = audioStatus,
             palette = palette,
             modifier = Modifier.constrainAs(playbackButtons) {
@@ -130,7 +125,6 @@ fun PlayingScreenLandscape(
         )
 
         UtilsButtons(
-            viewModel = viewModel,
             palette = palette,
             audioStatus = audioStatus,
             modifier = Modifier.constrainAs(utilsButtons) {

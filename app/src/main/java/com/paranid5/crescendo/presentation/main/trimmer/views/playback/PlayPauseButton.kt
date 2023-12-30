@@ -13,17 +13,17 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.paranid5.crescendo.R
+import com.paranid5.crescendo.koinActivityViewModel
 import com.paranid5.crescendo.presentation.composition_locals.trimmer.LocalTrimmerFocusPoints
 import com.paranid5.crescendo.presentation.main.trimmer.FocusPoints
 import com.paranid5.crescendo.presentation.main.trimmer.TrimmerViewModel
 import com.paranid5.crescendo.presentation.main.trimmer.properties.compose.collectIsPlayingAsState
-import com.paranid5.crescendo.presentation.main.trimmer.properties.setPlaying
 import com.paranid5.crescendo.presentation.ui.theme.LocalAppColors
 
 @Composable
 fun PlayPauseButton(
-    viewModel: TrimmerViewModel,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    viewModel: TrimmerViewModel = koinActivityViewModel(),
 ) {
     val colors = LocalAppColors.current
     val focusPoints = LocalTrimmerFocusPoints.current!!

@@ -18,7 +18,6 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.palette.graphics.Palette
 import com.paranid5.crescendo.R
-import com.paranid5.crescendo.presentation.main.playing.PlayingViewModel
 import com.paranid5.crescendo.presentation.main.playing.views.CacheDialog
 import com.paranid5.crescendo.presentation.ui.extensions.getLightMutedOrPrimary
 import com.paranid5.crescendo.presentation.ui.extensions.simpleShadow
@@ -26,7 +25,6 @@ import com.paranid5.crescendo.presentation.ui.permissions.requests.externalStora
 
 @Composable
 fun DownloadButton(
-    viewModel: PlayingViewModel,
     palette: Palette?,
     isLiveStreaming: Boolean,
     modifier: Modifier = Modifier
@@ -57,7 +55,6 @@ fun DownloadButton(
 
         if (isCashPropertiesDialogShown && areStoragePermissionsGranted)
             CacheDialog(
-                viewModel = viewModel,
                 isDialogShownState = isCashPropertiesDialogShownState,
                 modifier = Modifier.align(Alignment.Center)
             )

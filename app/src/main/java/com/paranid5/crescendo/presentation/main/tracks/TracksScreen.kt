@@ -11,17 +11,17 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import com.paranid5.crescendo.koinActivityViewModel
 import com.paranid5.crescendo.presentation.main.tracks.effects.LoadTracksFromMediaStoreEffect
 import com.paranid5.crescendo.presentation.main.tracks.properties.compose.collectSearchBarHeightDpAsState
-import com.paranid5.crescendo.presentation.main.tracks.properties.setFilteredTracks
 import com.paranid5.crescendo.presentation.main.tracks.views.DefaultTrackList
 import com.paranid5.crescendo.presentation.main.tracks.views.TrackSearcher
 import com.paranid5.crescendo.presentation.main.tracks.views.TracksBar
 
 @Composable
 fun TracksScreen(
-    viewModel: TracksViewModel,
     modifier: Modifier = Modifier,
+    viewModel: TracksViewModel = koinActivityViewModel(),
 ) {
     val searchBarHeight by viewModel.collectSearchBarHeightDpAsState()
     var tracksScrollingState = rememberLazyListState()

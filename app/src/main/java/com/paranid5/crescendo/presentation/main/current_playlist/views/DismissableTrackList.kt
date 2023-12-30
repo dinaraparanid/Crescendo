@@ -3,6 +3,7 @@ package com.paranid5.crescendo.presentation.main.current_playlist.views
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import com.paranid5.crescendo.data.states.playback.AudioStatusStatePublisher
 import com.paranid5.crescendo.domain.tracks.Track
 import com.paranid5.crescendo.presentation.main.tracks.views.DefaultTrackItem
 import com.paranid5.crescendo.presentation.ui.utils.drag.DismissableList
@@ -33,6 +34,7 @@ internal inline fun <T : Track> DismissableTrackList(
 
 @Composable
 internal inline fun <T : Track> DismissableTrackList(
+    viewModel: AudioStatusStatePublisher,
     tracks: ImmutableList<T>,
     scrollingState: LazyListState,
     crossinline onDismissed: (Int, T) -> Boolean,
@@ -44,6 +46,7 @@ internal inline fun <T : Track> DismissableTrackList(
     modifier = modifier,
     itemView = { trackList, trackInd, itemModifier ->
         DefaultTrackItem(
+            viewModel = viewModel,
             tracks = trackList,
             trackInd = trackInd,
             modifier = itemModifier then trackItemModifier,

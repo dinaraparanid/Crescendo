@@ -5,10 +5,7 @@ import com.paranid5.crescendo.domain.media.AudioStatus
 import com.paranid5.crescendo.domain.metadata.VideoMetadata
 import com.paranid5.crescendo.domain.tracks.DefaultTrack
 import com.paranid5.crescendo.presentation.main.playing.PlayingViewModel
-import com.paranid5.crescendo.presentation.main.playing.properties.currentMetadataFlow
-import com.paranid5.crescendo.presentation.main.playing.properties.currentTrackFlow
 import com.paranid5.crescendo.presentation.main.playing.properties.durationMillisFlow
-import com.paranid5.crescendo.presentation.main.playing.properties.isRepeatingFlow
 import com.paranid5.crescendo.presentation.main.playing.properties.playbackPositionFlow
 import com.paranid5.crescendo.presentation.ui.extensions.collectLatestAsState
 

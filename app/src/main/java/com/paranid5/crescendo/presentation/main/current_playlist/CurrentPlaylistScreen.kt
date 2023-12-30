@@ -23,10 +23,7 @@ import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
 
 @Composable
-fun CurrentPlaylistScreen(
-    viewModel: CurrentPlaylistViewModel,
-    modifier: Modifier = Modifier,
-) {
+fun CurrentPlaylistScreen(modifier: Modifier = Modifier) {
     val playlistDismissMediatorState: MutableState<ImmutableList<DefaultTrack>> = remember {
         mutableStateOf(persistentListOf())
     }
@@ -46,7 +43,6 @@ fun CurrentPlaylistScreen(
     val trackPathDismissKey by trackPathDismissKeyState
 
     TrackDismissEffect(
-        viewModel = viewModel,
         trackPathDismissKey = trackPathDismissKey,
         playlistDismissMediator = playlistDismissMediator,
         trackIndexDismissMediator = trackIndexDismissMediator
@@ -56,22 +52,19 @@ fun CurrentPlaylistScreen(
         playlistDismissMediatorState = playlistDismissMediatorState,
         trackIndexDismissMediatorState = trackIndexDismissMediatorState,
         trackPathDismissKeyState = trackPathDismissKeyState,
-        viewModel = viewModel,
         modifier = modifier
     )
 }
 
 @Composable
 private fun CurrentPlaylistScreenContent(
-    viewModel: CurrentPlaylistViewModel,
     playlistDismissMediatorState: MutableState<ImmutableList<DefaultTrack>>,
     trackIndexDismissMediatorState: MutableState<Int>,
     trackPathDismissKeyState: MutableState<String>,
     modifier: Modifier = Modifier,
 ) = Column(modifier) {
     CurrentPlaylistBar(
-        viewModel = viewModel,
-        modifier = Modifier
+        Modifier
             .fillMaxWidth()
             .padding(start = 10.dp, end = 10.dp, bottom = 10.dp)
     )
@@ -82,7 +75,6 @@ private fun CurrentPlaylistScreenContent(
         playlistDismissMediatorState = playlistDismissMediatorState,
         trackIndexDismissMediatorState = trackIndexDismissMediatorState,
         trackPathDismissKeyState = trackPathDismissKeyState,
-        viewModel = viewModel,
         modifier = Modifier.padding(
             top = 16.dp,
             start = 8.dp,

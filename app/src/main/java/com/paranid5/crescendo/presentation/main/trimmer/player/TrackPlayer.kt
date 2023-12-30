@@ -13,8 +13,6 @@ import com.paranid5.crescendo.domain.utils.extensions.toMediaItem
 import com.paranid5.crescendo.presentation.main.trimmer.TrimmerViewModel
 import com.paranid5.crescendo.presentation.main.trimmer.effects.playback.notifyPlaybackTaskFinished
 import com.paranid5.crescendo.presentation.main.trimmer.effects.playback.pausePlayback
-import com.paranid5.crescendo.presentation.main.trimmer.properties.launchPlaybackPosMonitorTask
-import com.paranid5.crescendo.presentation.main.trimmer.properties.trackOrNullState
 import kotlinx.coroutines.launch
 
 private const val TRANSITION_DURATION = 10_000L
@@ -41,7 +39,7 @@ fun TrackPlayer(
 fun TrackPlayer(context: Context, viewModel: TrimmerViewModel) =
     TrackPlayer(
         context = context,
-        track = viewModel.trackOrNullState.value!!,
+        track = viewModel.trackState.value!!,
         viewModel = viewModel,
         onCompletion = {
             viewModel.viewModelScope.launch {

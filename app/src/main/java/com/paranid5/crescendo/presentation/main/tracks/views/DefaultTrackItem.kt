@@ -23,6 +23,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import com.paranid5.crescendo.data.StorageHandler
 import com.paranid5.crescendo.data.properties.currentTrackFlow
+import com.paranid5.crescendo.data.states.playback.AudioStatusStatePublisher
 import com.paranid5.crescendo.domain.tracks.Track
 import com.paranid5.crescendo.presentation.main.tracks.views.item.TrackCover
 import com.paranid5.crescendo.presentation.main.tracks.views.item.TrackInfo
@@ -56,10 +57,10 @@ fun DefaultTrackItem(
 
 @Composable
 fun DefaultTrackItem(
+    viewModel: AudioStatusStatePublisher,
     tracks: ImmutableList<Track>,
     trackInd: Int,
     modifier: Modifier = Modifier,
-    storageHandler: StorageHandler = koinInject(),
     trackServiceAccessor: TrackServiceAccessor = koinInject(),
 ) {
     val coroutineScope = rememberCoroutineScope()
@@ -73,7 +74,7 @@ fun DefaultTrackItem(
                 startPlaylistPlayback(
                     tracks = tracks,
                     trackInd = trackInd,
-                    storageHandler = storageHandler,
+                    viewModel = viewModel,
                     trackServiceAccessor = trackServiceAccessor,
                 )
             }

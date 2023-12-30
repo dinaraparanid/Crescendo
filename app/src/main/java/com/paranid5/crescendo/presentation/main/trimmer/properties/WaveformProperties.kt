@@ -1,26 +1,35 @@
 package com.paranid5.crescendo.presentation.main.trimmer.properties
 
+import androidx.lifecycle.viewModelScope
 import com.paranid5.crescendo.presentation.main.trimmer.TrimmerViewModel
-import com.paranid5.crescendo.presentation.main.trimmer.states.zoomIn
-import com.paranid5.crescendo.presentation.main.trimmer.states.zoomOut
+import com.paranid5.crescendo.presentation.main.trimmer.states.WaveformStateHolder
 import kotlinx.collections.immutable.ImmutableList
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.launch
 
-inline val TrimmerViewModel.amplitudesFlow
-    get() = waveformStateHolder.amplitudesFlow
+fun WaveformStateHolder.zoomIn() =
+    setZoom(
+        when (val zoom = zoom) {
+            zoomSteps -> zoom
+            else -> zoom + 1
+        }
+    )
 
-fun TrimmerViewModel.setAmplitudesAsync(amplitudes: ImmutableList<Int>) =
-    waveformStateHolder.setAmplitudesAsync(amplitudes)
+fun WaveformStateHolder.zoomOut() =
+    setZoom(
+        when (val zoom = zoom) {
+            0 -> 0
+            else -> zoom - 1
+        }
+    )
 
-suspend inline fun TrimmerViewModel.setAmplitudes(amplitudes: ImmutableList<Int>) =
-    waveformStateHolder.setAmplitudesAsync(amplitudes).join()
+private inline val WaveformStateHolder.zoom
+    get() = zoomState.value
 
-inline val TrimmerViewModel.zoomState
-    get() = waveformStateHolder.zoomState
-
-fun TrimmerViewModel.setZoom(zoomRatio: Int) =
-    waveformStateHolder.setZoom(zoomRatio)
+private inline val WaveformStateHolder.zoomSteps
+    get() = zoomStepsState.value
 
 fun TrimmerViewModel.waveformWidthFlow(spikeWidthRatio: Int) =
     combine(
@@ -43,17 +52,8 @@ inline val TrimmerViewModel.canZoomInFlow
         zoom < zoomSteps
     }
 
-fun TrimmerViewModel.zoomIn() =
-    waveformStateHolder.zoomIn()
-
 inline val TrimmerViewModel.canZoomOutFlow
     get() = zoomState.map { it > 0 }
 
-fun TrimmerViewModel.zoomOut() =
-    waveformStateHolder.zoomOut()
-
-inline val TrimmerViewModel.zoomStepsState
-    get() = waveformStateHolder.zoomStepsState
-
-fun TrimmerViewModel.setZoomSteps(zoomSteps: Int) =
-    waveformStateHolder.setZoomSteps(zoomSteps)
+fun TrimmerViewModel.setAmplitudesAsync(amplitudes: ImmutableList<Int>) =
+    viewModelScope.launch(Dispatchers.IO) { setAmplitudes(amplitudes) }

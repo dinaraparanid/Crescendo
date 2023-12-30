@@ -1,67 +1,96 @@
 package com.paranid5.crescendo.presentation.main.trimmer.states
 
-import androidx.lifecycle.SavedStateHandle
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
-import kotlinx.coroutines.flow.updateAndGet
 import kotlinx.coroutines.launch
 
-private const val PITCH = "pitch"
-private const val SPEED = "speed"
+interface PlaybackStateHolder {
+    val isPlayerInitializedState: StateFlow<Boolean>
+    val isPlaybackTaskFinishedState: StateFlow<Boolean>
+    val isPlayingState: StateFlow<Boolean>
+    val pitchState: StateFlow<Float>
+    val speedState: StateFlow<Float>
 
-class PlaybackStateHolder(private val savedStateHandle: SavedStateHandle) :
-    CoroutineScope by MainScope() {
-    private val _isPlayerInitializedState by lazy { MutableStateFlow(false) }
+    fun setPlayerInitialized(isInitialized: Boolean)
+    fun setPlaying(isPlaying: Boolean)
+    fun setPitch(pitch: Float)
+    fun setSpeed(speed: Float)
+    fun launchPlaybackPosMonitorTask(task: suspend () -> Unit)
+    fun setPlaybackTaskFinished(isFinished: Boolean)
+    fun releasePlaybackPosMonitorTask()
+}
 
-    val isPlayerInitializedState by lazy { _isPlayerInitializedState.asStateFlow() }
+class PlaybackStateHolderImpl : PlaybackStateHolder, CoroutineScope by MainScope() {
+    private val _isPlayerInitializedState by lazy {
+        MutableStateFlow(false)
+    }
 
-    fun setPlayerInitialized(isInitialized: Boolean) =
+    override val isPlayerInitializedState by lazy {
+        _isPlayerInitializedState.asStateFlow()
+    }
+
+    override fun setPlayerInitialized(isInitialized: Boolean) =
         _isPlayerInitializedState.update { isInitialized }
 
-    private val _isPlayingState by lazy { MutableStateFlow(false) }
-
-    val isPlayingState by lazy { _isPlayingState.asStateFlow() }
-
-    fun setPlaying(isPlaying: Boolean) = _isPlayingState.update { isPlaying }
-
-    private val _pitchState by lazy { MutableStateFlow(1F) }
-
-    val pitchState by lazy { _pitchState.asStateFlow() }
-
-    fun setPitch(pitch: Float) {
-        savedStateHandle[PITCH] = _pitchState.updateAndGet { pitch }
+    private val _isPlayingState by lazy {
+        MutableStateFlow(false)
     }
 
-    private val _speedState by lazy { MutableStateFlow(1F) }
-
-    val speedState by lazy { _speedState.asStateFlow() }
-
-    fun setSpeed(speed: Float) {
-        savedStateHandle[SPEED] = _speedState.updateAndGet { speed }
+    override val isPlayingState by lazy {
+        _isPlayingState.asStateFlow()
     }
 
-    private val playbackPosMonitorTaskState by lazy { MutableStateFlow<Job?>(null) }
+    override fun setPlaying(isPlaying: Boolean) =
+        _isPlayingState.update { isPlaying }
 
-    fun launchPlaybackPosMonitorTask(task: suspend () -> Unit) =
-        playbackPosMonitorTaskState.update {
-            launch { task() }
-        }
+    private val _pitchState by lazy {
+        MutableStateFlow(1F)
+    }
 
-    private val _isPlaybackTaskFinishedState by lazy { MutableStateFlow(false) }
+    override val pitchState by lazy {
+        _pitchState.asStateFlow()
+    }
 
-    val isPlaybackTaskFinishedState by lazy { _isPlaybackTaskFinishedState.asStateFlow() }
+    override fun setPitch(pitch: Float) =
+        _pitchState.update { pitch }
 
-    fun setPlaybackTaskFinished(isFinished: Boolean) =
+    private val _speedState by lazy {
+        MutableStateFlow(1F)
+    }
+
+    override val speedState by lazy {
+        _speedState.asStateFlow()
+    }
+
+    override fun setSpeed(speed: Float) =
+        _speedState.update { speed }
+
+    private val playbackPosMonitorTaskState by lazy {
+        MutableStateFlow<Job?>(null)
+    }
+
+    override fun launchPlaybackPosMonitorTask(task: suspend () -> Unit) =
+        playbackPosMonitorTaskState.update { launch { task() } }
+
+    private val _isPlaybackTaskFinishedState by lazy {
+        MutableStateFlow(false)
+    }
+
+    override val isPlaybackTaskFinishedState by lazy {
+        _isPlaybackTaskFinishedState.asStateFlow()
+    }
+
+    override fun setPlaybackTaskFinished(isFinished: Boolean) =
         _isPlaybackTaskFinishedState.update { isFinished }
 
-    fun releasePlaybackPosMonitorTask() {
+    override fun releasePlaybackPosMonitorTask() =
         playbackPosMonitorTaskState.update {
             it?.cancel()
             null
         }
-    }
 }

@@ -23,6 +23,7 @@ import androidx.compose.ui.focus.onFocusEvent
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
+import com.paranid5.crescendo.koinActivityViewModel
 import com.paranid5.crescendo.presentation.composition_locals.trimmer.LocalTrimmerFocusPoints
 import com.paranid5.crescendo.presentation.composition_locals.trimmer.LocalTrimmerWaveformScrollState
 import com.paranid5.crescendo.presentation.main.trimmer.CONTROLLER_CIRCLE_RADIUS
@@ -41,18 +42,17 @@ import kotlinx.coroutines.launch
 
 @Composable
 fun TrimmerWaveformContent(
-    viewModel: TrimmerViewModel,
     spikesAmplitudes: List<Float>,
     canvasSizeState: MutableState<Size>,
     spikesState: MutableFloatState,
     modifier: Modifier = Modifier,
+    viewModel: TrimmerViewModel = koinActivityViewModel(),
     spikeWidthRatio: Int = WAVEFORM_SPIKE_WIDTH_RATIO
 ) {
     val waveformWidth by viewModel.collectWaveformWidthAsState(spikeWidthRatio)
 
     Box(modifier) {
         Waveform(
-            viewModel = viewModel,
             spikeWidthRatio = spikeWidthRatio,
             canvasSizeState = canvasSizeState,
             spikesState = spikesState,
@@ -61,12 +61,8 @@ fun TrimmerWaveformContent(
         )
 
         StartBorder(
-            viewModel = viewModel,
             spikeWidthRatio = spikeWidthRatio,
-            modifier = Modifier.startBorderModifier(
-                viewModel = viewModel,
-                waveformWidth = waveformWidth,
-            )
+            modifier = Modifier.startBorderModifier(waveformWidth)
         )
 
         EndBorder(
@@ -96,8 +92,8 @@ private fun Modifier.waveformModifier(waveformWidth: Int) =
 
 @Composable
 private fun Modifier.startBorderModifier(
-    viewModel: TrimmerViewModel,
     waveformWidth: Int,
+    viewModel: TrimmerViewModel = koinActivityViewModel(),
 ): Modifier {
     val focusPoints = LocalTrimmerFocusPoints.current!!
     val waveformScrollState = LocalTrimmerWaveformScrollState.current!!
@@ -129,8 +125,8 @@ private fun Modifier.startBorderModifier(
 
 @Composable
 private fun Modifier.endBorderModifier(
-    viewModel: TrimmerViewModel,
     waveformWidth: Int,
+    viewModel: TrimmerViewModel = koinActivityViewModel(),
 ): Modifier {
     val focusPoints = LocalTrimmerFocusPoints.current!!
     val waveformScrollState = LocalTrimmerWaveformScrollState.current!!
@@ -163,8 +159,8 @@ private fun Modifier.endBorderModifier(
 
 @Composable
 private fun Modifier.playbackOffsetModifier(
-    viewModel: TrimmerViewModel,
     waveformWidth: Int,
+    viewModel: TrimmerViewModel = koinActivityViewModel(),
 ): Modifier {
     val focusPoints = LocalTrimmerFocusPoints.current!!
     val waveformScrollState = LocalTrimmerWaveformScrollState.current!!
@@ -179,7 +175,7 @@ private fun Modifier.playbackOffsetModifier(
 
     val playbackPositionOffsetPx = playbackPositionOffset.dp.toPx().toInt()
     val waveformViewport = waveformScrollState.viewportSize
-    val playbackAlphaAnim by animatePlaybackAlphaAsState(viewModel)
+    val playbackAlphaAnim by animatePlaybackAlphaAsState()
 
     return this
         .offset(x = playbackPositionOffset.dp)
@@ -200,8 +196,8 @@ private fun Modifier.playbackOffsetModifier(
 
 @Composable
 internal fun rememberStartBorderOffsetAsState(
-    viewModel: TrimmerViewModel,
     waveformWidth: Int,
+    viewModel: TrimmerViewModel = koinActivityViewModel(),
 ): State<Int> {
     val startOffset by viewModel.collectStartOffsetAsState()
 
@@ -212,8 +208,8 @@ internal fun rememberStartBorderOffsetAsState(
 
 @Composable
 internal fun rememberEndBorderOffsetAsState(
-    viewModel: TrimmerViewModel,
     waveformWidth: Int,
+    viewModel: TrimmerViewModel = koinActivityViewModel(),
 ): State<Int> {
     val endOffset by viewModel.collectEndOffsetAsState()
 
@@ -224,8 +220,8 @@ internal fun rememberEndBorderOffsetAsState(
 
 @Composable
 private fun rememberPlaybackPositionOffsetAsState(
-    viewModel: TrimmerViewModel,
     waveformWidth: Int,
+    viewModel: TrimmerViewModel = koinActivityViewModel(),
 ): State<Int> {
     val playbackOffset by viewModel.collectPlaybackOffsetAsState()
 
@@ -235,7 +231,9 @@ private fun rememberPlaybackPositionOffsetAsState(
 }
 
 @Composable
-private fun animatePlaybackAlphaAsState(viewModel: TrimmerViewModel): State<Float> {
+private fun animatePlaybackAlphaAsState(
+    viewModel: TrimmerViewModel = koinActivityViewModel(),
+): State<Float> {
     val playbackAlpha by viewModel.collectPlaybackAlphaAsState()
     return animateFloatAsState(playbackAlpha, label = "")
 }

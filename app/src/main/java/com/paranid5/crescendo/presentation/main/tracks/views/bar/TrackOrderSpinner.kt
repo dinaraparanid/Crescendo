@@ -16,7 +16,6 @@ import com.paranid5.crescendo.domain.tracks.TrackOrder
 import com.paranid5.crescendo.koinActivityViewModel
 import com.paranid5.crescendo.presentation.main.tracks.TracksViewModel
 import com.paranid5.crescendo.presentation.main.tracks.properties.compose.collectTrackOrderAsState
-import com.paranid5.crescendo.presentation.main.tracks.properties.setTrackOrder
 import com.paranid5.crescendo.presentation.ui.utils.Spinner
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf

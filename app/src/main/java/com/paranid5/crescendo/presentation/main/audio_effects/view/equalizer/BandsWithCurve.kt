@@ -11,7 +11,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import com.paranid5.crescendo.EQUALIZER_DATA
 import com.paranid5.crescendo.domain.eq.EqualizerData
-import com.paranid5.crescendo.presentation.main.audio_effects.AudioEffectsViewModel
 import com.paranid5.crescendo.presentation.ui.extensions.collectLatestAsState
 import kotlinx.coroutines.flow.MutableStateFlow
 import org.koin.compose.koinInject
@@ -19,7 +18,6 @@ import org.koin.core.qualifier.named
 
 @Composable
 fun BandsWithCurve(
-    viewModel: AudioEffectsViewModel,
     modifier: Modifier = Modifier,
     equalizerDataState: MutableStateFlow<EqualizerData?> = koinInject(named(EQUALIZER_DATA))
 ) {
@@ -38,7 +36,6 @@ fun BandsWithCurve(
         )
 
         Bands(
-            viewModel = viewModel,
             pointsState = pointsState,
             modifier = Modifier
                 .fillMaxWidth()

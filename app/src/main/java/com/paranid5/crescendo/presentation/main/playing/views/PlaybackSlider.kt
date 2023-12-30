@@ -22,6 +22,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.palette.graphics.Palette
 import com.paranid5.crescendo.domain.media.AudioStatus
+import com.paranid5.crescendo.koinActivityViewModel
 import com.paranid5.crescendo.presentation.main.playing.PlayingUIHandler
 import com.paranid5.crescendo.presentation.main.playing.PlayingViewModel
 import com.paranid5.crescendo.presentation.main.playing.effects.PlaybackPositionFetcher
@@ -35,7 +36,6 @@ import org.koin.compose.koinInject
 
 @Composable
 fun PlaybackSlider(
-    viewModel: PlayingViewModel,
     audioStatus: AudioStatus,
     durationMillis: Long,
     palette: Palette?,
@@ -44,8 +44,8 @@ fun PlaybackSlider(
 ) {
     val paletteColor = palette.getLightMutedOrPrimary()
 
-    val isLiveStreaming by rememberIsLiveStreaming(viewModel, audioStatus)
-    val isSliderEnabled by rememberIsSliderEnabled(viewModel, audioStatus)
+    val isLiveStreaming by rememberIsLiveStreaming(audioStatus)
+    val isSliderEnabled by rememberIsSliderEnabled(audioStatus)
 
     val currentPositionState = remember { mutableLongStateOf(0) }
 
@@ -53,14 +53,12 @@ fun PlaybackSlider(
     val isDragging by isDraggingState
 
     PlaybackPositionFetcher(
-        viewModel = viewModel,
         audioStatus = audioStatus,
         isDragging = isDragging,
         currentPositionState = currentPositionState
     )
 
     PlaybackSliderContent(
-        viewModel = viewModel,
         audioStatus = audioStatus,
         durationMillis = durationMillis,
         paletteColor = paletteColor,
@@ -75,7 +73,6 @@ fun PlaybackSlider(
 
 @Composable
 fun PlaybackSliderContent(
-    viewModel: PlayingViewModel,
     audioStatus: AudioStatus,
     durationMillis: Long,
     paletteColor: Color,
@@ -91,7 +88,6 @@ fun PlaybackSliderContent(
     Column(modifier) {
         if (!isLiveStreaming)
             PlaybackSliderImpl(
-                viewModel = viewModel,
                 durationMillis = durationMillis,
                 paletteColor = paletteColor,
                 audioStatus = audioStatus,
@@ -112,7 +108,6 @@ fun PlaybackSliderContent(
 
 @Composable
 private fun PlaybackSliderImpl(
-    viewModel: PlayingViewModel,
     audioStatus: AudioStatus,
     durationMillis: Long,
     paletteColor: Color,
@@ -120,6 +115,7 @@ private fun PlaybackSliderImpl(
     isDraggingState: MutableState<Boolean>,
     currentPositionState: MutableState<Long>,
     modifier: Modifier = Modifier,
+    viewModel: PlayingViewModel = koinActivityViewModel(),
     playingUIHandler: PlayingUIHandler = koinInject(),
 ) {
     var isDragging by isDraggingState
@@ -153,8 +149,8 @@ private fun PlaybackSliderImpl(
 
 @Composable
 private fun rememberIsSliderEnabled(
-    viewModel: PlayingViewModel,
     audioStatus: AudioStatus,
+    viewModel: PlayingViewModel = koinActivityViewModel(),
 ): State<Boolean> {
     val actualAudioStatus by viewModel.collectAudioStatusAsState()
 

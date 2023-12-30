@@ -19,6 +19,7 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.paranid5.crescendo.koinActivityViewModel
 import com.paranid5.crescendo.presentation.composition_locals.trimmer.LocalTrimmerWaveformScrollState
 import com.paranid5.crescendo.presentation.main.trimmer.PLAYBACK_CIRCLE_CENTER
 import com.paranid5.crescendo.presentation.main.trimmer.TrimmerViewModel
@@ -33,39 +34,30 @@ import com.paranid5.crescendo.presentation.ui.utils.textWidth
 
 @Composable
 fun WaveformWithPosition(
-    viewModel: TrimmerViewModel,
     modifier: Modifier = Modifier,
     spikeWidthRatio: Int = WAVEFORM_SPIKE_WIDTH_RATIO,
     spaceBetween: Dp = 2.dp
 ) {
     val waveformScrollState = LocalTrimmerWaveformScrollState.current!!
-
-    val playbackTextOffsetAnim = animatePlaybackTextOffsetAsState(
-        viewModel = viewModel,
-        spikeWidthRatio = spikeWidthRatio
-    )
+    val playbackTextOffsetAnim = animatePlaybackTextOffsetAsState(spikeWidthRatio)
 
     Column(modifier.horizontalScroll(waveformScrollState)) {
         TrimWaveform(
-            viewModel = viewModel,
-            modifier = Modifier
+            Modifier
                 .weight(1F)
                 .align(Alignment.CenterHorizontally)
         )
 
         Spacer(Modifier.height(spaceBetween))
 
-        PlaybackPositionText(
-            viewModel = viewModel,
-            modifier = Modifier.offset(x = playbackTextOffsetAnim.dp)
-        )
+        PlaybackPositionText(Modifier.offset(x = playbackTextOffsetAnim.dp))
     }
 }
 
 @Composable
 private fun PlaybackPositionText(
-    viewModel: TrimmerViewModel,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    viewModel: TrimmerViewModel = koinActivityViewModel(),
 ) {
     val colors = LocalAppColors.current
     val playbackText by viewModel.collectPlaybackTextAsState()
@@ -81,8 +73,8 @@ private fun PlaybackPositionText(
 
 @Composable
 private fun animatePlaybackTextOffsetAsState(
-    viewModel: TrimmerViewModel,
-    spikeWidthRatio: Int
+    spikeWidthRatio: Int,
+    viewModel: TrimmerViewModel = koinActivityViewModel(),
 ): Int {
     val playbackControllerOffset by viewModel
         .playbackControllerOffsetFlow(spikeWidthRatio)

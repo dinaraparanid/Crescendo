@@ -5,15 +5,10 @@ import com.paranid5.crescendo.domain.trimming.FadeDurations
 import com.paranid5.crescendo.domain.trimming.TrimRange
 import com.paranid5.crescendo.presentation.main.trimmer.TrimmerViewModel
 import com.paranid5.crescendo.presentation.main.trimmer.properties.endOffsetFlow
-import com.paranid5.crescendo.presentation.main.trimmer.properties.endPosInMillisState
 import com.paranid5.crescendo.presentation.main.trimmer.properties.fadeDurationsFlow
-import com.paranid5.crescendo.presentation.main.trimmer.properties.fadeInSecsState
-import com.paranid5.crescendo.presentation.main.trimmer.properties.fadeOutSecsState
 import com.paranid5.crescendo.presentation.main.trimmer.properties.playbackOffsetFlow
-import com.paranid5.crescendo.presentation.main.trimmer.properties.playbackPosInMillisState
 import com.paranid5.crescendo.presentation.main.trimmer.properties.playbackTextFlow
 import com.paranid5.crescendo.presentation.main.trimmer.properties.startOffsetFlow
-import com.paranid5.crescendo.presentation.main.trimmer.properties.startPosInMillisState
 import com.paranid5.crescendo.presentation.main.trimmer.properties.trimRangeFlow
 import com.paranid5.crescendo.presentation.main.trimmer.properties.trimmedDurationInMillisFlow
 import com.paranid5.crescendo.presentation.ui.extensions.collectLatestAsState

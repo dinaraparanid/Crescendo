@@ -20,21 +20,18 @@ import androidx.palette.graphics.Palette
 import com.paranid5.crescendo.R
 import com.paranid5.crescendo.domain.media.AudioStatus
 import com.paranid5.crescendo.domain.utils.extensions.timeString
-import com.paranid5.crescendo.presentation.main.playing.PlayingViewModel
 import com.paranid5.crescendo.presentation.ui.theme.LocalAppColors
 import com.paranid5.crescendo.services.stream_service.StreamServiceAccessor
 import org.koin.compose.koinInject
 
 @Composable
 fun PlaybackSliderWithTimeContainer(
-    viewModel: PlayingViewModel,
     durationMillis: Long,
     palette: Palette?,
     audioStatus: AudioStatus,
     isLiveStreaming: Boolean,
     modifier: Modifier = Modifier
 ) = PlaybackSlider(
-    viewModel = viewModel,
     durationMillis = durationMillis,
     palette = palette,
     audioStatus = audioStatus,
