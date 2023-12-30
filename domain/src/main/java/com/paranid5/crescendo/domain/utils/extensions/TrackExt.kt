@@ -24,5 +24,5 @@ fun Iterable<Track>.toDefaultTrackList() = map(::DefaultTrack)
 
 fun Iterable<Track>.toMediaItemList() = map(Track::toMediaItem)
 
-inline val Iterable<Track>.totalDuration
+inline val Iterable<Track>.totalDurationMillis
     get() = fold(0L) { acc, track -> acc + track.durationMillis }

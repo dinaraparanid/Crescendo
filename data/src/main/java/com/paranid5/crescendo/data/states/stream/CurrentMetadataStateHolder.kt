@@ -5,6 +5,7 @@ import com.paranid5.crescendo.data.properties.currentMetadataFlow
 import com.paranid5.crescendo.data.properties.storeCurrentMetadata
 import com.paranid5.crescendo.domain.metadata.VideoMetadata
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.map
 
 interface CurrentMetadataStateSubscriber {
     val currentMetadataFlow: Flow<VideoMetadata?>
@@ -26,3 +27,6 @@ class CurrentMetadataStatePublisherImpl(private val storageHandler: StorageHandl
     override suspend fun setCurrentMetadata(metadata: VideoMetadata?) =
         storageHandler.storeCurrentMetadata(metadata)
 }
+
+inline val CurrentMetadataStateSubscriber.currentMetadataDurationMillisFlow
+    get() = currentMetadataFlow.map { it?.durationMillis ?: 0 }

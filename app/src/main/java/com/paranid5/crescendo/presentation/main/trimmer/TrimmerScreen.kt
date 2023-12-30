@@ -8,10 +8,6 @@ import androidx.compose.material.ModalBottomSheetValue
 import androidx.compose.material.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
-import androidx.compose.runtime.derivedStateOf
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.paranid5.crescendo.presentation.composition_locals.trimmer.LocalTrimmerEffectSheetState
@@ -51,16 +47,6 @@ internal const val WAVEFORM_PADDING =
 fun TrimmerScreen(modifier: Modifier = Modifier) {
     val colors = LocalAppColors.current
 
-    val shownEffectsState = remember {
-        mutableIntStateOf(ShownEffects.NONE.ordinal)
-    }
-
-    val shownEffectsOrd by shownEffectsState
-
-    val shownEffects by remember(shownEffectsOrd) {
-        derivedStateOf { ShownEffects.entries[shownEffectsOrd] }
-    }
-
     val effectsScaffoldState = rememberModalBottomSheetState(
         initialValue = ModalBottomSheetValue.Hidden,
     )
@@ -70,18 +56,10 @@ fun TrimmerScreen(modifier: Modifier = Modifier) {
         sheetState = effectsScaffoldState,
         sheetBackgroundColor = colors.background,
         sheetShape = RoundedCornerShape(topStart = 20.dp, topEnd = 20.dp),
-        sheetContent = {
-            EffectsBottomSheet(
-                effects = shownEffects,
-                alpha = 0F,
-            )
-        },
+        sheetContent = { EffectsBottomSheet() },
     ) {
         CompositionLocalProvider(LocalTrimmerEffectSheetState provides effectsScaffoldState) {
-            TrimmerScreenContent(
-                shownEffectsState = shownEffectsState,
-                modifier = Modifier.padding(top = 16.dp, start = 8.dp, end = 8.dp)
-            )
+            TrimmerScreenContent(Modifier.padding(top = 16.dp, start = 8.dp, end = 8.dp))
         }
     }
 }

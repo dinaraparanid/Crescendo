@@ -9,42 +9,26 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.sp
 import com.paranid5.crescendo.R
-import com.paranid5.crescendo.domain.tracks.DefaultTrack
-import com.paranid5.crescendo.domain.utils.extensions.timeString
-import com.paranid5.crescendo.domain.utils.extensions.totalDuration
 import com.paranid5.crescendo.koinActivityViewModel
 import com.paranid5.crescendo.presentation.main.current_playlist.CurrentPlaylistViewModel
-import com.paranid5.crescendo.presentation.main.current_playlist.properties.compose.collectCurrentPlaylistAsState
+import com.paranid5.crescendo.presentation.main.current_playlist.properties.compose.collectCurrentPlaylistDurationStrAsState
+import com.paranid5.crescendo.presentation.main.current_playlist.properties.compose.collectCurrentPlaylistSizeAsState
 import com.paranid5.crescendo.presentation.ui.theme.LocalAppColors
-import kotlinx.collections.immutable.ImmutableList
 
 @Composable
-fun CurrentPlaylistBar(
-    modifier: Modifier = Modifier,
-    viewModel: CurrentPlaylistViewModel = koinActivityViewModel(),
-) {
-    val currentPlaylist by viewModel.collectCurrentPlaylistAsState()
-
+fun CurrentPlaylistBar(modifier: Modifier = Modifier) =
     Row(modifier) {
-        TracksLabel(
-            currentPlaylist = currentPlaylist,
-            modifier = Modifier.weight(1F)
-        )
-
-        CurrentPlaylistDuration(
-            currentPlaylist = currentPlaylist,
-            modifier = Modifier.weight(1F)
-        )
+        TracksLabel(Modifier.weight(1F))
+        CurrentPlaylistDuration(Modifier.weight(1F))
     }
-}
 
 @Composable
 private fun TracksLabel(
-    currentPlaylist: ImmutableList<DefaultTrack>,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    viewModel: CurrentPlaylistViewModel = koinActivityViewModel(),
 ) {
     val colors = LocalAppColors.current
-    val tracksNumber = currentPlaylist.size
+    val tracksNumber by viewModel.collectCurrentPlaylistSizeAsState()
 
     Text(
         text = "${stringResource(R.string.tracks)}: $tracksNumber",
@@ -57,11 +41,11 @@ private fun TracksLabel(
 
 @Composable
 private fun CurrentPlaylistDuration(
-    currentPlaylist: ImmutableList<DefaultTrack>,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    viewModel: CurrentPlaylistViewModel = koinActivityViewModel(),
 ) {
     val colors = LocalAppColors.current
-    val totalDurationText = currentPlaylist.totalDuration.timeString
+    val totalDurationText by viewModel.collectCurrentPlaylistDurationStrAsState()
 
     Text(
         text = "${stringResource(R.string.duration)}: $totalDurationText",

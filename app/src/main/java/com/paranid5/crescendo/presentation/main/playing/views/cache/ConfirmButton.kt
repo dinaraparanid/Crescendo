@@ -12,24 +12,30 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
 import com.paranid5.crescendo.R
-import com.paranid5.crescendo.domain.caching.Formats
-import com.paranid5.crescendo.domain.trimming.TrimRange
+import com.paranid5.crescendo.koinActivityViewModel
 import com.paranid5.crescendo.presentation.main.playing.PlayingUIHandler
+import com.paranid5.crescendo.presentation.main.playing.PlayingViewModel
+import com.paranid5.crescendo.presentation.main.playing.properties.compose.collectCacheFormatAsState
+import com.paranid5.crescendo.presentation.main.playing.properties.compose.collectFilenameAsState
+import com.paranid5.crescendo.presentation.main.playing.properties.compose.collectIsCacheButtonClickableAsState
+import com.paranid5.crescendo.presentation.main.playing.properties.compose.collectTrimRangeAsState
 import com.paranid5.crescendo.presentation.ui.theme.LocalAppColors
 import org.koin.compose.koinInject
 
 @Composable
 fun ConfirmButton(
-    format: Formats,
-    trimRange: TrimRange,
-    isButtonClickable: Boolean,
-    filename: String,
     isDialogShownState: MutableState<Boolean>,
     modifier: Modifier = Modifier,
+    viewModel: PlayingViewModel = koinActivityViewModel(),
     playingUIHandler: PlayingUIHandler = koinInject()
 ) {
     val colors = LocalAppColors.current
     var isDialogShown by isDialogShownState
+
+    val isButtonClickable by viewModel.collectIsCacheButtonClickableAsState()
+    val filename by viewModel.collectFilenameAsState()
+    val format by viewModel.collectCacheFormatAsState()
+    val trimRange by viewModel.collectTrimRangeAsState()
 
     Button(
         modifier = modifier,

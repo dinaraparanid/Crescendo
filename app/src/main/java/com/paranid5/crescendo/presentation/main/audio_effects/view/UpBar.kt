@@ -57,10 +57,7 @@ private fun AudioEffectsSwitch(
     val coroutineScope = rememberCoroutineScope()
 
     val primaryColor = colors.primary
-
-    val argbPrimaryColor by remember(primaryColor) {
-        derivedStateOf { primaryColor.toArgb() }
-    }
+    val argbPrimaryColor by rememberArgbPrimaryColor(primaryColor)
 
     val areAudioEffectsEnabled by viewModel.collectAreAudioEffectsEnabledAsState()
     val audioStatus by viewModel.collectAudioStatusAsState()
@@ -84,3 +81,7 @@ private fun AudioEffectsSwitch(
         }
     )
 }
+
+@Composable
+private fun rememberArgbPrimaryColor(primaryColor: Color) =
+    remember(primaryColor) { derivedStateOf { primaryColor.toArgb() } }

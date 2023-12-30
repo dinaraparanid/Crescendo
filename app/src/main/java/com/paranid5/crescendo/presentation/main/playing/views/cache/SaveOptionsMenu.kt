@@ -13,42 +13,37 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.sp
+import com.paranid5.crescendo.R
+import com.paranid5.crescendo.koinActivityViewModel
+import com.paranid5.crescendo.presentation.main.playing.PlayingViewModel
+import com.paranid5.crescendo.presentation.main.playing.properties.compose.collectSelectedSaveOptionIndexAsState
 import com.paranid5.crescendo.presentation.ui.theme.LocalAppColors
+import kotlinx.collections.immutable.persistentListOf
 
 @Composable
-fun SaveOptionsMenu(
-    fileSaveOptions: Array<String>,
-    selectedSaveOptionIndexState: MutableState<Int>,
-    modifier: Modifier = Modifier
-) {
-    val selectedSaveOptionIndex by selectedSaveOptionIndexState
+fun SaveOptionsMenu(modifier: Modifier = Modifier) {
     val isDropdownShownState = remember { mutableStateOf(false) }
 
     Box(modifier) {
         OptionLabel(
-            fileSaveOptions = fileSaveOptions,
             isDropdownShownState = isDropdownShownState,
-            selectedSaveOptionIndex = selectedSaveOptionIndex,
             modifier = Modifier.align(Alignment.Center)
         )
 
-        OptionsMenu(
-            fileSaveOptions = fileSaveOptions,
-            isDropdownShownState = isDropdownShownState,
-            selectedSaveOptionIndexState = selectedSaveOptionIndexState
-        )
+        OptionsMenu(isDropdownShownState = isDropdownShownState)
     }
 }
 
 @Composable
 private fun OptionLabel(
-    fileSaveOptions: Array<String>,
     isDropdownShownState: MutableState<Boolean>,
-    selectedSaveOptionIndex: Int,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    viewModel: PlayingViewModel = koinActivityViewModel()
 ) {
     val colors = LocalAppColors.current
+    val selectedSaveOptionIndex by viewModel.collectSelectedSaveOptionIndexAsState()
     var isDropdownShown by isDropdownShownState
 
     Text(
@@ -60,9 +55,7 @@ private fun OptionLabel(
 
 @Composable
 private fun OptionsMenu(
-    fileSaveOptions: Array<String>,
     isDropdownShownState: MutableState<Boolean>,
-    selectedSaveOptionIndexState: MutableState<Int>,
     modifier: Modifier = Modifier
 ) {
     var isDropdownShown by isDropdownShownState
@@ -73,7 +66,7 @@ private fun OptionsMenu(
         onDismissRequest = { isDropdownShown = false }
     ) {
         fileSaveOptions.forEachIndexed { index, item ->
-            OptionMenuItem(index, item, selectedSaveOptionIndexState)
+            OptionMenuItem(index, item)
         }
     }
 }
@@ -82,17 +75,13 @@ private fun OptionsMenu(
 private fun OptionMenuItem(
     index: Int,
     item: String,
-    selectedSaveOptionIndexState: MutableState<Int>,
-    modifier: Modifier = Modifier
-) {
-    var selectedSaveOptionIndex by selectedSaveOptionIndexState
-
-    DropdownMenuItem(
-        modifier = modifier,
-        text = { OptionMenuItemLabel(item) },
-        onClick = { selectedSaveOptionIndex = index },
-    )
-}
+    modifier: Modifier = Modifier,
+    viewModel: PlayingViewModel = koinActivityViewModel()
+) = DropdownMenuItem(
+    modifier = modifier,
+    text = { OptionMenuItemLabel(item) },
+    onClick = { viewModel.setSelectedSaveOptionIndex(index) },
+)
 
 @Composable
 private fun OptionMenuItemLabel(
@@ -108,3 +97,12 @@ private fun OptionMenuItemLabel(
         modifier = modifier
     )
 }
+
+private inline val fileSaveOptions
+    @Composable
+    get() = persistentListOf(
+        stringResource(R.string.mp3),
+        stringResource(R.string.wav),
+        stringResource(R.string.aac),
+        stringResource(R.string.mp4)
+    )

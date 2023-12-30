@@ -1,6 +1,7 @@
 package com.paranid5.crescendo.presentation.main.playing.properties.compose
 
 import androidx.compose.runtime.Composable
+import com.paranid5.crescendo.data.states.stream.currentMetadataDurationMillisFlow
 import com.paranid5.crescendo.domain.media.AudioStatus
 import com.paranid5.crescendo.domain.metadata.VideoMetadata
 import com.paranid5.crescendo.domain.tracks.DefaultTrack
@@ -28,3 +29,7 @@ fun PlayingViewModel.collectDurationMillisAsState(audioStatus: AudioStatus, init
 @Composable
 fun PlayingViewModel.collectIsRepeatingAsState(initial: Boolean = false) =
     isRepeatingFlow.collectLatestAsState(initial)
+
+@Composable
+fun PlayingViewModel.collectCurrentMetadataDurationMillisAsState(initial: Long = 0) =
+    currentMetadataDurationMillisFlow.collectLatestAsState(initial)

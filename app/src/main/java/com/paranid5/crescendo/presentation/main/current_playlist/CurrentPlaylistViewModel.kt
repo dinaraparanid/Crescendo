@@ -12,6 +12,8 @@ import com.paranid5.crescendo.data.states.tracks.CurrentTrackIndexStatePublisher
 import com.paranid5.crescendo.data.states.tracks.CurrentTrackIndexStatePublisherImpl
 import com.paranid5.crescendo.data.states.tracks.CurrentTrackIndexStateSubscriber
 import com.paranid5.crescendo.data.states.tracks.CurrentTrackIndexStateSubscriberImpl
+import com.paranid5.crescendo.presentation.main.current_playlist.states.TrackDismissStateHolder
+import com.paranid5.crescendo.presentation.main.current_playlist.states.TrackDismissStateHolderImpl
 
 class CurrentPlaylistViewModel(private val storageHandler: StorageHandler) :
     ViewModel(),
@@ -19,4 +21,5 @@ class CurrentPlaylistViewModel(private val storageHandler: StorageHandler) :
     CurrentPlaylistStateSubscriber by CurrentPlaylistStateSubscriberImpl(storageHandler),
     CurrentPlaylistStatePublisher by CurrentPlaylistStatePublisherImpl(storageHandler),
     CurrentTrackIndexStateSubscriber by CurrentTrackIndexStateSubscriberImpl(storageHandler),
-    CurrentTrackIndexStatePublisher by CurrentTrackIndexStatePublisherImpl(storageHandler)
+    CurrentTrackIndexStatePublisher by CurrentTrackIndexStatePublisherImpl(storageHandler),
+    TrackDismissStateHolder by TrackDismissStateHolderImpl()

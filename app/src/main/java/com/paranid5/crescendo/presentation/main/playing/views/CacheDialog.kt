@@ -1,97 +1,43 @@
 package com.paranid5.crescendo.presentation.main.playing.views
 
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
-import androidx.compose.runtime.State
-import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
-import androidx.compose.runtime.mutableLongStateOf
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.stringResource
-import com.paranid5.crescendo.R
-import com.paranid5.crescendo.domain.caching.Formats
-import com.paranid5.crescendo.domain.trimming.TrimRange
-import com.paranid5.crescendo.koinActivityViewModel
-import com.paranid5.crescendo.presentation.main.playing.PlayingViewModel
-import com.paranid5.crescendo.presentation.main.playing.properties.compose.collectCurrentMetadataAsState
+import androidx.compose.ui.unit.dp
 import com.paranid5.crescendo.presentation.main.playing.views.cache.CacheDialogContent
+import com.paranid5.crescendo.presentation.ui.theme.LocalAppColors
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CacheDialog(
     isDialogShownState: MutableState<Boolean>,
     modifier: Modifier = Modifier,
 ) {
-    val durationMillis by rememberDurationMillis()
-    val trimOffsetMillisState = remember { mutableLongStateOf(0) }
-    val totalDurationMillisState = remember(durationMillis) { mutableLongStateOf(durationMillis) }
-
-    val trimOffsetMillis by trimOffsetMillisState
-    val totalDurationMillis by totalDurationMillisState
-    val trimRange by rememberTrimRange(trimOffsetMillis, totalDurationMillis)
-
-    val filenameState = remember { mutableStateOf("") }
-    val filename by filenameState
-
-    val isButtonClickable by rememberIsCacheButtonClickable(filename)
-
-    val fileSaveOptions = arrayOf(
-        stringResource(R.string.mp3),
-        stringResource(R.string.wav),
-        stringResource(R.string.aac),
-        stringResource(R.string.mp4)
-    )
-
-    val selectedSaveOptionIndexState = remember { mutableIntStateOf(0) }
-    val selectedSaveOptionIndex by selectedSaveOptionIndexState
-    val format by rememberCacheFormat(selectedSaveOptionIndex)
-
-    val isDialogShown by isDialogShownState
+    val colors = LocalAppColors.current
+    var isDialogShown by isDialogShownState
 
     if (isDialogShown)
-        CacheDialogContent(
-            fileSaveOptions = fileSaveOptions,
-            format = format,
-            trimRange = trimRange,
-            isButtonClickable = isButtonClickable,
-            isDialogShownState = isDialogShownState,
-            filenameState = filenameState,
-            selectedSaveOptionIndexState = selectedSaveOptionIndexState,
-            modifier = modifier
-        )
-}
-
-@Composable
-private fun rememberDurationMillis(
-    viewModel: PlayingViewModel = koinActivityViewModel(),
-): State<Long> {
-    val currentMetadata by viewModel.collectCurrentMetadataAsState()
-
-    return remember(currentMetadata) {
-        derivedStateOf { currentMetadata?.durationMillis ?: 0 }
-    }
-}
-
-@Composable
-private fun rememberTrimRange(trimOffsetMillis: Long, totalDurationMillis: Long) =
-    remember(trimOffsetMillis, totalDurationMillis) {
-        derivedStateOf {
-            TrimRange(
-                startPointMillis = trimOffsetMillis,
-                totalDurationMillis = totalDurationMillis
-            )
+        AlertDialog(
+            modifier = modifier,
+            onDismissRequest = { isDialogShown = false }
+        ) {
+            Card(
+                modifier = modifier.fillMaxWidth(),
+                shape = RoundedCornerShape(20.dp),
+                colors = CardDefaults.cardColors(containerColor = colors.background)
+            ) {
+                CacheDialogContent(
+                    isDialogShownState = isDialogShownState,
+                    modifier = Modifier.fillMaxWidth()
+                )
+            }
         }
-    }
-
-@Composable
-private fun rememberIsCacheButtonClickable(filename: String) = remember(filename) {
-    derivedStateOf { filename.isNotBlank() }
 }
-
-@Composable
-private fun rememberCacheFormat(selectedSaveOptionIndex: Int) =
-    remember(selectedSaveOptionIndex) {
-        derivedStateOf { Formats.entries[selectedSaveOptionIndex] }
-    }

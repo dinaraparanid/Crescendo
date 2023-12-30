@@ -69,7 +69,6 @@ private fun ReverbController(
     audioEffectsUIHandler: AudioEffectsUIHandler = koinInject()
 ) {
     val context = LocalContext.current
-
     val reverbValue by rememberReverbValue()
     val audioStatus by viewModel.collectAudioStatusAsState()
 

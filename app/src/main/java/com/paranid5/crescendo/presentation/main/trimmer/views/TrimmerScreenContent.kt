@@ -32,10 +32,7 @@ import com.paranid5.crescendo.presentation.main.trimmer.views.waveform.TrimmedDu
 import kotlinx.coroutines.flow.MutableSharedFlow
 
 @Composable
-fun TrimmerScreenContent(
-    shownEffectsState: MutableIntState,
-    modifier: Modifier = Modifier
-) {
+fun TrimmerScreenContent(modifier: Modifier = Modifier) {
     val isFileSaveDialogShownState = remember {
         mutableStateOf(false)
     }
@@ -48,7 +45,6 @@ fun TrimmerScreenContent(
 
     Box(modifier.onGloballyPositioned { screenWidthPx = it.size.width }) {
         TrimmerScreenContentOriented(
-            shownEffectsState = shownEffectsState,
             screenWidthPxState = screenWidthPxState,
             isFileSaveDialogShownState = isFileSaveDialogShownState
         )
@@ -63,7 +59,6 @@ fun TrimmerScreenContent(
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
 private fun TrimmerScreenContentOriented(
-    shownEffectsState: MutableIntState,
     screenWidthPxState: MutableIntState,
     isFileSaveDialogShownState: MutableState<Boolean>
 ) {
@@ -88,14 +83,12 @@ private fun TrimmerScreenContentOriented(
         when (config.orientation) {
             Configuration.ORIENTATION_LANDSCAPE ->
                 TrimmerScreenContentLandscape(
-                    shownEffectsState = shownEffectsState,
                     screenWidthPxState = screenWidthPxState,
                     isFileSaveDialogShownState = isFileSaveDialogShownState,
                     modifier = Modifier.fillMaxSize()
                 )
 
             else -> TrimmerScreenContentPortrait(
-                shownEffectsState = shownEffectsState,
                 screenWidthPxState = screenWidthPxState,
                 isFileSaveDialogShownState = isFileSaveDialogShownState,
                 modifier = Modifier.fillMaxSize()
@@ -106,7 +99,6 @@ private fun TrimmerScreenContentOriented(
 
 @Composable
 private fun TrimmerScreenContentPortrait(
-    shownEffectsState: MutableIntState,
     screenWidthPxState: MutableIntState,
     isFileSaveDialogShownState: MutableState<Boolean>,
     modifier: Modifier = Modifier
@@ -141,8 +133,7 @@ private fun TrimmerScreenContentPortrait(
     )
 
     EffectsButtons(
-        shownEffectsState = shownEffectsState,
-        modifier = Modifier.constrainAs(effects) {
+        Modifier.constrainAs(effects) {
             bottom.linkTo(playbackButtons.top, margin = 16.dp)
             start.linkTo(parent.start, margin = 8.dp)
         }
@@ -190,7 +181,6 @@ private fun TrimmerScreenContentPortrait(
 
 @Composable
 private fun TrimmerScreenContentLandscape(
-    shownEffectsState: MutableIntState,
     screenWidthPxState: MutableIntState,
     isFileSaveDialogShownState: MutableState<Boolean>,
     modifier: Modifier = Modifier
@@ -224,7 +214,6 @@ private fun TrimmerScreenContentLandscape(
     )
 
     EffectsButtons(
-        shownEffectsState = shownEffectsState,
         modifier = Modifier.constrainAs(effects) {
             bottom.linkTo(controllers.top, margin = 4.dp)
             start.linkTo(parent.start, margin = 8.dp)

@@ -1,7 +1,6 @@
 package com.paranid5.crescendo.presentation.main.current_playlist.views
 
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import com.paranid5.crescendo.domain.tracks.DefaultTrack
@@ -16,9 +15,6 @@ import org.koin.compose.koinInject
 
 @Composable
 fun CurrentPlaylistTrackList(
-    playlistDismissMediatorState: MutableState<ImmutableList<DefaultTrack>>,
-    trackIndexDismissMediatorState: MutableState<Int>,
-    trackPathDismissKeyState: MutableState<String>,
     modifier: Modifier = Modifier,
     viewModel: CurrentPlaylistViewModel = koinActivityViewModel(),
     trackServiceAccessor: TrackServiceAccessor = koinInject()
@@ -32,13 +28,11 @@ fun CurrentPlaylistTrackList(
         modifier = modifier,
         onTrackDismissed = { index, track ->
             tryDismissTrack(
+                viewModel = viewModel,
                 index = index,
                 track = track,
                 currentPlaylist = currentPlaylist,
                 currentTrackIndex = currentTrackIndex,
-                playlistDismissMediatorState,
-                trackIndexDismissMediatorState,
-                trackPathDismissKeyState
             )
         },
         onTrackDragged = { newTracks, newCurTrackIndex ->
@@ -53,23 +47,22 @@ fun CurrentPlaylistTrackList(
 }
 
 private fun tryDismissTrack(
+    viewModel: CurrentPlaylistViewModel,
     index: Int,
     track: DefaultTrack,
     currentPlaylist: ImmutableList<DefaultTrack>,
     currentTrackIndex: Int,
-    playlistDismissMediatorState: MutableState<ImmutableList<DefaultTrack>>,
-    trackIndexDismissMediatorState: MutableState<Int>,
-    trackPathDismissKeyState: MutableState<String>,
 ): Boolean {
     if (index == currentTrackIndex)
         return false
 
-    playlistDismissMediatorState.value =
+    viewModel.setPlaylistDismissMediator(
         (currentPlaylist.take(index) + currentPlaylist.drop(index + 1))
             .toImmutableList()
+    )
 
-    trackIndexDismissMediatorState.value = index
-    trackPathDismissKeyState.value = track.path
+    viewModel.setTrackIndexDismissMediator(index)
+    viewModel.setTrackPathDismissKey(track.path)
     return true
 }
 

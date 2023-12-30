@@ -8,6 +8,8 @@ import com.paranid5.crescendo.data.states.waveform.AmplitudesStateSubscriber
 import com.paranid5.crescendo.data.states.waveform.AmplitudesStateSubscriberImpl
 import com.paranid5.crescendo.domain.utils.AsyncCondVar
 import com.paranid5.crescendo.presentation.main.trimmer.properties.setAmplitudesAsync
+import com.paranid5.crescendo.presentation.main.trimmer.states.EffectsStateHolder
+import com.paranid5.crescendo.presentation.main.trimmer.states.EffectsStateHolderImpl
 import com.paranid5.crescendo.presentation.main.trimmer.states.PlaybackPositionsStateHolder
 import com.paranid5.crescendo.presentation.main.trimmer.states.PlaybackPositionsStateHolderImpl
 import com.paranid5.crescendo.presentation.main.trimmer.states.PlaybackStateHolder
@@ -25,7 +27,8 @@ class TrimmerViewModel(private val storageHandler: StorageHandler) :
     PlaybackPositionsStateHolder by PlaybackPositionsStateHolderImpl(),
     PlaybackStateHolder by PlaybackStateHolderImpl(),
     TrackStateHolder by TrackStateHolderImpl(),
-    WaveformStateHolder by WaveformStateHolderImpl() {
+    WaveformStateHolder by WaveformStateHolderImpl(),
+    EffectsStateHolder by EffectsStateHolderImpl() {
     val resetPlaybackPosCondVar by lazy { AsyncCondVar() }
 
     override fun onCleared() {
