@@ -7,14 +7,15 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableIntState
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
 import arrow.core.curried
 import com.paranid5.crescendo.domain.utils.extensions.moved
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlin.math.absoluteValue
 
 @Composable
@@ -27,29 +28,31 @@ fun <T> DraggingEffect(
     draggedItemIndexState: MutableState<Int?>,
 ) {
     var draggedItemIndex by draggedItemIndexState
+    val updPosition by rememberUpdatedState(position)
+    val updDragging by rememberUpdatedState(isDragging)
 
     val listFlow = snapshotFlow { scrollingState.layoutInfo }
-
-    val positionFlow = remember {
-        snapshotFlow { position }.distinctUntilChanged()
-    }
+    val positionFlow = snapshotFlow { updPosition }
+    var nearOffset by remember { mutableStateOf<Int?>(null) }
 
     LaunchedEffect(Unit) {
-        listFlow
-            .combine(positionFlow) { listState, draggedCenter ->
-                draggedCenter
-                    ?.let(::nearestVisibleItem.curried()(listState))
-                    ?.index
-            }
-            .collect { near ->
-                if (isDragging)
-                    draggedItemIndex = nextDragItemIndex(
-                        near = near,
-                        draggedItemIndex = draggedItemIndex,
-                        itemsState = itemsState,
-                        currentDragIndexState = currentDragIndexState
-                    )
-            }
+        combine(listFlow, positionFlow) { listState, draggedCenter ->
+            draggedCenter
+                ?.let(::nearestVisibleItem.curried()(listState))
+                ?.index
+        }.collect { near ->
+            nearOffset = near
+        }
+    }
+
+    LaunchedEffect(nearOffset) {
+        if (updDragging)
+            draggedItemIndex = nextDragItemIndex(
+                near = nearOffset,
+                draggedItemIndex = draggedItemIndex,
+                itemsState = itemsState,
+                currentDragIndexState = currentDragIndexState
+            )
     }
 }
 

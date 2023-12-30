@@ -10,7 +10,7 @@ import androidx.compose.ui.unit.dp
 import androidx.palette.graphics.Palette
 import com.paranid5.crescendo.data.StorageHandler
 import com.paranid5.crescendo.domain.media.AudioStatus
-import com.paranid5.crescendo.presentation.main.tracks.TrackPropertiesButton
+import com.paranid5.crescendo.presentation.main.tracks.views.TrackPropertiesButton
 import com.paranid5.crescendo.presentation.ui.extensions.getLightMutedOrPrimary
 import org.koin.compose.koinInject
 

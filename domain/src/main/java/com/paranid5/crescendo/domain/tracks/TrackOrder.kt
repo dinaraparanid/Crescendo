@@ -1,6 +1,8 @@
 package com.paranid5.crescendo.domain.tracks
 
 import androidx.compose.runtime.Immutable
+import kotlinx.collections.immutable.ImmutableList
+import kotlinx.collections.immutable.toImmutableList
 
 @Immutable
 data class TrackOrder(val contentOrder: TrackContentOrder, val orderType: TrackOrderType) {
@@ -18,7 +20,7 @@ data class TrackOrder(val contentOrder: TrackContentOrder, val orderType: TrackO
     }
 }
 
-fun <T : Track> Iterable<T>.sortedBy(trackOrder: TrackOrder) = when (trackOrder.orderType) {
+infix fun <T : Track> Iterable<T>.sortedBy(trackOrder: TrackOrder) = when (trackOrder.orderType) {
     TrackOrder.TrackOrderType.ASC -> when (trackOrder.contentOrder) {
         TrackOrder.TrackContentOrder.TITLE -> sortedBy(Track::title)
         TrackOrder.TrackContentOrder.ARTIST -> sortedBy(Track::artist)
@@ -35,3 +37,8 @@ fun <T : Track> Iterable<T>.sortedBy(trackOrder: TrackOrder) = when (trackOrder.
         TrackOrder.TrackContentOrder.NUMBER_IN_ALBUM -> sortedByDescending(Track::numberInAlbum)
     }
 }
+
+infix fun <T : Track> ImmutableList<T>.sortedBy(trackOrder: TrackOrder) =
+    (this as Iterable<T>)
+        .sortedBy(trackOrder)
+        .toImmutableList()

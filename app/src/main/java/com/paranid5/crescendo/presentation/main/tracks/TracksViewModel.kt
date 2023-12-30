@@ -1,34 +1,21 @@
 package com.paranid5.crescendo.presentation.main.tracks
 
-import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
-import com.paranid5.crescendo.domain.tracks.Track
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.updateAndGet
+import com.paranid5.crescendo.data.StorageHandler
+import com.paranid5.crescendo.presentation.main.tracks.states.QueryStateHolder
+import com.paranid5.crescendo.presentation.main.tracks.states.SearchBarStateHolder
+import com.paranid5.crescendo.presentation.main.tracks.states.TracksStateHolder
 
-class TracksViewModel(private val savedStateHandle: SavedStateHandle) : ViewModel() {
-    private companion object {
-        private const val QUERY = "query"
+class TracksViewModel(private val storageHandler: StorageHandler) : ViewModel() {
+    val tracksStateHolder by lazy {
+        TracksStateHolder(storageHandler)
     }
 
-    private val _tracksState by lazy {
-        MutableStateFlow(listOf<Track>())
+    val queryStateHolder by lazy {
+        QueryStateHolder()
     }
 
-    val tracksState = _tracksState.asStateFlow()
-
-    fun setTracks(tracks: List<Track>) {
-        _tracksState.updateAndGet { tracks }
-    }
-
-    private val _queryState by lazy {
-        MutableStateFlow(savedStateHandle.get<String>(QUERY))
-    }
-
-    val queryState = _queryState.asStateFlow()
-
-    fun setQueryState(query: String?) {
-        savedStateHandle[QUERY] = _queryState.updateAndGet { query }
+    val searchBarStateHolder by lazy {
+        SearchBarStateHolder()
     }
 }

@@ -16,11 +16,6 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.MutableState
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -29,64 +24,68 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.paranid5.crescendo.R
 import com.paranid5.crescendo.presentation.ui.theme.LocalAppColors
-import kotlinx.coroutines.flow.StateFlow
+import kotlinx.collections.immutable.ImmutableList
+import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.launch
+
+typealias FilteredContent<T> = @Composable ColumnScope.(
+    filtered: ImmutableList<T>,
+    scrollingState: LazyListState
+) -> Unit
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun <T> Searcher(
-    allItemsState: StateFlow<List<T>>,
-    queryState: StateFlow<String?>,
-    setQuery: (String?) -> Unit,
+internal inline fun <T> Searcher(
+    items: ImmutableList<T>,
+    shownItems: ImmutableList<T>,
+    crossinline setFilteredItems: (ImmutableList<T>) -> Unit,
+    query: String?,
+    crossinline setQuery: (String?) -> Unit,
+    isSearchBarActive: Boolean,
+    crossinline setSearchBarActive: (Boolean) -> Unit,
     modifier: Modifier = Modifier,
-    isSearchBarActiveState: MutableState<Boolean> = remember { mutableStateOf(false) },
-    filter: (query: String, item: T) -> Boolean,
-    filteredContent: @Composable (ColumnScope.(List<T>, LazyListState) -> Unit)
+    crossinline filter: (query: String, item: T) -> Boolean,
+    crossinline filteredContent: FilteredContent<T>
 ) {
-    val colors = LocalAppColors.current.colorScheme
-
-    val queryText by queryState.collectAsState()
-    val allItems by allItemsState.collectAsState()
-    val shownItems = remember { mutableStateOf(listOf<T>()) }
-
+    val colors = LocalAppColors.current
     val scrollListScope = rememberCoroutineScope()
     val trackListState = rememberLazyListState()
 
-    LaunchedEffect(key1 = allItems, key2 = queryText) {
-        onFilterUpdate(allItems, shownItems, queryText, filter)
+    LaunchedEffect(items, query) {
+        setFilteredItems(filteredItems(items, query, filter))
     }
 
     SearchBar(
         modifier = modifier,
-        query = queryText ?: "",
+        query = query ?: "",
         leadingIcon = { SearchIcon(Modifier.size(30.dp)) },
         trailingIcon = {
-            if (isSearchBarActiveState.value)
+            if (isSearchBarActive)
                 CancelSearchIcon(
-                    queryState = queryState,
+                    query = query,
                     setQuery = setQuery,
-                    isSearchBarActiveState = isSearchBarActiveState,
+                    setSearchBarActive = setSearchBarActive,
                     modifier = Modifier.size(20.dp)
                 )
         },
         placeholder = {
             Text(
                 text = stringResource(R.string.track_input_filter_hint),
-                color = colors.inverseSurface
+                color = colors.fontColor
             )
         },
         colors = searcherColors,
         windowInsets = WindowInsets(0.dp),
-        onQueryChange = { query ->
-            setQuery(query)
+        onQueryChange = { q ->
+            setQuery(q)
             scrollListScope.launch { trackListState.scrollToItem(0) }
         },
-        active = isSearchBarActiveState.value,
-        onSearch = { isSearchBarActiveState.value = false },
-        onActiveChange = { isSearchBarActiveState.value = it },
+        active = isSearchBarActive,
+        onSearch = { setSearchBarActive(false) },
+        onActiveChange = { setSearchBarActive(it) },
     ) {
         Spacer(Modifier.height(10.dp))
-        filteredContent(shownItems.value, trackListState)
+        filteredContent(shownItems, trackListState)
     }
 }
 
@@ -104,20 +103,20 @@ private fun SearchIcon(modifier: Modifier = Modifier) {
 
 @Composable
 private inline fun CancelSearchIcon(
-    queryState: StateFlow<String?>,
-    isSearchBarActiveState: MutableState<Boolean>,
+    query: String?,
+    crossinline setSearchBarActive: (Boolean) -> Unit,
     modifier: Modifier = Modifier,
     crossinline setQuery: (String?) -> Unit
 ) {
-    val primaryColor = LocalAppColors.current.colorScheme.primary
+    val colors = LocalAppColors.current
 
     Icon(
         painter = painterResource(R.drawable.cross),
         contentDescription = null,
-        tint = primaryColor,
+        tint = colors.primary,
         modifier = modifier.clickable {
             when {
-                queryState.value.isNullOrEmpty() -> isSearchBarActiveState.value = false
+                query.isNullOrEmpty() -> setSearchBarActive(false)
                 else -> setQuery(null)
             }
         }
@@ -135,18 +134,18 @@ private inline val searcherColors
         )
     )
 
-private inline fun <T> onFilterUpdate(
-    allItems: List<T>,
-    shownItems: MutableState<List<T>>,
+private inline fun <T> filteredItems(
+    allItems: ImmutableList<T>,
     queryText: String?,
     filter: (query: String, item: T) -> Boolean
-) {
-    shownItems.value = when {
-        queryText.isNullOrEmpty() -> allItems
+) = when {
+    queryText.isNullOrEmpty() -> allItems
 
-        else -> {
-            val query = queryText.lowercase()
-            allItems.filter { track -> filter(query, track) }
-        }
+    else -> {
+        val query = queryText.lowercase()
+
+        allItems
+            .filter { track -> filter(query, track) }
+            .toImmutableList()
     }
 }

@@ -8,68 +8,37 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
-import com.paranid5.crescendo.data.StorageHandler
-import com.paranid5.crescendo.domain.tracks.Track
-import com.paranid5.crescendo.domain.tracks.sortedBy
-import org.koin.compose.koinInject
+import com.paranid5.crescendo.presentation.main.tracks.effects.LoadTracksFromMediaStoreEffect
+import com.paranid5.crescendo.presentation.main.tracks.properties.compose.collectSearchBarHeightDpAsState
+import com.paranid5.crescendo.presentation.main.tracks.properties.setFilteredTracks
+import com.paranid5.crescendo.presentation.main.tracks.views.DefaultTrackList
+import com.paranid5.crescendo.presentation.main.tracks.views.TrackSearcher
+import com.paranid5.crescendo.presentation.main.tracks.views.TracksBar
 
 @Composable
 fun TracksScreen(
-    tracksViewModel: TracksViewModel,
+    viewModel: TracksViewModel,
     modifier: Modifier = Modifier,
-    storageHandler: StorageHandler = koinInject()
 ) {
-    val allTracks by tracksViewModel.tracksState.collectAsState()
-    val filterTracksState = remember { mutableStateOf(listOf<Track>()) }
-    var showsTracks by remember { mutableStateOf(listOf<Track>()) }
-
+    val searchBarHeight by viewModel.collectSearchBarHeightDpAsState()
     var tracksScrollingState = rememberLazyListState()
-    val isSearchBarActiveState = remember { mutableStateOf(false) }
-    val trackOrder by storageHandler.trackOrderState.collectAsState()
 
-    val context = LocalContext.current
-
-    LaunchedEffect(Unit) {
-        tracksViewModel.setTracks(context.allTracksFromMediaStore)
-    }
-
-    LaunchedEffect(key1 = allTracks, key2 = filterTracksState.value, key3 = trackOrder) {
-        showsTracks = when (isSearchBarActiveState.value) {
-            false -> allTracks.sortedBy(trackOrder)
-            true -> filterTracksState.value.sortedBy(trackOrder)
-        }
-    }
+    LoadTracksFromMediaStoreEffect()
 
     Column(modifier) {
         TrackSearcher(
-            tracksState = tracksViewModel.tracksState,
-            queryState = tracksViewModel.queryState,
-            setQuery = tracksViewModel::setQueryState,
-            isSearchBarActiveState = isSearchBarActiveState,
-            modifier = Modifier
+            Modifier
                 .fillMaxWidth()
-                .height(
-                    when (isSearchBarActiveState.value) {
-                        true -> 80.dp
-                        false -> 60.dp
-                    }
-                )
-        ) { filteredTracks, scrollingState ->
-            filterTracksState.value = filteredTracks
+                .height(searchBarHeight)
+        ) { filtered, scrollingState ->
+            viewModel.setFilteredTracks(filtered)
             tracksScrollingState = scrollingState
         }
 
-        TracksNumberOrderBar(
-            tracksNumber = showsTracks.size,
+        TracksBar(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(horizontal = 5.dp)
@@ -77,8 +46,7 @@ fun TracksScreen(
 
         Spacer(Modifier.height(10.dp))
 
-        TrackList(
-            tracks = showsTracks,
+        DefaultTrackList(
             scrollingState = tracksScrollingState,
             modifier = Modifier
                 .fillMaxSize(1F)

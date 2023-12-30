@@ -33,7 +33,7 @@ import com.paranid5.crescendo.domain.utils.extensions.toAndroidMetadata
 import com.paranid5.crescendo.media.images.getThumbnailBitmap
 import com.paranid5.crescendo.media.images.getVideoCoverBitmapAsync
 import com.paranid5.crescendo.presentation.main.MainActivity
-import com.paranid5.crescendo.receivers.StreamingErrorReceiver
+import com.paranid5.crescendo.receivers.PlaybackErrorReceiver
 import com.paranid5.crescendo.services.SuspendService
 import com.paranid5.crescendo.services.service_controllers.MediaRetrieverController
 import com.paranid5.crescendo.services.service_controllers.MediaSessionController
@@ -883,10 +883,10 @@ class StreamService : SuspendService(), KoinComponent {
         isStoppedWithError = true
 
         sendBroadcast(
-            Intent(applicationContext, StreamingErrorReceiver::class.java)
-                .setAction(StreamingErrorReceiver.Broadcast_STREAMING_ERROR)
+            Intent(applicationContext, PlaybackErrorReceiver::class.java)
+                .setAction(PlaybackErrorReceiver.Broadcast_PLAYBACK_ERROR)
                 .putExtra(
-                    StreamingErrorReceiver.STREAMING_ERROR_ARG,
+                    PlaybackErrorReceiver.ERROR_MESSAGE_ARG,
                     errorMessage
                 )
         )

@@ -11,6 +11,7 @@ import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
@@ -128,21 +129,15 @@ private inline fun <T> Modifier.handleTracksMovement(
     draggedItemIndexState: MutableState<Int?>,
     crossinline onDragged: suspend (ImmutableList<T>, Int) -> Unit,
 ): Modifier {
-    val coroutineScope = rememberCoroutineScope()
+    val draggedItems by rememberUpdatedState(items)
+    val dragIndex by rememberUpdatedState(currentDragIndex)
+
     var position by positionState
     var isDragging by isDraggingState
     var draggedItemIndex by draggedItemIndexState
+    val coroutineScope = rememberCoroutineScope()
 
-    val stopDragAndUpdateTrackList = {
-        isDragging = false
-
-        coroutineScope.launch {
-            onDragged(items, currentDragIndex)
-            draggedItemIndex = null
-        }
-    }
-
-    return this.pointerInput(Unit) {
+    return this then Modifier.pointerInput(Unit) {
         detectDragGesturesAfterLongPress(
             onDrag = { change, offset ->
                 change.consume()
@@ -156,8 +151,14 @@ private inline fun <T> Modifier.handleTracksMovement(
 
                 position = firstVisibleItem.offset + firstVisibleItem.size / 2F
             },
-            onDragEnd = { stopDragAndUpdateTrackList() },
-            onDragCancel = { stopDragAndUpdateTrackList() }
+            onDragEnd = {
+                isDragging = false
+
+                coroutineScope.launch {
+                    onDragged(draggedItems, dragIndex)
+                    draggedItemIndex = null
+                }
+            },
         )
     }
 }

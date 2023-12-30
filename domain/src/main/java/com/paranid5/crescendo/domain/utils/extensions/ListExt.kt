@@ -30,7 +30,7 @@ private fun <T> List<T>.movedForward(fromIdx: Int, toIdx: Int) =
 
 private fun <T> List<T>.movedBackward(fromIdx: Int, toIdx: Int) =
     persistentListOf<T>().mutate {
-        it.addAll(take(fromIdx))
+        it.addAll(take(toIdx))
         it.add(get(fromIdx))
         it.addAll(subList(toIdx, fromIdx))
         it.addAll(drop(fromIdx + 1))

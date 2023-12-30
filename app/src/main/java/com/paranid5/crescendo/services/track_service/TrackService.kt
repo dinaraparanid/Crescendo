@@ -34,6 +34,7 @@ import com.paranid5.crescendo.domain.utils.extensions.toAndroidMetadata
 import com.paranid5.crescendo.domain.utils.extensions.toMediaItemList
 import com.paranid5.crescendo.media.images.getTrackCoverBitmapAsync
 import com.paranid5.crescendo.presentation.main.MainActivity
+import com.paranid5.crescendo.receivers.PlaybackErrorReceiver
 import com.paranid5.crescendo.services.SuspendService
 import com.paranid5.crescendo.services.service_controllers.MediaRetrieverController
 import com.paranid5.crescendo.services.service_controllers.MediaSessionController
@@ -680,7 +681,12 @@ class TrackService : SuspendService(), KoinComponent {
         scope.launch {
             when (playlist) {
                 // Resume received
-                null -> onResumeClicked()
+                null -> when {
+                    currentPlaylist.isEmpty() ->
+                        return@launch sendErrorBroadcast(Exception("Playlist is empty"))
+
+                    else -> onResumeClicked()
+                }
 
                 // New playlist received
                 else -> onTrackClicked(playlist, trackInd!!)
@@ -693,6 +699,9 @@ class TrackService : SuspendService(), KoinComponent {
     }
 
     private suspend fun onResumeClicked() {
+        if (currentPlaylist.isEmpty())
+            return sendErrorBroadcast(Exception("Playlist is empty"))
+
         resetPlaylistForPlayer(currentPlaylist)
 
         playPlaylist(
@@ -967,4 +976,42 @@ class TrackService : SuspendService(), KoinComponent {
 
     private suspend inline fun storeCurrentTrackIndex(index: Int) =
         mediaRetrieverController.storeCurrentTrackIndex(index)
+
+    // --------------------------- Error Handle ---------------------------
+
+    @Suppress("DEPRECATION")
+    private fun ErrorNotification(message: String) = when {
+        Build.VERSION.SDK_INT >= Build.VERSION_CODES.O ->
+            Notification.Builder(applicationContext, AUDIO_CHANNEL_ID)
+
+        else -> Notification.Builder(applicationContext)
+    }
+        .setSmallIcon(R.drawable.save_icon)
+        .setContentIntent(
+            PendingIntent.getActivity(
+                applicationContext,
+                0,
+                Intent(applicationContext, MainActivity::class.java),
+                PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+            )
+        )
+        .setContentTitle(message)
+        .setAutoCancel(true)
+        .setShowWhen(false)
+        .build()
+
+    private fun sendErrorBroadcast(error: Throwable) {
+        val errorMessage = error.message ?: getString(R.string.unknown_error)
+        startForeground(NOTIFICATION_ID, ErrorNotification(errorMessage))
+        isStoppedWithError = true
+
+        sendBroadcast(
+            Intent(applicationContext, PlaybackErrorReceiver::class.java)
+                .setAction(PlaybackErrorReceiver.Broadcast_PLAYBACK_ERROR)
+                .putExtra(
+                    PlaybackErrorReceiver.ERROR_MESSAGE_ARG,
+                    errorMessage
+                )
+        )
+    }
 }

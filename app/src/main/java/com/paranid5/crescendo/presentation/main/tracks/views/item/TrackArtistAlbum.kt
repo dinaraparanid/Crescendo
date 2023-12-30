@@ -1,0 +1,18 @@
+package com.paranid5.crescendo.presentation.main.tracks.views.item
+
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.unit.sp
+
+@Composable
+fun TrackArtistAlbum(
+    trackArtistAlbum: String,
+    textColor: Color,
+    modifier: Modifier = Modifier
+) = TrackTextLabel(
+    modifier = modifier,
+    text = trackArtistAlbum,
+    textColor = textColor,
+    fontSize = 15.sp,
+)

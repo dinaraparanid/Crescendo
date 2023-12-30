@@ -88,7 +88,7 @@ fun ContentScreen(
             viewModel.setCurScreen(Screens.Tracks)
 
             TracksScreen(
-                tracksViewModel = tracksViewModel,
+                viewModel = tracksViewModel,
                 modifier = Modifier
                     .fillMaxSize()
                     .padding(10.dp)

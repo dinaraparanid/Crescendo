@@ -2,9 +2,12 @@ package com.paranid5.crescendo
 
 import android.os.Build
 import androidx.annotation.StringRes
+import androidx.compose.runtime.Composable
+import androidx.lifecycle.ViewModel
 import com.paranid5.crescendo.data.StorageHandler
 import com.paranid5.crescendo.domain.eq.EqualizerData
 import com.paranid5.crescendo.domain.ktor_client.KtorClient
+import com.paranid5.crescendo.presentation.composition_locals.LocalActivity
 import com.paranid5.crescendo.presentation.main.MainActivityViewModel
 import com.paranid5.crescendo.presentation.main.audio_effects.AudioEffectsUIHandler
 import com.paranid5.crescendo.presentation.main.audio_effects.AudioEffectsViewModel
@@ -13,7 +16,6 @@ import com.paranid5.crescendo.presentation.main.fetch_stream.FetchStreamUIHandle
 import com.paranid5.crescendo.presentation.main.fetch_stream.FetchStreamViewModel
 import com.paranid5.crescendo.presentation.main.playing.PlayingUIHandler
 import com.paranid5.crescendo.presentation.main.playing.PlayingViewModel
-import com.paranid5.crescendo.presentation.main.tracks.TracksUIHandler
 import com.paranid5.crescendo.presentation.main.tracks.TracksViewModel
 import com.paranid5.crescendo.presentation.main.trimmer.TrimmerUIHandler
 import com.paranid5.crescendo.presentation.main.trimmer.TrimmerViewModel
@@ -29,6 +31,7 @@ import com.paranid5.crescendo.services.video_cache_service.VideoCacheServiceAcce
 import kotlinx.coroutines.flow.MutableStateFlow
 import org.koin.android.ext.koin.androidApplication
 import org.koin.android.ext.koin.androidContext
+import org.koin.androidx.compose.koinViewModel
 import org.koin.androidx.viewmodel.dsl.viewModelOf
 import org.koin.core.module.dsl.singleOf
 import org.koin.core.qualifier.named
@@ -142,7 +145,6 @@ private val trimmerModule = module {
 }
 
 private val tracksModule = module {
-    singleOf(::TracksUIHandler)
     viewModelOf(::TracksViewModel)
 }
 
@@ -162,3 +164,7 @@ val appModule = module {
     includes(globalsModule, uiModule)
     viewModelOf(::MainActivityViewModel)
 }
+
+@Composable
+inline fun <reified V : ViewModel> koinActivityViewModel() =
+    koinViewModel<V>(viewModelStoreOwner = LocalActivity.current!!)

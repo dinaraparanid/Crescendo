@@ -4,8 +4,44 @@ import android.content.Context
 import android.database.Cursor
 import android.os.Build
 import android.provider.MediaStore
+import arrow.core.curried
 import com.paranid5.crescendo.R
 import com.paranid5.crescendo.domain.tracks.DefaultTrack
+import kotlinx.collections.immutable.persistentListOf
+import kotlinx.collections.immutable.toImmutableList
+
+fun allTracksFromMediaStore(context: Context) =
+    allTracksMediaStoreQuery(context)
+        ?.use(::trackList.curried()(context))
+        ?: persistentListOf()
+
+private fun trackList(context: Context, cursor: Cursor) =
+    generateSequence { getNextTrackOrNull(context, cursor) }.toImmutableList()
+
+private fun getNextTrackOrNull(context: Context, cursor: Cursor) = when {
+    cursor.moveToNext() -> DefaultTrack(
+        androidId = cursor.getLong(0),
+        title = cursor.getString(1).nullIfUnknown ?: context.unknownTrackStr,
+        artist = cursor.getString(2).nullIfUnknown ?: context.unknownArtistStr,
+        album = cursor.getString(3).nullIfUnknown ?: context.unknownAlbumStr,
+        path = cursor.getString(4),
+        durationMillis = cursor.getLong(5),
+        displayName = cursor.getString(6),
+        dateAdded = cursor.getLong(7),
+        numberInAlbum = cursor.getInt(8)
+    )
+
+    else -> null
+}
+
+private fun allTracksMediaStoreQuery(context: Context) =
+    context.contentResolver.query(
+        MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,
+        projection,
+        selection,
+        null,
+        order
+    )
 
 private inline val selection
     get() = when {
@@ -39,41 +75,13 @@ private inline val order
     get() = "${MediaStore.Audio.Media.DATE_ADDED} DESC"
 
 private inline val String.nullIfUnknown
-    get() = if (this == "<unknown>") null else this
+    get() = takeIf { it != "<unknown>" }
 
-private inline val Context.unknownTrack
+private inline val Context.unknownTrackStr
     get() = resources.getString(R.string.unknown_track)
 
-private inline val Context.unknownArtist
+private inline val Context.unknownArtistStr
     get() = resources.getString(R.string.unknown_artist)
 
-private inline val Context.unknownAlbum
+private inline val Context.unknownAlbumStr
     get() = resources.getString(R.string.unknown_album)
-
-internal inline val Context.allTracksFromMediaStore
-    get() = contentResolver.query(
-        MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,
-        projection,
-        selection,
-        null,
-        order
-    )?.use { cursor ->
-        generateSequence { getNextTrackOrNull(cursor) }.toList()
-    } ?: listOf()
-
-private fun Context.getNextTrackOrNull(cursor: Cursor) = when {
-    cursor.moveToNext() -> DefaultTrack(
-        androidId = cursor.getLong(0),
-        title = cursor.getString(1).nullIfUnknown ?: unknownTrack,
-        artist = cursor.getString(2).nullIfUnknown ?: unknownArtist,
-        album = cursor.getString(3).nullIfUnknown ?: unknownAlbum,
-        path = cursor.getString(4),
-        durationMillis = cursor.getLong(5),
-        displayName = cursor.getString(6),
-        dateAdded = cursor.getLong(7),
-        numberInAlbum = cursor.getInt(8)
-    )
-
-    else -> null
-}
-

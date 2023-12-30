@@ -1,69 +1,41 @@
-package com.paranid5.crescendo.presentation.main.tracks
+package com.paranid5.crescendo.presentation.main.tracks.views
 
 import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
-import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.unit.dp
 import com.paranid5.crescendo.data.StorageHandler
+import com.paranid5.crescendo.data.properties.storeAudioStatus
+import com.paranid5.crescendo.domain.media.AudioStatus
 import com.paranid5.crescendo.domain.tracks.Track
+import com.paranid5.crescendo.domain.utils.extensions.toDefaultTrackList
+import com.paranid5.crescendo.koinActivityViewModel
 import com.paranid5.crescendo.presentation.composition_locals.playing.LocalPlayingPagerState
+import com.paranid5.crescendo.presentation.main.tracks.TracksViewModel
+import com.paranid5.crescendo.presentation.main.tracks.properties.compose.collectShownTracksAsState
 import com.paranid5.crescendo.services.track_service.TrackServiceAccessor
+import kotlinx.collections.immutable.ImmutableList
 import kotlinx.coroutines.launch
 import org.koin.compose.koinInject
 
-typealias TrackItemView = @Composable (
-    tracks: List<Track>,
-    trackInd: Int,
-    modifier: Modifier
-) -> Unit
-
-@Composable
-fun TrackList(
-    tracks: List<Track>,
-    scrollingState: LazyListState,
-    modifier: Modifier = Modifier,
-    trackItemModifier: Modifier = Modifier,
-    trackItemView: TrackItemView,
-) {
-    LazyColumn(
-        verticalArrangement = Arrangement.spacedBy(10.dp),
-        state = scrollingState,
-        modifier = modifier
-    ) {
-        itemsIndexed(
-            items = tracks,
-            key = { ind, track -> track.path.hashCode() + ind }
-        ) { ind, _ ->
-            trackItemView(
-                tracks,
-                ind,
-                trackItemModifier.fillMaxWidth()
-            )
-        }
-    }
-}
-
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-fun TrackList(
-    tracks: List<Track>,
+fun DefaultTrackList(
     scrollingState: LazyListState,
     modifier: Modifier = Modifier,
     trackItemModifier: Modifier = Modifier,
+    viewModel: TracksViewModel = koinActivityViewModel(),
     storageHandler: StorageHandler = koinInject(),
     trackServiceAccessor: TrackServiceAccessor = koinInject()
 ) {
     val playingPagerState = LocalPlayingPagerState.current
+    val shownTracks by viewModel.collectShownTracksAsState()
     val coroutineScope = rememberCoroutineScope()
 
     TrackList(
-        tracks = tracks,
+        tracks = shownTracks,
         scrollingState = scrollingState,
         modifier = modifier,
         trackItemView = { trackList, trackInd, trackModifier ->
@@ -74,9 +46,29 @@ fun TrackList(
             ) {
                 coroutineScope.launch {
                     playingPagerState?.animateScrollToPage(0)
-                    startPlaylistPlayback(tracks, trackInd, storageHandler, trackServiceAccessor)
+
+                    startPlaylistPlayback(
+                        shownTracks,
+                        trackInd,
+                        storageHandler,
+                        trackServiceAccessor
+                    )
                 }
             }
         }
+    )
+}
+
+internal suspend inline fun startPlaylistPlayback(
+    tracks: ImmutableList<Track>,
+    trackInd: Int,
+    storageHandler: StorageHandler,
+    trackServiceAccessor: TrackServiceAccessor,
+) {
+    storageHandler.storeAudioStatus(AudioStatus.PLAYING)
+
+    trackServiceAccessor.startPlaying(
+        playlist = tracks.toDefaultTrackList(),
+        trackInd = trackInd
     )
 }
