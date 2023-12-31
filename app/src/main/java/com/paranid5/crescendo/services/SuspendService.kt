@@ -7,7 +7,7 @@ import kotlinx.coroutines.SupervisorJob
 
 abstract class SuspendService : LifecycleService() {
     private val job = SupervisorJob()
-    protected val scope = CoroutineScope(Dispatchers.Main + job)
+    val serviceScope = CoroutineScope(Dispatchers.Main + job)
 
     override fun onDestroy() {
         super.onDestroy()

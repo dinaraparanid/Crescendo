@@ -10,7 +10,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Modifier
 import androidx.core.content.ContextCompat
 import com.paranid5.crescendo.presentation.composition_locals.LocalActivity
@@ -28,43 +28,22 @@ fun permissionsRequestLauncher(
 ): Pair<Boolean, () -> Unit> {
     val activity = LocalActivity.current
     val notGrantedPermissions = remember { mutableStateListOf<String>() }
+    val areAllPermissionsGrantedState = rememberAllPermissionsGranted(permissionQueue)
+    val areAllPermissionsGranted by areAllPermissionsGrantedState
 
-    var areAllPermissionsGranted by remember {
-        mutableStateOf(
-            permissionQueue.all { permission ->
-                ContextCompat.checkSelfPermission(activity!!, permission) ==
-                        PackageManager.PERMISSION_GRANTED
-            }
-        )
-    }
+    val permissionResultLauncher = rememberPermissionResultLauncher(
+        notGrantedPermissions = notGrantedPermissions,
+        areAllPermissionsGrantedState = areAllPermissionsGrantedState
+    )
 
-    val permissionResultLauncher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.RequestMultiplePermissions()
-    ) { permissionsToGranted ->
-        permissionsToGranted
-            .asSequence()
-            .filter { (_, isGranted) -> isGranted }
-            .forEach { (permission, _) ->
-                notGrantedPermissions.remove(permission)
-            }
+    val isPermissionDialogShown by isPermissionDialogShownState
 
-        notGrantedPermissions.addAll(
-            permissionsToGranted
-                .asSequence()
-                .filter { (_, isGranted) -> !isGranted }
-                .filter { (permission, _) -> permission !in notGrantedPermissions }
-                .map { (permission, _) -> permission }
-        )
-
-        areAllPermissionsGranted = notGrantedPermissions.isEmpty()
-    }
-
-    if (isPermissionDialogShownState.value)
+    if (isPermissionDialogShown)
         notGrantedPermissions.forEach { permission ->
             PermissionDialog(
+                permissionDescriptionProvider = descriptionProvider,
                 isDialogShownState = isPermissionDialogShownState,
                 modifier = modifier,
-                permissionDescriptionProvider = descriptionProvider,
                 isPermanentlyDeclined = when {
                     Build.VERSION.SDK_INT >= Build.VERSION_CODES.M ->
                         !activity!!.shouldShowRequestPermissionRationale(permission)
@@ -82,4 +61,43 @@ fun permissionsRequestLauncher(
     return areAllPermissionsGranted to {
         permissionResultLauncher.launch(permissionQueue.toTypedArray())
     }
+}
+
+@Composable
+private fun rememberAllPermissionsGranted(permissionQueue: Queue<String>): MutableState<Boolean> {
+    val activity = LocalActivity.current
+
+    return remember {
+        mutableStateOf(
+            permissionQueue.all { permission ->
+                ContextCompat.checkSelfPermission(activity!!, permission) ==
+                        PackageManager.PERMISSION_GRANTED
+            }
+        )
+    }
+}
+
+@Composable
+private fun rememberPermissionResultLauncher(
+    notGrantedPermissions: SnapshotStateList<String>,
+    areAllPermissionsGrantedState: MutableState<Boolean>
+) = rememberLauncherForActivityResult(
+    contract = ActivityResultContracts.RequestMultiplePermissions()
+) { permissionsToGranted ->
+    permissionsToGranted
+        .asSequence()
+        .filter { (_, isGranted) -> isGranted }
+        .forEach { (permission, _) ->
+            notGrantedPermissions.remove(permission)
+        }
+
+    notGrantedPermissions.addAll(
+        permissionsToGranted
+            .asSequence()
+            .filter { (_, isGranted) -> !isGranted }
+            .filter { (permission, _) -> permission !in notGrantedPermissions }
+            .map { (permission, _) -> permission }
+    )
+
+    areAllPermissionsGrantedState.value = notGrantedPermissions.isEmpty()
 }

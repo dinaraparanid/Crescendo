@@ -5,8 +5,8 @@ import android.widget.Toast
 import com.paranid5.crescendo.R
 import com.paranid5.crescendo.domain.caching.VideoCacheResponse
 
-fun VideoCacheResponse.toast(context: Context) =
-    Toast.makeText(context, message(context), Toast.LENGTH_LONG).show()
+fun toast(response: VideoCacheResponse, context: Context) =
+    Toast.makeText(context, response.message(context), Toast.LENGTH_LONG).show()
 
 private fun VideoCacheResponse.message(context: Context) = when (this) {
     is VideoCacheResponse.Error -> {

@@ -15,6 +15,7 @@ import androidx.compose.runtime.snapshotFlow
 import arrow.core.curried
 import com.paranid5.crescendo.domain.utils.extensions.moved
 import kotlinx.collections.immutable.ImmutableList
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.combine
 import kotlin.math.absoluteValue
 
@@ -40,7 +41,7 @@ fun <T> DraggingEffect(
             draggedCenter
                 ?.let(::nearestVisibleItem.curried()(listState))
                 ?.index
-        }.collect { near ->
+        }.collectLatest { near ->
             nearOffset = near
         }
     }

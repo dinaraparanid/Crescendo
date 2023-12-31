@@ -2,13 +2,17 @@ package com.paranid5.crescendo.services
 
 import android.content.Context
 import android.content.Intent
-import com.paranid5.crescendo.MainApplication
-import org.koin.core.component.KoinComponent
 
-abstract class ServiceAccessor(protected val application: MainApplication) : KoinComponent {
-    protected inline val appContext: Context
-        get() = application.applicationContext
+interface ServiceAccessor {
+    val appContext: Context
+    fun sendBroadcast(intent: Intent)
+    fun sendBroadcast(action: String)
+}
 
-    protected fun sendBroadcast(intent: Intent) = application.sendBroadcast(intent)
-    protected fun sendBroadcast(action: String) = sendBroadcast(Intent(action))
+class ServiceAccessorImpl(override val appContext: Context) : ServiceAccessor {
+    override fun sendBroadcast(intent: Intent) =
+        appContext.sendBroadcast(intent)
+
+    override fun sendBroadcast(action: String) =
+        sendBroadcast(Intent(action))
 }

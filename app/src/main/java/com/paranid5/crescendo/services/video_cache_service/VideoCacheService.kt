@@ -159,21 +159,21 @@ class VideoCacheService : SuspendService(), KoinComponent {
     private val cacheNextVideoReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context?, intent: Intent) {
             Log.d(TAG, "Cash next is received")
-            scope.launch { mOfferVideoToQueue(videoCacheData = intent.mVideoCacheDataArg) }
+            serviceScope.launch { mOfferVideoToQueue(videoCacheData = intent.mVideoCacheDataArg) }
         }
     }
 
     private val cancelCurVideoReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context?, intent: Intent?) {
             Log.d(TAG, "Canceling video caching")
-            scope.launch { mCancelCurVideoCashing() }
+            serviceScope.launch { mCancelCurVideoCashing() }
         }
     }
 
     private val cancelAllReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context?, intent: Intent?) {
             Log.d(TAG, "Canceling all videos caching")
-            scope.launch { mCancelAllVideosCashing() }
+            serviceScope.launch { mCancelAllVideosCashing() }
         }
     }
 
@@ -203,9 +203,9 @@ class VideoCacheService : SuspendService(), KoinComponent {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
             createChannel()
 
-        scope.launch { mOfferVideoToQueue(videoCacheData = intent!!.mVideoCacheDataArg) }
+        serviceScope.launch { mOfferVideoToQueue(videoCacheData = intent!!.mVideoCacheDataArg) }
         resetCashingJobIfCanceled()
-        scope.launch { startNotificationObserving() }
+        serviceScope.launch { startNotificationObserving() }
         return START_REDELIVER_INTENT
     }
 
@@ -259,7 +259,7 @@ class VideoCacheService : SuspendService(), KoinComponent {
         val videoMetadata = videoMeta?.let(::VideoMetadata) ?: VideoMetadata()
         curVideoMetadataState.update { videoMetadata }
 
-        scope.launch {
+        serviceScope.launch {
             onVideoCacheStatusReceived(
                 cachingResult = cacheMediaFileOrNotifyError(
                     desiredFilename = desiredFilename,
@@ -626,7 +626,7 @@ class VideoCacheService : SuspendService(), KoinComponent {
         }
 
         if (cachingLoopJob?.isActive != true)
-            cachingLoopJob = scope.launch(Dispatchers.IO) { launchCashing() }
+            cachingLoopJob = serviceScope.launch(Dispatchers.IO) { launchCashing() }
     }
 
     internal suspend inline fun mCancelCurVideoCashing() {
@@ -975,7 +975,7 @@ class VideoCacheService : SuspendService(), KoinComponent {
             else -> {
                 when (cachingState) {
                     DownloadingStatus.DOWNLOADED -> {
-                        scope.launch {
+                        serviceScope.launch {
                             // Delay for NotificationManager in order
                             // to not skip this update
                             delay(1.seconds)

@@ -294,7 +294,7 @@ class StreamService : SuspendService(), KoinComponent {
                 sendErrorBroadcast(error)
             }
 
-            private fun transitToNextTrackAsync() = scope.launch {
+            private fun transitToNextTrackAsync() = serviceScope.launch {
                 storePlaybackPosition()
                 updateNotification()
             }
@@ -310,7 +310,7 @@ class StreamService : SuspendService(), KoinComponent {
     @kotlin.OptIn(ExperimentalCoroutinesApi::class)
     private val videoLengthState = currentMetadataState
         .mapLatest { it?.durationMillis ?: 0 }
-        .stateIn(scope, SharingStarted.Eagerly, 0)
+        .stateIn(serviceScope, SharingStarted.Eagerly, 0)
 
     private suspend fun extractAudioUrlWithMeta(ytUrl: String): Result<Pair<String, VideoMeta?>> {
         val extractRes = withTimeoutOrNull(timeMillis = 4500) {
@@ -352,7 +352,7 @@ class StreamService : SuspendService(), KoinComponent {
         Log.d(TAG, "Url: $audioUrl")
         Log.d(TAG, "Position: $initialPosition")
 
-        playbackTask = scope.launch {
+        playbackTask = serviceScope.launch {
             updateMediaSession(videoMeta?.let(::VideoMetadata))
             playerNotificationManager.invalidate()
             launch(Dispatchers.IO) { storeMetadata(videoMeta) }
@@ -375,7 +375,7 @@ class StreamService : SuspendService(), KoinComponent {
     private fun playStream(ytUrl: String, initialPosition: Long = 0) {
         playbackController.resetAudioSessionIdIfNotPlaying()
 
-        scope.launch(Dispatchers.IO) {
+        serviceScope.launch(Dispatchers.IO) {
             extractMediaFilesAndStartPlaying(
                 ytUrl = ytUrl,
                 initialPosition = initialPosition
@@ -384,7 +384,7 @@ class StreamService : SuspendService(), KoinComponent {
     }
 
     private fun storeAndPlayNewStream(url: String, initialPosition: Long = 0) {
-        scope.launch { storeCurrentUrl(url) }
+        serviceScope.launch { storeCurrentUrl(url) }
         playStream(url, initialPosition)
     }
 
@@ -401,7 +401,7 @@ class StreamService : SuspendService(), KoinComponent {
     }
 
     private fun pausePlayback() {
-        scope.launch { storePlaybackPosition() }
+        serviceScope.launch { storePlaybackPosition() }
         playbackController.pause()
     }
 
@@ -411,14 +411,14 @@ class StreamService : SuspendService(), KoinComponent {
     private lateinit var playbackPosCacheTask: Job
 
     private fun startPlaybackPositionMonitoring() {
-        playbackPosMonitorTask = scope.launch {
+        playbackPosMonitorTask = serviceScope.launch {
             while (playbackController.isPlaying) {
                 playbackController.updateCurrentPosition()
                 delay(PLAYBACK_UPDATE_COOLDOWN)
             }
         }
 
-        playbackPosCacheTask = scope.launch(Dispatchers.IO) {
+        playbackPosCacheTask = serviceScope.launch(Dispatchers.IO) {
             while (playbackController.isPlaying) {
                 storePlaybackPosition()
                 delay(PLAYBACK_UPDATE_COOLDOWN)
@@ -477,7 +477,7 @@ class StreamService : SuspendService(), KoinComponent {
         override fun onReceive(context: Context?, intent: Intent) {
             val url = intent.urlArg
 
-            scope.launch(Dispatchers.IO) {
+            serviceScope.launch(Dispatchers.IO) {
                 storePlaybackPosition()
                 storeCurrentUrl(url)
             }
@@ -511,7 +511,7 @@ class StreamService : SuspendService(), KoinComponent {
 
     private val repeatChangedReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context?, intent: Intent?) {
-            scope.launch {
+            serviceScope.launch {
                 val newRepeatMode = !mediaRetrieverController.isRepeating
                 storeIsRepeating(newRepeatMode)
                 playbackController.repeatMode = playbackController.getRepeatMode(newRepeatMode)
@@ -621,7 +621,7 @@ class StreamService : SuspendService(), KoinComponent {
         isConnectedState.update { true }
         initMediaSession()
 
-        scope.launch {
+        serviceScope.launch {
             when (val url = intent?.urlArgOrNull) {
                 // Continue with previous stream
                 null -> onResumeClicked()
@@ -648,8 +648,8 @@ class StreamService : SuspendService(), KoinComponent {
     }
 
     private fun launchMonitoringTasks() {
-        scope.launch { startNotificationObserving() }
-        scope.launch { startAudioEffectsMonitoring() }
+        serviceScope.launch { startNotificationObserving() }
+        serviceScope.launch { startAudioEffectsMonitoring() }
     }
 
     override fun onDestroy() {
@@ -733,7 +733,7 @@ class StreamService : SuspendService(), KoinComponent {
                 player: Player,
                 callback: PlayerNotificationManager.BitmapCallback
             ): Bitmap? {
-                scope.launch(Dispatchers.IO) {
+                serviceScope.launch(Dispatchers.IO) {
                     callback.onBitmap(getVideoCoverAsync().await())
                 }
 
@@ -792,7 +792,7 @@ class StreamService : SuspendService(), KoinComponent {
             ) { isPlaying, isRepeating ->
                 isPlaying to isRepeating
             }.collectLatest {
-                scope.launch { updateNotification() }
+                serviceScope.launch { updateNotification() }
             }
         }
 

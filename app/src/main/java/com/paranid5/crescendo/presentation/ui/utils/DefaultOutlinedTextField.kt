@@ -5,6 +5,7 @@ import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.OutlinedTextFieldDefaults
+import androidx.compose.material3.TextFieldColors
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
@@ -13,7 +14,6 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.VisualTransformation
 import com.paranid5.crescendo.presentation.ui.theme.LocalAppColors
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun DefaultOutlinedTextField(
     value: String,
@@ -23,40 +23,62 @@ fun DefaultOutlinedTextField(
     label: @Composable (() -> Unit)? = null,
     keyboardOptions: KeyboardOptions = KeyboardOptions.Default,
 ) {
-    val colors = LocalAppColors.current.colorScheme
+    val colors = LocalAppColors.current
 
     BasicTextField(
         value = value,
         singleLine = true,
         onValueChange = onValueChange,
         modifier = modifier,
-        textStyle = TextStyle(color = colors.inverseSurface),
+        textStyle = TextStyle(color = colors.fontColor),
         keyboardOptions = keyboardOptions,
         decorationBox = @Composable { innerTextField ->
-            OutlinedTextFieldDefaults.DecorationBox(
+            outlinedTextFieldDecorationBox(
                 value = value,
                 innerTextField = innerTextField,
                 placeholder = placeholder,
-                label = label,
-                singleLine = true,
-                enabled = true,
-                interactionSource = remember { MutableInteractionSource() },
-                visualTransformation = VisualTransformation.None,
-                colors = OutlinedTextFieldDefaults.colors(
-                    focusedTextColor = colors.inverseSurface,
-                    unfocusedTextColor = colors.inverseSurface,
-                    disabledTextColor = colors.inverseSurface,
-                    errorTextColor = colors.inverseSurface,
-                    focusedContainerColor = Color.Transparent,
-                    unfocusedContainerColor = Color.Transparent,
-                    disabledContainerColor = Color.Transparent,
-                    errorContainerColor = Color.Transparent,
-                    focusedBorderColor = colors.primary,
-                    unfocusedBorderColor = colors.primary,
-                    disabledBorderColor = colors.primary,
-                    errorBorderColor = colors.primary
-                ),
+                label = label
             )
         }
     )
 }
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun outlinedTextFieldDecorationBox(
+    value: String,
+    innerTextField: @Composable () -> Unit,
+    placeholder: @Composable (() -> Unit)? = null,
+    label: @Composable (() -> Unit)? = null,
+) = OutlinedTextFieldDefaults.DecorationBox(
+    value = value,
+    innerTextField = innerTextField,
+    placeholder = placeholder,
+    label = label,
+    singleLine = true,
+    enabled = true,
+    interactionSource = remember { MutableInteractionSource() },
+    visualTransformation = VisualTransformation.None,
+    colors = outlinedTextColors,
+)
+
+private inline val outlinedTextColors: TextFieldColors
+    @Composable
+    get() {
+        val colors = LocalAppColors.current
+
+        return OutlinedTextFieldDefaults.colors(
+            focusedTextColor = colors.fontColor,
+            unfocusedTextColor = colors.fontColor,
+            disabledTextColor = colors.fontColor,
+            errorTextColor = colors.fontColor,
+            focusedContainerColor = Color.Transparent,
+            unfocusedContainerColor = Color.Transparent,
+            disabledContainerColor = Color.Transparent,
+            errorContainerColor = Color.Transparent,
+            focusedBorderColor = colors.primary,
+            unfocusedBorderColor = colors.primary,
+            disabledBorderColor = colors.primary,
+            errorBorderColor = colors.primary
+        )
+    }

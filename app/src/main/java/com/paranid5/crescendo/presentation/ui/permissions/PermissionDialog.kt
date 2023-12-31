@@ -20,15 +20,15 @@ import com.paranid5.crescendo.presentation.ui.theme.LocalAppColors
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 internal inline fun PermissionDialog(
-    isDialogShownState: MutableState<Boolean>,
     permissionDescriptionProvider: PermissionDescriptionProvider,
+    isDialogShownState: MutableState<Boolean>,
     modifier: Modifier = Modifier,
     isPermanentlyDeclined: Boolean = false,
     crossinline onGrantedClicked: () -> Unit = {},
     crossinline onGoToAppSettingsClicked: () -> Unit = {},
     noinline onDismiss: () -> Unit = {},
 ) {
-    val colors = LocalAppColors.current.colorScheme
+    val colors = LocalAppColors.current
 
     AlertDialog(
         onDismissRequest = {
@@ -61,7 +61,7 @@ internal inline fun PermissionDialog(
 
 @Composable
 private fun Title(modifier: Modifier = Modifier) {
-    val colors = LocalAppColors.current.colorScheme
+    val colors = LocalAppColors.current
 
     Text(
         text = stringResource(R.string.permission_required),
@@ -90,7 +90,7 @@ private inline fun GrantPermissionButton(
     crossinline onGoToAppSettingsClicked: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    val colors = LocalAppColors.current.colorScheme
+    val colors = LocalAppColors.current
 
     Button(
         modifier = modifier.padding(vertical = 10.dp),

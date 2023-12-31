@@ -7,7 +7,7 @@ import com.paranid5.crescendo.presentation.ui.theme.LocalAppColors
 
 @Composable
 fun Palette?.getLightMutedOrPrimary(): Color {
-    val colors = LocalAppColors.current.colorScheme
+    val colors = LocalAppColors.current
     val primaryColorVal = colors.primary.value.toInt()
 
     val resultColor = this

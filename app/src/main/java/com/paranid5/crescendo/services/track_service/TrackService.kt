@@ -149,7 +149,7 @@ class TrackService : SuspendService(), KoinComponent {
         get() = object : MediaSessionCompat.Callback() {
             override fun onPlay() {
                 super.onPlay()
-                scope.launch { resumePlayback() }
+                serviceScope.launch { resumePlayback() }
             }
 
             override fun onPause() {
@@ -164,12 +164,12 @@ class TrackService : SuspendService(), KoinComponent {
 
             override fun onSkipToNext() {
                 super.onSkipToNext()
-                scope.launch { switchToNextTrack() }
+                serviceScope.launch { switchToNextTrack() }
             }
 
             override fun onSkipToPrevious() {
                 super.onSkipToPrevious()
-                scope.launch { switchToPrevTrack() }
+                serviceScope.launch { switchToPrevTrack() }
             }
 
             override fun onCustomAction(action: String, extras: Bundle?) {
@@ -280,7 +280,7 @@ class TrackService : SuspendService(), KoinComponent {
             super.onPlaybackStateChanged(playbackState)
 
             when (playbackState) {
-                Player.STATE_IDLE -> scope.launch {
+                Player.STATE_IDLE -> serviceScope.launch {
                     restartPlayer(initialPosition = exoPlaybackPosition)
                 }
 
@@ -311,12 +311,12 @@ class TrackService : SuspendService(), KoinComponent {
             ).show()
         }
 
-        private fun updateTrackIndexAsync() = scope.launch {
+        private fun updateTrackIndexAsync() = serviceScope.launch {
             mediaRetrieverController.storeCurrentTrackIndex(playbackController.currentMediaItemIndex)
             updateNotification()
         }
 
-        private fun storePositionAndUpdateNotificationAsync() = scope.launch {
+        private fun storePositionAndUpdateNotificationAsync() = serviceScope.launch {
             storePlaybackPosition()
             updateNotification()
         }
@@ -354,7 +354,7 @@ class TrackService : SuspendService(), KoinComponent {
         get() = mediaRetrieverController.tracksPlaybackPosition
 
     private fun pausePlayback() {
-        scope.launch { storePlaybackPosition() }
+        serviceScope.launch { storePlaybackPosition() }
         playbackController.pause()
     }
 
@@ -431,14 +431,14 @@ class TrackService : SuspendService(), KoinComponent {
     private lateinit var playbackPosCacheTask: Job
 
     private fun startPlaybackPositionMonitoring() {
-        playbackPosMonitorTask = scope.launch {
+        playbackPosMonitorTask = serviceScope.launch {
             while (playbackController.isPlaying) {
                 playbackController.updateCurrentPosition()
                 delay(PLAYBACK_UPDATE_COOLDOWN)
             }
         }
 
-        playbackPosCacheTask = scope.launch(Dispatchers.IO) {
+        playbackPosCacheTask = serviceScope.launch(Dispatchers.IO) {
             while (playbackController.isPlaying) {
                 storePlaybackPosition()
                 delay(PLAYBACK_UPDATE_COOLDOWN)
@@ -482,7 +482,7 @@ class TrackService : SuspendService(), KoinComponent {
         override fun onReceive(context: Context?, intent: Intent?) {
             Log.d(TAG, "playback resumed")
 
-            scope.launch {
+            serviceScope.launch {
                 when {
                     isStoppedWithError -> {
                         restartPlayer(initialPosition = exoPlaybackPosition)
@@ -500,7 +500,7 @@ class TrackService : SuspendService(), KoinComponent {
             Log.d(TAG, "switch playlist")
             val playlist = intent.playlistArg
             val trackInd = intent.trackIndexArg
-            scope.launch { onTrackClicked(playlist, trackInd) }
+            serviceScope.launch { onTrackClicked(playlist, trackInd) }
         }
     }
 
@@ -538,14 +538,14 @@ class TrackService : SuspendService(), KoinComponent {
     private val switchToPrevTrackReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context?, intent: Intent?) {
             Log.d(TAG, "prev track")
-            scope.launch { switchToPrevTrack() }
+            serviceScope.launch { switchToPrevTrack() }
         }
     }
 
     private val switchToNextTrackReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context?, intent: Intent?) {
             Log.d(TAG, "next track")
-            scope.launch { switchToNextTrack() }
+            serviceScope.launch { switchToNextTrack() }
         }
     }
 
@@ -559,7 +559,7 @@ class TrackService : SuspendService(), KoinComponent {
 
     private val repeatChangedReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context?, intent: Intent?) {
-            scope.launch {
+            serviceScope.launch {
                 val newRepeatMode = !mediaRetrieverController.isRepeating
                 storeIsRepeating(newRepeatMode)
                 playbackController.repeatMode = playbackController.getRepeatMode(newRepeatMode)
@@ -678,7 +678,7 @@ class TrackService : SuspendService(), KoinComponent {
         val playlist = intent?.playlistArgOrNull
         val trackInd = intent?.trackIndexArg
 
-        scope.launch {
+        serviceScope.launch {
             when (playlist) {
                 // Resume received
                 null -> when {
@@ -767,8 +767,8 @@ class TrackService : SuspendService(), KoinComponent {
     }
 
     private fun launchMonitoringTasks() {
-        scope.launch { startNotificationObserving() }
-        scope.launch { startAudioEffectsMonitoring() }
+        serviceScope.launch { startNotificationObserving() }
+        serviceScope.launch { startAudioEffectsMonitoring() }
     }
 
     override fun onDestroy() {
@@ -853,7 +853,7 @@ class TrackService : SuspendService(), KoinComponent {
                 player: Player,
                 callback: PlayerNotificationManager.BitmapCallback
             ): Bitmap? {
-                scope.launch(Dispatchers.IO) {
+                serviceScope.launch(Dispatchers.IO) {
                     callback.onBitmap(getTrackCoverAsync(path = currentTrackOrNull?.path).await())
                 }
 
@@ -913,7 +913,7 @@ class TrackService : SuspendService(), KoinComponent {
             ) { isPlaying, isRepeating, curTrackInd ->
                 Triple(isPlaying, isRepeating, curTrackInd)
             }.collectLatest {
-                scope.launch { updateNotification() }
+                serviceScope.launch { updateNotification() }
             }
         }
 

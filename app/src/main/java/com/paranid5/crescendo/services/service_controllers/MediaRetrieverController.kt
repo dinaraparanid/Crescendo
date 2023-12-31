@@ -7,7 +7,7 @@ import com.paranid5.crescendo.data.properties.storeCurrentMetadata
 import com.paranid5.crescendo.data.properties.storeCurrentPlaylist
 import com.paranid5.crescendo.data.properties.storeCurrentTrackIndex
 import com.paranid5.crescendo.data.properties.storeCurrentUrl
-import com.paranid5.crescendo.data.properties.storeIsRepeating
+import com.paranid5.crescendo.data.properties.storeRepeating
 import com.paranid5.crescendo.data.properties.storeStreamPlaybackPosition
 import com.paranid5.crescendo.data.properties.storeTracksPlaybackPosition
 import com.paranid5.crescendo.domain.metadata.VideoMetadata
@@ -15,11 +15,9 @@ import com.paranid5.crescendo.domain.tracks.DefaultTrack
 import com.paranid5.yt_url_extractor_kt.extractYtFilesWithMeta
 import io.ktor.client.HttpClient
 import kotlinx.collections.immutable.ImmutableList
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
-import kotlinx.coroutines.withContext
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import org.koin.core.qualifier.named
@@ -81,7 +79,7 @@ class MediaRetrieverController : KoinComponent {
     fun setPlaying(isPlaying: Boolean) = _isPlayingState.update { isPlaying }
 
     suspend fun storeIsRepeating(isRepeating: Boolean) =
-        storageHandler.storeIsRepeating(isRepeating)
+        storageHandler.storeRepeating(isRepeating)
 
     suspend fun storeCurrentUrl(url: String) =
         storageHandler.storeCurrentUrl(url)

@@ -1,0 +1,55 @@
+package com.paranid5.crescendo.services.stream_service.media_session
+
+import android.os.Bundle
+import android.support.v4.media.session.MediaSessionCompat
+import com.paranid5.crescendo.domain.utils.extensions.sendBroadcast
+import com.paranid5.crescendo.services.stream_service.StreamService2
+import kotlinx.coroutines.launch
+
+fun MediaSessionCallback(service: StreamService2) =
+    object : MediaSessionCompat.Callback() {
+        override fun onPlay() {
+            super.onPlay()
+
+            service.serviceScope.launch {
+                service.playerProvider.resume()
+            }
+        }
+
+        override fun onPause() {
+            super.onPause()
+
+            service.serviceScope.launch {
+                service.playerProvider.pause()
+            }
+        }
+
+        override fun onSeekTo(pos: Long) {
+            super.onSeekTo(pos)
+
+            service.serviceScope.launch {
+                service.playerProvider.seekTo(pos)
+            }
+        }
+
+        override fun onSkipToNext() {
+            super.onSkipToNext()
+
+            service.serviceScope.launch {
+                service.playerProvider.seekTenSecsForward()
+            }
+        }
+
+        override fun onSkipToPrevious() {
+            super.onSkipToPrevious()
+
+            service.serviceScope.launch {
+                service.playerProvider.seekTenSecsBack()
+            }
+        }
+
+        override fun onCustomAction(action: String, extras: Bundle?) {
+            super.onCustomAction(action, extras)
+            service.sendBroadcast(service.commandsToActions[action]!!.playbackAction)
+        }
+    }

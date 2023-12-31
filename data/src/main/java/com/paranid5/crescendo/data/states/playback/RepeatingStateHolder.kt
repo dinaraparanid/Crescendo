@@ -2,7 +2,7 @@ package com.paranid5.crescendo.data.states.playback
 
 import com.paranid5.crescendo.data.StorageHandler
 import com.paranid5.crescendo.data.properties.isRepeatingFlow
-import com.paranid5.crescendo.data.properties.storeIsRepeating
+import com.paranid5.crescendo.data.properties.storeRepeating
 import kotlinx.coroutines.flow.Flow
 
 interface RepeatingStateSubscriber {
@@ -10,7 +10,7 @@ interface RepeatingStateSubscriber {
 }
 
 interface RepeatingStatePublisher {
-    suspend fun setIsRepeating(isRepeating: Boolean)
+    suspend fun setRepeating(isRepeating: Boolean)
 }
 
 class RepeatingStateSubscriberImpl(private val storageHandler: StorageHandler) :
@@ -22,6 +22,6 @@ class RepeatingStateSubscriberImpl(private val storageHandler: StorageHandler) :
 
 class RepeatingStatePublisherImpl(private val storageHandler: StorageHandler) :
     RepeatingStatePublisher {
-    override suspend fun setIsRepeating(isRepeating: Boolean) =
-        storageHandler.storeIsRepeating(isRepeating)
+    override suspend fun setRepeating(isRepeating: Boolean) =
+        storageHandler.storeRepeating(isRepeating)
 }

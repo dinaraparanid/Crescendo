@@ -26,6 +26,7 @@ import com.paranid5.crescendo.presentation.ui.permissions.description_providers.
 import com.paranid5.crescendo.presentation.ui.permissions.externalStoragePermissionQueue
 import com.paranid5.crescendo.presentation.ui.permissions.foregroundServicePermissionQueue
 import com.paranid5.crescendo.services.stream_service.StreamServiceAccessor
+import com.paranid5.crescendo.services.stream_service.playback.PlayerProvider
 import com.paranid5.crescendo.services.track_service.TrackServiceAccessor
 import com.paranid5.crescendo.services.video_cache_service.VideoCacheServiceAccessor
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -113,6 +114,7 @@ private val globalsModule = module {
 
     singleOf(::StorageHandler)
     single { androidApplication() as MainApplication }
+    single { androidContext() }
     singleOf(::KtorClient)
 
     single(named(IS_PLAYING)) { MutableStateFlow(false) }
@@ -148,16 +150,12 @@ private val tracksModule = module {
     viewModelOf(::TracksViewModel)
 }
 
-private val uiMainModule = module {
+private val uiModule = module {
     includes(
         searchStreamModule, playingModule,
         audioEffectsModule, trimmerModule,
         tracksModule, currentPlaylistModule
     )
-}
-
-private val uiModule = module {
-    includes(uiMainModule)
 }
 
 val appModule = module {

@@ -26,16 +26,14 @@ import org.koin.core.component.inject
 import org.koin.core.qualifier.named
 import java.util.concurrent.atomic.AtomicLong
 
+private const val TEN_SECS_AS_MILLIS = 10000
+
 class PlaybackController(
     context: Context,
     private val playbackType: PlaybackType,
     playerStateChangedListener: Player.Listener,
     mediaRetrieverController: MediaRetrieverController,
 ) : KoinComponent {
-    companion object {
-        private const val TEN_SECS_AS_MILLIS = 10000
-    }
-
     enum class PlaybackType { STREAM, TRACKS }
 
     private val audioSessionIdState by inject<MutableStateFlow<Int>>(
@@ -90,7 +88,7 @@ class PlaybackController(
     @Volatile
     var isPlaying: Boolean = false
 
-    var currentPosition = AtomicLong()
+    val currentPosition = AtomicLong()
 
     @MainThread
     fun updateCurrentPosition() =
@@ -124,7 +122,8 @@ class PlaybackController(
     }
 
     @OptIn(UnstableApi::class)
-    private fun resetAudioSessionId() = audioSessionIdState.update { player.audioSessionId }
+    private fun resetAudioSessionId() =
+        audioSessionIdState.update { player.audioSessionId }
 
     fun resetAudioSessionIdIfNotPlaying() {
         if (!isPlaying) resetAudioSessionId()

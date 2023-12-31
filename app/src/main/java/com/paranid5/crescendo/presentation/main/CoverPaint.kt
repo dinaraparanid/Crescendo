@@ -3,7 +3,14 @@ package com.paranid5.crescendo.presentation.main
 import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.drawable.BitmapDrawable
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.derivedStateOf
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.LocalContext
 import androidx.palette.graphics.Palette
 import coil.compose.AsyncImagePainter
@@ -451,7 +458,7 @@ private fun ImageRequest.Builder.applyTransformations(
         prevCoverPlaceholderOrDefault(usePrevCoverAsPlaceholder, prevCoverModel)
 
     if (isBlured)
-        transformations(BlurTransformation(context))
+        transformations(BlurTransformation())
 
     size?.run { size(width, height) }
 }

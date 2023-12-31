@@ -16,7 +16,7 @@ class CacheStatusReceiver : BroadcastReceiver() {
 
     override fun onReceive(context: Context, intent: Intent) {
         @Suppress("DEPRECATION")
-        val status = when {
+        val response = when {
             Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU ->
                 intent.getParcelableExtra(
                     VIDEO_CASH_STATUS_ARG,
@@ -26,6 +26,6 @@ class CacheStatusReceiver : BroadcastReceiver() {
             else -> intent.getParcelableExtra(VIDEO_CASH_STATUS_ARG)
         }!!
 
-        status.toast(context.applicationContext)
+        toast(response, context.applicationContext)
     }
 }

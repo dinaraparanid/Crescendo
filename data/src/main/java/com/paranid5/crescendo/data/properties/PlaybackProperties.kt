@@ -18,7 +18,7 @@ suspend inline fun StorageHandler.storeStreamPlaybackPosition(position: Long) =
 inline val StorageHandler.isRepeatingFlow
     get() = playbackStateProvider.isRepeatingFlow
 
-suspend inline fun StorageHandler.storeIsRepeating(isRepeating: Boolean) =
+suspend inline fun StorageHandler.storeRepeating(isRepeating: Boolean) =
     playbackStateProvider.storeIsRepeating(isRepeating)
 
 inline val StorageHandler.audioStatusFlow

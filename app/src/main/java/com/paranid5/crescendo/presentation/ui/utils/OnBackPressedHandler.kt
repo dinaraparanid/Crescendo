@@ -11,29 +11,36 @@ import com.paranid5.crescendo.presentation.composition_locals.LocalNavController
 import kotlinx.coroutines.launch
 
 @Composable
-fun OnBackPressedHandler(
-    onBackPressedCallback: suspend (isScreenStackEmpty: Boolean) -> Unit = {}
-) {
-    val navHostController = LocalNavController.current
-    val coroutineScope = rememberCoroutineScope()
+fun OnBackPressedHandler(onBackPressedCallback: suspend (isScreenStackEmpty: Boolean) -> Unit = {}) {
+    val lifecycleOwner = LocalLifecycleOwner.current
 
-    val callback = remember {
-        object : OnBackPressedCallback(true) {
-            override fun handleOnBackPressed() {
-                coroutineScope.launch {
-                    onBackPressedCallback(navHostController.onBackPressed() == null)
-                }
-            }
-        }
-    }
+    val callback = rememberCallback(onBackPressedCallback)
 
     val backDispatcher =
         LocalOnBackPressedDispatcherOwner.current!!.onBackPressedDispatcher
 
-    val lifecycleOwner = LocalLifecycleOwner.current
-
     DisposableEffect(lifecycleOwner, backDispatcher) {
         backDispatcher.addCallback(lifecycleOwner, callback)
         onDispose { callback.remove() }
+    }
+}
+
+@Composable
+private fun rememberCallback(
+    onBackPressedCallback: suspend (isScreenStackEmpty: Boolean) -> Unit = {}
+): OnBackPressedCallback {
+    val navHostController = LocalNavController.current
+    val coroutineScope = rememberCoroutineScope()
+
+    return remember {
+        object : OnBackPressedCallback(true) {
+            override fun handleOnBackPressed() {
+                coroutineScope.launch {
+                    onBackPressedCallback(
+                        navHostController.onBackPressed() == null
+                    )
+                }
+            }
+        }
     }
 }
