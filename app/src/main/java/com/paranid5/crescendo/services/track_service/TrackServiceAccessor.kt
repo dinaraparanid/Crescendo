@@ -1,5 +1,6 @@
 package com.paranid5.crescendo.services.track_service
 
+import android.content.Context
 import android.content.Intent
 import android.os.Build
 import android.util.Log
@@ -7,12 +8,15 @@ import com.paranid5.crescendo.MainApplication
 import com.paranid5.crescendo.TRACK_SERVICE_CONNECTION
 import com.paranid5.crescendo.domain.tracks.DefaultTrack
 import com.paranid5.crescendo.services.ServiceAccessor
+import com.paranid5.crescendo.services.ServiceAccessorImpl
 import com.paranid5.crescendo.services.stream_service.StreamService
 import kotlinx.coroutines.flow.MutableStateFlow
+import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import org.koin.core.qualifier.named
 
-class TrackServiceAccessor(application: MainApplication) : ServiceAccessor(application) {
+class TrackServiceAccessor(application: MainApplication) : KoinComponent,
+    ServiceAccessor by ServiceAccessorImpl(application) {
     private companion object {
         private val TAG = TrackServiceAccessor::class.simpleName!!
     }

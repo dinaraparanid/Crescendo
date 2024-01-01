@@ -1,4 +1,4 @@
-package com.paranid5.crescendo.services.stream_service.managers
+package com.paranid5.crescendo.services.stream_service
 
 import com.paranid5.crescendo.STREAM_SERVICE_CONNECTION
 import kotlinx.coroutines.flow.MutableStateFlow

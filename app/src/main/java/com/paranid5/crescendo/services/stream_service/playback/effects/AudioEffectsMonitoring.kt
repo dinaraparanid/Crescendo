@@ -3,10 +3,11 @@ package com.paranid5.crescendo.services.stream_service.playback.effects
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.media3.common.PlaybackParameters
-import androidx.media3.common.Player
 import com.paranid5.crescendo.services.stream_service.StreamService2
+import com.paranid5.crescendo.services.stream_service.playback.PlayerProvider
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.distinctUntilChanged
 
 suspend fun StreamService2.startPlaybackEffectsMonitoring() =
     lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
@@ -16,10 +17,10 @@ suspend fun StreamService2.startPlaybackEffectsMonitoring() =
             effectsController.speedFlow,
         ) { enabled, pitch, speed ->
             Triple(enabled, pitch, speed)
-        }.collectLatest { (enabled, pitch, speed) ->
+        }.distinctUntilChanged().collectLatest { (enabled, pitch, speed) ->
             resetPlaybackEffects(
                 audioEffectsController = effectsController,
-                player = playerProvider.player,
+                playerProvider = playerProvider,
                 isEnabled = enabled,
                 pitch = pitch,
                 speed = speed
@@ -37,32 +38,34 @@ suspend fun StreamService2.startEqMonitoring() =
             effectsController.equalizerParamFlow,
         ) { param, bands, preset ->
             Triple(param, bands, preset)
-        }.collectLatest { (bands, preset, param) ->
+        }.distinctUntilChanged().collectLatest { (bands, preset, param) ->
             effectsController.setEqParameter(bands, preset, param)
         }
     }
 
 suspend fun StreamService2.startBassMonitoring() =
-    effectsController.bassStrengthFlow.collectLatest {
-        effectsController.setBassStrength(it)
-    }
+    effectsController
+        .bassStrengthFlow
+        .distinctUntilChanged()
+        .collectLatest { effectsController.setBassStrength(it) }
 
 suspend fun StreamService2.startReverbMonitoring() =
-    effectsController.reverbPresetFlow.collectLatest {
-        effectsController.setReverbPreset(it)
-    }
+    effectsController
+        .reverbPresetFlow
+        .distinctUntilChanged()
+        .collectLatest { effectsController.setReverbPreset(it) }
 
 private inline val StreamService2.effectsController
     get() = playerProvider.playerController.audioEffectsController
 
 private fun resetPlaybackEffects(
     audioEffectsController: AudioEffectsController,
-    player: Player,
+    playerProvider: PlayerProvider,
     isEnabled: Boolean,
     speed: Float,
     pitch: Float,
 ) {
-    player.playbackParameters = when {
+    playerProvider.playbackParameters = when {
         isEnabled -> PlaybackParameters(speed, pitch)
         else -> PlaybackParameters(1F, 1F)
     }

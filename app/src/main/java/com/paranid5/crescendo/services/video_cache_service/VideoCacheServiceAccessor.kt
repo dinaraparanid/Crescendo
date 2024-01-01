@@ -4,14 +4,17 @@ import android.content.Intent
 import android.os.Build
 import com.paranid5.crescendo.MainApplication
 import com.paranid5.crescendo.VIDEO_CASH_SERVICE_CONNECTION
-import com.paranid5.crescendo.domain.trimming.TrimRange
 import com.paranid5.crescendo.domain.caching.Formats
+import com.paranid5.crescendo.domain.trimming.TrimRange
 import com.paranid5.crescendo.services.ServiceAccessor
+import com.paranid5.crescendo.services.ServiceAccessorImpl
 import kotlinx.coroutines.flow.MutableStateFlow
+import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import org.koin.core.qualifier.named
 
-class VideoCacheServiceAccessor(application: MainApplication) : ServiceAccessor(application) {
+class VideoCacheServiceAccessor(application: MainApplication) : KoinComponent,
+    ServiceAccessor by ServiceAccessorImpl(application) {
     private val isVideoCashServiceConnectedState by inject<MutableStateFlow<Boolean>>(
         named(VIDEO_CASH_SERVICE_CONNECTION)
     )

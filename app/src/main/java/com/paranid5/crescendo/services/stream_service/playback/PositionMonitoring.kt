@@ -1,6 +1,5 @@
 package com.paranid5.crescendo.services.stream_service.playback
 
-import com.paranid5.crescendo.services.stream_service.StreamService
 import com.paranid5.crescendo.services.stream_service.StreamService2
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job

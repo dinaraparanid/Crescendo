@@ -12,6 +12,8 @@ import com.paranid5.crescendo.services.stream_service.ACTION_UNREPEAT
 import com.paranid5.crescendo.services.stream_service.StreamService2
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.map
 
 suspend fun StreamService2.startPlaybackStatesMonitoring() =
     lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
@@ -20,17 +22,22 @@ suspend fun StreamService2.startPlaybackStatesMonitoring() =
             playerProvider.isRepeatingFlow,
             playerProvider.speedFlow,
         ) { isPlaying, isRepeating, speed ->
-            PlaybackState(
-                context = this@startPlaybackStatesMonitoring,
-                isPlaying = isPlaying,
-                isRepeating = isRepeating,
-                currentPlaybackPosition = playerProvider.currentPosition,
-                speed = speed
-            )
-        }.collectLatest {
-            mediaSessionManager.updatePlaybackState(it)
-            notificationManager.updateNotification()
+            Triple(isPlaying, isRepeating, speed)
         }
+            .distinctUntilChanged()
+            .map { (isPlaying, isRepeating, speed) ->
+                PlaybackState(
+                    context = this@startPlaybackStatesMonitoring,
+                    isPlaying = isPlaying,
+                    isRepeating = isRepeating,
+                    currentPlaybackPosition = playerProvider.currentPosition,
+                    speed = speed
+                )
+            }
+            .collectLatest {
+                mediaSessionManager.updatePlaybackState(it)
+                notificationManager.updateNotification()
+            }
     }
 
 private fun PlaybackState(

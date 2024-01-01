@@ -1,5 +1,9 @@
 package com.paranid5.crescendo.presentation.main.playing.states
 
+import com.paranid5.crescendo.data.StorageHandler
+import com.paranid5.crescendo.data.states.stream.CurrentMetadataStateSubscriber
+import com.paranid5.crescendo.data.states.stream.CurrentMetadataStateSubscriberImpl
+import com.paranid5.crescendo.data.states.stream.currentMetadataDurationMillisFlow
 import com.paranid5.crescendo.domain.caching.Formats
 import com.paranid5.crescendo.domain.trimming.TrimRange
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -9,7 +13,7 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.update
 
-interface CacheDialogStateHolder {
+interface CacheDialogStateHolder : CurrentMetadataStateSubscriber {
     val trimOffsetMillisState: StateFlow<Long>
     val totalDurationMillisState: StateFlow<Long>
     val filenameState: StateFlow<String>
@@ -21,7 +25,8 @@ interface CacheDialogStateHolder {
     fun setSelectedSaveOptionIndex(selectedSaveOptionIndex: Int)
 }
 
-class CacheDialogStateHolderImpl : CacheDialogStateHolder {
+class CacheDialogStateHolderImpl(storageHandler: StorageHandler) : CacheDialogStateHolder,
+    CurrentMetadataStateSubscriber by CurrentMetadataStateSubscriberImpl(storageHandler) {
     private val _trimOffsetMillisState by lazy {
         MutableStateFlow(0L)
     }
@@ -70,12 +75,23 @@ class CacheDialogStateHolderImpl : CacheDialogStateHolder {
 inline val CacheDialogStateHolder.trimRangeFlow
     get() = combine(
         trimOffsetMillisState,
-        totalDurationMillisState
-    ) { trimOffsetMillis, totalDurationMillis ->
+        trimDurationMillisFlow
+    ) { trimOffsetMillis, trimDurationMillis ->
         TrimRange(
             startPointMillis = trimOffsetMillis,
-            totalDurationMillis = totalDurationMillis
+            totalDurationMillis = trimDurationMillis
         )
+    }
+
+inline val CacheDialogStateHolder.trimDurationMillisFlow
+    get() = combine(
+        totalDurationMillisState,
+        currentMetadataDurationMillisFlow
+    ) { totalDurationMillis, metaMillis ->
+        when (totalDurationMillis) {
+            0L -> metaMillis
+            else -> totalDurationMillis
+        }
     }
 
 inline val CacheDialogStateHolder.isCacheButtonClickableFlow

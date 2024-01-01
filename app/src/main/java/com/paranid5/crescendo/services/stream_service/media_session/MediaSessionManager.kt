@@ -1,6 +1,7 @@
 package com.paranid5.crescendo.services.stream_service.media_session
 
 import android.os.Build
+import android.support.v4.media.MediaMetadataCompat
 import android.support.v4.media.session.MediaSessionCompat
 import android.support.v4.media.session.PlaybackStateCompat
 import com.paranid5.crescendo.data.StorageHandler
@@ -29,6 +30,9 @@ class MediaSessionManager(storageHandler: StorageHandler) :
 
     fun updatePlaybackState(state: PlaybackStateCompat) =
         mediaSession.setPlaybackState(state)
+
+    fun updateMetadata(metadata: MediaMetadataCompat) =
+        mediaSession.setMetadata(metadata)
 
     fun releaseMediaSession() = mediaSession.release()
 }

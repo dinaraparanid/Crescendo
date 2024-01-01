@@ -22,6 +22,7 @@ import com.paranid5.crescendo.domain.media.AudioStatus
 import com.paranid5.crescendo.domain.utils.extensions.timeString
 import com.paranid5.crescendo.presentation.ui.theme.LocalAppColors
 import com.paranid5.crescendo.services.stream_service.StreamServiceAccessor
+import com.paranid5.crescendo.services.stream_service.sendSeekToBroadcast
 import org.koin.compose.koinInject
 
 @Composable

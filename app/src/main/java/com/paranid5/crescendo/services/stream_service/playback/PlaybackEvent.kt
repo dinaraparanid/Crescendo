@@ -1,18 +1,34 @@
 package com.paranid5.crescendo.services.stream_service.playback
 
 sealed interface PlaybackEvent {
-    data object StartSameStream : PlaybackEvent
+    data class StartSameStream(
+        private val id: Long = System.currentTimeMillis()
+    ) : PlaybackEvent
 
-    data class StartNewStream(val ytUrl: String, val initialPosition: Long) : PlaybackEvent
+    data class StartNewStream(
+        val ytUrl: String,
+        val initialPosition: Long,
+        private val id: Long = System.currentTimeMillis()
+    ) : PlaybackEvent
 
-    data object Resume : PlaybackEvent
+    data class Resume(
+        private val id: Long = System.currentTimeMillis()
+    ) : PlaybackEvent
 
-    data object Pause : PlaybackEvent
+    data class Pause(
+        private val id: Long = System.currentTimeMillis()
+    ) : PlaybackEvent
 
-    @JvmInline
-    value class SeekTo(val position: Long) : PlaybackEvent
+    data class SeekTo(
+        val position: Long,
+        private val id: Long = System.currentTimeMillis()
+    ) : PlaybackEvent
 
-    data object SeekTenSecsForward : PlaybackEvent
+    data class SeekTenSecsForward(
+        private val id: Long = System.currentTimeMillis()
+    ) : PlaybackEvent
 
-    data object SeekTenSecsBack : PlaybackEvent
+    data class SeekTenSecsBack(
+        private val id: Long = System.currentTimeMillis()
+    ) : PlaybackEvent
 }

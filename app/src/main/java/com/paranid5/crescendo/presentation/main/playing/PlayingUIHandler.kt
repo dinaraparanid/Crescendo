@@ -12,6 +12,10 @@ import com.paranid5.crescendo.presentation.UIHandler
 import com.paranid5.crescendo.presentation.main.NavHostController
 import com.paranid5.crescendo.presentation.main.Screens
 import com.paranid5.crescendo.services.stream_service.StreamServiceAccessor
+import com.paranid5.crescendo.services.stream_service.sendPauseBroadcast
+import com.paranid5.crescendo.services.stream_service.sendSeekTo10SecsBackBroadcast
+import com.paranid5.crescendo.services.stream_service.sendSeekTo10SecsForwardBroadcast
+import com.paranid5.crescendo.services.stream_service.sendSeekToBroadcast
 import com.paranid5.crescendo.services.track_service.TrackServiceAccessor
 import com.paranid5.crescendo.services.video_cache_service.VideoCacheServiceAccessor
 import kotlinx.coroutines.flow.MutableStateFlow

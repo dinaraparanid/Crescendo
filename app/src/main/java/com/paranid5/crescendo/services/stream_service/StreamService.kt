@@ -63,6 +63,7 @@ import org.koin.core.component.inject
 import org.koin.core.qualifier.named
 
 @OptIn(UnstableApi::class)
+@Deprecated("Use StreamService2 instead")
 class StreamService : SuspendService(), KoinComponent {
     @Suppress("IncorrectFormatting")
     companion object {

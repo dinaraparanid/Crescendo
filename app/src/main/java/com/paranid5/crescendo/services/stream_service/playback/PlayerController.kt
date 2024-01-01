@@ -22,6 +22,7 @@ import com.paranid5.crescendo.services.stream_service.playback.effects.AudioEffe
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import org.koin.core.component.KoinComponent
@@ -39,7 +40,7 @@ class PlayerController(service: StreamService2, storageHandler: StorageHandler) 
     private val audioSessionIdState by inject<MutableStateFlow<Int>>(named(AUDIO_SESSION_ID))
 
     internal val audioEffectsController by lazy {
-        AudioEffectsController()
+        AudioEffectsController(storageHandler)
     }
 
     @OptIn(UnstableApi::class)
@@ -121,9 +122,9 @@ class PlayerController(service: StreamService2, storageHandler: StorageHandler) 
 
     private suspend inline fun startRepeatMonitoring(lifecycle: Lifecycle): Unit =
         lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
-            isRepeatingFlow.collectLatest {
-                player.repeatMode = getRepeatMode(it)
-            }
+            isRepeatingFlow
+                .distinctUntilChanged()
+                .collectLatest { player.repeatMode = getRepeatMode(it) }
         }
 
     fun releasePlayerWithEffects() {

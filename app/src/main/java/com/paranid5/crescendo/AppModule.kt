@@ -114,7 +114,6 @@ private val globalsModule = module {
 
     singleOf(::StorageHandler)
     single { androidApplication() as MainApplication }
-    single { androidContext() }
     singleOf(::KtorClient)
 
     single(named(IS_PLAYING)) { MutableStateFlow(false) }

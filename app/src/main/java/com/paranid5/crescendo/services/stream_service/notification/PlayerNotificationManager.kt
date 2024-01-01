@@ -78,12 +78,10 @@ private fun NotificationListener(service: StreamService2) =
 private fun MediaDescriptionProvider(service: StreamService2) =
     object : PlayerNotificationManager.MediaDescriptionAdapter {
         override fun getCurrentContentTitle(player: Player) =
-            player.currentMediaItem?.mediaMetadata?.title?.toString()
-                ?: service.getString(R.string.stream_no_name)
+            service.videoTitle ?: service.getString(R.string.stream_no_name)
 
         override fun getCurrentContentText(player: Player) =
-            player.currentMediaItem?.mediaMetadata?.artist?.toString()
-                ?: service.getString(R.string.unknown_streamer)
+            service.videoAuthor ?: service.getString(R.string.unknown_streamer)
 
         override fun createCurrentContentIntent(player: Player) =
             PendingIntent.getActivity(
@@ -128,6 +126,15 @@ private fun CustomActionsReceiver(service: StreamService2) =
         override fun onCustomAction(player: Player, action: String, intent: Intent) =
             service.sendBroadcast(service.commandsToActions[action]!!.playbackAction)
     }
+
+private inline val StreamService2.videoTitle
+    get() = metadata?.title
+
+private inline val StreamService2.videoAuthor
+    get() = metadata?.author
+
+private inline val StreamService2.metadata
+    get() = notificationManager.currentMetadataState.value
 
 private suspend inline fun NotificationManager.getVideoCoverAsync(context: Context) =
     currentMetadataState.value

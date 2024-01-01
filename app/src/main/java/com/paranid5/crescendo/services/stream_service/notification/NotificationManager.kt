@@ -13,6 +13,7 @@ import com.paranid5.crescendo.data.states.stream.CurrentMetadataStateSubscriberI
 import com.paranid5.crescendo.services.stream_service.StreamService2
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
@@ -21,13 +22,8 @@ internal const val STREAM_CHANNEL_ID = "stream_channel"
 
 class NotificationManager(service: StreamService2, storageHandler: StorageHandler) :
     CurrentMetadataStateSubscriber by CurrentMetadataStateSubscriberImpl(storageHandler) {
-    internal val currentMetadataState by lazy {
-        currentMetadataFlow.stateIn(
-            service.serviceScope,
-            SharingStarted.Lazily,
-            null
-        )
-    }
+    internal val currentMetadataState = currentMetadataFlow
+        .stateIn(service.serviceScope, SharingStarted.Eagerly, null)
 
     @delegate:UnstableApi
     private val playerNotificationManager by lazy {
@@ -47,9 +43,12 @@ class NotificationManager(service: StreamService2, storageHandler: StorageHandle
 
 suspend inline fun StreamService2.startNotificationMonitoring() =
     lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
-        notificationManager.currentMetadataFlow.collectLatest {
-            serviceScope.launch { notificationManager.updateNotification() }
-        }
+        notificationManager
+            .currentMetadataFlow
+            .distinctUntilChanged()
+            .collectLatest {
+                serviceScope.launch { notificationManager.updateNotification() }
+            }
     }
 
 @Suppress("DEPRECATION")

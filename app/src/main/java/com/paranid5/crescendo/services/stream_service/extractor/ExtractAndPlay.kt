@@ -6,7 +6,7 @@ import com.paranid5.crescendo.services.stream_service.sendErrorBroadcast
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
-suspend inline fun StreamService2.extractMediaFilesAndStartPlaying(
+internal suspend inline fun StreamService2.extractMediaFilesAndStartPlaying(
     ytUrl: String,
     initialPosition: Long,
 ) {
@@ -23,6 +23,7 @@ suspend inline fun StreamService2.extractMediaFilesAndStartPlaying(
     }
 
     serviceScope.launch {
-        playerProvider.storeAndPlayStream(audioUrl, initialPosition)
+        playerProvider.setStreamPlaybackPosition(initialPosition)
+        playerProvider.playStreamImpl(audioUrl, initialPosition)
     }
 }

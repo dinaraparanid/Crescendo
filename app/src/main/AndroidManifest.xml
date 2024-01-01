@@ -57,7 +57,7 @@
                 android:theme="@style/Theme.MediaStreamer">
         </activity>
         <service
-                android:name=".services.stream_service.StreamService"
+                android:name=".services.stream_service.StreamService2"
                 android:foregroundServiceType="mediaPlayback" />
         <service android:name=".services.track_service.TrackService"
                 android:foregroundServiceType="mediaPlayback" />
