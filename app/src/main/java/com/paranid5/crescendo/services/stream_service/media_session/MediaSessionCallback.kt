@@ -4,48 +4,37 @@ import android.os.Bundle
 import android.support.v4.media.session.MediaSessionCompat
 import com.paranid5.crescendo.domain.utils.extensions.sendBroadcast
 import com.paranid5.crescendo.services.stream_service.StreamService2
-import kotlinx.coroutines.launch
+import com.paranid5.crescendo.services.stream_service.playback.pauseAsync
+import com.paranid5.crescendo.services.stream_service.playback.resumeAsync
+import com.paranid5.crescendo.services.stream_service.playback.seekTenSecsBackAsync
+import com.paranid5.crescendo.services.stream_service.playback.seekTenSecsForwardAsync
+import com.paranid5.crescendo.services.stream_service.playback.seekToAsync
 
 fun MediaSessionCallback(service: StreamService2) =
     object : MediaSessionCompat.Callback() {
         override fun onPlay() {
             super.onPlay()
-
-            service.serviceScope.launch {
-                service.playerProvider.resume()
-            }
+            service.resumeAsync()
         }
 
         override fun onPause() {
             super.onPause()
-
-            service.serviceScope.launch {
-                service.playerProvider.pause()
-            }
+            service.pauseAsync()
         }
 
         override fun onSeekTo(pos: Long) {
             super.onSeekTo(pos)
-
-            service.serviceScope.launch {
-                service.playerProvider.seekTo(pos)
-            }
+            service.seekToAsync(pos)
         }
 
         override fun onSkipToNext() {
             super.onSkipToNext()
-
-            service.serviceScope.launch {
-                service.playerProvider.seekTenSecsForward()
-            }
+            service.seekTenSecsForwardAsync()
         }
 
         override fun onSkipToPrevious() {
             super.onSkipToPrevious()
-
-            service.serviceScope.launch {
-                service.playerProvider.seekTenSecsBack()
-            }
+            service.seekTenSecsBackAsync()
         }
 
         override fun onCustomAction(action: String, extras: Bundle?) {

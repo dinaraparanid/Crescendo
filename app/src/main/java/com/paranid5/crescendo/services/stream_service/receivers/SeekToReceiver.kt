@@ -13,7 +13,7 @@ fun SeekToReceiver(service: StreamService2) =
             val position = intent.positionArg
 
             service.serviceScope.launch {
-                service.playerProvider.seekTo(position)
+                service.playerProvider.seekToViaPlayer(position)
             }
         }
     }

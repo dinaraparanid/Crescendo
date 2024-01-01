@@ -14,7 +14,7 @@ fun RepeatChangedReceiver(service: StreamService2) =
             val isRepeating = playerProvider.player.repeatMode == Player.REPEAT_MODE_ONE
 
             service.serviceScope.launch {
-                playerProvider.playerController.setAndStoreRepeating(!isRepeating)
+                playerProvider.setAndStoreRepeating(!isRepeating)
                 service.notificationManager.updateNotification()
             }
         }

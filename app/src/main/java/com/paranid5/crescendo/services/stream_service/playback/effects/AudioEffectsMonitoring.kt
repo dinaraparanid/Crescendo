@@ -12,14 +12,14 @@ import kotlinx.coroutines.flow.distinctUntilChanged
 suspend fun StreamService2.startPlaybackEffectsMonitoring() =
     lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
         combine(
-            effectsController.areAudioEffectsEnabledFlow,
-            effectsController.pitchFlow,
-            effectsController.speedFlow,
+            playerProvider.areAudioEffectsEnabledFlow,
+            playerProvider.pitchFlow,
+            playerProvider.speedFlow,
         ) { enabled, pitch, speed ->
             Triple(enabled, pitch, speed)
         }.distinctUntilChanged().collectLatest { (enabled, pitch, speed) ->
             resetPlaybackEffects(
-                audioEffectsController = effectsController,
+                audioEffectsController = playerProvider,
                 playerProvider = playerProvider,
                 isEnabled = enabled,
                 pitch = pitch,
@@ -33,30 +33,27 @@ suspend fun StreamService2.startPlaybackEffectsMonitoring() =
 suspend fun StreamService2.startEqMonitoring() =
     lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
         combine(
-            effectsController.equalizerBandsFlow,
-            effectsController.equalizerPresetFlow,
-            effectsController.equalizerParamFlow,
+            playerProvider.equalizerBandsFlow,
+            playerProvider.equalizerPresetFlow,
+            playerProvider.equalizerParamFlow,
         ) { param, bands, preset ->
             Triple(param, bands, preset)
         }.distinctUntilChanged().collectLatest { (bands, preset, param) ->
-            effectsController.setEqParameter(bands, preset, param)
+            playerProvider.setEqParameter(bands, preset, param)
         }
     }
 
 suspend fun StreamService2.startBassMonitoring() =
-    effectsController
+    playerProvider
         .bassStrengthFlow
         .distinctUntilChanged()
-        .collectLatest { effectsController.setBassStrength(it) }
+        .collectLatest { playerProvider.setBassStrength(it) }
 
 suspend fun StreamService2.startReverbMonitoring() =
-    effectsController
+    playerProvider
         .reverbPresetFlow
         .distinctUntilChanged()
-        .collectLatest { effectsController.setReverbPreset(it) }
-
-private inline val StreamService2.effectsController
-    get() = playerProvider.playerController.audioEffectsController
+        .collectLatest { playerProvider.setReverbPreset(it) }
 
 private fun resetPlaybackEffects(
     audioEffectsController: AudioEffectsController,

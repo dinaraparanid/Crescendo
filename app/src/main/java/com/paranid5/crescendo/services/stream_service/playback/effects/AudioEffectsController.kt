@@ -30,7 +30,36 @@ import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import org.koin.core.qualifier.named
 
-class AudioEffectsController(storageHandler: StorageHandler) : KoinComponent,
+interface AudioEffectsController :
+    AudioEffectsEnabledStateSubscriber,
+    PitchStateSubscriber,
+    SpeedStateSubscriber,
+    EqualizerParamStateSubscriber,
+    EqualizerBandsStateSubscriber,
+    EqualizerPresetStateSubscriber,
+    BassStrengthStateSubscriber,
+    ReverbPresetStateSubscriber {
+    val equalizer: Equalizer
+    val bassBoost: BassBoost
+    val reverb: PresetReverb
+
+    fun initAudioEffects(audioSessionId: Int)
+
+    fun setEqParameter(
+        bandLevels: List<Short>?,
+        preset: Short,
+        currentParameter: EqualizerBandsPreset,
+    )
+
+    fun setBassStrength(bassStrength: Short)
+
+    fun setReverbPreset(reverbPreset: Short)
+
+    fun releaseAudioEffects()
+}
+
+internal class AudioEffectsControllerImpl(storageHandler: StorageHandler) :
+    AudioEffectsController, KoinComponent,
     AudioEffectsEnabledStateSubscriber by AudioEffectsEnabledStateSubscriberImpl(storageHandler),
     PitchStateSubscriber by PitchStateSubscriberImpl(storageHandler),
     SpeedStateSubscriber by SpeedStateSubscriberImpl(storageHandler),
@@ -43,22 +72,22 @@ class AudioEffectsController(storageHandler: StorageHandler) : KoinComponent,
         named(EQUALIZER_DATA)
     )
 
-    lateinit var equalizer: Equalizer
+    override lateinit var equalizer: Equalizer
         private set
 
-    lateinit var bassBoost: BassBoost
+    override lateinit var bassBoost: BassBoost
         private set
 
-    lateinit var reverb: PresetReverb
+    override lateinit var reverb: PresetReverb
         private set
 
-    fun initAudioEffects(audioSessionId: Int) {
+    override fun initAudioEffects(audioSessionId: Int) {
         equalizer = Equalizer(0, audioSessionId)
         bassBoost = BassBoost(0, audioSessionId)
         reverb = PresetReverb(0, audioSessionId)
     }
 
-    fun setEqParameter(
+    override fun setEqParameter(
         bandLevels: List<Short>?,
         preset: Short,
         currentParameter: EqualizerBandsPreset,
@@ -67,10 +96,10 @@ class AudioEffectsController(storageHandler: StorageHandler) : KoinComponent,
         updateEqData(bandLevels, preset, currentParameter)
     }
 
-    fun setBassStrength(bassStrength: Short) =
+    override fun setBassStrength(bassStrength: Short) =
         bassBoost.setStrength(bassStrength)
 
-    fun setReverbPreset(reverbPreset: Short) {
+    override fun setReverbPreset(reverbPreset: Short) {
         reverb.preset = reverbPreset
     }
 
@@ -82,7 +111,7 @@ class AudioEffectsController(storageHandler: StorageHandler) : KoinComponent,
         EqualizerData(equalizer, bandLevels, preset, parameter)
     }
 
-    fun releaseAudioEffects() {
+    override fun releaseAudioEffects() {
         equalizer.release()
         bassBoost.release()
         reverb.release()

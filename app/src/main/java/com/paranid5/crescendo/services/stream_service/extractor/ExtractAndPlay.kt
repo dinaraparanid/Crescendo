@@ -24,6 +24,6 @@ internal suspend inline fun StreamService2.extractMediaFilesAndStartPlaying(
 
     serviceScope.launch {
         playerProvider.setStreamPlaybackPosition(initialPosition)
-        playerProvider.playStreamImpl(audioUrl, initialPosition)
+        playerProvider.playStreamViaPlayer(audioUrl, initialPosition)
     }
 }

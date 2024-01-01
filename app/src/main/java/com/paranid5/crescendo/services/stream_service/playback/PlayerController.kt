@@ -19,7 +19,9 @@ import com.paranid5.crescendo.data.states.playback.RepeatingStateSubscriber
 import com.paranid5.crescendo.data.states.playback.RepeatingStateSubscriberImpl
 import com.paranid5.crescendo.services.stream_service.StreamService2
 import com.paranid5.crescendo.services.stream_service.playback.effects.AudioEffectsController
+import com.paranid5.crescendo.services.stream_service.playback.effects.AudioEffectsControllerImpl
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.distinctUntilChanged
@@ -28,23 +30,51 @@ import kotlinx.coroutines.launch
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import org.koin.core.qualifier.named
-import java.util.concurrent.atomic.AtomicLong
 
 private const val TEN_SECS_AS_MILLIS = 10000
 
-class PlayerController(service: StreamService2, storageHandler: StorageHandler) : KoinComponent,
+interface PlayerController :
+    AudioEffectsController,
+    RepeatingStateSubscriber,
+    RepeatingStatePublisher {
+    val player: Player
+
+    var isPlaying: Boolean
+    val isPlayingState: StateFlow<Boolean>
+
+    val currentPositionState: StateFlow<Long>
+    fun updateCurrentPosition()
+
+    suspend fun setAndStoreRepeating(isRepeating: Boolean)
+
+    fun playStreamViaPlayer(url: String, initialPosition: Long)
+
+    fun pausePlayer()
+
+    fun resumePlayer()
+
+    fun seekToViaPlayer(position: Long)
+
+    fun seekTenSecsBackViaPlayer()
+
+    fun seekTenSecsForwardViaPlayer(videoDurationMillis: Long)
+
+    fun resetAudioSessionIdIfNotPlaying()
+
+    fun releasePlayerWithEffects()
+}
+
+internal class PlayerControllerImpl(service: StreamService2, storageHandler: StorageHandler) :
+    PlayerController, KoinComponent,
+    AudioEffectsController by AudioEffectsControllerImpl(storageHandler),
     RepeatingStateSubscriber by RepeatingStateSubscriberImpl(storageHandler),
     RepeatingStatePublisher by RepeatingStatePublisherImpl(storageHandler) {
     private val _isPlayingState by inject<MutableStateFlow<Boolean>>(named(IS_PLAYING))
 
     private val audioSessionIdState by inject<MutableStateFlow<Int>>(named(AUDIO_SESSION_ID))
 
-    internal val audioEffectsController by lazy {
-        AudioEffectsController(storageHandler)
-    }
-
     @OptIn(UnstableApi::class)
-    internal val player by lazy {
+    override val player by lazy {
         ExoPlayer.Builder(service)
             .setAudioAttributes(newAudioAttributes, true)
             .setHandleAudioBecomingNoisy(true)
@@ -54,7 +84,7 @@ class PlayerController(service: StreamService2, storageHandler: StorageHandler) 
             .apply {
                 addListener(PlayerStateChangedListener(service))
                 audioSessionIdState.update { audioSessionId }
-                audioEffectsController.initAudioEffects(audioSessionId)
+                initAudioEffects(audioSessionId)
 
                 service.serviceScope.launch {
                     startRepeatMonitoring(service.lifecycle)
@@ -62,35 +92,44 @@ class PlayerController(service: StreamService2, storageHandler: StorageHandler) 
             }
     }
 
-    var isPlaying
+    override var isPlaying
         get() = _isPlayingState.value
         set(value) = _isPlayingState.update { value }
 
-    val isPlayingState by lazy {
+    override val isPlayingState by lazy {
         _isPlayingState.asStateFlow()
     }
 
-    val currentPosition = AtomicLong()
+    private val _currentPositionState by lazy {
+        MutableStateFlow(0L)
+    }
+
+    override val currentPositionState by lazy {
+        _currentPositionState.asStateFlow()
+    }
+
+    inline val currentPosition
+        get() = currentPositionState.value
 
     @MainThread
-    fun updateCurrentPosition() =
-        currentPosition.set(player.currentPosition)
+    override fun updateCurrentPosition() =
+        _currentPositionState.update { player.currentPosition }
 
-    suspend fun setAndStoreRepeating(isRepeating: Boolean) {
+    override suspend fun setAndStoreRepeating(isRepeating: Boolean) {
         player.repeatMode = getRepeatMode(isRepeating)
         setRepeating(isRepeating)
     }
 
-    fun playStream(url: String, initialPosition: Long) {
+    override fun playStreamViaPlayer(url: String, initialPosition: Long) {
         player.setMediaItem(MediaItem.fromUri(url))
         player.playWhenReady = true
         player.prepare()
         player.seekTo(initialPosition)
     }
 
-    fun pause() = player.pause()
+    override fun pausePlayer() = player.pause()
 
-    fun resume() {
+    override fun resumePlayer() {
         resetAudioSessionId()
         play()
     }
@@ -99,7 +138,7 @@ class PlayerController(service: StreamService2, storageHandler: StorageHandler) 
         player.playWhenReady = true
     }
 
-    fun resetAudioSessionIdIfNotPlaying() {
+    override fun resetAudioSessionIdIfNotPlaying() {
         if (!isPlaying) resetAudioSessionId()
     }
 
@@ -107,17 +146,17 @@ class PlayerController(service: StreamService2, storageHandler: StorageHandler) 
     private fun resetAudioSessionId() =
         audioSessionIdState.update { player.audioSessionId }
 
-    fun seekTo(position: Long) {
+    override fun seekToViaPlayer(position: Long) {
         resetAudioSessionId()
         player.seekTo(position)
     }
 
-    fun seekTenSecsBack() = seekTo(
-        maxOf(currentPosition.get() - TEN_SECS_AS_MILLIS, 0)
+    override fun seekTenSecsBackViaPlayer() = seekToViaPlayer(
+        maxOf(currentPosition - TEN_SECS_AS_MILLIS, 0)
     )
 
-    fun seekTenSecsForward(videoDurationMillis: Long) = seekTo(
-        minOf(currentPosition.get() + TEN_SECS_AS_MILLIS, videoDurationMillis)
+    override fun seekTenSecsForwardViaPlayer(videoDurationMillis: Long) = seekToViaPlayer(
+        minOf(currentPosition + TEN_SECS_AS_MILLIS, videoDurationMillis)
     )
 
     private suspend inline fun startRepeatMonitoring(lifecycle: Lifecycle): Unit =
@@ -127,8 +166,8 @@ class PlayerController(service: StreamService2, storageHandler: StorageHandler) 
                 .collectLatest { player.repeatMode = getRepeatMode(it) }
         }
 
-    fun releasePlayerWithEffects() {
-        audioEffectsController.releaseAudioEffects()
+    override fun releasePlayerWithEffects() {
+        releaseAudioEffects()
         player.stop()
         player.release()
         audioSessionIdState.update { 0 }

@@ -13,9 +13,9 @@ fun ErrorNotification(context: Context, message: String) =
         .setSmallIcon(R.drawable.save_icon)
         .setContentIntent(
             PendingIntent.getActivity(
-                context.applicationContext,
+                context,
                 0,
-                Intent(context.applicationContext, MainActivity::class.java),
+                Intent(context, MainActivity::class.java),
                 PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
             )
         )
@@ -27,10 +27,7 @@ fun ErrorNotification(context: Context, message: String) =
 @Suppress("DEPRECATION")
 private fun NotificationBuilderCompat(context: Context) = when {
     Build.VERSION.SDK_INT >= Build.VERSION_CODES.O ->
-        Notification.Builder(
-            context.applicationContext,
-            STREAM_CHANNEL_ID
-        )
+        Notification.Builder(context, STREAM_CHANNEL_ID)
 
-    else -> Notification.Builder(context.applicationContext)
+    else -> Notification.Builder(context)
 }

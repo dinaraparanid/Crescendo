@@ -10,7 +10,7 @@ fun TenSecsBackReceiver(service: StreamService2) =
     object : BroadcastReceiver() {
         override fun onReceive(context: Context?, intent: Intent?) {
             service.serviceScope.launch {
-                service.playerProvider.seekTenSecsBack()
+                service.playerProvider.seekTenSecsBackViaPlayer()
             }
         }
     }

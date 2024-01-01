@@ -9,18 +9,21 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.sp
 import com.paranid5.crescendo.presentation.ui.theme.LocalAppColors
+import kotlinx.collections.immutable.ImmutableList
 
 @Composable
 fun Spinner(
-    items: List<String>,
-    selectedItemIndexes: List<Int>,
+    items: ImmutableList<String>,
+    selectedItemIndices: ImmutableList<Int>,
     onItemSelected: (Int, String) -> Unit,
     modifier: Modifier = Modifier,
     dropdownModifier: Modifier = Modifier,
-    previewItemIndex: Int = selectedItemIndexes.firstOrNull() ?: 0,
+    previewItemIndex: Int = selectedItemIndices.firstOrNull() ?: 0,
     selectedItemFactory: @Composable (Int, String, Modifier) -> Unit = { _, text, mod ->
         DefaultSelectedItem(text, mod)
     },
@@ -47,7 +50,9 @@ fun Spinner(
                 DropdownMenuItem(
                     text = {
                         when (index) {
-                            in selectedItemIndexes -> selectedItemFactory(index, element, Modifier)
+                            in selectedItemIndices ->
+                                selectedItemFactory(index, element, Modifier)
+
                             else -> dropdownItemFactory(index, element, Modifier)
                         }
                     },
@@ -63,9 +68,26 @@ fun Spinner(
 
 @Composable
 private fun DefaultSelectedItem(text: String, modifier: Modifier = Modifier) {
-    val primaryColor = LocalAppColors.current.colorScheme.primary
-    Text(text, modifier, primaryColor)
+    val colors = LocalAppColors.current
+    val updText by rememberUpdatedState(text)
+
+    Text(
+        text = updText,
+        modifier = modifier,
+        color = colors.primary,
+        fontSize = 14.sp
+    )
 }
 
 @Composable
-private fun DefaultItem(text: String, modifier: Modifier = Modifier) = Text(text, modifier)
+private fun DefaultItem(text: String, modifier: Modifier = Modifier) {
+    val colors = LocalAppColors.current
+    val updText by rememberUpdatedState(text)
+
+    Text(
+        text = updText,
+        modifier = modifier,
+        color = colors.fontColor,
+        fontSize = 14.sp
+    )
+}

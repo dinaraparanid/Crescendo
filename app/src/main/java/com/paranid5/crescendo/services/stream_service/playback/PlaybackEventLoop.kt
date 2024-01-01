@@ -16,6 +16,8 @@ suspend fun PlaybackEventLoop(service: StreamService2): MutableSharedFlow<Playba
 
     service.serviceScope.launch {
         service.lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
+            service.playerProvider.incrementPlaybackEventLoopInitSteps()
+
             playbackEventFlow
                 .combine(ArgsFlow(service)) { event, (url, position, metadata) ->
                     Tuple4(url, position, metadata, event)
@@ -78,7 +80,7 @@ private suspend inline fun StreamService2.onPlayStream(ytUrl: String, initialPos
 
 private suspend fun StreamService2.onPause() {
     playerProvider.setStreamPlaybackPosition(playerProvider.currentPosition)
-    playerProvider.playerController.pause()
+    playerProvider.pausePlayer()
 }
 
 private suspend inline fun StreamService2.onResume(ytUrl: String, initialPosition: Long) =
@@ -88,20 +90,20 @@ private suspend inline fun StreamService2.onResume(ytUrl: String, initialPositio
             playerProvider.isStoppedWithError = false
         }
 
-        else -> playerProvider.playerController.resume()
+        else -> playerProvider.resumePlayer()
     }
 
 private fun StreamService2.onSeekTo(position: Long) {
     playerProvider.resetAudioSessionIdIfNotPlaying()
-    playerProvider.playerController.seekTo(position)
+    playerProvider.seekToViaPlayer(position)
 }
 
 private fun StreamService2.onSeekTenSecsBack() {
     playerProvider.resetAudioSessionIdIfNotPlaying()
-    playerProvider.playerController.seekTenSecsBack()
+    playerProvider.seekTenSecsBackViaPlayer()
 }
 
 private fun StreamService2.onSeekTenSecsForward(videoDurationMillis: Long) {
     playerProvider.resetAudioSessionIdIfNotPlaying()
-    playerProvider.playerController.seekTenSecsForward(videoDurationMillis)
+    playerProvider.seekTenSecsForwardViaPlayer(videoDurationMillis)
 }

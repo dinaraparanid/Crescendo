@@ -110,7 +110,7 @@ class StreamService2 : SuspendService(), KoinComponent,
         connect(startId)
 
         mediaSessionManager.initMediaSession(
-            service = this@StreamService2,
+            context = this@StreamService2,
             mediaSessionCallback = MediaSessionCallback(this@StreamService2),
         )
 

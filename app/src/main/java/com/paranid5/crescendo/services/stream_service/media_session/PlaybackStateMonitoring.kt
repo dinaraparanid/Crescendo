@@ -5,6 +5,7 @@ import android.os.SystemClock
 import android.support.v4.media.session.PlaybackStateCompat
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.repeatOnLifecycle
+import arrow.core.Tuple4
 import com.paranid5.crescendo.R
 import com.paranid5.crescendo.services.stream_service.ACTION_DISMISS
 import com.paranid5.crescendo.services.stream_service.ACTION_REPEAT
@@ -20,17 +21,18 @@ suspend fun StreamService2.startPlaybackStatesMonitoring() =
         combine(
             playerProvider.isPlayingState,
             playerProvider.isRepeatingFlow,
+            playerProvider.currentPositionState,
             playerProvider.speedFlow,
-        ) { isPlaying, isRepeating, speed ->
-            Triple(isPlaying, isRepeating, speed)
+        ) { isPlaying, isRepeating, position, speed ->
+            Tuple4(isPlaying, isRepeating, position, speed)
         }
             .distinctUntilChanged()
-            .map { (isPlaying, isRepeating, speed) ->
+            .map { (isPlaying, isRepeating, position, speed) ->
                 PlaybackState(
                     context = this@startPlaybackStatesMonitoring,
                     isPlaying = isPlaying,
                     isRepeating = isRepeating,
-                    currentPlaybackPosition = playerProvider.currentPosition,
+                    currentPlaybackPosition = position,
                     speed = speed
                 )
             }

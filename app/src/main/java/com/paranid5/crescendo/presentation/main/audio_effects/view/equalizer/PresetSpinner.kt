@@ -32,6 +32,7 @@ import com.paranid5.crescendo.presentation.ui.extensions.collectLatestAsState
 import com.paranid5.crescendo.presentation.ui.theme.LocalAppColors
 import com.paranid5.crescendo.presentation.ui.utils.Spinner
 import kotlinx.collections.immutable.persistentListOf
+import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
 import org.koin.compose.koinInject
@@ -67,12 +68,14 @@ private fun PresetSpinnerImpl(
 
     val customPresetIndex by rememberCustomPresetIndex(equalizerData)
     var selectedItemIndex by rememberSelectedItemIndex(equalizerData)
-    val curItemInd by rememberCurrentItemIndex(selectedItemIndex, equalizerData)
+    val curItemIndex by rememberCurrentItemIndex(selectedItemIndex, equalizerData)
     val builtInPresets by rememberBuiltInPresets(equalizerData)
+    val presets = (builtInPresets + stringResource(R.string.custom)).toImmutableList()
+    val selectedItemIndices by rememberSelectedItemIndices(curItemIndex)
 
     Spinner(
-        items = builtInPresets + stringResource(R.string.custom),
-        selectedItemIndexes = listOf(curItemInd ?: 0),
+        items = presets,
+        selectedItemIndices = selectedItemIndices,
         modifier = modifier,
         onItemSelected = { ind, _ ->
             selectedItemIndex = ind
@@ -155,7 +158,7 @@ private fun rememberCurrentItemIndex(
     val isCustomPreset by rememberIsCustomPreset(equalizerData)
     val customPresetIndex by rememberCustomPresetIndex(equalizerData)
 
-    return remember(isCustomPreset) {
+    return remember(selectedItemIndex, isCustomPreset) {
         derivedStateOf { if (isCustomPreset) customPresetIndex else selectedItemIndex }
     }
 }
@@ -164,4 +167,10 @@ private fun rememberCurrentItemIndex(
 private fun rememberBuiltInPresets(equalizerData: EqualizerData?) =
     remember(equalizerData?.presets) {
         derivedStateOf { equalizerData?.presets ?: persistentListOf() }
+    }
+
+@Composable
+private fun rememberSelectedItemIndices(curItemIndex: Int?) =
+    remember(curItemIndex) {
+        derivedStateOf { persistentListOf(curItemIndex ?: 0) }
     }

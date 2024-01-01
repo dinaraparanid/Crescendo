@@ -60,7 +60,7 @@ private fun TrackOrderSpinnerImpl(
 
     Spinner(
         items = spinnerItems,
-        selectedItemIndexes = selectedItemIndexes,
+        selectedItemIndices = selectedItemIndexes,
         modifier = modifier,
         onItemSelected = { ind, _ ->
             scope.launch {
