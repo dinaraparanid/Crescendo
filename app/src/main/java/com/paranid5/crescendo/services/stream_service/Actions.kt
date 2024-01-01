@@ -28,12 +28,12 @@ sealed class Actions(
 
     data object Repeat : Actions(
         requestCode = 7,
-        playbackAction = StreamService.Broadcast_CHANGE_REPEAT
+        playbackAction = StreamService.Broadcast_REPEAT_CHANGED
     )
 
     data object Unrepeat : Actions(
         requestCode = 8,
-        playbackAction = StreamService.Broadcast_CHANGE_REPEAT
+        playbackAction = StreamService.Broadcast_REPEAT_CHANGED
     )
 
     data object Dismiss : Actions(

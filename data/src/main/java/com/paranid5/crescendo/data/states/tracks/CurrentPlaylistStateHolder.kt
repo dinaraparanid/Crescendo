@@ -3,7 +3,7 @@ package com.paranid5.crescendo.data.states.tracks
 import com.paranid5.crescendo.data.StorageHandler
 import com.paranid5.crescendo.data.properties.currentPlaylistFlow
 import com.paranid5.crescendo.data.properties.storeCurrentPlaylist
-import com.paranid5.crescendo.domain.tracks.DefaultTrack
+import com.paranid5.crescendo.domain.tracks.Track
 import com.paranid5.crescendo.domain.utils.extensions.timeString
 import com.paranid5.crescendo.domain.utils.extensions.totalDurationMillis
 import kotlinx.collections.immutable.ImmutableList
@@ -11,11 +11,11 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 
 interface CurrentPlaylistStateSubscriber {
-    val currentPlaylistFlow: Flow<ImmutableList<DefaultTrack>>
+    val currentPlaylistFlow: Flow<ImmutableList<Track>>
 }
 
 interface CurrentPlaylistStatePublisher {
-    suspend fun setCurrentPlaylist(playlist: ImmutableList<DefaultTrack>)
+    suspend fun setCurrentPlaylist(playlist: List<Track>)
 }
 
 class CurrentPlaylistStateSubscriberImpl(private val storageHandler: StorageHandler) :
@@ -27,7 +27,7 @@ class CurrentPlaylistStateSubscriberImpl(private val storageHandler: StorageHand
 
 class CurrentPlaylistStatePublisherImpl(private val storageHandler: StorageHandler) :
     CurrentPlaylistStatePublisher {
-    override suspend fun setCurrentPlaylist(playlist: ImmutableList<DefaultTrack>) =
+    override suspend fun setCurrentPlaylist(playlist: List<Track>) =
         storageHandler.storeCurrentPlaylist(playlist)
 }
 

@@ -1,12 +1,12 @@
 package com.paranid5.crescendo.services.stream_service.extractor
 
 import com.paranid5.crescendo.domain.metadata.VideoMetadata
-import com.paranid5.crescendo.services.stream_service.StreamService2
+import com.paranid5.crescendo.services.stream_service.StreamService
 import com.paranid5.crescendo.services.stream_service.sendErrorBroadcast
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
-internal suspend inline fun StreamService2.extractMediaFilesAndStartPlaying(
+internal suspend inline fun StreamService.extractMediaFilesAndStartPlaying(
     ytUrl: String,
     initialPosition: Long,
 ) {

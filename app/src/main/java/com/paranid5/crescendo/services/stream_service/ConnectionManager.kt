@@ -1,16 +1,12 @@
 package com.paranid5.crescendo.services.stream_service
 
 import com.paranid5.crescendo.STREAM_SERVICE_CONNECTION
+import com.paranid5.crescendo.services.ConnectionManager
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.update
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import org.koin.core.qualifier.named
-
-interface ConnectionManager {
-    var startId: Int
-    var isConnected: Boolean
-}
 
 class ConnectionManagerImpl : ConnectionManager, KoinComponent {
     override var startId = 0
@@ -22,13 +18,4 @@ class ConnectionManagerImpl : ConnectionManager, KoinComponent {
     override var isConnected
         get() = isConnectedState.value
         set(value) = isConnectedState.update { value }
-}
-
-fun ConnectionManager.connect(startId: Int) {
-    this.startId = startId
-    isConnected = true
-}
-
-fun ConnectionManager.disconnect() {
-    isConnected = false
 }

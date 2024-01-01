@@ -1,12 +1,12 @@
 package com.paranid5.crescendo.services.track_service
 
-import android.content.Context
 import android.content.Intent
 import android.os.Build
 import android.util.Log
 import com.paranid5.crescendo.MainApplication
 import com.paranid5.crescendo.TRACK_SERVICE_CONNECTION
 import com.paranid5.crescendo.domain.tracks.DefaultTrack
+import com.paranid5.crescendo.domain.tracks.Track
 import com.paranid5.crescendo.services.ServiceAccessor
 import com.paranid5.crescendo.services.ServiceAccessorImpl
 import com.paranid5.crescendo.services.stream_service.StreamService
@@ -32,7 +32,7 @@ class TrackServiceAccessor(application: MainApplication) : KoinComponent,
         apply { putExtra(TrackService.TRACK_ARG, track) }
 
     private fun Intent.putPlaylistAndTrackIndexIfNotNull(
-        playlist: List<DefaultTrack>?,
+        playlist: List<Track>?,
         trackInd: Int
     ) = apply {
         if (playlist != null) {
@@ -64,19 +64,19 @@ class TrackServiceAccessor(application: MainApplication) : KoinComponent,
 
     fun addToPlaylist(track: DefaultTrack) {
         Log.d(TAG, "Send track $track to playlist")
-        sendBroadcast(Intent(TrackService.Broadcast_ADD_TO_PLAYLIST).putTrack(track))
+        sendBroadcast(Intent(TrackService.Broadcast_ADD_TRACK).putTrack(track))
     }
 
     fun removeFromPlaylist(trackInd: Int) {
         Log.d(TAG, "Send remove track at $trackInd")
 
         sendBroadcast(
-            Intent(TrackService.Broadcast_REMOVE_FROM_PLAYLIST)
+            Intent(TrackService.Broadcast_REMOVE_TRACK)
                 .putExtra(TrackService.TRACK_INDEX_ARG, trackInd)
         )
     }
 
-    fun updatePlaylistAfterDrag(newPlaylist: List<DefaultTrack>, newCurTrackIndex: Int) {
+    fun updatePlaylistAfterDrag(newPlaylist: List<Track>, newCurTrackIndex: Int) {
         Log.d(TAG, "Send update playlist after drag")
 
         sendBroadcast(
@@ -119,5 +119,5 @@ class TrackServiceAccessor(application: MainApplication) : KoinComponent,
         }
     }
 
-    fun sendChangeRepeatBroadcast() = sendBroadcast(TrackService.Broadcast_CHANGE_REPEAT)
+    fun sendChangeRepeatBroadcast() = sendBroadcast(TrackService.Broadcast_REPEAT_CHANGED)
 }

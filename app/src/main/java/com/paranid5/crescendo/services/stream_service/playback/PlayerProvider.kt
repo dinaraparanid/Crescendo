@@ -13,7 +13,7 @@ import com.paranid5.crescendo.data.states.stream.CurrentUrlStatePublisherImpl
 import com.paranid5.crescendo.data.states.stream.CurrentUrlStateSubscriber
 import com.paranid5.crescendo.data.states.stream.CurrentUrlStateSubscriberImpl
 import com.paranid5.crescendo.domain.utils.AsyncCondVar
-import com.paranid5.crescendo.services.stream_service.StreamService2
+import com.paranid5.crescendo.services.stream_service.StreamService
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableSharedFlow
 import org.koin.core.component.KoinComponent
@@ -22,7 +22,7 @@ import java.util.concurrent.atomic.AtomicInteger
 private const val PLAYBACK_EVENT_LOOP_INIT_STEPS = 2
 
 @Suppress("IncorrectFormatting")
-class PlayerProvider(service: StreamService2, storageHandler: StorageHandler) : KoinComponent,
+class PlayerProvider(service: StreamService, storageHandler: StorageHandler) : KoinComponent,
     PlayerController by PlayerControllerImpl(service, storageHandler),
     CurrentUrlStateSubscriber by CurrentUrlStateSubscriberImpl(storageHandler),
     CurrentUrlStatePublisher by CurrentUrlStatePublisherImpl(storageHandler),
@@ -60,7 +60,7 @@ class PlayerProvider(service: StreamService2, storageHandler: StorageHandler) : 
             player.playbackParameters = value
         }
 
-    suspend fun startPlaybackEventLoop(service: StreamService2) {
+    suspend fun startPlaybackEventLoop(service: StreamService) {
         playbackEventFlow = PlaybackEventLoop(service)
         incrementPlaybackEventLoopInitSteps()
     }

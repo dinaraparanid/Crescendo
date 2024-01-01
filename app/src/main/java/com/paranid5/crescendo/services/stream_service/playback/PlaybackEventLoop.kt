@@ -3,7 +3,7 @@ package com.paranid5.crescendo.services.stream_service.playback
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.repeatOnLifecycle
 import arrow.core.Tuple4
-import com.paranid5.crescendo.services.stream_service.StreamService2
+import com.paranid5.crescendo.services.stream_service.StreamService
 import com.paranid5.crescendo.services.stream_service.extractor.extractMediaFilesAndStartPlaying
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.collectLatest
@@ -11,7 +11,7 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.launch
 
-suspend fun PlaybackEventLoop(service: StreamService2): MutableSharedFlow<PlaybackEvent> {
+suspend fun PlaybackEventLoop(service: StreamService): MutableSharedFlow<PlaybackEvent> {
     val playbackEventFlow = MutableSharedFlow<PlaybackEvent>()
 
     service.serviceScope.launch {
@@ -20,11 +20,11 @@ suspend fun PlaybackEventLoop(service: StreamService2): MutableSharedFlow<Playba
 
             playbackEventFlow
                 .combine(ArgsFlow(service)) { event, (url, position, metadata) ->
-                    Tuple4(url, position, metadata, event)
+                    Tuple4(event, url, position, metadata)
                 }
-                .distinctUntilChanged { (_, _, _, e1), (_, _, _, e2) -> e1 == e2 }
-                .collectLatest { (ytUrl, position, duration, event) ->
-                    service.onEvent(ytUrl, position, duration, event)
+                .distinctUntilChanged { (e1, _, _, _), (e2, _, _, _) -> e1 == e2 }
+                .collectLatest { (event, ytUrl, position, duration) ->
+                    service.onEvent(event, ytUrl, position, duration)
                 }
         }
     }
@@ -32,7 +32,7 @@ suspend fun PlaybackEventLoop(service: StreamService2): MutableSharedFlow<Playba
     return playbackEventFlow
 }
 
-private fun ArgsFlow(service: StreamService2) =
+private fun ArgsFlow(service: StreamService) =
     combine(
         service.playerProvider.currentUrlFlow,
         service.playerProvider.streamPlaybackPositionFlow,
@@ -41,11 +41,11 @@ private fun ArgsFlow(service: StreamService2) =
         Triple(url, position, metadata?.durationMillis ?: 0L)
     }.distinctUntilChanged()
 
-private suspend inline fun StreamService2.onEvent(
+private suspend inline fun StreamService.onEvent(
+    event: PlaybackEvent,
     ytUrl: String,
     position: Long,
     duration: Long,
-    event: PlaybackEvent
 ) = when (event) {
     is PlaybackEvent.StartSameStream -> onPlayStream(
         ytUrl = ytUrl,
@@ -73,17 +73,17 @@ private suspend inline fun StreamService2.onEvent(
     )
 }
 
-private suspend inline fun StreamService2.onPlayStream(ytUrl: String, initialPosition: Long) {
+private suspend inline fun StreamService.onPlayStream(ytUrl: String, initialPosition: Long) {
     playerProvider.resetAudioSessionIdIfNotPlaying()
     extractMediaFilesAndStartPlaying(ytUrl, initialPosition)
 }
 
-private suspend fun StreamService2.onPause() {
+private suspend fun StreamService.onPause() {
     playerProvider.setStreamPlaybackPosition(playerProvider.currentPosition)
     playerProvider.pausePlayer()
 }
 
-private suspend inline fun StreamService2.onResume(ytUrl: String, initialPosition: Long) =
+private suspend inline fun StreamService.onResume(ytUrl: String, initialPosition: Long) =
     when {
         playerProvider.isStoppedWithError -> {
             onPlayStream(ytUrl, initialPosition)
@@ -93,17 +93,17 @@ private suspend inline fun StreamService2.onResume(ytUrl: String, initialPositio
         else -> playerProvider.resumePlayer()
     }
 
-private fun StreamService2.onSeekTo(position: Long) {
+private fun StreamService.onSeekTo(position: Long) {
     playerProvider.resetAudioSessionIdIfNotPlaying()
     playerProvider.seekToViaPlayer(position)
 }
 
-private fun StreamService2.onSeekTenSecsBack() {
+private fun StreamService.onSeekTenSecsBack() {
     playerProvider.resetAudioSessionIdIfNotPlaying()
     playerProvider.seekTenSecsBackViaPlayer()
 }
 
-private fun StreamService2.onSeekTenSecsForward(videoDurationMillis: Long) {
+private fun StreamService.onSeekTenSecsForward(videoDurationMillis: Long) {
     playerProvider.resetAudioSessionIdIfNotPlaying()
     playerProvider.seekTenSecsForwardViaPlayer(videoDurationMillis)
 }

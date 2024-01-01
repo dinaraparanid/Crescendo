@@ -1,11 +1,9 @@
 package com.paranid5.crescendo.presentation.main
 
-import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.drawable.BitmapDrawable
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -21,12 +19,15 @@ import coil.size.Precision
 import coil.size.Scale
 import com.paranid5.crescendo.R
 import com.paranid5.crescendo.data.StorageHandler
+import com.paranid5.crescendo.data.properties.currentMetadataFlow
+import com.paranid5.crescendo.data.properties.currentTrackFlow
 import com.paranid5.crescendo.domain.media.AudioStatus
 import com.paranid5.crescendo.media.images.ImageSize
 import com.paranid5.crescendo.media.images.getTrackCoverAsync
 import com.paranid5.crescendo.media.images.getTrackCoverWithPaletteAsync
 import com.paranid5.crescendo.media.images.getVideoCoverAsync
 import com.paranid5.crescendo.media.images.getVideoCoverWithPaletteAsync
+import com.paranid5.crescendo.presentation.ui.extensions.collectLatestAsState
 import com.paranid5.crescendo.presentation.ui.utils.BlurTransformation
 import org.koin.compose.koinInject
 
@@ -40,8 +41,11 @@ fun videoCoverModel(
     storageHandler: StorageHandler = koinInject(),
     bitmapSettings: (Bitmap) -> Unit = {}
 ): ImageRequest {
-    val metadata by storageHandler.currentMetadataState.collectAsState()
     val context = LocalContext.current
+
+    val metadata by storageHandler
+        .currentMetadataFlow
+        .collectLatestAsState(initial = null)
 
     var coverModel by remember { mutableStateOf<BitmapDrawable?>(null) }
     var prevCoverModel by remember { mutableStateOf<BitmapDrawable?>(null) }
@@ -61,7 +65,6 @@ fun videoCoverModel(
         .prevCoverErrorOrDefault(usePrevCoverAsPlaceholder, prevCoverModel)
         .prevCoverFallbackOrDefault(usePrevCoverAsPlaceholder, prevCoverModel)
         .applyTransformations(
-            context = context,
             isPlaceholderRequired = isPlaceholderRequired,
             size = size,
             isBlured = isBlured,
@@ -108,8 +111,11 @@ fun videoCoverModelWithPalette(
     storageHandler: StorageHandler = koinInject(),
     bitmapSettings: (Bitmap) -> Unit = {}
 ): Pair<ImageRequest, Palette?> {
-    val metadata by storageHandler.currentMetadataState.collectAsState()
     val context = LocalContext.current
+
+    val metadata by storageHandler
+        .currentMetadataFlow
+        .collectLatestAsState(initial = null)
 
     var coverModel by remember { mutableStateOf<BitmapDrawable?>(null) }
     var prevCoverModel by remember { mutableStateOf<BitmapDrawable?>(null) }
@@ -130,7 +136,6 @@ fun videoCoverModelWithPalette(
         .prevCoverErrorOrDefault(usePrevCoverAsPlaceholder, prevCoverModel)
         .prevCoverFallbackOrDefault(usePrevCoverAsPlaceholder, prevCoverModel)
         .applyTransformations(
-            context = context,
             isPlaceholderRequired = isPlaceholderRequired,
             size = size,
             isBlured = isBlured,
@@ -193,7 +198,6 @@ fun trackCoverModel(
         .prevCoverErrorOrDefault(usePrevCoverAsPlaceholder, prevCoverModel)
         .prevCoverFallbackOrDefault(usePrevCoverAsPlaceholder, prevCoverModel)
         .applyTransformations(
-            context = context,
             isPlaceholderRequired = isPlaceholderRequired,
             size = size,
             isBlured = isBlured,
@@ -256,7 +260,6 @@ fun trackCoverModelWithPalette(
         .prevCoverErrorOrDefault(usePrevCoverAsPlaceholder, prevCoverModel)
         .prevCoverFallbackOrDefault(usePrevCoverAsPlaceholder, prevCoverModel)
         .applyTransformations(
-            context = context,
             isPlaceholderRequired = isPlaceholderRequired,
             size = size,
             isBlured = isBlured,
@@ -302,7 +305,10 @@ fun currentTrackCoverModel(
     storageHandler: StorageHandler = koinInject(),
     bitmapSettings: (Bitmap) -> Unit = {}
 ): ImageRequest {
-    val curTrack by storageHandler.currentTrackState.collectAsState()
+    val curTrack by storageHandler
+        .currentTrackFlow
+        .collectLatestAsState(initial = null)
+
     val path by remember { derivedStateOf { curTrack?.path } }
 
     return trackCoverModel(
@@ -347,7 +353,10 @@ fun currentTrackCoverModelWithPalette(
     storageHandler: StorageHandler = koinInject(),
     bitmapSettings: (Bitmap) -> Unit = {}
 ): Pair<ImageRequest, Palette?> {
-    val curTrack by storageHandler.currentTrackState.collectAsState()
+    val curTrack by storageHandler
+        .currentTrackFlow
+        .collectLatestAsState(initial = null)
+
     val path by remember { derivedStateOf { curTrack?.path } }
 
     return trackCoverModelWithPalette(
@@ -447,7 +456,6 @@ private fun ImageRequest.Builder.prevCoverFallbackOrDefault(
 }
 
 private fun ImageRequest.Builder.applyTransformations(
-    context: Context,
     isPlaceholderRequired: Boolean,
     size: ImageSize?,
     isBlured: Boolean,

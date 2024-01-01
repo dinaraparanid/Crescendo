@@ -1,6 +1,5 @@
 package com.paranid5.crescendo.services.stream_service.playback
 
-import androidx.annotation.MainThread
 import androidx.annotation.OptIn
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.repeatOnLifecycle
@@ -17,9 +16,9 @@ import com.paranid5.crescendo.data.states.playback.RepeatingStatePublisher
 import com.paranid5.crescendo.data.states.playback.RepeatingStatePublisherImpl
 import com.paranid5.crescendo.data.states.playback.RepeatingStateSubscriber
 import com.paranid5.crescendo.data.states.playback.RepeatingStateSubscriberImpl
-import com.paranid5.crescendo.services.stream_service.StreamService2
-import com.paranid5.crescendo.services.stream_service.playback.effects.AudioEffectsController
-import com.paranid5.crescendo.services.stream_service.playback.effects.AudioEffectsControllerImpl
+import com.paranid5.crescendo.services.core.playback.AudioEffectsController
+import com.paranid5.crescendo.services.core.playback.AudioEffectsControllerImpl
+import com.paranid5.crescendo.services.stream_service.StreamService
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -64,7 +63,7 @@ interface PlayerController :
     fun releasePlayerWithEffects()
 }
 
-internal class PlayerControllerImpl(service: StreamService2, storageHandler: StorageHandler) :
+internal class PlayerControllerImpl(service: StreamService, storageHandler: StorageHandler) :
     PlayerController, KoinComponent,
     AudioEffectsController by AudioEffectsControllerImpl(storageHandler),
     RepeatingStateSubscriber by RepeatingStateSubscriberImpl(storageHandler),
@@ -111,12 +110,11 @@ internal class PlayerControllerImpl(service: StreamService2, storageHandler: Sto
     inline val currentPosition
         get() = currentPositionState.value
 
-    @MainThread
     override fun updateCurrentPosition() =
         _currentPositionState.update { player.currentPosition }
 
     override suspend fun setAndStoreRepeating(isRepeating: Boolean) {
-        player.repeatMode = getRepeatMode(isRepeating)
+        repeatMode = repeatMode(isRepeating)
         setRepeating(isRepeating)
     }
 
@@ -163,7 +161,7 @@ internal class PlayerControllerImpl(service: StreamService2, storageHandler: Sto
         lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
             isRepeatingFlow
                 .distinctUntilChanged()
-                .collectLatest { player.repeatMode = getRepeatMode(it) }
+                .collectLatest { player.repeatMode = repeatMode(it) }
         }
 
     override fun releasePlayerWithEffects() {
@@ -174,6 +172,18 @@ internal class PlayerControllerImpl(service: StreamService2, storageHandler: Sto
     }
 }
 
+inline var PlayerController.repeatMode
+    get() = player.repeatMode
+    set(value) {
+        player.repeatMode = value
+    }
+
+var PlayerController.isRepeating
+    get() = player.repeatMode == Player.REPEAT_MODE_ONE
+    set(value) {
+        player.repeatMode = repeatMode(value)
+    }
+
 @OptIn(UnstableApi::class)
 private inline val newAudioAttributes
     get() = AudioAttributes.Builder()
@@ -181,7 +191,7 @@ private inline val newAudioAttributes
         .setUsage(C.USAGE_MEDIA)
         .build()
 
-private fun getRepeatMode(isRepeating: Boolean) = when {
+private fun repeatMode(isRepeating: Boolean) = when {
     isRepeating -> Player.REPEAT_MODE_ONE
     else -> Player.REPEAT_MODE_OFF
 }

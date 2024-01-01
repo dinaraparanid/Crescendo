@@ -99,4 +99,5 @@
     <string name="fade_out">Fade Out</string>
     <string name="zoom_in">Zoom In</string>
     <string name="zoom_out">Zoom Out</string>
+    <string name="playlist_empty_err">Playlist is empty</string>
 </resources>

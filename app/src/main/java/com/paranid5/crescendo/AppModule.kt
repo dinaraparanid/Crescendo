@@ -26,7 +26,6 @@ import com.paranid5.crescendo.presentation.ui.permissions.description_providers.
 import com.paranid5.crescendo.presentation.ui.permissions.externalStoragePermissionQueue
 import com.paranid5.crescendo.presentation.ui.permissions.foregroundServicePermissionQueue
 import com.paranid5.crescendo.services.stream_service.StreamServiceAccessor
-import com.paranid5.crescendo.services.stream_service.playback.PlayerProvider
 import com.paranid5.crescendo.services.track_service.TrackServiceAccessor
 import com.paranid5.crescendo.services.video_cache_service.VideoCacheServiceAccessor
 import kotlinx.coroutines.flow.MutableStateFlow

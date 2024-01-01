@@ -10,30 +10,21 @@ import com.paranid5.crescendo.services.stream_service.Actions
 
 fun RepeatActionCompat(context: Context) =
     NotificationCompat.Action.Builder(
-        IconCompat.createWithResource(
-            context,
-            R.drawable.repeat
-        ),
+        IconCompat.createWithResource(context, R.drawable.repeat),
         context.getString(R.string.change_repeat),
         Actions.Repeat.playbackIntent(context)
     ).build()
 
 fun UnrepeatActionCompat(context: Context) =
     NotificationCompat.Action.Builder(
-        IconCompat.createWithResource(
-            context,
-            R.drawable.no_repeat
-        ),
+        IconCompat.createWithResource(context, R.drawable.no_repeat),
         context.getString(R.string.change_repeat),
         Actions.Unrepeat.playbackIntent(context)
     ).build()
 
 fun DismissNotificationActionCompat(context: Context) =
     NotificationCompat.Action.Builder(
-        IconCompat.createWithResource(
-            context,
-            R.drawable.dismiss
-        ),
+        IconCompat.createWithResource(context, R.drawable.dismiss),
         context.getString(R.string.cancel),
         Actions.Dismiss.playbackIntent(context)
     ).build()

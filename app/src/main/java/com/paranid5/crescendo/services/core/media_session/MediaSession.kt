@@ -1,4 +1,4 @@
-package com.paranid5.crescendo.services.stream_service.media_session
+package com.paranid5.crescendo.services.core.media_session
 
 import android.content.Context
 import android.os.Build

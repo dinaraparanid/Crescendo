@@ -1,6 +1,6 @@
 package com.paranid5.crescendo.services.stream_service.playback
 
-import com.paranid5.crescendo.services.stream_service.StreamService2
+import com.paranid5.crescendo.services.stream_service.StreamService
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
@@ -11,7 +11,7 @@ private const val PLAYBACK_UPDATE_COOLDOWN = 500L
 private lateinit var playbackPosMonitorTask: Job
 private lateinit var playbackPosCacheTask: Job
 
-fun StreamService2.startPlaybackPositionMonitoring() {
+fun StreamService.startPlaybackPositionMonitoring() {
     playbackPosMonitorTask = serviceScope.launch {
         while (playerProvider.isPlaying) {
             playerProvider.updateCurrentPosition()

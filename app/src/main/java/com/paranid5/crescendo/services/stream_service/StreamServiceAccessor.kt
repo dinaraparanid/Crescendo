@@ -43,33 +43,33 @@ class StreamServiceAccessor(application: MainApplication) :
 }
 
 fun StreamServiceAccessor.sendSeekTo10SecsBackBroadcast() =
-    sendBroadcast(StreamService2.Broadcast_10_SECS_BACK)
+    sendBroadcast(StreamService.Broadcast_10_SECS_BACK)
 
 fun StreamServiceAccessor.sendSeekTo10SecsForwardBroadcast() =
-    sendBroadcast(StreamService2.Broadcast_10_SECS_FORWARD)
+    sendBroadcast(StreamService.Broadcast_10_SECS_FORWARD)
 
 fun StreamServiceAccessor.sendSeekToBroadcast(position: Long) = sendBroadcast(
-    Intent(StreamService2.Broadcast_SEEK_TO)
-        .putExtra(StreamService2.POSITION_ARG, position)
+    Intent(StreamService.Broadcast_SEEK_TO)
+        .putExtra(StreamService.POSITION_ARG, position)
 )
 
 fun StreamServiceAccessor.sendPauseBroadcast() =
-    sendBroadcast(StreamService2.Broadcast_PAUSE)
+    sendBroadcast(StreamService.Broadcast_PAUSE)
 
 fun StreamServiceAccessor.sendChangeRepeatBroadcast() =
-    sendBroadcast(StreamService2.Broadcast_CHANGE_REPEAT)
+    sendBroadcast(StreamService.Broadcast_REPEAT_CHANGED)
 
 private fun StreamServiceAccessor.sendResumeBroadcast() =
-    sendBroadcast(StreamService2.Broadcast_RESUME)
+    sendBroadcast(StreamService.Broadcast_RESUME)
 
 private fun StreamServiceAccessor.sendSwitchToNextStreamBroadcast(url: String) =
-    sendBroadcast(Intent(StreamService2.Broadcast_SWITCH_VIDEO).putStreamUrlIfNotNull(url))
+    sendBroadcast(Intent(StreamService.Broadcast_SWITCH_VIDEO).putStreamUrlIfNotNull(url))
 
 private fun StreamServiceAccessor.sendStopTrackServiceBroadcast() =
     sendBroadcast(TrackService.Broadcast_STOP)
 
 private fun StreamServiceAccessor.startStreamService(url: String? = null) {
-    val serviceIntent = Intent(appContext, StreamService2::class.java)
+    val serviceIntent = Intent(appContext, StreamService::class.java)
         .putStreamUrlIfNotNull(url)
 
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
@@ -79,5 +79,5 @@ private fun StreamServiceAccessor.startStreamService(url: String? = null) {
 }
 
 private fun Intent.putStreamUrlIfNotNull(url: String?) = apply {
-    if (url != null) putExtra(StreamService2.URL_ARG, url)
+    if (url != null) putExtra(StreamService.URL_ARG, url)
 }

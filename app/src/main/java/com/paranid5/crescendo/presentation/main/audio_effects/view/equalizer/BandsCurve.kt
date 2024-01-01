@@ -31,13 +31,15 @@ fun BandsCurve(
 
 private fun BandsPath(pointsState: SnapshotStateList<Offset>) =
     Path().apply {
-        moveTo(pointsState[0].x, pointsState[0].y)
+        if (pointsState.isNotEmpty()) {
+            moveTo(pointsState[0].x, pointsState[0].y)
 
-        (1 until pointsState.size).forEach { i ->
-            cubicToPoint(
-                prevPoint = pointsState[i - 1],
-                nextPoint = pointsState[i]
-            )
+            (1 until pointsState.size).forEach { i ->
+                cubicToPoint(
+                    prevPoint = pointsState[i - 1],
+                    nextPoint = pointsState[i]
+                )
+            }
         }
     }
 

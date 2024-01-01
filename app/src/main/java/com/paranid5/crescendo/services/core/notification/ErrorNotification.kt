@@ -1,4 +1,4 @@
-package com.paranid5.crescendo.services.stream_service.notification
+package com.paranid5.crescendo.services.core.notification
 
 import android.app.Notification
 import android.app.PendingIntent
@@ -8,8 +8,8 @@ import android.os.Build
 import com.paranid5.crescendo.R
 import com.paranid5.crescendo.presentation.main.MainActivity
 
-fun ErrorNotification(context: Context, message: String) =
-    NotificationBuilderCompat(context)
+fun ErrorNotification(context: Context, message: String, channelId: String) =
+    NotificationBuilderCompat(context, channelId)
         .setSmallIcon(R.drawable.save_icon)
         .setContentIntent(
             PendingIntent.getActivity(
@@ -25,9 +25,9 @@ fun ErrorNotification(context: Context, message: String) =
         .build()
 
 @Suppress("DEPRECATION")
-private fun NotificationBuilderCompat(context: Context) = when {
+private fun NotificationBuilderCompat(context: Context, channelId: String) = when {
     Build.VERSION.SDK_INT >= Build.VERSION_CODES.O ->
-        Notification.Builder(context, STREAM_CHANNEL_ID)
+        Notification.Builder(context, channelId)
 
     else -> Notification.Builder(context)
 }

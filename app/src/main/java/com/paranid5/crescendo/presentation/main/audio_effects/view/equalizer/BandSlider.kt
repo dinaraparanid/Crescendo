@@ -8,14 +8,12 @@ import androidx.compose.material3.SliderDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableFloatState
 import androidx.compose.runtime.MutableIntState
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.layout.positionInWindow
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
@@ -25,8 +23,8 @@ import com.paranid5.crescendo.domain.eq.EqualizerData
 import com.paranid5.crescendo.koinActivityViewModel
 import com.paranid5.crescendo.presentation.main.audio_effects.AudioEffectsUIHandler
 import com.paranid5.crescendo.presentation.main.audio_effects.AudioEffectsViewModel
-import com.paranid5.crescendo.presentation.main.audio_effects.properties.compose.collectAudioStatusAsState
 import com.paranid5.crescendo.presentation.ui.theme.LocalAppColors
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import org.koin.compose.koinInject
 
@@ -47,9 +45,7 @@ fun BandSlider(
     viewModel: AudioEffectsViewModel = koinActivityViewModel(),
     audioEffectsUIHandler: AudioEffectsUIHandler = koinInject()
 ) {
-    val context = LocalContext.current
     val colors = LocalAppColors.current
-    val audioStatus by viewModel.collectAudioStatusAsState()
 
     Slider(
         value = presentLvlsDbState[index],
@@ -61,15 +57,15 @@ fun BandSlider(
             sliderHeightState = sliderHeightState
         ),
         onValueChange = { level ->
-            viewModel.viewModelScope.launch {
-                audioEffectsUIHandler.updateEQBandLevel(
+            viewModel.viewModelScope.launch(Dispatchers.IO) {
+                val bands = audioEffectsUIHandler.updatedEQBandLevels(
                     level = level,
                     index = index,
                     presentLvlsDbState = presentLvlsDbState,
                     equalizerData = equalizerData!!,
-                    context = context,
-                    audioStatus = audioStatus!!
                 )
+
+                viewModel.setEqualizerBands(bands)
             }
         },
         thumb = {

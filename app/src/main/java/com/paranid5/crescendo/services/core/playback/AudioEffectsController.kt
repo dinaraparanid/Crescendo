@@ -1,4 +1,4 @@
-package com.paranid5.crescendo.services.stream_service.playback.effects
+package com.paranid5.crescendo.services.core.playback
 
 import android.media.audiofx.BassBoost
 import android.media.audiofx.Equalizer

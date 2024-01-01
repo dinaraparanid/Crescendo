@@ -15,7 +15,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.ColorFilter
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
@@ -25,14 +24,13 @@ import com.paranid5.crescendo.R
 import com.paranid5.crescendo.domain.eq.EqualizerBandsPreset
 import com.paranid5.crescendo.domain.eq.EqualizerData
 import com.paranid5.crescendo.koinActivityViewModel
-import com.paranid5.crescendo.presentation.main.audio_effects.AudioEffectsUIHandler
 import com.paranid5.crescendo.presentation.main.audio_effects.AudioEffectsViewModel
-import com.paranid5.crescendo.presentation.main.audio_effects.properties.compose.collectAudioStatusAsState
 import com.paranid5.crescendo.presentation.ui.extensions.collectLatestAsState
 import com.paranid5.crescendo.presentation.ui.theme.LocalAppColors
 import com.paranid5.crescendo.presentation.ui.utils.Spinner
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.toImmutableList
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
 import org.koin.compose.koinInject
@@ -59,13 +57,8 @@ private fun PresetSpinnerImpl(
     modifier: Modifier = Modifier,
     viewModel: AudioEffectsViewModel = koinActivityViewModel(),
     equalizerDataState: MutableStateFlow<EqualizerData?> = koinInject(named(EQUALIZER_DATA)),
-    audioEffectsUIHandler: AudioEffectsUIHandler = koinInject()
 ) {
-    val context = LocalContext.current
-
-    val audioStatus by viewModel.collectAudioStatusAsState()
     val equalizerData by equalizerDataState.collectLatestAsState()
-
     val customPresetIndex by rememberCustomPresetIndex(equalizerData)
     var selectedItemIndex by rememberSelectedItemIndex(equalizerData)
     val curItemIndex by rememberCurrentItemIndex(selectedItemIndex, equalizerData)
@@ -81,19 +74,13 @@ private fun PresetSpinnerImpl(
             selectedItemIndex = ind
 
             when (ind) {
-                customPresetIndex -> viewModel.viewModelScope.launch {
-                    audioEffectsUIHandler.switchToBands(
-                        context = context,
-                        audioStatus = audioStatus!!
-                    )
+                customPresetIndex -> viewModel.viewModelScope.launch(Dispatchers.IO) {
+                    viewModel.setEqualizerParam(EqualizerBandsPreset.CUSTOM)
                 }
 
-                else -> viewModel.viewModelScope.launch {
-                    audioEffectsUIHandler.storeAndSwitchToPreset(
-                        context = context,
-                        preset = ind.toShort(),
-                        audioStatus = audioStatus!!
-                    )
+                else -> viewModel.viewModelScope.launch(Dispatchers.IO) {
+                    viewModel.setEqualizerParam(EqualizerBandsPreset.BUILT_IN)
+                    viewModel.setEqualizerPreset(ind.toShort())
                 }
             }
         }

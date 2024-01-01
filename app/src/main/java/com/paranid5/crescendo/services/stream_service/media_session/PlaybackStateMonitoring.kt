@@ -10,13 +10,13 @@ import com.paranid5.crescendo.R
 import com.paranid5.crescendo.services.stream_service.ACTION_DISMISS
 import com.paranid5.crescendo.services.stream_service.ACTION_REPEAT
 import com.paranid5.crescendo.services.stream_service.ACTION_UNREPEAT
-import com.paranid5.crescendo.services.stream_service.StreamService2
+import com.paranid5.crescendo.services.stream_service.StreamService
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
 
-suspend fun StreamService2.startPlaybackStatesMonitoring() =
+suspend fun StreamService.startPlaybackStatesMonitoring() =
     lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
         combine(
             playerProvider.isPlayingState,
@@ -63,11 +63,11 @@ private fun PlaybackState(
     .build()
 
 private inline val playbackActions
-    get() = PlaybackStateCompat.ACTION_SKIP_TO_PREVIOUS or
-            PlaybackStateCompat.ACTION_PLAY or
+    get() = PlaybackStateCompat.ACTION_PLAY or
             PlaybackStateCompat.ACTION_PAUSE or
             PlaybackStateCompat.ACTION_PLAY_PAUSE or
             PlaybackStateCompat.ACTION_SKIP_TO_NEXT or
+            PlaybackStateCompat.ACTION_SKIP_TO_PREVIOUS or
             PlaybackStateCompat.ACTION_SEEK_TO
 
 private fun PlaybackStateCompat.Builder.setCustomActions(

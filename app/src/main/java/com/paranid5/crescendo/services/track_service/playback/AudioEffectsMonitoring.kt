@@ -1,15 +1,15 @@
-package com.paranid5.crescendo.services.stream_service.playback.effects
+package com.paranid5.crescendo.services.track_service.playback
 
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.media3.common.PlaybackParameters
-import com.paranid5.crescendo.services.stream_service.StreamService2
-import com.paranid5.crescendo.services.stream_service.playback.PlayerProvider
+import com.paranid5.crescendo.services.core.playback.AudioEffectsController
+import com.paranid5.crescendo.services.track_service.TrackService
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
 
-suspend fun StreamService2.startPlaybackEffectsMonitoring() =
+suspend fun TrackService.startPlaybackEffectsMonitoring() =
     lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
         combine(
             playerProvider.areAudioEffectsEnabledFlow,
@@ -30,7 +30,7 @@ suspend fun StreamService2.startPlaybackEffectsMonitoring() =
         }
     }
 
-suspend fun StreamService2.startEqMonitoring() =
+suspend fun TrackService.startEqMonitoring() =
     lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
         combine(
             playerProvider.equalizerBandsFlow,
@@ -43,13 +43,13 @@ suspend fun StreamService2.startEqMonitoring() =
         }
     }
 
-suspend fun StreamService2.startBassMonitoring() =
+suspend fun TrackService.startBassMonitoring() =
     playerProvider
         .bassStrengthFlow
         .distinctUntilChanged()
         .collectLatest { playerProvider.setBassStrength(it) }
 
-suspend fun StreamService2.startReverbMonitoring() =
+suspend fun TrackService.startReverbMonitoring() =
     playerProvider
         .reverbPresetFlow
         .distinctUntilChanged()

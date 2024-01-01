@@ -3,7 +3,7 @@ package com.paranid5.crescendo.presentation.main.current_playlist.views
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
-import com.paranid5.crescendo.domain.tracks.DefaultTrack
+import com.paranid5.crescendo.domain.tracks.Track
 import com.paranid5.crescendo.koinActivityViewModel
 import com.paranid5.crescendo.presentation.main.current_playlist.CurrentPlaylistViewModel
 import com.paranid5.crescendo.presentation.main.current_playlist.properties.compose.collectCurrentPlaylistAsState
@@ -49,8 +49,8 @@ fun CurrentPlaylistTrackList(
 private fun tryDismissTrack(
     viewModel: CurrentPlaylistViewModel,
     index: Int,
-    track: DefaultTrack,
-    currentPlaylist: ImmutableList<DefaultTrack>,
+    track: Track,
+    currentPlaylist: ImmutableList<Track>,
     currentTrackIndex: Int,
 ): Boolean {
     if (index == currentTrackIndex)
@@ -67,7 +67,7 @@ private fun tryDismissTrack(
 }
 
 private suspend fun updateCurrentPlaylist(
-    newTracks: ImmutableList<DefaultTrack>,
+    newTracks: ImmutableList<Track>,
     newCurTrackIndex: Int,
     viewModel: CurrentPlaylistViewModel,
     trackServiceAccessor: TrackServiceAccessor

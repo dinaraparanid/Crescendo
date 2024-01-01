@@ -1,893 +1,97 @@
 package com.paranid5.crescendo.services.track_service
 
-import android.app.Notification
-import android.app.PendingIntent
-import android.content.BroadcastReceiver
-import android.content.Context
 import android.content.Intent
-import android.graphics.Bitmap
 import android.os.Build
-import android.os.Bundle
-import android.os.SystemClock
-import android.support.v4.media.session.MediaSessionCompat
-import android.support.v4.media.session.PlaybackStateCompat
-import android.util.Log
-import android.widget.Toast
-import androidx.annotation.OptIn
-import androidx.core.app.NotificationCompat
-import androidx.core.graphics.drawable.IconCompat
-import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.repeatOnLifecycle
-import androidx.media3.common.MediaItem
-import androidx.media3.common.PlaybackException
-import androidx.media3.common.PlaybackParameters
-import androidx.media3.common.Player
-import androidx.media3.common.util.NotificationUtil
-import androidx.media3.common.util.UnstableApi
-import androidx.media3.ui.PlayerNotificationManager
-import com.paranid5.crescendo.R
-import com.paranid5.crescendo.TRACK_SERVICE_CONNECTION
+import com.paranid5.crescendo.data.StorageHandler
 import com.paranid5.crescendo.domain.tracks.DefaultTrack
-import com.paranid5.crescendo.domain.utils.extensions.registerReceiverCompat
-import com.paranid5.crescendo.domain.utils.extensions.sendBroadcast
-import com.paranid5.crescendo.domain.utils.extensions.toAndroidMetadata
-import com.paranid5.crescendo.domain.utils.extensions.toMediaItemList
-import com.paranid5.crescendo.media.images.getTrackCoverBitmapAsync
-import com.paranid5.crescendo.presentation.main.MainActivity
-import com.paranid5.crescendo.receivers.PlaybackErrorReceiver
+import com.paranid5.crescendo.domain.tracks.Track
+import com.paranid5.crescendo.services.ConnectionManager
 import com.paranid5.crescendo.services.SuspendService
-import com.paranid5.crescendo.services.service_controllers.MediaRetrieverController
-import com.paranid5.crescendo.services.service_controllers.MediaSessionController
-import com.paranid5.crescendo.services.service_controllers.PlaybackController
-import kotlinx.collections.immutable.ImmutableList
-import kotlinx.collections.immutable.toImmutableList
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.collectLatest
-import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.update
+import com.paranid5.crescendo.services.connect
+import com.paranid5.crescendo.services.core.media_session.MediaSessionManager
+import com.paranid5.crescendo.services.track_service.media_session.startMetadataMonitoring
+import com.paranid5.crescendo.services.core.notification.detachNotification
+import com.paranid5.crescendo.services.core.receivers.DismissNotificationReceiver
+import com.paranid5.crescendo.services.core.receivers.StopReceiver
+import com.paranid5.crescendo.services.disconnect
+import com.paranid5.crescendo.services.track_service.media_session.MediaSessionCallback
+import com.paranid5.crescendo.services.track_service.media_session.startPlaybackStatesMonitoring
+import com.paranid5.crescendo.services.track_service.notification.NotificationManager
+import com.paranid5.crescendo.services.track_service.notification.startNotificationMonitoring
+import com.paranid5.crescendo.services.track_service.playback.PlayerProvider
+import com.paranid5.crescendo.services.track_service.playback.startBassMonitoring
+import com.paranid5.crescendo.services.track_service.playback.startEqMonitoring
+import com.paranid5.crescendo.services.track_service.playback.startPlaybackEffectsMonitoring
+import com.paranid5.crescendo.services.track_service.playback.startResumingAsync
+import com.paranid5.crescendo.services.track_service.playback.startReverbMonitoring
+import com.paranid5.crescendo.services.track_service.playback.playPlaylistAsync
+import com.paranid5.crescendo.services.track_service.receivers.AddTrackReceiver
+import com.paranid5.crescendo.services.track_service.receivers.PauseReceiver
+import com.paranid5.crescendo.services.track_service.receivers.PlaylistDraggedReceiver
+import com.paranid5.crescendo.services.track_service.receivers.RemoveTrackReceiver
+import com.paranid5.crescendo.services.track_service.receivers.RepeatChangedReceiver
+import com.paranid5.crescendo.services.track_service.receivers.ResumeReceiver
+import com.paranid5.crescendo.services.track_service.receivers.SeekToNextTrackReceiver
+import com.paranid5.crescendo.services.track_service.receivers.SeekToPrevTrackReceiver
+import com.paranid5.crescendo.services.track_service.receivers.SeekToReceiver
+import com.paranid5.crescendo.services.track_service.receivers.SwitchPlaylistReceiver
+import com.paranid5.crescendo.services.track_service.receivers.registerReceivers
+import com.paranid5.crescendo.services.track_service.receivers.unregisterReceiver
 import kotlinx.coroutines.launch
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
-import org.koin.core.qualifier.named
 
-@OptIn(UnstableApi::class)
-class TrackService : SuspendService(), KoinComponent {
-    @Suppress("IncorrectFormatting")
+private const val ACTION_PAUSE = "pause"
+private const val ACTION_RESUME = "resume"
+private const val ACTION_PREV_TRACK = "prev_track"
+private const val ACTION_NEXT_TRACK = "next_track"
+
+internal const val ACTION_REPEAT = "repeat"
+internal const val ACTION_UNREPEAT = "unrepeat"
+internal const val ACTION_DISMISS = "dismiss"
+
+class TrackService : SuspendService(), KoinComponent,
+    ConnectionManager by ConnectionManagerImpl() {
     companion object {
-        private val TAG = TrackService::class.simpleName!!
-
-        internal const val NOTIFICATION_ID = 102
-        private const val AUDIO_CHANNEL_ID = "stream_channel"
-        private const val PLAYBACK_UPDATE_COOLDOWN = 500L
-
         private const val SERVICE_LOCATION = "com.paranid5.crescendo.services.track_service"
 
         const val Broadcast_PAUSE = "$SERVICE_LOCATION.PAUSE"
         const val Broadcast_RESUME = "$SERVICE_LOCATION.RESUME"
         const val Broadcast_SWITCH_PLAYLIST = "$SERVICE_LOCATION.SWITCH_PLAYLIST"
 
-        const val Broadcast_ADD_TO_PLAYLIST = "$SERVICE_LOCATION.ADD_TO_PLAYLIST"
-        const val Broadcast_REMOVE_FROM_PLAYLIST = "$SERVICE_LOCATION.REMOVE_FROM_PLAYLIST"
+        const val Broadcast_ADD_TRACK = "$SERVICE_LOCATION.ADD_TRACK"
+        const val Broadcast_REMOVE_TRACK = "$SERVICE_LOCATION.REMOVE_TRACK"
         const val Broadcast_PLAYLIST_DRAGGED = "$SERVICE_LOCATION.PLAYLIST_DRAGGED"
 
         const val Broadcast_PREV_TRACK = "$SERVICE_LOCATION.PREV_TRACK"
         const val Broadcast_NEXT_TRACK = "$SERVICE_LOCATION.NEXT_TRACK"
         const val Broadcast_SEEK_TO = "$SERVICE_LOCATION.SEEK_TO"
 
-        const val Broadcast_CHANGE_REPEAT = "$SERVICE_LOCATION.CHANGE_REPEAT"
+        const val Broadcast_REPEAT_CHANGED = "$SERVICE_LOCATION.REPEAT_CHANGED"
         const val Broadcast_DISMISS_NOTIFICATION = "$SERVICE_LOCATION.DISMISS_NOTIFICATION"
         const val Broadcast_STOP = "$SERVICE_LOCATION.STOP"
-
-        const val Broadcast_AUDIO_EFFECTS_ENABLED_UPDATE = "$SERVICE_LOCATION.AUDIO_EFFECTS_ENABLED_UPDATE"
-        const val Broadcast_EQUALIZER_PARAM_UPDATE = "$SERVICE_LOCATION.EQUALIZER_PARAM_UPDATE"
-        const val Broadcast_BASS_STRENGTH_UPDATE = "$SERVICE_LOCATION.BASS_STRENGTH_UPDATE"
-        const val Broadcast_REVERB_PRESET_UPDATE = "$SERVICE_LOCATION.REVERB_PRESET_UPDATE"
-
-        private const val ACTION_PAUSE = "pause"
-        private const val ACTION_RESUME = "resume"
-        private const val ACTION_PREV_TRACK = "prev_track"
-        private const val ACTION_NEXT_TRACK = "next_track"
-        private const val ACTION_REPEAT = "repeat"
-        private const val ACTION_UNREPEAT = "unrepeat"
-        private const val ACTION_DISMISS = "dismiss"
 
         const val TRACK_ARG = "track"
         const val PLAYLIST_ARG = "playlist"
         const val TRACK_INDEX_ARG = "track_index"
         const val POSITION_ARG = "position"
-
-        @Suppress("DEPRECATION")
-        private inline val Intent.trackArgOrNull
-            get() = when {
-                Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU ->
-                    getParcelableExtra(TRACK_ARG, DefaultTrack::class.java)
-
-                else -> getParcelableExtra(TRACK_ARG)
-            }
-
-        @Suppress("DEPRECATION")
-        private inline val Intent.playlistArgOrNull
-            @Suppress("UNCHECKED_CAST")
-            get() = when {
-                Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU ->
-                    getParcelableArrayExtra(PLAYLIST_ARG, DefaultTrack::class.java)
-
-                else -> getParcelableArrayExtra(PLAYLIST_ARG) as Array<DefaultTrack>
-            }?.toList()?.toImmutableList()
-
-        private inline val Intent.trackArg
-            get() = trackArgOrNull!!
-
-        private inline val Intent.playlistArg
-            get() = playlistArgOrNull!!
-
-        private inline val Intent.trackIndexArg
-            get() = getIntExtra(TRACK_INDEX_ARG, 0)
     }
 
-    private val isConnectedState by inject<MutableStateFlow<Boolean>>(
-        named(TRACK_SERVICE_CONNECTION)
-    )
+    private val storageHandler by inject<StorageHandler>()
 
-    // ----------------------- Media Session Management -----------------------
-
-    private val mediaRetrieverController by lazy {
-        MediaRetrieverController()
+    val mediaSessionManager by lazy {
+        MediaSessionManager(storageHandler)
     }
 
-    private val mediaSessionController by lazy {
-        MediaSessionController(context = this, tag = TAG)
+    val playerProvider by lazy {
+        PlayerProvider(this, storageHandler)
     }
 
-    private inline val mediaSession
-        get() = mediaSessionController.mediaSession
-
-    private inline val newMediaSessionCallback
-        get() = object : MediaSessionCompat.Callback() {
-            override fun onPlay() {
-                super.onPlay()
-                serviceScope.launch { resumePlayback() }
-            }
-
-            override fun onPause() {
-                super.onPause()
-                pausePlayback()
-            }
-
-            override fun onSeekTo(pos: Long) {
-                super.onSeekTo(pos)
-                playbackController.seekTo(pos)
-            }
-
-            override fun onSkipToNext() {
-                super.onSkipToNext()
-                serviceScope.launch { switchToNextTrack() }
-            }
-
-            override fun onSkipToPrevious() {
-                super.onSkipToPrevious()
-                serviceScope.launch { switchToPrevTrack() }
-            }
-
-            override fun onCustomAction(action: String, extras: Bundle?) {
-                super.onCustomAction(action, extras)
-                sendBroadcast(commandsToActions[action]!!.playbackAction)
-            }
-        }
-
-    private inline val newPlaybackState
-        get() = PlaybackStateCompat.Builder()
-            .setActions(
-                PlaybackStateCompat.ACTION_SKIP_TO_PREVIOUS
-                        or PlaybackStateCompat.ACTION_PLAY
-                        or PlaybackStateCompat.ACTION_PAUSE
-                        or PlaybackStateCompat.ACTION_PLAY_PAUSE
-                        or PlaybackStateCompat.ACTION_SKIP_TO_NEXT
-                        or PlaybackStateCompat.ACTION_SEEK_TO
-            )
-            .setCustomActions()
-            .setState(
-                when {
-                    playbackController.isPlaying -> PlaybackStateCompat.STATE_PLAYING
-                    else -> PlaybackStateCompat.STATE_PAUSED
-                },
-                exoPlaybackPosition,
-                mediaRetrieverController.speed,
-                SystemClock.elapsedRealtime()
-            )
-            .build()
-
-    private fun PlaybackStateCompat.Builder.setCustomActions(): PlaybackStateCompat.Builder {
-        val repeatAction = when {
-            mediaRetrieverController.isRepeating -> PlaybackStateCompat.CustomAction.Builder(
-                ACTION_REPEAT,
-                resources.getString(R.string.change_repeat),
-                R.drawable.repeat
-            )
-
-            else -> PlaybackStateCompat.CustomAction.Builder(
-                ACTION_UNREPEAT,
-                resources.getString(R.string.change_repeat),
-                R.drawable.no_repeat
-            )
-        }.build()
-
-        val dismissAction = PlaybackStateCompat.CustomAction.Builder(
-            ACTION_DISMISS,
-            resources.getString(R.string.cancel),
-            R.drawable.dismiss
-        ).build()
-
-        return this
-            .addCustomAction(repeatAction)
-            .addCustomAction(dismissAction)
+    val notificationManager by lazy {
+        NotificationManager(this, storageHandler)
     }
 
-    private fun initMediaSession() {
-        mediaSessionController.initMediaSession(
-            mediaSessionCallback = newMediaSessionCallback,
-            playbackState = newPlaybackState
-        )
-
-        playerNotificationManager.setPlayer(playbackController.player)
-    }
-
-    private suspend fun updateMediaSession(track: DefaultTrack) = mediaSession.run {
-        setPlaybackState(newPlaybackState)
-        setMetadata(track.toAndroidMetadata(getTrackCoverAsync(track.path).await()))
-    }
-
-    private suspend fun getTrackCoverAsync(path: String?) =
-        getTrackCoverBitmapAsync(context = this, path = path)
-
-    // ----------------------- Player Management -----------------------
-
-    @Volatile
-    private var isStoppedWithError = false
-
-    private val playbackController by lazy {
-        PlaybackController(
-            context = this,
-            playerStateChangedListener = playerStateChangedListener,
-            mediaRetrieverController = mediaRetrieverController,
-            playbackType = PlaybackController.PlaybackType.TRACKS
-        )
-    }
-
-    private val playerStateChangedListener: Player.Listener = object : Player.Listener {
-        override fun onMediaItemTransition(mediaItem: MediaItem?, reason: Int) {
-            super.onMediaItemTransition(mediaItem, reason)
-
-            if (reason == Player.MEDIA_ITEM_TRANSITION_REASON_AUTO)
-                updateTrackIndexAsync()
-        }
-
-        override fun onPositionDiscontinuity(
-            oldPosition: Player.PositionInfo,
-            newPosition: Player.PositionInfo,
-            reason: Int
-        ) {
-            super.onPositionDiscontinuity(oldPosition, newPosition, reason)
-
-            if (reason == Player.DISCONTINUITY_REASON_AUTO_TRANSITION)
-                storePositionAndUpdateNotificationAsync()
-        }
-
-        override fun onPlaybackStateChanged(playbackState: Int) {
-            super.onPlaybackStateChanged(playbackState)
-
-            when (playbackState) {
-                Player.STATE_IDLE -> serviceScope.launch {
-                    restartPlayer(initialPosition = exoPlaybackPosition)
-                }
-
-                else -> Unit
-            }
-        }
-
-        override fun onIsPlayingChanged(isPlaying: Boolean) {
-            super.onIsPlayingChanged(isPlaying)
-            playbackController.isPlaying = isPlaying
-            mediaRetrieverController.setPlaying(isPlaying)
-
-            when {
-                isPlaying -> startPlaybackPositionMonitoring()
-                else -> stopPlaybackPositionMonitoring()
-            }
-        }
-
-        override fun onPlayerError(error: PlaybackException) {
-            isStoppedWithError = true
-            super.onPlayerError(error)
-            Log.e(TAG, "onPlayerError", error)
-
-            Toast.makeText(
-                applicationContext,
-                "${getString(R.string.error)}: ${error.message ?: getString(R.string.unknown_error)}",
-                Toast.LENGTH_LONG
-            ).show()
-        }
-
-        private fun updateTrackIndexAsync() = serviceScope.launch {
-            mediaRetrieverController.storeCurrentTrackIndex(playbackController.currentMediaItemIndex)
-            updateNotification()
-        }
-
-        private fun storePositionAndUpdateNotificationAsync() = serviceScope.launch {
-            storePlaybackPosition()
-            updateNotification()
-        }
-    }
-
-    // ----------------------- Playback Management  -----------------------
-
-    private fun resetPlaylistForPlayer(playlist: List<DefaultTrack>) =
-        playbackController.player.run {
-            clearMediaItems()
-            addMediaItems(playlist.toMediaItemList())
-        }
-
-    // ----------------------- Playback Handle -----------------------
-
-    private inline val exoPlaybackPosition
-        get() = playbackController.currentPosition.get()
-
-    private inline val exoTrackIndex
-        get() = playbackController.currentMediaItemIndex
-
-    private inline val currentTrackOrNull
-        get() = mediaRetrieverController.currentTrackOrNull
-
-    private inline val currentTrack
-        get() = currentTrackOrNull!!
-
-    private inline val currentPlaylist
-        get() = mediaRetrieverController.currentPlaylist
-
-    private inline val savedTrackIndex
-        get() = mediaRetrieverController.currentTrackIndex
-
-    private inline val savedPlaybackPosition
-        get() = mediaRetrieverController.tracksPlaybackPosition
-
-    private fun pausePlayback() {
-        serviceScope.launch { storePlaybackPosition() }
-        playbackController.pause()
-    }
-
-    private suspend fun resumePlayback() = playPlaylist(
-        playlist = currentPlaylist,
-        curTrackInd = exoTrackIndex,
-        initialPosition = exoPlaybackPosition
-    )
-
-    @OptIn(UnstableApi::class)
-    private suspend fun playPlaylist(
-        playlist: List<DefaultTrack>,
-        curTrackInd: Int,
-        initialPosition: Long = 0
-    ) {
-        Log.d(TAG, "Playing track with index $curTrackInd: ${playlist[curTrackInd]}")
-
-        playbackController.resetAudioSessionIdIfNotPlaying()
-        updateMediaSession(track = playlist[curTrackInd])
-        playerNotificationManager.invalidate()
-
-        playbackController.player.run {
-            seekTo(curTrackInd, initialPosition)
-            prepare()
-            playWhenReady = true
-        }
-    }
-
-    private suspend fun restartPlayer(initialPosition: Long = 0) {
-        resetPlaylistForPlayer(playlist = currentPlaylist)
-
-        playPlaylist(
-            playlist = currentPlaylist,
-            curTrackInd = savedTrackIndex,
-            initialPosition = initialPosition
-        )
-    }
-
-    private fun seekTo(position: Long) {
-        playbackController.resetAudioSessionIdIfNotPlaying()
-        playbackController.player.seekTo(position)
-    }
-
-    private suspend fun storeAndSwitchToTrackAt(index: Int) {
-        storeCurrentTrackIndex(index)
-        playbackController.resetAudioSessionIdIfNotPlaying()
-        playbackController.seekToTrackAtDefaultPosition(index)
-    }
-
-    private suspend fun switchToPrevTrack() = storeAndSwitchToTrackAt(
-        index = when {
-            playbackController.hasPreviousMediaItem -> playbackController.previousMediaItemIndex
-            else -> maxOf(currentPlaylist.size - 1, 0)
-        }
-    )
-
-    private suspend fun switchToNextTrack() = storeAndSwitchToTrackAt(
-        index = when {
-            playbackController.hasNextMediaItem -> playbackController.nextMediaItemIndex
-            else -> 0
-        }
-    )
-
-    private fun releaseMedia() {
-        playerNotificationManager.setPlayer(null)
-        playbackController.releaseAudioEffects()
-        playbackController.releasePlayer()
-        mediaSessionController.releaseMediaSession()
-    }
-
-    // --------------------------- Playback Monitoring ---------------------------
-
-    private lateinit var playbackPosMonitorTask: Job
-    private lateinit var playbackPosCacheTask: Job
-
-    private fun startPlaybackPositionMonitoring() {
-        playbackPosMonitorTask = serviceScope.launch {
-            while (playbackController.isPlaying) {
-                playbackController.updateCurrentPosition()
-                delay(PLAYBACK_UPDATE_COOLDOWN)
-            }
-        }
-
-        playbackPosCacheTask = serviceScope.launch(Dispatchers.IO) {
-            while (playbackController.isPlaying) {
-                storePlaybackPosition()
-                delay(PLAYBACK_UPDATE_COOLDOWN)
-            }
-        }
-    }
-
-    private fun stopPlaybackPositionMonitoring() {
-        playbackPosMonitorTask.cancel()
-        playbackPosCacheTask.cancel()
-    }
-
-    private suspend fun startAudioEffectsMonitoring() =
-        lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
-            combine(
-                mediaRetrieverController.areAudioEffectsEnabledState,
-                mediaRetrieverController.speedState,
-                mediaRetrieverController.pitchState
-            ) { enabled, speed, pitch ->
-                Triple(enabled, speed, pitch)
-            }.collectLatest { (enabled, speed, pitch) ->
-                playbackController.playbackParameters = when {
-                    enabled -> PlaybackParameters(speed, pitch)
-                    else -> PlaybackParameters(1F, 1F)
-                }
-
-                updateNotification()
-            }
-        }
-
-    // --------------------------- Broadcast Receivers ---------------------------
-
-    private val pauseReceiver = object : BroadcastReceiver() {
-        override fun onReceive(context: Context?, intent: Intent?) {
-            Log.d(TAG, "playback paused")
-            pausePlayback()
-        }
-    }
-
-    private val resumeReceiver = object : BroadcastReceiver() {
-        override fun onReceive(context: Context?, intent: Intent?) {
-            Log.d(TAG, "playback resumed")
-
-            serviceScope.launch {
-                when {
-                    isStoppedWithError -> {
-                        restartPlayer(initialPosition = exoPlaybackPosition)
-                        isStoppedWithError = false
-                    }
-
-                    else -> resumePlayback()
-                }
-            }
-        }
-    }
-
-    private val switchPlaylistReceiver = object : BroadcastReceiver() {
-        override fun onReceive(context: Context?, intent: Intent) {
-            Log.d(TAG, "switch playlist")
-            val playlist = intent.playlistArg
-            val trackInd = intent.trackIndexArg
-            serviceScope.launch { onTrackClicked(playlist, trackInd) }
-        }
-    }
-
-    private val addToPlaylistReceiver = object : BroadcastReceiver() {
-        override fun onReceive(context: Context?, intent: Intent) {
-            val track = intent.trackArg
-            Log.d(TAG, "Add track $track to playlist")
-            playbackController.addMediaItem(MediaItem.fromUri(track.path))
-        }
-    }
-
-    private val removeFromPlaylistReceiver = object : BroadcastReceiver() {
-        override fun onReceive(context: Context?, intent: Intent) {
-            val index = intent.trackIndexArg
-            Log.d(TAG, "Remove $index track from playlist")
-            playbackController.removeMediaItem(index)
-        }
-    }
-
-    private val playlistDraggedReceiver = object : BroadcastReceiver() {
-        override fun onReceive(context: Context?, intent: Intent) {
-            Log.d(TAG, "on playlist dragged")
-
-            val newPlaylist = intent.playlistArg
-            val newTrackInd = intent.trackIndexArg
-
-            playbackController.setMediaItems(
-                newPlaylist.toMediaItemList(),
-                newTrackInd,
-                exoPlaybackPosition
-            )
-        }
-    }
-
-    private val switchToPrevTrackReceiver = object : BroadcastReceiver() {
-        override fun onReceive(context: Context?, intent: Intent?) {
-            Log.d(TAG, "prev track")
-            serviceScope.launch { switchToPrevTrack() }
-        }
-    }
-
-    private val switchToNextTrackReceiver = object : BroadcastReceiver() {
-        override fun onReceive(context: Context?, intent: Intent?) {
-            Log.d(TAG, "next track")
-            serviceScope.launch { switchToNextTrack() }
-        }
-    }
-
-    private val seekToReceiver = object : BroadcastReceiver() {
-        override fun onReceive(context: Context, intent: Intent) {
-            val position = intent.getLongExtra(POSITION_ARG, 0)
-            Log.d(TAG, "seek to $position")
-            seekTo(position)
-        }
-    }
-
-    private val repeatChangedReceiver = object : BroadcastReceiver() {
-        override fun onReceive(context: Context?, intent: Intent?) {
-            serviceScope.launch {
-                val newRepeatMode = !mediaRetrieverController.isRepeating
-                storeIsRepeating(newRepeatMode)
-                playbackController.repeatMode = playbackController.getRepeatMode(newRepeatMode)
-                playerNotificationManager.invalidate()
-                Log.d(TAG, "Repeating changed: $newRepeatMode")
-            }
-        }
-    }
-
-    private val dismissNotificationReceiver = object : BroadcastReceiver() {
-        override fun onReceive(context: Context?, intent: Intent?) {
-            Log.d(TAG, "Notification removed")
-            detachNotification()
-        }
-    }
-
-    private val audioEffectsEnabledUpdateReceiver = object : BroadcastReceiver() {
-        override fun onReceive(context: Context?, intent: Intent?) =
-            playbackController.setAudioEffectsEnabled(
-                isEnabled = mediaRetrieverController.areAudioEffectsEnabled,
-                mediaRetrieverController = mediaRetrieverController
-            )
-    }
-
-    private val equalizerParameterUpdateReceiver = object : BroadcastReceiver() {
-        override fun onReceive(context: Context?, intent: Intent?) {
-            val currentParameter = mediaRetrieverController.equalizerParams
-            val bandLevels = mediaRetrieverController.equalizerBands
-            val preset = mediaRetrieverController.equalizerPreset
-
-            playbackController.setEqParameter(currentParameter, bandLevels, preset)
-            Log.d(TAG, "EQ Params Set: $currentParameter; EQ: $bandLevels")
-
-            playbackController.updateEqData(
-                bandLevels = bandLevels,
-                currentPreset = preset,
-                currentParameter = currentParameter
-            )
-        }
-    }
-
-    private val bassStrengthUpdateReceiver = object : BroadcastReceiver() {
-        override fun onReceive(context: Context?, intent: Intent?) {
-            playbackController.bassStrength = mediaRetrieverController.bassStrength
-        }
-    }
-
-    private val reverbPresetUpdateReceiver = object : BroadcastReceiver() {
-        override fun onReceive(context: Context?, intent: Intent?) {
-            playbackController.reverbPreset = mediaRetrieverController.reverbPreset
-        }
-    }
-
-    private val stopReceiver = object : BroadcastReceiver() {
-        override fun onReceive(context: Context?, intent: Intent?) {
-            Log.d(TAG, "Stopped after stop receive: ${stopSelfResult(startIdState.value)}")
-        }
-    }
-
-    @Suppress("IncorrectFormatting")
-    private fun registerReceivers() {
-        registerReceiverCompat(pauseReceiver, Broadcast_PAUSE)
-        registerReceiverCompat(resumeReceiver, Broadcast_RESUME)
-        registerReceiverCompat(switchPlaylistReceiver, Broadcast_SWITCH_PLAYLIST)
-        registerReceiverCompat(addToPlaylistReceiver, Broadcast_ADD_TO_PLAYLIST)
-        registerReceiverCompat(removeFromPlaylistReceiver, Broadcast_REMOVE_FROM_PLAYLIST)
-        registerReceiverCompat(playlistDraggedReceiver, Broadcast_PLAYLIST_DRAGGED)
-        registerReceiverCompat(switchToPrevTrackReceiver, Broadcast_PREV_TRACK)
-        registerReceiverCompat(switchToNextTrackReceiver, Broadcast_NEXT_TRACK)
-        registerReceiverCompat(seekToReceiver, Broadcast_SEEK_TO)
-        registerReceiverCompat(repeatChangedReceiver, Broadcast_CHANGE_REPEAT)
-        registerReceiverCompat(dismissNotificationReceiver, Broadcast_DISMISS_NOTIFICATION)
-        registerReceiverCompat(audioEffectsEnabledUpdateReceiver, Broadcast_AUDIO_EFFECTS_ENABLED_UPDATE)
-        registerReceiverCompat(equalizerParameterUpdateReceiver, Broadcast_EQUALIZER_PARAM_UPDATE)
-        registerReceiverCompat(bassStrengthUpdateReceiver, Broadcast_BASS_STRENGTH_UPDATE)
-        registerReceiverCompat(reverbPresetUpdateReceiver, Broadcast_REVERB_PRESET_UPDATE)
-        registerReceiverCompat(stopReceiver, Broadcast_STOP)
-    }
-
-    private fun unregisterReceivers() {
-        unregisterReceiver(pauseReceiver)
-        unregisterReceiver(resumeReceiver)
-        unregisterReceiver(switchPlaylistReceiver)
-        unregisterReceiver(addToPlaylistReceiver)
-        unregisterReceiver(removeFromPlaylistReceiver)
-        unregisterReceiver(playlistDraggedReceiver)
-        unregisterReceiver(switchToPrevTrackReceiver)
-        unregisterReceiver(switchToNextTrackReceiver)
-        unregisterReceiver(seekToReceiver)
-        unregisterReceiver(repeatChangedReceiver)
-        unregisterReceiver(dismissNotificationReceiver)
-        unregisterReceiver(audioEffectsEnabledUpdateReceiver)
-        unregisterReceiver(equalizerParameterUpdateReceiver)
-        unregisterReceiver(bassStrengthUpdateReceiver)
-        unregisterReceiver(reverbPresetUpdateReceiver)
-        unregisterReceiver(stopReceiver)
-    }
-
-    // --------------------------- Service Impl ---------------------------
-
-    private val startIdState = MutableStateFlow(0)
-
-    override fun onCreate() {
-        super.onCreate()
-        registerReceivers()
-    }
-
-    override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
-        super.onStartCommand(intent, flags, startId)
-        startIdState.update { startId }
-        Log.d(TAG, "onStart called with id $startId")
-
-        isConnectedState.update { true }
-        initMediaSession()
-
-        val playlist = intent?.playlistArgOrNull
-        val trackInd = intent?.trackIndexArg
-
-        serviceScope.launch {
-            when (playlist) {
-                // Resume received
-                null -> when {
-                    currentPlaylist.isEmpty() ->
-                        return@launch sendErrorBroadcast(Exception("Playlist is empty"))
-
-                    else -> onResumeClicked()
-                }
-
-                // New playlist received
-                else -> onTrackClicked(playlist, trackInd!!)
-            }
-
-            launchMonitoringTasks()
-        }
-
-        return START_STICKY
-    }
-
-    private suspend fun onResumeClicked() {
-        if (currentPlaylist.isEmpty())
-            return sendErrorBroadcast(Exception("Playlist is empty"))
-
-        resetPlaylistForPlayer(currentPlaylist)
-
-        playPlaylist(
-            playlist = currentPlaylist,
-            curTrackInd = savedTrackIndex,
-            initialPosition = savedPlaybackPosition
-        )
-    }
-
-    private suspend fun onTrackClicked(playlist: ImmutableList<DefaultTrack>, trackInd: Int) {
-        val newCurTrackPath = playlist[trackInd].path
-        val prevCurTrackPath = currentTrackOrNull?.path
-
-        Log.d(TAG, "Track with index $trackInd is clicked")
-        Log.d(TAG, "New track: $newCurTrackPath; Old track: $prevCurTrackPath")
-
-        val currentTrackIndex = exoTrackIndex
-        val currentPosition = savedPlaybackPosition
-
-        storeCurrentPlaylist(playlist)
-        storeCurrentTrackIndex(trackInd)
-
-        when {
-            newCurTrackPath == prevCurTrackPath && playbackController.isPlaying ->
-                pauseOnTrackClicked(playlist, currentTrackIndex, currentPosition)
-
-            newCurTrackPath == prevCurTrackPath ->
-                resumeOnTrackClicked(playlist, trackInd, currentPosition)
-
-            else -> newPlaylistOnTrackClicked(playlist, trackInd)
-        }
-    }
-
-    private fun pauseOnTrackClicked(
-        playlist: List<DefaultTrack>,
-        currentTrackIndex: Int,
-        currentPosition: Long
-    ) {
-        Log.d(TAG, "Pause after click")
-        pausePlayback()
-        resetPlaylistForPlayer(playlist)
-        playbackController.player.seekTo(currentTrackIndex, currentPosition)
-    }
-
-    private suspend inline fun resumeOnTrackClicked(
-        playlist: List<DefaultTrack>,
-        trackIndex: Int,
-        currentPosition: Long
-    ) {
-        Log.d(TAG, "Resume after click")
-        resetPlaylistForPlayer(playlist)
-        playPlaylist(playlist, trackIndex, currentPosition)
-    }
-
-    private suspend inline fun newPlaylistOnTrackClicked(
-        playlist: List<DefaultTrack>,
-        trackInd: Int
-    ) {
-        Log.d(TAG, "New playlist on click")
-        pausePlayback()
-        resetPlaylistForPlayer(playlist)
-        playPlaylist(playlist, trackInd)
-    }
-
-    private fun launchMonitoringTasks() {
-        serviceScope.launch { startNotificationObserving() }
-        serviceScope.launch { startAudioEffectsMonitoring() }
-    }
-
-    override fun onDestroy() {
-        super.onDestroy()
-        isConnectedState.update { false }
-        detachNotification()
-        releaseMedia()
-        unregisterReceivers()
-        Log.d(TAG, "TrackService is destroyed")
-    }
-
-    // --------------------------- Notification Setup ---------------------------
-
-    private inline val Actions.playbackIntent: PendingIntent
-        get() = PendingIntent.getBroadcast(
-            this@TrackService,
-            requestCode,
-            Intent(playbackAction),
-            PendingIntent.FLAG_IMMUTABLE
-        )
-
-    private val playerNotificationManager by lazy {
-        PlayerNotificationManager.Builder(this, NOTIFICATION_ID, AUDIO_CHANNEL_ID)
-            .setChannelNameResourceId(R.string.app_name)
-            .setChannelDescriptionResourceId(R.string.app_name)
-            .setChannelImportance(NotificationUtil.IMPORTANCE_HIGH)
-            .setNotificationListener(notificationListener)
-            .setMediaDescriptionAdapter(mediaDescriptionProvider)
-            .setCustomActionReceiver(customActionsReceiver)
-            .setNextActionIconResourceId(R.drawable.next_track)
-            .setPreviousActionIconResourceId(R.drawable.prev_track)
-            .setPlayActionIconResourceId(R.drawable.play)
-            .setPauseActionIconResourceId(R.drawable.pause)
-            .build()
-            .apply {
-                setUseStopAction(false)
-                setUseChronometer(false)
-                setUseFastForwardAction(false)
-                setUseRewindAction(false)
-                setUseFastForwardActionInCompactView(false)
-                setUseRewindActionInCompactView(false)
-
-                setPriority(NotificationCompat.PRIORITY_HIGH)
-                setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
-                setMediaSessionToken(mediaSession.sessionToken)
-            }
-    }
-
-    private val notificationListener = object : PlayerNotificationManager.NotificationListener {
-        override fun onNotificationCancelled(notificationId: Int, dismissedByUser: Boolean) {
-            super.onNotificationCancelled(notificationId, dismissedByUser)
-            detachNotification()
-            if (!dismissedByUser) pausePlayback()
-        }
-
-        override fun onNotificationPosted(
-            notificationId: Int,
-            notification: Notification,
-            ongoing: Boolean
-        ) {
-            super.onNotificationPosted(notificationId, notification, ongoing)
-            startForeground(notificationId, notification)
-        }
-    }
-
-    private val mediaDescriptionProvider =
-        object : PlayerNotificationManager.MediaDescriptionAdapter {
-            override fun getCurrentContentTitle(player: Player) =
-                currentTrackOrNull?.title ?: getString(R.string.unknown_track)
-
-            override fun createCurrentContentIntent(player: Player) = PendingIntent.getActivity(
-                applicationContext,
-                0,
-                Intent(applicationContext, MainActivity::class.java),
-                PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
-            )
-
-            override fun getCurrentContentText(player: Player) =
-                currentTrackOrNull?.artist ?: getString(R.string.unknown_artist)
-
-            override fun getCurrentLargeIcon(
-                player: Player,
-                callback: PlayerNotificationManager.BitmapCallback
-            ): Bitmap? {
-                serviceScope.launch(Dispatchers.IO) {
-                    callback.onBitmap(getTrackCoverAsync(path = currentTrackOrNull?.path).await())
-                }
-
-                return null
-            }
-        }
-
-    private val customActionsReceiver =
-        object : PlayerNotificationManager.CustomActionReceiver {
-            override fun createCustomActions(
-                context: Context,
-                instanceId: Int
-            ) = mutableMapOf(
-                ACTION_REPEAT to repeatActionCompat,
-                ACTION_UNREPEAT to unrepeatActionCompat,
-                ACTION_DISMISS to dismissNotificationActionCompat
-            )
-
-            override fun getCustomActions(player: Player) = newCustomActions
-
-            override fun onCustomAction(player: Player, action: String, intent: Intent) =
-                sendBroadcast(commandsToActions[action]!!.playbackAction)
-        }
-
-    private val newCustomActions
-        get() = mutableListOf(
-            when {
-                mediaRetrieverController.isRepeating -> ACTION_REPEAT
-                else -> ACTION_UNREPEAT
-            },
-            ACTION_DISMISS
-        )
-
-    private val commandsToActions = mapOf(
+    internal val commandsToActions = mapOf(
         ACTION_PAUSE to Actions.Pause,
         ACTION_RESUME to Actions.Resume,
         ACTION_PREV_TRACK to Actions.PrevTrack,
@@ -897,121 +101,104 @@ class TrackService : SuspendService(), KoinComponent {
         ACTION_DISMISS to Actions.Dismiss
     )
 
-    // --------------------------- Notification Handle ---------------------------
+    internal val pauseReceiver = PauseReceiver(this)
+    internal val resumeReceiver = ResumeReceiver(this)
+    internal val switchPlaylistReceiver = SwitchPlaylistReceiver(this)
+    internal val seekToReceiver = SeekToReceiver(this)
+    internal val seekToNextTrackReceiver = SeekToNextTrackReceiver(this)
+    internal val seekToPrevTrackReceiver = SeekToPrevTrackReceiver(this)
+    internal val repeatChangedReceiver = RepeatChangedReceiver(this)
+    internal val addTrackReceiver = AddTrackReceiver(this)
+    internal val removeTrackReceiver = RemoveTrackReceiver(this)
+    internal val playlistDraggedReceiver = PlaylistDraggedReceiver(this)
+    internal val dismissNotificationReceiver = DismissNotificationReceiver(this)
+    internal val stopReceiver = StopReceiver(this)
 
-    /**
-     * Runs loop that observers all notification related states
-     * and updates notification when something has changed
-     */
+    override fun onCreate() {
+        super.onCreate()
+        registerReceivers()
+    }
 
-    private suspend inline fun startNotificationObserving() =
-        lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
-            combine(
-                mediaRetrieverController.isPlayingState,
-                mediaRetrieverController.isRepeatingState,
-                mediaRetrieverController.currentTrackIndexState,
-            ) { isPlaying, isRepeating, curTrackInd ->
-                Triple(isPlaying, isRepeating, curTrackInd)
-            }.collectLatest {
-                serviceScope.launch { updateNotification() }
-            }
+    override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
+        super.onStartCommand(intent, flags, startId)
+
+        connect(startId)
+
+        mediaSessionManager.initMediaSession(
+            context = this,
+            mediaSessionCallback = MediaSessionCallback(this)
+        )
+
+        notificationManager.initNotificationManager(playerProvider.player)
+
+        launchMonitoringTasks()
+
+        val playlist = intent?.playlistArgOrNull
+        val trackInd = intent?.trackIndexArg
+
+        when (playlist) {
+            // Resume received
+            null -> startResumingAsync()
+
+            // New playlist received
+            else -> playPlaylistAsync(playlist, trackInd!!)
         }
 
-    private suspend fun updateNotification() {
-        Log.d(TAG, "Update Notification; track: $currentTrackOrNull")
-        updateMediaSession(currentTrackOrNull ?: return)
-        playerNotificationManager.invalidate()
+        return START_STICKY
     }
 
-    private fun detachNotification() {
-        Log.d(TAG, "Notification is removed")
+    override fun onDestroy() {
+        super.onDestroy()
+        disconnect()
 
-        @Suppress("DEPRECATION")
-        when {
-            Build.VERSION.SDK_INT >= Build.VERSION_CODES.N -> stopForeground(STOP_FOREGROUND_REMOVE)
-            else -> stopForeground(true)
-        }
-    }
+        detachNotification()
+        notificationManager.releasePlayer()
 
-    // --------------------------- Notification Actions ---------------------------
+        playerProvider.releasePlayerWithEffects()
+        mediaSessionManager.releaseMediaSession()
 
-    private val repeatActionCompat
-        get() = NotificationCompat.Action.Builder(
-            IconCompat.createWithResource(
-                this,
-                R.drawable.repeat
-            ),
-            resources.getString(R.string.change_repeat),
-            Actions.Repeat.playbackIntent
-        ).build()
-
-    private val unrepeatActionCompat
-        get() = NotificationCompat.Action.Builder(
-            IconCompat.createWithResource(
-                this,
-                R.drawable.no_repeat
-            ),
-            resources.getString(R.string.change_repeat),
-            Actions.Unrepeat.playbackIntent
-        ).build()
-
-    private val dismissNotificationActionCompat
-        get() = NotificationCompat.Action.Builder(
-            IconCompat.createWithResource(this, R.drawable.dismiss),
-            resources.getString(R.string.cancel),
-            Actions.Dismiss.playbackIntent
-        ).build()
-
-    // ----------------------- Storage Handler Utils -----------------------
-
-    private suspend inline fun storePlaybackPosition(position: Long = exoPlaybackPosition) =
-        mediaRetrieverController.storeTracksPlaybackPosition(position)
-
-    private suspend inline fun storeIsRepeating(isRepeating: Boolean) =
-        mediaRetrieverController.storeIsRepeating(isRepeating)
-
-    private suspend inline fun storeCurrentPlaylist(playlist: ImmutableList<DefaultTrack>) =
-        mediaRetrieverController.storeCurrentPlaylist(playlist)
-            .apply { println("STORE CURRENT PLAYLIST") }
-
-    private suspend inline fun storeCurrentTrackIndex(index: Int) =
-        mediaRetrieverController.storeCurrentTrackIndex(index)
-
-    // --------------------------- Error Handle ---------------------------
-
-    @Suppress("DEPRECATION")
-    private fun ErrorNotification(message: String) = when {
-        Build.VERSION.SDK_INT >= Build.VERSION_CODES.O ->
-            Notification.Builder(applicationContext, AUDIO_CHANNEL_ID)
-
-        else -> Notification.Builder(applicationContext)
-    }
-        .setSmallIcon(R.drawable.save_icon)
-        .setContentIntent(
-            PendingIntent.getActivity(
-                applicationContext,
-                0,
-                Intent(applicationContext, MainActivity::class.java),
-                PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
-            )
-        )
-        .setContentTitle(message)
-        .setAutoCancel(true)
-        .setShowWhen(false)
-        .build()
-
-    private fun sendErrorBroadcast(error: Throwable) {
-        val errorMessage = error.message ?: getString(R.string.unknown_error)
-        startForeground(NOTIFICATION_ID, ErrorNotification(errorMessage))
-        isStoppedWithError = true
-
-        sendBroadcast(
-            Intent(applicationContext, PlaybackErrorReceiver::class.java)
-                .setAction(PlaybackErrorReceiver.Broadcast_PLAYBACK_ERROR)
-                .putExtra(
-                    PlaybackErrorReceiver.ERROR_MESSAGE_ARG,
-                    errorMessage
-                )
-        )
+        unregisterReceiver()
     }
 }
+
+private fun TrackService.launchMonitoringTasks() {
+    serviceScope.launch { playerProvider.startPlaybackEventLoop(this@launchMonitoringTasks) }
+    serviceScope.launch { startNotificationMonitoring() }
+    serviceScope.launch { startPlaybackStatesMonitoring() }
+    serviceScope.launch { startMetadataMonitoring() }
+    serviceScope.launch { startPlaybackEffectsMonitoring() }
+    serviceScope.launch { startEqMonitoring() }
+    serviceScope.launch { startBassMonitoring() }
+    serviceScope.launch { startReverbMonitoring() }
+}
+
+@Suppress("DEPRECATION")
+private inline val Intent.trackArgOrNull: Track?
+    get() = when {
+        Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU ->
+            getParcelableExtra(TrackService.TRACK_ARG, DefaultTrack::class.java)
+
+        else -> getParcelableExtra(TrackService.TRACK_ARG)
+    }
+
+@Suppress("DEPRECATION")
+private inline val Intent.playlistArgOrNull: List<Track>?
+    @Suppress("UNCHECKED_CAST")
+    get() = when {
+        Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU ->
+            getParcelableArrayExtra(TrackService.PLAYLIST_ARG, DefaultTrack::class.java)
+
+        else -> getParcelableArrayExtra(TrackService.PLAYLIST_ARG) as Array<DefaultTrack>
+    }?.toList()
+
+internal inline val Intent.trackArg
+    get() = trackArgOrNull!!
+
+internal inline val Intent.playlistArg
+    get() = playlistArgOrNull!!
+
+internal inline val Intent.trackIndexArg
+    get() = getIntExtra(TrackService.TRACK_INDEX_ARG, 0)
+
+internal inline val Intent.positionArg
+    get() = getLongExtra(TrackService.POSITION_ARG, 0)

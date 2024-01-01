@@ -6,12 +6,12 @@ import androidx.lifecycle.repeatOnLifecycle
 import com.paranid5.crescendo.domain.metadata.VideoMetadata
 import com.paranid5.crescendo.domain.utils.extensions.toAndroidMetadata
 import com.paranid5.crescendo.media.images.getVideoCoverBitmapAsync
-import com.paranid5.crescendo.services.stream_service.StreamService2
+import com.paranid5.crescendo.services.stream_service.StreamService
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
 
-suspend fun StreamService2.startMetadataMonitoring() =
+suspend fun StreamService.startMetadataMonitoring() =
     lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
         mediaSessionManager
             .currentMetadataFlow

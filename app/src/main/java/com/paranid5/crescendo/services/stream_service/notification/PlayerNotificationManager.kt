@@ -16,20 +16,21 @@ import com.paranid5.crescendo.domain.utils.extensions.sendBroadcast
 import com.paranid5.crescendo.media.images.getThumbnailBitmap
 import com.paranid5.crescendo.media.images.getVideoCoverBitmapAsync
 import com.paranid5.crescendo.presentation.main.MainActivity
+import com.paranid5.crescendo.services.core.notification.detachNotification
 import com.paranid5.crescendo.services.stream_service.ACTION_DISMISS
 import com.paranid5.crescendo.services.stream_service.ACTION_REPEAT
 import com.paranid5.crescendo.services.stream_service.ACTION_UNREPEAT
-import com.paranid5.crescendo.services.stream_service.StreamService2
+import com.paranid5.crescendo.services.stream_service.StreamService
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
 
 @OptIn(UnstableApi::class)
-fun PlayerNotificationManager(service: StreamService2) =
+fun PlayerNotificationManager(service: StreamService) =
     PlayerNotificationManager.Builder(
         service,
-        NOTIFICATION_ID,
+        STREAM_NOTIFICATION_ID,
         STREAM_CHANNEL_ID
     )
         .setChannelNameResourceId(R.string.app_name)
@@ -57,7 +58,7 @@ fun PlayerNotificationManager(service: StreamService2) =
         }
 
 @OptIn(UnstableApi::class)
-private fun NotificationListener(service: StreamService2) =
+private fun NotificationListener(service: StreamService) =
     object : PlayerNotificationManager.NotificationListener {
         override fun onNotificationCancelled(notificationId: Int, dismissedByUser: Boolean) {
             super.onNotificationCancelled(notificationId, dismissedByUser)
@@ -75,7 +76,7 @@ private fun NotificationListener(service: StreamService2) =
     }
 
 @OptIn(UnstableApi::class)
-private fun MediaDescriptionProvider(service: StreamService2) =
+private fun MediaDescriptionProvider(service: StreamService) =
     object : PlayerNotificationManager.MediaDescriptionAdapter {
         override fun getCurrentContentTitle(player: Player) =
             service.videoTitle ?: service.getString(R.string.stream_no_name)
@@ -99,7 +100,7 @@ private fun MediaDescriptionProvider(service: StreamService2) =
                 callback.onBitmap(
                     service
                         .notificationManager
-                        .getVideoCoverAsync(service)
+                        .getVideoCoverBitmapAsync(service)
                         .await()
                 )
             }
@@ -109,7 +110,7 @@ private fun MediaDescriptionProvider(service: StreamService2) =
     }
 
 @OptIn(UnstableApi::class)
-private fun CustomActionsReceiver(service: StreamService2) =
+private fun CustomActionsReceiver(service: StreamService) =
     object : PlayerNotificationManager.CustomActionReceiver {
         override fun createCustomActions(
             context: Context,
@@ -127,23 +128,19 @@ private fun CustomActionsReceiver(service: StreamService2) =
             service.sendBroadcast(service.commandsToActions[action]!!.playbackAction)
     }
 
-private inline val StreamService2.videoTitle
+private inline val StreamService.videoTitle
     get() = metadata?.title
 
-private inline val StreamService2.videoAuthor
+private inline val StreamService.videoAuthor
     get() = metadata?.author
 
-private inline val StreamService2.metadata
+private inline val StreamService.metadata
     get() = notificationManager.currentMetadataState.value
 
-private suspend inline fun NotificationManager.getVideoCoverAsync(context: Context) =
+private suspend inline fun NotificationManager.getVideoCoverBitmapAsync(context: Context) =
     currentMetadataState.value
         ?.let { getVideoCoverBitmapAsync(context = context, videoMetadata = it) }
-        ?: coroutineScope {
-            async(Dispatchers.IO) {
-                getThumbnailBitmap(context = context)
-            }
-        }
+        ?: coroutineScope { async(Dispatchers.IO) { getThumbnailBitmap(context) } }
 
 private fun CustomActions(repeatMode: Int) = mutableListOf(
     when (repeatMode) {
