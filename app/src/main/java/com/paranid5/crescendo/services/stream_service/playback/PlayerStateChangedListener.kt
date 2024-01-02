@@ -4,7 +4,6 @@ import androidx.media3.common.PlaybackException
 import androidx.media3.common.Player
 import com.paranid5.crescendo.services.stream_service.StreamService
 import com.paranid5.crescendo.services.stream_service.sendErrorBroadcast
-import kotlinx.coroutines.launch
 
 fun PlayerStateChangedListener(service: StreamService) =
     object : Player.Listener {
@@ -12,9 +11,7 @@ fun PlayerStateChangedListener(service: StreamService) =
             super.onPlaybackStateChanged(playbackState)
 
             if (playbackState == Player.STATE_IDLE)
-                service.serviceScope.launch {
-                    service.playerProvider.restartPlayer()
-                }
+                service.restartPlayerAsync()
         }
 
         override fun onIsPlayingChanged(isPlaying: Boolean) {
@@ -22,13 +19,8 @@ fun PlayerStateChangedListener(service: StreamService) =
             service.playerProvider.isPlaying = isPlaying
 
             when {
-                isPlaying -> service.serviceScope.launch {
-                    service.startPlaybackPositionMonitoring()
-                }
-
-                else -> service.serviceScope.launch {
-                    stopPlaybackPositionMonitoring()
-                }
+                isPlaying -> service.startPlaybackPositionMonitoringAsync()
+                else -> stopPlaybackPositionMonitoring()
             }
         }
 

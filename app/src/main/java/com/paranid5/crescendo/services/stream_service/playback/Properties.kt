@@ -23,3 +23,6 @@ fun StreamService.seekTenSecsForwardAsync() =
 
 fun StreamService.seekTenSecsBackAsync() =
     serviceScope.launch { playerProvider.seekTenSecsBack() }
+
+fun StreamService.restartPlayerAsync() =
+    serviceScope.launch { playerProvider.restartPlayer() }

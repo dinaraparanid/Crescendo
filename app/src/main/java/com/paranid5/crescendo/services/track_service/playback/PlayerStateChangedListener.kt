@@ -1,20 +1,25 @@
 package com.paranid5.crescendo.services.track_service.playback
 
+import androidx.media3.common.MediaItem
 import androidx.media3.common.PlaybackException
 import androidx.media3.common.Player
 import com.paranid5.crescendo.services.track_service.TrackService
 import com.paranid5.crescendo.services.track_service.sendErrorBroadcast
-import kotlinx.coroutines.launch
 
 fun PlayerStateChangedListener(service: TrackService) =
     object : Player.Listener {
+        override fun onMediaItemTransition(mediaItem: MediaItem?, reason: Int) {
+            super.onMediaItemTransition(mediaItem, reason)
+
+            if (reason == Player.MEDIA_ITEM_TRANSITION_REASON_AUTO)
+                service.updateCurrentTrackIndexAsync()
+        }
+
         override fun onPlaybackStateChanged(playbackState: Int) {
             super.onPlaybackStateChanged(playbackState)
 
             if (playbackState == Player.STATE_IDLE)
-                service.serviceScope.launch {
-                    service.playerProvider.restartPlayer()
-                }
+                service.restartPlayerAsync()
         }
 
         override fun onIsPlayingChanged(isPlaying: Boolean) {
@@ -22,13 +27,8 @@ fun PlayerStateChangedListener(service: TrackService) =
             service.playerProvider.isPlaying = isPlaying
 
             when {
-                isPlaying -> service.serviceScope.launch {
-                    service.startPlaybackPositionMonitoring()
-                }
-
-                else -> service.serviceScope.launch {
-                    stopPlaybackPositionMonitoring()
-                }
+                isPlaying -> service.startPlaybackPositionMonitoringAsync()
+                else -> stopPlaybackPositionMonitoring()
             }
         }
 

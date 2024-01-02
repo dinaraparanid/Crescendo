@@ -86,7 +86,7 @@ class PlayerProvider(service: TrackService, storageHandler: StorageHandler) : Ko
 
     suspend fun startResuming() {
         waitEventFlowInit()
-        delay(500L)
+        delay(500L) // little delay for an event loop to overcome laziness
         playbackEventFlow.emit(PlaybackEvent.StartSamePlaylist())
     }
 
@@ -134,6 +134,9 @@ class PlayerProvider(service: TrackService, storageHandler: StorageHandler) : Ko
             )
         )
     }
-
-    suspend fun restartPlayer() = startResuming()
 }
+
+suspend inline fun PlayerProvider.restartPlayer() = startResuming()
+
+suspend inline fun PlayerProvider.updateCurrentTrackIndex() =
+    setCurrentTrackIndex(currentMediaItemIndex)

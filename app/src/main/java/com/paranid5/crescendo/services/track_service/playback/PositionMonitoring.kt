@@ -11,6 +11,9 @@ private const val PLAYBACK_UPDATE_COOLDOWN = 500L
 private lateinit var playbackPosMonitorTask: Job
 private lateinit var playbackPosCacheTask: Job
 
+fun TrackService.startPlaybackPositionMonitoringAsync() =
+    serviceScope.launch { startPlaybackPositionMonitoring() }
+
 fun TrackService.startPlaybackPositionMonitoring() {
     playbackPosMonitorTask = serviceScope.launch {
         while (playerProvider.isPlaying) {

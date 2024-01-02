@@ -33,3 +33,9 @@ fun TrackService.removeTrackFromPlaylistAsync(index: Int) =
 
 fun TrackService.replacePlaylistAsync(newPlaylist: List<Track>, newCurrentTrackIndex: Int) =
     serviceScope.launch { playerProvider.replacePlaylist(newPlaylist, newCurrentTrackIndex) }
+
+fun TrackService.restartPlayerAsync() =
+    serviceScope.launch { playerProvider.restartPlayer() }
+
+fun TrackService.updateCurrentTrackIndexAsync() =
+    serviceScope.launch { playerProvider.updateCurrentTrackIndex() }

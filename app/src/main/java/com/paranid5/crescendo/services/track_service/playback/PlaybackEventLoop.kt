@@ -125,7 +125,6 @@ private suspend inline fun TrackService.onStartNewPlaylist(
 ) {
     val currentTrackPath = currentPlaylist.getOrNull(currentTrackIndex)?.path
     val newTrackPath = newPlaylist[newTrackIndex].path
-    println("$currentTrackPath $newTrackPath")
 
     when {
         newTrackPath == currentTrackPath && isPlaying -> onPause()
