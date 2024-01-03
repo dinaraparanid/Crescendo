@@ -56,12 +56,13 @@ class PlayingUIHandler(
         trackAction = trackServiceAccessor::startStreamingOrSendResumeBroadcast
     )
 
-    fun launchVideoCashService(
+    fun launchVideoCacheService(
+        url: String,
         desiredFilename: String,
         format: Formats,
         trimRange: TrimRange
-    ) = videoCacheServiceAccessor.startCashingOrAddToQueue(
-        videoUrl = storageHandler.currentUrlState.value,
+    ) = videoCacheServiceAccessor.startCachingOrAddToQueue(
+        videoUrl = url,
         desiredFilename = desiredFilename,
         format = format,
         trimRange = trimRange

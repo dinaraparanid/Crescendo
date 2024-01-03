@@ -2,7 +2,6 @@ package com.paranid5.crescendo.data
 
 import android.content.Context
 import androidx.datastore.preferences.preferencesDataStore
-import com.paranid5.crescendo.data.properties.currentUrlFlow
 import com.paranid5.crescendo.data.states.AudioEffectsStateProvider
 import com.paranid5.crescendo.data.states.PlaybackStateProvider
 import com.paranid5.crescendo.data.states.StreamStateProvider
@@ -10,8 +9,6 @@ import com.paranid5.crescendo.data.states.TracksStateProvider
 import com.paranid5.crescendo.data.states.WaveformStateProvider
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.SharingStarted
-import kotlinx.coroutines.flow.stateIn
 
 class StorageHandler(context: Context) : CoroutineScope by CoroutineScope(Dispatchers.IO) {
     private val Context.dataStore by preferencesDataStore("params")
@@ -22,9 +19,4 @@ class StorageHandler(context: Context) : CoroutineScope by CoroutineScope(Dispat
     val playbackStateProvider by lazy { PlaybackStateProvider(dataStore) }
     val audioEffectsStateProvider by lazy { AudioEffectsStateProvider(dataStore) }
     val waveformStateProvider by lazy { WaveformStateProvider(dataStore) }
-
-    // ------------------ TODO: Remove state flows ------------------
-
-    val currentUrlState = currentUrlFlow
-        .stateIn(this, SharingStarted.Eagerly, "")
 }

@@ -9,7 +9,7 @@
     <string name="enter_stream_url">Enter YouTube URL to start streaming</string>
     <string name="your_url">YouTube URL link</string>
     <string name="confirm">Confirm</string>
-    <string name="stream_no_name">Video with no name</string>
+    <string name="stream_no_name">Unknown Video</string>
     <string name="unknown_streamer">Unknown channel</string>
     <string name="video_cover">Video cover</string>
     <string name="ten_secs_back">10 seconds back</string>
@@ -100,4 +100,5 @@
     <string name="zoom_in">Zoom In</string>
     <string name="zoom_out">Zoom Out</string>
     <string name="playlist_empty_err">Playlist is empty</string>
+    <string name="converting">Converting</string>
 </resources>

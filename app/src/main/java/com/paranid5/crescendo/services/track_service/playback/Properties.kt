@@ -2,13 +2,20 @@ package com.paranid5.crescendo.services.track_service.playback
 
 import com.paranid5.crescendo.domain.tracks.Track
 import com.paranid5.crescendo.services.track_service.TrackService
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 fun TrackService.startResumingAsync() =
-    serviceScope.launch { playerProvider.startResuming() }
+    serviceScope.launch {
+        delay(500)
+        playerProvider.startResuming()
+    }
 
 fun TrackService.playPlaylistAsync(playlist: List<Track>, trackIndex: Int) =
-    serviceScope.launch { playerProvider.playPlaylist(playlist, trackIndex) }
+    serviceScope.launch {
+        delay(500)
+        playerProvider.playPlaylist(playlist, trackIndex)
+    }
 
 fun TrackService.resumeAsync() =
     serviceScope.launch { playerProvider.resume() }

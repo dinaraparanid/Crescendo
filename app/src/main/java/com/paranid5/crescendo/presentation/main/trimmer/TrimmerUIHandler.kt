@@ -3,6 +3,7 @@ package com.paranid5.crescendo.presentation.main.trimmer
 import android.content.Context
 import android.content.Intent
 import androidx.compose.runtime.Immutable
+import arrow.core.Either
 import com.paranid5.crescendo.R
 import com.paranid5.crescendo.domain.caching.Formats
 import com.paranid5.crescendo.domain.media.files.MediaFile
@@ -49,7 +50,7 @@ class TrimmerUIHandler : UIHandler {
         fadeDurations: FadeDurations
     ) = MediaFile.AudioFile(File(track.path))
         .trimmedCatching(outputFilename, audioFormat, trimRange, pitchAndSpeed, fadeDurations)
-        .onSuccess { file ->
+        .onRight { file ->
             setAudioTags(
                 context = context,
                 audioFile = file,
@@ -58,7 +59,7 @@ class TrimmerUIHandler : UIHandler {
             )
         }
 
-    private fun Context.sendTrimmingStatusBroadcast(trimmingResult: Result<MediaFile.AudioFile>) =
+    private fun Context.sendTrimmingStatusBroadcast(trimmingResult: Either<Throwable, MediaFile.AudioFile>) =
         sendBroadcast(
             Intent(applicationContext, TrimmingStatusReceiver::class.java)
                 .setAction(TrimmingStatusReceiver.Broadcast_TRIMMING_COMPLETED)
@@ -68,12 +69,12 @@ class TrimmerUIHandler : UIHandler {
                 )
         )
 
-    private fun Context.trimmingStatusMessage(trimmingResult: Result<MediaFile.AudioFile>) =
-        when {
-            trimmingResult.isSuccess -> getString(R.string.file_trimmed)
+    private fun Context.trimmingStatusMessage(trimmingResult: Either<Throwable, MediaFile.AudioFile>) =
+        when (trimmingResult) {
+            is Either.Right -> getString(R.string.file_trimmed)
 
-            else -> "${getString(R.string.error)}: " +
-                    (trimmingResult.exceptionOrNull()!!.message
+            is Either.Left -> "${getString(R.string.error)}: " +
+                    (trimmingResult.value.message
                         ?: getString(R.string.unknown_error))
         }
 }

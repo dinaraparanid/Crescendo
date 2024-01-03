@@ -3,7 +3,7 @@ package com.paranid5.crescendo.services.stream_service.playback
 import androidx.media3.common.PlaybackException
 import androidx.media3.common.Player
 import com.paranid5.crescendo.services.stream_service.StreamService
-import com.paranid5.crescendo.services.stream_service.sendErrorBroadcast
+import com.paranid5.crescendo.services.stream_service.showErrNotificationAndSendBroadcast
 
 fun PlayerStateChangedListener(service: StreamService) =
     object : Player.Listener {
@@ -27,6 +27,6 @@ fun PlayerStateChangedListener(service: StreamService) =
         override fun onPlayerError(error: PlaybackException) {
             super.onPlayerError(error)
             service.playerProvider.isStoppedWithError = true
-            service.sendErrorBroadcast(error)
+            service.showErrNotificationAndSendBroadcast(error)
         }
     }

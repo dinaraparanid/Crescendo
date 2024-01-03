@@ -1,13 +1,20 @@
 package com.paranid5.crescendo.services.stream_service.playback
 
 import com.paranid5.crescendo.services.stream_service.StreamService
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 fun StreamService.startResumingAsync() =
-    serviceScope.launch { playerProvider.startResuming() }
+    serviceScope.launch {
+        delay(500)
+        playerProvider.startResuming()
+    }
 
-fun StreamService.storeAndPlayStreamAsync(url: String) =
-    serviceScope.launch { playerProvider.storeAndPlayStream(url) }
+fun StreamService.startStreamAsync(url: String) =
+    serviceScope.launch {
+        delay(500)
+        playerProvider.startStream(url)
+    }
 
 fun StreamService.resumeAsync() =
     serviceScope.launch { playerProvider.resume() }

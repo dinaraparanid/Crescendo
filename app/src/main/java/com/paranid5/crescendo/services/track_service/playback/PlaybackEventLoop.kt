@@ -7,33 +7,22 @@ import arrow.core.Tuple5
 import com.paranid5.crescendo.R
 import com.paranid5.crescendo.domain.tracks.Track
 import com.paranid5.crescendo.services.track_service.TrackService
-import com.paranid5.crescendo.services.track_service.sendErrorBroadcast
-import kotlinx.coroutines.flow.MutableSharedFlow
+import com.paranid5.crescendo.services.track_service.showErrNotificationAndSendBroadcast
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
-import kotlinx.coroutines.launch
 
-suspend fun PlaybackEventLoop(service: TrackService): MutableSharedFlow<PlaybackEvent> {
-    val playbackEventFlow = MutableSharedFlow<PlaybackEvent>()
-
-    service.serviceScope.launch {
-        service.lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
-            service.playerProvider.incrementPlaybackEventLoopInitSteps()
-
-            playbackEventFlow
-                .combine(ArgsFlow(service)) { event, (trackInd, position, isPlaying, playlist) ->
-                    Tuple5(event, trackInd, position, isPlaying, playlist)
-                }
-                .distinctUntilChanged { (e1, _, _, _, _), (e2, _, _, _, _) -> e1 == e2 }
-                .collectLatest { (event, trackInd, position, isPlaying, playlist) ->
-                    service.onEvent(event, trackInd, position, isPlaying, playlist)
-                }
-        }
+suspend fun TrackService.startPlaybackEventLoop() =
+    lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
+        playerProvider.playbackEventFlow
+            .combine(ArgsFlow(this@startPlaybackEventLoop)) { event, (trackInd, position, isPlaying, playlist) ->
+                Tuple5(event, trackInd, position, isPlaying, playlist)
+            }
+            .distinctUntilChanged { (e1, _, _, _, _), (e2, _, _, _, _) -> e1 == e2 }
+            .collectLatest { (event, trackInd, position, isPlaying, playlist) ->
+                onEvent(event, trackInd, position, isPlaying, playlist)
+            }
     }
-
-    return playbackEventFlow
-}
 
 private fun ArgsFlow(service: TrackService) =
     combine(
@@ -106,7 +95,7 @@ private suspend inline fun TrackService.onPlayPlaylist(
     initialPosition: Long
 ) {
     if (playlist.isEmpty())
-        return sendErrorBroadcast(Exception(getString(R.string.playlist_empty_err)))
+        return showErrNotificationAndSendBroadcast(Exception(getString(R.string.playlist_empty_err)))
 
     playerProvider.resetAudioSessionIdIfNotPlaying()
     playerProvider.setCurrentTrackIndex(trackIndex)

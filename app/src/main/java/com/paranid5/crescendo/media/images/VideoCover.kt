@@ -17,7 +17,7 @@ suspend inline fun getVideoCoverBitmapAsync(
         videoMetadata
             .covers
             .map { getBitmapFromUrlCatching(context, it, size, bitmapSettings) }
-            .firstOrNull { it.isSuccess }
+            .firstOrNull { it.isRight() }
             ?.getOrNull()
             ?: getThumbnailBitmap(context)
     }
@@ -31,7 +31,7 @@ inline fun getVideoCoverBitmapBlocking(
 ) = videoMetadata
     .covers
     .map { getBitmapFromUrlBlockingCatching(context, it, size, bitmapSettings) }
-    .firstOrNull { it.isSuccess }
+    .firstOrNull { it.isRight() }
     ?.getOrNull()
     ?: getThumbnailBitmapBlocking(context)
 
@@ -45,7 +45,7 @@ suspend inline fun getVideoCoverBitmapWithPaletteAsync(
         videoMetadata
             .covers
             .map { getBitmapFromUrlWithPaletteCatching(context, it, size, bitmapSettings) }
-            .firstOrNull { it.isSuccess }
+            .firstOrNull { it.isRight() }
             ?.getOrNull()
             ?: getThumbnailBitmapWithPalette(context)
     }
@@ -59,7 +59,7 @@ inline fun getVideoCoverBitmapWithPaletteBlocking(
 ) = videoMetadata
     .covers
     .map { getBitmapFromUrlWithPaletteBlockingCatching(context, it, size, bitmapSettings) }
-    .firstOrNull { it.isSuccess }
+    .firstOrNull { it.isRight() }
     ?.getOrNull()
     ?: getThumbnailBitmapWithPaletteBlocking(context)
 
@@ -73,7 +73,7 @@ suspend inline fun getVideoCoverAsync(
         videoMetadata
             .covers
             .map { getBitmapFromUrlCatching(context, it, size, bitmapSettings) }
-            .firstOrNull { it.isSuccess }
+            .firstOrNull { it.isRight() }
             ?.map { it.toBitmapDrawable(context) }
             ?.getOrNull()
             ?: getThumbnailBitmapDrawable(context)
@@ -88,7 +88,7 @@ inline fun getVideoCoverBlocking(
 ) = videoMetadata
     .covers
     .map { getBitmapFromUrlBlockingCatching(context, it, size, bitmapSettings) }
-    .firstOrNull { it.isSuccess }
+    .firstOrNull { it.isRight() }
     ?.map { it.toBitmapDrawable(context) }
     ?.getOrNull()
     ?: getThumbnailBitmapDrawableBlocking(context)
@@ -103,7 +103,7 @@ suspend inline fun getVideoCoverWithPaletteAsync(
         videoMetadata
             .covers
             .map { getBitmapFromUrlWithPaletteCatching(context, it, size, bitmapSettings) }
-            .firstOrNull { it.isSuccess }
+            .firstOrNull { it.isRight() }
             ?.map { (palette, bitmap) ->
                 palette to bitmap.toBitmapDrawable(context)
             }
@@ -120,7 +120,7 @@ inline fun getVideoCoverWithPaletteBlocking(
 ) = videoMetadata
     .covers
     .map { getBitmapFromUrlWithPaletteBlockingCatching(context, it, size, bitmapSettings) }
-    .firstOrNull { it.isSuccess }
+    .firstOrNull { it.isRight() }
     ?.map { (palette, bitmap) ->
         palette to bitmap.toBitmapDrawable(context)
     }

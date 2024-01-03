@@ -77,7 +77,7 @@
             </intent-filter>
         </receiver>
         <receiver
-                android:name=".receivers.PlaybackErrorReceiver"
+                android:name=".receivers.ServiceErrorReceiver"
                 android:exported="false">
             <intent-filter>
                 <action android:name="com.paranid5.crescendo.receivers.STREAMING_ERROR"/>

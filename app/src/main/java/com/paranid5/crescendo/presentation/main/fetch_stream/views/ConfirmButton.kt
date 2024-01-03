@@ -2,6 +2,8 @@ package com.paranid5.crescendo.presentation.main.fetch_stream.views
 
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.pager.PagerState
+import androidx.compose.material.BottomSheetScaffoldState
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -94,10 +96,13 @@ private inline fun ConfirmButtonImpl(
                     launchRecordPermissions()
 
                 else -> coroutineScope.launch {
-                    viewModel.setAudioStatus(AudioStatus.STREAMING)
-                    fetchStreamUIHandler.startStreaming(currentText.trim())
-                    playingPagerState?.animateScrollToPage(1)
-                    playingSheetState?.bottomSheetState?.expand()
+                    startStreaming(
+                        currentText = currentText,
+                        playingPagerState = playingPagerState,
+                        playingSheetState = playingSheetState,
+                        viewModel = viewModel,
+                        fetchStreamUIHandler = fetchStreamUIHandler
+                    )
                 }
             }
         }
@@ -115,4 +120,20 @@ private fun ConfirmButtonLabel(modifier: Modifier = Modifier) {
         fontWeight = FontWeight.Bold,
         modifier = modifier
     )
+}
+
+@OptIn(ExperimentalFoundationApi::class, ExperimentalMaterialApi::class)
+private suspend fun startStreaming(
+    currentText: String,
+    playingPagerState: PagerState?,
+    playingSheetState: BottomSheetScaffoldState?,
+    viewModel: FetchStreamViewModel,
+    fetchStreamUIHandler: FetchStreamUIHandler,
+) {
+    val url = currentText.trim()
+    viewModel.setAudioStatus(AudioStatus.STREAMING)
+    viewModel.setCurrentUrl(url)
+    fetchStreamUIHandler.startStreaming(url)
+    playingPagerState?.animateScrollToPage(1)
+    playingSheetState?.bottomSheetState?.expand()
 }

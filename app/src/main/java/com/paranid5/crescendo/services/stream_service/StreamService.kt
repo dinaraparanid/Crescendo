@@ -20,9 +20,10 @@ import com.paranid5.crescendo.services.stream_service.playback.PlayerProvider
 import com.paranid5.crescendo.services.stream_service.playback.startBassMonitoring
 import com.paranid5.crescendo.services.stream_service.playback.startEqMonitoring
 import com.paranid5.crescendo.services.stream_service.playback.startPlaybackEffectsMonitoring
+import com.paranid5.crescendo.services.stream_service.playback.startPlaybackEventLoop
 import com.paranid5.crescendo.services.stream_service.playback.startResumingAsync
 import com.paranid5.crescendo.services.stream_service.playback.startReverbMonitoring
-import com.paranid5.crescendo.services.stream_service.playback.storeAndPlayStreamAsync
+import com.paranid5.crescendo.services.stream_service.playback.startStreamAsync
 import com.paranid5.crescendo.services.stream_service.receivers.PauseReceiver
 import com.paranid5.crescendo.services.stream_service.receivers.RepeatChangedReceiver
 import com.paranid5.crescendo.services.stream_service.receivers.ResumeReceiver
@@ -112,7 +113,6 @@ class StreamService : SuspendService(), KoinComponent,
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         super.onStartCommand(intent, flags, startId)
-
         connect(startId)
 
         mediaSessionManager.initMediaSession(
@@ -129,7 +129,7 @@ class StreamService : SuspendService(), KoinComponent,
             null -> startResumingAsync()
 
             // New stream
-            else -> storeAndPlayStreamAsync(url)
+            else -> startStreamAsync(url)
         }
 
         return START_STICKY
@@ -150,7 +150,7 @@ class StreamService : SuspendService(), KoinComponent,
 }
 
 private fun StreamService.launchMonitoringTasks() {
-    serviceScope.launch { playerProvider.startPlaybackEventLoop(this@StreamService) }
+    serviceScope.launch { startPlaybackEventLoop() }
     serviceScope.launch { startNotificationMonitoring() }
     serviceScope.launch { startPlaybackStatesMonitoring() }
     serviceScope.launch { startMetadataMonitoring() }

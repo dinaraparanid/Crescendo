@@ -19,6 +19,10 @@ fun PlayingViewModel.collectCurrentTrackAsState(initial: DefaultTrack? = null) =
     currentTrackFlow.collectLatestAsState(initial)
 
 @Composable
+fun PlayingViewModel.collectCurrentUrlAsState(initial: String = "") =
+    currentUrlFlow.collectLatestAsState(initial)
+
+@Composable
 fun PlayingViewModel.collectPlaybackPositionAsState(audioStatus: AudioStatus, initial: Long = 0) =
     playbackPositionFlow(audioStatus).collectLatestAsState(initial)
 

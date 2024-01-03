@@ -1,6 +1,10 @@
 package com.paranid5.crescendo.services.stream_service.extractor
 
 import android.content.Context
+import arrow.core.Either
+import arrow.core.raise.either
+import arrow.core.raise.ensure
+import com.paranid5.crescendo.domain.metadata.VideoMetadata
 import com.paranid5.yt_url_extractor_kt.VideoMeta
 import com.paranid5.yt_url_extractor_kt.YtFailure
 import com.paranid5.yt_url_extractor_kt.YtFilesNotFoundException
@@ -20,34 +24,35 @@ class UrlExtractor : KoinComponent {
     suspend fun extractAudioUrlWithMeta(
         context: Context,
         ytUrl: String
-    ): Result<Pair<String, VideoMeta?>> {
-        val extractRes = extractYtFilesWithMeta(context, ytUrl)
-            ?: return YtFailure(YtRequestTimeoutException())
+    ) = either {
+        val (ytFiles, liveStreamManifestsRes, videoMetaRes) = extractYtFilesWithMeta(context, ytUrl)
+            .mapLeft { YtRequestTimeoutException() }
+            .bind()
 
-        val (ytFiles, liveStreamManifestsRes, videoMetaRes) =
-            when (val res = extractRes.getOrNull()) {
-                null -> return Result.failure(extractRes.exceptionOrNull()!!)
-                else -> res
-            }
-
-        val videoMeta = videoMetaRes.getOrNull()
+        val videoMeta = videoMetaRes.getOrDefault()
         val liveStreamManifests = liveStreamManifestsRes.getOrNull()
 
-        val audioUrl = when (videoMeta?.isLiveStream) {
+        val audioUrl = when (videoMeta.isLiveStream) {
             true -> liveStreamManifests?.hlsManifestUrl
             else -> ytFiles[DEFAULT_AUDIO_TAG]?.url
         }
 
-        return when (audioUrl) {
-            null -> Result.failure(YtFilesNotFoundException())
-            else -> Result.success(audioUrl to videoMeta)
+        ensure(audioUrl != null) {
+            YtFilesNotFoundException()
         }
+
+        audioUrl to videoMeta
     }
 
     private suspend inline fun extractYtFilesWithMeta(context: Context, ytUrl: String) =
-        runCatching {
+        Either.catch {
             withTimeout(TIMEOUT) {
-                ktorClient.extractYtFilesWithMeta(context, ytUrl)
+                ktorClient
+                    .extractYtFilesWithMeta(context, ytUrl)
+                    .getOrThrow()
             }
-        }.getOrNull()
+        }
 }
+
+fun Result<VideoMeta>.getOrDefault() =
+    getOrNull()?.let(::VideoMetadata) ?: VideoMetadata()

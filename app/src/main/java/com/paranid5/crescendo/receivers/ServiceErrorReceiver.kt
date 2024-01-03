@@ -5,11 +5,11 @@ import android.content.Context
 import android.content.Intent
 import android.widget.Toast
 
-class PlaybackErrorReceiver : BroadcastReceiver() {
+class ServiceErrorReceiver : BroadcastReceiver() {
     companion object {
         private const val RECEIVER_LOCATION = "com.paranid5.crescendo.receivers"
-        const val Broadcast_PLAYBACK_ERROR = "$RECEIVER_LOCATION.PLAYBACK_ERROR"
-        const val ERROR_MESSAGE_ARG = "playback_error"
+        const val Broadcast_SERVICE_ERROR = "$RECEIVER_LOCATION.SERVICE_ERROR"
+        const val ERROR_MESSAGE_ARG = "message_error"
     }
 
     override fun onReceive(context: Context, intent: Intent) {

@@ -16,6 +16,7 @@ import com.paranid5.crescendo.koinActivityViewModel
 import com.paranid5.crescendo.presentation.main.playing.PlayingUIHandler
 import com.paranid5.crescendo.presentation.main.playing.PlayingViewModel
 import com.paranid5.crescendo.presentation.main.playing.properties.compose.collectCacheFormatAsState
+import com.paranid5.crescendo.presentation.main.playing.properties.compose.collectCurrentUrlAsState
 import com.paranid5.crescendo.presentation.main.playing.properties.compose.collectFilenameAsState
 import com.paranid5.crescendo.presentation.main.playing.properties.compose.collectIsCacheButtonClickableAsState
 import com.paranid5.crescendo.presentation.main.playing.properties.compose.collectTrimRangeAsState
@@ -33,6 +34,7 @@ fun ConfirmButton(
     var isDialogShown by isDialogShownState
 
     val isButtonClickable by viewModel.collectIsCacheButtonClickableAsState()
+    val url by viewModel.collectCurrentUrlAsState()
     val filename by viewModel.collectFilenameAsState()
     val format by viewModel.collectCacheFormatAsState()
     val trimRange by viewModel.collectTrimRangeAsState()
@@ -45,7 +47,13 @@ fun ConfirmButton(
         ),
         content = { ConfirmButtonLabel() },
         onClick = {
-            playingUIHandler.launchVideoCashService(filename, format, trimRange)
+            playingUIHandler.launchVideoCacheService(
+                url = url,
+                desiredFilename = filename,
+                format = format,
+                trimRange = trimRange
+            )
+
             isDialogShown = false
         },
     )

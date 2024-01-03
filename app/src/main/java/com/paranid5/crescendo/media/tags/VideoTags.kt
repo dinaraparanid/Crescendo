@@ -5,6 +5,7 @@ import android.content.Context
 import android.os.Build
 import android.os.Environment
 import android.provider.MediaStore
+import arrow.core.Either
 import com.paranid5.crescendo.domain.media.files.MediaFile
 import com.paranid5.crescendo.domain.media_scanner.sendScanFile
 import com.paranid5.crescendo.domain.metadata.VideoMetadata
@@ -25,7 +26,7 @@ private fun setVideoTagsToFile(file: MediaFile.VideoFile, metadata: VideoMetadat
     }
 
 private fun setVideoTagsToFileCatching(file: MediaFile.VideoFile, metadata: VideoMetadata) =
-    runCatching { setVideoTagsToFile(file, metadata) }
+    Either.catch { setVideoTagsToFile(file, metadata) }
 
 suspend fun setVideoTagsAsync(
     context: Context,

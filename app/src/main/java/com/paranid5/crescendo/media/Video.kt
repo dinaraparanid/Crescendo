@@ -18,7 +18,7 @@ import kotlinx.coroutines.coroutineScope
 suspend fun mergeToMP4AndSetTagsAsync(
     context: Context,
     audioTrack: MediaFile,
-    videoTrack: MediaFile.VideoFile,
+    videoTrack: MediaFile,
     mp4StoreFile: MediaFile.VideoFile,
     videoMetadata: VideoMetadata
 ) = coroutineScope {
@@ -42,7 +42,7 @@ suspend fun mergeToMP4AndSetTagsAsync(
         videoTrack.delete()
 
         tagsTask.join()
-        CachingResult.DownloadResult.Success(mp4StoreFile)
+        CachingResult.DownloadResult.Success(listOf(mp4StoreFile))
     }
 }
 

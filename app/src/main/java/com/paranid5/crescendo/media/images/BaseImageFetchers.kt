@@ -5,7 +5,7 @@ import android.graphics.Bitmap
 import android.media.MediaMetadataRetriever
 import android.os.Build
 import androidx.annotation.DrawableRes
-import androidx.annotation.Px
+import arrow.core.Either
 import coil.executeBlocking
 import com.paranid5.crescendo.presentation.ui.extensions.toBitmap
 import org.jaudiotagger.audio.AudioFileIO
@@ -63,7 +63,7 @@ suspend inline fun getBitmapFromResourceCatching(
     @DrawableRes res: Int,
     size: ImageSize? = null,
     bitmapSettings: (Bitmap) -> Unit = {}
-) = runCatching {
+) = Either.catch {
     getBitmapFromResource(context, res, size, bitmapSettings)
 }
 
@@ -72,7 +72,7 @@ inline fun getBitmapFromResourceBlockingCatching(
     @DrawableRes res: Int,
     size: ImageSize? = null,
     bitmapSettings: (Bitmap) -> Unit = {}
-) = runCatching {
+) = Either.catch {
     getBitmapFromResourceBlocking(context, res, size, bitmapSettings)
 }
 
@@ -109,7 +109,7 @@ suspend inline fun getBitmapFromUrlCatching(
     url: String,
     size: ImageSize? = null,
     bitmapSettings: (Bitmap) -> Unit = {}
-) = runCatching {
+) = Either.catch {
     getBitmapFromUrl(context, url, size, bitmapSettings)
 }
 
@@ -118,7 +118,7 @@ inline fun getBitmapFromUrlBlockingCatching(
     url: String,
     size: ImageSize? = null,
     bitmapSettings: (Bitmap) -> Unit = {}
-) = runCatching {
+) = Either.catch {
     getBitmapFromUrlBlocking(context, url, size, bitmapSettings)
 }
 
@@ -127,7 +127,7 @@ suspend inline fun getBitmapFromUrlWithPaletteCatching(
     url: String,
     size: ImageSize? = null,
     bitmapSettings: (Bitmap) -> Unit = {}
-) = runCatching {
+) = Either.catch {
     getBitmapFromUrlWithPalette(context, url, size, bitmapSettings)
 }
 
@@ -136,7 +136,7 @@ inline fun getBitmapFromUrlWithPaletteBlockingCatching(
     url: String,
     size: ImageSize? = null,
     bitmapSettings: (Bitmap) -> Unit = {}
-) = runCatching {
+) = Either.catch {
     getBitmapFromUrlWithPaletteBlocking(context, url, size, bitmapSettings)
 }
 
@@ -200,7 +200,7 @@ suspend fun getBitmapFromPathCatching(
     path: String?,
     size: ImageSize? = null,
     bitmapSettings: (Bitmap) -> Unit = {}
-) = runCatching {
+) = Either.catch {
     getBitmapFromPath(context, path, size, bitmapSettings)
 }
 
@@ -209,7 +209,7 @@ fun getBitmapFromPathBlockingCatching(
     path: String?,
     size: ImageSize? = null,
     bitmapSettings: (Bitmap) -> Unit = {}
-) = runCatching {
+) = Either.catch {
     getBitmapFromPathBlocking(context, path, size, bitmapSettings)
 }
 
@@ -218,7 +218,7 @@ suspend fun getBitmapFromPathWithPaletteCatching(
     path: String?,
     size: ImageSize? = null,
     bitmapSettings: (Bitmap) -> Unit = {}
-) = runCatching {
+) = Either.catch {
     getBitmapFromPathWithPalette(context, path, size, bitmapSettings)
 }
 
@@ -227,6 +227,6 @@ fun getBitmapFromPathWithPaletteBlockingCatching(
     path: String?,
     size: ImageSize? = null,
     bitmapSettings: (Bitmap) -> Unit = {}
-) = runCatching {
+) = Either.catch {
     getBitmapFromPathWithPaletteBlocking(context, path, size, bitmapSettings)
 }

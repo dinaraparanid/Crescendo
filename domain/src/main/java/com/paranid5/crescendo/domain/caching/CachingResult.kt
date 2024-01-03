@@ -9,7 +9,7 @@ import kotlinx.parcelize.Parcelize
 sealed interface CachingResult : Parcelable {
     sealed interface DownloadResult : CachingResult {
         @Parcelize
-        data class Success(val file: MediaFile) : DownloadResult
+        data class Success(val files: List<MediaFile>) : DownloadResult
 
         data class Error(val statusCode: HttpStatusCode) : DownloadResult {
             companion object CREATOR : Parcelable.Creator<Error> {
@@ -33,14 +33,17 @@ sealed interface CachingResult : Parcelable {
         }
 
         @Parcelize
-        data object Canceled : DownloadResult
-
-        @Parcelize
         data object FileCreationError : DownloadResult
 
         @Parcelize
         data object ConnectionLostError : DownloadResult
     }
+
+    @Parcelize
+    data object Canceled : DownloadResult
+
+    @Parcelize
+    data class Success(val file: MediaFile) : CachingResult
 
     @Parcelize
     data object ConversionError : CachingResult

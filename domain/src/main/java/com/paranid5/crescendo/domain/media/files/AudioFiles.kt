@@ -2,12 +2,14 @@ package com.paranid5.crescendo.domain.media.files
 
 import android.os.Environment
 import android.util.Log
+import arrow.core.Either
+import arrow.core.flatMap
 import com.arthenica.mobileffmpeg.FFmpeg
-import com.paranid5.crescendo.domain.trimming.TrimRange
 import com.paranid5.crescendo.domain.caching.Formats
 import com.paranid5.crescendo.domain.caching.audioFileExt
 import com.paranid5.crescendo.domain.trimming.FadeDurations
 import com.paranid5.crescendo.domain.trimming.PitchAndSpeed
+import com.paranid5.crescendo.domain.trimming.TrimRange
 import com.paranid5.crescendo.domain.trimming.totalDurationSecs
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.coroutineScope
@@ -28,28 +30,21 @@ suspend fun MediaFile.AudioFile.trimmedCatching(
     trimRange: TrimRange,
     pitchAndSpeed: PitchAndSpeed,
     fadeDurations: FadeDurations,
-): Result<MediaFile.AudioFile> {
-    val newFileRes = createAudioFileCatching(
-        mediaDirectory = MediaDirectory(Environment.DIRECTORY_MUSIC),
-        filename = outputFilename,
-        ext = audioFormat.audioFileExt
-    )
+) = createAudioFileCatching(
+    mediaDirectory = MediaDirectory(Environment.DIRECTORY_MUSIC),
+    filename = outputFilename,
+    ext = audioFormat.audioFileExt
+).flatMap { outputFile ->
+    Either.catch {
+        trim(
+            inputPath = absolutePath,
+            outputPath = outputFile.absolutePath,
+            trimRange = trimRange,
+            pitchAndSpeed = pitchAndSpeed,
+            fadeDurations = fadeDurations
+        )
 
-    if (newFileRes.isFailure)
-        return newFileRes
-
-    return runCatching {
-        newFileRes
-            .getOrNull()!!
-            .also { outputFile ->
-                trim(
-                    inputPath = absolutePath,
-                    outputPath = outputFile.absolutePath,
-                    trimRange = trimRange,
-                    pitchAndSpeed = pitchAndSpeed,
-                    fadeDurations = fadeDurations
-                )
-            }
+        outputFile
     }
 }
 

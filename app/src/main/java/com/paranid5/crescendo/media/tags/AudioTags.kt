@@ -5,6 +5,7 @@ import android.content.Context
 import android.os.Build
 import android.os.Environment
 import android.provider.MediaStore
+import arrow.core.Either
 import com.paranid5.crescendo.domain.caching.Formats
 import com.paranid5.crescendo.domain.media.files.MediaFile
 import com.paranid5.crescendo.domain.media_scanner.sendScanFile
@@ -82,7 +83,7 @@ private fun setAudioTagsToFile(
         .covers
         .asSequence()
         .map { getImageBinaryDataFromUrlCatching(context, it) }
-        .firstOrNull { it.isSuccess }
+        .firstOrNull { it.isRight() }
         ?.getOrNull()
         ?.let { ArtworkFactory.getNew().apply { binaryData = it } }
         ?.let(tag::setField)
@@ -99,7 +100,7 @@ private fun setAudioTagsToFile(
         .covers
         .asSequence()
         .map { getImageBinaryDataFromPathCatching(context, it) }
-        .firstOrNull { it.isSuccess }
+        .firstOrNull { it.isRight() }
         ?.getOrNull()
         ?.let { ArtworkFactory.getNew().apply { binaryData = it } }
         ?.let(tag::setField)
@@ -109,7 +110,7 @@ private fun setAudioTagsToFileCatching(
     context: Context,
     file: MediaFile.AudioFile,
     metadata: Metadata
-) = runCatching {
+) = Either.catch {
     when (metadata) {
         is AudioMetadata -> setAudioTagsToFile(context, file, metadata)
         is VideoMetadata -> setAudioTagsToFile(context, file, metadata)

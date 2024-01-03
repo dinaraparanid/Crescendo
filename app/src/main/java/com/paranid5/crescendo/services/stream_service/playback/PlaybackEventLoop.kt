@@ -5,32 +5,21 @@ import androidx.lifecycle.repeatOnLifecycle
 import arrow.core.Tuple4
 import com.paranid5.crescendo.services.stream_service.StreamService
 import com.paranid5.crescendo.services.stream_service.extractor.extractMediaFilesAndStartPlaying
-import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
-import kotlinx.coroutines.launch
 
-suspend fun PlaybackEventLoop(service: StreamService): MutableSharedFlow<PlaybackEvent> {
-    val playbackEventFlow = MutableSharedFlow<PlaybackEvent>()
-
-    service.serviceScope.launch {
-        service.lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
-            service.playerProvider.incrementPlaybackEventLoopInitSteps()
-
-            playbackEventFlow
-                .combine(ArgsFlow(service)) { event, (url, position, metadata) ->
-                    Tuple4(event, url, position, metadata)
-                }
-                .distinctUntilChanged { (e1, _, _, _), (e2, _, _, _) -> e1 == e2 }
-                .collectLatest { (event, ytUrl, position, duration) ->
-                    service.onEvent(event, ytUrl, position, duration)
-                }
-        }
+suspend fun StreamService.startPlaybackEventLoop() =
+    lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
+        playerProvider.playbackEventFlow
+            .combine(ArgsFlow(this@startPlaybackEventLoop)) { event, (url, position, metadata) ->
+                Tuple4(event, url, position, metadata)
+            }
+            .distinctUntilChanged { (e1, _, _, _), (e2, _, _, _) -> e1 == e2 }
+            .collectLatest { (event, ytUrl, position, duration) ->
+                onEvent(event, ytUrl, position, duration)
+            }
     }
-
-    return playbackEventFlow
-}
 
 private fun ArgsFlow(service: StreamService) =
     combine(

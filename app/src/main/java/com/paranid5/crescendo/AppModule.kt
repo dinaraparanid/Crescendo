@@ -46,7 +46,7 @@ const val EQUALIZER_DATA = "equalizer_data"
 
 const val STREAM_SERVICE_CONNECTION = "stream_service_connection"
 const val TRACK_SERVICE_CONNECTION = "track_service_connection"
-const val VIDEO_CASH_SERVICE_CONNECTION = "video_cash_service_connection"
+const val VIDEO_CACHE_SERVICE_CONNECTION = "video_cache_service_connection"
 
 const val EXTERNAL_STORAGE_PERMISSION_QUEUE = "external_storage_permission_queue"
 const val FOREGROUND_SERVICE_PERMISSION_QUEUE = "foreground_service_permission_queue"
@@ -69,7 +69,7 @@ private val serviceAccessorsModule = module {
 private val serviceConnectionsModule = module {
     single(named(STREAM_SERVICE_CONNECTION)) { MutableStateFlow(false) }
     single(named(TRACK_SERVICE_CONNECTION)) { MutableStateFlow(false) }
-    single(named(VIDEO_CASH_SERVICE_CONNECTION)) { MutableStateFlow(false) }
+    single(named(VIDEO_CACHE_SERVICE_CONNECTION)) { MutableStateFlow(false) }
 }
 
 private val servicesModule = module {

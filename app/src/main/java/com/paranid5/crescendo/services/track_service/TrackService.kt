@@ -25,6 +25,7 @@ import com.paranid5.crescendo.services.track_service.playback.startPlaybackEffec
 import com.paranid5.crescendo.services.track_service.playback.startResumingAsync
 import com.paranid5.crescendo.services.track_service.playback.startReverbMonitoring
 import com.paranid5.crescendo.services.track_service.playback.playPlaylistAsync
+import com.paranid5.crescendo.services.track_service.playback.startPlaybackEventLoop
 import com.paranid5.crescendo.services.track_service.receivers.AddTrackReceiver
 import com.paranid5.crescendo.services.track_service.receivers.PauseReceiver
 import com.paranid5.crescendo.services.track_service.receivers.PlaylistDraggedReceiver
@@ -121,7 +122,6 @@ class TrackService : SuspendService(), KoinComponent,
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         super.onStartCommand(intent, flags, startId)
-
         connect(startId)
 
         mediaSessionManager.initMediaSession(
@@ -162,7 +162,7 @@ class TrackService : SuspendService(), KoinComponent,
 }
 
 private fun TrackService.launchMonitoringTasks() {
-    serviceScope.launch { playerProvider.startPlaybackEventLoop(this@launchMonitoringTasks) }
+    serviceScope.launch { startPlaybackEventLoop() }
     serviceScope.launch { startNotificationMonitoring() }
     serviceScope.launch { startPlaybackStatesMonitoring() }
     serviceScope.launch { startMetadataMonitoring() }

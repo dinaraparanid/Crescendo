@@ -16,6 +16,8 @@ import com.paranid5.crescendo.data.states.playback.TracksPlaybackPositionStatePu
 import com.paranid5.crescendo.data.states.playback.TracksPlaybackPositionStatePublisherImpl
 import com.paranid5.crescendo.data.states.playback.TracksPlaybackPositionStateSubscriber
 import com.paranid5.crescendo.data.states.playback.TracksPlaybackPositionStateSubscriberImpl
+import com.paranid5.crescendo.data.states.stream.CurrentUrlStateSubscriber
+import com.paranid5.crescendo.data.states.stream.CurrentUrlStateSubscriberImpl
 import com.paranid5.crescendo.data.states.tracks.CurrentTrackStateSubscriber
 import com.paranid5.crescendo.data.states.tracks.CurrentTrackStateSubscriberImpl
 import com.paranid5.crescendo.presentation.main.playing.states.CacheDialogStateHolder
@@ -31,4 +33,5 @@ class PlayingViewModel(private val storageHandler: StorageHandler) : ViewModel()
     TracksPlaybackPositionStatePublisher by TracksPlaybackPositionStatePublisherImpl(storageHandler),
     RepeatingStateSubscriber by RepeatingStateSubscriberImpl(storageHandler),
     CurrentTrackStateSubscriber by CurrentTrackStateSubscriberImpl(storageHandler),
+    CurrentUrlStateSubscriber by CurrentUrlStateSubscriberImpl(storageHandler),
     CacheDialogStateHolder by CacheDialogStateHolderImpl(storageHandler)

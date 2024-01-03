@@ -15,14 +15,10 @@ import com.paranid5.crescendo.data.states.tracks.CurrentTrackIndexStatePublisher
 import com.paranid5.crescendo.data.states.tracks.CurrentTrackIndexStateSubscriber
 import com.paranid5.crescendo.data.states.tracks.CurrentTrackIndexStateSubscriberImpl
 import com.paranid5.crescendo.domain.tracks.Track
-import com.paranid5.crescendo.domain.utils.AsyncCondVar
 import com.paranid5.crescendo.services.track_service.TrackService
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import org.koin.core.component.KoinComponent
-import java.util.concurrent.atomic.AtomicInteger
-
-private const val PLAYBACK_EVENT_LOOP_INIT_STEPS = 2
 
 @Suppress("IncorrectFormatting")
 class PlayerProvider(service: TrackService, storageHandler: StorageHandler) : KoinComponent,
@@ -33,20 +29,12 @@ class PlayerProvider(service: TrackService, storageHandler: StorageHandler) : Ko
     CurrentTrackIndexStatePublisher by CurrentTrackIndexStatePublisherImpl(storageHandler),
     TracksPlaybackPositionStateSubscriber by TracksPlaybackPositionStateSubscriberImpl(storageHandler),
     TracksPlaybackPositionStatePublisher by TracksPlaybackPositionStatePublisherImpl(storageHandler) {
-    private lateinit var playbackEventFlow: MutableSharedFlow<PlaybackEvent>
-
-    private val eventFlowInitSteps = AtomicInteger()
-
-    private val eventFlowInitCondVar = AsyncCondVar()
-
-    internal suspend inline fun incrementPlaybackEventLoopInitSteps() {
-        if (eventFlowInitSteps.incrementAndGet() == PLAYBACK_EVENT_LOOP_INIT_STEPS)
-            eventFlowInitCondVar.notify()
+    private val _playbackEventFlow by lazy {
+        MutableSharedFlow<PlaybackEvent>()
     }
 
-    private suspend inline fun waitEventFlowInit() {
-        while (eventFlowInitSteps.get() != PLAYBACK_EVENT_LOOP_INIT_STEPS)
-            eventFlowInitCondVar.wait()
+    val playbackEventFlow by lazy {
+        _playbackEventFlow.asSharedFlow()
     }
 
     @Volatile
@@ -64,76 +52,49 @@ class PlayerProvider(service: TrackService, storageHandler: StorageHandler) : Ko
             player.playbackParameters = value
         }
 
-    suspend fun startPlaybackEventLoop(service: TrackService) {
-        playbackEventFlow = PlaybackEventLoop(service)
-        incrementPlaybackEventLoopInitSteps()
-    }
-
     suspend fun playPlaylist(
         playlist: List<Track>,
         trackIndex: Int,
         initialPosition: Long = 0
-    ) {
-        waitEventFlowInit()
-        playbackEventFlow.emit(
-            PlaybackEvent.StartNewPlaylist(
-                playlist,
-                trackIndex,
-                initialPosition
-            )
+    ) = _playbackEventFlow.emit(
+        PlaybackEvent.StartNewPlaylist(
+            playlist,
+            trackIndex,
+            initialPosition
         )
-    }
+    )
 
-    suspend fun startResuming() {
-        waitEventFlowInit()
-        delay(500L) // little delay for an event loop to overcome laziness
-        playbackEventFlow.emit(PlaybackEvent.StartSamePlaylist())
-    }
+    suspend fun startResuming() =
+        _playbackEventFlow.emit(PlaybackEvent.StartSamePlaylist())
 
-    suspend fun resume() {
-        waitEventFlowInit()
-        playbackEventFlow.emit(PlaybackEvent.Resume())
-    }
+    suspend fun resume() =
+        _playbackEventFlow.emit(PlaybackEvent.Resume())
 
-    suspend fun pause() {
-        waitEventFlowInit()
-        playbackEventFlow.emit(PlaybackEvent.Pause())
-    }
+    suspend fun pause() =
+        _playbackEventFlow.emit(PlaybackEvent.Pause())
 
-    suspend fun seekTo(position: Long) {
-        waitEventFlowInit()
-        playbackEventFlow.emit(PlaybackEvent.SeekTo(position))
-    }
+    suspend fun seekTo(position: Long) =
+        _playbackEventFlow.emit(PlaybackEvent.SeekTo(position))
 
-    suspend fun seekToNextTrack() {
-        waitEventFlowInit()
-        playbackEventFlow.emit(PlaybackEvent.SeekToNextTrack())
-    }
+    suspend fun seekToNextTrack() =
+        _playbackEventFlow.emit(PlaybackEvent.SeekToNextTrack())
 
-    suspend fun seekToPrevTrack() {
-        waitEventFlowInit()
-        playbackEventFlow.emit(PlaybackEvent.SeekToPrevTrack())
-    }
+    suspend fun seekToPrevTrack() =
+        _playbackEventFlow.emit(PlaybackEvent.SeekToPrevTrack())
 
-    suspend fun addTrackToPlaylist(track: Track) {
-        waitEventFlowInit()
-        playbackEventFlow.emit(PlaybackEvent.AddTrackToPlaylist(track))
-    }
+    suspend fun addTrackToPlaylist(track: Track) =
+        _playbackEventFlow.emit(PlaybackEvent.AddTrackToPlaylist(track))
 
-    suspend fun removeTrackFromPlaylist(index: Int) {
-        waitEventFlowInit()
-        playbackEventFlow.emit(PlaybackEvent.RemoveTrackFromPlaylist(index))
-    }
+    suspend fun removeTrackFromPlaylist(index: Int) =
+        _playbackEventFlow.emit(PlaybackEvent.RemoveTrackFromPlaylist(index))
 
-    suspend fun replacePlaylist(newPlaylist: List<Track>, newCurrentTrackIndex: Int) {
-        waitEventFlowInit()
-        playbackEventFlow.emit(
+    suspend fun replacePlaylist(newPlaylist: List<Track>, newCurrentTrackIndex: Int) =
+        _playbackEventFlow.emit(
             PlaybackEvent.ReplacePlaylist(
                 newPlaylist,
                 newCurrentTrackIndex
             )
         )
-    }
 }
 
 suspend inline fun PlayerProvider.restartPlayer() = startResuming()

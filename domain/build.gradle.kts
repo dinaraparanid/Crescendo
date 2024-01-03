@@ -51,6 +51,7 @@ dependencies {
     implementation(libs.kotlinx.serialization.json)
     implementation(libs.kotlinx.collections.immutable)
     implementation(libs.koin.androidx.compose)
+    implementation(libs.arrow.fx.coroutines)
 
     implementation(libs.mobile.ffmpeg.full)
     implementation(libs.jaudiotagger)

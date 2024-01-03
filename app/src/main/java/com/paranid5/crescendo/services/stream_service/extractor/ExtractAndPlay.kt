@@ -1,22 +1,26 @@
 package com.paranid5.crescendo.services.stream_service.extractor
 
-import com.paranid5.crescendo.domain.metadata.VideoMetadata
+import arrow.core.raise.either
+import arrow.core.raise.ensure
 import com.paranid5.crescendo.services.stream_service.StreamService
-import com.paranid5.crescendo.services.stream_service.sendErrorBroadcast
+import com.paranid5.crescendo.services.stream_service.showErrNotificationAndSendBroadcast
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
 internal suspend inline fun StreamService.extractMediaFilesAndStartPlaying(
     ytUrl: String,
     initialPosition: Long,
-) {
-    val extractRes = urlExtractor.extractAudioUrlWithMeta(this, ytUrl)
+) = either {
+    val extractRes = urlExtractor.extractAudioUrlWithMeta(
+        context = this@extractMediaFilesAndStartPlaying,
+        ytUrl = ytUrl
+    )
 
-    if (extractRes.isFailure)
-        return sendErrorBroadcast(extractRes.exceptionOrNull()!!)
+    ensure(extractRes.isRight()) {
+        showErrNotificationAndSendBroadcast(extractRes.leftOrNull()!!)
+    }
 
-    val (audioUrl, videoMeta) = extractRes.getOrNull()!!
-    val metadata = videoMeta?.let(::VideoMetadata)
+    val (audioUrl, metadata) = extractRes.getOrNull()!!
 
     serviceScope.launch(Dispatchers.IO) {
         mediaSessionManager.setCurrentMetadata(metadata)

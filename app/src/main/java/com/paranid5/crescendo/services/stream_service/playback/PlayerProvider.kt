@@ -12,14 +12,10 @@ import com.paranid5.crescendo.data.states.stream.CurrentUrlStatePublisher
 import com.paranid5.crescendo.data.states.stream.CurrentUrlStatePublisherImpl
 import com.paranid5.crescendo.data.states.stream.CurrentUrlStateSubscriber
 import com.paranid5.crescendo.data.states.stream.CurrentUrlStateSubscriberImpl
-import com.paranid5.crescendo.domain.utils.AsyncCondVar
 import com.paranid5.crescendo.services.stream_service.StreamService
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import org.koin.core.component.KoinComponent
-import java.util.concurrent.atomic.AtomicInteger
-
-private const val PLAYBACK_EVENT_LOOP_INIT_STEPS = 2
 
 @Suppress("IncorrectFormatting")
 class PlayerProvider(service: StreamService, storageHandler: StorageHandler) : KoinComponent,
@@ -29,20 +25,12 @@ class PlayerProvider(service: StreamService, storageHandler: StorageHandler) : K
     CurrentMetadataStateSubscriber by CurrentMetadataStateSubscriberImpl(storageHandler),
     StreamPlaybackPositionStateSubscriber by StreamPlaybackPositionStateSubscriberImpl(storageHandler),
     StreamPlaybackPositionStatePublisher by StreamPlaybackPositionStatePublisherImpl(storageHandler) {
-    private lateinit var playbackEventFlow: MutableSharedFlow<PlaybackEvent>
-
-    private val eventFlowInitSteps = AtomicInteger()
-
-    private val eventFlowInitCondVar = AsyncCondVar()
-
-    internal suspend inline fun incrementPlaybackEventLoopInitSteps() {
-        if (eventFlowInitSteps.incrementAndGet() == PLAYBACK_EVENT_LOOP_INIT_STEPS)
-            eventFlowInitCondVar.notify()
+    private val _playbackEventFlow by lazy {
+        MutableSharedFlow<PlaybackEvent>()
     }
 
-    private suspend inline fun waitEventFlowInit() {
-        while (eventFlowInitSteps.get() != PLAYBACK_EVENT_LOOP_INIT_STEPS)
-            eventFlowInitCondVar.wait()
+    val playbackEventFlow by lazy {
+        _playbackEventFlow.asSharedFlow()
     }
 
     @Volatile
@@ -60,48 +48,26 @@ class PlayerProvider(service: StreamService, storageHandler: StorageHandler) : K
             player.playbackParameters = value
         }
 
-    suspend fun startPlaybackEventLoop(service: StreamService) {
-        playbackEventFlow = PlaybackEventLoop(service)
-        incrementPlaybackEventLoopInitSteps()
-    }
+    suspend fun startStream(url: String, initialPosition: Long = 0) =
+        _playbackEventFlow.emit(PlaybackEvent.StartNewStream(url, initialPosition))
 
-    suspend fun storeAndPlayStream(url: String, initialPosition: Long = 0) {
-        waitEventFlowInit()
-        setCurrentUrl(url)
-        setStreamPlaybackPosition(initialPosition)
-        playbackEventFlow.emit(PlaybackEvent.StartNewStream(url, initialPosition))
-    }
+    suspend fun startResuming() =
+        _playbackEventFlow.emit(PlaybackEvent.StartSameStream())
 
-    suspend fun startResuming() {
-        waitEventFlowInit()
-        delay(500L)
-        playbackEventFlow.emit(PlaybackEvent.StartSameStream())
-    }
+    suspend fun resume() =
+        _playbackEventFlow.emit(PlaybackEvent.Resume())
 
-    suspend fun resume() {
-        waitEventFlowInit()
-        playbackEventFlow.emit(PlaybackEvent.Resume())
-    }
+    suspend fun pause() =
+        _playbackEventFlow.emit(PlaybackEvent.Pause())
 
-    suspend fun pause() {
-        waitEventFlowInit()
-        playbackEventFlow.emit(PlaybackEvent.Pause())
-    }
+    suspend fun seekTo(position: Long) =
+        _playbackEventFlow.emit(PlaybackEvent.SeekTo(position))
 
-    suspend fun seekTo(position: Long) {
-        waitEventFlowInit()
-        playbackEventFlow.emit(PlaybackEvent.SeekTo(position))
-    }
+    suspend fun seekTenSecsForward() =
+        _playbackEventFlow.emit(PlaybackEvent.SeekTenSecsForward())
 
-    suspend fun seekTenSecsForward() {
-        waitEventFlowInit()
-        playbackEventFlow.emit(PlaybackEvent.SeekTenSecsForward())
-    }
-
-    suspend fun seekTenSecsBack() {
-        waitEventFlowInit()
-        playbackEventFlow.emit(PlaybackEvent.SeekTenSecsBack())
-    }
+    suspend fun seekTenSecsBack() =
+        _playbackEventFlow.emit(PlaybackEvent.SeekTenSecsBack())
 
     suspend fun restartPlayer() = startResuming()
 }

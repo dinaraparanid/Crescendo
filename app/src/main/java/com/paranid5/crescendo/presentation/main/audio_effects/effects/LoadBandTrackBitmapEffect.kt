@@ -31,7 +31,7 @@ fun LoadBandTrackBitmapEffect(
                 size = ImageSize(width, height)
             )
                 .map { it.toBitmapDrawable(context) }
-                .getOrThrow()
+                .getOrNull()
         }
     }
 }
