@@ -1,5 +1,6 @@
 package com.paranid5.crescendo.presentation.ui.utils
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.material3.DropdownMenu
@@ -32,6 +33,7 @@ fun Spinner(
         DefaultItem(text, mod)
     },
 ) {
+    val colors = LocalAppColors.current
     var isExpanded by remember { mutableStateOf(false) }
 
     Box(modifier.clickable { isExpanded = true }) {
@@ -44,7 +46,7 @@ fun Spinner(
         DropdownMenu(
             expanded = isExpanded,
             onDismissRequest = { isExpanded = false },
-            modifier = dropdownModifier
+            modifier = dropdownModifier.background(colors.background)
         ) {
             items.forEachIndexed { index, element ->
                 DropdownMenuItem(

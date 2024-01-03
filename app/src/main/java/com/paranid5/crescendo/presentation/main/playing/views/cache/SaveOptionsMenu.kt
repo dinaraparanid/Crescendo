@@ -1,9 +1,11 @@
 package com.paranid5.crescendo.presentation.main.playing.views.cache
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.MenuDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
@@ -58,10 +60,11 @@ private fun OptionsMenu(
     isDropdownShownState: MutableState<Boolean>,
     modifier: Modifier = Modifier
 ) {
+    val colors = LocalAppColors.current
     var isDropdownShown by isDropdownShownState
 
     DropdownMenu(
-        modifier = modifier,
+        modifier = modifier.background(color = colors.background),
         expanded = isDropdownShown,
         onDismissRequest = { isDropdownShown = false }
     ) {
@@ -77,11 +80,16 @@ private fun OptionMenuItem(
     item: String,
     modifier: Modifier = Modifier,
     viewModel: PlayingViewModel = koinActivityViewModel()
-) = DropdownMenuItem(
-    modifier = modifier,
-    text = { OptionMenuItemLabel(item) },
-    onClick = { viewModel.setSelectedSaveOptionIndex(index) },
-)
+) {
+    val colors = LocalAppColors.current
+
+    DropdownMenuItem(
+        modifier = modifier,
+        colors = MenuDefaults.itemColors(textColor = colors.fontColor),
+        text = { OptionMenuItemLabel(item) },
+        onClick = { viewModel.setSelectedSaveOptionIndex(index) },
+    )
+}
 
 @Composable
 private fun OptionMenuItemLabel(
