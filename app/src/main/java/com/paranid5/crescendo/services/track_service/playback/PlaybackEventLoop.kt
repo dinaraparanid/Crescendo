@@ -73,15 +73,9 @@ private suspend inline fun TrackService.onEvent(
 
     is PlaybackEvent.SeekToNextTrack -> onSeekToNextTrack()
 
-    is PlaybackEvent.AddTrackToPlaylist -> onAddTrackToPlaylist(
-        track = event.track,
-        currentPlaylist = playlist
-    )
+    is PlaybackEvent.AddTrackToPlaylist -> onAddTrackToPlaylist(event.track)
 
-    is PlaybackEvent.RemoveTrackFromPlaylist -> onRemoveTrackFromPlaylist(
-        index = event.index,
-        currentPlaylist = playlist
-    )
+    is PlaybackEvent.RemoveTrackFromPlaylist -> onRemoveTrackFromPlaylist(event.index)
 
     is PlaybackEvent.ReplacePlaylist -> onReplacePlaylist(
         newCurrentPlaylist = event.playlist,
@@ -98,9 +92,9 @@ private suspend inline fun TrackService.onPlayPlaylist(
         return showErrNotificationAndSendBroadcast(Exception(getString(R.string.playlist_empty_err)))
 
     playerProvider.resetAudioSessionIdIfNotPlaying()
+    playerProvider.playPlaylistViaPlayer(playlist, trackIndex, initialPosition)
     playerProvider.setCurrentTrackIndex(trackIndex)
     playerProvider.setCurrentPlaylist(playlist)
-    playerProvider.playPlaylistViaPlayer(playlist, trackIndex, initialPosition)
 }
 
 private suspend inline fun TrackService.onStartNewPlaylist(
@@ -160,29 +154,14 @@ private suspend inline fun TrackService.onSeekToNextTrack() {
     playerProvider.setCurrentTrackIndex(newCurTrackInd)
 }
 
-private suspend inline fun TrackService.onAddTrackToPlaylist(
-    track: Track,
-    currentPlaylist: List<Track>
-) {
-    playerProvider.setCurrentPlaylist(currentPlaylist + track)
+private fun TrackService.onAddTrackToPlaylist(track: Track) =
     playerProvider.addTrackToPlaylistViaPlayer(track)
+
+private fun TrackService.onRemoveTrackFromPlaylist(index: Int) {
+    playerProvider.removeTrackViaPlayer(index)
 }
 
-private suspend inline fun TrackService.onRemoveTrackFromPlaylist(
-    index: Int,
-    currentPlaylist: List<Track>
-) {
-    val newPlaylist = currentPlaylist.run { take(index) + drop(index + 1) }
-    val newCurrentTrackIndex = playerProvider.removeTrackViaPlayer(index)
-    playerProvider.setCurrentTrackIndex(newCurrentTrackIndex)
-    playerProvider.setCurrentPlaylist(newPlaylist)
-}
-
-private suspend inline fun TrackService.onReplacePlaylist(
+private fun TrackService.onReplacePlaylist(
     newCurrentTrackIndex: Int,
     newCurrentPlaylist: List<Track>
-) {
-    playerProvider.setCurrentTrackIndex(newCurrentTrackIndex)
-    playerProvider.setCurrentPlaylist(newCurrentPlaylist)
-    playerProvider.replacePlaylistViaPlayer(newCurrentPlaylist, newCurrentTrackIndex)
-}
+) = playerProvider.replacePlaylistViaPlayer(newCurrentPlaylist, newCurrentTrackIndex)

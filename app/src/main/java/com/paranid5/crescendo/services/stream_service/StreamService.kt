@@ -2,6 +2,7 @@ package com.paranid5.crescendo.services.stream_service
 
 import android.content.Intent
 import com.paranid5.crescendo.data.StorageHandler
+import com.paranid5.crescendo.data.current_playlist.CurrentPlaylistRepository
 import com.paranid5.crescendo.services.ConnectionManager
 import com.paranid5.crescendo.services.SuspendService
 import com.paranid5.crescendo.services.connect
@@ -69,9 +70,10 @@ class StreamService : SuspendService(), KoinComponent,
     }
 
     private val storageHandler by inject<StorageHandler>()
+    private val currentPlaylistRepository by inject<CurrentPlaylistRepository>()
 
     val mediaSessionManager by lazy {
-        MediaSessionManager(storageHandler)
+        MediaSessionManager(storageHandler, currentPlaylistRepository)
     }
 
     val playerProvider by lazy {

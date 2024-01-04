@@ -1,0 +1,23 @@
+CREATE TABLE IF NOT EXISTS CurrentPlaylistTrack (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    androidId INTEGER NOT NULL,
+    title TEXT NOT NULL,
+    artist TEXT NOT NULL,
+    album TEXT NOT NULL,
+    path TEXT NOT NULL,
+    durationMillis INTEGER NOT NULL,
+    displayName TEXT NOT NULL,
+    dateAdded INTEGER NOT NULL,
+    numberInAlbum INTEGER NOT NULL
+);
+
+selectAll:
+SELECT *
+FROM CurrentPlaylistTrack;
+
+clearPlaylist:
+DELETE FROM CurrentPlaylistTrack;
+
+insertTrack:
+INSERT INTO CurrentPlaylistTrack (id, androidId, title, artist, album, path, durationMillis, displayName, dateAdded, numberInAlbum)
+VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?);

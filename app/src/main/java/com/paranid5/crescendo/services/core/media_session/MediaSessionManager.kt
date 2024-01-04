@@ -5,6 +5,7 @@ import android.support.v4.media.MediaMetadataCompat
 import android.support.v4.media.session.MediaSessionCompat
 import android.support.v4.media.session.PlaybackStateCompat
 import com.paranid5.crescendo.data.StorageHandler
+import com.paranid5.crescendo.data.current_playlist.CurrentPlaylistRepository
 import com.paranid5.crescendo.data.states.stream.CurrentMetadataStatePublisher
 import com.paranid5.crescendo.data.states.stream.CurrentMetadataStatePublisherImpl
 import com.paranid5.crescendo.data.states.stream.CurrentMetadataStateSubscriber
@@ -12,10 +13,15 @@ import com.paranid5.crescendo.data.states.stream.CurrentMetadataStateSubscriberI
 import com.paranid5.crescendo.data.states.tracks.CurrentTrackStateSubscriber
 import com.paranid5.crescendo.data.states.tracks.CurrentTrackStateSubscriberImpl
 
-class MediaSessionManager(storageHandler: StorageHandler) :
-    CurrentMetadataStateSubscriber by CurrentMetadataStateSubscriberImpl(storageHandler),
+class MediaSessionManager(
+    storageHandler: StorageHandler,
+    currentPlaylistRepository: CurrentPlaylistRepository
+) : CurrentMetadataStateSubscriber by CurrentMetadataStateSubscriberImpl(storageHandler),
     CurrentMetadataStatePublisher by CurrentMetadataStatePublisherImpl(storageHandler),
-    CurrentTrackStateSubscriber by CurrentTrackStateSubscriberImpl(storageHandler) {
+    CurrentTrackStateSubscriber by CurrentTrackStateSubscriberImpl(
+        storageHandler,
+        currentPlaylistRepository
+    ) {
     private lateinit var mediaSession: MediaSessionCompat
 
     val sessionToken: MediaSessionCompat.Token

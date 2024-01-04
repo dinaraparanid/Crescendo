@@ -4,7 +4,6 @@ import android.graphics.Bitmap
 import android.graphics.drawable.BitmapDrawable
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -20,13 +19,13 @@ import coil.size.Scale
 import com.paranid5.crescendo.R
 import com.paranid5.crescendo.data.StorageHandler
 import com.paranid5.crescendo.data.properties.currentMetadataFlow
-import com.paranid5.crescendo.data.properties.currentTrackFlow
 import com.paranid5.crescendo.domain.media.AudioStatus
 import com.paranid5.crescendo.media.images.ImageSize
 import com.paranid5.crescendo.media.images.getTrackCoverAsync
 import com.paranid5.crescendo.media.images.getTrackCoverWithPaletteAsync
 import com.paranid5.crescendo.media.images.getVideoCoverAsync
 import com.paranid5.crescendo.media.images.getVideoCoverWithPaletteAsync
+import com.paranid5.crescendo.presentation.main.tracks.properties.compose.currentTrack
 import com.paranid5.crescendo.presentation.ui.extensions.collectLatestAsState
 import com.paranid5.crescendo.presentation.ui.utils.BlurTransformation
 import org.koin.compose.koinInject
@@ -302,17 +301,12 @@ fun currentTrackCoverModel(
     isBlured: Boolean = false,
     usePrevCoverAsPlaceholder: Boolean = true,
     animationMillis: Int = 400,
-    storageHandler: StorageHandler = koinInject(),
-    bitmapSettings: (Bitmap) -> Unit = {}
+    bitmapSettings: (Bitmap) -> Unit = {},
 ): ImageRequest {
-    val curTrack by storageHandler
-        .currentTrackFlow
-        .collectLatestAsState(initial = null)
-
-    val path by remember { derivedStateOf { curTrack?.path } }
+    val curTrack by currentTrack()
 
     return trackCoverModel(
-        path = path,
+        path = curTrack?.path,
         isPlaceholderRequired = isPlaceholderRequired,
         size = size,
         isBlured = isBlured,
@@ -329,7 +323,6 @@ fun rememberCurrentTrackCoverPainter(
     isBlured: Boolean = false,
     usePrevCoverAsPlaceholder: Boolean = true,
     animationMillis: Int = 400,
-    storageHandler: StorageHandler = koinInject(),
     bitmapSettings: (Bitmap) -> Unit = {}
 ) = rememberAsyncImagePainter(
     model = currentTrackCoverModel(
@@ -338,7 +331,6 @@ fun rememberCurrentTrackCoverPainter(
         isBlured = isBlured,
         usePrevCoverAsPlaceholder = usePrevCoverAsPlaceholder,
         animationMillis = animationMillis,
-        storageHandler = storageHandler,
         bitmapSettings = bitmapSettings,
     )
 )
@@ -350,17 +342,12 @@ fun currentTrackCoverModelWithPalette(
     isBlured: Boolean = false,
     usePrevCoverAsPlaceholder: Boolean = true,
     animationMillis: Int = 400,
-    storageHandler: StorageHandler = koinInject(),
     bitmapSettings: (Bitmap) -> Unit = {}
 ): Pair<ImageRequest, Palette?> {
-    val curTrack by storageHandler
-        .currentTrackFlow
-        .collectLatestAsState(initial = null)
-
-    val path by remember { derivedStateOf { curTrack?.path } }
+    val curTrack by currentTrack()
 
     return trackCoverModelWithPalette(
-        path = path,
+        path = curTrack?.path,
         isPlaceholderRequired = isPlaceholderRequired,
         size = size,
         isBlured = isBlured,
@@ -377,7 +364,6 @@ fun rememberCurrentTrackCoverPainterWithPalette(
     isBlured: Boolean = false,
     usePrevCoverAsPlaceholder: Boolean = true,
     animationMillis: Int = 400,
-    storageHandler: StorageHandler = koinInject(),
     bitmapSettings: (Bitmap) -> Unit = {}
 ): Pair<AsyncImagePainter, Palette?> {
     val (coverModel, palette) = currentTrackCoverModelWithPalette(
@@ -386,7 +372,6 @@ fun rememberCurrentTrackCoverPainterWithPalette(
         isBlured = isBlured,
         usePrevCoverAsPlaceholder = usePrevCoverAsPlaceholder,
         animationMillis = animationMillis,
-        storageHandler = storageHandler,
         bitmapSettings = bitmapSettings
     )
 

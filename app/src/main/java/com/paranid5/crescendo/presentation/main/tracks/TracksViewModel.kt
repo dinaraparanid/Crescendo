@@ -2,6 +2,7 @@ package com.paranid5.crescendo.presentation.main.tracks
 
 import androidx.lifecycle.ViewModel
 import com.paranid5.crescendo.data.StorageHandler
+import com.paranid5.crescendo.data.current_playlist.CurrentPlaylistRepository
 import com.paranid5.crescendo.data.states.playback.AudioStatusStatePublisher
 import com.paranid5.crescendo.data.states.playback.AudioStatusStatePublisherImpl
 import com.paranid5.crescendo.data.states.tracks.CurrentTrackStateSubscriber
@@ -17,12 +18,15 @@ import com.paranid5.crescendo.presentation.main.tracks.states.SearchBarStateHold
 import com.paranid5.crescendo.presentation.main.tracks.states.TracksStateHolder
 import com.paranid5.crescendo.presentation.main.tracks.states.TracksStateHolderImpl
 
-class TracksViewModel(private val storageHandler: StorageHandler) :
-    ViewModel(),
+@Suppress("IncorrectFormatting")
+class TracksViewModel(
+    storageHandler: StorageHandler,
+    currentPlaylistRepository: CurrentPlaylistRepository
+) : ViewModel(),
     AudioStatusStatePublisher by AudioStatusStatePublisherImpl(storageHandler),
     TrackOrderStateSubscriber by TrackOrderStateSubscriberImpl(storageHandler),
     TrackOrderStatePublisher by TrackOrderStatePublisherImpl(storageHandler),
-    CurrentTrackStateSubscriber by CurrentTrackStateSubscriberImpl(storageHandler),
+    CurrentTrackStateSubscriber by CurrentTrackStateSubscriberImpl(storageHandler, currentPlaylistRepository),
     QueryStateHolder by QueryStateHolderImpl(),
     SearchBarStateHolder by SearchBarStateHolderImpl(),
     TracksStateHolder by TracksStateHolderImpl(storageHandler)

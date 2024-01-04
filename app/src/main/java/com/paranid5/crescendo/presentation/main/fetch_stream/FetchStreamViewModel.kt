@@ -13,8 +13,8 @@ import com.paranid5.crescendo.presentation.main.fetch_stream.states.UrlStateHold
 import com.paranid5.crescendo.presentation.main.fetch_stream.states.UrlStateHolderImpl
 
 class FetchStreamViewModel(
-    private val savedStateHandle: SavedStateHandle,
-    private val storageHandler: StorageHandler,
+    savedStateHandle: SavedStateHandle,
+    storageHandler: StorageHandler,
 ) : ViewModel(),
     CurrentUrlStateSubscriber by CurrentUrlStateSubscriberImpl(storageHandler),
     CurrentUrlStatePublisher by CurrentUrlStatePublisherImpl(storageHandler),

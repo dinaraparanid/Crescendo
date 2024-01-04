@@ -77,5 +77,5 @@ private fun videoUrl(ytFiles: Map<Int, YtFile>) =
         .filterNotNull()
         .map(YtFile::url)
         .filterNotNull()
-        .filter(String::isNullOrEmpty)
+        .filterNot(String::isNullOrEmpty)
         .firstOrNull()

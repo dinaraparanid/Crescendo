@@ -2,6 +2,7 @@ package com.paranid5.crescendo.services.track_service.playback
 
 import androidx.annotation.MainThread
 import com.paranid5.crescendo.data.StorageHandler
+import com.paranid5.crescendo.data.current_playlist.CurrentPlaylistRepository
 import com.paranid5.crescendo.data.states.playback.TracksPlaybackPositionStatePublisher
 import com.paranid5.crescendo.data.states.playback.TracksPlaybackPositionStatePublisherImpl
 import com.paranid5.crescendo.data.states.playback.TracksPlaybackPositionStateSubscriber
@@ -21,10 +22,14 @@ import kotlinx.coroutines.flow.asSharedFlow
 import org.koin.core.component.KoinComponent
 
 @Suppress("IncorrectFormatting")
-class PlayerProvider(service: TrackService, storageHandler: StorageHandler) : KoinComponent,
+class PlayerProvider(
+    service: TrackService,
+    storageHandler: StorageHandler,
+    currentPlaylistRepository: CurrentPlaylistRepository
+) : KoinComponent,
     PlayerController by PlayerControllerImpl(service, storageHandler),
-    CurrentPlaylistStateSubscriber by CurrentPlaylistStateSubscriberImpl(storageHandler),
-    CurrentPlaylistStatePublisher by CurrentPlaylistStatePublisherImpl(storageHandler),
+    CurrentPlaylistStateSubscriber by CurrentPlaylistStateSubscriberImpl(currentPlaylistRepository),
+    CurrentPlaylistStatePublisher by CurrentPlaylistStatePublisherImpl(currentPlaylistRepository),
     CurrentTrackIndexStateSubscriber by CurrentTrackIndexStateSubscriberImpl(storageHandler),
     CurrentTrackIndexStatePublisher by CurrentTrackIndexStatePublisherImpl(storageHandler),
     TracksPlaybackPositionStateSubscriber by TracksPlaybackPositionStateSubscriberImpl(storageHandler),

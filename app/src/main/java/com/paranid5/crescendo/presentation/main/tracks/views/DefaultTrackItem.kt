@@ -21,15 +21,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
-import com.paranid5.crescendo.data.StorageHandler
-import com.paranid5.crescendo.data.properties.currentTrackFlow
 import com.paranid5.crescendo.data.states.playback.AudioStatusStatePublisher
 import com.paranid5.crescendo.domain.tracks.Track
+import com.paranid5.crescendo.presentation.main.tracks.properties.compose.currentTrack
 import com.paranid5.crescendo.presentation.main.tracks.views.item.TrackCover
 import com.paranid5.crescendo.presentation.main.tracks.views.item.TrackInfo
-import com.paranid5.crescendo.presentation.ui.extensions.collectLatestAsState
 import com.paranid5.crescendo.presentation.ui.permissions.requests.audioRecordingPermissionsRequestLauncher
-import com.paranid5.crescendo.presentation.ui.permissions.requests.foregroundServicePermissionsRequestLauncher
+import com.paranid5.crescendo.presentation.ui.permissions.requests.foregroundServicePermissionsRequestLauncherCompat
 import com.paranid5.crescendo.presentation.ui.theme.LocalAppColors
 import com.paranid5.crescendo.services.track_service.TrackServiceAccessor
 import kotlinx.collections.immutable.ImmutableList
@@ -139,16 +137,13 @@ private fun rememberTextColor(track: Track): State<Color> {
 }
 
 @Composable
-private fun rememberIsTrackCurrent(
-    track: Track,
-    storageHandler: StorageHandler = koinInject()
-): State<Boolean> {
-    val currentTrack by storageHandler
-        .currentTrackFlow
-        .collectLatestAsState(initial = null)
+private fun rememberIsTrackCurrent(track: Track): State<Boolean> {
+    val currentTrack by currentTrack()
 
     return remember(track.path, currentTrack?.path) {
-        derivedStateOf { track.path == currentTrack?.path }
+        derivedStateOf {
+            track.path == currentTrack?.path
+        }
     }
 }
 
@@ -160,15 +155,17 @@ inline fun Modifier.clickableTrackWithPermissions(
     val isFSPermissionDialogShownState = remember { mutableStateOf(false) }
     val isRecordingPermissionDialogShownState = remember { mutableStateOf(false) }
 
-    val (areFSPermissionsGranted, launchFSPermissions) = foregroundServicePermissionsRequestLauncher(
-        isFSPermissionDialogShownState,
-        permissionModifier
-    )
+    val (areFSPermissionsGranted, launchFSPermissions) =
+        foregroundServicePermissionsRequestLauncherCompat(
+            isFSPermissionDialogShownState,
+            permissionModifier
+        )
 
-    val (isRecordingPermissionGranted, launchRecordPermissions) = audioRecordingPermissionsRequestLauncher(
-        isRecordingPermissionDialogShownState,
-        permissionModifier
-    )
+    val (isRecordingPermissionGranted, launchRecordPermissions) =
+        audioRecordingPermissionsRequestLauncher(
+            isRecordingPermissionDialogShownState,
+            permissionModifier
+        )
 
     return this.clickable {
         when {

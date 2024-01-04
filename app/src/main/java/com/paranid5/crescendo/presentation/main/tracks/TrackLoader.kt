@@ -35,13 +35,18 @@ private fun getNextTrackOrNull(context: Context, cursor: Cursor) = when {
 }
 
 private fun allTracksMediaStoreQuery(context: Context) =
-    context.contentResolver.query(
-        MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,
-        projection,
-        selection,
-        null,
-        order
-    )
+    try {
+        context.contentResolver.query(
+            MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,
+            projection,
+            selection,
+            null,
+            order
+        )
+    } catch (e: SecurityException) {
+        // permission not granted
+        null
+    }
 
 private inline val selection
     get() = when {

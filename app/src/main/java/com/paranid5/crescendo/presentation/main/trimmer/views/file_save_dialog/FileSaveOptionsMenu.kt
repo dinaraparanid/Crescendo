@@ -1,5 +1,6 @@
 package com.paranid5.crescendo.presentation.main.trimmer.views.file_save_dialog
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.material3.DropdownMenu
@@ -69,10 +70,11 @@ private fun FileOptionsMenu(
     isDropdownShownState: MutableState<Boolean>,
     modifier: Modifier = Modifier
 ) {
+    val colors = LocalAppColors.current
     var isDropdownShown by isDropdownShownState
 
     DropdownMenu(
-        modifier = modifier,
+        modifier = modifier.background(colors.background),
         expanded = isDropdownShown,
         onDismissRequest = { isDropdownShown = false }
     ) {

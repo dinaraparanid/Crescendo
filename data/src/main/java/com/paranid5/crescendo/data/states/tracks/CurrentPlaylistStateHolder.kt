@@ -1,8 +1,6 @@
 package com.paranid5.crescendo.data.states.tracks
 
-import com.paranid5.crescendo.data.StorageHandler
-import com.paranid5.crescendo.data.properties.currentPlaylistFlow
-import com.paranid5.crescendo.data.properties.storeCurrentPlaylist
+import com.paranid5.crescendo.data.current_playlist.CurrentPlaylistRepository
 import com.paranid5.crescendo.domain.tracks.Track
 import com.paranid5.crescendo.domain.utils.extensions.timeString
 import com.paranid5.crescendo.domain.utils.extensions.totalDurationMillis
@@ -18,17 +16,19 @@ interface CurrentPlaylistStatePublisher {
     suspend fun setCurrentPlaylist(playlist: List<Track>)
 }
 
-class CurrentPlaylistStateSubscriberImpl(private val storageHandler: StorageHandler) :
-    CurrentPlaylistStateSubscriber {
+class CurrentPlaylistStateSubscriberImpl(
+    private val currentPlaylistRepository: CurrentPlaylistRepository
+) : CurrentPlaylistStateSubscriber {
     override val currentPlaylistFlow by lazy {
-        storageHandler.currentPlaylistFlow
+        currentPlaylistRepository.tracksFlow
     }
 }
 
-class CurrentPlaylistStatePublisherImpl(private val storageHandler: StorageHandler) :
-    CurrentPlaylistStatePublisher {
+class CurrentPlaylistStatePublisherImpl(
+    private val currentPlaylistRepository: CurrentPlaylistRepository
+) : CurrentPlaylistStatePublisher {
     override suspend fun setCurrentPlaylist(playlist: List<Track>) =
-        storageHandler.storeCurrentPlaylist(playlist)
+        currentPlaylistRepository.replacePlaylistAsync(playlist).join()
 }
 
 inline val CurrentPlaylistStateSubscriber.currentPlaylistSizeFlow

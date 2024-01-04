@@ -2,6 +2,7 @@ package com.paranid5.crescendo.presentation.main.playing
 
 import androidx.lifecycle.ViewModel
 import com.paranid5.crescendo.data.StorageHandler
+import com.paranid5.crescendo.data.current_playlist.CurrentPlaylistRepository
 import com.paranid5.crescendo.data.states.playback.AudioStatusStatePublisher
 import com.paranid5.crescendo.data.states.playback.AudioStatusStatePublisherImpl
 import com.paranid5.crescendo.data.states.playback.AudioStatusStateSubscriber
@@ -24,7 +25,10 @@ import com.paranid5.crescendo.presentation.main.playing.states.CacheDialogStateH
 import com.paranid5.crescendo.presentation.main.playing.states.CacheDialogStateHolderImpl
 
 @Suppress("IncorrectFormatting")
-class PlayingViewModel(private val storageHandler: StorageHandler) : ViewModel(),
+class PlayingViewModel(
+    storageHandler: StorageHandler,
+    currentPlaylistRepository: CurrentPlaylistRepository,
+) : ViewModel(),
     AudioStatusStateSubscriber by AudioStatusStateSubscriberImpl(storageHandler),
     AudioStatusStatePublisher by AudioStatusStatePublisherImpl(storageHandler),
     StreamPlaybackPositionStateSubscriber by StreamPlaybackPositionStateSubscriberImpl(storageHandler),
@@ -32,6 +36,6 @@ class PlayingViewModel(private val storageHandler: StorageHandler) : ViewModel()
     TracksPlaybackPositionStateSubscriber by TracksPlaybackPositionStateSubscriberImpl(storageHandler),
     TracksPlaybackPositionStatePublisher by TracksPlaybackPositionStatePublisherImpl(storageHandler),
     RepeatingStateSubscriber by RepeatingStateSubscriberImpl(storageHandler),
-    CurrentTrackStateSubscriber by CurrentTrackStateSubscriberImpl(storageHandler),
+    CurrentTrackStateSubscriber by CurrentTrackStateSubscriberImpl(storageHandler, currentPlaylistRepository),
     CurrentUrlStateSubscriber by CurrentUrlStateSubscriberImpl(storageHandler),
     CacheDialogStateHolder by CacheDialogStateHolderImpl(storageHandler)

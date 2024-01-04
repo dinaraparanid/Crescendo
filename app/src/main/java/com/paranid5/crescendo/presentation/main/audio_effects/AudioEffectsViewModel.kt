@@ -31,8 +31,7 @@ import com.paranid5.crescendo.data.states.effects.ReverbPresetStatePublisherImpl
 import com.paranid5.crescendo.data.states.effects.SpeedTextStateSubscriber
 import com.paranid5.crescendo.data.states.effects.SpeedTextStateSubscriberImpl
 
-class AudioEffectsViewModel(private val storageHandler: StorageHandler) :
-    ViewModel(),
+class AudioEffectsViewModel(storageHandler: StorageHandler) : ViewModel(),
     AudioStatusStateSubscriber by AudioStatusStateSubscriberImpl(storageHandler),
     AudioEffectsEnabledStateSubscriber by AudioEffectsEnabledStateSubscriberImpl(storageHandler),
     AudioEffectsEnabledStatePublisher by AudioEffectsEnabledStatePublisherImpl(storageHandler),

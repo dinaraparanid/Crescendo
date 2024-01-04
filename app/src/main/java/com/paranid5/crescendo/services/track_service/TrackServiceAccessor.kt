@@ -16,7 +16,7 @@ import org.koin.core.component.inject
 import org.koin.core.qualifier.named
 
 class TrackServiceAccessor(application: MainApplication) : KoinComponent,
-    ServiceAccessor by ServiceAccessorImpl(application) {
+    ServiceAccessor by ServiceAccessorImpl(application.applicationContext) {
     private companion object {
         private val TAG = TrackServiceAccessor::class.simpleName!!
     }

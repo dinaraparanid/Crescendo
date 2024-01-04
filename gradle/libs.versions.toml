@@ -1,6 +1,7 @@
 [versions]
 activityCompose = "1.8.2"
 amplituda = "2.2.2"
+sqlDelight = "2.0.1"
 appcompat = "1.6.1"
 arrowFxCoroutines = "1.2.1"
 audiovisualizer = "0.9.2"
@@ -69,6 +70,8 @@ ktor-client-okhttp = { module = "io.ktor:ktor-client-okhttp", version.ref = "kto
 ktor-serialization-kotlinx-json = { module = "io.ktor:ktor-serialization-kotlinx-json", version.ref = "ktorClientCore" }
 material = { module = "com.google.android.material:material", version.ref = "materialVersion" }
 mobile-ffmpeg-full = { module = "com.arthenica:mobile-ffmpeg-full", version.ref = "mobileFfmpegFull" }
+sqldelight-android-driver = { module = "app.cash.sqldelight:android-driver", version.ref = "sqlDelight" }
+sqldelight-coroutines-extensions = { module = "app.cash.sqldelight:coroutines-extensions", version.ref = "sqlDelight" }
 yt-url-extractor-kt = { module = "com.github.dinaraparanid:yt-url-extractor-kt", version.ref = "ytUrlExtractorKt" }
 
 [plugins]

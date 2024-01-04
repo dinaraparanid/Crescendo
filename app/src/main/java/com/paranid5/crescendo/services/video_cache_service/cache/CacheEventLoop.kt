@@ -10,14 +10,12 @@ import com.paranid5.crescendo.services.video_cache_service.VideoCacheService
 import com.paranid5.crescendo.services.video_cache_service.extractor.extractMediaFilesAndStartCaching
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.filterNot
-import kotlinx.coroutines.flow.onEach
 
 private const val TAG = "CacheEventLoop"
 
 suspend fun VideoCacheService.startCacheEventLoop() =
     lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
         cacheManager.videoCacheFlow
-            .onEach { println(it) }
             .distinctUntilChanged()
             .filterNot { _ ->
                 val downloadSt = mediaFileDownloader.downloadStatusState.value
@@ -40,4 +38,5 @@ private suspend inline fun VideoCacheService.onCaching(videoData: VideoCacheData
     ).getOrNull()?.let(this::reportCachingResult)
 
     cacheManager.decrementQueueLen()
+    println("CLOSED")
 }

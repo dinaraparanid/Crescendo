@@ -3,6 +3,7 @@ package com.paranid5.crescendo.services.track_service
 import android.content.Intent
 import android.os.Build
 import com.paranid5.crescendo.data.StorageHandler
+import com.paranid5.crescendo.data.current_playlist.CurrentPlaylistRepository
 import com.paranid5.crescendo.domain.tracks.DefaultTrack
 import com.paranid5.crescendo.domain.tracks.Track
 import com.paranid5.crescendo.services.ConnectionManager
@@ -79,17 +80,18 @@ class TrackService : SuspendService(), KoinComponent,
     }
 
     private val storageHandler by inject<StorageHandler>()
+    private val currentPlaylistRepository by inject<CurrentPlaylistRepository>()
 
     val mediaSessionManager by lazy {
-        MediaSessionManager(storageHandler)
+        MediaSessionManager(storageHandler, currentPlaylistRepository)
     }
 
     val playerProvider by lazy {
-        PlayerProvider(this, storageHandler)
+        PlayerProvider(this, storageHandler, currentPlaylistRepository)
     }
 
     val notificationManager by lazy {
-        NotificationManager(this, storageHandler)
+        NotificationManager(this, storageHandler, currentPlaylistRepository)
     }
 
     internal val commandsToActions = mapOf(

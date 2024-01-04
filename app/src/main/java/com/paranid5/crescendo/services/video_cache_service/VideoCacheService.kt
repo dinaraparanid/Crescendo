@@ -101,9 +101,9 @@ internal inline val Intent.videoCacheDataArg
 private inline val Intent.formatArg
     get() = when {
         Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU ->
-            getParcelableExtra(VideoCacheService.FORMAT_ARG, Formats::class.java)!!
+            getSerializableExtra(VideoCacheService.FORMAT_ARG, Formats::class.java)!!
 
-        else -> getParcelableExtra(VideoCacheService.FORMAT_ARG)!!
+        else -> getSerializableExtra(VideoCacheService.FORMAT_ARG) as Formats
     }
 
 @Suppress("DEPRECATION")

@@ -147,5 +147,5 @@ private suspend inline fun VideoCacheService.mergeToMp4(
         videoTrack = videoFileStore,
         mp4StoreFile = storeFileRes.value,
         videoMetadata = videoMetadata
-    ).await()
+    ).await().also { cacheManager.onConverted() }
 }

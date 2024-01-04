@@ -1,5 +1,7 @@
 package com.paranid5.crescendo.presentation.ui.permissions.requests
 
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
 import androidx.compose.ui.Modifier
@@ -10,7 +12,19 @@ import org.koin.core.qualifier.named
 import java.util.Queue
 
 @Composable
-fun foregroundServicePermissionsRequestLauncher(
+fun foregroundServicePermissionsRequestLauncherCompat(
+    isFGPermissionDialogShownState: MutableState<Boolean>,
+    modifier: Modifier = Modifier,
+) = when {
+    Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU ->
+        foregroundServicePermissionsRequestLauncher(isFGPermissionDialogShownState, modifier)
+
+    else -> true to {}
+}
+
+@RequiresApi(Build.VERSION_CODES.TIRAMISU)
+@Composable
+private fun foregroundServicePermissionsRequestLauncher(
     isFGPermissionDialogShownState: MutableState<Boolean>,
     modifier: Modifier = Modifier,
 ): Pair<Boolean, () -> Unit> {

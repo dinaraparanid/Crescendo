@@ -13,7 +13,7 @@ import org.koin.core.component.inject
 import org.koin.core.qualifier.named
 
 class StreamServiceAccessor(application: MainApplication) :
-    ServiceAccessor by ServiceAccessorImpl(application),
+    ServiceAccessor by ServiceAccessorImpl(application.applicationContext),
     KoinComponent {
     private val isStreamServiceConnectedState by inject<MutableStateFlow<Boolean>>(
         named(STREAM_SERVICE_CONNECTION)

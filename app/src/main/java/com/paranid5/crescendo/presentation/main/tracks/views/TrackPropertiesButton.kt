@@ -14,10 +14,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import com.paranid5.crescendo.R
-import com.paranid5.crescendo.data.StorageHandler
 import com.paranid5.crescendo.domain.tracks.Track
-import com.paranid5.crescendo.services.track_service.TrackServiceAccessor
-import org.koin.compose.koinInject
 
 @Composable
 fun TrackPropertiesButton(
@@ -26,8 +23,6 @@ fun TrackPropertiesButton(
     modifier: Modifier = Modifier,
     iconModifier: Modifier = Modifier,
     itemModifier: Modifier = Modifier,
-    storageHandler: StorageHandler = koinInject(),
-    trackServiceAccessor: TrackServiceAccessor = koinInject()
 ) {
     val isPropertiesMenuShownState = remember { mutableStateOf(false) }
 
@@ -36,8 +31,6 @@ fun TrackPropertiesButton(
             track = track,
             isPropertiesMenuShownState = isPropertiesMenuShownState,
             itemModifier = itemModifier,
-            storageHandler = storageHandler,
-            trackServiceAccessor = trackServiceAccessor,
         )
 
         TrackPropertiesButtonImpl(

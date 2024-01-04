@@ -20,8 +20,7 @@ import com.paranid5.crescendo.presentation.main.trimmer.states.WaveformStateHold
 import com.paranid5.crescendo.presentation.main.trimmer.states.WaveformStateHolderImpl
 import kotlinx.collections.immutable.persistentListOf
 
-class TrimmerViewModel(private val storageHandler: StorageHandler) :
-    ViewModel(),
+class TrimmerViewModel(storageHandler: StorageHandler) : ViewModel(),
     AmplitudesStateSubscriber by AmplitudesStateSubscriberImpl(storageHandler),
     AmplitudesStatePublisher by AmplitudesStatePublisherImpl(storageHandler),
     PlaybackPositionsStateHolder by PlaybackPositionsStateHolderImpl(),

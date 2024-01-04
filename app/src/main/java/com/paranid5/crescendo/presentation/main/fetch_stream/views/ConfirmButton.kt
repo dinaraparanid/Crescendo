@@ -28,7 +28,7 @@ import com.paranid5.crescendo.presentation.main.fetch_stream.FetchStreamViewMode
 import com.paranid5.crescendo.presentation.main.fetch_stream.properties.compose.collectCurrentTextAsState
 import com.paranid5.crescendo.presentation.main.fetch_stream.properties.compose.collectIsConfirmButtonActiveAsState
 import com.paranid5.crescendo.presentation.ui.permissions.requests.audioRecordingPermissionsRequestLauncher
-import com.paranid5.crescendo.presentation.ui.permissions.requests.foregroundServicePermissionsRequestLauncher
+import com.paranid5.crescendo.presentation.ui.permissions.requests.foregroundServicePermissionsRequestLauncherCompat
 import com.paranid5.crescendo.presentation.ui.theme.LocalAppColors
 import kotlinx.coroutines.launch
 import org.koin.compose.koinInject
@@ -40,7 +40,7 @@ fun ConfirmButton(modifier: Modifier = Modifier) {
 
     Box(modifier) {
         val (areForegroundPermissionsGranted, launchFSPermissions) =
-            foregroundServicePermissionsRequestLauncher(
+            foregroundServicePermissionsRequestLauncherCompat(
                 isForegroundServicePermissionDialogShownState,
                 Modifier.align(Alignment.Center)
             )

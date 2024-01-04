@@ -1,10 +1,12 @@
 package com.paranid5.crescendo
 
 import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.annotation.StringRes
 import androidx.compose.runtime.Composable
 import androidx.lifecycle.ViewModel
 import com.paranid5.crescendo.data.StorageHandler
+import com.paranid5.crescendo.data.sqlDelightModule
 import com.paranid5.crescendo.domain.eq.EqualizerData
 import com.paranid5.crescendo.domain.ktor_client.KtorClient
 import com.paranid5.crescendo.presentation.composition_locals.LocalActivity
@@ -49,7 +51,10 @@ const val TRACK_SERVICE_CONNECTION = "track_service_connection"
 const val VIDEO_CACHE_SERVICE_CONNECTION = "video_cache_service_connection"
 
 const val EXTERNAL_STORAGE_PERMISSION_QUEUE = "external_storage_permission_queue"
+
+@RequiresApi(Build.VERSION_CODES.TIRAMISU)
 const val FOREGROUND_SERVICE_PERMISSION_QUEUE = "foreground_service_permission_queue"
+
 const val AUDIO_RECORDING_PERMISSION_QUEUE = "audio_recording_permission_queue"
 
 private fun Scope.getString(@StringRes strRes: Int) =
@@ -157,7 +162,7 @@ private val uiModule = module {
 }
 
 val appModule = module {
-    includes(globalsModule, uiModule)
+    includes(globalsModule, uiModule, sqlDelightModule)
     viewModelOf(::MainActivityViewModel)
 }
 

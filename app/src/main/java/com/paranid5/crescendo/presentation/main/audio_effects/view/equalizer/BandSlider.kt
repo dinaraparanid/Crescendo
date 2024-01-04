@@ -19,6 +19,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewModelScope
 import com.paranid5.crescendo.R
+import com.paranid5.crescendo.domain.eq.EqualizerBandsPreset
 import com.paranid5.crescendo.domain.eq.EqualizerData
 import com.paranid5.crescendo.koinActivityViewModel
 import com.paranid5.crescendo.presentation.main.audio_effects.AudioEffectsUIHandler
@@ -66,6 +67,7 @@ fun BandSlider(
                 )
 
                 viewModel.setEqualizerBands(bands)
+                viewModel.setEqualizerParam(EqualizerBandsPreset.CUSTOM)
             }
         },
         thumb = {

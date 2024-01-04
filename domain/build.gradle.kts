@@ -3,6 +3,15 @@ plugins {
     id("org.jetbrains.kotlin.android")
     id("kotlin-parcelize")
     id("org.jetbrains.kotlin.plugin.serialization") version "1.9.0"
+    id("app.cash.sqldelight") version "2.0.1"
+}
+
+sqldelight {
+    databases {
+        create("Database") {
+            packageName.set("com.example")
+        }
+    }
 }
 
 android {
@@ -19,6 +28,7 @@ android {
     buildTypes {
         release {
             isMinifyEnabled = false
+            isJniDebuggable = false
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
