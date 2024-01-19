@@ -83,13 +83,8 @@ fun PlayingBottomSheet(
                 PushUpButton(
                     alpha = alpha,
                     modifier = Modifier
-                        .padding(
-                            top = when (LocalConfiguration.current.orientation) {
-                                Configuration.ORIENTATION_LANDSCAPE -> 6.dp
-                                else -> 12.dp
-                            }
-                        )
                         .align(Alignment.TopCenter)
+                        .padding(top = pushUpPadding)
                 )
             }
         }
@@ -114,3 +109,10 @@ private fun CurrentPlaylistBottomSheet(
             .padding(top = 24.dp)
     )
 }
+
+private inline val pushUpPadding
+    @Composable
+    get() = when (LocalConfiguration.current.orientation) {
+        Configuration.ORIENTATION_LANDSCAPE -> 6.dp
+        else -> 12.dp
+    }

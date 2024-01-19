@@ -129,7 +129,8 @@ private inline fun <T : Track> CurrentPlaylistTrackItemContent(
             TrackPropertiesButton(
                 track = track,
                 tint = colors.fontColor,
-                iconModifier = Modifier.height(20.dp),
+                modifier = Modifier.align(Alignment.CenterVertically),
+                iconModifier = Modifier.height(20.dp)
             )
         }
     }

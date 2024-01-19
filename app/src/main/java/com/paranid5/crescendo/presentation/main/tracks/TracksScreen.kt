@@ -22,6 +22,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.paranid5.crescendo.koinActivityViewModel
+import com.paranid5.crescendo.presentation.main.appbar.appBarHeight
 import com.paranid5.crescendo.presentation.main.tracks.effects.LoadTracksFromMediaStoreEffect
 import com.paranid5.crescendo.presentation.main.tracks.properties.compose.collectSearchBarHeightDpAsState
 import com.paranid5.crescendo.presentation.main.tracks.views.DefaultTrackList
@@ -79,6 +80,8 @@ fun TracksScreen(
                     .fillMaxSize(1F)
                     .padding(horizontal = 5.dp)
             )
+
+            Spacer(Modifier.height(appBarHeight))
         }
     }
 }

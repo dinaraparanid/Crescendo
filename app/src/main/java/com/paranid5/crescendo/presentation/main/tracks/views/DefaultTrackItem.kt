@@ -119,6 +119,7 @@ private inline fun DefaultTrackItemContent(
         TrackPropertiesButton(
             track = track,
             tint = textColor,
+            modifier = Modifier.align(Alignment.CenterVertically),
             iconModifier = Modifier.height(20.dp),
         )
     }

@@ -58,7 +58,7 @@ class MediaFileDownloader : KoinComponent {
     ): CachingResult.DownloadResult {
         _downloadStatusState.update { DownloadingStatus.DOWNLOADING }
 
-        val curVideoCashFile = when (val storeFileRes =
+        val curVideoCacheFile = when (val storeFileRes =
             initMediaFile(
                 desiredFilename = desiredFilename,
                 isAudio = isAudio
@@ -70,15 +70,15 @@ class MediaFileDownloader : KoinComponent {
 
         val statusCode = ktorClient.downloadFile(
             fileUrl = mediaUrl,
-            storeFile = curVideoCashFile,
+            storeFile = curVideoCacheFile,
             progressState = _videoDownloadProgressState,
             downloadingState = _downloadStatusState,
         )
 
         return when (statusCode?.isSuccess()) {
-            true -> CachingResult.DownloadResult.Success(listOf(curVideoCashFile))
-            false -> onError(statusCode, curVideoCashFile)
-            null -> onCancel(curVideoCashFile)
+            true -> CachingResult.DownloadResult.Success(listOf(curVideoCacheFile))
+            false -> onError(statusCode, curVideoCacheFile)
+            null -> onCancel(curVideoCacheFile)
         }
     }
 

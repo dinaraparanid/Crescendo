@@ -10,6 +10,7 @@ import io.ktor.client.plugins.logging.ANDROID
 import io.ktor.client.plugins.logging.LogLevel
 import io.ktor.client.plugins.logging.Logger
 import io.ktor.client.plugins.logging.Logging
+import io.ktor.http.isSuccess
 import io.ktor.serialization.kotlinx.json.json
 import kotlinx.serialization.json.Json
 
@@ -21,7 +22,13 @@ fun KtorClient() = HttpClient(OkHttp) {
         agent = USER_AGENT
     }
 
-    install(HttpRequestRetry)
+    install(HttpRequestRetry) {
+        maxRetries = -1
+
+        retryIf { request, response ->
+            !response.status.isSuccess()
+        }
+    }
 
     install(HttpTimeout) {
         connectTimeoutMillis = null
