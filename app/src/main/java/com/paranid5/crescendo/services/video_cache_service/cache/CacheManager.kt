@@ -57,21 +57,29 @@ class CacheManager {
     internal fun onConversionStarted() =
         _cachingStatusState.update { CachingStatus.CONVERTING }
 
-    internal fun onCanceledCurrent() =
+    internal fun onCanceledCurrent() {
+        decrementQueueLen()
         _cachingStatusState.update { CachingStatus.CANCELED_CUR }
+    }
 
     internal fun onCanceledAll() {
         _videoCacheQueueLenState.update { 0 }
         _cachingStatusState.update { CachingStatus.CANCELED_ALL }
     }
 
-    internal fun onConverted() =
+    internal fun onConverted() {
+        decrementQueueLen()
         _cachingStatusState.update { CachingStatus.CONVERTED }
+    }
 
-    internal fun onDownloadFailed() =
+    internal fun onDownloadFailed() {
+        decrementQueueLen()
         _cachingStatusState.update { CachingStatus.ERR }
+        Log.d(TAG, "Downloading was interrupted by an error")
+    }
 
     internal fun onCachingError(vararg videoCacheFiles: File) {
+        decrementQueueLen()
         _cachingStatusState.update { CachingStatus.ERR }
         videoCacheFiles.forEach { Log.d(TAG, "File is deleted ${it.delete()}") }
         Log.d(TAG, "Caching was interrupted by an error")
@@ -82,7 +90,7 @@ class CacheManager {
         _currentVideoMetadataState.update { VideoMetadata() }
     }
 
-    internal fun decrementQueueLen() =
+    private fun decrementQueueLen() =
         _videoCacheQueueLenState.update { maxOf(it - 1, 0) }
 
     internal fun resetCachingStatus() =

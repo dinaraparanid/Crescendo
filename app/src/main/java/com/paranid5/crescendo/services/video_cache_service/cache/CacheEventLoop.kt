@@ -36,7 +36,4 @@ private suspend inline fun VideoCacheService.onCaching(videoData: VideoCacheData
         format = videoData.format,
         trimRange = videoData.trimRange
     ).getOrNull()?.let(this::reportCachingResult)
-
-    cacheManager.decrementQueueLen()
-    println("CLOSED")
 }
