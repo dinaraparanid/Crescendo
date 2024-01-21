@@ -40,7 +40,7 @@ class NotificationManager(service: VideoCacheService) {
         downloadStatus: DownloadingStatus,
         cacheStatus: CachingStatus,
         videoMetadata: VideoMetadata,
-        videoCashQueueLen: Int,
+        videoQueueLen: Int,
         downloadedBytes: Long,
         totalBytes: Long,
         errorCode: Int,
@@ -50,7 +50,7 @@ class NotificationManager(service: VideoCacheService) {
             showDownloadNotification(
                 service = service,
                 videoTitle = service videoTitleOf videoMetadata,
-                videoCashQueueLen = videoCashQueueLen,
+                videoQueueLen = videoQueueLen,
                 downloadedBytes = downloadedBytes,
                 totalBytes = totalBytes
             )
@@ -103,7 +103,7 @@ class NotificationManager(service: VideoCacheService) {
     private fun showDownloadNotification(
         service: VideoCacheService,
         videoTitle: String,
-        videoCashQueueLen: Int,
+        videoQueueLen: Int,
         downloadedBytes: Long,
         totalBytes: Long
     ) = service.startForeground(
@@ -111,7 +111,7 @@ class NotificationManager(service: VideoCacheService) {
         DownloadNotificationBuilder(
             context = service,
             videoTitle = videoTitle,
-            videoCashQueueLen = videoCashQueueLen,
+            videoQueueLen = videoQueueLen,
             downloadedBytes = downloadedBytes,
             totalBytes = totalBytes
         ).build(),

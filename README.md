@@ -108,7 +108,7 @@ Crescendo provides multiple features to move your music experience to a new leve
 
 ## **Current Status:**
 
-**Alpha V 0.3.0.0**
+**Beta V 0.3.0.1**
 
 ### **Implemented features:**
 1. Media playback of YouTube videos and live streams

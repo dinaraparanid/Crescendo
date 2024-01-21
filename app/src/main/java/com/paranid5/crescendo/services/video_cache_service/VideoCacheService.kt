@@ -14,6 +14,7 @@ import com.paranid5.crescendo.services.video_cache_service.cache.cacheNewVideoAs
 import com.paranid5.crescendo.services.video_cache_service.cache.startCacheEventLoop
 import com.paranid5.crescendo.services.video_cache_service.extractor.UrlExtractor
 import com.paranid5.crescendo.services.video_cache_service.files.MediaFileDownloader
+import com.paranid5.crescendo.services.video_cache_service.files.VideoQueueManager
 import com.paranid5.crescendo.services.video_cache_service.notification.NotificationManager
 import com.paranid5.crescendo.services.video_cache_service.notification.startNotificationMonitoring
 import com.paranid5.crescendo.services.video_cache_service.receivers.CacheNextVideoReceiver
@@ -35,6 +36,10 @@ class VideoCacheService : SuspendService(),
         const val FILENAME_ARG = "filename"
         const val FORMAT_ARG = "format"
         const val TRIM_RANGE_ARG = "trim_range"
+    }
+
+    val videoQueueManager by lazy {
+        VideoQueueManager()
     }
 
     val notificationManager by lazy {

@@ -11,11 +11,11 @@ import com.paranid5.crescendo.presentation.main.MainActivity
 internal fun DownloadNotificationBuilder(
     context: Context,
     videoTitle: String,
-    videoCashQueueLen: Int,
+    videoQueueLen: Int,
     downloadedBytes: Long,
     totalBytes: Long
 ) = BusyNotificationBuilder(context, "${context.getString(R.string.downloading)}: $videoTitle")
-    .setContentText("${context.getString(R.string.tracks_in_queue)}: $videoCashQueueLen")
+    .setContentText("${context.getString(R.string.tracks_in_queue)}: $videoQueueLen")
     .setProgress(totalBytes.toInt(), downloadedBytes.toInt(), false)
     .addAction(CancelCurVideoAction(context))
     .addAction(CancelAllActionCompat(context))

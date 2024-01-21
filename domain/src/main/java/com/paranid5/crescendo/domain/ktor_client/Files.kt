@@ -1,10 +1,10 @@
 package com.paranid5.crescendo.domain.ktor_client
 
-import android.util.Log
 import arrow.core.Either
 import com.paranid5.crescendo.domain.caching.DownloadError
 import com.paranid5.crescendo.domain.caching.DownloadingStatus
 import io.ktor.client.HttpClient
+import io.ktor.client.plugins.retry
 import io.ktor.client.request.prepareGet
 import io.ktor.client.statement.HttpResponse
 import io.ktor.client.statement.HttpStatement
@@ -12,6 +12,7 @@ import io.ktor.client.statement.bodyAsChannel
 import io.ktor.http.HttpStatusCode
 import io.ktor.http.contentLength
 import io.ktor.http.isSuccess
+import io.ktor.utils.io.cancel
 import io.ktor.utils.io.core.isNotEmpty
 import io.ktor.utils.io.core.readBytes
 import io.ktor.utils.io.discardExact
@@ -33,7 +34,7 @@ data class UrlWithFile(val fileUrl: String, val file: File)
 private data class RequestWithFile(val request: HttpStatement, val file: File)
 
 suspend inline fun HttpClient.getFileExt(fileUrl: String) =
-    prepareGet(fileUrl).execute { response ->
+    prepareRetryingGet(fileUrl).execute { response ->
         response.headers["content-type"]!!.split("/")[1]
     }
 
@@ -54,20 +55,16 @@ suspend fun HttpClient.downloadFile(
     downloadingState: MutableStateFlow<DownloadingStatus>,
     progressState: MutableStateFlow<DownloadingProgress>? = null
 ): HttpStatusCode? {
-    Log.d(TAG, "Downloading $fileUrl")
-
     val progress = AtomicLong()
-    val request = prepareGet(fileUrl)
 
-    val status = request
+    val status = prepareRetryingGet(fileUrl)
         .downloadFileFlow(storeFile, progress, downloadingState, progressState) { response ->
             response.contentLength()!!
         }
-        .first { it.isRight() }
+        .first { status -> status.isRight() }
         .getOrNull()
 
     downloadingState.update { downloadingState.finishedValue }
-    Log.d(TAG, "Done, status: ${status?.value} ${downloadingState.value}")
     return status
 }
 
@@ -122,8 +119,6 @@ suspend fun HttpClient.downloadFiles(
     progressState: MutableStateFlow<DownloadingProgress>? = null,
     vararg files: UrlWithFile
 ): HttpStatusCode? = coroutineScope {
-    Log.d(TAG, "Downloading multiple files")
-
     val getRequests = files.getRequests()
 
     getRequests.firstFailure()?.let { err ->
@@ -136,12 +131,9 @@ suspend fun HttpClient.downloadFiles(
     val totalBytes = bytesPerFiles.sum()
     getRequests.downloadFilesUntilError(downloadingState, progressState, errorState, totalBytes)
 
-    val status = downloadingState
+    downloadingState
         .updateAndGet { downloadingState.finishedValue }
         .httpStatusCode(errorState)
-
-    Log.d(TAG, "Done, status: ${status?.value}")
-    status
 }
 
 private suspend inline fun HttpResponse.downloadFileImpl(
@@ -167,9 +159,10 @@ private suspend inline fun HttpResponse.downloadFileImpl(
         }
     }
 
+    channel.cancel()
+
     return when (downloadingState.finishedValue) {
-        DownloadingStatus.CANCELED_ALL -> null
-        DownloadingStatus.CANCELED_CUR -> null
+        DownloadingStatus.CANCELED_ALL, DownloadingStatus.CANCELED_CUR -> null
         else -> status
     }
 }
@@ -177,7 +170,7 @@ private suspend inline fun HttpResponse.downloadFileImpl(
 context(HttpClient)
 private suspend inline fun Array<out UrlWithFile>.getRequests() =
     map { (fileUrl, storeFile) ->
-        RequestWithFile(prepareGet(fileUrl), storeFile)
+        RequestWithFile(prepareRetryingGet(fileUrl), storeFile)
     }
 
 private suspend inline fun List<RequestWithFile>.firstFailure() =
@@ -207,6 +200,17 @@ private suspend inline fun List<RequestWithFile>.downloadFilesUntilError(
 
     !isOk
 }
+
+suspend inline fun HttpClient.prepareRetryingGet(url: String) =
+    prepareGet(url) {
+        retry {
+            maxRetries = -1
+
+            retryIf { _, response ->
+                !response.status.isSuccess()
+            }
+        }
+    }
 
 private inline val MutableStateFlow<DownloadingStatus>.finishedValue
     get() = when (value) {

@@ -31,7 +31,7 @@ suspend fun VideoCacheService.extractMediaFilesAndStartCaching(
     }
 
     val (urls, metadata) = extractRes.getOrNull()!!
-    cacheManager.resetVideoMetadata(metadata)
+    videoQueueManager.resetVideoMetadata(metadata)
 
     when (format) {
         Formats.MP4 -> cacheVideoFile(
@@ -64,8 +64,13 @@ private suspend inline fun VideoCacheService.cacheAudioFile(
         isAudio = true
     )
 
+    if (result is CachingResult.DownloadResult.Error) {
+        onDownloadError(result)
+        return result
+    }
+
     if (result !is CachingResult.DownloadResult.Success) {
-        cacheManager.onDownloadFailed()
+        videoQueueManager.decrementQueueLen()
         return result
     }
 
@@ -82,11 +87,13 @@ private suspend inline fun VideoCacheService.cacheAudioFile(
     ) {
         null -> {
             cacheManager.onCachingError(file)
+            videoQueueManager.decrementQueueLen()
             CachingResult.ConversionError
         }
 
         else -> {
             cacheManager.onConverted()
+            videoQueueManager.decrementQueueLen()
             CachingResult.Success(audioConversionResult)
         }
     }
@@ -105,16 +112,12 @@ private suspend inline fun VideoCacheService.cacheVideoFile(
     )
 
     if (result is CachingResult.DownloadResult.Error) {
-        mediaFileDownloader.onDownloadError(
-            errorCode = result.statusCode.value,
-            errorDescription = result.statusCode.description
-        )
-
+        onDownloadError(result)
         return result
     }
 
     if (result !is CachingResult.DownloadResult.Success) {
-        cacheManager.onDownloadFailed()
+        videoQueueManager.decrementQueueLen()
         return result
     }
 
@@ -148,4 +151,13 @@ private suspend inline fun VideoCacheService.mergeToMp4(
         mp4StoreFile = storeFileRes.value,
         videoMetadata = videoMetadata
     ).await().also { cacheManager.onConverted() }
+}
+
+private fun VideoCacheService.onDownloadError(result: CachingResult.DownloadResult.Error) {
+    videoQueueManager.decrementQueueLen()
+
+    mediaFileDownloader.onDownloadError(
+        errorCode = result.statusCode.value,
+        errorDescription = result.statusCode.description
+    )
 }

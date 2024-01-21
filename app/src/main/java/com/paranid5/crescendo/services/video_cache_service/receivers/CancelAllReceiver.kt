@@ -10,5 +10,6 @@ fun CancelAllReceiver(service: VideoCacheService) =
         override fun onReceive(context: Context?, intent: Intent?) {
             service.mediaFileDownloader.onCanceledAll()
             service.cacheManager.onCanceledAll()
+            service.videoQueueManager.onCanceledAll()
         }
     }

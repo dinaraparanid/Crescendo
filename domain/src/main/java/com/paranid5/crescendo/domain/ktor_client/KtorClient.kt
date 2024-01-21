@@ -25,7 +25,7 @@ fun KtorClient() = HttpClient(OkHttp) {
     install(HttpRequestRetry) {
         maxRetries = -1
 
-        retryIf { request, response ->
+        retryIf { _, response ->
             !response.status.isSuccess()
         }
     }

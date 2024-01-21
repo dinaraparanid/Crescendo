@@ -19,8 +19,8 @@ suspend inline fun VideoCacheService.startNotificationMonitoring() =
             mediaFileDownloader.videoDownloadProgressState,
             mediaFileDownloader.downloadErrorState,
             cacheManager.cachingStatusState,
-            cacheManager.currentVideoMetadataState,
-            cacheManager.videoCacheQueueLenState,
+            videoQueueManager.currentVideoMetadataState,
+            videoQueueManager.videoQueueLenState,
         ) { args ->
             Tuple6(
                 args[0] as DownloadingStatus,
@@ -36,7 +36,7 @@ suspend inline fun VideoCacheService.startNotificationMonitoring() =
                 downloadStatus = downloadSt,
                 cacheStatus = cacheSt,
                 videoMetadata = meta,
-                videoCashQueueLen = qLen,
+                videoQueueLen = qLen,
                 downloadedBytes = progress.downloadedBytes,
                 totalBytes = progress.totalBytes,
                 errorCode = error.errorCode,

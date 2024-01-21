@@ -8,5 +8,5 @@ import kotlinx.coroutines.launch
 fun VideoCacheService.cacheNewVideoAsync(videoCacheData: VideoCacheData) =
     serviceScope.launch {
         delay(500) // for an event loop to overcome laziness
-        cacheManager.cacheNewVideo(videoCacheData)
+        videoQueueManager.offerNewVideo(videoCacheData)
     }

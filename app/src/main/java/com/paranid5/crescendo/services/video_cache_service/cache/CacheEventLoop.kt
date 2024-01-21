@@ -1,6 +1,5 @@
 package com.paranid5.crescendo.services.video_cache_service.cache
 
-import android.util.Log
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.repeatOnLifecycle
 import com.paranid5.crescendo.domain.caching.CachingStatus
@@ -15,12 +14,11 @@ private const val TAG = "CacheEventLoop"
 
 suspend fun VideoCacheService.startCacheEventLoop() =
     lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
-        cacheManager.videoCacheFlow
+        videoQueueManager.videoQueueFlow
             .distinctUntilChanged()
             .filterNot { _ ->
                 val downloadSt = mediaFileDownloader.downloadStatusState.value
                 val cacheSt = cacheManager.cachingStatusState.value
-                Log.d(TAG, "Download: $downloadSt; Cache: $cacheSt")
                 downloadSt == DownloadingStatus.CANCELED_ALL || cacheSt == CachingStatus.CANCELED_ALL
             }
             .collect { video -> onCaching(video) }

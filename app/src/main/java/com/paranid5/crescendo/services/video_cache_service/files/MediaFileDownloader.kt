@@ -75,6 +75,8 @@ class MediaFileDownloader : KoinComponent {
             downloadingState = _downloadStatusState,
         )
 
+        println(statusCode)
+
         return when (statusCode?.isSuccess()) {
             true -> CachingResult.DownloadResult.Success(listOf(curVideoCacheFile))
             false -> onError(statusCode, curVideoCacheFile)
@@ -108,20 +110,20 @@ class MediaFileDownloader : KoinComponent {
         }
     }
 
-    internal fun onCanceledCurrent() =
+    fun onCanceledCurrent() =
         _downloadStatusState.update { DownloadingStatus.CANCELED_CUR }
 
-    internal fun onCanceledAll() =
+    fun onCanceledAll() =
         _downloadStatusState.update { DownloadingStatus.CANCELED_ALL }
 
-    internal fun prepareForNewVideo() {
-        _downloadStatusState.update { DownloadingStatus.DOWNLOADING }
+    fun prepareForNewVideo() {
+        _downloadStatusState.update { DownloadingStatus.NONE }
         _videoDownloadProgressState.update { DownloadingProgress(0, 0) }
         _downloadErrorState.update { DownloadError() }
     }
 
-    internal fun resetDownloadStatus() =
-        _downloadStatusState.update { DownloadingStatus.DOWNLOADING }
+    fun resetDownloadStatus() =
+        _downloadStatusState.update { it.afterReset }
 
     private fun onError(
         statusCode: HttpStatusCode,
@@ -129,13 +131,19 @@ class MediaFileDownloader : KoinComponent {
     ): CachingResult.DownloadResult.Error {
         _downloadErrorState.update { DownloadError(statusCode.value, statusCode.description) }
         videoCacheFiles.forEach { Log.d(TAG, "File is deleted ${it.delete()}") }
-        Log.d(TAG, "Caching was interrupted by an error ${statusCode.value}")
+        Log.d(TAG, "Downloading was interrupted by an error ${statusCode.value}")
         return CachingResult.DownloadResult.Error(statusCode)
     }
 
     private fun onCancel(vararg videoCacheFiles: File): CachingResult.Canceled {
         videoCacheFiles.forEach { Log.d(TAG, "File is deleted ${it.delete()}") }
-        Log.d(TAG, "Caching was canceled")
+        Log.d(TAG, "Downloading was canceled")
         return CachingResult.Canceled
     }
 }
+
+private inline val DownloadingStatus.afterReset
+    get() = when (this) {
+        DownloadingStatus.DOWNLOADING -> this
+        else -> DownloadingStatus.NONE
+    }
