@@ -25,7 +25,7 @@ import com.paranid5.crescendo.media.images.getTrackCoverAsync
 import com.paranid5.crescendo.media.images.getTrackCoverWithPaletteAsync
 import com.paranid5.crescendo.media.images.getVideoCoverAsync
 import com.paranid5.crescendo.media.images.getVideoCoverWithPaletteAsync
-import com.paranid5.crescendo.presentation.main.tracks.properties.compose.currentTrack
+import com.paranid5.crescendo.presentation.main.tracks.properties.compose.currentTrackState
 import com.paranid5.crescendo.presentation.ui.extensions.collectLatestAsState
 import com.paranid5.crescendo.presentation.ui.utils.BlurTransformation
 import org.koin.compose.koinInject
@@ -303,7 +303,7 @@ fun currentTrackCoverModel(
     animationMillis: Int = 400,
     bitmapSettings: (Bitmap) -> Unit = {},
 ): ImageRequest {
-    val curTrack by currentTrack()
+    val curTrack by currentTrackState()
 
     return trackCoverModel(
         path = curTrack?.path,
@@ -344,7 +344,7 @@ fun currentTrackCoverModelWithPalette(
     animationMillis: Int = 400,
     bitmapSettings: (Bitmap) -> Unit = {}
 ): Pair<ImageRequest, Palette?> {
-    val curTrack by currentTrack()
+    val curTrack by currentTrackState()
 
     return trackCoverModelWithPalette(
         path = curTrack?.path,

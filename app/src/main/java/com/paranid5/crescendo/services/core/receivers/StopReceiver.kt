@@ -5,6 +5,7 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.util.Log
+import com.paranid5.crescendo.domain.utils.extensions.sendBroadcast
 import com.paranid5.crescendo.services.ConnectionManager
 
 private const val TAG = "StopReceiver"

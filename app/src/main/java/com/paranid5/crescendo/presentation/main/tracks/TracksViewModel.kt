@@ -5,6 +5,10 @@ import com.paranid5.crescendo.data.StorageHandler
 import com.paranid5.crescendo.data.current_playlist.CurrentPlaylistRepository
 import com.paranid5.crescendo.data.states.playback.AudioStatusStatePublisher
 import com.paranid5.crescendo.data.states.playback.AudioStatusStatePublisherImpl
+import com.paranid5.crescendo.data.states.tracks.CurrentPlaylistStatePublisher
+import com.paranid5.crescendo.data.states.tracks.CurrentPlaylistStatePublisherImpl
+import com.paranid5.crescendo.data.states.tracks.CurrentTrackIndexStatePublisher
+import com.paranid5.crescendo.data.states.tracks.CurrentTrackIndexStatePublisherImpl
 import com.paranid5.crescendo.data.states.tracks.CurrentTrackStateSubscriber
 import com.paranid5.crescendo.data.states.tracks.CurrentTrackStateSubscriberImpl
 import com.paranid5.crescendo.data.states.tracks.TrackOrderStatePublisher
@@ -26,6 +30,8 @@ class TracksViewModel(
     AudioStatusStatePublisher by AudioStatusStatePublisherImpl(storageHandler),
     TrackOrderStateSubscriber by TrackOrderStateSubscriberImpl(storageHandler),
     TrackOrderStatePublisher by TrackOrderStatePublisherImpl(storageHandler),
+    CurrentPlaylistStatePublisher by CurrentPlaylistStatePublisherImpl(currentPlaylistRepository),
+    CurrentTrackIndexStatePublisher by CurrentTrackIndexStatePublisherImpl(storageHandler),
     CurrentTrackStateSubscriber by CurrentTrackStateSubscriberImpl(storageHandler, currentPlaylistRepository),
     QueryStateHolder by QueryStateHolderImpl(),
     SearchBarStateHolder by SearchBarStateHolderImpl(),

@@ -6,7 +6,6 @@ import android.util.Log
 import com.paranid5.crescendo.MainApplication
 import com.paranid5.crescendo.TRACK_SERVICE_CONNECTION
 import com.paranid5.crescendo.domain.tracks.DefaultTrack
-import com.paranid5.crescendo.domain.tracks.Track
 import com.paranid5.crescendo.services.ServiceAccessor
 import com.paranid5.crescendo.services.ServiceAccessorImpl
 import com.paranid5.crescendo.services.stream_service.StreamService
@@ -28,24 +27,11 @@ class TrackServiceAccessor(application: MainApplication) : KoinComponent,
     private inline val isTrackServiceConnected
         get() = isTrackServiceConnectedState.value
 
-    private fun Intent.putTrack(track: DefaultTrack) =
-        apply { putExtra(TrackService.TRACK_ARG, track) }
-
-    private fun Intent.putPlaylistAndTrackIndexIfNotNull(
-        playlist: List<Track>?,
-        trackInd: Int
-    ) = apply {
-        if (playlist != null) {
-            putExtra(TrackService.PLAYLIST_ARG, playlist.toTypedArray())
-            putExtra(TrackService.TRACK_INDEX_ARG, trackInd)
-        }
-    }
-
-    private fun startTrackService(playlist: List<DefaultTrack>? = null, trackInd: Int = 0) {
-        Log.d(TAG, "send start TrackService")
+    private fun startTrackService(startType: TrackServiceStart) {
+        Log.d(TAG, "send start TrackService $startType")
 
         val serviceIntent = Intent(appContext, TrackService::class.java)
-            .putPlaylistAndTrackIndexIfNotNull(playlist, trackInd)
+            .putStartType(startType)
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
             appContext.startForegroundService(serviceIntent)
@@ -53,12 +39,12 @@ class TrackServiceAccessor(application: MainApplication) : KoinComponent,
             appContext.startService(serviceIntent)
     }
 
-    private fun switchPlaylist(playlist: List<DefaultTrack>, trackInd: Int) {
+    private fun switchPlaylist(startType: TrackServiceStart) {
         Log.d(TAG, "send switch playlist")
 
         sendBroadcast(
             Intent(TrackService.Broadcast_SWITCH_PLAYLIST)
-                .putPlaylistAndTrackIndexIfNotNull(playlist, trackInd)
+                .putExtra(TrackService.START_TYPE_ARG, startType)
         )
     }
 
@@ -76,25 +62,21 @@ class TrackServiceAccessor(application: MainApplication) : KoinComponent,
         )
     }
 
-    fun updatePlaylistAfterDrag(newPlaylist: List<Track>, newCurTrackIndex: Int) {
+    fun updatePlaylistAfterDrag() {
         Log.d(TAG, "Send update playlist after drag")
-
-        sendBroadcast(
-            Intent(TrackService.Broadcast_PLAYLIST_DRAGGED)
-                .putPlaylistAndTrackIndexIfNotNull(newPlaylist, newCurTrackIndex)
-        )
+        sendBroadcast(Intent(TrackService.Broadcast_PLAYLIST_DRAGGED))
     }
 
-    private fun launchTrackService(playlist: List<DefaultTrack>, trackInd: Int) = when {
-        isTrackServiceConnected -> switchPlaylist(playlist, trackInd)
-        else -> startTrackService(playlist, trackInd)
+    private fun launchTrackService(startType: TrackServiceStart) = when {
+        isTrackServiceConnected -> switchPlaylist(startType)
+        else -> startTrackService(startType)
     }
 
     private fun stopStreamService() = sendBroadcast(StreamService.Broadcast_STOP)
 
-    fun startPlaying(playlist: List<DefaultTrack>, trackInd: Int) {
+    fun startPlaying(startType: TrackServiceStart) {
         stopStreamService()
-        launchTrackService(playlist, trackInd)
+        launchTrackService(startType)
     }
 
     fun sendSwitchToPrevTrackBroadcast() = sendBroadcast(TrackService.Broadcast_PREV_TRACK)
@@ -115,9 +97,15 @@ class TrackServiceAccessor(application: MainApplication) : KoinComponent,
 
         when {
             isTrackServiceConnected -> sendResumeBroadcast()
-            else -> startTrackService()
+            else -> startTrackService(TrackServiceStart.RESUME)
         }
     }
 
     fun sendChangeRepeatBroadcast() = sendBroadcast(TrackService.Broadcast_REPEAT_CHANGED)
 }
+
+private fun Intent.putStartType(startType: TrackServiceStart) =
+    apply { putExtra(TrackService.START_TYPE_ARG, startType) }
+
+private fun Intent.putTrack(track: DefaultTrack) =
+    apply { putExtra(TrackService.TRACK_ARG, track) }

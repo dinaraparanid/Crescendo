@@ -1,5 +1,6 @@
 package com.paranid5.crescendo.services.video_cache_service.receivers
 
+import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import com.paranid5.crescendo.domain.utils.extensions.registerReceiverCompat
 import com.paranid5.crescendo.services.video_cache_service.VideoCacheService
 
@@ -10,8 +11,9 @@ fun VideoCacheService.registerReceivers() {
     registerReceiverCompat(cancelAllReceiver, VideoCacheService.Broadcast_CANCEL_ALL)
 }
 
-fun VideoCacheService.unregisterReceivers() {
-    unregisterReceiver(cacheNextVideoReceiver)
-    unregisterReceiver(cancelCurrentVideoReceiver)
-    unregisterReceiver(cancelAllReceiver)
-}
+fun VideoCacheService.unregisterReceivers() =
+    LocalBroadcastManager.getInstance(this).run {
+        unregisterReceiver(cacheNextVideoReceiver)
+        unregisterReceiver(cancelCurrentVideoReceiver)
+        unregisterReceiver(cancelAllReceiver)
+    }

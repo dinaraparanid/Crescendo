@@ -8,9 +8,6 @@ sealed interface PlaybackEvent {
     ) : PlaybackEvent
 
     data class StartNewPlaylist(
-        val playlist: List<Track>,
-        val trackIndex: Int,
-        val initialPosition: Long,
         private val id: Long = System.currentTimeMillis()
     ) : PlaybackEvent
 
@@ -46,8 +43,6 @@ sealed interface PlaybackEvent {
     ) : PlaybackEvent
 
     data class ReplacePlaylist(
-        val playlist: List<Track>,
-        val index: Int,
         private val id: Long = System.currentTimeMillis()
     ) : PlaybackEvent
 }

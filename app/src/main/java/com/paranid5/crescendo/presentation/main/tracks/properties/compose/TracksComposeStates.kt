@@ -34,7 +34,7 @@ fun TracksViewModel.collectShownTracksNumberAsState() =
     shownTracksNumberFlow.collectLatestAsState(initial = 0)
 
 @Composable
-internal fun currentTrack(
+internal fun currentTrackState(
     currentPlaylistRepository: CurrentPlaylistRepository = koinInject(),
     storageHandler: StorageHandler = koinInject(),
 ): State<Track?> {

@@ -2,6 +2,7 @@ package com.paranid5.crescendo.services.stream_service
 
 import android.content.Intent
 import com.paranid5.crescendo.R
+import com.paranid5.crescendo.domain.utils.extensions.sendBroadcastCompat
 import com.paranid5.crescendo.receivers.ServiceErrorReceiver
 import com.paranid5.crescendo.services.core.notification.ErrorNotification
 import com.paranid5.crescendo.services.stream_service.notification.STREAM_CHANNEL_ID
@@ -17,7 +18,7 @@ fun StreamService.showErrNotificationAndSendBroadcast(error: Throwable) {
 
     playerProvider.isStoppedWithError = true
 
-    sendBroadcast(
+    sendBroadcastCompat(
         Intent(applicationContext, ServiceErrorReceiver::class.java)
             .setAction(ServiceErrorReceiver.Broadcast_SERVICE_ERROR)
             .putExtra(ServiceErrorReceiver.ERROR_MESSAGE_ARG, errorMessage)

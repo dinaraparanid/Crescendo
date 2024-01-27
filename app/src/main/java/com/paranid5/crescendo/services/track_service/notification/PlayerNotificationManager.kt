@@ -125,8 +125,9 @@ private fun CustomActionsReceiver(service: TrackService) =
         override fun getCustomActions(player: Player) =
             CustomActions(player.repeatMode)
 
-        override fun onCustomAction(player: Player, action: String, intent: Intent) =
+        override fun onCustomAction(player: Player, action: String, intent: Intent) {
             service.sendBroadcast(service.commandsToActions[action]!!.playbackAction)
+        }
     }
 
 private inline val TrackService.trackTitle

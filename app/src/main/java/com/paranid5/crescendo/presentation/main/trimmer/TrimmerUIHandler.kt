@@ -13,6 +13,7 @@ import com.paranid5.crescendo.domain.tracks.Track
 import com.paranid5.crescendo.domain.trimming.FadeDurations
 import com.paranid5.crescendo.domain.trimming.PitchAndSpeed
 import com.paranid5.crescendo.domain.trimming.TrimRange
+import com.paranid5.crescendo.domain.utils.extensions.sendBroadcastCompat
 import com.paranid5.crescendo.media.tags.setAudioTags
 import com.paranid5.crescendo.presentation.UIHandler
 import com.paranid5.crescendo.receivers.TrimmingStatusReceiver
@@ -60,7 +61,7 @@ class TrimmerUIHandler : UIHandler {
         }
 
     private fun Context.sendTrimmingStatusBroadcast(trimmingResult: Either<Throwable, MediaFile.AudioFile>) =
-        sendBroadcast(
+        sendBroadcastCompat(
             Intent(applicationContext, TrimmingStatusReceiver::class.java)
                 .setAction(TrimmingStatusReceiver.Broadcast_TRIMMING_COMPLETED)
                 .putExtra(

@@ -11,6 +11,7 @@ import com.paranid5.crescendo.presentation.main.current_playlist.properties.comp
 import com.paranid5.crescendo.services.track_service.TrackServiceAccessor
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.toImmutableList
+import kotlinx.coroutines.delay
 import org.koin.compose.koinInject
 
 @Composable
@@ -36,7 +37,7 @@ fun CurrentPlaylistTrackList(
             )
         },
         onTrackDragged = { newTracks, newCurTrackIndex ->
-            updateCurrentPlaylist(
+            updateCurrentPlaylistAfterDrag(
                 newTracks = newTracks,
                 newCurTrackIndex = newCurTrackIndex,
                 viewModel = viewModel,
@@ -66,13 +67,15 @@ private fun tryDismissTrack(
     return true
 }
 
-private suspend fun updateCurrentPlaylist(
+private suspend fun updateCurrentPlaylistAfterDrag(
     newTracks: ImmutableList<Track>,
     newCurTrackIndex: Int,
     viewModel: CurrentPlaylistViewModel,
     trackServiceAccessor: TrackServiceAccessor
 ) {
-    viewModel.setCurrentPlaylist(newTracks)
     viewModel.setCurrentTrackIndex(newCurTrackIndex)
-    trackServiceAccessor.updatePlaylistAfterDrag(newTracks, newCurTrackIndex)
+    viewModel.setCurrentPlaylist(newTracks)
+
+    delay(500) // small delay to complete transaction and update event flow
+    trackServiceAccessor.updatePlaylistAfterDrag()
 }

@@ -22,10 +22,14 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.flow.updateAndGet
+import kotlinx.coroutines.withTimeout
+import kotlinx.coroutines.withTimeoutOrNull
 import java.io.File
 import java.util.concurrent.atomic.AtomicLong
 
 private const val TAG = "Ktor Client"
+
+private const val NEXT_PACKET_TIMEOUT = 3000L
 
 data class DownloadingProgress(val downloadedBytes: Long, val totalBytes: Long)
 
@@ -65,6 +69,7 @@ suspend fun HttpClient.downloadFile(
         .getOrNull()
 
     downloadingState.update { downloadingState.finishedValue }
+    println("Done, status: $status")
     return status
 }
 
@@ -146,7 +151,9 @@ private suspend inline fun HttpResponse.downloadFileImpl(
     val channel = bodyAsChannel().apply { discardExact(progress.get()) }
 
     while (!channel.isClosedForRead && downloadingState.value == DownloadingStatus.DOWNLOADING) {
-        val packet = channel.readRemaining(DEFAULT_BUFFER_SIZE.toLong())
+        val packet = withTimeoutOrNull(NEXT_PACKET_TIMEOUT) {
+            channel.readRemaining(DEFAULT_BUFFER_SIZE.toLong())
+        } ?: continue
 
         while (packet.isNotEmpty && downloadingState.value == DownloadingStatus.DOWNLOADING) {
             val bytes = packet.readBytes()

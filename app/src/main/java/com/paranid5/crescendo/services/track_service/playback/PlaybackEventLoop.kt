@@ -3,7 +3,6 @@ package com.paranid5.crescendo.services.track_service.playback
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.repeatOnLifecycle
 import arrow.core.Tuple4
-import arrow.core.Tuple5
 import com.paranid5.crescendo.R
 import com.paranid5.crescendo.domain.tracks.Track
 import com.paranid5.crescendo.services.track_service.TrackService
@@ -15,12 +14,12 @@ import kotlinx.coroutines.flow.distinctUntilChanged
 suspend fun TrackService.startPlaybackEventLoop() =
     lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
         playerProvider.playbackEventFlow
-            .combine(ArgsFlow(this@startPlaybackEventLoop)) { event, (trackInd, position, isPlaying, playlist) ->
-                Tuple5(event, trackInd, position, isPlaying, playlist)
+            .combine(ArgsFlow(this@startPlaybackEventLoop)) { event, (trackInd, position, playlist) ->
+                Tuple4(event, trackInd, position, playlist)
             }
-            .distinctUntilChanged { (e1, _, _, _, _), (e2, _, _, _, _) -> e1 == e2 }
-            .collectLatest { (event, trackInd, position, isPlaying, playlist) ->
-                onEvent(event, trackInd, position, isPlaying, playlist)
+            .distinctUntilChanged { (e1, _, _, _), (e2, _, _, _) -> e1 == e2 }
+            .collectLatest { (event, trackInd, position, playlist) ->
+                onEvent(event, trackInd, position, playlist)
             }
     }
 
@@ -28,17 +27,15 @@ private fun ArgsFlow(service: TrackService) =
     combine(
         service.playerProvider.currentTrackIndexFlow,
         service.playerProvider.tracksPlaybackPositionFlow,
-        service.playerProvider.isPlayingState,
         service.playerProvider.currentPlaylistFlow,
-    ) { trackIndex, position, isPlaying, playlist ->
-        Tuple4(trackIndex, position, isPlaying, playlist)
+    ) { trackIndex, position, playlist ->
+        Triple(trackIndex, position, playlist)
     }.distinctUntilChanged()
 
 private suspend inline fun TrackService.onEvent(
     event: PlaybackEvent,
     trackInd: Int,
     position: Long,
-    isPlaying: Boolean,
     playlist: List<Track>,
 ) = when (event) {
     is PlaybackEvent.StartSamePlaylist -> onPlayPlaylist(
@@ -48,13 +45,8 @@ private suspend inline fun TrackService.onEvent(
     )
 
     is PlaybackEvent.StartNewPlaylist -> onStartNewPlaylist(
-        currentPlaylist = playlist,
-        currentTrackIndex = trackInd,
-        currentPosition = position,
-        newPlaylist = event.playlist,
-        newTrackIndex = event.trackIndex,
-        newPosition = event.initialPosition,
-        isPlaying = isPlaying
+        newPlaylist = playlist,
+        newTrackIndex = trackInd,
     )
 
     is PlaybackEvent.Pause -> onPause()
@@ -78,59 +70,49 @@ private suspend inline fun TrackService.onEvent(
     is PlaybackEvent.RemoveTrackFromPlaylist -> onRemoveTrackFromPlaylist(event.index)
 
     is PlaybackEvent.ReplacePlaylist -> onReplacePlaylist(
-        newCurrentPlaylist = event.playlist,
-        newCurrentTrackIndex = event.index
+        newCurrentTrackIndex = trackInd,
+        newCurrentPlaylist = playlist
     )
 }
 
-private suspend inline fun TrackService.onPlayPlaylist(
+private fun TrackService.onPlayPlaylist(
     playlist: List<Track>,
     trackIndex: Int,
-    initialPosition: Long
+    initialPosition: Long = 0
 ) {
     if (playlist.isEmpty())
         return showErrNotificationAndSendBroadcast(Exception(getString(R.string.playlist_empty_err)))
 
     playerProvider.resetAudioSessionIdIfNotPlaying()
+
     playerProvider.playPlaylistViaPlayer(playlist, trackIndex, initialPosition)
-    playerProvider.setCurrentTrackIndex(trackIndex)
-    playerProvider.setCurrentPlaylist(playlist)
 }
 
-private suspend inline fun TrackService.onStartNewPlaylist(
-    currentPlaylist: List<Track>,
-    currentTrackIndex: Int,
-    currentPosition: Long,
+private fun TrackService.onStartNewPlaylist(
     newPlaylist: List<Track>,
     newTrackIndex: Int,
-    newPosition: Long,
-    isPlaying: Boolean,
-) {
-    val currentTrackPath = currentPlaylist.getOrNull(currentTrackIndex)?.path
-    val newTrackPath = newPlaylist[newTrackIndex].path
+) = onPlayPlaylist(
+    playlist = newPlaylist,
+    trackIndex = newTrackIndex,
+)
 
-    when {
-        newTrackPath == currentTrackPath && isPlaying -> onPause()
-
-        newTrackPath == currentTrackPath ->
-            onPlayPlaylist(newPlaylist, newTrackIndex, currentPosition)
-
-        else -> onPlayPlaylist(newPlaylist, newTrackIndex, newPosition)
-    }
-}
-
-private suspend fun TrackService.onPause() {
+private suspend inline fun TrackService.onPause() {
     playerProvider.setTracksPlaybackPosition(playerProvider.currentPosition)
     playerProvider.pausePlayer()
 }
 
-private suspend inline fun TrackService.onResume(
+private fun TrackService.onResume(
     playlist: List<Track>,
     trackIndex: Int,
     initialPosition: Long
 ) = when {
     playerProvider.isStoppedWithError -> {
-        onPlayPlaylist(playlist, trackIndex, initialPosition)
+        onPlayPlaylist(
+            playlist = playlist,
+            trackIndex = trackIndex,
+            initialPosition = initialPosition
+        )
+
         playerProvider.isStoppedWithError = false
     }
 
@@ -164,4 +146,6 @@ private fun TrackService.onRemoveTrackFromPlaylist(index: Int) {
 private fun TrackService.onReplacePlaylist(
     newCurrentTrackIndex: Int,
     newCurrentPlaylist: List<Track>
-) = playerProvider.replacePlaylistViaPlayer(newCurrentPlaylist, newCurrentTrackIndex)
+) {
+    playerProvider.replacePlaylistViaPlayer(newCurrentPlaylist, newCurrentTrackIndex)
+}

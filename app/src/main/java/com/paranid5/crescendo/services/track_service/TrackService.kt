@@ -4,29 +4,28 @@ import android.content.Intent
 import android.os.Build
 import com.paranid5.crescendo.data.StorageHandler
 import com.paranid5.crescendo.data.current_playlist.CurrentPlaylistRepository
-import com.paranid5.crescendo.domain.tracks.DefaultTrack
 import com.paranid5.crescendo.domain.tracks.Track
 import com.paranid5.crescendo.services.ConnectionManager
 import com.paranid5.crescendo.services.SuspendService
 import com.paranid5.crescendo.services.connect
 import com.paranid5.crescendo.services.core.media_session.MediaSessionManager
-import com.paranid5.crescendo.services.track_service.media_session.startMetadataMonitoring
 import com.paranid5.crescendo.services.core.notification.detachNotification
 import com.paranid5.crescendo.services.core.receivers.DismissNotificationReceiver
 import com.paranid5.crescendo.services.core.receivers.StopReceiver
 import com.paranid5.crescendo.services.disconnect
 import com.paranid5.crescendo.services.track_service.media_session.MediaSessionCallback
+import com.paranid5.crescendo.services.track_service.media_session.startMetadataMonitoring
 import com.paranid5.crescendo.services.track_service.media_session.startPlaybackStatesMonitoring
 import com.paranid5.crescendo.services.track_service.notification.NotificationManager
 import com.paranid5.crescendo.services.track_service.notification.startNotificationMonitoring
 import com.paranid5.crescendo.services.track_service.playback.PlayerProvider
+import com.paranid5.crescendo.services.track_service.playback.playPlaylistAsync
 import com.paranid5.crescendo.services.track_service.playback.startBassMonitoring
 import com.paranid5.crescendo.services.track_service.playback.startEqMonitoring
 import com.paranid5.crescendo.services.track_service.playback.startPlaybackEffectsMonitoring
+import com.paranid5.crescendo.services.track_service.playback.startPlaybackEventLoop
 import com.paranid5.crescendo.services.track_service.playback.startResumingAsync
 import com.paranid5.crescendo.services.track_service.playback.startReverbMonitoring
-import com.paranid5.crescendo.services.track_service.playback.playPlaylistAsync
-import com.paranid5.crescendo.services.track_service.playback.startPlaybackEventLoop
 import com.paranid5.crescendo.services.track_service.receivers.AddTrackReceiver
 import com.paranid5.crescendo.services.track_service.receivers.PauseReceiver
 import com.paranid5.crescendo.services.track_service.receivers.PlaylistDraggedReceiver
@@ -73,8 +72,8 @@ class TrackService : SuspendService(), KoinComponent,
         const val Broadcast_DISMISS_NOTIFICATION = "$SERVICE_LOCATION.DISMISS_NOTIFICATION"
         const val Broadcast_STOP = "$SERVICE_LOCATION.STOP"
 
+        const val START_TYPE_ARG = "start_type"
         const val TRACK_ARG = "track"
-        const val PLAYLIST_ARG = "playlist"
         const val TRACK_INDEX_ARG = "track_index"
         const val POSITION_ARG = "position"
     }
@@ -120,11 +119,6 @@ class TrackService : SuspendService(), KoinComponent,
     override fun onCreate() {
         super.onCreate()
         registerReceivers()
-    }
-
-    override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
-        super.onStartCommand(intent, flags, startId)
-        connect(startId)
 
         mediaSessionManager.initMediaSession(
             context = this,
@@ -134,16 +128,15 @@ class TrackService : SuspendService(), KoinComponent,
         notificationManager.initNotificationManager(playerProvider.player)
 
         launchMonitoringTasks()
+    }
 
-        val playlist = intent?.playlistArgOrNull
-        val trackInd = intent?.trackIndexArg
+    override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
+        super.onStartCommand(intent, flags, startId)
+        connect(startId)
 
-        when (playlist) {
-            // Resume received
-            null -> startResumingAsync()
-
-            // New playlist received
-            else -> playPlaylistAsync(playlist, trackInd!!)
+        when (intent!!.startType) {
+            TrackServiceStart.RESUME -> startResumingAsync()
+            TrackServiceStart.NEW_PLAYLIST -> playPlaylistAsync()
         }
 
         return START_STICKY
@@ -175,29 +168,25 @@ private fun TrackService.launchMonitoringTasks() {
 }
 
 @Suppress("DEPRECATION")
+internal inline val Intent.startType: TrackServiceStart
+    get() = when {
+        Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU ->
+            getSerializableExtra(TrackService.START_TYPE_ARG, TrackServiceStart::class.java)!!
+
+        else -> getSerializableExtra(TrackService.START_TYPE_ARG) as TrackServiceStart
+    }
+
+@Suppress("DEPRECATION")
 private inline val Intent.trackArgOrNull: Track?
     get() = when {
         Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU ->
-            getParcelableExtra(TrackService.TRACK_ARG, DefaultTrack::class.java)
+            getParcelableExtra(TrackService.TRACK_ARG, Track::class.java)
 
         else -> getParcelableExtra(TrackService.TRACK_ARG)
     }
 
-@Suppress("DEPRECATION")
-private inline val Intent.playlistArgOrNull: List<Track>?
-    @Suppress("UNCHECKED_CAST")
-    get() = when {
-        Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU ->
-            getParcelableArrayExtra(TrackService.PLAYLIST_ARG, DefaultTrack::class.java)
-
-        else -> getParcelableArrayExtra(TrackService.PLAYLIST_ARG) as Array<DefaultTrack>
-    }?.toList()
-
 internal inline val Intent.trackArg
     get() = trackArgOrNull!!
-
-internal inline val Intent.playlistArg
-    get() = playlistArgOrNull!!
 
 internal inline val Intent.trackIndexArg
     get() = getIntExtra(TrackService.TRACK_INDEX_ARG, 0)

@@ -75,8 +75,6 @@ class MediaFileDownloader : KoinComponent {
             downloadingState = _downloadStatusState,
         )
 
-        println(statusCode)
-
         return when (statusCode?.isSuccess()) {
             true -> CachingResult.DownloadResult.Success(listOf(curVideoCacheFile))
             false -> onError(statusCode, curVideoCacheFile)

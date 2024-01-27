@@ -57,17 +57,8 @@ class PlayerProvider(
             player.playbackParameters = value
         }
 
-    suspend fun playPlaylist(
-        playlist: List<Track>,
-        trackIndex: Int,
-        initialPosition: Long = 0
-    ) = _playbackEventFlow.emit(
-        PlaybackEvent.StartNewPlaylist(
-            playlist,
-            trackIndex,
-            initialPosition
-        )
-    )
+    suspend fun playPlaylist() =
+        _playbackEventFlow.emit(PlaybackEvent.StartNewPlaylist())
 
     suspend fun startResuming() =
         _playbackEventFlow.emit(PlaybackEvent.StartSamePlaylist())
@@ -93,13 +84,8 @@ class PlayerProvider(
     suspend fun removeTrackFromPlaylist(index: Int) =
         _playbackEventFlow.emit(PlaybackEvent.RemoveTrackFromPlaylist(index))
 
-    suspend fun replacePlaylist(newPlaylist: List<Track>, newCurrentTrackIndex: Int) =
-        _playbackEventFlow.emit(
-            PlaybackEvent.ReplacePlaylist(
-                newPlaylist,
-                newCurrentTrackIndex
-            )
-        )
+    suspend fun replacePlaylist() =
+        _playbackEventFlow.emit(PlaybackEvent.ReplacePlaylist())
 }
 
 suspend inline fun PlayerProvider.restartPlayer() = startResuming()

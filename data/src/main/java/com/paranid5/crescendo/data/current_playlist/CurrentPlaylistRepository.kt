@@ -31,13 +31,11 @@ class CurrentPlaylistRepository(driver: SqlDriver) :
             .map { it.map(CurrentPlaylistTrack::toTrack).toImmutableList() }
 
     fun replacePlaylistAsync(playlist: List<Track>): Job {
-        Exception("BEBRA").printStackTrace()
         return launch(Dispatchers.IO) { replacePlaylist(playlist) }
     }
 
     private fun replacePlaylist(playlist: List<Track>) =
         queries.transaction {
-            println("TRANSACTION: ${playlist.size}")
             queries.clearPlaylist()
 
             playlist.forEach {

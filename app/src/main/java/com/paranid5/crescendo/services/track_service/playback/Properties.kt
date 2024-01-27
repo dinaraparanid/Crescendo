@@ -11,10 +11,10 @@ fun TrackService.startResumingAsync() =
         playerProvider.startResuming()
     }
 
-fun TrackService.playPlaylistAsync(playlist: List<Track>, trackIndex: Int) =
+fun TrackService.playPlaylistAsync() =
     serviceScope.launch {
         delay(500)
-        playerProvider.playPlaylist(playlist, trackIndex)
+        playerProvider.playPlaylist()
     }
 
 fun TrackService.resumeAsync() =
@@ -38,8 +38,8 @@ fun TrackService.addTrackToPlaylistAsync(track: Track) =
 fun TrackService.removeTrackFromPlaylistAsync(index: Int) =
     serviceScope.launch { playerProvider.removeTrackFromPlaylist(index) }
 
-fun TrackService.replacePlaylistAsync(newPlaylist: List<Track>, newCurrentTrackIndex: Int) =
-    serviceScope.launch { playerProvider.replacePlaylist(newPlaylist, newCurrentTrackIndex) }
+fun TrackService.replacePlaylistAsync() =
+    serviceScope.launch { playerProvider.replacePlaylist() }
 
 fun TrackService.restartPlayerAsync() =
     serviceScope.launch { playerProvider.restartPlayer() }
