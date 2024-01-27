@@ -62,11 +62,12 @@ fun UpdateCheckerDialog(modifier: Modifier = Modifier, ktorClient: HttpClient = 
             Card(
                 shape = RoundedCornerShape(20.dp),
                 colors = CardDefaults.cardColors(containerColor = colors.background),
-                modifier = modifier
-                    .fillMaxWidth()
-                    .padding(10.dp)
+                modifier = modifier.fillMaxWidth()
             ) {
-                UpdateCheckerDialogContent(newVersion = newVersion!!)
+                UpdateCheckerDialogContent(
+                    newVersion = newVersion!!,
+                    modifier = Modifier.padding(10.dp)
+                )
             }
         }
 }
@@ -74,7 +75,10 @@ fun UpdateCheckerDialog(modifier: Modifier = Modifier, ktorClient: HttpClient = 
 @Composable
 private fun UpdateCheckerDialogContent(newVersion: Release, modifier: Modifier = Modifier) =
     Column(modifier) {
-        VersionLabel(versionName = newVersion.name)
+        VersionLabel(
+            versionName = newVersion.name,
+            modifier = Modifier.align(Alignment.CenterHorizontally)
+        )
 
         Spacer(Modifier.height(20.dp))
 
@@ -97,7 +101,7 @@ private fun VersionLabel(versionName: String, modifier: Modifier = Modifier) {
         color = colors.primary,
         fontSize = 8.sp,
         maxLines = 1,
-        modifier = modifier.simpleShadow(elevation = 20.dp)
+        modifier = modifier.simpleShadow(elevation = 25.dp)
     )
 }
 
