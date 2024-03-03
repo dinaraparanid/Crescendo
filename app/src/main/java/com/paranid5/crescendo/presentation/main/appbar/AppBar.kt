@@ -37,7 +37,7 @@ fun AppBar(modifier: Modifier = Modifier) {
             screen = Screens.Tracks,
             modifier = Modifier
                 .weight(1F)
-                .padding(top = 5.dp)
+                .padding(top = 12.dp)
         )
 
         AppBarItem(
@@ -46,7 +46,7 @@ fun AppBar(modifier: Modifier = Modifier) {
             screen = Screens.TrackCollections.Albums,
             modifier = Modifier
                 .weight(1F)
-                .padding(top = 5.dp)
+                .padding(top = 12.dp)
         )
 
         AppBarItem(
@@ -55,7 +55,7 @@ fun AppBar(modifier: Modifier = Modifier) {
             screen = Screens.StreamFetching,
             modifier = Modifier
                 .weight(1F)
-                .padding(top = 5.dp)
+                .padding(top = 12.dp)
         )
 
         AppBarItem(
@@ -64,7 +64,7 @@ fun AppBar(modifier: Modifier = Modifier) {
             screen = Screens.Favourites,
             modifier = Modifier
                 .weight(1F)
-                .padding(top = 5.dp)
+                .padding(top = 12.dp)
         )
 
         AppBarItem(
@@ -73,7 +73,7 @@ fun AppBar(modifier: Modifier = Modifier) {
             screen = Screens.Settings,
             modifier = Modifier
                 .weight(1F)
-                .padding(top = 5.dp)
+                .padding(top = 12.dp)
         )
     }
 }
@@ -81,6 +81,6 @@ fun AppBar(modifier: Modifier = Modifier) {
 inline val appBarHeight
     @Composable
     get() = when (LocalConfiguration.current.orientation) {
-        Configuration.ORIENTATION_LANDSCAPE -> 60.dp
-        else -> 80.dp
+        Configuration.ORIENTATION_LANDSCAPE -> 80.dp
+        else -> 110.dp
     }

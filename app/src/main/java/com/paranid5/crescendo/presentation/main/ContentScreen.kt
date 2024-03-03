@@ -1,12 +1,17 @@
 package com.paranid5.crescendo.presentation.main
 
+import android.content.res.Configuration
 import android.widget.Toast
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.calculateEndPadding
+import androidx.compose.foundation.layout.calculateStartPadding
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -38,6 +43,7 @@ fun ContentScreen(
     val activity = LocalActivity.current
     val playingSheetState = LocalPlayingSheetState.current
     val currentPlaylistSheetState = LocalCurrentPlaylistSheetState.current
+    val layoutDirection = LocalLayoutDirection.current
 
     OnBackPressedHandler { isStackEmpty ->
         if (currentPlaylistSheetState?.isVisible == true) {
@@ -73,7 +79,9 @@ fun ContentScreen(
         startDestination = Screens.Tracks.title,
         modifier = Modifier.padding(
             top = padding.calculateTopPadding(),
-            bottom = padding.calculateBottomPadding()
+            bottom = padding.calculateBottomPadding(),
+            start = padding.calculateStartPadding(layoutDirection),
+            end = padding.calculateEndPadding(layoutDirection)
         )
     ) {
         composable(route = Screens.Tracks.title) {
@@ -82,7 +90,11 @@ fun ContentScreen(
             TracksScreen(
                 Modifier
                     .fillMaxSize()
-                    .padding(10.dp)
+                    .padding(
+                        top = topPadding,
+                        start = 8.dp,
+                        end = endPadding
+                    )
             )
         }
 
@@ -98,12 +110,27 @@ fun ContentScreen(
 
         composable(route = Screens.Audio.AudioEffects.title) {
             viewModel.setCurScreen(Screens.Audio.AudioEffects)
-            AudioEffectsScreen(Modifier.padding(horizontal = 10.dp))
+
+            AudioEffectsScreen(
+                Modifier.padding(
+                    top = topPadding,
+                    start = 8.dp,
+                    end = endPadding
+                )
+            )
         }
 
         composable(route = Screens.Audio.Trimmer.title) {
             viewModel.setCurScreen(Screens.Audio.Trimmer)
-            TrimmerScreen(Modifier.fillMaxSize())
+            TrimmerScreen(
+                Modifier
+                    .fillMaxSize()
+                    .padding(
+                        top = topPadding,
+                        start = 8.dp,
+                        end = endPadding
+                    )
+            )
         }
 
         composable(route = Screens.AboutApp.title) {
@@ -122,3 +149,17 @@ fun ContentScreen(
         }
     }
 }
+
+private inline val topPadding
+    @Composable
+    get() = when (LocalConfiguration.current.orientation) {
+        Configuration.ORIENTATION_LANDSCAPE -> 16.dp
+        else -> 48.dp
+    }
+
+private inline val endPadding
+    @Composable
+    get() = when (LocalConfiguration.current.orientation) {
+        Configuration.ORIENTATION_LANDSCAPE -> 40.dp
+        else -> 8.dp
+    }

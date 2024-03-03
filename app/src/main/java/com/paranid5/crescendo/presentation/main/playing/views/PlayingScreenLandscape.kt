@@ -59,7 +59,7 @@ fun PlayingScreenLandscape(
                 height = Dimension.fillToConstraints
 
                 start.linkTo(parent.start, margin = 20.dp)
-                end.linkTo(parent.end, margin = 20.dp)
+                end.linkTo(parent.end, margin = 48.dp)
                 width = Dimension.fillToConstraints
             }
         )
@@ -85,8 +85,8 @@ fun PlayingScreenLandscape(
             palette = palette,
             audioStatus = audioStatus,
             modifier = Modifier.constrainAs(propertiesButton) {
-                top.linkTo(parent.top, margin = 8.dp)
-                end.linkTo(parent.end, margin = 5.dp)
+                top.linkTo(parent.top, margin = 12.dp)
+                end.linkTo(parent.end, margin = 32.dp)
             },
         )
 
@@ -108,7 +108,7 @@ fun PlayingScreenLandscape(
                 top.linkTo(parent.top, margin = 20.dp)
                 bottom.linkTo(parent.bottom)
                 start.linkTo(parent.start, margin = 20.dp)
-                end.linkTo(parent.end, margin = 20.dp)
+                end.linkTo(parent.end, margin = 48.dp)
                 width = Dimension.fillToConstraints
             }
         )
@@ -117,7 +117,7 @@ fun PlayingScreenLandscape(
             audioStatus = audioStatus,
             palette = palette,
             modifier = Modifier.constrainAs(playbackButtons) {
-                top.linkTo(slider.bottom, margin = 5.dp)
+                bottom.linkTo(utilsButtons.top, margin = 2.dp)
                 start.linkTo(parent.start, margin = 20.dp)
                 end.linkTo(parent.end, margin = 20.dp)
                 width = Dimension.fillToConstraints
@@ -128,7 +128,7 @@ fun PlayingScreenLandscape(
             palette = palette,
             audioStatus = audioStatus,
             modifier = Modifier.constrainAs(utilsButtons) {
-                top.linkTo(playbackButtons.bottom, margin = 2.dp)
+                bottom.linkTo(parent.bottom, margin = 16.dp)
                 start.linkTo(parent.start, margin = 20.dp)
                 end.linkTo(parent.end, margin = 20.dp)
                 width = Dimension.fillToConstraints

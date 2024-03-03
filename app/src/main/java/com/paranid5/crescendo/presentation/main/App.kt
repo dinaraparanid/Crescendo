@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.material.BottomSheetScaffold
+import androidx.compose.material.BottomSheetScaffoldState
 import androidx.compose.material.BottomSheetValue
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.ModalBottomSheetValue
@@ -18,10 +19,10 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import com.paranid5.crescendo.presentation.UpdateCheckerDialog
-import com.paranid5.crescendo.presentation.main.appbar.appBarHeight
 import com.paranid5.crescendo.presentation.composition_locals.LocalCurrentPlaylistSheetState
 import com.paranid5.crescendo.presentation.composition_locals.playing.LocalPlayingPagerState
 import com.paranid5.crescendo.presentation.composition_locals.playing.LocalPlayingSheetState
+import com.paranid5.crescendo.presentation.main.appbar.appBarHeight
 import com.paranid5.crescendo.presentation.ui.permissions.requests.externalStoragePermissionsRequestLauncher
 import com.paranid5.crescendo.presentation.ui.theme.LocalAppColors
 
@@ -52,10 +53,6 @@ private fun ScreenScaffold(modifier: Modifier = Modifier) {
     val backgroundColor = LocalAppColors.current.colorScheme.background
 
     val playingScaffoldState = rememberBottomSheetScaffoldState()
-    val sheetState = playingScaffoldState.bottomSheetState
-    val progress = sheetState.progress
-    val targetValue = sheetState.targetValue
-    val currentValue = sheetState.currentValue
 
     val curPlaylistScaffoldState = rememberModalBottomSheetState(
         initialValue = ModalBottomSheetValue.Hidden,
@@ -63,12 +60,7 @@ private fun ScreenScaffold(modifier: Modifier = Modifier) {
 
     val playingPagerState = rememberPagerState { 2 }
 
-    val alpha = when {
-        currentValue == BottomSheetValue.Collapsed && targetValue == BottomSheetValue.Collapsed -> 1F
-        currentValue == BottomSheetValue.Expanded && targetValue == BottomSheetValue.Expanded -> 0F
-        currentValue == BottomSheetValue.Expanded && targetValue == BottomSheetValue.Collapsed -> progress
-        else -> 1 - progress
-    }
+    val alpha = bottomSheetPushAlpha(playingScaffoldState)
 
     CompositionLocalProvider(
         LocalPlayingSheetState provides playingScaffoldState,
@@ -81,8 +73,25 @@ private fun ScreenScaffold(modifier: Modifier = Modifier) {
             sheetPeekHeight = appBarHeight,
             backgroundColor = backgroundColor,
             sheetBackgroundColor = backgroundColor,
-            sheetContent = { PlayingBottomSheet(alpha) },
+            sheetContent = {
+                PlayingBottomSheet(alpha)
+            },
             content = { ContentScreen(padding = it) }
         )
+    }
+}
+
+@OptIn(ExperimentalMaterialApi::class)
+private fun bottomSheetPushAlpha(state: BottomSheetScaffoldState): Float {
+    val sheetState = state.bottomSheetState
+    val progress = sheetState.progress
+    val targetValue = sheetState.targetValue
+    val currentValue = sheetState.currentValue
+
+    return when {
+        currentValue == BottomSheetValue.Collapsed && targetValue == BottomSheetValue.Collapsed -> 1F
+        currentValue == BottomSheetValue.Expanded && targetValue == BottomSheetValue.Expanded -> 0F
+        currentValue == BottomSheetValue.Expanded && targetValue == BottomSheetValue.Collapsed -> progress
+        else -> 1 - progress
     }
 }

@@ -51,7 +51,7 @@ private fun CurrentPlaylistDuration(
         text = "${stringResource(R.string.duration)}: $totalDurationText",
         color = colors.primary,
         fontSize = 14.sp,
-        textAlign = TextAlign.Start,
+        textAlign = TextAlign.End,
         modifier = modifier
     )
 }

@@ -10,6 +10,8 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.BottomSheetValue
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.ModalBottomSheetLayout
+import androidx.compose.material.ModalBottomSheetState
+import androidx.compose.material.ModalBottomSheetValue
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -50,7 +52,12 @@ fun PlayingBottomSheet(
         ModalBottomSheetLayout(
             modifier = modifier,
             sheetState = curPlaylistScaffoldState,
-            sheetContent = { CurrentPlaylistBottomSheet(alpha) },
+            sheetContent = {
+                CurrentPlaylistBottomSheet(
+                    alpha = alpha,
+                    state = curPlaylistScaffoldState
+                )
+            },
             sheetBackgroundColor = backgroundColor,
             sheetShape = RoundedCornerShape(topStart = 20.dp, topEnd = 20.dp)
         ) {
@@ -91,9 +98,11 @@ fun PlayingBottomSheet(
     }
 }
 
+@OptIn(ExperimentalMaterialApi::class)
 @Composable
 private fun CurrentPlaylistBottomSheet(
     alpha: Float,
+    state: ModalBottomSheetState,
     modifier: Modifier = Modifier,
 ) = Box(modifier) {
     PushUpButton(
@@ -106,9 +115,31 @@ private fun CurrentPlaylistBottomSheet(
     CurrentPlaylistScreen(
         Modifier
             .fillMaxSize()
-            .padding(top = 24.dp)
+            .padding(top = contentTopPadding(state))
     )
 }
+
+@OptIn(ExperimentalMaterialApi::class)
+@Composable
+private fun contentTopPadding(sheetState: ModalBottomSheetState) =
+    when (LocalConfiguration.current.orientation) {
+        Configuration.ORIENTATION_LANDSCAPE -> 24.dp
+
+        else -> {
+            val progress = sheetState.progress
+            val targetValue = sheetState.targetValue
+            val currentValue = sheetState.currentValue
+
+            when {
+                targetValue == ModalBottomSheetValue.Hidden -> 8.dp
+                currentValue == ModalBottomSheetValue.Hidden && targetValue == ModalBottomSheetValue.HalfExpanded -> 8.dp
+                currentValue == ModalBottomSheetValue.HalfExpanded && targetValue == ModalBottomSheetValue.HalfExpanded -> 8.dp
+                currentValue == ModalBottomSheetValue.Expanded && targetValue == ModalBottomSheetValue.Expanded -> 32.dp
+                currentValue == ModalBottomSheetValue.Expanded && targetValue == ModalBottomSheetValue.HalfExpanded -> ((1 - progress) * 24 + 8).dp
+                else -> (progress * 24 + 8).dp
+            }
+        }
+    }
 
 private inline val pushUpPadding
     @Composable
