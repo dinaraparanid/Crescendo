@@ -122,6 +122,7 @@ fun ContentScreen(
 
         composable(route = Screens.Audio.Trimmer.title) {
             viewModel.setCurScreen(Screens.Audio.Trimmer)
+
             TrimmerScreen(
                 Modifier
                     .fillMaxSize()

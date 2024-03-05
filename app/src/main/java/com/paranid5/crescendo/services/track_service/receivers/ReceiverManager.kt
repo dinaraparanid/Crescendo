@@ -1,6 +1,5 @@
 package com.paranid5.crescendo.services.track_service.receivers
 
-import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import com.paranid5.crescendo.domain.utils.extensions.registerReceiverCompat
 import com.paranid5.crescendo.services.track_service.TrackService
 
@@ -20,18 +19,17 @@ internal fun TrackService.registerReceivers() {
     registerReceiverCompat(stopReceiver, TrackService.Broadcast_STOP)
 }
 
-internal fun TrackService.unregisterReceiver() =
-    LocalBroadcastManager.getInstance(this).run {
-        unregisterReceiver(pauseReceiver)
-        unregisterReceiver(resumeReceiver)
-        unregisterReceiver(switchPlaylistReceiver)
-        unregisterReceiver(seekToReceiver)
-        unregisterReceiver(seekToNextTrackReceiver)
-        unregisterReceiver(seekToPrevTrackReceiver)
-        unregisterReceiver(repeatChangedReceiver)
-        unregisterReceiver(addTrackReceiver)
-        unregisterReceiver(removeTrackReceiver)
-        unregisterReceiver(playlistDraggedReceiver)
-        unregisterReceiver(dismissNotificationReceiver)
-        unregisterReceiver(stopReceiver)
-    }
+internal fun TrackService.unregisterReceiver() {
+    unregisterReceiver(pauseReceiver)
+    unregisterReceiver(resumeReceiver)
+    unregisterReceiver(switchPlaylistReceiver)
+    unregisterReceiver(seekToReceiver)
+    unregisterReceiver(seekToNextTrackReceiver)
+    unregisterReceiver(seekToPrevTrackReceiver)
+    unregisterReceiver(repeatChangedReceiver)
+    unregisterReceiver(addTrackReceiver)
+    unregisterReceiver(removeTrackReceiver)
+    unregisterReceiver(playlistDraggedReceiver)
+    unregisterReceiver(dismissNotificationReceiver)
+    unregisterReceiver(stopReceiver)
+}

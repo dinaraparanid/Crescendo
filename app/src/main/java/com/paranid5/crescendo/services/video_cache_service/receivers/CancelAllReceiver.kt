@@ -8,6 +8,7 @@ import com.paranid5.crescendo.services.video_cache_service.VideoCacheService
 fun CancelAllReceiver(service: VideoCacheService) =
     object : BroadcastReceiver() {
         override fun onReceive(context: Context?, intent: Intent?) {
+            println("CANCEL ALL RECEIVED")
             service.mediaFileDownloader.onCanceledAll()
             service.cacheManager.onCanceledAll()
             service.videoQueueManager.onCanceledAll()

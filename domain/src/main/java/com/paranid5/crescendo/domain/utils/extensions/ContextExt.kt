@@ -5,15 +5,18 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
-import androidx.localbroadcastmanager.content.LocalBroadcastManager
+import android.os.Build
 
 @SuppressLint("UnspecifiedRegisterReceiverFlag")
 fun Context.registerReceiverCompat(
     receiver: BroadcastReceiver,
     filter: IntentFilter,
-) = LocalBroadcastManager
-    .getInstance(this)
-    .registerReceiver(receiver, filter)
+) = when {
+    Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU ->
+        registerReceiver(receiver, filter, Context.RECEIVER_NOT_EXPORTED)
+
+    else -> registerReceiver(receiver, filter)
+}
 
 fun Context.registerReceiverCompat(
     receiver: BroadcastReceiver,
@@ -24,11 +27,4 @@ fun Context.registerReceiverCompat(
 )
 
 fun Context.sendBroadcast(action: String) =
-    LocalBroadcastManager
-        .getInstance(this)
-        .sendBroadcast(Intent(action))
-
-fun Context.sendBroadcastCompat(intent: Intent) =
-    LocalBroadcastManager
-        .getInstance(this)
-        .sendBroadcast(intent)
+    sendBroadcast(Intent(action))
