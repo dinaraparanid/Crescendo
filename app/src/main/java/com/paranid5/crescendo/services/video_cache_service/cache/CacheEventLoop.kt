@@ -19,7 +19,7 @@ suspend fun VideoCacheService.startCacheEventLoop() =
             .filterNot { _ ->
                 val downloadSt = mediaFileDownloader.downloadStatusState.value
                 val cacheSt = cacheManager.cachingStatusState.value
-                downloadSt == DownloadingStatus.CANCELED_ALL || cacheSt == CachingStatus.CANCELED_ALL
+                downloadSt == DownloadingStatus.CanceledAll || cacheSt == CachingStatus.CANCELED_ALL
             }
             .collect { video -> onCaching(video) }
     }
@@ -28,10 +28,12 @@ private suspend inline fun VideoCacheService.onCaching(videoData: VideoCacheData
     mediaFileDownloader.prepareForNewVideo()
     cacheManager.prepareForNewVideo()
 
-    extractMediaFilesAndStartCaching(
-        ytUrl = videoData.url,
-        desiredFilename = videoData.desiredFilename,
-        format = videoData.format,
-        trimRange = videoData.trimRange
-    ).getOrNull()?.let(this::reportCachingResult)
+    reportCachingResult(
+        extractMediaFilesAndStartCaching(
+            ytUrl = videoData.url,
+            desiredFilename = videoData.desiredFilename,
+            format = videoData.format,
+            trimRange = videoData.trimRange
+        )
+    )
 }

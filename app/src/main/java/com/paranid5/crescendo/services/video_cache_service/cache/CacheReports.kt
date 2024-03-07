@@ -8,7 +8,7 @@ import com.paranid5.crescendo.services.video_cache_service.VideoCacheService
 
 fun VideoCacheService.reportCachingResult(cachingResult: CachingResult) =
     when (cachingResult) {
-        is CachingResult.DownloadResult.Success -> true
+        is CachingResult.DownloadResult.Success -> Unit
 
         CachingResult.DownloadResult.FileCreationError -> reportFileCreationError()
 

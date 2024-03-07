@@ -2,14 +2,13 @@ package com.paranid5.crescendo.domain.ktor_client
 
 import android.util.Log
 import arrow.core.Either
-import com.paranid5.crescendo.domain.caching.DownloadError
+import arrow.core.raise.nullable
 import com.paranid5.crescendo.domain.caching.DownloadingStatus
 import com.paranid5.crescendo.domain.caching.isCanceled
 import io.ktor.client.HttpClient
 import io.ktor.client.request.header
 import io.ktor.client.request.prepareGet
 import io.ktor.client.statement.HttpResponse
-import io.ktor.client.statement.HttpStatement
 import io.ktor.client.statement.bodyAsChannel
 import io.ktor.http.HttpHeaders
 import io.ktor.http.HttpStatusCode
@@ -19,10 +18,8 @@ import io.ktor.utils.io.cancel
 import io.ktor.utils.io.core.isNotEmpty
 import io.ktor.utils.io.core.readBytes
 import kotlinx.coroutines.coroutineScope
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.flow.updateAndGet
 import kotlinx.coroutines.withTimeoutOrNull
@@ -33,13 +30,9 @@ private const val TAG = "Ktor Client"
 
 private const val NEXT_PACKET_TIMEOUT = 3000L
 
-private const val RETRY_DELAY = 5000L
-
 data class DownloadingProgress(val downloadedBytes: Long, val totalBytes: Long)
 
 data class UrlWithFile(val fileUrl: String, val file: File)
-
-private data class RequestWithFile(val request: HttpStatement, val file: File)
 
 /**
  * Downloads file from given url until file is downloaded or task is canceled
@@ -60,44 +53,22 @@ suspend fun HttpClient.downloadFile(
 ): HttpStatusCode? {
     val progress = AtomicLong()
 
-    val status = downloadFileFlow(
+    val status = downloadFileResult(
         fileUrl = fileUrl,
         storeFile = storeFile,
         fileProgress = progress,
         downloadingState = downloadingState,
         totalProgressState = totalProgressState,
         totalBytes = { it.totalBytes }
-    )
-        .first { it.isNotFailure() }
-        .getOrNull()
+    ).getOrNull()
 
-    downloadingState.update { downloadingState.finishedValue }
-    println("Done, status: $status")
+    downloadingState.updatedToFinishedValue()
+    Log.d(TAG, "Done, status: $status")
     return status
 }
 
-private inline fun HttpClient.downloadFileFlow(
-    fileUrl: String,
-    storeFile: File,
-    fileProgress: AtomicLong,
-    downloadingState: MutableStateFlow<DownloadingStatus>,
-    totalProgressState: MutableStateFlow<DownloadingProgress>?,
-    crossinline totalBytes: (response: HttpResponse) -> Long
-) = flow {
-    while (true)
-        emit(
-            downloadFileResult(
-                fileUrl = fileUrl,
-                storeFile = storeFile,
-                fileProgress = fileProgress,
-                downloadingState = downloadingState,
-                totalProgressState = totalProgressState,
-                totalBytes = totalBytes
-            )
-        )
-}
-
-private suspend inline fun HttpClient.downloadFileResult(
+context(HttpClient)
+private suspend inline fun downloadFileResult(
     fileUrl: String,
     storeFile: File,
     fileProgress: AtomicLong,
@@ -109,10 +80,8 @@ private suspend inline fun HttpClient.downloadFileResult(
         return@catch null
 
     prepareFileGet(url = fileUrl, progress = fileProgress.get()).execute { response ->
-        if (!response.status.isSuccess()) {
-            Log.d(TAG, "ERROR: ${response.status}")
+        if (!response.status.isSuccess())
             return@execute response.status
-        }
 
         response.downloadFileImpl(
             downloadingState = downloadingState,
@@ -137,15 +106,11 @@ private suspend inline fun HttpClient.downloadFileResult(
 
 suspend fun HttpClient.downloadFiles(
     downloadingState: MutableStateFlow<DownloadingStatus>,
-    errorState: MutableStateFlow<DownloadError>,
     progressState: MutableStateFlow<DownloadingProgress>? = null,
     vararg files: UrlWithFile
-): HttpStatusCode? = coroutineScope {
-    downloadFilesUntilError(downloadingState, progressState, errorState, *files)
-
-    downloadingState
-        .updateAndGet { downloadingState.finishedValue }
-        .httpStatusCode(errorState)
+): DownloadingStatus = coroutineScope {
+    downloadFilesUntilError(downloadingState, progressState, *files)
+    downloadingState.updatedToFinishedValue()
 }
 
 private suspend inline fun HttpResponse.downloadFileImpl(
@@ -157,12 +122,12 @@ private suspend inline fun HttpResponse.downloadFileImpl(
 ): HttpStatusCode? {
     val channel = bodyAsChannel()
 
-    while (!channel.isClosedForRead && downloadingState.value == DownloadingStatus.DOWNLOADING) {
+    while (!channel.isClosedForRead && downloadingState.value == DownloadingStatus.Downloading) {
         val packet = withTimeoutOrNull(NEXT_PACKET_TIMEOUT) {
             channel.readRemaining(DEFAULT_BUFFER_SIZE.toLong())
         } ?: continue
 
-        while (packet.isNotEmpty && downloadingState.value == DownloadingStatus.DOWNLOADING) {
+        while (packet.isNotEmpty && downloadingState.value == DownloadingStatus.Downloading) {
             val bytes = packet.readBytes()
             fileProgress.addAndGet(bytes.size.toLong())
             storeFile.appendBytes(bytes)
@@ -176,50 +141,61 @@ private suspend inline fun HttpResponse.downloadFileImpl(
     channel.cancel()
 
     return when (downloadingState.finishedValue) {
-        DownloadingStatus.CANCELED_ALL, DownloadingStatus.CANCELED_CUR -> null
+        DownloadingStatus.CanceledAll, DownloadingStatus.CanceledCurrent -> null
         else -> status
     }
 }
 
-private suspend inline fun List<RequestWithFile>.firstFailure() =
-    map { (request, _) -> request.execute { it.status } }
-        .firstOrNull { !it.isSuccess() }
-
-private suspend inline fun List<RequestWithFile>.bytesPerFile() =
-    map { (request, _) -> request.execute { response -> response.contentLength()!! } }
-
-private suspend inline fun HttpClient.downloadFilesUntilError(
+context(HttpClient)
+private suspend fun downloadFilesUntilError(
     downloadingState: MutableStateFlow<DownloadingStatus>,
     totalProgressState: MutableStateFlow<DownloadingProgress>?,
-    errorState: MutableStateFlow<DownloadError>,
     vararg files: UrlWithFile
-) = files.firstOrNull { (fileUrl, storeFile) ->
-    val progress = AtomicLong()
+): UrlWithFile? {
+    downloadingState.update { DownloadingStatus.Downloading }
 
-    val status = downloadFileFlow(
-        fileUrl = fileUrl,
-        storeFile = storeFile,
-        fileProgress = progress,
-        downloadingState = downloadingState,
-        totalProgressState = totalProgressState,
-    ) { it.totalBytes } // TODO: get full content len
-        .first { it.isNotFailure() }
-        .getOrNull()
+    suspend fun downloadSingleFile(
+        fileUrl: String,
+        storeFile: File,
+        totalBytes: Long
+    ): Boolean {
+        val progress = AtomicLong()
 
-    val isOk = status?.isSuccess() == true
+        val status = downloadFileResult(
+            fileUrl = fileUrl,
+            storeFile = storeFile,
+            fileProgress = progress,
+            downloadingState = downloadingState,
+            totalProgressState = totalProgressState,
+            totalBytes = { totalBytes }
+        ).getOrNull()
 
-    if (!isOk && status != null)
-        errorState.update { DownloadError(status.value, status.description) }
+        return status?.isSuccess() != false
+    }
 
-    !isOk
+    return nullable {
+        val totalBytes = files
+            .map { contentLength(it.fileUrl) }
+            .bindAll()
+            .sum()
+
+        files.firstOrNull { (fileUrl, storeFile) ->
+            !downloadSingleFile(fileUrl, storeFile, totalBytes)
+        }.bind()
+    }
 }
 
-private suspend inline fun HttpClient.prepareFileGet(
+context(HttpClient)
+private suspend inline fun prepareFileGet(
     url: String,
     progress: Long,
 ) = prepareGet(url) {
     header(HttpHeaders.Range, "bytes=$progress-")
 }
+
+context(HttpClient)
+private suspend inline fun contentLength(url: String) =
+    prepareGet(url).execute { if (it.status.isSuccess()) it.contentLength() else null }
 
 private inline val HttpResponse.totalBytes
     get() = headers[HttpHeaders.ContentRange]
@@ -229,19 +205,14 @@ private inline val HttpResponse.totalBytes
         ?: contentLength()
         ?: 0L
 
-private inline val MutableStateFlow<DownloadingStatus>.finishedValue
-    get() = when (value) {
-        DownloadingStatus.DOWNLOADING -> DownloadingStatus.DOWNLOADED
-        else -> value
-    }
+private fun MutableStateFlow<DownloadingStatus>.updatedToFinishedValue() =
+    updateAndGet { it.finished }
 
-private fun DownloadingStatus.httpStatusCode(errorState: MutableStateFlow<DownloadError>) =
-    when (this) {
-        DownloadingStatus.CANCELED_CUR -> null
-        DownloadingStatus.CANCELED_ALL -> null
-        DownloadingStatus.DOWNLOADED -> HttpStatusCode.OK
-        else -> HttpStatusCode(errorState.value.errorCode, errorState.value.errorDescription)
-    }
+private inline val StateFlow<DownloadingStatus>.finishedValue
+    get() = value.finished
 
-private suspend inline fun Either<Throwable, HttpStatusCode?>.isNotFailure() =
-    isRight { it?.isSuccess() != false }.also { if (!it) delay(RETRY_DELAY) }
+private inline val DownloadingStatus.finished
+    get() = when (this) {
+        DownloadingStatus.Downloading -> DownloadingStatus.Downloaded
+        else -> this
+    }

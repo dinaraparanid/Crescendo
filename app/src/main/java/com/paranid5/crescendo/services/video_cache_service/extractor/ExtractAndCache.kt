@@ -2,9 +2,12 @@ package com.paranid5.crescendo.services.video_cache_service.extractor
 
 import arrow.core.Either
 import arrow.core.raise.either
-import arrow.core.raise.ensure
+import arrow.core.raise.ensureNotNull
 import com.paranid5.crescendo.domain.caching.CachingResult
 import com.paranid5.crescendo.domain.caching.Formats
+import com.paranid5.crescendo.domain.caching.cachingResult
+import com.paranid5.crescendo.domain.caching.isNotError
+import com.paranid5.crescendo.domain.caching.onCanceled
 import com.paranid5.crescendo.domain.media.files.MediaFile
 import com.paranid5.crescendo.domain.metadata.VideoMetadata
 import com.paranid5.crescendo.domain.trimming.TrimRange
@@ -12,123 +15,115 @@ import com.paranid5.crescendo.media.convertToAudioFileAndSetTagsAsync
 import com.paranid5.crescendo.media.mergeToMP4AndSetTagsAsync
 import com.paranid5.crescendo.services.video_cache_service.VideoCacheService
 import com.paranid5.crescendo.services.video_cache_service.files.initMediaFile
-import com.paranid5.crescendo.services.video_cache_service.reportExtractionError
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.flow
+
+private const val RETRY_DELAY = 2000L
 
 suspend fun VideoCacheService.extractMediaFilesAndStartCaching(
     ytUrl: String,
     desiredFilename: String,
     format: Formats,
     trimRange: TrimRange
-) = either {
-    val extractRes = urlExtractor.extractUrlsWithMeta(
-        context = this@extractMediaFilesAndStartCaching,
-        ytUrl = ytUrl,
-        format = format
-    )
+): CachingResult {
+    suspend fun impl() = either {
+        val (urls, metadata) = urlExtractor.extractUrlsWithMeta(
+            context = this@extractMediaFilesAndStartCaching,
+            ytUrl = ytUrl,
+            format = format
+        ).bind()
 
-    ensure(extractRes.isRight()) {
-        reportExtractionError(extractRes.leftOrNull()!!)
+        videoQueueManager.resetVideoMetadata(metadata)
+
+        when (format) {
+            Formats.MP4 -> cacheVideoFile(
+                desiredFilename = desiredFilename,
+                audioUrl = urls[0],
+                videoUrl = urls[1],
+                videoMetadata = metadata
+            )
+
+            else -> cacheAudioFile(
+                desiredFilename = desiredFilename,
+                audioUrl = urls[0],
+                videoMetadata = metadata,
+                audioFormat = format,
+                trimRange = trimRange
+            )
+        }
     }
 
-    val (urls, metadata) = extractRes.getOrNull()!!
-    videoQueueManager.resetVideoMetadata(metadata)
-
-    when (format) {
-        Formats.MP4 -> cacheVideoFile(
-            desiredFilename = desiredFilename,
-            audioUrl = urls[0],
-            videoUrl = urls[1],
-            videoMetadata = metadata
-        )
-
-        else -> cacheAudioFile(
-            desiredFilename = desiredFilename,
-            audioUrl = urls[0],
-            videoMetadata = metadata,
-            audioFormat = format,
-            trimRange = trimRange
-        )
+    fun implFlow() = flow {
+        while (true) emit(impl())
     }
+
+    return implFlow()
+        .first { it.isRightOrDelay() }
+        .getOrNull()!!
 }
 
-private suspend inline fun VideoCacheService.cacheAudioFile(
+private suspend fun VideoCacheService.cacheAudioFile(
     desiredFilename: String,
     audioUrl: String,
     videoMetadata: VideoMetadata,
     audioFormat: Formats,
     trimRange: TrimRange
 ): CachingResult {
-    val result = mediaFileDownloader.downloadAudioFile(
-        desiredFilename = desiredFilename,
-        mediaUrl = audioUrl,
-        isAudio = true
-    )
+    suspend fun impl() = cachingResult {
+        val result = mediaFileDownloader.downloadAudioFile(
+            desiredFilename = desiredFilename,
+            mediaUrl = audioUrl,
+            isAudio = true
+        ).bind()
 
-    if (result is CachingResult.DownloadResult.Error) {
-        onDownloadError(result)
-        return result
-    }
+        val file = result.first() as MediaFile.VideoFile
+        cacheManager.onConversionStarted()
 
-    if (result !is CachingResult.DownloadResult.Success) {
-        videoQueueManager.decrementQueueLen()
-        return result
-    }
+        val audioConversionResult =
+            file.convertToAudioFileAndSetTagsAsync(
+                context = this@cacheAudioFile,
+                videoMetadata = videoMetadata,
+                audioFormat = audioFormat,
+                trimRange = trimRange
+            ).await()
 
-    val file = result.files[0] as MediaFile.VideoFile
-    cacheManager.onConversionStarted()
-
-    return when (val audioConversionResult =
-        file.convertToAudioFileAndSetTagsAsync(
-            context = this,
-            videoMetadata = videoMetadata,
-            audioFormat = audioFormat,
-            trimRange = trimRange
-        ).await()
-    ) {
-        null -> {
-            cacheManager.onCachingError(file)
-            videoQueueManager.decrementQueueLen()
+        ensureNotNull(audioConversionResult) {
             CachingResult.ConversionError
         }
 
-        else -> {
-            cacheManager.onConverted()
-            videoQueueManager.decrementQueueLen()
-            CachingResult.Success(audioConversionResult)
-        }
+        cacheManager.onConverted()
+        videoQueueManager.decrementQueueLen()
+        audioConversionResult
     }
+
+    return impl().onCanceled { videoQueueManager.decrementQueueLen() }
 }
 
-private suspend inline fun VideoCacheService.cacheVideoFile(
+private suspend fun VideoCacheService.cacheVideoFile(
     desiredFilename: String,
     audioUrl: String,
     videoUrl: String,
     videoMetadata: VideoMetadata,
 ): CachingResult {
-    val result = mediaFileDownloader.downloadAudioAndVideoFiles(
-        desiredFilename = desiredFilename,
-        audioUrl = audioUrl,
-        videoUrl = videoUrl
-    )
+    suspend fun impl() = cachingResult {
+        val result = mediaFileDownloader.downloadAudioAndVideoFiles(
+            desiredFilename = desiredFilename,
+            audioUrl = audioUrl,
+            videoUrl = videoUrl
+        ).bind()
 
-    if (result is CachingResult.DownloadResult.Error) {
-        onDownloadError(result)
-        return result
+        val (audioFileStore, videoFileStore) = result
+
+        mergeToMp4(
+            desiredFilename = desiredFilename,
+            audioFileStore = audioFileStore,
+            videoFileStore = videoFileStore,
+            videoMetadata = videoMetadata
+        ).bind().first()
     }
 
-    if (result !is CachingResult.DownloadResult.Success) {
-        videoQueueManager.decrementQueueLen()
-        return result
-    }
-
-    val (audioFileStore, videoFileStore) = result.files
-
-    return mergeToMp4(
-        desiredFilename = desiredFilename,
-        audioFileStore = audioFileStore,
-        videoFileStore = videoFileStore,
-        videoMetadata = videoMetadata
-    )
+    return impl().onCanceled { videoQueueManager.decrementQueueLen() }
 }
 
 private suspend inline fun VideoCacheService.mergeToMp4(
@@ -153,11 +148,5 @@ private suspend inline fun VideoCacheService.mergeToMp4(
     ).await().also { cacheManager.onConverted() }
 }
 
-private fun VideoCacheService.onDownloadError(result: CachingResult.DownloadResult.Error) {
-    videoQueueManager.decrementQueueLen()
-
-    mediaFileDownloader.onDownloadError(
-        errorCode = result.statusCode.value,
-        errorDescription = result.statusCode.description
-    )
-}
+private suspend inline fun Either<Throwable, CachingResult>.isRightOrDelay() =
+    isRight { it.isNotError }.also { if (!it) delay(RETRY_DELAY) }

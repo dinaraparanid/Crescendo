@@ -3,7 +3,6 @@ package com.paranid5.crescendo.services.video_cache_service.files
 import android.util.Log
 import arrow.core.Either
 import com.paranid5.crescendo.domain.caching.CachingResult
-import com.paranid5.crescendo.domain.caching.DownloadError
 import com.paranid5.crescendo.domain.caching.DownloadingStatus
 import com.paranid5.crescendo.domain.ktor_client.DownloadingProgress
 import com.paranid5.crescendo.domain.ktor_client.UrlWithFile
@@ -33,30 +32,19 @@ class MediaFileDownloader : KoinComponent {
     }
 
     private val _downloadStatusState by lazy {
-        MutableStateFlow(DownloadingStatus.NONE)
+        MutableStateFlow<DownloadingStatus>(DownloadingStatus.None)
     }
 
     val downloadStatusState by lazy {
         _downloadStatusState.asStateFlow()
     }
 
-    private val _downloadErrorState by lazy {
-        MutableStateFlow(DownloadError())
-    }
-
-    val downloadErrorState by lazy {
-        _downloadErrorState.asStateFlow()
-    }
-
-    fun onDownloadError(errorCode: Int, errorDescription: String) =
-        _downloadErrorState.update { DownloadError(errorCode, errorDescription) }
-
     suspend fun downloadAudioFile(
         desiredFilename: String,
         mediaUrl: String,
         isAudio: Boolean
     ): CachingResult.DownloadResult {
-        _downloadStatusState.update { DownloadingStatus.DOWNLOADING }
+        _downloadStatusState.update { DownloadingStatus.Downloading }
 
         val curVideoCacheFile = when (val storeFileRes =
             initMediaFile(
@@ -94,54 +82,70 @@ class MediaFileDownloader : KoinComponent {
             is Either.Right -> mediaFilesInitResult.value
         }
 
-        val statusCode = ktorClient.downloadFiles(
+        val downloadStatus = ktorClient.downloadFiles(
             _downloadStatusState,
-            _downloadErrorState,
             _videoDownloadProgressState,
             UrlWithFile(audioUrl, audioFileStore), UrlWithFile(videoUrl, videoFileStore)
         )
 
-        return when (statusCode?.isSuccess()) {
-            true -> CachingResult.DownloadResult.Success(listOf(audioFileStore, videoFileStore))
-            false -> onError(statusCode, audioFileStore, videoFileStore)
-            null -> onCancel(audioFileStore, videoFileStore)
+        return when (downloadStatus) {
+            DownloadingStatus.Downloaded ->
+                CachingResult.DownloadResult.Success(listOf(audioFileStore, videoFileStore))
+
+            DownloadingStatus.CanceledCurrent ->
+                onCancel(audioFileStore, videoFileStore)
+
+            DownloadingStatus.CanceledAll ->
+                onCancel(audioFileStore, videoFileStore)
+
+            is DownloadingStatus.Error ->
+                onError(downloadStatus.status, audioFileStore, videoFileStore)
+
+            DownloadingStatus.ConnectionLost ->
+                onConnectionLost()
+
+            else -> throw IllegalStateException("Illegal final downloading state")
         }
     }
 
     fun onCanceledCurrent() =
-        _downloadStatusState.update { DownloadingStatus.CANCELED_CUR }
+        _downloadStatusState.update { DownloadingStatus.CanceledCurrent }
 
     fun onCanceledAll() =
-        _downloadStatusState.update { DownloadingStatus.CANCELED_ALL }
+        _downloadStatusState.update { DownloadingStatus.CanceledAll }
 
     fun prepareForNewVideo() {
-        _downloadStatusState.update { DownloadingStatus.NONE }
+        _downloadStatusState.update { DownloadingStatus.None }
         _videoDownloadProgressState.update { DownloadingProgress(0, 0) }
-        _downloadErrorState.update { DownloadError() }
     }
 
     fun resetDownloadStatus() =
         _downloadStatusState.update { it.afterReset }
+}
 
-    private fun onError(
-        statusCode: HttpStatusCode,
-        vararg videoCacheFiles: File
-    ): CachingResult.DownloadResult.Error {
-        _downloadErrorState.update { DownloadError(statusCode.value, statusCode.description) }
-        videoCacheFiles.forEach { Log.d(TAG, "File is deleted ${it.delete()}") }
-        Log.d(TAG, "Downloading was interrupted by an error ${statusCode.value}")
-        return CachingResult.DownloadResult.Error(statusCode)
-    }
+private fun onError(
+    statusCode: HttpStatusCode,
+    vararg videoCacheFiles: File
+): CachingResult.DownloadResult.Error {
+    videoCacheFiles.forEach { Log.d(TAG, "File is deleted ${it.delete()}") }
+    Log.d(TAG, "Downloading was interrupted by an error ${statusCode.value}")
+    return CachingResult.DownloadResult.Error(statusCode)
+}
 
-    private fun onCancel(vararg videoCacheFiles: File): CachingResult.Canceled {
-        videoCacheFiles.forEach { Log.d(TAG, "File is deleted ${it.delete()}") }
-        Log.d(TAG, "Downloading was canceled")
-        return CachingResult.Canceled
-    }
+private fun onCancel(vararg videoCacheFiles: File): CachingResult.Canceled {
+    videoCacheFiles.forEach { Log.d(TAG, "File is deleted ${it.delete()}") }
+    Log.d(TAG, "Downloading was canceled")
+    return CachingResult.Canceled
+}
+
+private fun onConnectionLost(vararg videoCacheFiles: File): CachingResult.DownloadResult.ConnectionLostError {
+    videoCacheFiles.forEach { Log.d(TAG, "File is deleted ${it.delete()}") }
+    Log.d(TAG, "Connection was lost")
+    return CachingResult.DownloadResult.ConnectionLostError
 }
 
 private inline val DownloadingStatus.afterReset
     get() = when (this) {
-        DownloadingStatus.DOWNLOADING -> this
-        else -> DownloadingStatus.NONE
+        DownloadingStatus.Downloading -> this
+        else -> DownloadingStatus.None
     }

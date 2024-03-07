@@ -48,3 +48,20 @@ sealed interface CachingResult : Parcelable {
     @Parcelize
     data object ConversionError : CachingResult
 }
+
+inline val CachingResult.isError
+    get() = when (this) {
+        CachingResult.ConversionError -> true
+        CachingResult.Canceled -> false
+        CachingResult.DownloadResult.ConnectionLostError -> true
+        is CachingResult.DownloadResult.Error -> true
+        CachingResult.DownloadResult.FileCreationError -> true
+        is CachingResult.DownloadResult.Success -> false
+        is CachingResult.Success -> false
+    }
+
+inline val CachingResult.isNotError
+    get() = !isError
+
+inline fun CachingResult.onCanceled(block: () -> Unit) =
+    apply { if (this is CachingResult.Canceled) block() }

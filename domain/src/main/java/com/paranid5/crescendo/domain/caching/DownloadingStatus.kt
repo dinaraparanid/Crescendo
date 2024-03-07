@@ -1,18 +1,26 @@
 package com.paranid5.crescendo.domain.caching
 
-enum class DownloadingStatus {
-    DOWNLOADING,
-    DOWNLOADED,
-    CANCELED_CUR,
-    CANCELED_ALL,
-    ERR,
-    CONNECT_LOST,
-    NONE
+import io.ktor.http.HttpStatusCode
+
+sealed interface DownloadingStatus {
+    data object Downloading : DownloadingStatus
+
+    data object Downloaded : DownloadingStatus
+
+    data object CanceledCurrent : DownloadingStatus
+
+    data object CanceledAll : DownloadingStatus
+
+    data class Error(val status: HttpStatusCode) : DownloadingStatus
+
+    data object ConnectionLost : DownloadingStatus
+
+    data object None : DownloadingStatus
 }
 
 inline val DownloadingStatus.isCanceled
     get() = when (this) {
-        DownloadingStatus.CANCELED_CUR -> true
-        DownloadingStatus.CANCELED_ALL -> true
+        DownloadingStatus.CanceledCurrent -> true
+        DownloadingStatus.CanceledAll -> true
         else -> false
     }

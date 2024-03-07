@@ -25,7 +25,7 @@ class NotificationManager(service: VideoCacheService) {
     fun createChannel() = manager.createNotificationChannel(
         NotificationChannel(
             VIDEO_CACHE_CHANNEL_ID,
-            "Video Cash",
+            "Video Cache",
             NotificationManager.IMPORTANCE_DEFAULT
         ).apply {
             lockscreenVisibility = Notification.VISIBILITY_PUBLIC
@@ -43,10 +43,8 @@ class NotificationManager(service: VideoCacheService) {
         videoQueueLen: Int,
         downloadedBytes: Long,
         totalBytes: Long,
-        errorCode: Int,
-        errorDescription: String
     ) = when (downloadStatus) {
-        DownloadingStatus.DOWNLOADING ->
+        DownloadingStatus.Downloading ->
             showDownloadNotification(
                 service = service,
                 videoTitle = service videoTitleOf videoMetadata,
@@ -55,26 +53,23 @@ class NotificationManager(service: VideoCacheService) {
                 totalBytes = totalBytes
             )
 
-        DownloadingStatus.CANCELED_CUR ->
+        DownloadingStatus.CanceledCurrent ->
             showCanceledNotification(service)
 
-        DownloadingStatus.CANCELED_ALL ->
+        DownloadingStatus.CanceledAll ->
             showCanceledNotification(service)
 
-        DownloadingStatus.ERR ->
-            showDownloadErrorNotification(service, errorCode, errorDescription)
-
-        DownloadingStatus.CONNECT_LOST ->
+        DownloadingStatus.ConnectionLost ->
             showConnectionLostNotification(service)
 
-        DownloadingStatus.NONE -> Unit
-
-        DownloadingStatus.DOWNLOADED ->
+        DownloadingStatus.Downloaded ->
             showCachingNotification(
                 service = service,
                 cacheStatus = cacheStatus,
                 videoMetadata = videoMetadata,
             )
+
+        else -> Unit
     }
 
     private fun showCachingNotification(
