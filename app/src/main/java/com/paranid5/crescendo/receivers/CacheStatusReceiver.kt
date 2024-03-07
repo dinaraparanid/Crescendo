@@ -10,8 +10,8 @@ import com.paranid5.crescendo.presentation.ui.extensions.toast
 class CacheStatusReceiver : BroadcastReceiver() {
     companion object {
         private const val RECEIVER_LOCATION = "com.paranid5.crescendo.receivers"
-        const val Broadcast_VIDEO_CASH_COMPLETED = "$RECEIVER_LOCATION.VIDEO_CASH_COMPLETED"
-        const val VIDEO_CASH_STATUS_ARG = "video_cash_status"
+        const val Broadcast_VIDEO_CACHE_COMPLETED = "$RECEIVER_LOCATION.VIDEO_CACHE_COMPLETED"
+        const val VIDEO_CACHE_STATUS_ARG = "video_cache_status"
     }
 
     override fun onReceive(context: Context, intent: Intent) {
@@ -19,11 +19,11 @@ class CacheStatusReceiver : BroadcastReceiver() {
         val response = when {
             Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU ->
                 intent.getParcelableExtra(
-                    VIDEO_CASH_STATUS_ARG,
+                    VIDEO_CACHE_STATUS_ARG,
                     VideoCacheResponse::class.java
                 )
 
-            else -> intent.getParcelableExtra(VIDEO_CASH_STATUS_ARG)
+            else -> intent.getParcelableExtra(VIDEO_CACHE_STATUS_ARG)
         }!!
 
         toast(response, context.applicationContext)

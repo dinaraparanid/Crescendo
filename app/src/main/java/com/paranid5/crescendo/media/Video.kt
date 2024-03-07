@@ -2,11 +2,13 @@ package com.paranid5.crescendo.media
 
 import android.content.Context
 import android.provider.MediaStore
+import arrow.core.raise.ensure
 import com.arthenica.mobileffmpeg.FFmpeg
 import com.paranid5.crescendo.domain.metadata.VideoMetadata
 import com.paranid5.crescendo.domain.trimming.TrimRange
 import com.paranid5.crescendo.domain.caching.CachingResult
 import com.paranid5.crescendo.domain.caching.Formats
+import com.paranid5.crescendo.domain.caching.cachingResult
 import com.paranid5.crescendo.domain.media.files.MediaFile
 import com.paranid5.crescendo.domain.media.files.toAudioFileAsync
 import com.paranid5.crescendo.media.tags.setAudioTags
@@ -23,26 +25,29 @@ suspend fun mergeToMP4AndSetTagsAsync(
     videoMetadata: VideoMetadata
 ) = coroutineScope {
     async(Dispatchers.IO) {
-        val status = FFmpeg.execute(
-            "-y -i ${videoTrack.absolutePath} " +
-                    "-y -i ${audioTrack.absolutePath} " +
-                    "-c copy ${mp4StoreFile.absolutePath}"
-        )
+        cachingResult {
+            val status = FFmpeg.execute(
+                "-y -i ${videoTrack.absolutePath} " +
+                        "-y -i ${audioTrack.absolutePath} " +
+                        "-c copy ${mp4StoreFile.absolutePath}"
+            )
 
-        if (status != 0)
-            return@async CachingResult.ConversionError
+            ensure(status == 0) {
+                CachingResult.ConversionError
+            }
 
-        val tagsTask = setVideoTagsAsync(
-            context = context,
-            videoFile = mp4StoreFile,
-            metadata = videoMetadata
-        )
+            val tagsTask = setVideoTagsAsync(
+                context = context,
+                videoFile = mp4StoreFile,
+                metadata = videoMetadata
+            )
 
-        audioTrack.delete()
-        videoTrack.delete()
+            audioTrack.delete()
+            videoTrack.delete()
 
-        tagsTask.join()
-        CachingResult.DownloadResult.Success(listOf(mp4StoreFile))
+            tagsTask.join()
+            mp4StoreFile
+        }
     }
 }
 

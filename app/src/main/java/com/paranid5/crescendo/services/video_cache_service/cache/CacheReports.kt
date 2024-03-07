@@ -14,10 +14,8 @@ fun VideoCacheService.reportCachingResult(cachingResult: CachingResult) =
 
         CachingResult.DownloadResult.ConnectionLostError -> reportConnectionLostError()
 
-        is CachingResult.DownloadResult.Error -> reportDownloadError(
-            code = cachingResult.statusCode.value,
-            description = cachingResult.statusCode.description
-        )
+        is CachingResult.DownloadResult.Error ->
+            throw IllegalStateException("Downloading was finished with an error, which is not acceptable")
 
         CachingResult.ConversionError -> reportAudioConversionError()
 
@@ -29,49 +27,41 @@ fun VideoCacheService.reportCachingResult(cachingResult: CachingResult) =
 private fun VideoCacheService.reportVideoCacheSuccessful() =
     sendBroadcast(
         Intent(this, CacheStatusReceiver::class.java)
-            .setAction(CacheStatusReceiver.Broadcast_VIDEO_CASH_COMPLETED)
+            .setAction(CacheStatusReceiver.Broadcast_VIDEO_CACHE_COMPLETED)
             .putExtra(
-                CacheStatusReceiver.VIDEO_CASH_STATUS_ARG,
+                CacheStatusReceiver.VIDEO_CACHE_STATUS_ARG,
                 VideoCacheResponse.Success
             )
     )
 
-private fun VideoCacheService.reportDownloadError(code: Int, description: String) =
-    sendBroadcast(
-        Intent(CacheStatusReceiver.Broadcast_VIDEO_CASH_COMPLETED).putExtra(
-            CacheStatusReceiver.VIDEO_CASH_STATUS_ARG,
-            VideoCacheResponse.Error(code, description)
-        )
-    )
-
 private fun VideoCacheService.reportVideoCacheCanceled() =
     sendBroadcast(
-        Intent(CacheStatusReceiver.Broadcast_VIDEO_CASH_COMPLETED).putExtra(
-            CacheStatusReceiver.VIDEO_CASH_STATUS_ARG,
+        Intent(CacheStatusReceiver.Broadcast_VIDEO_CACHE_COMPLETED).putExtra(
+            CacheStatusReceiver.VIDEO_CACHE_STATUS_ARG,
             VideoCacheResponse.Canceled
         )
     )
 
 private fun VideoCacheService.reportAudioConversionError() =
     sendBroadcast(
-        Intent(CacheStatusReceiver.Broadcast_VIDEO_CASH_COMPLETED).putExtra(
-            CacheStatusReceiver.VIDEO_CASH_STATUS_ARG,
+        Intent(CacheStatusReceiver.Broadcast_VIDEO_CACHE_COMPLETED).putExtra(
+            CacheStatusReceiver.VIDEO_CACHE_STATUS_ARG,
             VideoCacheResponse.AudioConversionError
         )
     )
 
 private fun VideoCacheService.reportFileCreationError() =
     sendBroadcast(
-        Intent(CacheStatusReceiver.Broadcast_VIDEO_CASH_COMPLETED).putExtra(
-            CacheStatusReceiver.VIDEO_CASH_STATUS_ARG,
+        Intent(CacheStatusReceiver.Broadcast_VIDEO_CACHE_COMPLETED).putExtra(
+            CacheStatusReceiver.VIDEO_CACHE_STATUS_ARG,
             VideoCacheResponse.FileCreationError
         )
     )
 
 private fun VideoCacheService.reportConnectionLostError() =
     sendBroadcast(
-        Intent(CacheStatusReceiver.Broadcast_VIDEO_CASH_COMPLETED).putExtra(
-            CacheStatusReceiver.VIDEO_CASH_STATUS_ARG,
+        Intent(CacheStatusReceiver.Broadcast_VIDEO_CACHE_COMPLETED).putExtra(
+            CacheStatusReceiver.VIDEO_CACHE_STATUS_ARG,
             VideoCacheResponse.ConnectionLostError
         )
     )

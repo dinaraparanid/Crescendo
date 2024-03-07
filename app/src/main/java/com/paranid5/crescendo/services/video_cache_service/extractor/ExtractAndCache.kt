@@ -59,7 +59,7 @@ suspend fun VideoCacheService.extractMediaFilesAndStartCaching(
     }
 
     return implFlow()
-        .first { it.isRightOrDelay() }
+        .first { it.isNotErrorOrDelay() }
         .getOrNull()!!
 }
 
@@ -106,24 +106,28 @@ private suspend fun VideoCacheService.cacheVideoFile(
     videoUrl: String,
     videoMetadata: VideoMetadata,
 ): CachingResult {
-    suspend fun impl() = cachingResult {
-        val result = mediaFileDownloader.downloadAudioAndVideoFiles(
-            desiredFilename = desiredFilename,
-            audioUrl = audioUrl,
-            videoUrl = videoUrl
-        ).bind()
+    suspend fun merge(result: CachingResult.DownloadResult) = cachingResult {
+        val (audioFileStore, videoFileStore) = result.bind()
 
-        val (audioFileStore, videoFileStore) = result
-
-        mergeToMp4(
+        val mergedMp4 = mergeToMp4(
             desiredFilename = desiredFilename,
             audioFileStore = audioFileStore,
             videoFileStore = videoFileStore,
             videoMetadata = videoMetadata
         ).bind().first()
+
+        cacheManager.onConverted()
+        videoQueueManager.decrementQueueLen()
+        mergedMp4
     }
 
-    return impl().onCanceled { videoQueueManager.decrementQueueLen() }
+    val result = mediaFileDownloader.downloadAudioAndVideoFiles(
+        desiredFilename = desiredFilename,
+        audioUrl = audioUrl,
+        videoUrl = videoUrl
+    )
+
+    return merge(result).onCanceled { videoQueueManager.decrementQueueLen() }
 }
 
 private suspend inline fun VideoCacheService.mergeToMp4(
@@ -148,5 +152,5 @@ private suspend inline fun VideoCacheService.mergeToMp4(
     ).await().also { cacheManager.onConverted() }
 }
 
-private suspend inline fun Either<Throwable, CachingResult>.isRightOrDelay() =
-    isRight { it.isNotError }.also { if (!it) delay(RETRY_DELAY) }
+private suspend inline fun Either<Throwable, CachingResult?>.isNotErrorOrDelay() =
+    isRight { it?.isNotError == true }.also { if (!it) delay(RETRY_DELAY) }

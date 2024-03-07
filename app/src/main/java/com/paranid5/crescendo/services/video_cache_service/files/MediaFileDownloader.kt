@@ -3,14 +3,13 @@ package com.paranid5.crescendo.services.video_cache_service.files
 import android.util.Log
 import arrow.core.Either
 import com.paranid5.crescendo.domain.caching.CachingResult
+import com.paranid5.crescendo.domain.caching.DownloadFilesStatus
 import com.paranid5.crescendo.domain.caching.DownloadingStatus
 import com.paranid5.crescendo.domain.ktor_client.DownloadingProgress
 import com.paranid5.crescendo.domain.ktor_client.UrlWithFile
 import com.paranid5.crescendo.domain.ktor_client.downloadFile
 import com.paranid5.crescendo.domain.ktor_client.downloadFiles
 import io.ktor.client.HttpClient
-import io.ktor.http.HttpStatusCode
-import io.ktor.http.isSuccess
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
@@ -56,17 +55,22 @@ class MediaFileDownloader : KoinComponent {
             is Either.Right -> storeFileRes.value
         }
 
-        val statusCode = ktorClient.downloadFile(
+        val status = ktorClient.downloadFile(
             fileUrl = mediaUrl,
             storeFile = curVideoCacheFile,
             totalProgressState = _videoDownloadProgressState,
             downloadingState = _downloadStatusState,
         )
 
-        return when (statusCode?.isSuccess()) {
-            true -> CachingResult.DownloadResult.Success(listOf(curVideoCacheFile))
-            false -> onError(statusCode, curVideoCacheFile)
-            null -> onCancel(curVideoCacheFile)
+        return when (status) {
+            DownloadFilesStatus.Success ->
+                CachingResult.DownloadResult.Success(listOf(curVideoCacheFile))
+
+            DownloadFilesStatus.Error ->
+                onError(curVideoCacheFile)
+
+            DownloadFilesStatus.Canceled ->
+                onCancel(curVideoCacheFile)
         }
     }
 
@@ -89,22 +93,14 @@ class MediaFileDownloader : KoinComponent {
         )
 
         return when (downloadStatus) {
-            DownloadingStatus.Downloaded ->
+            DownloadFilesStatus.Success ->
                 CachingResult.DownloadResult.Success(listOf(audioFileStore, videoFileStore))
 
-            DownloadingStatus.CanceledCurrent ->
+            DownloadFilesStatus.Canceled ->
                 onCancel(audioFileStore, videoFileStore)
 
-            DownloadingStatus.CanceledAll ->
-                onCancel(audioFileStore, videoFileStore)
-
-            is DownloadingStatus.Error ->
-                onError(downloadStatus.status, audioFileStore, videoFileStore)
-
-            DownloadingStatus.ConnectionLost ->
-                onConnectionLost()
-
-            else -> throw IllegalStateException("Illegal final downloading state")
+            DownloadFilesStatus.Error ->
+                onError(audioFileStore, videoFileStore)
         }
     }
 
@@ -123,25 +119,15 @@ class MediaFileDownloader : KoinComponent {
         _downloadStatusState.update { it.afterReset }
 }
 
-private fun onError(
-    statusCode: HttpStatusCode,
-    vararg videoCacheFiles: File
-): CachingResult.DownloadResult.Error {
+private fun onError(vararg videoCacheFiles: File): CachingResult.DownloadResult.Error {
     videoCacheFiles.forEach { Log.d(TAG, "File is deleted ${it.delete()}") }
-    Log.d(TAG, "Downloading was interrupted by an error ${statusCode.value}")
-    return CachingResult.DownloadResult.Error(statusCode)
+    return CachingResult.DownloadResult.Error
 }
 
 private fun onCancel(vararg videoCacheFiles: File): CachingResult.Canceled {
     videoCacheFiles.forEach { Log.d(TAG, "File is deleted ${it.delete()}") }
     Log.d(TAG, "Downloading was canceled")
     return CachingResult.Canceled
-}
-
-private fun onConnectionLost(vararg videoCacheFiles: File): CachingResult.DownloadResult.ConnectionLostError {
-    videoCacheFiles.forEach { Log.d(TAG, "File is deleted ${it.delete()}") }
-    Log.d(TAG, "Connection was lost")
-    return CachingResult.DownloadResult.ConnectionLostError
 }
 
 private inline val DownloadingStatus.afterReset
