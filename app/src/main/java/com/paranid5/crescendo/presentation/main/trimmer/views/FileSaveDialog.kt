@@ -2,7 +2,7 @@ package com.paranid5.crescendo.presentation.main.trimmer.views
 
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.BasicAlertDialog
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -62,7 +62,7 @@ fun FileSaveDialog(
     }
 
     if (isDialogShown)
-        AlertDialog(onDismissRequest = { isDialogShown = false }) {
+        BasicAlertDialog(onDismissRequest = { isDialogShown = false }) {
             Card(
                 modifier = modifier.fillMaxWidth(),
                 shape = RoundedCornerShape(20.dp),

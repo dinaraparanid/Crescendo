@@ -71,7 +71,7 @@ class MediaFileDownloader : KoinComponent {
         val statusCode = ktorClient.downloadFile(
             fileUrl = mediaUrl,
             storeFile = curVideoCacheFile,
-            progressState = _videoDownloadProgressState,
+            totalProgressState = _videoDownloadProgressState,
             downloadingState = _downloadStatusState,
         )
 

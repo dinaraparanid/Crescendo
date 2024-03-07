@@ -33,8 +33,8 @@ typealias DraggableListItemView<T> = @Composable (
 internal inline fun <T> DraggableList(
     items: ImmutableList<T>,
     currentItemIndex: Int,
-    crossinline onDismissed: (Int, T) -> Boolean,
-    crossinline onDragged: suspend (ImmutableList<T>, Int) -> Unit,
+    crossinline onDismissed: (index: Int, item: T) -> Boolean,
+    crossinline onDragged: suspend (draggedItems: ImmutableList<T>, dragIndex: Int) -> Unit,
     crossinline itemView: DraggableListItemView<T>,
     modifier: Modifier = Modifier,
     itemModifier: Modifier = Modifier,
@@ -127,7 +127,7 @@ private inline fun <T> Modifier.handleTracksMovement(
     positionState: MutableState<Float?>,
     isDraggingState: MutableState<Boolean>,
     draggedItemIndexState: MutableState<Int?>,
-    crossinline onDragged: suspend (ImmutableList<T>, Int) -> Unit,
+    crossinline onDragged: suspend (draggedItems: ImmutableList<T>, dragIndex: Int) -> Unit,
 ): Modifier {
     val draggedItems by rememberUpdatedState(items)
     val dragIndex by rememberUpdatedState(currentDragIndex)

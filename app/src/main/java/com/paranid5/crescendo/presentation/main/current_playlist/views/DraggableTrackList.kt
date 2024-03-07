@@ -11,8 +11,8 @@ import kotlinx.collections.immutable.ImmutableList
 internal inline fun <T : Track> DraggableTrackList(
     tracks: ImmutableList<T>,
     currentTrackIndex: Int,
-    crossinline onTrackDismissed: (Int, T) -> Boolean,
-    crossinline onTrackDragged: suspend (ImmutableList<T>, Int) -> Unit,
+    crossinline onTrackDismissed: (index: Int, item: T) -> Boolean,
+    crossinline onTrackDragged: suspend (draggedItems: ImmutableList<T>, dragIndex: Int) -> Unit,
     crossinline trackItemView: DraggableListItemView<T>,
     modifier: Modifier = Modifier,
     trackItemModifier: Modifier = Modifier,
@@ -31,8 +31,8 @@ internal inline fun <T : Track> DraggableTrackList(
 internal inline fun <T : Track> DraggableTrackList(
     tracks: ImmutableList<T>,
     currentTrackIndex: Int,
-    crossinline onTrackDismissed: (Int, T) -> Boolean,
-    crossinline onTrackDragged: suspend (ImmutableList<T>, Int) -> Unit,
+    crossinline onTrackDismissed: (index: Int, item: T) -> Boolean,
+    crossinline onTrackDragged: suspend (draggedItems: ImmutableList<T>, dragIndex: Int) -> Unit,
     modifier: Modifier = Modifier,
     trackItemModifier: Modifier = Modifier,
 ) = DraggableTrackList(

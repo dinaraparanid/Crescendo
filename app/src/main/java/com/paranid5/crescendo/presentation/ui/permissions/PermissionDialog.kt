@@ -30,7 +30,7 @@ internal inline fun PermissionDialog(
 ) {
     val colors = LocalAppColors.current
 
-    AlertDialog(
+    BasicAlertDialog(
         onDismissRequest = {
             onDismiss()
             isDialogShownState.value = false
@@ -42,7 +42,7 @@ internal inline fun PermissionDialog(
                 width = 30.dp,
                 color = Color.Transparent,
                 shape = RoundedCornerShape(30.dp)
-            ),
+            )
     ) {
         Column(Modifier.fillMaxWidth()) {
             Title(Modifier.align(Alignment.CenterHorizontally))
