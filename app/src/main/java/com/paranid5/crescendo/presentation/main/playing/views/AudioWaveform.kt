@@ -14,7 +14,7 @@ import androidx.palette.graphics.Palette
 import com.gauravk.audiovisualizer.visualizer.WaveVisualizer
 import com.paranid5.crescendo.AUDIO_SESSION_ID
 import com.paranid5.crescendo.IS_PLAYING
-import com.paranid5.crescendo.R
+import com.paranid5.crescendo.core.resources.R
 import com.paranid5.crescendo.presentation.ui.extensions.collectLatestAsState
 import com.paranid5.crescendo.presentation.ui.extensions.getLightMutedOrPrimary
 import kotlinx.coroutines.flow.MutableStateFlow

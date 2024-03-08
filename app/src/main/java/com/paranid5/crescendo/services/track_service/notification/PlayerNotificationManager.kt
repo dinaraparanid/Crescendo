@@ -11,7 +11,7 @@ import androidx.media3.common.Player
 import androidx.media3.common.util.NotificationUtil
 import androidx.media3.common.util.UnstableApi
 import androidx.media3.ui.PlayerNotificationManager
-import com.paranid5.crescendo.R
+import com.paranid5.crescendo.core.resources.R
 import com.paranid5.crescendo.domain.utils.extensions.artistAlbum
 import com.paranid5.crescendo.domain.utils.extensions.sendBroadcast
 import com.paranid5.crescendo.media.images.getThumbnailBitmap

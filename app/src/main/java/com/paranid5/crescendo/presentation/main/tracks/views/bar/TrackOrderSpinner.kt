@@ -11,7 +11,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
-import com.paranid5.crescendo.R
+import com.paranid5.crescendo.core.resources.R
 import com.paranid5.crescendo.domain.tracks.TrackOrder
 import com.paranid5.crescendo.koinActivityViewModel
 import com.paranid5.crescendo.presentation.main.tracks.TracksViewModel

@@ -18,7 +18,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewModelScope
-import com.paranid5.crescendo.R
+import com.paranid5.crescendo.core.resources.R
 import com.paranid5.crescendo.domain.eq.EqualizerBandsPreset
 import com.paranid5.crescendo.domain.eq.EqualizerData
 import com.paranid5.crescendo.koinActivityViewModel

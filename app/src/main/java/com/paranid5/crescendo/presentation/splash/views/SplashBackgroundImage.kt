@@ -8,7 +8,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
-import com.paranid5.crescendo.R
+import com.paranid5.crescendo.core.resources.R
 
 @Composable
 fun SplashBackgroundImage(modifier: Modifier = Modifier) =

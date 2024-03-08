@@ -5,7 +5,7 @@ import android.database.Cursor
 import android.os.Build
 import android.provider.MediaStore
 import arrow.core.curried
-import com.paranid5.crescendo.R
+import com.paranid5.crescendo.core.resources.R
 import com.paranid5.crescendo.domain.tracks.DefaultTrack
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.toImmutableList

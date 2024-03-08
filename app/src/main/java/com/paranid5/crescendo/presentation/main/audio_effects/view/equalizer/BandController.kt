@@ -22,7 +22,7 @@ import androidx.compose.ui.unit.Constraints
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import com.paranid5.crescendo.EQUALIZER_DATA
-import com.paranid5.crescendo.R
+import com.paranid5.crescendo.core.resources.R
 import com.paranid5.crescendo.domain.eq.EqualizerData
 import com.paranid5.crescendo.presentation.main.audio_effects.view.getBandTrackModel
 import com.paranid5.crescendo.presentation.ui.extensions.collectLatestAsState

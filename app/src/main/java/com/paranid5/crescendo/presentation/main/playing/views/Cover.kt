@@ -12,7 +12,7 @@ import androidx.compose.ui.unit.dp
 import androidx.palette.graphics.Palette
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
-import com.paranid5.crescendo.R
+import com.paranid5.crescendo.core.resources.R
 import com.paranid5.crescendo.presentation.ui.extensions.getLightMutedOrPrimary
 
 @Composable

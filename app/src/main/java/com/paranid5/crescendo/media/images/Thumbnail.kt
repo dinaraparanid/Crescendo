@@ -4,7 +4,7 @@ import android.content.Context
 import androidx.annotation.DrawableRes
 import androidx.core.graphics.drawable.toBitmap
 import coil.executeBlocking
-import com.paranid5.crescendo.R
+import com.paranid5.crescendo.core.resources.R
 
 fun @receiver:DrawableRes Int.getCoilModel(context: Context) =
     getCoilModelBuilder(context).build()

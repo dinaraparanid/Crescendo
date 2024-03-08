@@ -1,7 +1,7 @@
 package com.paranid5.crescendo.services.stream_service
 
 import android.content.Intent
-import com.paranid5.crescendo.R
+import com.paranid5.crescendo.core.resources.R
 import com.paranid5.crescendo.receivers.ServiceErrorReceiver
 import com.paranid5.crescendo.services.core.notification.ErrorNotification
 import com.paranid5.crescendo.services.stream_service.notification.STREAM_CHANNEL_ID

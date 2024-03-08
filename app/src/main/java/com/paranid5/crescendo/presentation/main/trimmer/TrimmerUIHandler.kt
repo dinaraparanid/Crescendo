@@ -4,7 +4,7 @@ import android.content.Context
 import android.content.Intent
 import androidx.compose.runtime.Immutable
 import arrow.core.Either
-import com.paranid5.crescendo.R
+import com.paranid5.crescendo.core.resources.R
 import com.paranid5.crescendo.domain.caching.Formats
 import com.paranid5.crescendo.domain.media.files.MediaFile
 import com.paranid5.crescendo.domain.media.files.trimmedCatching

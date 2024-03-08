@@ -7,7 +7,7 @@ import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.LocalContext
-import com.paranid5.crescendo.R
+import com.paranid5.crescendo.core.resources.R
 import com.paranid5.crescendo.media.images.ImageSize
 import com.paranid5.crescendo.media.images.getBitmapFromResourceCatching
 import com.paranid5.crescendo.media.images.toBitmapDrawable

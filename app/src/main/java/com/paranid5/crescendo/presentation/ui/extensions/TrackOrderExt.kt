@@ -1,7 +1,7 @@
 package com.paranid5.crescendo.presentation.ui.extensions
 
 import android.content.Context
-import com.paranid5.crescendo.R
+import com.paranid5.crescendo.core.resources.R
 import com.paranid5.crescendo.domain.tracks.TrackOrder
 
 fun TrackOrder.toString(context: Context) = when (orderType) {

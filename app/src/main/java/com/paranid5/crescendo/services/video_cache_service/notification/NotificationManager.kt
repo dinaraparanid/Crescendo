@@ -7,7 +7,7 @@ import android.app.Service
 import android.content.Context
 import android.os.Build
 import androidx.annotation.RequiresApi
-import com.paranid5.crescendo.R
+import com.paranid5.crescendo.core.resources.R
 import com.paranid5.crescendo.domain.caching.CachingStatus
 import com.paranid5.crescendo.domain.caching.DownloadingStatus
 import com.paranid5.crescendo.domain.metadata.VideoMetadata

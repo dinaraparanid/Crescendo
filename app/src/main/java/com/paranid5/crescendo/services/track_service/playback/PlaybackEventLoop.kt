@@ -3,7 +3,7 @@ package com.paranid5.crescendo.services.track_service.playback
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.repeatOnLifecycle
 import arrow.core.Tuple4
-import com.paranid5.crescendo.R
+import com.paranid5.crescendo.core.resources.R
 import com.paranid5.crescendo.domain.tracks.Track
 import com.paranid5.crescendo.services.track_service.TrackService
 import com.paranid5.crescendo.services.track_service.showErrNotificationAndSendBroadcast
