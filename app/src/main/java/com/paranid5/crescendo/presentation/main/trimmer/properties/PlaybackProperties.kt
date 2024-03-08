@@ -1,6 +1,6 @@
 package com.paranid5.crescendo.presentation.main.trimmer.properties
 
-import com.paranid5.crescendo.domain.trimming.PitchAndSpeed
+import com.paranid5.crescendo.core.common.trimming.PitchAndSpeed
 import com.paranid5.crescendo.presentation.main.trimmer.TrimmerViewModel
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.map
@@ -10,5 +10,5 @@ inline val TrimmerViewModel.playbackAlphaFlow
 
 inline val TrimmerViewModel.pitchAndSpeedFlow
     get() = combine(pitchState, speedState) { pitch, speed ->
-        PitchAndSpeed(pitch, speed)
+        com.paranid5.crescendo.core.common.trimming.PitchAndSpeed(pitch, speed)
     }

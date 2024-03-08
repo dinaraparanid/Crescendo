@@ -1,7 +1,7 @@
 package com.paranid5.crescendo.presentation.main.trimmer.properties
 
-import com.paranid5.crescendo.domain.trimming.FadeDurations
-import com.paranid5.crescendo.domain.trimming.TrimRange
+import com.paranid5.crescendo.core.common.trimming.FadeDurations
+import com.paranid5.crescendo.core.common.trimming.TrimRange
 import com.paranid5.crescendo.domain.utils.extensions.timeString
 import com.paranid5.crescendo.presentation.main.trimmer.CONTROLLER_CIRCLE_CENTER
 import com.paranid5.crescendo.presentation.main.trimmer.CONTROLLER_CIRCLE_RADIUS
@@ -40,7 +40,7 @@ inline val TrimmerViewModel.trimRangeFlow
         startPosInMillisState,
         trimmedDurationInMillisFlow
     ) { startMillis, trimmedDurationMillis ->
-        TrimRange(
+        com.paranid5.crescendo.core.common.trimming.TrimRange(
             startPointMillis = startMillis,
             totalDurationMillis = trimmedDurationMillis
         )
@@ -51,7 +51,7 @@ inline val TrimmerViewModel.fadeDurationsFlow
         fadeInSecsState,
         fadeOutSecsState
     ) { fadeInSecs, fadeOutSecs ->
-        FadeDurations(
+        com.paranid5.crescendo.core.common.trimming.FadeDurations(
             fadeInSecs = fadeInSecs,
             fadeOutSecs = fadeOutSecs
         )

@@ -1,8 +1,8 @@
 package com.paranid5.crescendo.presentation.main.trimmer.properties.compose
 
 import androidx.compose.runtime.Composable
-import com.paranid5.crescendo.domain.trimming.FadeDurations
-import com.paranid5.crescendo.domain.trimming.TrimRange
+import com.paranid5.crescendo.core.common.trimming.FadeDurations
+import com.paranid5.crescendo.core.common.trimming.TrimRange
 import com.paranid5.crescendo.presentation.main.trimmer.TrimmerViewModel
 import com.paranid5.crescendo.presentation.main.trimmer.properties.endOffsetFlow
 import com.paranid5.crescendo.presentation.main.trimmer.properties.fadeDurationsFlow
@@ -46,11 +46,11 @@ fun TrimmerViewModel.collectTrimmedDurationInMillisAsState(initial: Long = 0L) =
     trimmedDurationInMillisFlow.collectLatestAsState(initial)
 
 @Composable
-fun TrimmerViewModel.collectTrimRangeAsState(initial: TrimRange = TrimRange()) =
+fun TrimmerViewModel.collectTrimRangeAsState(initial: com.paranid5.crescendo.core.common.trimming.TrimRange = com.paranid5.crescendo.core.common.trimming.TrimRange()) =
     trimRangeFlow.collectLatestAsState(initial)
 
 @Composable
-fun TrimmerViewModel.collectFadeDurationsAsState(initial: FadeDurations = FadeDurations()) =
+fun TrimmerViewModel.collectFadeDurationsAsState(initial: com.paranid5.crescendo.core.common.trimming.FadeDurations = com.paranid5.crescendo.core.common.trimming.FadeDurations()) =
     fadeDurationsFlow.collectLatestAsState(initial)
 
 @Composable

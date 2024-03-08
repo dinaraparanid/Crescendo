@@ -10,7 +10,7 @@ import com.paranid5.crescendo.koinActivityViewModel
 import com.paranid5.crescendo.presentation.main.tracks.TracksViewModel
 import com.paranid5.crescendo.presentation.main.tracks.properties.compose.collectTrackOrderAsState
 import com.paranid5.crescendo.presentation.ui.extensions.toString
-import com.paranid5.crescendo.presentation.ui.theme.LocalAppColors
+import com.paranid5.crescendo.presentation.ui.LocalAppColors
 
 @Composable
 fun TrackOrderLabel(

@@ -33,7 +33,7 @@ import com.paranid5.crescendo.domain.ktor_client.github.Release
 import com.paranid5.crescendo.domain.ktor_client.github.checkForUpdates
 import com.paranid5.crescendo.presentation.composition_locals.LocalActivity
 import com.paranid5.crescendo.presentation.ui.extensions.simpleShadow
-import com.paranid5.crescendo.presentation.ui.theme.LocalAppColors
+import com.paranid5.crescendo.presentation.ui.LocalAppColors
 import dev.jeziellago.compose.markdowntext.MarkdownText
 import io.ktor.client.HttpClient
 import org.koin.compose.koinInject

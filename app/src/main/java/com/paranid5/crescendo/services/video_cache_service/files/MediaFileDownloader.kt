@@ -2,9 +2,9 @@ package com.paranid5.crescendo.services.video_cache_service.files
 
 import android.util.Log
 import arrow.core.Either
-import com.paranid5.crescendo.domain.caching.CachingResult
-import com.paranid5.crescendo.domain.caching.DownloadFilesStatus
-import com.paranid5.crescendo.domain.caching.DownloadingStatus
+import com.paranid5.crescendo.core.common.caching.DownloadFilesStatus
+import com.paranid5.crescendo.core.common.caching.DownloadingStatus
+import com.paranid5.crescendo.core.media.caching.CachingResult
 import com.paranid5.crescendo.domain.ktor_client.DownloadingProgress
 import com.paranid5.crescendo.domain.ktor_client.UrlWithFile
 import com.paranid5.crescendo.domain.ktor_client.downloadFile

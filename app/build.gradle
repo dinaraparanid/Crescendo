@@ -91,7 +91,6 @@ dependencies {
     implementation libs.arrow.fx.coroutines
 
     implementation libs.kotlinx.serialization.json
-
     implementation libs.kotlinx.collections.immutable
 
     implementation libs.jaudiotagger
@@ -109,4 +108,7 @@ dependencies {
     implementation libs.yt.url.extractor.kt
 
     implementation files('libs/jave-1.0.2.jar')
+    implementation project(':core:common')
+    implementation project(':core:media')
+    implementation project(':core:impl')
 }

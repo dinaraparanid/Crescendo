@@ -1,6 +1,6 @@
 package com.paranid5.crescendo.presentation.main.audio_effects
 
-import com.paranid5.crescendo.domain.eq.EqualizerData
+import com.paranid5.crescendo.core.common.eq.EqualizerData
 import com.paranid5.crescendo.presentation.UIHandler
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.toImmutableList
@@ -16,7 +16,7 @@ class AudioEffectsUIHandler : UIHandler, KoinComponent {
         level: Float,
         index: Int,
         presentLvlsDbState: MutableList<Float>,
-        equalizerData: EqualizerData,
+        equalizerData: com.paranid5.crescendo.core.common.eq.EqualizerData,
     ): ImmutableList<Short> {
         presentLvlsDbState[index] = level
 

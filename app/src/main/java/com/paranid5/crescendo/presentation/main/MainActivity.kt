@@ -10,7 +10,7 @@ import androidx.compose.ui.Modifier
 import androidx.navigation.compose.rememberNavController
 import com.paranid5.crescendo.presentation.composition_locals.LocalActivity
 import com.paranid5.crescendo.presentation.composition_locals.LocalNavController
-import com.paranid5.crescendo.presentation.ui.theme.MediaStreamerTheme
+import com.paranid5.crescendo.presentation.ui.CrescendoTheme
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class MainActivity : ComponentActivity() {
@@ -22,7 +22,7 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
 
         setContent {
-            MediaStreamerTheme {
+            CrescendoTheme {
                 val mainNavController = NavHostController(
                     value = rememberNavController(),
                     mainActivityViewModel = viewModel

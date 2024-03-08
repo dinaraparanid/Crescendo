@@ -1,6 +1,6 @@
 package com.paranid5.crescendo.services.track_service.playback
 
-import com.paranid5.crescendo.domain.tracks.Track
+import com.paranid5.crescendo.core.common.tracks.Track
 import com.paranid5.crescendo.services.track_service.TrackService
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -32,7 +32,7 @@ fun TrackService.seekToNextTrackAsync() =
 fun TrackService.seekToPrevTrackAsync() =
     serviceScope.launch { playerProvider.seekToPrevTrack() }
 
-fun TrackService.addTrackToPlaylistAsync(track: Track) =
+fun TrackService.addTrackToPlaylistAsync(track: com.paranid5.crescendo.core.common.tracks.Track) =
     serviceScope.launch { playerProvider.addTrackToPlaylist(track) }
 
 fun TrackService.removeTrackFromPlaylistAsync(index: Int) =

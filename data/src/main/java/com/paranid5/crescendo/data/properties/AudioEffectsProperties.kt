@@ -1,7 +1,7 @@
 package com.paranid5.crescendo.data.properties
 
 import com.paranid5.crescendo.data.StorageHandler
-import com.paranid5.crescendo.domain.eq.EqualizerBandsPreset
+import com.paranid5.crescendo.core.common.eq.EqualizerBandsPreset
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.mapLatest
@@ -47,7 +47,7 @@ suspend inline fun StorageHandler.storeEqualizerPreset(preset: Short) =
 inline val StorageHandler.equalizerParamFlow
     get() = audioEffectsStateProvider.equalizerParamFlow
 
-suspend inline fun StorageHandler.storeEqualizerParam(param: EqualizerBandsPreset) =
+suspend inline fun StorageHandler.storeEqualizerParam(param: com.paranid5.crescendo.core.common.eq.EqualizerBandsPreset) =
     audioEffectsStateProvider.storeEqualizerParam(param)
 
 inline val StorageHandler.bassStrengthFlow

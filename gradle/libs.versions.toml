@@ -26,8 +26,9 @@ media3Exoplayer = "1.2.1"
 mobileFfmpegFull = "4.4.LTS"
 navigationCompose = "2.7.7"
 paletteKtx = "1.0.0"
-ui = "1.6.2"
+ui = "1.6.3"
 ytUrlExtractorKt = "0.1.0.2"
+foundationAndroid = "1.6.3"
 
 [libraries]
 amplituda = { module = "com.github.lincollincol:amplituda", version.ref = "amplituda" }
@@ -73,5 +74,6 @@ mobile-ffmpeg-full = { module = "com.arthenica:mobile-ffmpeg-full", version.ref 
 sqldelight-android-driver = { module = "app.cash.sqldelight:android-driver", version.ref = "sqlDelight" }
 sqldelight-coroutines-extensions = { module = "app.cash.sqldelight:coroutines-extensions", version.ref = "sqlDelight" }
 yt-url-extractor-kt = { module = "com.github.dinaraparanid:yt-url-extractor-kt", version.ref = "ytUrlExtractorKt" }
+androidx-foundation-android = { group = "androidx.compose.foundation", name = "foundation-android", version.ref = "foundationAndroid" }
 
 [plugins]

@@ -6,7 +6,7 @@ import android.os.Build
 import android.provider.MediaStore
 import arrow.core.curried
 import com.paranid5.crescendo.core.resources.R
-import com.paranid5.crescendo.domain.tracks.DefaultTrack
+import com.paranid5.crescendo.core.common.tracks.DefaultTrack
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.toImmutableList
 
@@ -19,7 +19,7 @@ private fun trackList(context: Context, cursor: Cursor) =
     generateSequence { getNextTrackOrNull(context, cursor) }.toImmutableList()
 
 private fun getNextTrackOrNull(context: Context, cursor: Cursor) = when {
-    cursor.moveToNext() -> DefaultTrack(
+    cursor.moveToNext() -> com.paranid5.crescendo.core.common.tracks.DefaultTrack(
         androidId = cursor.getLong(0),
         title = cursor.getString(1).nullIfUnknown ?: context.unknownTrackStr,
         artist = cursor.getString(2).nullIfUnknown ?: context.unknownArtistStr,

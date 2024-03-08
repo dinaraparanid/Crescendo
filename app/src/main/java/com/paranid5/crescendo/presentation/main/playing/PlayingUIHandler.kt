@@ -3,11 +3,11 @@ package com.paranid5.crescendo.presentation.main.playing
 import android.content.Context
 import android.widget.Toast
 import com.paranid5.crescendo.AUDIO_SESSION_ID
+import com.paranid5.crescendo.core.common.AudioStatus
+import com.paranid5.crescendo.core.common.caching.Formats
+import com.paranid5.crescendo.core.common.trimming.TrimRange
 import com.paranid5.crescendo.core.resources.R
 import com.paranid5.crescendo.data.StorageHandler
-import com.paranid5.crescendo.domain.trimming.TrimRange
-import com.paranid5.crescendo.domain.caching.Formats
-import com.paranid5.crescendo.domain.media.AudioStatus
 import com.paranid5.crescendo.presentation.UIHandler
 import com.paranid5.crescendo.presentation.main.NavHostController
 import com.paranid5.crescendo.presentation.main.Screens

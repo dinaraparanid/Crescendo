@@ -21,7 +21,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.palette.graphics.Palette
-import com.paranid5.crescendo.domain.media.AudioStatus
+import com.paranid5.crescendo.core.common.AudioStatus
 import com.paranid5.crescendo.koinActivityViewModel
 import com.paranid5.crescendo.presentation.main.playing.PlayingUIHandler
 import com.paranid5.crescendo.presentation.main.playing.PlayingViewModel
@@ -30,7 +30,7 @@ import com.paranid5.crescendo.presentation.main.playing.properties.compose.colle
 import com.paranid5.crescendo.presentation.main.playing.properties.setPlaybackPosition
 import com.paranid5.crescendo.presentation.main.playing.rememberIsLiveStreaming
 import com.paranid5.crescendo.presentation.ui.extensions.getLightMutedOrPrimary
-import com.paranid5.crescendo.presentation.ui.theme.TransparentUtility
+import com.paranid5.crescendo.core.resources.ui.theme.TransparentUtility
 import kotlinx.coroutines.launch
 import org.koin.compose.koinInject
 

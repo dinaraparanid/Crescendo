@@ -33,7 +33,7 @@ import com.paranid5.crescendo.presentation.main.trimmer.properties.compose.colle
 import com.paranid5.crescendo.presentation.main.trimmer.properties.compose.collectWaveformWidthAsState
 import com.paranid5.crescendo.presentation.main.trimmer.properties.compose.collectZoomAsState
 import com.paranid5.crescendo.presentation.ui.extensions.pxToDp
-import com.paranid5.crescendo.presentation.ui.theme.LocalAppColors
+import com.paranid5.crescendo.presentation.ui.LocalAppColors
 
 @Composable
 fun WaveformSpikes(

@@ -4,9 +4,9 @@ import android.content.Context
 import arrow.core.Either
 import arrow.core.raise.either
 import arrow.core.raise.ensure
-import com.paranid5.crescendo.domain.metadata.VideoMetadata
+import com.paranid5.crescendo.core.common.metadata.VideoMetadata
+import com.paranid5.crescendo.core.media.metadata.VideoMetadata.fromYtMeta
 import com.paranid5.yt_url_extractor_kt.VideoMeta
-import com.paranid5.yt_url_extractor_kt.YtFailure
 import com.paranid5.yt_url_extractor_kt.YtFilesNotFoundException
 import com.paranid5.yt_url_extractor_kt.YtRequestTimeoutException
 import com.paranid5.yt_url_extractor_kt.extractYtFilesWithMeta
@@ -55,4 +55,4 @@ class UrlExtractor : KoinComponent {
 }
 
 fun Result<VideoMeta>.getOrDefault() =
-    getOrNull()?.let(::VideoMetadata) ?: VideoMetadata()
+    getOrNull()?.let(::fromYtMeta) ?: VideoMetadata()

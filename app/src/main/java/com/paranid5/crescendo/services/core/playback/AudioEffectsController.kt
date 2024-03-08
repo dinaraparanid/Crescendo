@@ -21,9 +21,10 @@ import com.paranid5.crescendo.data.states.effects.ReverbPresetStateSubscriber
 import com.paranid5.crescendo.data.states.effects.ReverbPresetStateSubscriberImpl
 import com.paranid5.crescendo.data.states.effects.SpeedStateSubscriber
 import com.paranid5.crescendo.data.states.effects.SpeedStateSubscriberImpl
-import com.paranid5.crescendo.domain.eq.EqualizerBandsPreset
-import com.paranid5.crescendo.domain.eq.EqualizerData
-import com.paranid5.crescendo.domain.utils.extensions.usePreset
+import com.paranid5.crescendo.core.common.eq.EqualizerBandsPreset
+import com.paranid5.crescendo.core.common.eq.EqualizerData
+import com.paranid5.crescendo.core.media.eq.EqualizerData.fromEqualizer
+import com.paranid5.crescendo.core.media.eq.usePreset
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.update
 import org.koin.core.component.KoinComponent
@@ -108,7 +109,12 @@ internal class AudioEffectsControllerImpl(storageHandler: StorageHandler) :
         preset: Short,
         parameter: EqualizerBandsPreset
     ) = equalizerDataState.update {
-        EqualizerData(equalizer, bandLevels, preset, parameter)
+        fromEqualizer(
+            equalizer,
+            bandLevels,
+            preset,
+            parameter
+        )
     }
 
     override fun releaseAudioEffects() {

@@ -29,7 +29,7 @@ import com.paranid5.crescendo.presentation.main.trimmer.properties.compose.colle
 import com.paranid5.crescendo.presentation.main.trimmer.properties.compose.collectWaveformWidthAsState
 import com.paranid5.crescendo.presentation.main.trimmer.properties.playbackControllerOffsetFlow
 import com.paranid5.crescendo.presentation.main.trimmer.views.waveform.TrimWaveform
-import com.paranid5.crescendo.presentation.ui.theme.LocalAppColors
+import com.paranid5.crescendo.presentation.ui.LocalAppColors
 import com.paranid5.crescendo.presentation.ui.utils.textWidth
 
 @Composable

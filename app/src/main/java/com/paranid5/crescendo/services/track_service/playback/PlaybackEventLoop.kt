@@ -4,7 +4,7 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.repeatOnLifecycle
 import arrow.core.Tuple4
 import com.paranid5.crescendo.core.resources.R
-import com.paranid5.crescendo.domain.tracks.Track
+import com.paranid5.crescendo.core.common.tracks.Track
 import com.paranid5.crescendo.services.track_service.TrackService
 import com.paranid5.crescendo.services.track_service.showErrNotificationAndSendBroadcast
 import kotlinx.coroutines.flow.collectLatest
@@ -36,7 +36,7 @@ private suspend inline fun TrackService.onEvent(
     event: PlaybackEvent,
     trackInd: Int,
     position: Long,
-    playlist: List<Track>,
+    playlist: List<com.paranid5.crescendo.core.common.tracks.Track>,
 ) = when (event) {
     is PlaybackEvent.StartSamePlaylist -> onPlayPlaylist(
         playlist = playlist,
@@ -76,7 +76,7 @@ private suspend inline fun TrackService.onEvent(
 }
 
 private fun TrackService.onPlayPlaylist(
-    playlist: List<Track>,
+    playlist: List<com.paranid5.crescendo.core.common.tracks.Track>,
     trackIndex: Int,
     initialPosition: Long = 0
 ) {
@@ -89,7 +89,7 @@ private fun TrackService.onPlayPlaylist(
 }
 
 private fun TrackService.onStartNewPlaylist(
-    newPlaylist: List<Track>,
+    newPlaylist: List<com.paranid5.crescendo.core.common.tracks.Track>,
     newTrackIndex: Int,
 ) = onPlayPlaylist(
     playlist = newPlaylist,
@@ -102,7 +102,7 @@ private suspend inline fun TrackService.onPause() {
 }
 
 private fun TrackService.onResume(
-    playlist: List<Track>,
+    playlist: List<com.paranid5.crescendo.core.common.tracks.Track>,
     trackIndex: Int,
     initialPosition: Long
 ) = when {
@@ -136,7 +136,7 @@ private suspend inline fun TrackService.onSeekToNextTrack() {
     playerProvider.setCurrentTrackIndex(newCurTrackInd)
 }
 
-private fun TrackService.onAddTrackToPlaylist(track: Track) =
+private fun TrackService.onAddTrackToPlaylist(track: com.paranid5.crescendo.core.common.tracks.Track) =
     playerProvider.addTrackToPlaylistViaPlayer(track)
 
 private fun TrackService.onRemoveTrackFromPlaylist(index: Int) {
@@ -145,7 +145,7 @@ private fun TrackService.onRemoveTrackFromPlaylist(index: Int) {
 
 private fun TrackService.onReplacePlaylist(
     newCurrentTrackIndex: Int,
-    newCurrentPlaylist: List<Track>
+    newCurrentPlaylist: List<com.paranid5.crescendo.core.common.tracks.Track>
 ) {
     playerProvider.replacePlaylistViaPlayer(newCurrentPlaylist, newCurrentTrackIndex)
 }

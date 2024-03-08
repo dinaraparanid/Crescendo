@@ -1,7 +1,7 @@
 package com.paranid5.crescendo.services.video_cache_service.cache
 
 import android.util.Log
-import com.paranid5.crescendo.domain.caching.CachingStatus
+import com.paranid5.crescendo.core.common.caching.CachingStatus
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
@@ -11,7 +11,7 @@ private const val TAG = "CacheManager"
 
 class CacheManager {
     private val _cachingStatusState by lazy {
-        MutableStateFlow(CachingStatus.NONE)
+        MutableStateFlow(com.paranid5.crescendo.core.common.caching.CachingStatus.NONE)
     }
 
     val cachingStatusState by lazy {
@@ -19,31 +19,31 @@ class CacheManager {
     }
 
     fun onConversionStarted() =
-        _cachingStatusState.update { CachingStatus.CONVERTING }
+        _cachingStatusState.update { com.paranid5.crescendo.core.common.caching.CachingStatus.CONVERTING }
 
     fun onCanceledCurrent() =
-        _cachingStatusState.update { CachingStatus.CANCELED_CUR }
+        _cachingStatusState.update { com.paranid5.crescendo.core.common.caching.CachingStatus.CANCELED_CUR }
 
     fun onCanceledAll() =
-        _cachingStatusState.update { CachingStatus.CANCELED_ALL }
+        _cachingStatusState.update { com.paranid5.crescendo.core.common.caching.CachingStatus.CANCELED_ALL }
 
     fun onConverted() =
-        _cachingStatusState.update { CachingStatus.CONVERTED }
+        _cachingStatusState.update { com.paranid5.crescendo.core.common.caching.CachingStatus.CONVERTED }
 
     fun onCachingError(vararg videoCacheFiles: File) {
-        _cachingStatusState.update { CachingStatus.ERR }
+        _cachingStatusState.update { com.paranid5.crescendo.core.common.caching.CachingStatus.ERR }
         videoCacheFiles.forEach { Log.d(TAG, "File is deleted ${it.delete()}") }
     }
 
     fun prepareForNewVideo() =
-        _cachingStatusState.update { CachingStatus.NONE }
+        _cachingStatusState.update { com.paranid5.crescendo.core.common.caching.CachingStatus.NONE }
 
     fun resetCachingStatus() =
         _cachingStatusState.update { it.afterReset }
 }
 
-private inline val CachingStatus.afterReset
+private inline val com.paranid5.crescendo.core.common.caching.CachingStatus.afterReset
     get() = when (this) {
-        CachingStatus.CONVERTING -> this
-        else -> CachingStatus.NONE
+        com.paranid5.crescendo.core.common.caching.CachingStatus.CONVERTING -> this
+        else -> com.paranid5.crescendo.core.common.caching.CachingStatus.NONE
     }

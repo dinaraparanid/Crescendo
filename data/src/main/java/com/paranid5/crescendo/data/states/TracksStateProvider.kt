@@ -5,9 +5,9 @@ import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.byteArrayPreferencesKey
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.intPreferencesKey
-import com.paranid5.crescendo.domain.tracks.DefaultTrack
-import com.paranid5.crescendo.domain.tracks.Track
-import com.paranid5.crescendo.domain.tracks.TrackOrder
+import com.paranid5.crescendo.core.common.tracks.DefaultTrack
+import com.paranid5.crescendo.core.common.tracks.Track
+import com.paranid5.crescendo.core.common.tracks.TrackOrder
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.ExperimentalCoroutinesApi

@@ -2,9 +2,9 @@ package com.paranid5.crescendo.services.track_service
 
 import android.content.Intent
 import android.os.Build
+import com.paranid5.crescendo.core.common.tracks.Track
 import com.paranid5.crescendo.data.StorageHandler
 import com.paranid5.crescendo.data.current_playlist.CurrentPlaylistRepository
-import com.paranid5.crescendo.domain.tracks.Track
 import com.paranid5.crescendo.services.ConnectionManager
 import com.paranid5.crescendo.services.SuspendService
 import com.paranid5.crescendo.services.connect

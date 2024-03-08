@@ -4,27 +4,10 @@ import arrow.core.Either
 import arrow.core.left
 import arrow.core.raise.either
 import arrow.core.raise.ensure
-import com.paranid5.crescendo.domain.caching.CachingResult
-import com.paranid5.crescendo.domain.media.files.MediaFile
-import com.paranid5.crescendo.domain.media.files.createVideoFileCatching
-import com.paranid5.crescendo.domain.media.files.getInitialVideoDirectory
-
-suspend fun initMediaFile(
-    desiredFilename: String,
-    isAudio: Boolean
-) = either {
-    val storeFileRes = createVideoFileCatching(
-        mediaDirectory = getInitialVideoDirectory(isAudio),
-        filename = desiredFilename.replace(Regex("\\W+"), "_"),
-        ext = "mp4"
-    )
-
-    ensure(storeFileRes.isRight()) {
-        CachingResult.DownloadResult.FileCreationError
-    }
-
-    storeFileRes.getOrNull()!!
-}
+import com.paranid5.crescendo.core.media.caching.CachingResult
+import com.paranid5.crescendo.core.media.files.MediaFile
+import com.paranid5.crescendo.core.media.files.createVideoFileCatching
+import com.paranid5.crescendo.core.media.files.getInitialVideoDirectory
 
 suspend inline fun prepareMediaFilesForMP4Merging(
     desiredFilename: String,
@@ -54,4 +37,21 @@ suspend inline fun prepareMediaFilesForMP4Merging(
     }
 
     return Either.Right(audioFileStore to videoFileStore)
+}
+
+suspend fun initMediaFile(
+    desiredFilename: String,
+    isAudio: Boolean
+) = either {
+    val storeFileRes = createVideoFileCatching(
+        mediaDirectory = getInitialVideoDirectory(isAudio),
+        filename = desiredFilename.replace(Regex("\\W+"), "_"),
+        ext = "mp4"
+    )
+
+    ensure(storeFileRes.isRight()) {
+        CachingResult.DownloadResult.FileCreationError
+    }
+
+    storeFileRes.getOrNull()!!
 }

@@ -4,8 +4,9 @@ import android.content.Intent
 import android.os.Build
 import com.paranid5.crescendo.MainApplication
 import com.paranid5.crescendo.VIDEO_CACHE_SERVICE_CONNECTION
-import com.paranid5.crescendo.domain.caching.Formats
-import com.paranid5.crescendo.domain.trimming.TrimRange
+import com.paranid5.crescendo.core.common.caching.Formats
+import com.paranid5.crescendo.core.common.trimming.TrimRange
+import com.paranid5.crescendo.core.impl.trimming.TrimRangeModel
 import com.paranid5.crescendo.services.ServiceAccessor
 import com.paranid5.crescendo.services.ServiceAccessorImpl
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -31,7 +32,7 @@ class VideoCacheServiceAccessor(application: MainApplication) : KoinComponent,
         putExtra(VideoCacheService.URL_ARG, videoUrl)
         putExtra(VideoCacheService.FILENAME_ARG, desiredFilename)
         putExtra(VideoCacheService.FORMAT_ARG, format)
-        putExtra(VideoCacheService.TRIM_RANGE_ARG, trimRange)
+        putExtra(VideoCacheService.TRIM_RANGE_ARG, TrimRangeModel(trimRange))
     }
 
     private fun startVideoCacheService(

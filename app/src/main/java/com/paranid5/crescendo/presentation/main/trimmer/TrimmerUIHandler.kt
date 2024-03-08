@@ -5,14 +5,14 @@ import android.content.Intent
 import androidx.compose.runtime.Immutable
 import arrow.core.Either
 import com.paranid5.crescendo.core.resources.R
-import com.paranid5.crescendo.domain.caching.Formats
-import com.paranid5.crescendo.domain.media.files.MediaFile
-import com.paranid5.crescendo.domain.media.files.trimmedCatching
-import com.paranid5.crescendo.domain.metadata.AudioMetadata
-import com.paranid5.crescendo.domain.tracks.Track
-import com.paranid5.crescendo.domain.trimming.FadeDurations
-import com.paranid5.crescendo.domain.trimming.PitchAndSpeed
-import com.paranid5.crescendo.domain.trimming.TrimRange
+import com.paranid5.crescendo.core.common.caching.Formats
+import com.paranid5.crescendo.core.media.files.MediaFile
+import com.paranid5.crescendo.core.media.files.trimmedCatching
+import com.paranid5.crescendo.core.common.metadata.AudioMetadata
+import com.paranid5.crescendo.core.common.tracks.Track
+import com.paranid5.crescendo.core.common.trimming.FadeDurations
+import com.paranid5.crescendo.core.common.trimming.PitchAndSpeed
+import com.paranid5.crescendo.core.common.trimming.TrimRange
 import com.paranid5.crescendo.media.tags.setAudioTags
 import com.paranid5.crescendo.presentation.UIHandler
 import com.paranid5.crescendo.receivers.TrimmingStatusReceiver
@@ -22,12 +22,12 @@ import java.io.File
 class TrimmerUIHandler : UIHandler {
     suspend fun trimTrackAndSendBroadcast(
         context: Context,
-        track: Track,
+        track: com.paranid5.crescendo.core.common.tracks.Track,
         outputFilename: String,
-        audioFormat: Formats,
-        trimRange: TrimRange,
-        pitchAndSpeed: PitchAndSpeed,
-        fadeDurations: FadeDurations
+        audioFormat: com.paranid5.crescendo.core.common.caching.Formats,
+        trimRange: com.paranid5.crescendo.core.common.trimming.TrimRange,
+        pitchAndSpeed: com.paranid5.crescendo.core.common.trimming.PitchAndSpeed,
+        fadeDurations: com.paranid5.crescendo.core.common.trimming.FadeDurations
     ) = context.sendTrimmingStatusBroadcast(
         trimTrackResult(
             context = context,
@@ -42,24 +42,24 @@ class TrimmerUIHandler : UIHandler {
 
     private suspend inline fun trimTrackResult(
         context: Context,
-        track: Track,
+        track: com.paranid5.crescendo.core.common.tracks.Track,
         outputFilename: String,
-        audioFormat: Formats,
-        trimRange: TrimRange,
-        pitchAndSpeed: PitchAndSpeed,
-        fadeDurations: FadeDurations
-    ) = MediaFile.AudioFile(File(track.path))
+        audioFormat: com.paranid5.crescendo.core.common.caching.Formats,
+        trimRange: com.paranid5.crescendo.core.common.trimming.TrimRange,
+        pitchAndSpeed: com.paranid5.crescendo.core.common.trimming.PitchAndSpeed,
+        fadeDurations: com.paranid5.crescendo.core.common.trimming.FadeDurations
+    ) = com.paranid5.crescendo.core.media.files.MediaFile.AudioFile(File(track.path))
         .trimmedCatching(outputFilename, audioFormat, trimRange, pitchAndSpeed, fadeDurations)
         .onRight { file ->
             setAudioTags(
                 context = context,
                 audioFile = file,
-                metadata = AudioMetadata.extract(track),
+                metadata = com.paranid5.crescendo.core.common.metadata.AudioMetadata.extract(track),
                 audioFormat = audioFormat
             )
         }
 
-    private fun Context.sendTrimmingStatusBroadcast(trimmingResult: Either<Throwable, MediaFile.AudioFile>) =
+    private fun Context.sendTrimmingStatusBroadcast(trimmingResult: Either<Throwable, com.paranid5.crescendo.core.media.files.MediaFile.AudioFile>) =
         sendBroadcast(
             Intent(applicationContext, TrimmingStatusReceiver::class.java)
                 .setAction(TrimmingStatusReceiver.Broadcast_TRIMMING_COMPLETED)
@@ -69,7 +69,7 @@ class TrimmerUIHandler : UIHandler {
                 )
         )
 
-    private fun Context.trimmingStatusMessage(trimmingResult: Either<Throwable, MediaFile.AudioFile>) =
+    private fun Context.trimmingStatusMessage(trimmingResult: Either<Throwable, com.paranid5.crescendo.core.media.files.MediaFile.AudioFile>) =
         when (trimmingResult) {
             is Either.Right -> getString(R.string.file_trimmed)
 

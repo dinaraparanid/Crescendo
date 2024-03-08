@@ -23,7 +23,7 @@ import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import com.paranid5.crescendo.EQUALIZER_DATA
 import com.paranid5.crescendo.core.resources.R
-import com.paranid5.crescendo.domain.eq.EqualizerData
+import com.paranid5.crescendo.core.common.eq.EqualizerData
 import com.paranid5.crescendo.presentation.main.audio_effects.view.getBandTrackModel
 import com.paranid5.crescendo.presentation.ui.extensions.collectLatestAsState
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -36,7 +36,7 @@ fun BandController(
     presentLvlsDbState: SnapshotStateList<Float>,
     pointsState: SnapshotStateList<Offset>,
     modifier: Modifier = Modifier,
-    equalizerDataState: MutableStateFlow<EqualizerData?> = koinInject(named(EQUALIZER_DATA)),
+    equalizerDataState: MutableStateFlow<com.paranid5.crescendo.core.common.eq.EqualizerData?> = koinInject(named(EQUALIZER_DATA)),
 ) {
     val equalizerData by equalizerDataState.collectLatestAsState()
 

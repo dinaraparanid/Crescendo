@@ -1,7 +1,7 @@
 package com.paranid5.crescendo.presentation.main.tracks.states
 
 import com.paranid5.crescendo.data.StorageHandler
-import com.paranid5.crescendo.domain.tracks.Track
+import com.paranid5.crescendo.core.common.tracks.Track
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -10,15 +10,15 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 
 interface TracksStateHolder {
-    val tracksState: StateFlow<ImmutableList<Track>>
-    val filteredTracksState: StateFlow<ImmutableList<Track>>
+    val tracksState: StateFlow<ImmutableList<com.paranid5.crescendo.core.common.tracks.Track>>
+    val filteredTracksState: StateFlow<ImmutableList<com.paranid5.crescendo.core.common.tracks.Track>>
 
-    fun setTracks(tracks: ImmutableList<Track>)
-    fun setFilteredTracks(tracks: ImmutableList<Track>)
+    fun setTracks(tracks: ImmutableList<com.paranid5.crescendo.core.common.tracks.Track>)
+    fun setFilteredTracks(tracks: ImmutableList<com.paranid5.crescendo.core.common.tracks.Track>)
 }
 
 class TracksStateHolderImpl(private val storageHandler: StorageHandler) : TracksStateHolder {
-    private val _tracksState: MutableStateFlow<ImmutableList<Track>> by lazy {
+    private val _tracksState: MutableStateFlow<ImmutableList<com.paranid5.crescendo.core.common.tracks.Track>> by lazy {
         MutableStateFlow(persistentListOf())
     }
 
@@ -26,10 +26,10 @@ class TracksStateHolderImpl(private val storageHandler: StorageHandler) : Tracks
         _tracksState.asStateFlow()
     }
 
-    override fun setTracks(tracks: ImmutableList<Track>) =
+    override fun setTracks(tracks: ImmutableList<com.paranid5.crescendo.core.common.tracks.Track>) =
         _tracksState.update { tracks }
 
-    private val _filteredTracksState: MutableStateFlow<ImmutableList<Track>> by lazy {
+    private val _filteredTracksState: MutableStateFlow<ImmutableList<com.paranid5.crescendo.core.common.tracks.Track>> by lazy {
         MutableStateFlow(persistentListOf())
     }
 
@@ -37,6 +37,6 @@ class TracksStateHolderImpl(private val storageHandler: StorageHandler) : Tracks
         _filteredTracksState.asStateFlow()
     }
 
-    override fun setFilteredTracks(tracks: ImmutableList<Track>) =
+    override fun setFilteredTracks(tracks: ImmutableList<com.paranid5.crescendo.core.common.tracks.Track>) =
         _filteredTracksState.update { tracks }
 }

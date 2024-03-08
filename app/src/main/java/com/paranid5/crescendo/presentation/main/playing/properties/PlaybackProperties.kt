@@ -1,6 +1,6 @@
 package com.paranid5.crescendo.presentation.main.playing.properties
 
-import com.paranid5.crescendo.domain.media.AudioStatus
+import com.paranid5.crescendo.core.common.AudioStatus
 import com.paranid5.crescendo.presentation.main.playing.PlayingViewModel
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.map

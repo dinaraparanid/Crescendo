@@ -1,7 +1,7 @@
 package com.paranid5.crescendo.presentation.main.trimmer.properties.compose
 
 import androidx.compose.runtime.Composable
-import com.paranid5.crescendo.domain.trimming.PitchAndSpeed
+import com.paranid5.crescendo.core.common.trimming.PitchAndSpeed
 import com.paranid5.crescendo.presentation.main.trimmer.TrimmerViewModel
 import com.paranid5.crescendo.presentation.main.trimmer.properties.pitchAndSpeedFlow
 import com.paranid5.crescendo.presentation.main.trimmer.properties.playbackAlphaFlow
@@ -28,5 +28,5 @@ fun TrimmerViewModel.collectPlaybackAlphaAsState(initial: Float = 0F) =
     playbackAlphaFlow.collectLatestAsState(initial)
 
 @Composable
-fun TrimmerViewModel.collectPitchAndSpeedAsState(initial: PitchAndSpeed = PitchAndSpeed()) =
+fun TrimmerViewModel.collectPitchAndSpeedAsState(initial: com.paranid5.crescendo.core.common.trimming.PitchAndSpeed = com.paranid5.crescendo.core.common.trimming.PitchAndSpeed()) =
     pitchAndSpeedFlow.collectLatestAsState(initial)

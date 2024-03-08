@@ -1,7 +1,7 @@
 package com.paranid5.crescendo.data.properties
 
+import com.paranid5.crescendo.core.common.tracks.TrackOrder
 import com.paranid5.crescendo.data.StorageHandler
-import com.paranid5.crescendo.domain.tracks.TrackOrder
 
 inline val StorageHandler.currentTrackIndexFlow
     get() = tracksStateProvider.currentTrackIndexFlow

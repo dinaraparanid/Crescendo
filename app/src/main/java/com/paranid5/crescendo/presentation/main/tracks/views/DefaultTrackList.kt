@@ -7,17 +7,16 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import com.paranid5.crescendo.IS_PLAYING
+import com.paranid5.crescendo.core.common.AudioStatus
+import com.paranid5.crescendo.core.common.tracks.Track
 import com.paranid5.crescendo.data.states.playback.AudioStatusStatePublisher
 import com.paranid5.crescendo.data.states.tracks.CurrentPlaylistStatePublisher
 import com.paranid5.crescendo.data.states.tracks.CurrentTrackIndexStatePublisher
-import com.paranid5.crescendo.domain.media.AudioStatus
-import com.paranid5.crescendo.domain.tracks.Track
 import com.paranid5.crescendo.koinActivityViewModel
 import com.paranid5.crescendo.presentation.composition_locals.playing.LocalPlayingPagerState
 import com.paranid5.crescendo.presentation.main.tracks.TracksViewModel
 import com.paranid5.crescendo.presentation.main.tracks.properties.compose.collectShownTracksAsState
 import com.paranid5.crescendo.presentation.main.tracks.properties.compose.currentTrackState
-import com.paranid5.crescendo.presentation.ui.extensions.collectLatestAsState
 import com.paranid5.crescendo.services.track_service.TrackServiceAccessor
 import com.paranid5.crescendo.services.track_service.TrackServiceStart
 import kotlinx.collections.immutable.ImmutableList
@@ -38,7 +37,6 @@ fun DefaultTrackList(
 ) {
     val playingPagerState = LocalPlayingPagerState.current
     val shownTracks by viewModel.collectShownTracksAsState()
-    val isPlaying by isPlayingState.collectLatestAsState()
     val currentTrack by currentTrackState()
     val coroutineScope = rememberCoroutineScope()
 
@@ -59,7 +57,6 @@ fun DefaultTrackList(
                         newTracks = shownTracks,
                         newTrackIndex = trackInd,
                         currentTrack = currentTrack,
-                        isPlaying = isPlaying,
                         viewModel = viewModel,
                         trackServiceAccessor = trackServiceAccessor
                     )
@@ -73,7 +70,6 @@ internal suspend inline fun <VM> startPlaylistPlayback(
     newTracks: ImmutableList<Track>,
     newTrackIndex: Int,
     currentTrack: Track?,
-    isPlaying: Boolean,
     viewModel: VM,
     trackServiceAccessor: TrackServiceAccessor,
 ) where VM : AudioStatusStatePublisher,
@@ -84,14 +80,13 @@ internal suspend inline fun <VM> startPlaylistPlayback(
     viewModel.setCurrentTrackIndex(newTrackIndex)
 
     val newCurrentTrack = newTracks.getOrNull(newTrackIndex)
-    val startType = startType(currentTrack, newCurrentTrack, isPlaying)
+    val startType = startType(currentTrack, newCurrentTrack)
     trackServiceAccessor.startPlaying(startType)
 }
 
 private fun startType(
     currentTrack: Track?,
     newCurrentTrack: Track?,
-    isPlaying: Boolean
 ) = when {
     currentTrack?.path == newCurrentTrack?.path -> TrackServiceStart.RESUME
     else -> TrackServiceStart.NEW_PLAYLIST

@@ -4,7 +4,7 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.os.Build
-import com.paranid5.crescendo.domain.caching.VideoCacheResponse
+import com.paranid5.crescendo.core.media.caching.VideoCacheResponse
 import com.paranid5.crescendo.presentation.ui.extensions.toast
 
 class CacheStatusReceiver : BroadcastReceiver() {

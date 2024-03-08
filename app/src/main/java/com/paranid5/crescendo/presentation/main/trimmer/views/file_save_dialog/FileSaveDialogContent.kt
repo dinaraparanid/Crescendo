@@ -11,20 +11,20 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.paranid5.crescendo.domain.caching.Formats
-import com.paranid5.crescendo.domain.tracks.Track
-import com.paranid5.crescendo.domain.trimming.FadeDurations
-import com.paranid5.crescendo.domain.trimming.PitchAndSpeed
-import com.paranid5.crescendo.domain.trimming.TrimRange
+import com.paranid5.crescendo.core.common.caching.Formats
+import com.paranid5.crescendo.core.common.tracks.Track
+import com.paranid5.crescendo.core.common.trimming.FadeDurations
+import com.paranid5.crescendo.core.common.trimming.PitchAndSpeed
+import com.paranid5.crescendo.core.common.trimming.TrimRange
 
 @Composable
 fun FileSaveDialogContent(
     fileSaveOptions: Array<String>,
-    track: Track,
-    audioFormat: Formats,
-    pitchAndSpeed: PitchAndSpeed,
-    trimRange: TrimRange,
-    fadeDurations: FadeDurations,
+    track: com.paranid5.crescendo.core.common.tracks.Track,
+    audioFormat: com.paranid5.crescendo.core.common.caching.Formats,
+    pitchAndSpeed: com.paranid5.crescendo.core.common.trimming.PitchAndSpeed,
+    trimRange: com.paranid5.crescendo.core.common.trimming.TrimRange,
+    fadeDurations: com.paranid5.crescendo.core.common.trimming.FadeDurations,
     isSaveButtonClickable: Boolean,
     isDialogShownState: MutableState<Boolean>,
     filenameState: MutableState<String>,

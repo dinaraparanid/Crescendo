@@ -19,12 +19,12 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewModelScope
 import com.paranid5.crescendo.core.resources.R
-import com.paranid5.crescendo.domain.eq.EqualizerBandsPreset
-import com.paranid5.crescendo.domain.eq.EqualizerData
+import com.paranid5.crescendo.core.common.eq.EqualizerBandsPreset
+import com.paranid5.crescendo.core.common.eq.EqualizerData
 import com.paranid5.crescendo.koinActivityViewModel
 import com.paranid5.crescendo.presentation.main.audio_effects.AudioEffectsUIHandler
 import com.paranid5.crescendo.presentation.main.audio_effects.AudioEffectsViewModel
-import com.paranid5.crescendo.presentation.ui.theme.LocalAppColors
+import com.paranid5.crescendo.presentation.ui.LocalAppColors
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import org.koin.compose.koinInject
@@ -40,7 +40,7 @@ fun BandSlider(
     sliderYPosState: MutableFloatState,
     sliderWidthState: MutableIntState,
     sliderHeightState: MutableIntState,
-    equalizerData: EqualizerData?,
+    equalizerData: com.paranid5.crescendo.core.common.eq.EqualizerData?,
     modifier: Modifier = Modifier,
     thumbModifier: Modifier = Modifier,
     viewModel: AudioEffectsViewModel = koinActivityViewModel(),
@@ -67,7 +67,7 @@ fun BandSlider(
                 )
 
                 viewModel.setEqualizerBands(bands)
-                viewModel.setEqualizerParam(EqualizerBandsPreset.CUSTOM)
+                viewModel.setEqualizerParam(com.paranid5.crescendo.core.common.eq.EqualizerBandsPreset.CUSTOM)
             }
         },
         thumb = {

@@ -1,8 +1,8 @@
 package com.paranid5.crescendo.data.current_playlist
 
+import com.paranid5.crescendo.core.common.tracks.DefaultTrack
+import com.paranid5.crescendo.core.common.tracks.Track
 import com.paranid5.crescendo.data.CurrentPlaylistTrack
-import com.paranid5.crescendo.domain.tracks.DefaultTrack
-import com.paranid5.crescendo.domain.tracks.Track
 
 internal fun CurrentPlaylistTrack.toTrack(): Track =
     DefaultTrack(

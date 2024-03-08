@@ -5,15 +5,15 @@ import android.content.Context
 import android.net.Uri
 import android.os.Build
 import android.provider.MediaStore
-import com.paranid5.crescendo.domain.metadata.AudioMetadata
-import com.paranid5.crescendo.domain.metadata.Metadata
-import com.paranid5.crescendo.domain.metadata.VideoMetadata
+import com.paranid5.crescendo.core.common.metadata.AudioMetadata
+import com.paranid5.crescendo.core.common.metadata.Metadata
+import com.paranid5.crescendo.core.common.metadata.VideoMetadata
 
 fun Context.insertMediaFileToMediaStore(
     externalContentUri: Uri,
     absoluteFilePath: String,
     relativeFilePath: String,
-    metadata: Metadata,
+    metadata: com.paranid5.crescendo.core.common.metadata.Metadata,
     mimeType: String,
 ): Uri {
     val uri = applicationContext.contentResolver.insert(
@@ -33,9 +33,9 @@ fun Context.insertMediaFileToMediaStore(
 private fun ContentValues(
     absoluteFilePath: String,
     relativeFilePath: String,
-    metadata: Metadata,
+    metadata: com.paranid5.crescendo.core.common.metadata.Metadata,
     mimeType: String,
 ) = when (metadata) {
-    is AudioMetadata -> ContentValues(absoluteFilePath, relativeFilePath, metadata, mimeType)
-    is VideoMetadata -> ContentValues(absoluteFilePath, relativeFilePath, metadata, mimeType)
+    is com.paranid5.crescendo.core.common.metadata.AudioMetadata -> ContentValues(absoluteFilePath, relativeFilePath, metadata, mimeType)
+    is com.paranid5.crescendo.core.common.metadata.VideoMetadata -> ContentValues(absoluteFilePath, relativeFilePath, metadata, mimeType)
 }

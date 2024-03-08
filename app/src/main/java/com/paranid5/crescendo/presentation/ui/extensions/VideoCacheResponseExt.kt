@@ -2,8 +2,8 @@ package com.paranid5.crescendo.presentation.ui.extensions
 
 import android.content.Context
 import android.widget.Toast
+import com.paranid5.crescendo.core.media.caching.VideoCacheResponse
 import com.paranid5.crescendo.core.resources.R
-import com.paranid5.crescendo.domain.caching.VideoCacheResponse
 
 fun toast(response: VideoCacheResponse, context: Context) =
     Toast.makeText(context, response.message(context), Toast.LENGTH_LONG).show()

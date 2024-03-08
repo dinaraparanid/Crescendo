@@ -21,8 +21,8 @@ import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import com.paranid5.crescendo.core.resources.R
-import com.paranid5.crescendo.presentation.ui.theme.Disabled
-import com.paranid5.crescendo.presentation.ui.theme.LocalAppColors
+import com.paranid5.crescendo.core.resources.ui.theme.Disabled
+import com.paranid5.crescendo.presentation.ui.LocalAppColors
 import kotlin.math.PI
 import kotlin.math.atan2
 

@@ -5,7 +5,7 @@ import app.cash.sqldelight.coroutines.mapToList
 import app.cash.sqldelight.db.SqlDriver
 import com.paranid5.crescendo.data.CurrentPlaylist
 import com.paranid5.crescendo.data.CurrentPlaylistTrack
-import com.paranid5.crescendo.domain.tracks.Track
+import com.paranid5.crescendo.core.common.tracks.Track
 import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -30,11 +30,11 @@ class CurrentPlaylistRepository(driver: SqlDriver) :
             .mapToList(Dispatchers.IO)
             .map { it.map(CurrentPlaylistTrack::toTrack).toImmutableList() }
 
-    fun replacePlaylistAsync(playlist: List<Track>): Job {
+    fun replacePlaylistAsync(playlist: List<com.paranid5.crescendo.core.common.tracks.Track>): Job {
         return launch(Dispatchers.IO) { replacePlaylist(playlist) }
     }
 
-    private fun replacePlaylist(playlist: List<Track>) =
+    private fun replacePlaylist(playlist: List<com.paranid5.crescendo.core.common.tracks.Track>) =
         queries.transaction {
             queries.clearPlaylist()
 

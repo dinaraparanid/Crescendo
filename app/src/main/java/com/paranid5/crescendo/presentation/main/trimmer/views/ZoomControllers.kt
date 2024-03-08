@@ -29,7 +29,7 @@ import com.paranid5.crescendo.presentation.main.trimmer.properties.compose.colle
 import com.paranid5.crescendo.presentation.main.trimmer.properties.compose.collectZoomAsState
 import com.paranid5.crescendo.presentation.main.trimmer.properties.zoomIn
 import com.paranid5.crescendo.presentation.main.trimmer.properties.zoomOut
-import com.paranid5.crescendo.presentation.ui.theme.LocalAppColors
+import com.paranid5.crescendo.presentation.ui.LocalAppColors
 
 @Composable
 fun ZoomControllers(

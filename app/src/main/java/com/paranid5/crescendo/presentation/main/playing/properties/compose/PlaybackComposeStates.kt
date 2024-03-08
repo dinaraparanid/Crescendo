@@ -1,10 +1,10 @@
 package com.paranid5.crescendo.presentation.main.playing.properties.compose
 
 import androidx.compose.runtime.Composable
+import com.paranid5.crescendo.core.common.AudioStatus
 import com.paranid5.crescendo.data.states.stream.currentMetadataDurationMillisFlow
-import com.paranid5.crescendo.domain.media.AudioStatus
-import com.paranid5.crescendo.domain.metadata.VideoMetadata
-import com.paranid5.crescendo.domain.tracks.DefaultTrack
+import com.paranid5.crescendo.core.common.metadata.VideoMetadata
+import com.paranid5.crescendo.core.common.tracks.DefaultTrack
 import com.paranid5.crescendo.presentation.main.playing.PlayingViewModel
 import com.paranid5.crescendo.presentation.main.playing.properties.durationMillisFlow
 import com.paranid5.crescendo.presentation.main.playing.properties.playbackPositionFlow

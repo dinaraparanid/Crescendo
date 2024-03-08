@@ -13,7 +13,7 @@ import androidx.compose.ui.unit.dp
 import com.paranid5.crescendo.presentation.composition_locals.trimmer.LocalTrimmerEffectSheetState
 import com.paranid5.crescendo.presentation.main.trimmer.views.EffectsBottomSheet
 import com.paranid5.crescendo.presentation.main.trimmer.views.TrimmerScreenContent
-import com.paranid5.crescendo.presentation.ui.theme.LocalAppColors
+import com.paranid5.crescendo.presentation.ui.LocalAppColors
 
 internal const val MIN_SPIKE_HEIGHT = 1F
 internal const val DEFAULT_GRAPHICS_LAYER_ALPHA = 0.99F

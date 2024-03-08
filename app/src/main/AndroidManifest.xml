@@ -70,7 +70,7 @@
             </intent-filter>
         </receiver>
         <receiver
-                android:name=".domain.media_scanner.MediaScannerReceiver"
+                android:name=".core.media.media_scanner.MediaScannerReceiver"
                 android:exported="false">
             <intent-filter>
                 <action android:name="com.paranid5.crescendo.domain.media_scanner.SCAN_FILE"/>

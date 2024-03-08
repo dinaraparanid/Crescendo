@@ -5,7 +5,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.palette.graphics.Palette
-import com.paranid5.crescendo.domain.media.AudioStatus
+import com.paranid5.crescendo.core.common.AudioStatus
 import com.paranid5.crescendo.presentation.main.playing.rememberIsLiveStreaming
 import com.paranid5.crescendo.presentation.main.playing.views.playback_buttons.NextButton
 import com.paranid5.crescendo.presentation.main.playing.views.playback_buttons.PlayPauseButton

@@ -5,10 +5,10 @@ import androidx.annotation.RequiresApi
 import androidx.annotation.StringRes
 import androidx.compose.runtime.Composable
 import androidx.lifecycle.ViewModel
+import com.paranid5.crescendo.core.common.eq.EqualizerData
 import com.paranid5.crescendo.core.resources.R
 import com.paranid5.crescendo.data.StorageHandler
 import com.paranid5.crescendo.data.sqlDelightModule
-import com.paranid5.crescendo.domain.eq.EqualizerData
 import com.paranid5.crescendo.domain.ktor_client.KtorClient
 import com.paranid5.crescendo.presentation.composition_locals.LocalActivity
 import com.paranid5.crescendo.presentation.main.MainActivityViewModel

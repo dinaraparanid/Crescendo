@@ -8,9 +8,9 @@ import android.content.Context
 import android.os.Build
 import androidx.annotation.RequiresApi
 import com.paranid5.crescendo.core.resources.R
-import com.paranid5.crescendo.domain.caching.CachingStatus
-import com.paranid5.crescendo.domain.caching.DownloadingStatus
-import com.paranid5.crescendo.domain.metadata.VideoMetadata
+import com.paranid5.crescendo.core.common.caching.CachingStatus
+import com.paranid5.crescendo.core.common.caching.DownloadingStatus
+import com.paranid5.crescendo.core.common.metadata.VideoMetadata
 import com.paranid5.crescendo.services.video_cache_service.VideoCacheService
 
 internal const val VIDEO_CACHE_NOTIFICATION_ID = 103
@@ -37,14 +37,14 @@ class NotificationManager(service: VideoCacheService) {
 
     fun showNotification(
         service: VideoCacheService,
-        downloadStatus: DownloadingStatus,
-        cacheStatus: CachingStatus,
-        videoMetadata: VideoMetadata,
+        downloadStatus: com.paranid5.crescendo.core.common.caching.DownloadingStatus,
+        cacheStatus: com.paranid5.crescendo.core.common.caching.CachingStatus,
+        videoMetadata: com.paranid5.crescendo.core.common.metadata.VideoMetadata,
         videoQueueLen: Int,
         downloadedBytes: Long,
         totalBytes: Long,
     ) = when (downloadStatus) {
-        DownloadingStatus.Downloading ->
+        com.paranid5.crescendo.core.common.caching.DownloadingStatus.Downloading ->
             showDownloadNotification(
                 service = service,
                 videoTitle = service videoTitleOf videoMetadata,
@@ -53,16 +53,16 @@ class NotificationManager(service: VideoCacheService) {
                 totalBytes = totalBytes
             )
 
-        DownloadingStatus.CanceledCurrent ->
+        com.paranid5.crescendo.core.common.caching.DownloadingStatus.CanceledCurrent ->
             showCanceledNotification(service)
 
-        DownloadingStatus.CanceledAll ->
+        com.paranid5.crescendo.core.common.caching.DownloadingStatus.CanceledAll ->
             showCanceledNotification(service)
 
-        DownloadingStatus.ConnectionLost ->
+        com.paranid5.crescendo.core.common.caching.DownloadingStatus.ConnectionLost ->
             showConnectionLostNotification(service)
 
-        DownloadingStatus.Downloaded ->
+        com.paranid5.crescendo.core.common.caching.DownloadingStatus.Downloaded ->
             showCachingNotification(
                 service = service,
                 cacheStatus = cacheStatus,
@@ -74,22 +74,22 @@ class NotificationManager(service: VideoCacheService) {
 
     private fun showCachingNotification(
         service: VideoCacheService,
-        cacheStatus: CachingStatus,
-        videoMetadata: VideoMetadata,
+        cacheStatus: com.paranid5.crescendo.core.common.caching.CachingStatus,
+        videoMetadata: com.paranid5.crescendo.core.common.metadata.VideoMetadata,
     ) = when (cacheStatus) {
-        CachingStatus.CONVERTING ->
+        com.paranid5.crescendo.core.common.caching.CachingStatus.CONVERTING ->
             showConvertingNotification(
                 context = service,
                 videoTitle = service videoTitleOf videoMetadata
             )
 
-        CachingStatus.CONVERTED ->
+        com.paranid5.crescendo.core.common.caching.CachingStatus.CONVERTED ->
             showCachedNotification(service)
 
-        CachingStatus.CANCELED_CUR ->
+        com.paranid5.crescendo.core.common.caching.CachingStatus.CANCELED_CUR ->
             showCanceledNotification(service)
 
-        CachingStatus.CANCELED_ALL ->
+        com.paranid5.crescendo.core.common.caching.CachingStatus.CANCELED_ALL ->
             showCanceledNotification(service)
 
         else -> Unit
@@ -143,5 +143,5 @@ class NotificationManager(service: VideoCacheService) {
         )
 }
 
-private infix fun Context.videoTitleOf(videoMetadata: VideoMetadata) =
+private infix fun Context.videoTitleOf(videoMetadata: com.paranid5.crescendo.core.common.metadata.VideoMetadata) =
     videoMetadata.title ?: getString(R.string.stream_no_name)

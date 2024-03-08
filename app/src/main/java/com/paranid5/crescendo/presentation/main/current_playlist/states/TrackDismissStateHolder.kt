@@ -1,6 +1,6 @@
 package com.paranid5.crescendo.presentation.main.current_playlist.states
 
-import com.paranid5.crescendo.domain.tracks.Track
+import com.paranid5.crescendo.core.common.tracks.Track
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -9,25 +9,25 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 
 interface TrackDismissStateHolder {
-    val playlistDismissMediatorState: StateFlow<ImmutableList<Track>>
+    val playlistDismissMediatorState: StateFlow<ImmutableList<com.paranid5.crescendo.core.common.tracks.Track>>
     val trackIndexDismissMediatorState: StateFlow<Int>
     val trackPathDismissKeyState: StateFlow<String>
 
-    fun setPlaylistDismissMediator(playlistDismissMediator: ImmutableList<Track>)
+    fun setPlaylistDismissMediator(playlistDismissMediator: ImmutableList<com.paranid5.crescendo.core.common.tracks.Track>)
     fun setTrackIndexDismissMediator(trackIndexDismissMediator: Int)
     fun setTrackPathDismissKey(trackPathDismissKey: String)
 }
 
 class TrackDismissStateHolderImpl : TrackDismissStateHolder {
     private val _playlistDismissMediatorState by lazy {
-        MutableStateFlow<ImmutableList<Track>>(persistentListOf())
+        MutableStateFlow<ImmutableList<com.paranid5.crescendo.core.common.tracks.Track>>(persistentListOf())
     }
 
     override val playlistDismissMediatorState by lazy {
         _playlistDismissMediatorState.asStateFlow()
     }
 
-    override fun setPlaylistDismissMediator(playlistDismissMediator: ImmutableList<Track>) =
+    override fun setPlaylistDismissMediator(playlistDismissMediator: ImmutableList<com.paranid5.crescendo.core.common.tracks.Track>) =
         _playlistDismissMediatorState.update { playlistDismissMediator }
 
     private val _trackIndexDismissMediatorState by lazy {

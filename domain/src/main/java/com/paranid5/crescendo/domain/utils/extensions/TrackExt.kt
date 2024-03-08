@@ -3,13 +3,13 @@ package com.paranid5.crescendo.domain.utils.extensions
 import android.graphics.Bitmap
 import android.support.v4.media.MediaMetadataCompat
 import androidx.media3.common.MediaItem
-import com.paranid5.crescendo.domain.tracks.DefaultTrack
-import com.paranid5.crescendo.domain.tracks.Track
+import com.paranid5.crescendo.core.common.tracks.DefaultTrack
+import com.paranid5.crescendo.core.common.tracks.Track
 
-inline val Track.artistAlbum
+inline val com.paranid5.crescendo.core.common.tracks.Track.artistAlbum
     get() = "$artist / $album"
 
-fun Track.toAndroidMetadata(cover: Bitmap? = null): MediaMetadataCompat =
+fun com.paranid5.crescendo.core.common.tracks.Track.toAndroidMetadata(cover: Bitmap? = null): MediaMetadataCompat =
     MediaMetadataCompat.Builder()
         .putText(MediaMetadataCompat.METADATA_KEY_TITLE, title)
         .putText(MediaMetadataCompat.METADATA_KEY_ARTIST, artist)
@@ -18,11 +18,11 @@ fun Track.toAndroidMetadata(cover: Bitmap? = null): MediaMetadataCompat =
         .putBitmap(MediaMetadataCompat.METADATA_KEY_ART, cover)
         .build()
 
-fun Track.toMediaItem() = MediaItem.fromUri(path)
+fun com.paranid5.crescendo.core.common.tracks.Track.toMediaItem() = MediaItem.fromUri(path)
 
-fun Iterable<Track>.toDefaultTrackList() = map(::DefaultTrack)
+fun Iterable<com.paranid5.crescendo.core.common.tracks.Track>.toDefaultTrackList() = map(::DefaultTrack)
 
-fun Iterable<Track>.toMediaItemList() = map(Track::toMediaItem)
+fun Iterable<com.paranid5.crescendo.core.common.tracks.Track>.toMediaItemList() = map(com.paranid5.crescendo.core.common.tracks.Track::toMediaItem)
 
-inline val Iterable<Track>.totalDurationMillis
+inline val Iterable<com.paranid5.crescendo.core.common.tracks.Track>.totalDurationMillis
     get() = fold(0L) { acc, track -> acc + track.durationMillis }

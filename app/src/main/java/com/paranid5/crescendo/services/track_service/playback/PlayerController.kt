@@ -3,7 +3,7 @@ package com.paranid5.crescendo.services.track_service.playback
 import androidx.media3.common.Player
 import com.paranid5.crescendo.data.states.playback.RepeatingStatePublisher
 import com.paranid5.crescendo.data.states.playback.RepeatingStateSubscriber
-import com.paranid5.crescendo.domain.tracks.Track
+import com.paranid5.crescendo.core.common.tracks.Track
 import com.paranid5.crescendo.services.core.playback.AudioEffectsController
 import kotlinx.coroutines.flow.StateFlow
 
@@ -22,7 +22,7 @@ interface PlayerController :
     suspend fun setAndStoreRepeating(isRepeating: Boolean)
 
     fun playPlaylistViaPlayer(
-        playlist: List<Track>,
+        playlist: List<com.paranid5.crescendo.core.common.tracks.Track>,
         currentTrackIndex: Int,
         initialPosition: Long
     )
@@ -41,11 +41,11 @@ interface PlayerController :
 
     fun resetAudioSessionIdIfNotPlaying()
 
-    fun addTrackToPlaylistViaPlayer(track: Track)
+    fun addTrackToPlaylistViaPlayer(track: com.paranid5.crescendo.core.common.tracks.Track)
 
     fun removeTrackViaPlayer(index: Int): Int
 
-    fun replacePlaylistViaPlayer(newPlaylist: List<Track>, newCurrentTrackIndex: Int)
+    fun replacePlaylistViaPlayer(newPlaylist: List<com.paranid5.crescendo.core.common.tracks.Track>, newCurrentTrackIndex: Int)
 
     fun releasePlayerWithEffects()
 }

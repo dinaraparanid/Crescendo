@@ -21,12 +21,12 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewModelScope
 import com.paranid5.crescendo.EQUALIZER_DATA
 import com.paranid5.crescendo.core.resources.R
-import com.paranid5.crescendo.domain.eq.EqualizerBandsPreset
-import com.paranid5.crescendo.domain.eq.EqualizerData
+import com.paranid5.crescendo.core.common.eq.EqualizerBandsPreset
+import com.paranid5.crescendo.core.common.eq.EqualizerData
 import com.paranid5.crescendo.koinActivityViewModel
 import com.paranid5.crescendo.presentation.main.audio_effects.AudioEffectsViewModel
 import com.paranid5.crescendo.presentation.ui.extensions.collectLatestAsState
-import com.paranid5.crescendo.presentation.ui.theme.LocalAppColors
+import com.paranid5.crescendo.presentation.ui.LocalAppColors
 import com.paranid5.crescendo.presentation.ui.utils.Spinner
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.toImmutableList
@@ -56,7 +56,7 @@ fun PresetSpinner(modifier: Modifier = Modifier) =
 private fun PresetSpinnerImpl(
     modifier: Modifier = Modifier,
     viewModel: AudioEffectsViewModel = koinActivityViewModel(),
-    equalizerDataState: MutableStateFlow<EqualizerData?> = koinInject(named(EQUALIZER_DATA)),
+    equalizerDataState: MutableStateFlow<com.paranid5.crescendo.core.common.eq.EqualizerData?> = koinInject(named(EQUALIZER_DATA)),
 ) {
     val equalizerData by equalizerDataState.collectLatestAsState()
     val customPresetIndex by rememberCustomPresetIndex(equalizerData)
@@ -75,11 +75,11 @@ private fun PresetSpinnerImpl(
 
             when (ind) {
                 customPresetIndex -> viewModel.viewModelScope.launch(Dispatchers.IO) {
-                    viewModel.setEqualizerParam(EqualizerBandsPreset.CUSTOM)
+                    viewModel.setEqualizerParam(com.paranid5.crescendo.core.common.eq.EqualizerBandsPreset.CUSTOM)
                 }
 
                 else -> viewModel.viewModelScope.launch(Dispatchers.IO) {
-                    viewModel.setEqualizerParam(EqualizerBandsPreset.BUILT_IN)
+                    viewModel.setEqualizerParam(com.paranid5.crescendo.core.common.eq.EqualizerBandsPreset.BUILT_IN)
                     viewModel.setEqualizerPreset(ind.toShort())
                 }
             }
@@ -100,37 +100,37 @@ private fun PresetSpinnerArrow(modifier: Modifier = Modifier) {
 }
 
 @Composable
-private fun rememberCustomPresetIndex(equalizerData: EqualizerData?) =
+private fun rememberCustomPresetIndex(equalizerData: com.paranid5.crescendo.core.common.eq.EqualizerData?) =
     remember(equalizerData?.presets) {
         derivedStateOf { equalizerData?.presets?.size }
     }
 
 @Composable
-private fun rememberBandsPreset(equalizerData: EqualizerData?) =
+private fun rememberBandsPreset(equalizerData: com.paranid5.crescendo.core.common.eq.EqualizerData?) =
     remember(equalizerData?.bandsPreset) {
         derivedStateOf { equalizerData?.bandsPreset }
     }
 
 @Composable
-private fun rememberIsCustomPreset(equalizerData: EqualizerData?): State<Boolean> {
+private fun rememberIsCustomPreset(equalizerData: com.paranid5.crescendo.core.common.eq.EqualizerData?): State<Boolean> {
     val bandsPreset by rememberBandsPreset(equalizerData)
 
     return remember(bandsPreset) {
-        derivedStateOf { bandsPreset == EqualizerBandsPreset.CUSTOM }
+        derivedStateOf { bandsPreset == com.paranid5.crescendo.core.common.eq.EqualizerBandsPreset.CUSTOM }
     }
 }
 
 @Composable
-private fun rememberSelectedItemIndex(equalizerData: EqualizerData?): MutableState<Int> {
+private fun rememberSelectedItemIndex(equalizerData: com.paranid5.crescendo.core.common.eq.EqualizerData?): MutableState<Int> {
     val customPresetIndex by rememberCustomPresetIndex(equalizerData)
     val bandsPreset by rememberBandsPreset(equalizerData)
 
     return remember(bandsPreset) {
         mutableIntStateOf(
             when (bandsPreset) {
-                EqualizerBandsPreset.CUSTOM -> customPresetIndex ?: 0
-                EqualizerBandsPreset.BUILT_IN -> equalizerData?.currentPreset?.toInt() ?: 0
-                EqualizerBandsPreset.NIL -> 0
+                com.paranid5.crescendo.core.common.eq.EqualizerBandsPreset.CUSTOM -> customPresetIndex ?: 0
+                com.paranid5.crescendo.core.common.eq.EqualizerBandsPreset.BUILT_IN -> equalizerData?.currentPreset?.toInt() ?: 0
+                com.paranid5.crescendo.core.common.eq.EqualizerBandsPreset.NIL -> 0
                 null -> 0
             }
         )
@@ -140,7 +140,7 @@ private fun rememberSelectedItemIndex(equalizerData: EqualizerData?): MutableSta
 @Composable
 private fun rememberCurrentItemIndex(
     selectedItemIndex: Int,
-    equalizerData: EqualizerData?
+    equalizerData: com.paranid5.crescendo.core.common.eq.EqualizerData?
 ): State<Int?> {
     val isCustomPreset by rememberIsCustomPreset(equalizerData)
     val customPresetIndex by rememberCustomPresetIndex(equalizerData)
@@ -151,7 +151,7 @@ private fun rememberCurrentItemIndex(
 }
 
 @Composable
-private fun rememberBuiltInPresets(equalizerData: EqualizerData?) =
+private fun rememberBuiltInPresets(equalizerData: com.paranid5.crescendo.core.common.eq.EqualizerData?) =
     remember(equalizerData?.presets) {
         derivedStateOf { equalizerData?.presets ?: persistentListOf() }
     }

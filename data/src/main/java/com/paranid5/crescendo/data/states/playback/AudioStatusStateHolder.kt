@@ -1,9 +1,9 @@
 package com.paranid5.crescendo.data.states.playback
 
+import com.paranid5.crescendo.core.common.AudioStatus
 import com.paranid5.crescendo.data.StorageHandler
 import com.paranid5.crescendo.data.properties.audioStatusFlow
 import com.paranid5.crescendo.data.properties.storeAudioStatus
-import com.paranid5.crescendo.domain.media.AudioStatus
 import kotlinx.coroutines.flow.Flow
 
 interface AudioStatusStateSubscriber {

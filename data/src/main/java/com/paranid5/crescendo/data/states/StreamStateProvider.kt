@@ -4,7 +4,7 @@ import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.stringPreferencesKey
-import com.paranid5.crescendo.domain.metadata.VideoMetadata
+import com.paranid5.crescendo.core.common.metadata.VideoMetadata
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.mapLatest
 import kotlinx.serialization.encodeToString
@@ -38,7 +38,7 @@ class StreamStateProvider(private val dataStore: DataStore<Preferences>) {
             .mapLatest { metaString -> metaString?.let(json::decodeVideoMetadata) }
     }
 
-    suspend fun storeCurrentMetadata(metadata: VideoMetadata?) {
+    suspend fun storeCurrentMetadata(metadata: com.paranid5.crescendo.core.common.metadata.VideoMetadata?) {
         dataStore.edit { preferences ->
             preferences[CURRENT_METADATA] = json.encodeToString(metadata)
         }
@@ -46,4 +46,4 @@ class StreamStateProvider(private val dataStore: DataStore<Preferences>) {
 }
 
 private fun Json.decodeVideoMetadata(metadata: String) =
-    decodeFromString<VideoMetadata>(metadata)
+    decodeFromString<com.paranid5.crescendo.core.common.metadata.VideoMetadata>(metadata)

@@ -1,7 +1,7 @@
 package com.paranid5.crescendo.data.properties
 
+import com.paranid5.crescendo.core.common.AudioStatus
 import com.paranid5.crescendo.data.StorageHandler
-import com.paranid5.crescendo.domain.media.AudioStatus
 
 inline val StorageHandler.tracksPlaybackPositionFlow
     get() = playbackStateProvider.tracksPlaybackPositionFlow

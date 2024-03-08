@@ -14,7 +14,7 @@ import com.paranid5.crescendo.data.states.playback.RepeatingStatePublisher
 import com.paranid5.crescendo.data.states.playback.RepeatingStatePublisherImpl
 import com.paranid5.crescendo.data.states.playback.RepeatingStateSubscriber
 import com.paranid5.crescendo.data.states.playback.RepeatingStateSubscriberImpl
-import com.paranid5.crescendo.domain.tracks.Track
+import com.paranid5.crescendo.core.common.tracks.Track
 import com.paranid5.crescendo.domain.utils.extensions.toMediaItem
 import com.paranid5.crescendo.domain.utils.extensions.toMediaItemList
 import com.paranid5.crescendo.services.core.playback.AudioEffectsController
@@ -86,7 +86,7 @@ internal class PlayerControllerImpl(service: TrackService, storageHandler: Stora
     }
 
     override fun playPlaylistViaPlayer(
-        playlist: List<Track>,
+        playlist: List<com.paranid5.crescendo.core.common.tracks.Track>,
         currentTrackIndex: Int,
         initialPosition: Long
     ) {
@@ -103,7 +103,7 @@ internal class PlayerControllerImpl(service: TrackService, storageHandler: Stora
         play()
     }
 
-    private fun resetPlaylistForPlayer(playlist: List<Track>) {
+    private fun resetPlaylistForPlayer(playlist: List<com.paranid5.crescendo.core.common.tracks.Track>) {
         player.clearMediaItems()
         player.addMediaItems(playlist.toMediaItemList())
     }
@@ -164,7 +164,7 @@ internal class PlayerControllerImpl(service: TrackService, storageHandler: Stora
     override val currentMediaItemIndex
         get() = player.currentMediaItemIndex
 
-    override fun addTrackToPlaylistViaPlayer(track: Track) =
+    override fun addTrackToPlaylistViaPlayer(track: com.paranid5.crescendo.core.common.tracks.Track) =
         player.addMediaItem(track.toMediaItem())
 
     override fun removeTrackViaPlayer(index: Int): Int {
@@ -172,7 +172,7 @@ internal class PlayerControllerImpl(service: TrackService, storageHandler: Stora
         return currentMediaItemIndex
     }
 
-    override fun replacePlaylistViaPlayer(newPlaylist: List<Track>, newCurrentTrackIndex: Int) =
+    override fun replacePlaylistViaPlayer(newPlaylist: List<com.paranid5.crescendo.core.common.tracks.Track>, newCurrentTrackIndex: Int) =
         player.setMediaItems(
             newPlaylist.toMediaItemList(),
             newCurrentTrackIndex,

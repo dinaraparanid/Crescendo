@@ -17,10 +17,10 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.palette.graphics.Palette
+import com.paranid5.crescendo.core.common.AudioStatus
 import com.paranid5.crescendo.core.resources.R
-import com.paranid5.crescendo.domain.media.AudioStatus
 import com.paranid5.crescendo.domain.utils.extensions.timeString
-import com.paranid5.crescendo.presentation.ui.theme.LocalAppColors
+import com.paranid5.crescendo.presentation.ui.LocalAppColors
 import com.paranid5.crescendo.services.stream_service.StreamServiceAccessor
 import com.paranid5.crescendo.services.stream_service.sendSeekToBroadcast
 import org.koin.compose.koinInject

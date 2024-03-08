@@ -14,7 +14,7 @@ import androidx.compose.ui.unit.dp
 import com.paranid5.crescendo.presentation.main.current_playlist.effects.TrackDismissEffect
 import com.paranid5.crescendo.presentation.main.current_playlist.views.CurrentPlaylistBar
 import com.paranid5.crescendo.presentation.main.current_playlist.views.CurrentPlaylistTrackList
-import com.paranid5.crescendo.presentation.ui.theme.TransparentUtility
+import com.paranid5.crescendo.core.resources.ui.theme.TransparentUtility
 
 @Composable
 fun CurrentPlaylistScreen(modifier: Modifier = Modifier) {

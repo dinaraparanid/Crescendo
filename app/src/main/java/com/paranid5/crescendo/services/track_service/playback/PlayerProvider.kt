@@ -15,7 +15,7 @@ import com.paranid5.crescendo.data.states.tracks.CurrentTrackIndexStatePublisher
 import com.paranid5.crescendo.data.states.tracks.CurrentTrackIndexStatePublisherImpl
 import com.paranid5.crescendo.data.states.tracks.CurrentTrackIndexStateSubscriber
 import com.paranid5.crescendo.data.states.tracks.CurrentTrackIndexStateSubscriberImpl
-import com.paranid5.crescendo.domain.tracks.Track
+import com.paranid5.crescendo.core.common.tracks.Track
 import com.paranid5.crescendo.services.track_service.TrackService
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
@@ -78,7 +78,7 @@ class PlayerProvider(
     suspend fun seekToPrevTrack() =
         _playbackEventFlow.emit(PlaybackEvent.SeekToPrevTrack())
 
-    suspend fun addTrackToPlaylist(track: Track) =
+    suspend fun addTrackToPlaylist(track: com.paranid5.crescendo.core.common.tracks.Track) =
         _playbackEventFlow.emit(PlaybackEvent.AddTrackToPlaylist(track))
 
     suspend fun removeTrackFromPlaylist(index: Int) =

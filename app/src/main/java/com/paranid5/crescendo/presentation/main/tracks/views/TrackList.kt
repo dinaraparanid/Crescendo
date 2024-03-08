@@ -8,18 +8,18 @@ import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.paranid5.crescendo.domain.tracks.Track
+import com.paranid5.crescendo.core.common.tracks.Track
 import kotlinx.collections.immutable.ImmutableList
 
 typealias TrackItemView = @Composable (
-    tracks: ImmutableList<Track>,
+    tracks: ImmutableList<com.paranid5.crescendo.core.common.tracks.Track>,
     trackInd: Int,
     modifier: Modifier
 ) -> Unit
 
 @Composable
 fun TrackList(
-    tracks: ImmutableList<Track>,
+    tracks: ImmutableList<com.paranid5.crescendo.core.common.tracks.Track>,
     scrollingState: LazyListState,
     modifier: Modifier = Modifier,
     trackItemModifier: Modifier = Modifier,

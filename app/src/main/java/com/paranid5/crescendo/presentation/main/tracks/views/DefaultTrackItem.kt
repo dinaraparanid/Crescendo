@@ -21,24 +21,20 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
-import com.paranid5.crescendo.IS_PLAYING
+import com.paranid5.crescendo.core.common.tracks.Track
 import com.paranid5.crescendo.data.states.playback.AudioStatusStatePublisher
 import com.paranid5.crescendo.data.states.tracks.CurrentPlaylistStatePublisher
 import com.paranid5.crescendo.data.states.tracks.CurrentTrackIndexStatePublisher
-import com.paranid5.crescendo.domain.tracks.Track
 import com.paranid5.crescendo.presentation.main.tracks.properties.compose.currentTrackState
 import com.paranid5.crescendo.presentation.main.tracks.views.item.TrackCover
 import com.paranid5.crescendo.presentation.main.tracks.views.item.TrackInfo
-import com.paranid5.crescendo.presentation.ui.extensions.collectLatestAsState
+import com.paranid5.crescendo.presentation.ui.LocalAppColors
 import com.paranid5.crescendo.presentation.ui.permissions.requests.audioRecordingPermissionsRequestLauncher
 import com.paranid5.crescendo.presentation.ui.permissions.requests.foregroundServicePermissionsRequestLauncherCompat
-import com.paranid5.crescendo.presentation.ui.theme.LocalAppColors
 import com.paranid5.crescendo.services.track_service.TrackServiceAccessor
 import kotlinx.collections.immutable.ImmutableList
-import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
 import org.koin.compose.koinInject
-import org.koin.core.qualifier.named
 
 @Composable
 fun DefaultTrackItem(
@@ -66,13 +62,11 @@ fun <VM> DefaultTrackItem(
     trackInd: Int,
     modifier: Modifier = Modifier,
     trackServiceAccessor: TrackServiceAccessor = koinInject(),
-    isPlayingState: MutableStateFlow<Boolean> = koinInject(named(IS_PLAYING)),
 ) where VM : AudioStatusStatePublisher,
         VM : CurrentPlaylistStatePublisher,
         VM : CurrentTrackIndexStatePublisher {
     val coroutineScope = rememberCoroutineScope()
     val currentTrack by currentTrackState()
-    val isPlaying by isPlayingState.collectLatestAsState()
 
     DefaultTrackItem(
         tracks = tracks,
@@ -84,7 +78,6 @@ fun <VM> DefaultTrackItem(
                     newTracks = tracks,
                     newTrackIndex = trackInd,
                     currentTrack = currentTrack,
-                    isPlaying = isPlaying,
                     viewModel = viewModel,
                     trackServiceAccessor = trackServiceAccessor,
                 )

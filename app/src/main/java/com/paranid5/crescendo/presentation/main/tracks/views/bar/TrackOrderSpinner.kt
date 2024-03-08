@@ -12,7 +12,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import com.paranid5.crescendo.core.resources.R
-import com.paranid5.crescendo.domain.tracks.TrackOrder
+import com.paranid5.crescendo.core.common.tracks.TrackOrder
 import com.paranid5.crescendo.koinActivityViewModel
 import com.paranid5.crescendo.presentation.main.tracks.TracksViewModel
 import com.paranid5.crescendo.presentation.main.tracks.properties.compose.collectTrackOrderAsState
@@ -84,7 +84,7 @@ private fun rememberSelectedItemIndexes(viewModel: TracksViewModel = koinActivit
     return remember(trackOrder) {
         derivedStateOf {
             val firstInd = trackOrder.contentOrder.ordinal
-            val contentOrders = TrackOrder.TrackContentOrder.entries
+            val contentOrders = com.paranid5.crescendo.core.common.tracks.TrackOrder.TrackContentOrder.entries
             val secondInd = trackOrder.orderType.ordinal + contentOrders.size
             persistentListOf(firstInd, secondInd)
         }
@@ -93,21 +93,27 @@ private fun rememberSelectedItemIndexes(viewModel: TracksViewModel = koinActivit
 
 private fun selectedTrackOrder(
     selectedIndex: Int,
-    currentTrackOrder: TrackOrder,
-): TrackOrder {
-    val contentOrders = TrackOrder.TrackContentOrder.entries
-    val orderTypes = TrackOrder.TrackOrderType.entries
+    currentTrackOrder: com.paranid5.crescendo.core.common.tracks.TrackOrder,
+): com.paranid5.crescendo.core.common.tracks.TrackOrder {
+    val contentOrders = com.paranid5.crescendo.core.common.tracks.TrackOrder.TrackContentOrder.entries
+    val orderTypes = com.paranid5.crescendo.core.common.tracks.TrackOrder.TrackOrderType.entries
     val contentOrdersNum = contentOrders.size
 
     return when {
         selectedIndex < contentOrdersNum -> {
             val newContentOrder = contentOrders[selectedIndex]
-            TrackOrder(newContentOrder, currentTrackOrder.orderType)
+            com.paranid5.crescendo.core.common.tracks.TrackOrder(
+                newContentOrder,
+                currentTrackOrder.orderType
+            )
         }
 
         else -> {
             val newOrderType = orderTypes[selectedIndex - contentOrdersNum]
-            TrackOrder(currentTrackOrder.contentOrder, newOrderType)
+            com.paranid5.crescendo.core.common.tracks.TrackOrder(
+                currentTrackOrder.contentOrder,
+                newOrderType
+            )
         }
     }
 }

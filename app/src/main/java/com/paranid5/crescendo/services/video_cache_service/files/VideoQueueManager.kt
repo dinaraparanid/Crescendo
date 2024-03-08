@@ -1,7 +1,7 @@
 package com.paranid5.crescendo.services.video_cache_service.files
 
-import com.paranid5.crescendo.domain.caching.VideoCacheData
-import com.paranid5.crescendo.domain.metadata.VideoMetadata
+import com.paranid5.crescendo.core.common.caching.VideoCacheData
+import com.paranid5.crescendo.core.common.metadata.VideoMetadata
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asSharedFlow
@@ -10,7 +10,7 @@ import kotlinx.coroutines.flow.update
 
 class VideoQueueManager {
     private val _videoQueueFlow by lazy {
-        MutableSharedFlow<VideoCacheData>(extraBufferCapacity = 1000)
+        MutableSharedFlow<com.paranid5.crescendo.core.common.caching.VideoCacheData>(extraBufferCapacity = 1000)
     }
 
     val videoQueueFlow by lazy {
@@ -26,17 +26,17 @@ class VideoQueueManager {
     }
 
     private val _currentVideoMetadataState by lazy {
-        MutableStateFlow(VideoMetadata())
+        MutableStateFlow(com.paranid5.crescendo.core.common.metadata.VideoMetadata())
     }
 
     val currentVideoMetadataState by lazy {
         _currentVideoMetadataState.asStateFlow()
     }
 
-    fun resetVideoMetadata(videoMetadata: VideoMetadata) =
+    fun resetVideoMetadata(videoMetadata: com.paranid5.crescendo.core.common.metadata.VideoMetadata) =
         _currentVideoMetadataState.update { videoMetadata }
 
-    suspend fun offerNewVideo(videoCacheData: VideoCacheData) {
+    suspend fun offerNewVideo(videoCacheData: com.paranid5.crescendo.core.common.caching.VideoCacheData) {
         _videoQueueFlow.emit(videoCacheData)
         _videoQueueLenState.update { it + 1 }
     }

@@ -3,7 +3,7 @@ package com.paranid5.crescendo.presentation.main.current_playlist.properties.com
 import androidx.compose.runtime.Composable
 import com.paranid5.crescendo.data.states.tracks.currentPlaylistDurationStrFlow
 import com.paranid5.crescendo.data.states.tracks.currentPlaylistSizeFlow
-import com.paranid5.crescendo.domain.tracks.DefaultTrack
+import com.paranid5.crescendo.core.common.tracks.DefaultTrack
 import com.paranid5.crescendo.presentation.main.current_playlist.CurrentPlaylistViewModel
 import com.paranid5.crescendo.presentation.ui.extensions.collectLatestAsState
 import kotlinx.collections.immutable.ImmutableList
@@ -11,7 +11,7 @@ import kotlinx.collections.immutable.persistentListOf
 
 @Composable
 fun CurrentPlaylistViewModel.collectCurrentPlaylistAsState(
-    initial: ImmutableList<DefaultTrack> = persistentListOf()
+    initial: ImmutableList<com.paranid5.crescendo.core.common.tracks.DefaultTrack> = persistentListOf()
 ) = currentPlaylistFlow.collectLatestAsState(initial)
 
 @Composable

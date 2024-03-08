@@ -4,8 +4,8 @@ import android.content.Context
 import arrow.core.Either
 import arrow.core.raise.either
 import arrow.core.raise.ensure
-import com.paranid5.crescendo.domain.caching.Formats
-import com.paranid5.crescendo.domain.metadata.VideoMetadata
+import com.paranid5.crescendo.core.common.metadata.VideoMetadata
+import com.paranid5.crescendo.core.media.metadata.VideoMetadata.fromYtMeta
 import com.paranid5.yt_url_extractor_kt.VideoMeta
 import com.paranid5.yt_url_extractor_kt.YtFile
 import com.paranid5.yt_url_extractor_kt.YtFilesNotFoundException
@@ -25,7 +25,7 @@ class UrlExtractor : KoinComponent {
     suspend fun extractUrlsWithMeta(
         context: Context,
         ytUrl: String,
-        format: Formats
+        format: com.paranid5.crescendo.core.common.caching.Formats
     ) = either {
         val (ytFiles, _, videoMetaRes) = extractYtFilesWithMeta(context, ytUrl)
             .mapLeft { YtRequestTimeoutException() }
@@ -44,7 +44,7 @@ class UrlExtractor : KoinComponent {
         }
 
         when (format) {
-            Formats.MP4 -> {
+            com.paranid5.crescendo.core.common.caching.Formats.MP4 -> {
                 val videoUrl = videoUrl(ytFiles)
 
                 ensure(videoUrl != null) {
@@ -69,7 +69,7 @@ class UrlExtractor : KoinComponent {
 }
 
 fun Result<VideoMeta>.getOrDefault() =
-    getOrNull()?.let(::VideoMetadata) ?: VideoMetadata()
+    getOrNull()?.let(::fromYtMeta) ?: VideoMetadata()
 
 private fun videoUrl(ytFiles: Map<Int, YtFile>) =
     sequenceOf(137, 22, 18)

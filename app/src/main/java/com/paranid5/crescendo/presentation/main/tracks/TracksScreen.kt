@@ -28,7 +28,7 @@ import com.paranid5.crescendo.presentation.main.tracks.properties.compose.collec
 import com.paranid5.crescendo.presentation.main.tracks.views.DefaultTrackList
 import com.paranid5.crescendo.presentation.main.tracks.views.TrackSearcher
 import com.paranid5.crescendo.presentation.main.tracks.views.TracksBar
-import com.paranid5.crescendo.presentation.ui.theme.LocalAppColors
+import com.paranid5.crescendo.presentation.ui.LocalAppColors
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable

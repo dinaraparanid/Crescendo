@@ -6,9 +6,9 @@ import android.os.Build
 import android.os.Environment
 import android.provider.MediaStore
 import arrow.core.Either
-import com.paranid5.crescendo.domain.media.files.MediaFile
-import com.paranid5.crescendo.domain.media_scanner.sendScanFile
-import com.paranid5.crescendo.domain.metadata.VideoMetadata
+import com.paranid5.crescendo.core.media.files.MediaFile
+import com.paranid5.crescendo.core.media.media_scanner.sendScanFile
+import com.paranid5.crescendo.core.common.metadata.VideoMetadata
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
@@ -16,7 +16,7 @@ import org.jaudiotagger.audio.AudioFileIO
 import org.jaudiotagger.tag.mp4.Mp4FieldKey
 import org.jaudiotagger.tag.mp4.Mp4Tag
 
-private fun setVideoTagsToFile(file: MediaFile.VideoFile, metadata: VideoMetadata) =
+private fun setVideoTagsToFile(file: com.paranid5.crescendo.core.media.files.MediaFile.VideoFile, metadata: com.paranid5.crescendo.core.common.metadata.VideoMetadata) =
     AudioFileIO.read(file).run {
         tagOrCreateAndSetDefault.let { it as Mp4Tag }.run {
             setField(Mp4FieldKey.TITLE, metadata.title)
@@ -25,13 +25,13 @@ private fun setVideoTagsToFile(file: MediaFile.VideoFile, metadata: VideoMetadat
         }
     }
 
-private fun setVideoTagsToFileCatching(file: MediaFile.VideoFile, metadata: VideoMetadata) =
+private fun setVideoTagsToFileCatching(file: com.paranid5.crescendo.core.media.files.MediaFile.VideoFile, metadata: com.paranid5.crescendo.core.common.metadata.VideoMetadata) =
     Either.catch { setVideoTagsToFile(file, metadata) }
 
 suspend fun setVideoTagsAsync(
     context: Context,
-    videoFile: MediaFile.VideoFile,
-    metadata: VideoMetadata
+    videoFile: com.paranid5.crescendo.core.media.files.MediaFile.VideoFile,
+    metadata: com.paranid5.crescendo.core.common.metadata.VideoMetadata
 ) = coroutineScope {
     val externalContentUri = when {
         Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q ->
@@ -61,7 +61,7 @@ suspend fun setVideoTagsAsync(
 internal fun ContentValues(
     absoluteFilePath: String,
     relativeFilePath: String,
-    metadata: VideoMetadata,
+    metadata: com.paranid5.crescendo.core.common.metadata.VideoMetadata,
     mimeType: String,
 ) = ContentValues().apply {
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q)

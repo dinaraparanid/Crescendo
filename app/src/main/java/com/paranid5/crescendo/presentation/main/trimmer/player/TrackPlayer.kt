@@ -8,7 +8,7 @@ import androidx.media3.common.C
 import androidx.media3.common.Player
 import androidx.media3.common.util.UnstableApi
 import androidx.media3.exoplayer.ExoPlayer
-import com.paranid5.crescendo.domain.tracks.Track
+import com.paranid5.crescendo.core.common.tracks.Track
 import com.paranid5.crescendo.domain.utils.extensions.toMediaItem
 import com.paranid5.crescendo.presentation.main.trimmer.TrimmerViewModel
 import com.paranid5.crescendo.presentation.main.trimmer.effects.playback.notifyPlaybackTaskFinished
@@ -20,7 +20,7 @@ private const val TRANSITION_DURATION = 10_000L
 @OptIn(UnstableApi::class)
 fun TrackPlayer(
     context: Context,
-    track: Track,
+    track: com.paranid5.crescendo.core.common.tracks.Track,
     viewModel: TrimmerViewModel,
     onCompletion: (Player) -> Unit
 ) = ExoPlayer.Builder(context)

@@ -8,7 +8,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
-import com.paranid5.crescendo.presentation.ui.theme.TransparentUtility
+import com.paranid5.crescendo.core.resources.ui.theme.TransparentUtility
 
 @Composable
 fun PushUpButton(alpha: Float, modifier: Modifier = Modifier) =

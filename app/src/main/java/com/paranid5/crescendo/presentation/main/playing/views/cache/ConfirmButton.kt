@@ -20,7 +20,7 @@ import com.paranid5.crescendo.presentation.main.playing.properties.compose.colle
 import com.paranid5.crescendo.presentation.main.playing.properties.compose.collectFilenameAsState
 import com.paranid5.crescendo.presentation.main.playing.properties.compose.collectIsCacheButtonClickableAsState
 import com.paranid5.crescendo.presentation.main.playing.properties.compose.collectTrimRangeAsState
-import com.paranid5.crescendo.presentation.ui.theme.LocalAppColors
+import com.paranid5.crescendo.presentation.ui.LocalAppColors
 import org.koin.compose.koinInject
 
 @Composable

@@ -7,8 +7,8 @@ import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.floatPreferencesKey
 import androidx.datastore.preferences.core.intPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
-import com.paranid5.crescendo.domain.eq.EqualizerBandsPreset
-import com.paranid5.crescendo.domain.eq.EqualizerData
+import com.paranid5.crescendo.core.common.eq.EqualizerBandsPreset
+import com.paranid5.crescendo.core.common.eq.EqualizerData
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.toImmutableList
@@ -91,7 +91,7 @@ class AudioEffectsStateProvider(private val dataStore: DataStore<Preferences>) {
         dataStore.data
             .mapLatest { preferences -> preferences[EQ_PRESET] }
             .mapLatest { preset -> preset?.toShort() }
-            .mapLatest { it ?: EqualizerData.NO_EQ_PRESET }
+            .mapLatest { it ?: com.paranid5.crescendo.core.common.eq.EqualizerData.NO_EQ_PRESET }
     }
 
     suspend fun storeEqualizerPreset(preset: Short) {
@@ -104,10 +104,10 @@ class AudioEffectsStateProvider(private val dataStore: DataStore<Preferences>) {
     val equalizerParamFlow by lazy {
         dataStore.data
             .mapLatest { preferences -> preferences[EQ_PARAM] ?: 0 }
-            .mapLatest { param -> EqualizerBandsPreset.entries[param] }
+            .mapLatest { param -> com.paranid5.crescendo.core.common.eq.EqualizerBandsPreset.entries[param] }
     }
 
-    suspend fun storeEqualizerParam(param: EqualizerBandsPreset) {
+    suspend fun storeEqualizerParam(param: com.paranid5.crescendo.core.common.eq.EqualizerBandsPreset) {
         dataStore.edit { preferences ->
             preferences[EQ_PARAM] = param.ordinal
         }

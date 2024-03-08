@@ -21,7 +21,7 @@ import com.paranid5.crescendo.presentation.main.audio_effects.AudioEffectsViewMo
 import com.paranid5.crescendo.presentation.main.audio_effects.properties.compose.collectAreAudioEffectsEnabledAsState
 import com.paranid5.crescendo.presentation.ui.extensions.decreaseBrightness
 import com.paranid5.crescendo.presentation.ui.extensions.simpleShadow
-import com.paranid5.crescendo.presentation.ui.theme.LocalAppColors
+import com.paranid5.crescendo.presentation.ui.LocalAppColors
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 

@@ -2,9 +2,10 @@ package com.paranid5.crescendo.services.video_cache_service
 
 import android.content.Intent
 import android.os.Build
-import com.paranid5.crescendo.domain.caching.Formats
-import com.paranid5.crescendo.domain.caching.VideoCacheData
-import com.paranid5.crescendo.domain.trimming.TrimRange
+import com.paranid5.crescendo.core.common.caching.Formats
+import com.paranid5.crescendo.core.common.caching.VideoCacheData
+import com.paranid5.crescendo.core.impl.trimming.TrimRangeModel
+import com.paranid5.crescendo.core.impl.trimming.toEntity
 import com.paranid5.crescendo.services.ConnectionManager
 import com.paranid5.crescendo.services.SuspendService
 import com.paranid5.crescendo.services.connect
@@ -99,7 +100,7 @@ internal inline val Intent.videoCacheDataArg
         url = getStringExtra(VideoCacheService.URL_ARG)!!,
         desiredFilename = getStringExtra(VideoCacheService.FILENAME_ARG)!!,
         format = formatArg,
-        trimRange = trimRangeArg
+        trimRange = trimRangeArg.toEntity()
     )
 
 @Suppress("DEPRECATION")
@@ -115,7 +116,7 @@ private inline val Intent.formatArg
 private inline val Intent.trimRangeArg
     get() = when {
         Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU ->
-            getParcelableExtra(VideoCacheService.TRIM_RANGE_ARG, TrimRange::class.java)!!
+            getParcelableExtra(VideoCacheService.TRIM_RANGE_ARG, TrimRangeModel::class.java)!!
 
         else -> getParcelableExtra(VideoCacheService.TRIM_RANGE_ARG)!!
     }

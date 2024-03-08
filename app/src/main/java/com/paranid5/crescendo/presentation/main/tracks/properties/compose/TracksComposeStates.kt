@@ -8,8 +8,8 @@ import androidx.compose.runtime.remember
 import com.paranid5.crescendo.data.StorageHandler
 import com.paranid5.crescendo.data.current_playlist.CurrentPlaylistRepository
 import com.paranid5.crescendo.data.properties.currentTrackIndexFlow
-import com.paranid5.crescendo.domain.tracks.Track
-import com.paranid5.crescendo.domain.tracks.TrackOrder
+import com.paranid5.crescendo.core.common.tracks.Track
+import com.paranid5.crescendo.core.common.tracks.TrackOrder
 import com.paranid5.crescendo.presentation.main.tracks.TracksViewModel
 import com.paranid5.crescendo.presentation.main.tracks.properties.shownTracksFlow
 import com.paranid5.crescendo.presentation.main.tracks.properties.shownTracksNumberFlow
@@ -23,7 +23,7 @@ fun TracksViewModel.collectTracksAsState() =
 
 @Composable
 fun TracksViewModel.collectTrackOrderAsState() =
-    trackOrderFlow.collectLatestAsState(initial = TrackOrder.default)
+    trackOrderFlow.collectLatestAsState(initial = com.paranid5.crescendo.core.common.tracks.TrackOrder.default)
 
 @Composable
 fun TracksViewModel.collectShownTracksAsState() =
@@ -37,7 +37,7 @@ fun TracksViewModel.collectShownTracksNumberAsState() =
 internal fun currentTrackState(
     currentPlaylistRepository: CurrentPlaylistRepository = koinInject(),
     storageHandler: StorageHandler = koinInject(),
-): State<Track?> {
+): State<com.paranid5.crescendo.core.common.tracks.Track?> {
     val curPlaylist by currentPlaylistRepository
         .tracksFlow
         .collectLatestAsState(initial = persistentListOf())

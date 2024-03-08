@@ -3,7 +3,7 @@ package com.paranid5.crescendo.presentation.main.tracks.views
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
-import com.paranid5.crescendo.domain.tracks.Track
+import com.paranid5.crescendo.core.common.tracks.Track
 import com.paranid5.crescendo.koinActivityViewModel
 import com.paranid5.crescendo.presentation.main.tracks.TracksViewModel
 import com.paranid5.crescendo.presentation.main.tracks.properties.compose.collectIsSearchBarActiveAsState
@@ -17,7 +17,7 @@ import com.paranid5.crescendo.presentation.ui.utils.Searcher
 fun TrackSearcher(
     modifier: Modifier = Modifier,
     viewModel: TracksViewModel = koinActivityViewModel(),
-    content: FilteredContent<Track>
+    content: FilteredContent<com.paranid5.crescendo.core.common.tracks.Track>
 ) {
     val tracks by viewModel.collectTracksAsState()
     val shownTracks by viewModel.collectShownTracksAsState()
@@ -38,7 +38,7 @@ fun TrackSearcher(
     )
 }
 
-private fun filterTrack(query: String, track: Track): Boolean {
+private fun filterTrack(query: String, track: com.paranid5.crescendo.core.common.tracks.Track): Boolean {
     val title = track.title.lowercase()
     val artist = track.artist.lowercase()
     val album = track.album.lowercase()

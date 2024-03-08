@@ -2,9 +2,9 @@ package com.paranid5.crescendo.domain.utils.extensions
 
 import android.graphics.Bitmap
 import android.support.v4.media.MediaMetadataCompat
-import com.paranid5.crescendo.domain.metadata.VideoMetadata
+import com.paranid5.crescendo.core.common.metadata.VideoMetadata
 
-fun VideoMetadata.toAndroidMetadata(cover: Bitmap? = null): MediaMetadataCompat =
+fun com.paranid5.crescendo.core.common.metadata.VideoMetadata.toAndroidMetadata(cover: Bitmap? = null): MediaMetadataCompat =
     MediaMetadataCompat.Builder()
         .putText(MediaMetadataCompat.METADATA_KEY_TITLE, title)
         .putText(MediaMetadataCompat.METADATA_KEY_ARTIST, author)

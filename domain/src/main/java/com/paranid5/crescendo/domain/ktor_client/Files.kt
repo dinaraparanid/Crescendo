@@ -3,9 +3,9 @@ package com.paranid5.crescendo.domain.ktor_client
 import android.util.Log
 import arrow.core.Either
 import arrow.core.raise.nullable
-import com.paranid5.crescendo.domain.caching.DownloadFilesStatus
-import com.paranid5.crescendo.domain.caching.DownloadingStatus
-import com.paranid5.crescendo.domain.caching.isCanceled
+import com.paranid5.crescendo.core.common.caching.DownloadFilesStatus
+import com.paranid5.crescendo.core.common.caching.DownloadingStatus
+import com.paranid5.crescendo.core.common.caching.isCanceled
 import io.ktor.client.HttpClient
 import io.ktor.client.request.header
 import io.ktor.client.request.prepareGet

@@ -2,13 +2,13 @@ package com.paranid5.crescendo.presentation.main.current_playlist.views
 
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import com.paranid5.crescendo.domain.tracks.Track
+import com.paranid5.crescendo.core.common.tracks.Track
 import com.paranid5.crescendo.presentation.ui.utils.drag.DraggableList
 import com.paranid5.crescendo.presentation.ui.utils.drag.DraggableListItemView
 import kotlinx.collections.immutable.ImmutableList
 
 @Composable
-internal inline fun <T : Track> DraggableTrackList(
+internal inline fun <T : com.paranid5.crescendo.core.common.tracks.Track> DraggableTrackList(
     tracks: ImmutableList<T>,
     currentTrackIndex: Int,
     crossinline onTrackDismissed: (index: Int, item: T) -> Boolean,
@@ -28,7 +28,7 @@ internal inline fun <T : Track> DraggableTrackList(
 )
 
 @Composable
-internal inline fun <T : Track> DraggableTrackList(
+internal inline fun <T : com.paranid5.crescendo.core.common.tracks.Track> DraggableTrackList(
     tracks: ImmutableList<T>,
     currentTrackIndex: Int,
     crossinline onTrackDismissed: (index: Int, item: T) -> Boolean,

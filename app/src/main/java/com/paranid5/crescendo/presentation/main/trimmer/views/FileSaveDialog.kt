@@ -18,7 +18,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.paranid5.crescendo.core.resources.R
-import com.paranid5.crescendo.domain.caching.Formats
+import com.paranid5.crescendo.core.common.caching.Formats
 import com.paranid5.crescendo.koinActivityViewModel
 import com.paranid5.crescendo.presentation.main.trimmer.TrimmerViewModel
 import com.paranid5.crescendo.presentation.main.trimmer.properties.compose.collectFadeDurationsAsState
@@ -26,7 +26,7 @@ import com.paranid5.crescendo.presentation.main.trimmer.properties.compose.colle
 import com.paranid5.crescendo.presentation.main.trimmer.properties.compose.collectTrackAsState
 import com.paranid5.crescendo.presentation.main.trimmer.properties.compose.collectTrimRangeAsState
 import com.paranid5.crescendo.presentation.main.trimmer.views.file_save_dialog.FileSaveDialogContent
-import com.paranid5.crescendo.presentation.ui.theme.LocalAppColors
+import com.paranid5.crescendo.presentation.ui.LocalAppColors
 import java.io.File
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -58,7 +58,7 @@ fun FileSaveDialog(
     val selectedSaveOptionIndex by selectedSaveOptionIndexState
 
     val audioFormat by remember(selectedSaveOptionIndex) {
-        derivedStateOf { Formats.entries[selectedSaveOptionIndex] }
+        derivedStateOf { com.paranid5.crescendo.core.common.caching.Formats.entries[selectedSaveOptionIndex] }
     }
 
     if (isDialogShown)

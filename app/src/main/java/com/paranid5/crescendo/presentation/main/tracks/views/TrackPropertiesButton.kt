@@ -14,11 +14,11 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import com.paranid5.crescendo.core.resources.R
-import com.paranid5.crescendo.domain.tracks.Track
+import com.paranid5.crescendo.core.common.tracks.Track
 
 @Composable
 fun TrackPropertiesButton(
-    track: Track,
+    track: com.paranid5.crescendo.core.common.tracks.Track,
     tint: Color,
     modifier: Modifier = Modifier,
     iconModifier: Modifier = Modifier,

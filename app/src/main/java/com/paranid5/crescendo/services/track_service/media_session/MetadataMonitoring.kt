@@ -3,7 +3,7 @@ package com.paranid5.crescendo.services.track_service.media_session
 import android.content.Context
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.repeatOnLifecycle
-import com.paranid5.crescendo.domain.tracks.Track
+import com.paranid5.crescendo.core.common.tracks.Track
 import com.paranid5.crescendo.domain.utils.extensions.toAndroidMetadata
 import com.paranid5.crescendo.media.images.getTrackCoverBitmapAsync
 import com.paranid5.crescendo.services.track_service.TrackService
@@ -22,5 +22,5 @@ suspend fun TrackService.startMetadataMonitoring() =
             }
     }
 
-private suspend inline fun Track.toAndroidMetadata(context: Context) =
+private suspend inline fun com.paranid5.crescendo.core.common.tracks.Track.toAndroidMetadata(context: Context) =
     toAndroidMetadata(getTrackCoverBitmapAsync(context, path).await())

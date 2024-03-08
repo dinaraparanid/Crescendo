@@ -3,14 +3,14 @@ package com.paranid5.crescendo.services.video_cache_service.extractor
 import arrow.core.Either
 import arrow.core.raise.either
 import arrow.core.raise.ensureNotNull
-import com.paranid5.crescendo.domain.caching.CachingResult
-import com.paranid5.crescendo.domain.caching.Formats
-import com.paranid5.crescendo.domain.caching.cachingResult
-import com.paranid5.crescendo.domain.caching.isNotError
-import com.paranid5.crescendo.domain.caching.onCanceled
-import com.paranid5.crescendo.domain.media.files.MediaFile
-import com.paranid5.crescendo.domain.metadata.VideoMetadata
-import com.paranid5.crescendo.domain.trimming.TrimRange
+import com.paranid5.crescendo.core.common.caching.Formats
+import com.paranid5.crescendo.core.common.metadata.VideoMetadata
+import com.paranid5.crescendo.core.common.trimming.TrimRange
+import com.paranid5.crescendo.core.media.caching.CachingResult
+import com.paranid5.crescendo.core.media.caching.cachingResult
+import com.paranid5.crescendo.core.media.caching.isNotError
+import com.paranid5.crescendo.core.media.caching.onCanceled
+import com.paranid5.crescendo.core.media.files.MediaFile
 import com.paranid5.crescendo.media.convertToAudioFileAndSetTagsAsync
 import com.paranid5.crescendo.media.mergeToMP4AndSetTagsAsync
 import com.paranid5.crescendo.services.video_cache_service.VideoCacheService
@@ -106,20 +106,21 @@ private suspend fun VideoCacheService.cacheVideoFile(
     videoUrl: String,
     videoMetadata: VideoMetadata,
 ): CachingResult {
-    suspend fun merge(result: CachingResult.DownloadResult) = cachingResult {
-        val (audioFileStore, videoFileStore) = result.bind()
+    suspend fun merge(result: CachingResult.DownloadResult) =
+        cachingResult {
+            val (audioFileStore, videoFileStore) = result.bind()
 
-        val mergedMp4 = mergeToMp4(
-            desiredFilename = desiredFilename,
-            audioFileStore = audioFileStore,
-            videoFileStore = videoFileStore,
-            videoMetadata = videoMetadata
-        ).bind().first()
+            val mergedMp4 = mergeToMp4(
+                desiredFilename = desiredFilename,
+                audioFileStore = audioFileStore,
+                videoFileStore = videoFileStore,
+                videoMetadata = videoMetadata
+            ).bind().first()
 
-        cacheManager.onConverted()
-        videoQueueManager.decrementQueueLen()
-        mergedMp4
-    }
+            cacheManager.onConverted()
+            videoQueueManager.decrementQueueLen()
+            mergedMp4
+        }
 
     val result = mediaFileDownloader.downloadAudioAndVideoFiles(
         desiredFilename = desiredFilename,

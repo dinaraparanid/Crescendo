@@ -4,8 +4,8 @@ import com.paranid5.crescendo.data.StorageHandler
 import com.paranid5.crescendo.data.states.stream.CurrentMetadataStateSubscriber
 import com.paranid5.crescendo.data.states.stream.CurrentMetadataStateSubscriberImpl
 import com.paranid5.crescendo.data.states.stream.currentMetadataDurationMillisFlow
-import com.paranid5.crescendo.domain.caching.Formats
-import com.paranid5.crescendo.domain.trimming.TrimRange
+import com.paranid5.crescendo.core.common.caching.Formats
+import com.paranid5.crescendo.core.common.trimming.TrimRange
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -77,7 +77,7 @@ inline val CacheDialogStateHolder.trimRangeFlow
         trimOffsetMillisState,
         trimDurationMillisFlow
     ) { trimOffsetMillis, trimDurationMillis ->
-        TrimRange(
+        com.paranid5.crescendo.core.common.trimming.TrimRange(
             startPointMillis = trimOffsetMillis,
             totalDurationMillis = trimDurationMillis
         )
@@ -98,4 +98,4 @@ inline val CacheDialogStateHolder.isCacheButtonClickableFlow
     get() = filenameState.map { it.isNotBlank() }
 
 inline val CacheDialogStateHolder.cacheFormatFlow
-    get() = selectedSaveOptionIndexState.map { Formats.entries[it] }
+    get() = selectedSaveOptionIndexState.map { com.paranid5.crescendo.core.common.caching.Formats.entries[it] }

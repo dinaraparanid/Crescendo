@@ -1,6 +1,6 @@
 package com.paranid5.crescendo.services.track_service.playback
 
-import com.paranid5.crescendo.domain.tracks.Track
+import com.paranid5.crescendo.core.common.tracks.Track
 
 sealed interface PlaybackEvent {
     data class StartSamePlaylist(
@@ -33,7 +33,7 @@ sealed interface PlaybackEvent {
     ) : PlaybackEvent
 
     data class AddTrackToPlaylist(
-        val track: Track,
+        val track: com.paranid5.crescendo.core.common.tracks.Track,
         private val id: Long = System.currentTimeMillis()
     ) : PlaybackEvent
 
