@@ -1,6 +1,6 @@
 package com.paranid5.crescendo.services.track_service.receivers
 
-import com.paranid5.crescendo.domain.utils.extensions.registerReceiverCompat
+import com.paranid5.crescendo.utils.extensions.registerReceiverCompat
 import com.paranid5.crescendo.services.track_service.TrackService
 
 @Suppress("IncorrectFormatting")

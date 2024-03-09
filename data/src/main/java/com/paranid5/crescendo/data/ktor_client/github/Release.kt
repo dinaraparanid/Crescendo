@@ -1,4 +1,4 @@
-package com.paranid5.crescendo.domain.ktor_client.github
+package com.paranid5.crescendo.data.ktor_client.github
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable

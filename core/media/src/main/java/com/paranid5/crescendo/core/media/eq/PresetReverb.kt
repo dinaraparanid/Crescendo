@@ -1,4 +1,4 @@
-package com.paranid5.crescendo.domain.utils.extensions
+package com.paranid5.crescendo.core.media.eq
 
 import android.media.audiofx.PresetReverb
 

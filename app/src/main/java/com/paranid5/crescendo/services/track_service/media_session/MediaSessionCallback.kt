@@ -2,7 +2,7 @@ package com.paranid5.crescendo.services.track_service.media_session
 
 import android.os.Bundle
 import android.support.v4.media.session.MediaSessionCompat
-import com.paranid5.crescendo.domain.utils.extensions.sendBroadcast
+import com.paranid5.crescendo.utils.extensions.sendBroadcast
 import com.paranid5.crescendo.services.track_service.TrackService
 import com.paranid5.crescendo.services.track_service.playback.pauseAsync
 import com.paranid5.crescendo.services.track_service.playback.resumeAsync

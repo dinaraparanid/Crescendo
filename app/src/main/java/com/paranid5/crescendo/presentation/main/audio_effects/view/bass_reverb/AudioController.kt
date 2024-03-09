@@ -8,7 +8,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
-import com.paranid5.crescendo.domain.utils.extensions.toAngle
+import com.paranid5.crescendo.utils.extensions.toAngle
 
 @Composable
 fun AudioController(

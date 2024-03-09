@@ -5,10 +5,10 @@ import arrow.core.Either
 import com.paranid5.crescendo.core.common.caching.DownloadFilesStatus
 import com.paranid5.crescendo.core.common.caching.DownloadingStatus
 import com.paranid5.crescendo.core.media.caching.CachingResult
-import com.paranid5.crescendo.domain.ktor_client.DownloadingProgress
-import com.paranid5.crescendo.domain.ktor_client.UrlWithFile
-import com.paranid5.crescendo.domain.ktor_client.downloadFile
-import com.paranid5.crescendo.domain.ktor_client.downloadFiles
+import com.paranid5.crescendo.data.ktor_client.DownloadingProgress
+import com.paranid5.crescendo.data.ktor_client.UrlWithFile
+import com.paranid5.crescendo.data.ktor_client.downloadFile
+import com.paranid5.crescendo.data.ktor_client.downloadFiles
 import io.ktor.client.HttpClient
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow

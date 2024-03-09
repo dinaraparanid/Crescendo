@@ -2,7 +2,7 @@ package com.paranid5.crescendo.presentation.main.trimmer.properties
 
 import com.paranid5.crescendo.core.common.trimming.FadeDurations
 import com.paranid5.crescendo.core.common.trimming.TrimRange
-import com.paranid5.crescendo.domain.utils.extensions.timeString
+import com.paranid5.crescendo.utils.extensions.timeString
 import com.paranid5.crescendo.presentation.main.trimmer.CONTROLLER_CIRCLE_CENTER
 import com.paranid5.crescendo.presentation.main.trimmer.CONTROLLER_CIRCLE_RADIUS
 import com.paranid5.crescendo.presentation.main.trimmer.CONTROLLER_RECT_OFFSET

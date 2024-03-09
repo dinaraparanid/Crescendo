@@ -1,6 +1,6 @@
 package com.paranid5.crescendo.services.video_cache_service.receivers
 
-import com.paranid5.crescendo.domain.utils.extensions.registerReceiverCompat
+import com.paranid5.crescendo.utils.extensions.registerReceiverCompat
 import com.paranid5.crescendo.services.video_cache_service.VideoCacheService
 
 @Suppress("IncorrectFormatting")

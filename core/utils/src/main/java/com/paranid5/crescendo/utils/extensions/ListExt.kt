@@ -1,4 +1,4 @@
-package com.paranid5.crescendo.domain.utils.extensions
+package com.paranid5.crescendo.utils.extensions
 
 import kotlinx.collections.immutable.mutate
 import kotlinx.collections.immutable.persistentListOf

@@ -1,4 +1,4 @@
-package com.paranid5.crescendo.domain.utils.extensions
+package com.paranid5.crescendo.utils.extensions
 
 import android.annotation.SuppressLint
 import android.content.BroadcastReceiver

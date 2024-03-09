@@ -6,7 +6,7 @@ import com.paranid5.crescendo.data.states.waveform.AmplitudesStatePublisher
 import com.paranid5.crescendo.data.states.waveform.AmplitudesStatePublisherImpl
 import com.paranid5.crescendo.data.states.waveform.AmplitudesStateSubscriber
 import com.paranid5.crescendo.data.states.waveform.AmplitudesStateSubscriberImpl
-import com.paranid5.crescendo.domain.utils.AsyncCondVar
+import com.paranid5.crescendo.utils.AsyncCondVar
 import com.paranid5.crescendo.presentation.main.trimmer.properties.setAmplitudesAsync
 import com.paranid5.crescendo.presentation.main.trimmer.states.EffectsStateHolder
 import com.paranid5.crescendo.presentation.main.trimmer.states.EffectsStateHolderImpl

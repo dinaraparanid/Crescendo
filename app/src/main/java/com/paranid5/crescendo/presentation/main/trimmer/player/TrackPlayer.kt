@@ -9,7 +9,7 @@ import androidx.media3.common.Player
 import androidx.media3.common.util.UnstableApi
 import androidx.media3.exoplayer.ExoPlayer
 import com.paranid5.crescendo.core.common.tracks.Track
-import com.paranid5.crescendo.domain.utils.extensions.toMediaItem
+import com.paranid5.crescendo.utils.extensions.toMediaItem
 import com.paranid5.crescendo.presentation.main.trimmer.TrimmerViewModel
 import com.paranid5.crescendo.presentation.main.trimmer.effects.playback.notifyPlaybackTaskFinished
 import com.paranid5.crescendo.presentation.main.trimmer.effects.playback.pausePlayback

@@ -1,4 +1,4 @@
-package com.paranid5.crescendo.domain.utils.extensions
+package com.paranid5.crescendo.utils.extensions
 
 val Long.timeString: String
     get() {

@@ -29,8 +29,8 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.paranid5.crescendo.core.resources.R
-import com.paranid5.crescendo.domain.ktor_client.github.Release
-import com.paranid5.crescendo.domain.ktor_client.github.checkForUpdates
+import com.paranid5.crescendo.data.ktor_client.github.Release
+import com.paranid5.crescendo.data.ktor_client.github.checkForUpdates
 import com.paranid5.crescendo.presentation.composition_locals.LocalActivity
 import com.paranid5.crescendo.presentation.ui.extensions.simpleShadow
 import com.paranid5.crescendo.presentation.ui.LocalAppColors

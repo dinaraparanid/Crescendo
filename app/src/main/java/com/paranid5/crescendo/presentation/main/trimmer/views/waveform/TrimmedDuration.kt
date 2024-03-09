@@ -8,7 +8,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
-import com.paranid5.crescendo.domain.utils.extensions.timeString
+import com.paranid5.crescendo.utils.extensions.timeString
 import com.paranid5.crescendo.koinActivityViewModel
 import com.paranid5.crescendo.presentation.main.trimmer.TrimmerViewModel
 import com.paranid5.crescendo.presentation.main.trimmer.properties.compose.collectSpeedAsState

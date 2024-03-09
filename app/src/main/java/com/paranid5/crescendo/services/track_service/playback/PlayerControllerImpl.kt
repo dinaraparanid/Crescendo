@@ -15,8 +15,8 @@ import com.paranid5.crescendo.data.states.playback.RepeatingStatePublisherImpl
 import com.paranid5.crescendo.data.states.playback.RepeatingStateSubscriber
 import com.paranid5.crescendo.data.states.playback.RepeatingStateSubscriberImpl
 import com.paranid5.crescendo.core.common.tracks.Track
-import com.paranid5.crescendo.domain.utils.extensions.toMediaItem
-import com.paranid5.crescendo.domain.utils.extensions.toMediaItemList
+import com.paranid5.crescendo.utils.extensions.toMediaItem
+import com.paranid5.crescendo.utils.extensions.toMediaItemList
 import com.paranid5.crescendo.services.core.playback.AudioEffectsController
 import com.paranid5.crescendo.services.core.playback.AudioEffectsControllerImpl
 import com.paranid5.crescendo.services.track_service.TrackService

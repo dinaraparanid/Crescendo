@@ -6,7 +6,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import com.paranid5.crescendo.core.common.tracks.Track
-import com.paranid5.crescendo.domain.utils.extensions.artistAlbum
+import com.paranid5.crescendo.utils.extensions.artistAlbum
 
 @Composable
 fun TrackInfo(

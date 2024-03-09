@@ -1,4 +1,4 @@
-package com.paranid5.crescendo.domain.utils.extensions
+package com.paranid5.crescendo.utils.extensions
 
 inline fun <T> Iterable<T>.forEachStepped(step: Int, action: (T) -> Unit) =
     forEachIndexed { i, item -> if (i % step == 0) action(item) }

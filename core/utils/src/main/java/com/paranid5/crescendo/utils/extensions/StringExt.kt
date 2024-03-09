@@ -1,4 +1,4 @@
-package com.paranid5.crescendo.domain.utils.extensions
+package com.paranid5.crescendo.utils.extensions
 
 private val TIME_REGEX = Regex("(\\d{2}):(\\d{2}):(\\d{2})(\\.(\\d{3}))?")
 

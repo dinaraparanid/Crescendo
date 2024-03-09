@@ -1,4 +1,4 @@
-package com.paranid5.crescendo.domain.ktor_client
+package com.paranid5.crescendo.data.ktor_client
 
 import android.util.Log
 import arrow.core.Either

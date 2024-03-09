@@ -12,8 +12,8 @@ import androidx.media3.common.util.NotificationUtil
 import androidx.media3.common.util.UnstableApi
 import androidx.media3.ui.PlayerNotificationManager
 import com.paranid5.crescendo.core.resources.R
-import com.paranid5.crescendo.domain.utils.extensions.artistAlbum
-import com.paranid5.crescendo.domain.utils.extensions.sendBroadcast
+import com.paranid5.crescendo.utils.extensions.artistAlbum
+import com.paranid5.crescendo.utils.extensions.sendBroadcast
 import com.paranid5.crescendo.media.images.getThumbnailBitmap
 import com.paranid5.crescendo.media.images.getTrackCoverBitmapAsync
 import com.paranid5.crescendo.presentation.main.MainActivity

@@ -13,7 +13,7 @@ import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
 import arrow.core.curried
-import com.paranid5.crescendo.domain.utils.extensions.moved
+import com.paranid5.crescendo.utils.extensions.moved
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.combine

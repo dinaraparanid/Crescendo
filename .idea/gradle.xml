@@ -15,8 +15,8 @@
             <option value="$PROJECT_DIR$/core/impl" />
             <option value="$PROJECT_DIR$/core/media" />
             <option value="$PROJECT_DIR$/core/resources" />
+            <option value="$PROJECT_DIR$/core/utils" />
             <option value="$PROJECT_DIR$/data" />
-            <option value="$PROJECT_DIR$/domain" />
           </set>
         </option>
         <option name="resolveExternalAnnotations" value="false" />

@@ -13,7 +13,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewModelScope
 import com.paranid5.crescendo.core.resources.R
-import com.paranid5.crescendo.domain.utils.extensions.PresetReverb
+import com.paranid5.crescendo.core.media.eq.PresetReverb
 import com.paranid5.crescendo.koinActivityViewModel
 import com.paranid5.crescendo.presentation.main.audio_effects.AudioEffectsViewModel
 import com.paranid5.crescendo.presentation.main.audio_effects.properties.compose.collectBassStrengthAsNullableState

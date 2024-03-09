@@ -1,6 +1,6 @@
-package com.paranid5.crescendo.domain.utils
+package com.paranid5.crescendo.utils
 
-import com.paranid5.crescendo.domain.utils.extensions.receiveTimeout
+import com.paranid5.crescendo.utils.extensions.receiveTimeout
 import kotlinx.coroutines.channels.Channel
 import kotlin.time.Duration
 

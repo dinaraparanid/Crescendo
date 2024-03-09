@@ -9,7 +9,7 @@ import com.paranid5.crescendo.core.common.eq.EqualizerData
 import com.paranid5.crescendo.core.resources.R
 import com.paranid5.crescendo.data.StorageHandler
 import com.paranid5.crescendo.data.sqlDelightModule
-import com.paranid5.crescendo.domain.ktor_client.KtorClient
+import com.paranid5.crescendo.data.ktor_client.KtorClient
 import com.paranid5.crescendo.presentation.composition_locals.LocalActivity
 import com.paranid5.crescendo.presentation.main.MainActivityViewModel
 import com.paranid5.crescendo.presentation.main.audio_effects.AudioEffectsUIHandler

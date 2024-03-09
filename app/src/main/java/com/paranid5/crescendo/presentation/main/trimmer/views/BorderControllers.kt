@@ -14,8 +14,8 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.sp
 import com.paranid5.crescendo.core.resources.R
-import com.paranid5.crescendo.domain.utils.extensions.timeStringMs
-import com.paranid5.crescendo.domain.utils.extensions.toTimeOrNull
+import com.paranid5.crescendo.utils.extensions.timeStringMs
+import com.paranid5.crescendo.utils.extensions.toTimeOrNull
 import com.paranid5.crescendo.koinActivityViewModel
 import com.paranid5.crescendo.presentation.main.trimmer.TrimmerViewModel
 import com.paranid5.crescendo.presentation.main.trimmer.properties.compose.collectEndPosInMillisAsState

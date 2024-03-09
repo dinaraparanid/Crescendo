@@ -18,7 +18,7 @@ import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.drawscope.Fill
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.unit.Dp
-import com.paranid5.crescendo.domain.utils.extensions.forEachIndexedStepped
+import com.paranid5.crescendo.utils.extensions.forEachIndexedStepped
 import com.paranid5.crescendo.koinActivityViewModel
 import com.paranid5.crescendo.presentation.composition_locals.trimmer.LocalTrimmerFocusPoints
 import com.paranid5.crescendo.presentation.composition_locals.trimmer.LocalTrimmerWaveformScrollState
