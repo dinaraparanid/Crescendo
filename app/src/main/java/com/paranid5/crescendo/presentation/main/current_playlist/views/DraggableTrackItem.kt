@@ -27,7 +27,7 @@ import com.paranid5.crescendo.presentation.main.tracks.views.clickableTrackWithP
 import com.paranid5.crescendo.presentation.main.tracks.views.item.TrackCover
 import com.paranid5.crescendo.presentation.main.tracks.views.item.TrackInfo
 import com.paranid5.crescendo.presentation.main.tracks.views.startPlaylistPlayback
-import com.paranid5.crescendo.presentation.ui.LocalAppColors
+import com.paranid5.crescendo.core.resources.ui.theme.LocalAppColors
 import com.paranid5.crescendo.services.track_service.TrackServiceAccessor
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.coroutines.launch

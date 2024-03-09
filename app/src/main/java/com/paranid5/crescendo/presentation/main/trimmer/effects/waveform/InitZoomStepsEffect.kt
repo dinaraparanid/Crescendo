@@ -8,7 +8,7 @@ import com.paranid5.crescendo.koinActivityViewModel
 import com.paranid5.crescendo.presentation.main.trimmer.TrimmerViewModel
 import com.paranid5.crescendo.presentation.main.trimmer.WAVEFORM_SPIKE_WIDTH_RATIO
 import com.paranid5.crescendo.presentation.main.trimmer.properties.compose.collectWaveformMaxWidthAsState
-import com.paranid5.crescendo.presentation.ui.extensions.pxToDp
+import com.paranid5.crescendo.utils.extensions.pxToDp
 
 @Composable
 fun InitZoomStepsEffect(

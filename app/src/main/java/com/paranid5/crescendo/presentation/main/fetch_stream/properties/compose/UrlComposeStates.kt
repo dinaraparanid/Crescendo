@@ -4,7 +4,7 @@ import androidx.compose.runtime.Composable
 import com.paranid5.crescendo.presentation.main.fetch_stream.FetchStreamViewModel
 import com.paranid5.crescendo.presentation.main.fetch_stream.properties.currentTextFlow
 import com.paranid5.crescendo.presentation.main.fetch_stream.properties.isConfirmButtonActiveFlow
-import com.paranid5.crescendo.presentation.ui.extensions.collectLatestAsState
+import com.paranid5.crescendo.utils.extensions.collectLatestAsState
 
 @Composable
 fun FetchStreamViewModel.collectCurrentTextAsState(initial: String = "") =

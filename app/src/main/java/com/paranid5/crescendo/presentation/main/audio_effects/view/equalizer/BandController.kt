@@ -25,7 +25,7 @@ import com.paranid5.crescendo.EQUALIZER_DATA
 import com.paranid5.crescendo.core.resources.R
 import com.paranid5.crescendo.core.common.eq.EqualizerData
 import com.paranid5.crescendo.presentation.main.audio_effects.view.getBandTrackModel
-import com.paranid5.crescendo.presentation.ui.extensions.collectLatestAsState
+import com.paranid5.crescendo.utils.extensions.collectLatestAsState
 import kotlinx.coroutines.flow.MutableStateFlow
 import org.koin.compose.koinInject
 import org.koin.core.qualifier.named

@@ -1,4 +1,4 @@
-package com.paranid5.crescendo.media.images
+package com.paranid5.crescendo.core.media.images
 
 import android.content.Context
 import android.graphics.Bitmap

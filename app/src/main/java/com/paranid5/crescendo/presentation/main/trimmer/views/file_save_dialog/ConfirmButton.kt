@@ -14,15 +14,10 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewModelScope
 import com.paranid5.crescendo.core.resources.R
-import com.paranid5.crescendo.core.common.caching.Formats
-import com.paranid5.crescendo.core.common.tracks.Track
-import com.paranid5.crescendo.core.common.trimming.FadeDurations
-import com.paranid5.crescendo.core.common.trimming.PitchAndSpeed
-import com.paranid5.crescendo.core.common.trimming.TrimRange
 import com.paranid5.crescendo.koinActivityViewModel
 import com.paranid5.crescendo.presentation.main.trimmer.TrimmerUIHandler
 import com.paranid5.crescendo.presentation.main.trimmer.TrimmerViewModel
-import com.paranid5.crescendo.presentation.ui.LocalAppColors
+import com.paranid5.crescendo.core.resources.ui.theme.LocalAppColors
 import kotlinx.coroutines.launch
 import org.koin.compose.koinInject
 

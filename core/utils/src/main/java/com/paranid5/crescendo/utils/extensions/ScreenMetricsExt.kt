@@ -1,4 +1,4 @@
-package com.paranid5.crescendo.presentation.ui.extensions
+package com.paranid5.crescendo.utils.extensions
 
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.platform.LocalDensity

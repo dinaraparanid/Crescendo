@@ -11,7 +11,7 @@ import com.paranid5.crescendo.core.resources.R
 import com.paranid5.crescendo.data.current_playlist.CurrentPlaylistRepository
 import com.paranid5.crescendo.core.common.tracks.DefaultTrack
 import com.paranid5.crescendo.core.common.tracks.Track
-import com.paranid5.crescendo.presentation.ui.extensions.collectLatestAsState
+import com.paranid5.crescendo.utils.extensions.collectLatestAsState
 import com.paranid5.crescendo.services.track_service.TrackServiceAccessor
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.toImmutableList

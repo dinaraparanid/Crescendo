@@ -14,7 +14,7 @@ import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Modifier
 import androidx.core.content.ContextCompat
 import com.paranid5.crescendo.presentation.composition_locals.LocalActivity
-import com.paranid5.crescendo.presentation.ui.extensions.openAppSettings
+import com.paranid5.crescendo.utils.extensions.openAppSettings
 import com.paranid5.crescendo.presentation.ui.permissions.PermissionDialog
 import com.paranid5.crescendo.presentation.ui.permissions.description_providers.PermissionDescriptionProvider
 import java.util.Queue

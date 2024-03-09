@@ -18,8 +18,8 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.palette.graphics.Palette
 import com.paranid5.crescendo.core.resources.R
-import com.paranid5.crescendo.presentation.ui.extensions.getLightMutedOrPrimary
-import com.paranid5.crescendo.presentation.ui.extensions.simpleShadow
+import com.paranid5.crescendo.utils.extensions.getLightMutedOrPrimary
+import com.paranid5.crescendo.utils.extensions.simpleShadow
 
 @Composable
 fun LikeButton(palette: Palette?, modifier: Modifier = Modifier) {

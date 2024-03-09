@@ -13,7 +13,7 @@ import com.paranid5.crescendo.koinActivityViewModel
 import com.paranid5.crescendo.presentation.main.trimmer.TrimmerViewModel
 import com.paranid5.crescendo.presentation.main.trimmer.properties.compose.collectSpeedAsState
 import com.paranid5.crescendo.presentation.main.trimmer.properties.compose.collectTrimmedDurationInMillisAsState
-import com.paranid5.crescendo.presentation.ui.LocalAppColors
+import com.paranid5.crescendo.core.resources.ui.theme.LocalAppColors
 
 @Composable
 fun TrimmedDuration(

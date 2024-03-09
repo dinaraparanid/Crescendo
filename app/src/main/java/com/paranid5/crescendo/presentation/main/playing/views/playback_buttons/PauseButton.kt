@@ -15,7 +15,7 @@ import com.paranid5.crescendo.core.resources.R
 import com.paranid5.crescendo.koinActivityViewModel
 import com.paranid5.crescendo.presentation.main.playing.PlayingUIHandler
 import com.paranid5.crescendo.presentation.main.playing.PlayingViewModel
-import com.paranid5.crescendo.presentation.ui.extensions.simpleShadow
+import com.paranid5.crescendo.utils.extensions.simpleShadow
 import kotlinx.coroutines.launch
 import org.koin.compose.koinInject
 

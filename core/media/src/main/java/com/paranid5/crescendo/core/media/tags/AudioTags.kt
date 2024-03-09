@@ -1,4 +1,4 @@
-package com.paranid5.crescendo.media.tags
+package com.paranid5.crescendo.core.media.tags
 
 import android.content.ContentValues
 import android.content.Context
@@ -12,8 +12,8 @@ import com.paranid5.crescendo.core.media.media_scanner.sendScanFile
 import com.paranid5.crescendo.core.common.metadata.AudioMetadata
 import com.paranid5.crescendo.core.common.metadata.Metadata
 import com.paranid5.crescendo.core.common.metadata.VideoMetadata
-import com.paranid5.crescendo.media.images.getImageBinaryDataFromPathCatching
-import com.paranid5.crescendo.media.images.getImageBinaryDataFromUrlCatching
+import com.paranid5.crescendo.core.media.images.getImageBinaryDataFromPathCatching
+import com.paranid5.crescendo.core.media.images.getImageBinaryDataFromUrlCatching
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import org.jaudiotagger.audio.AudioFileIO
@@ -23,9 +23,9 @@ import org.jaudiotagger.tag.images.ArtworkFactory
 
 suspend fun setAudioTags(
     context: Context,
-    audioFile: com.paranid5.crescendo.core.media.files.MediaFile.AudioFile,
-    metadata: com.paranid5.crescendo.core.common.metadata.Metadata,
-    audioFormat: com.paranid5.crescendo.core.common.caching.Formats
+    audioFile: MediaFile.AudioFile,
+    metadata: Metadata,
+    audioFormat: Formats
 ) {
     val externalContentUri = when {
         Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q ->
@@ -37,9 +37,9 @@ suspend fun setAudioTags(
     val mediaDirectory = Environment.DIRECTORY_MUSIC
 
     val mimeType = when (audioFormat) {
-        com.paranid5.crescendo.core.common.caching.Formats.MP3 -> "audio/mpeg"
-        com.paranid5.crescendo.core.common.caching.Formats.AAC -> "audio/aac"
-        com.paranid5.crescendo.core.common.caching.Formats.WAV -> "audio/x-wav"
+        Formats.MP3 -> "audio/mpeg"
+        Formats.AAC -> "audio/aac"
+        Formats.WAV -> "audio/x-wav"
         else -> throw IllegalArgumentException("Video format for audio file")
     }
 
@@ -54,15 +54,15 @@ suspend fun setAudioTags(
             mimeType
         )
 
-        if (audioFormat == com.paranid5.crescendo.core.common.caching.Formats.MP3)
+        if (audioFormat == Formats.MP3)
             setAudioTagsToFileCatching(context, audioFile, metadata)
 
         context.sendScanFile(absoluteFilePath)
     }
 }
 
-private inline fun <M : com.paranid5.crescendo.core.common.metadata.Metadata> setBaseAudioTagsToFile(
-    file: com.paranid5.crescendo.core.media.files.MediaFile.AudioFile,
+private inline fun <M : Metadata> setBaseAudioTagsToFile(
+    file: MediaFile.AudioFile,
     metadata: M,
     setSpecificTags: (tag: Tag) -> Unit
 ) = AudioFileIO.read(file).run {
@@ -76,8 +76,8 @@ private inline fun <M : com.paranid5.crescendo.core.common.metadata.Metadata> se
 
 private fun setAudioTagsToFile(
     context: Context,
-    file: com.paranid5.crescendo.core.media.files.MediaFile.AudioFile,
-    metadata: com.paranid5.crescendo.core.common.metadata.VideoMetadata
+    file: MediaFile.AudioFile,
+    metadata: VideoMetadata
 ) = setBaseAudioTagsToFile(file, metadata) { tag ->
     metadata
         .covers
@@ -91,8 +91,8 @@ private fun setAudioTagsToFile(
 
 private fun setAudioTagsToFile(
     context: Context,
-    file: com.paranid5.crescendo.core.media.files.MediaFile.AudioFile,
-    metadata: com.paranid5.crescendo.core.common.metadata.AudioMetadata
+    file: MediaFile.AudioFile,
+    metadata: AudioMetadata
 ) = setBaseAudioTagsToFile(file, metadata) { tag ->
     tag.setField(FieldKey.ALBUM, metadata.album)
 
@@ -108,19 +108,19 @@ private fun setAudioTagsToFile(
 
 private fun setAudioTagsToFileCatching(
     context: Context,
-    file: com.paranid5.crescendo.core.media.files.MediaFile.AudioFile,
-    metadata: com.paranid5.crescendo.core.common.metadata.Metadata
+    file: MediaFile.AudioFile,
+    metadata: Metadata
 ) = Either.catch {
     when (metadata) {
-        is com.paranid5.crescendo.core.common.metadata.AudioMetadata -> setAudioTagsToFile(context, file, metadata)
-        is com.paranid5.crescendo.core.common.metadata.VideoMetadata -> setAudioTagsToFile(context, file, metadata)
+        is AudioMetadata -> setAudioTagsToFile(context, file, metadata)
+        is VideoMetadata -> setAudioTagsToFile(context, file, metadata)
     }
 }
 
 internal fun ContentValues(
     absoluteFilePath: String,
     relativeFilePath: String,
-    metadata: com.paranid5.crescendo.core.common.metadata.AudioMetadata,
+    metadata: AudioMetadata,
     mimeType: String,
 ) = ContentValues().apply {
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q)

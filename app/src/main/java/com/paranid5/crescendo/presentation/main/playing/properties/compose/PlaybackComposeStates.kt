@@ -8,7 +8,7 @@ import com.paranid5.crescendo.core.common.tracks.DefaultTrack
 import com.paranid5.crescendo.presentation.main.playing.PlayingViewModel
 import com.paranid5.crescendo.presentation.main.playing.properties.durationMillisFlow
 import com.paranid5.crescendo.presentation.main.playing.properties.playbackPositionFlow
-import com.paranid5.crescendo.presentation.ui.extensions.collectLatestAsState
+import com.paranid5.crescendo.utils.extensions.collectLatestAsState
 
 @Composable
 fun PlayingViewModel.collectCurrentMetadataAsState(initial: VideoMetadata? = null) =

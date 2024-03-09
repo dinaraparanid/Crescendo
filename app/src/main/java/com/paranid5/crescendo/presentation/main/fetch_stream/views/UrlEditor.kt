@@ -10,7 +10,7 @@ import com.paranid5.crescendo.core.resources.R
 import com.paranid5.crescendo.koinActivityViewModel
 import com.paranid5.crescendo.presentation.main.fetch_stream.FetchStreamViewModel
 import com.paranid5.crescendo.presentation.main.fetch_stream.properties.compose.collectCurrentTextAsState
-import com.paranid5.crescendo.presentation.ui.LocalAppColors
+import com.paranid5.crescendo.core.resources.ui.theme.LocalAppColors
 import com.paranid5.crescendo.presentation.ui.utils.DefaultOutlinedTextField
 
 @Composable

@@ -18,7 +18,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.paranid5.crescendo.core.resources.R
 import com.paranid5.crescendo.presentation.main.Screens
-import com.paranid5.crescendo.presentation.ui.LocalAppColors
+import com.paranid5.crescendo.core.resources.ui.theme.LocalAppColors
 
 @Composable
 fun AppBar(modifier: Modifier = Modifier) {

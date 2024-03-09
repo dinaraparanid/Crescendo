@@ -12,8 +12,8 @@ import com.paranid5.crescendo.core.common.AudioStatus
 import com.paranid5.crescendo.koinActivityViewModel
 import com.paranid5.crescendo.presentation.main.playing.PlayingViewModel
 import com.paranid5.crescendo.presentation.main.playing.properties.compose.collectAudioStatusAsState
-import com.paranid5.crescendo.presentation.ui.extensions.collectLatestAsState
-import com.paranid5.crescendo.presentation.ui.extensions.getLightMutedOrPrimary
+import com.paranid5.crescendo.utils.extensions.collectLatestAsState
+import com.paranid5.crescendo.utils.extensions.getLightMutedOrPrimary
 import kotlinx.coroutines.flow.MutableStateFlow
 import org.koin.compose.koinInject
 import org.koin.core.qualifier.named

@@ -2,7 +2,7 @@ package com.paranid5.crescendo.presentation.main.current_playlist.properties.com
 
 import androidx.compose.runtime.Composable
 import com.paranid5.crescendo.presentation.main.current_playlist.CurrentPlaylistViewModel
-import com.paranid5.crescendo.presentation.ui.extensions.collectLatestAsState
+import com.paranid5.crescendo.utils.extensions.collectLatestAsState
 
 @Composable
 fun CurrentPlaylistViewModel.collectPlaylistDismissMediatorAsState() =

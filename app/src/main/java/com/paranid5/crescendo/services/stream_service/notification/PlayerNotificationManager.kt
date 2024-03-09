@@ -13,8 +13,8 @@ import androidx.media3.common.util.UnstableApi
 import androidx.media3.ui.PlayerNotificationManager
 import com.paranid5.crescendo.core.resources.R
 import com.paranid5.crescendo.utils.extensions.sendBroadcast
-import com.paranid5.crescendo.media.images.getThumbnailBitmap
-import com.paranid5.crescendo.media.images.getVideoCoverBitmapAsync
+import com.paranid5.crescendo.core.media.images.getThumbnailBitmap
+import com.paranid5.crescendo.core.media.images.getVideoCoverBitmapAsync
 import com.paranid5.crescendo.presentation.main.MainActivity
 import com.paranid5.crescendo.services.core.notification.detachNotification
 import com.paranid5.crescendo.services.stream_service.ACTION_DISMISS

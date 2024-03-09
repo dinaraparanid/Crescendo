@@ -14,8 +14,8 @@ import androidx.media3.ui.PlayerNotificationManager
 import com.paranid5.crescendo.core.resources.R
 import com.paranid5.crescendo.utils.extensions.artistAlbum
 import com.paranid5.crescendo.utils.extensions.sendBroadcast
-import com.paranid5.crescendo.media.images.getThumbnailBitmap
-import com.paranid5.crescendo.media.images.getTrackCoverBitmapAsync
+import com.paranid5.crescendo.core.media.images.getThumbnailBitmap
+import com.paranid5.crescendo.core.media.images.getTrackCoverBitmapAsync
 import com.paranid5.crescendo.presentation.main.MainActivity
 import com.paranid5.crescendo.services.core.notification.detachNotification
 import com.paranid5.crescendo.services.track_service.ACTION_DISMISS

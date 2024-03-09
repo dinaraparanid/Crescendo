@@ -15,8 +15,8 @@ import com.gauravk.audiovisualizer.visualizer.WaveVisualizer
 import com.paranid5.crescendo.AUDIO_SESSION_ID
 import com.paranid5.crescendo.IS_PLAYING
 import com.paranid5.crescendo.core.resources.R
-import com.paranid5.crescendo.presentation.ui.extensions.collectLatestAsState
-import com.paranid5.crescendo.presentation.ui.extensions.getLightMutedOrPrimary
+import com.paranid5.crescendo.utils.extensions.collectLatestAsState
+import com.paranid5.crescendo.utils.extensions.getLightMutedOrPrimary
 import kotlinx.coroutines.flow.MutableStateFlow
 import org.koin.compose.koinInject
 import org.koin.core.qualifier.named

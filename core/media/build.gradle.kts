@@ -35,16 +35,22 @@ android {
 
 dependencies {
     implementation(project(":core:common"))
+    implementation(project(":core:resources"))
+    implementation(project(":core:utils"))
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)
+    implementation(libs.androidx.palette.ktx)
     implementation(libs.material)
+
+    implementation(libs.coil.compose)
 
     implementation(libs.kotlinx.collections.immutable)
 
     implementation(libs.arrow.fx.coroutines)
 
     implementation(libs.mobile.ffmpeg.full)
+    implementation(libs.jaudiotagger)
 
     implementation(libs.yt.url.extractor.kt)
 }

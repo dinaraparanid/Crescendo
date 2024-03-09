@@ -1,4 +1,4 @@
-package com.paranid5.crescendo.presentation.ui
+package com.paranid5.crescendo.core.resources.ui.theme
 
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.*
@@ -6,12 +6,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.graphics.Color
-import com.paranid5.crescendo.core.resources.ui.theme.Background
-import com.paranid5.crescendo.core.resources.ui.theme.BackgroundAlternative
-import com.paranid5.crescendo.core.resources.ui.theme.Primary
-import com.paranid5.crescendo.core.resources.ui.theme.Secondary
-import com.paranid5.crescendo.core.resources.ui.theme.SecondaryAlternative
-import com.paranid5.crescendo.core.resources.ui.theme.Typography
 import org.koin.compose.KoinContext
 
 private val DarkColorScheme = darkColorScheme(

@@ -26,7 +26,7 @@ import com.paranid5.crescendo.presentation.main.appbar.AppBar
 import com.paranid5.crescendo.presentation.main.current_playlist.CurrentPlaylistScreen
 import com.paranid5.crescendo.presentation.main.playing.PlayingScreen
 import com.paranid5.crescendo.presentation.main.playing.PlayingViewModel
-import com.paranid5.crescendo.presentation.ui.LocalAppColors
+import com.paranid5.crescendo.core.resources.ui.theme.LocalAppColors
 import com.paranid5.crescendo.presentation.ui.utils.PushUpButton
 import org.koin.androidx.compose.koinViewModel
 

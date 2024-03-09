@@ -4,7 +4,7 @@ import androidx.compose.runtime.Composable
 import com.paranid5.crescendo.presentation.main.trimmer.TrimmerViewModel
 import com.paranid5.crescendo.presentation.main.trimmer.properties.trackDurationInMillisFlow
 import com.paranid5.crescendo.presentation.main.trimmer.properties.trackPathOrNullFlow
-import com.paranid5.crescendo.presentation.ui.extensions.collectLatestAsState
+import com.paranid5.crescendo.utils.extensions.collectLatestAsState
 
 @Composable
 fun TrimmerViewModel.collectTrackAsState() =

@@ -13,7 +13,7 @@ import com.paranid5.crescendo.core.common.tracks.TrackOrder
 import com.paranid5.crescendo.presentation.main.tracks.TracksViewModel
 import com.paranid5.crescendo.presentation.main.tracks.properties.shownTracksFlow
 import com.paranid5.crescendo.presentation.main.tracks.properties.shownTracksNumberFlow
-import com.paranid5.crescendo.presentation.ui.extensions.collectLatestAsState
+import com.paranid5.crescendo.utils.extensions.collectLatestAsState
 import kotlinx.collections.immutable.persistentListOf
 import org.koin.compose.koinInject
 

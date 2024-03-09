@@ -7,7 +7,7 @@ import com.paranid5.crescendo.presentation.main.playing.PlayingViewModel
 import com.paranid5.crescendo.presentation.main.playing.states.cacheFormatFlow
 import com.paranid5.crescendo.presentation.main.playing.states.isCacheButtonClickableFlow
 import com.paranid5.crescendo.presentation.main.playing.states.trimRangeFlow
-import com.paranid5.crescendo.presentation.ui.extensions.collectLatestAsState
+import com.paranid5.crescendo.utils.extensions.collectLatestAsState
 
 @Composable
 fun PlayingViewModel.collectTrimOffsetMillisAsState() =

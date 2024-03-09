@@ -1,4 +1,4 @@
-package com.paranid5.crescendo.media.images
+package com.paranid5.crescendo.core.media.images
 
 import android.content.Context
 import android.graphics.Bitmap
@@ -9,7 +9,7 @@ import kotlinx.coroutines.coroutineScope
 
 suspend inline fun getVideoCoverBitmapAsync(
     context: Context,
-    videoMetadata: com.paranid5.crescendo.core.common.metadata.VideoMetadata,
+    videoMetadata: VideoMetadata,
     size: ImageSize? = null,
     crossinline bitmapSettings: (Bitmap) -> Unit = {}
 ) = coroutineScope {
@@ -25,7 +25,7 @@ suspend inline fun getVideoCoverBitmapAsync(
 
 inline fun getVideoCoverBitmapBlocking(
     context: Context,
-    videoMetadata: com.paranid5.crescendo.core.common.metadata.VideoMetadata,
+    videoMetadata: VideoMetadata,
     size: ImageSize? = null,
     bitmapSettings: (Bitmap) -> Unit = {}
 ) = videoMetadata
@@ -37,7 +37,7 @@ inline fun getVideoCoverBitmapBlocking(
 
 suspend inline fun getVideoCoverBitmapWithPaletteAsync(
     context: Context,
-    videoMetadata: com.paranid5.crescendo.core.common.metadata.VideoMetadata,
+    videoMetadata: VideoMetadata,
     size: ImageSize? = null,
     crossinline bitmapSettings: (Bitmap) -> Unit = {}
 ) = coroutineScope {
@@ -53,7 +53,7 @@ suspend inline fun getVideoCoverBitmapWithPaletteAsync(
 
 inline fun getVideoCoverBitmapWithPaletteBlocking(
     context: Context,
-    videoMetadata: com.paranid5.crescendo.core.common.metadata.VideoMetadata,
+    videoMetadata: VideoMetadata,
     size: ImageSize? = null,
     bitmapSettings: (Bitmap) -> Unit = {}
 ) = videoMetadata
@@ -65,7 +65,7 @@ inline fun getVideoCoverBitmapWithPaletteBlocking(
 
 suspend inline fun getVideoCoverAsync(
     context: Context,
-    videoMetadata: com.paranid5.crescendo.core.common.metadata.VideoMetadata,
+    videoMetadata: VideoMetadata,
     size: ImageSize? = null,
     crossinline bitmapSettings: (Bitmap) -> Unit = {}
 ) = coroutineScope {
@@ -82,7 +82,7 @@ suspend inline fun getVideoCoverAsync(
 
 inline fun getVideoCoverBlocking(
     context: Context,
-    videoMetadata: com.paranid5.crescendo.core.common.metadata.VideoMetadata,
+    videoMetadata: VideoMetadata,
     size: ImageSize? = null,
     bitmapSettings: (Bitmap) -> Unit = {}
 ) = videoMetadata
@@ -95,7 +95,7 @@ inline fun getVideoCoverBlocking(
 
 suspend inline fun getVideoCoverWithPaletteAsync(
     context: Context,
-    videoMetadata: com.paranid5.crescendo.core.common.metadata.VideoMetadata,
+    videoMetadata: VideoMetadata,
     size: ImageSize? = null,
     crossinline bitmapSettings: (Bitmap) -> Unit = {}
 ) = coroutineScope {
@@ -114,7 +114,7 @@ suspend inline fun getVideoCoverWithPaletteAsync(
 
 inline fun getVideoCoverWithPaletteBlocking(
     context: Context,
-    videoMetadata: com.paranid5.crescendo.core.common.metadata.VideoMetadata,
+    videoMetadata: VideoMetadata,
     size: ImageSize? = null,
     bitmapSettings: (Bitmap) -> Unit = {}
 ) = videoMetadata

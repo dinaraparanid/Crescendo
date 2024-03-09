@@ -5,7 +5,7 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.repeatOnLifecycle
 import com.paranid5.crescendo.core.common.metadata.VideoMetadata
 import com.paranid5.crescendo.utils.extensions.toAndroidMetadata
-import com.paranid5.crescendo.media.images.getVideoCoverBitmapAsync
+import com.paranid5.crescendo.core.media.images.getVideoCoverBitmapAsync
 import com.paranid5.crescendo.services.stream_service.StreamService
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.distinctUntilChanged

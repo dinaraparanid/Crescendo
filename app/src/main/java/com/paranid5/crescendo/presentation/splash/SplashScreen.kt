@@ -10,7 +10,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import com.paranid5.crescendo.presentation.splash.views.SplashBackgroundImage
 import com.paranid5.crescendo.presentation.splash.views.VersionLabels
-import com.paranid5.crescendo.presentation.ui.LocalAppColors
+import com.paranid5.crescendo.core.resources.ui.theme.LocalAppColors
 
 @Composable
 fun SplashScreen(modifier: Modifier = Modifier) {

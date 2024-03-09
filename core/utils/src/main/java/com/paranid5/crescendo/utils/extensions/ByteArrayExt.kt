@@ -1,4 +1,4 @@
-package com.paranid5.crescendo.presentation.ui.extensions
+package com.paranid5.crescendo.utils.extensions
 
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory

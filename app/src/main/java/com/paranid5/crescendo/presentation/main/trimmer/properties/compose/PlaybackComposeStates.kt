@@ -5,7 +5,7 @@ import com.paranid5.crescendo.core.common.trimming.PitchAndSpeed
 import com.paranid5.crescendo.presentation.main.trimmer.TrimmerViewModel
 import com.paranid5.crescendo.presentation.main.trimmer.properties.pitchAndSpeedFlow
 import com.paranid5.crescendo.presentation.main.trimmer.properties.playbackAlphaFlow
-import com.paranid5.crescendo.presentation.ui.extensions.collectLatestAsState
+import com.paranid5.crescendo.utils.extensions.collectLatestAsState
 
 @Composable
 fun TrimmerViewModel.collectIsPlayerInitializedAsState() =

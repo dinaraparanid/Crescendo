@@ -12,7 +12,7 @@ import com.paranid5.crescendo.koinActivityViewModel
 import com.paranid5.crescendo.presentation.main.playing.PlayingViewModel
 import com.paranid5.crescendo.presentation.main.playing.properties.compose.collectCurrentTrackAsState
 import com.paranid5.crescendo.presentation.main.tracks.views.TrackPropertiesButton
-import com.paranid5.crescendo.presentation.ui.extensions.getLightMutedOrPrimary
+import com.paranid5.crescendo.utils.extensions.getLightMutedOrPrimary
 
 @Composable
 fun PropertiesButton(

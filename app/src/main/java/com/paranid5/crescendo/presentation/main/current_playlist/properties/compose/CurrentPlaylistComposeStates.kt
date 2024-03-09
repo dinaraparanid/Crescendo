@@ -5,7 +5,7 @@ import com.paranid5.crescendo.data.states.tracks.currentPlaylistDurationStrFlow
 import com.paranid5.crescendo.data.states.tracks.currentPlaylistSizeFlow
 import com.paranid5.crescendo.core.common.tracks.DefaultTrack
 import com.paranid5.crescendo.presentation.main.current_playlist.CurrentPlaylistViewModel
-import com.paranid5.crescendo.presentation.ui.extensions.collectLatestAsState
+import com.paranid5.crescendo.utils.extensions.collectLatestAsState
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
 

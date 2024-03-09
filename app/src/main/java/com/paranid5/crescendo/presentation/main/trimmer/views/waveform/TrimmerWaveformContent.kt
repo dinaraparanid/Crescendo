@@ -36,8 +36,8 @@ import com.paranid5.crescendo.presentation.main.trimmer.properties.compose.colle
 import com.paranid5.crescendo.presentation.main.trimmer.properties.compose.collectPlaybackOffsetAsState
 import com.paranid5.crescendo.presentation.main.trimmer.properties.compose.collectStartOffsetAsState
 import com.paranid5.crescendo.presentation.main.trimmer.properties.compose.collectWaveformWidthAsState
-import com.paranid5.crescendo.presentation.ui.extensions.pxToDp
-import com.paranid5.crescendo.presentation.ui.extensions.toPx
+import com.paranid5.crescendo.utils.extensions.pxToDp
+import com.paranid5.crescendo.utils.extensions.toPx
 import kotlinx.coroutines.launch
 
 @Composable

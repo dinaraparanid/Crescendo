@@ -1,9 +1,8 @@
-package com.paranid5.crescendo.presentation.ui.extensions
+package com.paranid5.crescendo.utils.extensions
 
 import android.annotation.SuppressLint
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.State
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.produceState
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.StateFlow

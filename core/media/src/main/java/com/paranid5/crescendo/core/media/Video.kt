@@ -1,4 +1,4 @@
-package com.paranid5.crescendo.media
+package com.paranid5.crescendo.core.media
 
 import android.content.Context
 import android.provider.MediaStore
@@ -11,8 +11,8 @@ import com.paranid5.crescendo.core.media.caching.CachingResult
 import com.paranid5.crescendo.core.media.caching.cachingResult
 import com.paranid5.crescendo.core.media.files.MediaFile
 import com.paranid5.crescendo.core.media.files.toAudioFileAsync
-import com.paranid5.crescendo.media.tags.setAudioTags
-import com.paranid5.crescendo.media.tags.setVideoTagsAsync
+import com.paranid5.crescendo.core.media.tags.setAudioTags
+import com.paranid5.crescendo.core.media.tags.setVideoTagsAsync
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope

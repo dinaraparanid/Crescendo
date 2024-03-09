@@ -28,7 +28,7 @@ import com.paranid5.crescendo.data.states.tracks.CurrentTrackIndexStatePublisher
 import com.paranid5.crescendo.presentation.main.tracks.properties.compose.currentTrackState
 import com.paranid5.crescendo.presentation.main.tracks.views.item.TrackCover
 import com.paranid5.crescendo.presentation.main.tracks.views.item.TrackInfo
-import com.paranid5.crescendo.presentation.ui.LocalAppColors
+import com.paranid5.crescendo.core.resources.ui.theme.LocalAppColors
 import com.paranid5.crescendo.presentation.ui.permissions.requests.audioRecordingPermissionsRequestLauncher
 import com.paranid5.crescendo.presentation.ui.permissions.requests.foregroundServicePermissionsRequestLauncherCompat
 import com.paranid5.crescendo.services.track_service.TrackServiceAccessor

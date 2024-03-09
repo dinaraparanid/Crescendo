@@ -13,7 +13,7 @@ import com.paranid5.crescendo.core.common.tracks.Track
 import com.paranid5.crescendo.core.common.trimming.FadeDurations
 import com.paranid5.crescendo.core.common.trimming.PitchAndSpeed
 import com.paranid5.crescendo.core.common.trimming.TrimRange
-import com.paranid5.crescendo.media.tags.setAudioTags
+import com.paranid5.crescendo.core.media.tags.setAudioTags
 import com.paranid5.crescendo.presentation.UIHandler
 import com.paranid5.crescendo.receivers.TrimmingStatusReceiver
 import java.io.File
@@ -54,7 +54,7 @@ class TrimmerUIHandler : UIHandler {
             setAudioTags(
                 context = context,
                 audioFile = file,
-                metadata = com.paranid5.crescendo.core.common.metadata.AudioMetadata.extract(track),
+                metadata = AudioMetadata.extract(track),
                 audioFormat = audioFormat
             )
         }

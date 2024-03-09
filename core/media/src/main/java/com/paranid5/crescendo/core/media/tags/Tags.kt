@@ -1,4 +1,4 @@
-package com.paranid5.crescendo.media.tags
+package com.paranid5.crescendo.core.media.tags
 
 import android.content.ContentValues
 import android.content.Context
@@ -13,7 +13,7 @@ fun Context.insertMediaFileToMediaStore(
     externalContentUri: Uri,
     absoluteFilePath: String,
     relativeFilePath: String,
-    metadata: com.paranid5.crescendo.core.common.metadata.Metadata,
+    metadata: Metadata,
     mimeType: String,
 ): Uri {
     val uri = applicationContext.contentResolver.insert(
@@ -33,9 +33,9 @@ fun Context.insertMediaFileToMediaStore(
 private fun ContentValues(
     absoluteFilePath: String,
     relativeFilePath: String,
-    metadata: com.paranid5.crescendo.core.common.metadata.Metadata,
+    metadata: Metadata,
     mimeType: String,
 ) = when (metadata) {
-    is com.paranid5.crescendo.core.common.metadata.AudioMetadata -> ContentValues(absoluteFilePath, relativeFilePath, metadata, mimeType)
-    is com.paranid5.crescendo.core.common.metadata.VideoMetadata -> ContentValues(absoluteFilePath, relativeFilePath, metadata, mimeType)
+    is AudioMetadata -> ContentValues(absoluteFilePath, relativeFilePath, metadata, mimeType)
+    is VideoMetadata -> ContentValues(absoluteFilePath, relativeFilePath, metadata, mimeType)
 }

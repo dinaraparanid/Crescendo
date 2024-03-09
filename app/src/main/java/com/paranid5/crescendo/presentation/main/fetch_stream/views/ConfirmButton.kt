@@ -29,7 +29,7 @@ import com.paranid5.crescendo.presentation.main.fetch_stream.properties.compose.
 import com.paranid5.crescendo.presentation.main.fetch_stream.properties.compose.collectIsConfirmButtonActiveAsState
 import com.paranid5.crescendo.presentation.ui.permissions.requests.audioRecordingPermissionsRequestLauncher
 import com.paranid5.crescendo.presentation.ui.permissions.requests.foregroundServicePermissionsRequestLauncherCompat
-import com.paranid5.crescendo.presentation.ui.LocalAppColors
+import com.paranid5.crescendo.core.resources.ui.theme.LocalAppColors
 import kotlinx.coroutines.launch
 import org.koin.compose.koinInject
 

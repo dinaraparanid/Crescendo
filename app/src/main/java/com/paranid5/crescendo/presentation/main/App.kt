@@ -24,7 +24,7 @@ import com.paranid5.crescendo.presentation.composition_locals.playing.LocalPlayi
 import com.paranid5.crescendo.presentation.composition_locals.playing.LocalPlayingSheetState
 import com.paranid5.crescendo.presentation.main.appbar.appBarHeight
 import com.paranid5.crescendo.presentation.ui.permissions.requests.externalStoragePermissionsRequestLauncher
-import com.paranid5.crescendo.presentation.ui.LocalAppColors
+import com.paranid5.crescendo.core.resources.ui.theme.LocalAppColors
 
 @Composable
 fun App(modifier: Modifier = Modifier) {

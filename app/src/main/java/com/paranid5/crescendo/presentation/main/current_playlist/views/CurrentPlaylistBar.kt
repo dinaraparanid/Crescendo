@@ -13,7 +13,7 @@ import com.paranid5.crescendo.koinActivityViewModel
 import com.paranid5.crescendo.presentation.main.current_playlist.CurrentPlaylistViewModel
 import com.paranid5.crescendo.presentation.main.current_playlist.properties.compose.collectCurrentPlaylistDurationStrAsState
 import com.paranid5.crescendo.presentation.main.current_playlist.properties.compose.collectCurrentPlaylistSizeAsState
-import com.paranid5.crescendo.presentation.ui.LocalAppColors
+import com.paranid5.crescendo.core.resources.ui.theme.LocalAppColors
 
 @Composable
 fun CurrentPlaylistBar(modifier: Modifier = Modifier) =

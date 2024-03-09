@@ -14,7 +14,7 @@ import com.paranid5.crescendo.presentation.main.Screens
 import com.paranid5.crescendo.presentation.composition_locals.LocalCurrentPlaylistSheetState
 import com.paranid5.crescendo.presentation.composition_locals.LocalNavController
 import com.paranid5.crescendo.presentation.composition_locals.playing.LocalPlayingSheetState
-import com.paranid5.crescendo.presentation.ui.LocalAppColors
+import com.paranid5.crescendo.core.resources.ui.theme.LocalAppColors
 
 @Composable
 fun AppBarItem(

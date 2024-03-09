@@ -17,8 +17,8 @@ import com.paranid5.crescendo.core.resources.R
 import com.paranid5.crescendo.data.StorageHandler
 import com.paranid5.crescendo.data.properties.storeAudioStatus
 import com.paranid5.crescendo.presentation.main.playing.PlayingUIHandler
-import com.paranid5.crescendo.presentation.ui.extensions.getLightMutedOrPrimary
-import com.paranid5.crescendo.presentation.ui.extensions.simpleShadow
+import com.paranid5.crescendo.utils.extensions.getLightMutedOrPrimary
+import com.paranid5.crescendo.utils.extensions.simpleShadow
 import kotlinx.coroutines.launch
 import org.koin.compose.koinInject
 

@@ -6,7 +6,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.rememberTextMeasurer
-import com.paranid5.crescendo.presentation.ui.extensions.pxToDp
+import com.paranid5.crescendo.utils.extensions.pxToDp
 
 @Composable
 fun textWidth(text: String, style: TextStyle): Float {

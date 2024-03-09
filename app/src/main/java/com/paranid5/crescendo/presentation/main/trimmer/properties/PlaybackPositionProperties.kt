@@ -7,7 +7,7 @@ import com.paranid5.crescendo.presentation.main.trimmer.CONTROLLER_CIRCLE_CENTER
 import com.paranid5.crescendo.presentation.main.trimmer.CONTROLLER_CIRCLE_RADIUS
 import com.paranid5.crescendo.presentation.main.trimmer.CONTROLLER_RECT_OFFSET
 import com.paranid5.crescendo.presentation.main.trimmer.TrimmerViewModel
-import com.paranid5.crescendo.presentation.ui.extensions.safeDiv
+import com.paranid5.crescendo.utils.extensions.safeDiv
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.map
 

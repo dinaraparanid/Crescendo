@@ -1,8 +1,8 @@
-package com.paranid5.crescendo.media.images
+package com.paranid5.crescendo.core.media.images
 
 import android.content.Context
 import arrow.core.Either
-import com.paranid5.crescendo.presentation.ui.extensions.byteData
+import com.paranid5.crescendo.utils.extensions.byteData
 
 fun getImageBinaryDataFromUrl(context: Context, url: String) =
     getBitmapFromUrlBlockingCatching(context, url)

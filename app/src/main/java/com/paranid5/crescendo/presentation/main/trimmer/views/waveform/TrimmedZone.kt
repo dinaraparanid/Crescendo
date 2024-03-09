@@ -20,7 +20,7 @@ import com.paranid5.crescendo.presentation.main.trimmer.properties.compose.colle
 import com.paranid5.crescendo.presentation.main.trimmer.properties.compose.collectIsPlayingAsState
 import com.paranid5.crescendo.presentation.main.trimmer.properties.compose.collectStartOffsetAsState
 import com.paranid5.crescendo.presentation.main.trimmer.properties.compose.collectTrackDurationInMillisAsState
-import com.paranid5.crescendo.presentation.ui.LocalAppColors
+import com.paranid5.crescendo.core.resources.ui.theme.LocalAppColors
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.launch

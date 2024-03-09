@@ -1,4 +1,4 @@
-package com.paranid5.crescendo.presentation.ui.extensions
+package com.paranid5.crescendo.utils.extensions
 
 infix fun Int.safeDiv(value: Int) = when (value) {
     0 -> 0F

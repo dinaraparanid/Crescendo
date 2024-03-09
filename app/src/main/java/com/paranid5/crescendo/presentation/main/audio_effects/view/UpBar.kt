@@ -19,9 +19,9 @@ import com.paranid5.crescendo.core.resources.R
 import com.paranid5.crescendo.koinActivityViewModel
 import com.paranid5.crescendo.presentation.main.audio_effects.AudioEffectsViewModel
 import com.paranid5.crescendo.presentation.main.audio_effects.properties.compose.collectAreAudioEffectsEnabledAsState
-import com.paranid5.crescendo.presentation.ui.extensions.decreaseBrightness
-import com.paranid5.crescendo.presentation.ui.extensions.simpleShadow
-import com.paranid5.crescendo.presentation.ui.LocalAppColors
+import com.paranid5.crescendo.utils.extensions.decreaseBrightness
+import com.paranid5.crescendo.utils.extensions.simpleShadow
+import com.paranid5.crescendo.core.resources.ui.theme.LocalAppColors
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 

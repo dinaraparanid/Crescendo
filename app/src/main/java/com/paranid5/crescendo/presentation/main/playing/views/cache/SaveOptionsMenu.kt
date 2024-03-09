@@ -21,7 +21,7 @@ import com.paranid5.crescendo.core.resources.R
 import com.paranid5.crescendo.koinActivityViewModel
 import com.paranid5.crescendo.presentation.main.playing.PlayingViewModel
 import com.paranid5.crescendo.presentation.main.playing.properties.compose.collectSelectedSaveOptionIndexAsState
-import com.paranid5.crescendo.presentation.ui.LocalAppColors
+import com.paranid5.crescendo.core.resources.ui.theme.LocalAppColors
 import kotlinx.collections.immutable.persistentListOf
 
 @Composable

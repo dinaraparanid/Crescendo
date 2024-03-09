@@ -5,7 +5,7 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.repeatOnLifecycle
 import com.paranid5.crescendo.core.common.tracks.Track
 import com.paranid5.crescendo.utils.extensions.toAndroidMetadata
-import com.paranid5.crescendo.media.images.getTrackCoverBitmapAsync
+import com.paranid5.crescendo.core.media.images.getTrackCoverBitmapAsync
 import com.paranid5.crescendo.services.track_service.TrackService
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.distinctUntilChanged

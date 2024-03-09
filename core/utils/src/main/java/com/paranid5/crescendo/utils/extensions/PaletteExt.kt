@@ -1,9 +1,9 @@
-package com.paranid5.crescendo.presentation.ui.extensions
+package com.paranid5.crescendo.utils.extensions
 
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
 import androidx.palette.graphics.Palette
-import com.paranid5.crescendo.presentation.ui.LocalAppColors
+import com.paranid5.crescendo.core.resources.ui.theme.LocalAppColors
 
 @Composable
 fun Palette?.getLightMutedOrPrimary(): Color {

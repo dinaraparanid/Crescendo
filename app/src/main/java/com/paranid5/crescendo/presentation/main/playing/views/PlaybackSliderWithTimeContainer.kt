@@ -20,7 +20,7 @@ import androidx.palette.graphics.Palette
 import com.paranid5.crescendo.core.common.AudioStatus
 import com.paranid5.crescendo.core.resources.R
 import com.paranid5.crescendo.utils.extensions.timeString
-import com.paranid5.crescendo.presentation.ui.LocalAppColors
+import com.paranid5.crescendo.core.resources.ui.theme.LocalAppColors
 import com.paranid5.crescendo.services.stream_service.StreamServiceAccessor
 import com.paranid5.crescendo.services.stream_service.sendSeekToBroadcast
 import org.koin.compose.koinInject

@@ -11,7 +11,7 @@ import com.paranid5.crescendo.presentation.main.trimmer.properties.playbackTextF
 import com.paranid5.crescendo.presentation.main.trimmer.properties.startOffsetFlow
 import com.paranid5.crescendo.presentation.main.trimmer.properties.trimRangeFlow
 import com.paranid5.crescendo.presentation.main.trimmer.properties.trimmedDurationInMillisFlow
-import com.paranid5.crescendo.presentation.ui.extensions.collectLatestAsState
+import com.paranid5.crescendo.utils.extensions.collectLatestAsState
 
 @Composable
 fun TrimmerViewModel.collectStartPosInMillisAsState() =

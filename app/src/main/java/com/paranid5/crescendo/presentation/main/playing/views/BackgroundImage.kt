@@ -13,10 +13,10 @@ import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import com.paranid5.crescendo.core.common.AudioStatus
 import com.paranid5.crescendo.core.resources.R
-import com.paranid5.crescendo.media.images.ImageSize
+import com.paranid5.crescendo.core.media.images.ImageSize
 import com.paranid5.crescendo.presentation.main.currentTrackCoverModel
 import com.paranid5.crescendo.presentation.main.videoCoverModel
-import com.paranid5.crescendo.presentation.ui.extensions.increaseDarkness
+import com.paranid5.crescendo.utils.extensions.increaseDarkness
 
 @Composable
 fun BackgroundImage(audioStatus: AudioStatus, modifier: Modifier = Modifier) {

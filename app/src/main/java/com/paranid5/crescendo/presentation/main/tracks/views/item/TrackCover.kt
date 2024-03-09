@@ -7,7 +7,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.stringResource
 import coil.compose.AsyncImage
 import com.paranid5.crescendo.core.resources.R
-import com.paranid5.crescendo.media.images.ImageSize
+import com.paranid5.crescendo.core.media.images.ImageSize
 import com.paranid5.crescendo.presentation.main.trackCoverModel
 
 @Composable

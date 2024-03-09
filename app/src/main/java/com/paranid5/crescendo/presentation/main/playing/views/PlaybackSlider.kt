@@ -29,7 +29,7 @@ import com.paranid5.crescendo.presentation.main.playing.effects.PlaybackPosition
 import com.paranid5.crescendo.presentation.main.playing.properties.compose.collectAudioStatusAsState
 import com.paranid5.crescendo.presentation.main.playing.properties.setPlaybackPosition
 import com.paranid5.crescendo.presentation.main.playing.rememberIsLiveStreaming
-import com.paranid5.crescendo.presentation.ui.extensions.getLightMutedOrPrimary
+import com.paranid5.crescendo.utils.extensions.getLightMutedOrPrimary
 import com.paranid5.crescendo.core.resources.ui.theme.TransparentUtility
 import kotlinx.coroutines.launch
 import org.koin.compose.koinInject

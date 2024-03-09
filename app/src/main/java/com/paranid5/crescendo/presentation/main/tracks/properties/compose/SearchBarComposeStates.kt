@@ -4,7 +4,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.unit.dp
 import com.paranid5.crescendo.presentation.main.tracks.TracksViewModel
 import com.paranid5.crescendo.presentation.main.tracks.properties.searchBarHeightDpFlow
-import com.paranid5.crescendo.presentation.ui.extensions.collectLatestAsState
+import com.paranid5.crescendo.utils.extensions.collectLatestAsState
 
 @Composable
 fun TracksViewModel.collectIsSearchBarActiveAsState() =

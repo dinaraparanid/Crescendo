@@ -1,4 +1,4 @@
-package com.paranid5.crescendo.media.images
+package com.paranid5.crescendo.core.media.images
 
 import android.content.Context
 import android.graphics.Bitmap
@@ -7,7 +7,7 @@ import android.os.Build
 import androidx.annotation.DrawableRes
 import arrow.core.Either
 import coil.executeBlocking
-import com.paranid5.crescendo.presentation.ui.extensions.toBitmap
+import com.paranid5.crescendo.utils.extensions.toBitmap
 import org.jaudiotagger.audio.AudioFileIO
 import java.io.File
 

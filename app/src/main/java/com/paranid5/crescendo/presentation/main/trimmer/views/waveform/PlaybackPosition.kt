@@ -19,7 +19,7 @@ import com.paranid5.crescendo.presentation.main.trimmer.PLAYBACK_CIRCLE_CENTER
 import com.paranid5.crescendo.presentation.main.trimmer.PLAYBACK_CIRCLE_RADIUS
 import com.paranid5.crescendo.presentation.main.trimmer.PLAYBACK_RECT_OFFSET
 import com.paranid5.crescendo.presentation.main.trimmer.PLAYBACK_RECT_WIDTH
-import com.paranid5.crescendo.presentation.ui.LocalAppColors
+import com.paranid5.crescendo.core.resources.ui.theme.LocalAppColors
 
 @Composable
 fun PlaybackPosition(modifier: Modifier = Modifier) {

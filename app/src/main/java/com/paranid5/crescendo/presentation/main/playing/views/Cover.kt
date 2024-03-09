@@ -13,7 +13,7 @@ import androidx.palette.graphics.Palette
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import com.paranid5.crescendo.core.resources.R
-import com.paranid5.crescendo.presentation.ui.extensions.getLightMutedOrPrimary
+import com.paranid5.crescendo.utils.extensions.getLightMutedOrPrimary
 
 @Composable
 fun Cover(

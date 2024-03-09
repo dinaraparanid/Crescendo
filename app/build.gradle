@@ -56,6 +56,9 @@ android {
 }
 
 dependencies {
+    implementation project(':core:common')
+    implementation project(':core:media')
+    implementation project(':core:impl')
     implementation project(':core:resources')
     implementation project(':core:utils')
     implementation project(':data')
@@ -108,7 +111,4 @@ dependencies {
     implementation libs.yt.url.extractor.kt
 
     implementation files('libs/jave-1.0.2.jar')
-    implementation project(':core:common')
-    implementation project(':core:media')
-    implementation project(':core:impl')
 }

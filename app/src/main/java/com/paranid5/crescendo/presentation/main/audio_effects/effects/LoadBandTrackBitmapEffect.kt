@@ -8,9 +8,9 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.LocalContext
 import com.paranid5.crescendo.core.resources.R
-import com.paranid5.crescendo.media.images.ImageSize
-import com.paranid5.crescendo.media.images.getBitmapFromResourceCatching
-import com.paranid5.crescendo.media.images.toBitmapDrawable
+import com.paranid5.crescendo.core.media.images.ImageSize
+import com.paranid5.crescendo.core.media.images.getBitmapFromResourceCatching
+import com.paranid5.crescendo.core.media.images.toBitmapDrawable
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 

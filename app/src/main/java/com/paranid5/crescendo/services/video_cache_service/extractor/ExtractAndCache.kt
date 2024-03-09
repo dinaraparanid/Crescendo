@@ -11,8 +11,8 @@ import com.paranid5.crescendo.core.media.caching.cachingResult
 import com.paranid5.crescendo.core.media.caching.isNotError
 import com.paranid5.crescendo.core.media.caching.onCanceled
 import com.paranid5.crescendo.core.media.files.MediaFile
-import com.paranid5.crescendo.media.convertToAudioFileAndSetTagsAsync
-import com.paranid5.crescendo.media.mergeToMP4AndSetTagsAsync
+import com.paranid5.crescendo.core.media.convertToAudioFileAndSetTagsAsync
+import com.paranid5.crescendo.core.media.mergeToMP4AndSetTagsAsync
 import com.paranid5.crescendo.services.video_cache_service.VideoCacheService
 import com.paranid5.crescendo.services.video_cache_service.files.initMediaFile
 import kotlinx.coroutines.delay

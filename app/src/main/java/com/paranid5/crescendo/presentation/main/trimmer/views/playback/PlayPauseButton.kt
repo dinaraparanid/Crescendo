@@ -18,7 +18,7 @@ import com.paranid5.crescendo.presentation.composition_locals.trimmer.LocalTrimm
 import com.paranid5.crescendo.presentation.main.trimmer.FocusPoints
 import com.paranid5.crescendo.presentation.main.trimmer.TrimmerViewModel
 import com.paranid5.crescendo.presentation.main.trimmer.properties.compose.collectIsPlayingAsState
-import com.paranid5.crescendo.presentation.ui.LocalAppColors
+import com.paranid5.crescendo.core.resources.ui.theme.LocalAppColors
 
 @Composable
 fun PlayPauseButton(

@@ -6,7 +6,7 @@ import com.paranid5.crescendo.presentation.main.trimmer.properties.canZoomInFlow
 import com.paranid5.crescendo.presentation.main.trimmer.properties.canZoomOutFlow
 import com.paranid5.crescendo.presentation.main.trimmer.properties.waveformMaxWidthFlow
 import com.paranid5.crescendo.presentation.main.trimmer.properties.waveformWidthFlow
-import com.paranid5.crescendo.presentation.ui.extensions.collectLatestAsState
+import com.paranid5.crescendo.utils.extensions.collectLatestAsState
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
 

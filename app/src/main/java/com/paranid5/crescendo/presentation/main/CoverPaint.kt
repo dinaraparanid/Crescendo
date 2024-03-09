@@ -20,13 +20,13 @@ import com.paranid5.crescendo.core.common.AudioStatus
 import com.paranid5.crescendo.core.resources.R
 import com.paranid5.crescendo.data.StorageHandler
 import com.paranid5.crescendo.data.properties.currentMetadataFlow
-import com.paranid5.crescendo.media.images.ImageSize
-import com.paranid5.crescendo.media.images.getTrackCoverAsync
-import com.paranid5.crescendo.media.images.getTrackCoverWithPaletteAsync
-import com.paranid5.crescendo.media.images.getVideoCoverAsync
-import com.paranid5.crescendo.media.images.getVideoCoverWithPaletteAsync
+import com.paranid5.crescendo.core.media.images.ImageSize
+import com.paranid5.crescendo.core.media.images.getTrackCoverAsync
+import com.paranid5.crescendo.core.media.images.getTrackCoverWithPaletteAsync
+import com.paranid5.crescendo.core.media.images.getVideoCoverAsync
+import com.paranid5.crescendo.core.media.images.getVideoCoverWithPaletteAsync
 import com.paranid5.crescendo.presentation.main.tracks.properties.compose.currentTrackState
-import com.paranid5.crescendo.presentation.ui.extensions.collectLatestAsState
+import com.paranid5.crescendo.utils.extensions.collectLatestAsState
 import com.paranid5.crescendo.presentation.ui.utils.BlurTransformation
 import org.koin.compose.koinInject
 

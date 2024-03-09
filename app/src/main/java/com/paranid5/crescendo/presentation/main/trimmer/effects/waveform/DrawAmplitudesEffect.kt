@@ -11,7 +11,7 @@ import com.paranid5.crescendo.presentation.main.trimmer.CONTROLLER_HEIGHT_OFFSET
 import com.paranid5.crescendo.presentation.main.trimmer.MIN_SPIKE_HEIGHT
 import com.paranid5.crescendo.presentation.main.trimmer.TrimmerViewModel
 import com.paranid5.crescendo.presentation.main.trimmer.properties.compose.collectAmplitudesAsState
-import com.paranid5.crescendo.presentation.ui.extensions.safeDiv
+import com.paranid5.crescendo.utils.extensions.safeDiv
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.Dispatchers
