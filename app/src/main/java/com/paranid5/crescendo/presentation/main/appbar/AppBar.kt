@@ -17,7 +17,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.paranid5.crescendo.core.resources.R
-import com.paranid5.crescendo.presentation.main.Screens
+import com.paranid5.crescendo.navigation.Screens
 import com.paranid5.crescendo.core.resources.ui.theme.LocalAppColors
 
 @Composable
@@ -34,7 +34,7 @@ fun AppBar(modifier: Modifier = Modifier) {
         AppBarItem(
             title = stringResource(R.string.tracks),
             image = painterResource(R.drawable.tracks),
-            screen = Screens.Tracks,
+            screen = com.paranid5.crescendo.navigation.Screens.Tracks,
             modifier = Modifier
                 .weight(1F)
                 .padding(top = 12.dp)
@@ -43,7 +43,7 @@ fun AppBar(modifier: Modifier = Modifier) {
         AppBarItem(
             title = stringResource(R.string.track_collections),
             image = painterResource(R.drawable.playlists),
-            screen = Screens.TrackCollections.Albums,
+            screen = com.paranid5.crescendo.navigation.Screens.TrackCollections.Albums,
             modifier = Modifier
                 .weight(1F)
                 .padding(top = 12.dp)
@@ -52,7 +52,7 @@ fun AppBar(modifier: Modifier = Modifier) {
         AppBarItem(
             title = stringResource(R.string.streaming),
             image = painterResource(R.drawable.stream_icon),
-            screen = Screens.StreamFetching,
+            screen = com.paranid5.crescendo.navigation.Screens.StreamFetching,
             modifier = Modifier
                 .weight(1F)
                 .padding(top = 12.dp)
@@ -61,7 +61,7 @@ fun AppBar(modifier: Modifier = Modifier) {
         AppBarItem(
             title = stringResource(R.string.favourites),
             image = Icons.Filled.Favorite,
-            screen = Screens.Favourites,
+            screen = com.paranid5.crescendo.navigation.Screens.Favourites,
             modifier = Modifier
                 .weight(1F)
                 .padding(top = 12.dp)
@@ -70,7 +70,7 @@ fun AppBar(modifier: Modifier = Modifier) {
         AppBarItem(
             title = stringResource(R.string.settings),
             image = Icons.Filled.Settings,
-            screen = Screens.Settings,
+            screen = com.paranid5.crescendo.navigation.Screens.Settings,
             modifier = Modifier
                 .weight(1F)
                 .padding(top = 12.dp)

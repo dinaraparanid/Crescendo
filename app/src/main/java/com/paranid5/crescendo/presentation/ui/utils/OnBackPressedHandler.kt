@@ -7,7 +7,7 @@ import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.platform.LocalLifecycleOwner
-import com.paranid5.crescendo.presentation.composition_locals.LocalNavController
+import com.paranid5.crescendo.navigation.LocalNavController
 import kotlinx.coroutines.launch
 
 @Composable
@@ -29,7 +29,7 @@ fun OnBackPressedHandler(onBackPressedCallback: suspend (isScreenStackEmpty: Boo
 private fun rememberCallback(
     onBackPressedCallback: suspend (isScreenStackEmpty: Boolean) -> Unit = {}
 ): OnBackPressedCallback {
-    val navHostController = LocalNavController.current
+    val navHostController = com.paranid5.crescendo.navigation.LocalNavController.current
     val coroutineScope = rememberCoroutineScope()
 
     return remember {

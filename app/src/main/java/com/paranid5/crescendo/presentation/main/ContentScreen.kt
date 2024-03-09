@@ -15,12 +15,12 @@ import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import com.paranid5.crescendo.core.impl.presentation.composition_locals.LocalCurrentPlaylistSheetState
+import com.paranid5.crescendo.core.impl.presentation.composition_locals.playing.LocalPlayingSheetState
 import com.paranid5.crescendo.core.resources.R
-import com.paranid5.crescendo.koinActivityViewModel
+import com.paranid5.crescendo.navigation.LocalNavController
+import com.paranid5.crescendo.navigation.Screens
 import com.paranid5.crescendo.presentation.composition_locals.LocalActivity
-import com.paranid5.crescendo.presentation.composition_locals.LocalCurrentPlaylistSheetState
-import com.paranid5.crescendo.presentation.composition_locals.LocalNavController
-import com.paranid5.crescendo.presentation.composition_locals.playing.LocalPlayingSheetState
 import com.paranid5.crescendo.presentation.main.about_app.AboutApp
 import com.paranid5.crescendo.presentation.main.audio_effects.AudioEffectsScreen
 import com.paranid5.crescendo.presentation.main.favourites.FavouritesScreen
@@ -35,12 +35,10 @@ import java.util.concurrent.atomic.AtomicInteger
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
-fun ContentScreen(
-    padding: PaddingValues,
-    viewModel: MainActivityViewModel = koinActivityViewModel(),
-) {
+fun ContentScreen(padding: PaddingValues) {
     val backPressedCounter = AtomicInteger()
     val activity = LocalActivity.current
+    val navigator = LocalNavController.current
     val playingSheetState = LocalPlayingSheetState.current
     val currentPlaylistSheetState = LocalCurrentPlaylistSheetState.current
     val layoutDirection = LocalLayoutDirection.current
@@ -75,7 +73,7 @@ fun ContentScreen(
     }
 
     NavHost(
-        navController = LocalNavController.current.value!!,
+        navController = navigator.value!!,
         startDestination = Screens.Tracks.title,
         modifier = Modifier.padding(
             top = padding.calculateTopPadding(),
@@ -85,7 +83,7 @@ fun ContentScreen(
         )
     ) {
         composable(route = Screens.Tracks.title) {
-            viewModel.setCurScreen(Screens.Tracks)
+            navigator.setCurScreen(Screens.Tracks)
 
             TracksScreen(
                 Modifier
@@ -99,17 +97,17 @@ fun ContentScreen(
         }
 
         composable(route = Screens.TrackCollections.Albums.title) {
-            viewModel.setCurScreen(Screens.TrackCollections.Albums)
+            navigator.setCurScreen(Screens.TrackCollections.Albums)
             AlbumsScreen()
         }
 
         composable(route = Screens.StreamFetching.title) {
-            viewModel.setCurScreen(Screens.StreamFetching)
+            navigator.setCurScreen(Screens.StreamFetching)
             FetchStreamScreen(Modifier.fillMaxSize())
         }
 
         composable(route = Screens.Audio.AudioEffects.title) {
-            viewModel.setCurScreen(Screens.Audio.AudioEffects)
+            navigator.setCurScreen(Screens.Audio.AudioEffects)
 
             AudioEffectsScreen(
                 Modifier.padding(
@@ -121,7 +119,7 @@ fun ContentScreen(
         }
 
         composable(route = Screens.Audio.Trimmer.title) {
-            viewModel.setCurScreen(Screens.Audio.Trimmer)
+            navigator.setCurScreen(Screens.Audio.Trimmer)
 
             TrimmerScreen(
                 Modifier
@@ -135,17 +133,17 @@ fun ContentScreen(
         }
 
         composable(route = Screens.AboutApp.title) {
-            viewModel.setCurScreen(Screens.AboutApp)
+            navigator.setCurScreen(Screens.AboutApp)
             AboutApp()
         }
 
         composable(route = Screens.Favourites.title) {
-            viewModel.setCurScreen(Screens.Favourites)
+            navigator.setCurScreen(Screens.Favourites)
             FavouritesScreen()
         }
 
         composable(route = Screens.Settings.title) {
-            viewModel.setCurScreen(Screens.Settings)
+            navigator.setCurScreen(Screens.Settings)
             SettingsScreen()
         }
     }

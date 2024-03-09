@@ -9,8 +9,8 @@ import com.paranid5.crescendo.core.common.trimming.TrimRange
 import com.paranid5.crescendo.core.resources.R
 import com.paranid5.crescendo.data.StorageHandler
 import com.paranid5.crescendo.presentation.UIHandler
-import com.paranid5.crescendo.presentation.main.NavHostController
-import com.paranid5.crescendo.presentation.main.Screens
+import com.paranid5.crescendo.navigation.NavHostController
+import com.paranid5.crescendo.navigation.Screens
 import com.paranid5.crescendo.services.stream_service.StreamServiceAccessor
 import com.paranid5.crescendo.services.stream_service.sendPauseBroadcast
 import com.paranid5.crescendo.services.stream_service.sendSeekTo10SecsBackBroadcast
@@ -68,7 +68,7 @@ class PlayingUIHandler(
         trimRange = trimRange
     )
 
-    fun navigateToAudioEffects(context: Context, navHostController: NavHostController) {
+    fun navigateToAudioEffects(context: Context, navHostController: com.paranid5.crescendo.navigation.NavHostController) {
         when (audioSessionIdState.value) {
             0 -> Toast.makeText(
                 context,
@@ -77,7 +77,7 @@ class PlayingUIHandler(
             ).show()
 
             else -> navHostController.navigateIfNotSame(
-                Screens.Audio.AudioEffects
+                com.paranid5.crescendo.navigation.Screens.Audio.AudioEffects
             )
         }
     }

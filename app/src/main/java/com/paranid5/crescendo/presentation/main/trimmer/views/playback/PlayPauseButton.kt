@@ -14,8 +14,8 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.paranid5.crescendo.core.resources.R
 import com.paranid5.crescendo.koinActivityViewModel
-import com.paranid5.crescendo.presentation.composition_locals.trimmer.LocalTrimmerFocusPoints
-import com.paranid5.crescendo.presentation.main.trimmer.FocusPoints
+import com.paranid5.crescendo.core.impl.presentation.composition_locals.trimmer.LocalTrimmerFocusPoints
+import com.paranid5.crescendo.core.impl.trimming.FocusPoints
 import com.paranid5.crescendo.presentation.main.trimmer.TrimmerViewModel
 import com.paranid5.crescendo.presentation.main.trimmer.properties.compose.collectIsPlayingAsState
 import com.paranid5.crescendo.core.resources.ui.theme.LocalAppColors

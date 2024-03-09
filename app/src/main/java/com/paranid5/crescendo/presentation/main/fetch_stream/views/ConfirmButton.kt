@@ -21,8 +21,8 @@ import androidx.compose.ui.unit.sp
 import com.paranid5.crescendo.core.common.AudioStatus
 import com.paranid5.crescendo.core.resources.R
 import com.paranid5.crescendo.koinActivityViewModel
-import com.paranid5.crescendo.presentation.composition_locals.playing.LocalPlayingPagerState
-import com.paranid5.crescendo.presentation.composition_locals.playing.LocalPlayingSheetState
+import com.paranid5.crescendo.core.impl.presentation.composition_locals.playing.LocalPlayingPagerState
+import com.paranid5.crescendo.core.impl.presentation.composition_locals.playing.LocalPlayingSheetState
 import com.paranid5.crescendo.presentation.main.fetch_stream.FetchStreamUIHandler
 import com.paranid5.crescendo.presentation.main.fetch_stream.FetchStreamViewModel
 import com.paranid5.crescendo.presentation.main.fetch_stream.properties.compose.collectCurrentTextAsState

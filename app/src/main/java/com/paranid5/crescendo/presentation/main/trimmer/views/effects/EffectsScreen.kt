@@ -2,7 +2,7 @@ package com.paranid5.crescendo.presentation.main.trimmer.views.effects
 
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import com.paranid5.crescendo.presentation.main.trimmer.ShownEffects
+import com.paranid5.crescendo.core.impl.trimming.ShownEffects
 
 @Composable
 fun EffectsScreen(

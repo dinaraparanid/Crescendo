@@ -16,8 +16,8 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.palette.graphics.Palette
 import com.paranid5.crescendo.core.resources.R
-import com.paranid5.crescendo.presentation.composition_locals.LocalNavController
-import com.paranid5.crescendo.presentation.composition_locals.playing.LocalPlayingSheetState
+import com.paranid5.crescendo.navigation.LocalNavController
+import com.paranid5.crescendo.core.impl.presentation.composition_locals.playing.LocalPlayingSheetState
 import com.paranid5.crescendo.presentation.main.playing.PlayingUIHandler
 import com.paranid5.crescendo.utils.extensions.getLightMutedOrPrimary
 import com.paranid5.crescendo.utils.extensions.simpleShadow
@@ -32,7 +32,7 @@ fun EqualizerButton(
     playingUIHandler: PlayingUIHandler = koinInject()
 ) {
     val context = LocalContext.current
-    val navHostController = LocalNavController.current
+    val navHostController = com.paranid5.crescendo.navigation.LocalNavController.current
     val playingSheetState = LocalPlayingSheetState.current
 
     val paletteColor = palette.getLightMutedOrPrimary()

@@ -13,7 +13,7 @@ import com.paranid5.crescendo.data.states.playback.AudioStatusStatePublisher
 import com.paranid5.crescendo.data.states.tracks.CurrentPlaylistStatePublisher
 import com.paranid5.crescendo.data.states.tracks.CurrentTrackIndexStatePublisher
 import com.paranid5.crescendo.koinActivityViewModel
-import com.paranid5.crescendo.presentation.composition_locals.playing.LocalPlayingPagerState
+import com.paranid5.crescendo.core.impl.presentation.composition_locals.playing.LocalPlayingPagerState
 import com.paranid5.crescendo.presentation.main.tracks.TracksViewModel
 import com.paranid5.crescendo.presentation.main.tracks.properties.compose.collectShownTracksAsState
 import com.paranid5.crescendo.presentation.main.tracks.properties.compose.currentTrackState

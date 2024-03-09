@@ -31,9 +31,9 @@ import androidx.compose.ui.unit.sp
 import com.paranid5.crescendo.core.resources.R
 import com.paranid5.crescendo.data.ktor_client.github.Release
 import com.paranid5.crescendo.data.ktor_client.github.checkForUpdates
-import com.paranid5.crescendo.presentation.composition_locals.LocalActivity
 import com.paranid5.crescendo.utils.extensions.simpleShadow
 import com.paranid5.crescendo.core.resources.ui.theme.LocalAppColors
+import com.paranid5.crescendo.presentation.composition_locals.LocalActivity
 import dev.jeziellago.compose.markdowntext.MarkdownText
 import io.ktor.client.HttpClient
 import org.koin.compose.koinInject

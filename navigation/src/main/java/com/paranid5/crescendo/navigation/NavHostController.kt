@@ -1,22 +1,36 @@
-package com.paranid5.crescendo.presentation.main
+package com.paranid5.crescendo.navigation
 
 import androidx.navigation.NavHostController
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
 
 class NavHostController(
     val value: NavHostController? = null,
-    private val mainActivityViewModel: MainActivityViewModel? = null
 ) {
-    private inline val curScreen
-        get() = mainActivityViewModel!!.curScreenState.value
+    private val _curScreenState by lazy {
+        MutableStateFlow<Screens>(Screens.Tracks)
+    }
 
-    private fun setCurScreen(screen: Screens) =
-        mainActivityViewModel!!.setCurScreen(screen)
+    val curScreenState by lazy { _curScreenState.asStateFlow() }
 
-    private inline val screensStack
-        get() = mainActivityViewModel!!.screensStackState.value
+    fun setCurScreen(screen: Screens) =
+        _curScreenState.update { screen }
+
+    private val _screensStackState by lazy {
+        MutableStateFlow(mutableListOf<Screens>())
+    }
+
+    val screensStackState by lazy { _screensStackState.asStateFlow() }
 
     private fun setScreensStack(screensStack: MutableList<Screens>) =
-        mainActivityViewModel!!.setScreensStack(screensStack)
+        _screensStackState.update { screensStack }
+
+    private inline val curScreen
+        get() = curScreenState.value
+
+    private inline val screensStack
+        get() = screensStackState.value
 
     fun navigateIfNotSame(screen: Screens): Screens {
         val currentRoute = curScreen

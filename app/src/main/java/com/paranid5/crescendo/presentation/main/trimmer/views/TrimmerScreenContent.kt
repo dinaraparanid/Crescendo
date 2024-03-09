@@ -23,10 +23,10 @@ import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.unit.dp
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.constraintlayout.compose.Dimension
-import com.paranid5.crescendo.presentation.composition_locals.trimmer.LocalTrimmerFocusPoints
-import com.paranid5.crescendo.presentation.composition_locals.trimmer.LocalTrimmerPositionBroadcast
-import com.paranid5.crescendo.presentation.composition_locals.trimmer.LocalTrimmerWaveformScrollState
-import com.paranid5.crescendo.presentation.main.trimmer.FocusPoints
+import com.paranid5.crescendo.core.impl.presentation.composition_locals.trimmer.LocalTrimmerFocusPoints
+import com.paranid5.crescendo.core.impl.presentation.composition_locals.trimmer.LocalTrimmerPositionBroadcast
+import com.paranid5.crescendo.core.impl.presentation.composition_locals.trimmer.LocalTrimmerWaveformScrollState
+import com.paranid5.crescendo.core.impl.trimming.FocusPoints
 import com.paranid5.crescendo.presentation.main.trimmer.WAVEFORM_SPIKE_WIDTH_RATIO
 import com.paranid5.crescendo.presentation.main.trimmer.views.waveform.TrimmedDuration
 import kotlinx.coroutines.flow.MutableSharedFlow

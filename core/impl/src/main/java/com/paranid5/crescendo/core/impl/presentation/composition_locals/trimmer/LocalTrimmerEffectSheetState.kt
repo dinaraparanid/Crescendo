@@ -1,8 +1,8 @@
-package com.paranid5.crescendo.presentation.composition_locals
+package com.paranid5.crescendo.core.impl.presentation.composition_locals.trimmer
 
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.ModalBottomSheetState
 import androidx.compose.runtime.compositionLocalOf
 
 @OptIn(ExperimentalMaterialApi::class)
-val LocalCurrentPlaylistSheetState = compositionLocalOf<ModalBottomSheetState?> { null }
+val LocalTrimmerEffectSheetState = compositionLocalOf<ModalBottomSheetState?> { null }

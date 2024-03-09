@@ -1,4 +1,4 @@
-package com.paranid5.crescendo.presentation.main
+package com.paranid5.crescendo.navigation
 
 import android.os.Parcelable
 import kotlinx.parcelize.Parcelize

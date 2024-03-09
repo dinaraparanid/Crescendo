@@ -8,14 +8,11 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Modifier
 import androidx.navigation.compose.rememberNavController
-import com.paranid5.crescendo.presentation.composition_locals.LocalActivity
-import com.paranid5.crescendo.presentation.composition_locals.LocalNavController
 import com.paranid5.crescendo.core.resources.ui.theme.CrescendoTheme
-import org.koin.androidx.viewmodel.ext.android.viewModel
+import com.paranid5.crescendo.navigation.NavHostController
+import com.paranid5.crescendo.presentation.composition_locals.LocalActivity
 
 class MainActivity : ComponentActivity() {
-    private val viewModel by viewModel<MainActivityViewModel>()
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -23,13 +20,10 @@ class MainActivity : ComponentActivity() {
 
         setContent {
             CrescendoTheme {
-                val mainNavController = NavHostController(
-                    value = rememberNavController(),
-                    mainActivityViewModel = viewModel
-                )
+                val mainNavController = NavHostController(rememberNavController())
 
                 CompositionLocalProvider(
-                    LocalNavController provides mainNavController,
+                    com.paranid5.crescendo.navigation.LocalNavController provides mainNavController,
                     LocalActivity provides this,
                 ) {
                     App(Modifier.fillMaxSize())

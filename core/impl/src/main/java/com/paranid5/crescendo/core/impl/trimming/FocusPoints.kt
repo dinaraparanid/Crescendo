@@ -1,4 +1,4 @@
-package com.paranid5.crescendo.presentation.main.trimmer
+package com.paranid5.crescendo.core.impl.trimming
 
 import androidx.compose.runtime.Stable
 import androidx.compose.ui.focus.FocusRequester

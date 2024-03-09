@@ -10,17 +10,17 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.graphics.vector.ImageVector
-import com.paranid5.crescendo.presentation.main.Screens
-import com.paranid5.crescendo.presentation.composition_locals.LocalCurrentPlaylistSheetState
-import com.paranid5.crescendo.presentation.composition_locals.LocalNavController
-import com.paranid5.crescendo.presentation.composition_locals.playing.LocalPlayingSheetState
+import com.paranid5.crescendo.navigation.Screens
+import com.paranid5.crescendo.core.impl.presentation.composition_locals.LocalCurrentPlaylistSheetState
+import com.paranid5.crescendo.navigation.LocalNavController
+import com.paranid5.crescendo.core.impl.presentation.composition_locals.playing.LocalPlayingSheetState
 import com.paranid5.crescendo.core.resources.ui.theme.LocalAppColors
 
 @Composable
 fun AppBarItem(
     title: String,
     image: ImageVector,
-    screen: Screens,
+    screen: com.paranid5.crescendo.navigation.Screens,
     modifier: Modifier = Modifier,
 ) = AppBarItemInternal(
     screen = screen,
@@ -32,7 +32,7 @@ fun AppBarItem(
 fun AppBarItem(
     title: String,
     image: Painter,
-    screen: Screens,
+    screen: com.paranid5.crescendo.navigation.Screens,
     modifier: Modifier = Modifier,
 ) = AppBarItemInternal(
     screen = screen,
@@ -75,11 +75,11 @@ private fun AppBarIcon(
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
 private fun AppBarItemInternal(
-    screen: Screens,
+    screen: com.paranid5.crescendo.navigation.Screens,
     icon: @Composable () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    val navHostController = LocalNavController.current
+    val navHostController = com.paranid5.crescendo.navigation.LocalNavController.current
     val playingSheetState = LocalPlayingSheetState.current
     val curPlaylistSheetState = LocalCurrentPlaylistSheetState.current
 

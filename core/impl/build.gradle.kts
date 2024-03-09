@@ -45,6 +45,8 @@ dependencies {
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)
     implementation(libs.androidx.ui)
+    implementation(libs.androidx.foundation.android)
+    implementation(libs.androidx.material)
     implementation(libs.material)
 
     implementation(libs.kotlinx.collections.immutable)
