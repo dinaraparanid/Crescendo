@@ -27,7 +27,7 @@ import com.paranid5.crescendo.presentation.main.current_playlist.CurrentPlaylist
 import com.paranid5.crescendo.presentation.main.playing.PlayingScreen
 import com.paranid5.crescendo.presentation.main.playing.PlayingViewModel
 import com.paranid5.crescendo.core.resources.ui.theme.LocalAppColors
-import com.paranid5.crescendo.presentation.ui.utils.PushUpButton
+import com.paranid5.crescendo.utils.PushUpButton
 import org.koin.androidx.compose.koinViewModel
 
 @OptIn(ExperimentalMaterialApi::class, ExperimentalFoundationApi::class)

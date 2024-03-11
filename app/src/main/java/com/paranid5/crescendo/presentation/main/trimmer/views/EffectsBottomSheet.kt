@@ -19,7 +19,7 @@ import com.paranid5.crescendo.presentation.main.trimmer.TrimmerViewModel
 import com.paranid5.crescendo.presentation.main.trimmer.properties.compose.collectShownEffectsAsState
 import com.paranid5.crescendo.presentation.main.trimmer.views.effects.EffectsScreen
 import com.paranid5.crescendo.utils.extensions.pxToDp
-import com.paranid5.crescendo.presentation.ui.utils.PushUpButton
+import com.paranid5.crescendo.utils.PushUpButton
 
 @Composable
 fun EffectsBottomSheet(

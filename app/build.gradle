@@ -62,6 +62,9 @@ dependencies {
     implementation project(':core:resources')
     implementation project(':core:utils')
     implementation project(':data')
+    implementation project(':navigation')
+    implementation project(':features:about_app')
+    implementation project(':features:audio_effects')
 
     implementation libs.androidx.core.ktx
     implementation libs.androidx.lifecycle.runtime.ktx
@@ -111,5 +114,4 @@ dependencies {
     implementation libs.yt.url.extractor.kt
 
     implementation files('libs/jave-1.0.2.jar')
-    implementation project(':navigation')
 }

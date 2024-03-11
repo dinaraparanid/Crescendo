@@ -8,8 +8,8 @@ import androidx.media3.common.C
 import androidx.media3.common.MediaItem
 import androidx.media3.common.util.UnstableApi
 import androidx.media3.exoplayer.ExoPlayer
-import com.paranid5.crescendo.AUDIO_SESSION_ID
-import com.paranid5.crescendo.IS_PLAYING
+import com.paranid5.crescendo.core.impl.di.AUDIO_SESSION_ID
+import com.paranid5.crescendo.core.impl.di.IS_PLAYING
 import com.paranid5.crescendo.data.StorageHandler
 import com.paranid5.crescendo.data.states.playback.RepeatingStatePublisher
 import com.paranid5.crescendo.data.states.playback.RepeatingStatePublisherImpl

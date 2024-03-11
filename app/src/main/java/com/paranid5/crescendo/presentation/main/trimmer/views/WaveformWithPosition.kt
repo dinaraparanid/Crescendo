@@ -30,7 +30,7 @@ import com.paranid5.crescendo.presentation.main.trimmer.properties.compose.colle
 import com.paranid5.crescendo.presentation.main.trimmer.properties.playbackControllerOffsetFlow
 import com.paranid5.crescendo.presentation.main.trimmer.views.waveform.TrimWaveform
 import com.paranid5.crescendo.core.resources.ui.theme.LocalAppColors
-import com.paranid5.crescendo.presentation.ui.utils.textWidth
+import com.paranid5.crescendo.utils.textWidth
 
 @Composable
 fun WaveformWithPosition(

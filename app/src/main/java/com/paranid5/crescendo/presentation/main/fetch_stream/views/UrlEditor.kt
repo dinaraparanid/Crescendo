@@ -11,7 +11,7 @@ import com.paranid5.crescendo.koinActivityViewModel
 import com.paranid5.crescendo.presentation.main.fetch_stream.FetchStreamViewModel
 import com.paranid5.crescendo.presentation.main.fetch_stream.properties.compose.collectCurrentTextAsState
 import com.paranid5.crescendo.core.resources.ui.theme.LocalAppColors
-import com.paranid5.crescendo.presentation.ui.utils.DefaultOutlinedTextField
+import com.paranid5.crescendo.utils.DefaultOutlinedTextField
 
 @Composable
 fun UrlEditor(

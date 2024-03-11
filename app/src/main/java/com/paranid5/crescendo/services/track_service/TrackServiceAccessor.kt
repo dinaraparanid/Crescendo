@@ -4,8 +4,8 @@ import android.content.Intent
 import android.os.Build
 import android.util.Log
 import com.paranid5.crescendo.MainApplication
-import com.paranid5.crescendo.TRACK_SERVICE_CONNECTION
 import com.paranid5.crescendo.core.common.tracks.DefaultTrack
+import com.paranid5.crescendo.core.impl.di.TRACK_SERVICE_CONNECTION
 import com.paranid5.crescendo.core.impl.tracks.DefaultTrackModel
 import com.paranid5.crescendo.services.ServiceAccessor
 import com.paranid5.crescendo.services.ServiceAccessorImpl

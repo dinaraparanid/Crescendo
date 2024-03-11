@@ -27,7 +27,7 @@ import com.paranid5.crescendo.core.media.images.getVideoCoverAsync
 import com.paranid5.crescendo.core.media.images.getVideoCoverWithPaletteAsync
 import com.paranid5.crescendo.presentation.main.tracks.properties.compose.currentTrackState
 import com.paranid5.crescendo.utils.extensions.collectLatestAsState
-import com.paranid5.crescendo.presentation.ui.utils.BlurTransformation
+import com.paranid5.crescendo.utils.BlurTransformation
 import org.koin.compose.koinInject
 
 @Composable

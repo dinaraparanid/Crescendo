@@ -1,6 +1,6 @@
 package com.paranid5.crescendo.services.track_service
 
-import com.paranid5.crescendo.TRACK_SERVICE_CONNECTION
+import com.paranid5.crescendo.core.impl.di.TRACK_SERVICE_CONNECTION
 import com.paranid5.crescendo.services.ConnectionManager
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.update

@@ -3,9 +3,9 @@ package com.paranid5.crescendo.services.video_cache_service
 import android.content.Intent
 import android.os.Build
 import com.paranid5.crescendo.MainApplication
-import com.paranid5.crescendo.VIDEO_CACHE_SERVICE_CONNECTION
 import com.paranid5.crescendo.core.common.caching.Formats
 import com.paranid5.crescendo.core.common.trimming.TrimRange
+import com.paranid5.crescendo.core.impl.di.VIDEO_CACHE_SERVICE_CONNECTION
 import com.paranid5.crescendo.core.impl.trimming.TrimRangeModel
 import com.paranid5.crescendo.services.ServiceAccessor
 import com.paranid5.crescendo.services.ServiceAccessorImpl

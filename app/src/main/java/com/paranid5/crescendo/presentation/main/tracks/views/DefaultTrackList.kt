@@ -6,9 +6,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
-import com.paranid5.crescendo.IS_PLAYING
 import com.paranid5.crescendo.core.common.AudioStatus
 import com.paranid5.crescendo.core.common.tracks.Track
+import com.paranid5.crescendo.core.impl.di.IS_PLAYING
 import com.paranid5.crescendo.data.states.playback.AudioStatusStatePublisher
 import com.paranid5.crescendo.data.states.tracks.CurrentPlaylistStatePublisher
 import com.paranid5.crescendo.data.states.tracks.CurrentTrackIndexStatePublisher

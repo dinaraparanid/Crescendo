@@ -21,7 +21,7 @@ import com.paranid5.crescendo.presentation.main.trimmer.TrimmerViewModel
 import com.paranid5.crescendo.presentation.main.trimmer.properties.compose.collectEndPosInMillisAsState
 import com.paranid5.crescendo.presentation.main.trimmer.properties.compose.collectStartPosInMillisAsState
 import com.paranid5.crescendo.core.resources.ui.theme.LocalAppColors
-import com.paranid5.crescendo.presentation.ui.utils.DefaultOutlinedTextField
+import com.paranid5.crescendo.utils.DefaultOutlinedTextField
 
 /** hh:mm:ss.xxx */
 private const val CORRECT_TIME_INPUT_LENGTH = 2 + 1 + 2 + 1 + 2 + 1 + 3

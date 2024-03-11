@@ -12,8 +12,8 @@ import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.palette.graphics.Palette
 import com.gauravk.audiovisualizer.visualizer.WaveVisualizer
-import com.paranid5.crescendo.AUDIO_SESSION_ID
-import com.paranid5.crescendo.IS_PLAYING
+import com.paranid5.crescendo.core.impl.di.AUDIO_SESSION_ID
+import com.paranid5.crescendo.core.impl.di.IS_PLAYING
 import com.paranid5.crescendo.core.resources.R
 import com.paranid5.crescendo.utils.extensions.collectLatestAsState
 import com.paranid5.crescendo.utils.extensions.getLightMutedOrPrimary

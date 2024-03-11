@@ -10,14 +10,14 @@ import com.paranid5.crescendo.presentation.main.tracks.properties.compose.collec
 import com.paranid5.crescendo.presentation.main.tracks.properties.compose.collectQueryAsState
 import com.paranid5.crescendo.presentation.main.tracks.properties.compose.collectShownTracksAsState
 import com.paranid5.crescendo.presentation.main.tracks.properties.compose.collectTracksAsState
-import com.paranid5.crescendo.presentation.ui.utils.FilteredContent
-import com.paranid5.crescendo.presentation.ui.utils.Searcher
+import com.paranid5.crescendo.utils.FilteredContent
+import com.paranid5.crescendo.utils.Searcher
 
 @Composable
 fun TrackSearcher(
     modifier: Modifier = Modifier,
     viewModel: TracksViewModel = koinActivityViewModel(),
-    content: FilteredContent<com.paranid5.crescendo.core.common.tracks.Track>
+    content: FilteredContent<Track>
 ) {
     val tracks by viewModel.collectTracksAsState()
     val shownTracks by viewModel.collectShownTracksAsState()
@@ -38,7 +38,7 @@ fun TrackSearcher(
     )
 }
 
-private fun filterTrack(query: String, track: com.paranid5.crescendo.core.common.tracks.Track): Boolean {
+private fun filterTrack(query: String, track: Track): Boolean {
     val title = track.title.lowercase()
     val artist = track.artist.lowercase()
     val album = track.album.lowercase()

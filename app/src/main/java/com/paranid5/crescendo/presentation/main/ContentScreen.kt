@@ -21,15 +21,15 @@ import com.paranid5.crescendo.core.resources.R
 import com.paranid5.crescendo.navigation.LocalNavController
 import com.paranid5.crescendo.navigation.Screens
 import com.paranid5.crescendo.presentation.composition_locals.LocalActivity
-import com.paranid5.crescendo.presentation.main.about_app.AboutApp
-import com.paranid5.crescendo.presentation.main.audio_effects.AudioEffectsScreen
+import com.paranid5.crescendo.about_app.AboutApp
+import com.paranid5.crescendo.audio_effects.presentation.AudioEffectsScreen
 import com.paranid5.crescendo.presentation.main.favourites.FavouritesScreen
 import com.paranid5.crescendo.presentation.main.fetch_stream.FetchStreamScreen
 import com.paranid5.crescendo.presentation.main.settings.SettingsScreen
 import com.paranid5.crescendo.presentation.main.track_collections.AlbumsScreen
 import com.paranid5.crescendo.presentation.main.tracks.TracksScreen
 import com.paranid5.crescendo.presentation.main.trimmer.TrimmerScreen
-import com.paranid5.crescendo.presentation.ui.utils.OnBackPressedHandler
+import com.paranid5.crescendo.utils.OnBackPressed
 import kotlinx.coroutines.delay
 import java.util.concurrent.atomic.AtomicInteger
 
@@ -43,15 +43,15 @@ fun ContentScreen(padding: PaddingValues) {
     val currentPlaylistSheetState = LocalCurrentPlaylistSheetState.current
     val layoutDirection = LocalLayoutDirection.current
 
-    OnBackPressedHandler { isStackEmpty ->
+    OnBackPressed { isStackEmpty ->
         if (currentPlaylistSheetState?.isVisible == true) {
             currentPlaylistSheetState.hide()
-            return@OnBackPressedHandler
+            return@OnBackPressed
         }
 
         if (playingSheetState?.bottomSheetState?.isExpanded == true) {
             playingSheetState.bottomSheetState.collapse()
-            return@OnBackPressedHandler
+            return@OnBackPressed
         }
 
         if (isStackEmpty) {
@@ -88,34 +88,33 @@ fun ContentScreen(padding: PaddingValues) {
             TracksScreen(
                 Modifier
                     .fillMaxSize()
-                    .padding(
-                        top = topPadding,
-                        start = 8.dp,
-                        end = endPadding
-                    )
+                    .screenDefaultPadding()
             )
         }
 
         composable(route = Screens.TrackCollections.Albums.title) {
             navigator.setCurScreen(Screens.TrackCollections.Albums)
-            AlbumsScreen()
+
+            AlbumsScreen(
+                Modifier
+                    .fillMaxSize()
+                    .screenDefaultPadding()
+            )
         }
 
         composable(route = Screens.StreamFetching.title) {
             navigator.setCurScreen(Screens.StreamFetching)
-            FetchStreamScreen(Modifier.fillMaxSize())
+
+            FetchStreamScreen(
+                Modifier
+                    .fillMaxSize()
+                    .screenDefaultPadding()
+            )
         }
 
         composable(route = Screens.Audio.AudioEffects.title) {
             navigator.setCurScreen(Screens.Audio.AudioEffects)
-
-            AudioEffectsScreen(
-                Modifier.padding(
-                    top = topPadding,
-                    start = 8.dp,
-                    end = endPadding
-                )
-            )
+            AudioEffectsScreen(Modifier.screenDefaultPadding())
         }
 
         composable(route = Screens.Audio.Trimmer.title) {
@@ -124,30 +123,49 @@ fun ContentScreen(padding: PaddingValues) {
             TrimmerScreen(
                 Modifier
                     .fillMaxSize()
-                    .padding(
-                        top = topPadding,
-                        start = 8.dp,
-                        end = endPadding
-                    )
+                    .screenDefaultPadding()
             )
         }
 
         composable(route = Screens.AboutApp.title) {
             navigator.setCurScreen(Screens.AboutApp)
-            AboutApp()
+
+            AboutApp(
+                Modifier
+                    .fillMaxSize()
+                    .screenDefaultPadding()
+            )
         }
 
         composable(route = Screens.Favourites.title) {
             navigator.setCurScreen(Screens.Favourites)
-            FavouritesScreen()
+
+            FavouritesScreen(
+                Modifier
+                    .fillMaxSize()
+                    .screenDefaultPadding()
+            )
         }
 
         composable(route = Screens.Settings.title) {
             navigator.setCurScreen(Screens.Settings)
-            SettingsScreen()
+
+            SettingsScreen(
+                Modifier
+                    .fillMaxSize()
+                    .screenDefaultPadding()
+            )
         }
     }
 }
+
+@Composable
+private fun Modifier.screenDefaultPadding() =
+    this.padding(
+        top = topPadding,
+        start = 8.dp,
+        end = endPadding
+    )
 
 private inline val topPadding
     @Composable

@@ -2,10 +2,10 @@ package com.paranid5.crescendo.presentation.main.playing
 
 import android.content.Context
 import android.widget.Toast
-import com.paranid5.crescendo.AUDIO_SESSION_ID
 import com.paranid5.crescendo.core.common.AudioStatus
 import com.paranid5.crescendo.core.common.caching.Formats
 import com.paranid5.crescendo.core.common.trimming.TrimRange
+import com.paranid5.crescendo.core.impl.di.AUDIO_SESSION_ID
 import com.paranid5.crescendo.core.resources.R
 import com.paranid5.crescendo.data.StorageHandler
 import com.paranid5.crescendo.presentation.UIHandler
@@ -68,7 +68,7 @@ class PlayingUIHandler(
         trimRange = trimRange
     )
 
-    fun navigateToAudioEffects(context: Context, navHostController: com.paranid5.crescendo.navigation.NavHostController) {
+    fun navigateToAudioEffects(context: Context, navHostController: NavHostController) {
         when (audioSessionIdState.value) {
             0 -> Toast.makeText(
                 context,
@@ -76,9 +76,7 @@ class PlayingUIHandler(
                 Toast.LENGTH_LONG
             ).show()
 
-            else -> navHostController.navigateIfNotSame(
-                com.paranid5.crescendo.navigation.Screens.Audio.AudioEffects
-            )
+            else -> navHostController.navigateIfNotSame(Screens.Audio.AudioEffects)
         }
     }
 }

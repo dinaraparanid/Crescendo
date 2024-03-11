@@ -1,18 +1,18 @@
 package com.paranid5.crescendo
 
 import android.os.Build
-import androidx.annotation.RequiresApi
 import androidx.annotation.StringRes
 import androidx.compose.runtime.Composable
 import androidx.lifecycle.ViewModel
+import com.paranid5.crescendo.audio_effects.di.audioEffectsModule
 import com.paranid5.crescendo.core.common.eq.EqualizerData
+import com.paranid5.crescendo.core.impl.*
+import com.paranid5.crescendo.core.impl.di.*
 import com.paranid5.crescendo.core.resources.R
 import com.paranid5.crescendo.data.StorageHandler
-import com.paranid5.crescendo.data.sqlDelightModule
 import com.paranid5.crescendo.data.ktor_client.KtorClient
+import com.paranid5.crescendo.data.sqlDelightModule
 import com.paranid5.crescendo.presentation.composition_locals.LocalActivity
-import com.paranid5.crescendo.presentation.main.audio_effects.AudioEffectsUIHandler
-import com.paranid5.crescendo.presentation.main.audio_effects.AudioEffectsViewModel
 import com.paranid5.crescendo.presentation.main.current_playlist.CurrentPlaylistViewModel
 import com.paranid5.crescendo.presentation.main.fetch_stream.FetchStreamUIHandler
 import com.paranid5.crescendo.presentation.main.fetch_stream.FetchStreamViewModel
@@ -39,23 +39,6 @@ import org.koin.core.module.dsl.singleOf
 import org.koin.core.qualifier.named
 import org.koin.core.scope.Scope
 import org.koin.dsl.module
-
-const val STREAM_WITH_NO_NAME = "stream_no_name"
-const val UNKNOWN_STREAMER = "unknown_streamer"
-const val IS_PLAYING = "is_playing_state"
-const val AUDIO_SESSION_ID = "audio_session_id"
-const val EQUALIZER_DATA = "equalizer_data"
-
-const val STREAM_SERVICE_CONNECTION = "stream_service_connection"
-const val TRACK_SERVICE_CONNECTION = "track_service_connection"
-const val VIDEO_CACHE_SERVICE_CONNECTION = "video_cache_service_connection"
-
-const val EXTERNAL_STORAGE_PERMISSION_QUEUE = "external_storage_permission_queue"
-
-@RequiresApi(Build.VERSION_CODES.TIRAMISU)
-const val FOREGROUND_SERVICE_PERMISSION_QUEUE = "foreground_service_permission_queue"
-
-const val AUDIO_RECORDING_PERMISSION_QUEUE = "audio_recording_permission_queue"
 
 private fun Scope.getString(@StringRes strRes: Int) =
     androidContext().resources.getString(strRes)
@@ -133,11 +116,6 @@ private val searchStreamModule = module {
 private val playingModule = module {
     singleOf(::PlayingUIHandler)
     viewModelOf(::PlayingViewModel)
-}
-
-private val audioEffectsModule = module {
-    singleOf(::AudioEffectsUIHandler)
-    viewModelOf(::AudioEffectsViewModel)
 }
 
 private val currentPlaylistModule = module {

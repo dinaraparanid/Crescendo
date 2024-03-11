@@ -7,8 +7,8 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.palette.graphics.Palette
-import com.paranid5.crescendo.IS_PLAYING
 import com.paranid5.crescendo.core.common.AudioStatus
+import com.paranid5.crescendo.core.impl.di.IS_PLAYING
 import com.paranid5.crescendo.koinActivityViewModel
 import com.paranid5.crescendo.presentation.main.playing.PlayingViewModel
 import com.paranid5.crescendo.presentation.main.playing.properties.compose.collectAudioStatusAsState

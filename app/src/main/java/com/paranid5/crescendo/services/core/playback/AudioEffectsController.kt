@@ -3,7 +3,6 @@ package com.paranid5.crescendo.services.core.playback
 import android.media.audiofx.BassBoost
 import android.media.audiofx.Equalizer
 import android.media.audiofx.PresetReverb
-import com.paranid5.crescendo.EQUALIZER_DATA
 import com.paranid5.crescendo.data.StorageHandler
 import com.paranid5.crescendo.data.states.effects.AudioEffectsEnabledStateSubscriber
 import com.paranid5.crescendo.data.states.effects.AudioEffectsEnabledStateSubscriberImpl
@@ -23,6 +22,7 @@ import com.paranid5.crescendo.data.states.effects.SpeedStateSubscriber
 import com.paranid5.crescendo.data.states.effects.SpeedStateSubscriberImpl
 import com.paranid5.crescendo.core.common.eq.EqualizerBandsPreset
 import com.paranid5.crescendo.core.common.eq.EqualizerData
+import com.paranid5.crescendo.core.impl.di.EQUALIZER_DATA
 import com.paranid5.crescendo.core.media.eq.EqualizerData.fromEqualizer
 import com.paranid5.crescendo.core.media.eq.usePreset
 import kotlinx.coroutines.flow.MutableStateFlow

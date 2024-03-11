@@ -3,7 +3,7 @@ package com.paranid5.crescendo.presentation.ui.permissions.requests
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
 import androidx.compose.ui.Modifier
-import com.paranid5.crescendo.AUDIO_RECORDING_PERMISSION_QUEUE
+import com.paranid5.crescendo.core.impl.di.AUDIO_RECORDING_PERMISSION_QUEUE
 import com.paranid5.crescendo.presentation.ui.permissions.description_providers.AudioRecordingDescriptionProvider
 import org.koin.compose.koinInject
 import org.koin.core.qualifier.named

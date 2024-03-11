@@ -3,7 +3,7 @@ package com.paranid5.crescendo.services.stream_service
 import android.content.Intent
 import android.os.Build
 import com.paranid5.crescendo.MainApplication
-import com.paranid5.crescendo.STREAM_SERVICE_CONNECTION
+import com.paranid5.crescendo.core.impl.di.STREAM_SERVICE_CONNECTION
 import com.paranid5.crescendo.services.ServiceAccessor
 import com.paranid5.crescendo.services.ServiceAccessorImpl
 import com.paranid5.crescendo.services.track_service.TrackService

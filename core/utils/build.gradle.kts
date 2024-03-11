@@ -54,14 +54,18 @@ android {
 dependencies {
     implementation(project(":core:common"))
     implementation(project(":core:resources"))
+    implementation(project(":navigation"))
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)
+    implementation(libs.androidx.activity.compose)
     implementation(libs.androidx.foundation.android)
     implementation(libs.androidx.media)
     implementation(libs.androidx.media3.common)
     implementation(libs.androidx.palette.ktx)
+    implementation(libs.androidx.material3)
     implementation(libs.material)
+    implementation(libs.coil.compose)
 
     implementation(libs.ktor.client.core)
     implementation(libs.ktor.client.okhttp)

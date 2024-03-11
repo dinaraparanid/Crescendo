@@ -1,6 +1,6 @@
 package com.paranid5.crescendo.services.video_cache_service
 
-import com.paranid5.crescendo.VIDEO_CACHE_SERVICE_CONNECTION
+import com.paranid5.crescendo.core.impl.di.VIDEO_CACHE_SERVICE_CONNECTION
 import com.paranid5.crescendo.services.ConnectionManager
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.update
