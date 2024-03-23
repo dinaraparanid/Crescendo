@@ -1,7 +1,7 @@
 package com.paranid5.crescendo.presentation.main.trimmer
 
 import androidx.lifecycle.ViewModel
-import com.paranid5.crescendo.data.StorageHandler
+import com.paranid5.crescendo.data.StorageRepository
 import com.paranid5.crescendo.data.states.waveform.AmplitudesStatePublisher
 import com.paranid5.crescendo.data.states.waveform.AmplitudesStatePublisherImpl
 import com.paranid5.crescendo.data.states.waveform.AmplitudesStateSubscriber
@@ -20,9 +20,9 @@ import com.paranid5.crescendo.presentation.main.trimmer.states.WaveformStateHold
 import com.paranid5.crescendo.presentation.main.trimmer.states.WaveformStateHolderImpl
 import kotlinx.collections.immutable.persistentListOf
 
-class TrimmerViewModel(storageHandler: StorageHandler) : ViewModel(),
-    AmplitudesStateSubscriber by AmplitudesStateSubscriberImpl(storageHandler),
-    AmplitudesStatePublisher by AmplitudesStatePublisherImpl(storageHandler),
+class TrimmerViewModel(storageRepository: StorageRepository) : ViewModel(),
+    AmplitudesStateSubscriber by AmplitudesStateSubscriberImpl(storageRepository),
+    AmplitudesStatePublisher by AmplitudesStatePublisherImpl(storageRepository),
     PlaybackPositionsStateHolder by PlaybackPositionsStateHolderImpl(),
     PlaybackStateHolder by PlaybackStateHolderImpl(),
     TrackStateHolder by TrackStateHolderImpl(),

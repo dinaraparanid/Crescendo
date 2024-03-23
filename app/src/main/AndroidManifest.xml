@@ -57,37 +57,37 @@
                 android:theme="@style/Theme.MediaStreamer">
         </activity>
         <service
-                android:name=".services.stream_service.StreamService"
+                android:name=".system.services.stream.StreamService"
                 android:foregroundServiceType="mediaPlayback" />
-        <service android:name=".services.track_service.TrackService"
+        <service android:name=".system.services.track.TrackService"
                 android:foregroundServiceType="mediaPlayback" />
         <service android:name=".services.video_cache_service.VideoCacheService" />
         <receiver
-                android:name=".receivers.CacheStatusReceiver"
+                android:name=".system.receivers.CacheStatusReceiver"
                 android:exported="false">
             <intent-filter>
-                <action android:name="com.paranid5.crescendo.receivers.VIDEO_CASH_COMPLETED"/>
+                <action android:name="com.paranid5.crescendo.system.receivers.VIDEO_CACHE_COMPLETED"/>
             </intent-filter>
         </receiver>
         <receiver
                 android:name=".core.media.media_scanner.MediaScannerReceiver"
                 android:exported="false">
             <intent-filter>
-                <action android:name="com.paranid5.crescendo.domain.media_scanner.SCAN_FILE"/>
+                <action android:name="com.paranid5.crescendo.core.media.media_scanner.SCAN_FILE"/>
             </intent-filter>
         </receiver>
         <receiver
-                android:name=".receivers.ServiceErrorReceiver"
+                android:name=".system.receivers.ServiceErrorReceiver"
                 android:exported="false">
             <intent-filter>
-                <action android:name="com.paranid5.crescendo.receivers.STREAMING_ERROR"/>
+                <action android:name="com.paranid5.crescendo.system.receivers.STREAMING_ERROR"/>
             </intent-filter>
         </receiver>
         <receiver
-                android:name=".receivers.TrimmingStatusReceiver"
+                android:name=".system.receivers.TrimmingStatusReceiver"
                 android:exported="false">
             <intent-filter>
-                <action android:name="com.paranid5.crescendo.receivers.TRIMMING_COMPLETED"/>
+                <action android:name="com.paranid5.crescendo.system.receivers.TRIMMING_COMPLETED"/>
             </intent-filter>
         </receiver>
     </application>

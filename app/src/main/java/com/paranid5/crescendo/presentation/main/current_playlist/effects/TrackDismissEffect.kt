@@ -9,7 +9,7 @@ import com.paranid5.crescendo.presentation.main.current_playlist.properties.comp
 import com.paranid5.crescendo.presentation.main.current_playlist.properties.compose.collectPlaylistDismissMediatorAsState
 import com.paranid5.crescendo.presentation.main.current_playlist.properties.compose.collectTrackIndexDismissMediatorAsState
 import com.paranid5.crescendo.presentation.main.current_playlist.properties.compose.collectTrackPathDismissKeyAsState
-import com.paranid5.crescendo.services.track_service.TrackServiceAccessor
+import com.paranid5.crescendo.system.services.track.TrackServiceAccessor
 import org.koin.compose.koinInject
 
 @Composable

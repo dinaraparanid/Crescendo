@@ -65,6 +65,12 @@ dependencies {
     implementation project(':navigation')
     implementation project(':features:about_app')
     implementation project(':features:audio_effects')
+    implementation project(':system:common')
+    implementation project(':system:receivers')
+    implementation project(':system:services:common')
+    implementation project(':system:services:stream')
+    implementation project(':system:services:track')
+    implementation project(':system:services:video_cache')
 
     implementation libs.androidx.core.ktx
     implementation libs.androidx.lifecycle.runtime.ktx

@@ -1,6 +1,6 @@
 package com.paranid5.crescendo.presentation.main.trimmer.states
 
-import com.paranid5.crescendo.core.impl.trimming.ShownEffects
+import com.paranid5.crescendo.presentation.main.trimmer.entities.ShownEffects
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow

@@ -1,6 +1,6 @@
 package com.paranid5.crescendo.data.states.effects
 
-import com.paranid5.crescendo.data.StorageHandler
+import com.paranid5.crescendo.data.StorageRepository
 import com.paranid5.crescendo.data.properties.reverbPresetFlow
 import com.paranid5.crescendo.data.properties.storeReverbPreset
 import kotlinx.coroutines.flow.Flow
@@ -13,15 +13,15 @@ interface ReverbPresetStatePublisher {
     suspend fun setReverbPreset(reverbPreset: Short)
 }
 
-class ReverbPresetStateSubscriberImpl(private val storageHandler: StorageHandler) :
+class ReverbPresetStateSubscriberImpl(private val storageRepository: StorageRepository) :
     ReverbPresetStateSubscriber {
     override val reverbPresetFlow by lazy {
-        storageHandler.reverbPresetFlow
+        storageRepository.reverbPresetFlow
     }
 }
 
-class ReverbPresetStatePublisherImpl(private val storageHandler: StorageHandler) :
+class ReverbPresetStatePublisherImpl(private val storageRepository: StorageRepository) :
     ReverbPresetStatePublisher {
     override suspend fun setReverbPreset(reverbPreset: Short) =
-        storageHandler.storeReverbPreset(reverbPreset)
+        storageRepository.storeReverbPreset(reverbPreset)
 }

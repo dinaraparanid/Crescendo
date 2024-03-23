@@ -6,10 +6,19 @@ import androidx.compose.runtime.Composable
 import androidx.lifecycle.ViewModel
 import com.paranid5.crescendo.audio_effects.di.audioEffectsModule
 import com.paranid5.crescendo.core.common.eq.EqualizerData
-import com.paranid5.crescendo.core.impl.*
-import com.paranid5.crescendo.core.impl.di.*
+import com.paranid5.crescendo.core.impl.di.AUDIO_RECORDING_PERMISSION_QUEUE
+import com.paranid5.crescendo.core.impl.di.AUDIO_SESSION_ID
+import com.paranid5.crescendo.core.impl.di.EQUALIZER_DATA
+import com.paranid5.crescendo.core.impl.di.EXTERNAL_STORAGE_PERMISSION_QUEUE
+import com.paranid5.crescendo.core.impl.di.FOREGROUND_SERVICE_PERMISSION_QUEUE
+import com.paranid5.crescendo.core.impl.di.IS_PLAYING
+import com.paranid5.crescendo.core.impl.di.STREAM_SERVICE_CONNECTION
+import com.paranid5.crescendo.core.impl.di.STREAM_WITH_NO_NAME
+import com.paranid5.crescendo.core.impl.di.TRACK_SERVICE_CONNECTION
+import com.paranid5.crescendo.core.impl.di.UNKNOWN_STREAMER
+import com.paranid5.crescendo.core.impl.di.VIDEO_CACHE_SERVICE_CONNECTION
 import com.paranid5.crescendo.core.resources.R
-import com.paranid5.crescendo.data.StorageHandler
+import com.paranid5.crescendo.data.StorageRepository
 import com.paranid5.crescendo.data.ktor_client.KtorClient
 import com.paranid5.crescendo.data.sqlDelightModule
 import com.paranid5.crescendo.presentation.composition_locals.LocalActivity
@@ -27,9 +36,9 @@ import com.paranid5.crescendo.presentation.ui.permissions.description_providers.
 import com.paranid5.crescendo.presentation.ui.permissions.description_providers.ForegroundServiceDescriptionProvider
 import com.paranid5.crescendo.presentation.ui.permissions.externalStoragePermissionQueue
 import com.paranid5.crescendo.presentation.ui.permissions.foregroundServicePermissionQueue
-import com.paranid5.crescendo.services.stream_service.StreamServiceAccessor
-import com.paranid5.crescendo.services.track_service.TrackServiceAccessor
-import com.paranid5.crescendo.services.video_cache_service.VideoCacheServiceAccessor
+import com.paranid5.crescendo.system.services.stream.di.streamServiceModule
+import com.paranid5.crescendo.system.services.track.di.trackServiceModule
+import com.paranid5.crescendo.system.services.video_cache.di.videoCacheServiceModule
 import kotlinx.coroutines.flow.MutableStateFlow
 import org.koin.android.ext.koin.androidApplication
 import org.koin.android.ext.koin.androidContext
@@ -49,9 +58,7 @@ private val resourcesModule = module {
 }
 
 private val serviceAccessorsModule = module {
-    singleOf(::StreamServiceAccessor)
-    singleOf(::TrackServiceAccessor)
-    singleOf(::VideoCacheServiceAccessor)
+    includes(streamServiceModule, trackServiceModule, videoCacheServiceModule)
 }
 
 private val serviceConnectionsModule = module {
@@ -99,7 +106,7 @@ private val permissionsModule = module {
 private val globalsModule = module {
     includes(resourcesModule, servicesModule, permissionsModule)
 
-    singleOf(::StorageHandler)
+    singleOf(::StorageRepository)
     single { androidApplication() as MainApplication }
     singleOf(::KtorClient)
 

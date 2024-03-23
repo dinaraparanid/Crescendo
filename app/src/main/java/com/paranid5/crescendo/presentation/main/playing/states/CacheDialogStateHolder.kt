@@ -1,11 +1,9 @@
 package com.paranid5.crescendo.presentation.main.playing.states
 
-import com.paranid5.crescendo.data.StorageHandler
+import com.paranid5.crescendo.data.StorageRepository
 import com.paranid5.crescendo.data.states.stream.CurrentMetadataStateSubscriber
 import com.paranid5.crescendo.data.states.stream.CurrentMetadataStateSubscriberImpl
 import com.paranid5.crescendo.data.states.stream.currentMetadataDurationMillisFlow
-import com.paranid5.crescendo.core.common.caching.Formats
-import com.paranid5.crescendo.core.common.trimming.TrimRange
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -25,8 +23,8 @@ interface CacheDialogStateHolder : CurrentMetadataStateSubscriber {
     fun setSelectedSaveOptionIndex(selectedSaveOptionIndex: Int)
 }
 
-class CacheDialogStateHolderImpl(storageHandler: StorageHandler) : CacheDialogStateHolder,
-    CurrentMetadataStateSubscriber by CurrentMetadataStateSubscriberImpl(storageHandler) {
+class CacheDialogStateHolderImpl(storageRepository: StorageRepository) : CacheDialogStateHolder,
+    CurrentMetadataStateSubscriber by CurrentMetadataStateSubscriberImpl(storageRepository) {
     private val _trimOffsetMillisState by lazy {
         MutableStateFlow(0L)
     }

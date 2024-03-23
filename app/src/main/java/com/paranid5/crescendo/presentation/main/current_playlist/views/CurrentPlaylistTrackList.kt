@@ -8,7 +8,7 @@ import com.paranid5.crescendo.koinActivityViewModel
 import com.paranid5.crescendo.presentation.main.current_playlist.CurrentPlaylistViewModel
 import com.paranid5.crescendo.presentation.main.current_playlist.properties.compose.collectCurrentPlaylistAsState
 import com.paranid5.crescendo.presentation.main.current_playlist.properties.compose.collectCurrentTrackIndexAsState
-import com.paranid5.crescendo.services.track_service.TrackServiceAccessor
+import com.paranid5.crescendo.system.services.track.TrackServiceAccessor
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.delay
@@ -50,8 +50,8 @@ fun CurrentPlaylistTrackList(
 private fun tryDismissTrack(
     viewModel: CurrentPlaylistViewModel,
     index: Int,
-    track: com.paranid5.crescendo.core.common.tracks.Track,
-    currentPlaylist: ImmutableList<com.paranid5.crescendo.core.common.tracks.Track>,
+    track: Track,
+    currentPlaylist: ImmutableList<Track>,
     currentTrackIndex: Int,
 ): Boolean {
     if (index == currentTrackIndex)
@@ -68,7 +68,7 @@ private fun tryDismissTrack(
 }
 
 private suspend fun updateCurrentPlaylistAfterDrag(
-    newTracks: ImmutableList<com.paranid5.crescendo.core.common.tracks.Track>,
+    newTracks: ImmutableList<Track>,
     newCurTrackIndex: Int,
     viewModel: CurrentPlaylistViewModel,
     trackServiceAccessor: TrackServiceAccessor

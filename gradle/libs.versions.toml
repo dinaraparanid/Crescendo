@@ -15,20 +15,25 @@ jaudiotagger = "v3.0.1"
 koinAndroidxCompose = "3.5.3"
 kotlinxCollectionsImmutable = "0.3.7"
 kotlinxSerializationJson = "1.6.3"
-ktorClientCore = "2.3.8"
+ktorClientCore = "2.3.9"
 lifecycleExtensions = "2.2.0"
 lifecycleRuntimeKtx = "2.7.0"
-material = "1.6.2"
-material3 = "1.2.0"
+material = "1.6.4"
+material3 = "1.2.1"
 materialVersion = "1.11.0"
 media = "1.7.0"
 media3Exoplayer = "1.2.1"
 mobileFfmpegFull = "4.4.LTS"
 navigationCompose = "2.7.7"
 paletteKtx = "1.0.0"
-ui = "1.6.3"
+ui = "1.6.4"
 ytUrlExtractorKt = "0.1.0.2"
-foundationAndroid = "1.6.3"
+foundationAndroid = "1.6.4"
+agp = "8.3.1"
+kotlin = "1.9.21"
+junit = "4.13.2"
+junitVersion = "1.1.5"
+espressoCore = "3.5.1"
 
 [libraries]
 amplituda = { module = "com.github.lincollincol:amplituda", version.ref = "amplituda" }
@@ -75,5 +80,10 @@ sqldelight-android-driver = { module = "app.cash.sqldelight:android-driver", ver
 sqldelight-coroutines-extensions = { module = "app.cash.sqldelight:coroutines-extensions", version.ref = "sqlDelight" }
 yt-url-extractor-kt = { module = "com.github.dinaraparanid:yt-url-extractor-kt", version.ref = "ytUrlExtractorKt" }
 androidx-foundation-android = { group = "androidx.compose.foundation", name = "foundation-android", version.ref = "foundationAndroid" }
+junit = { group = "junit", name = "junit", version.ref = "junit" }
+androidx-junit = { group = "androidx.test.ext", name = "junit", version.ref = "junitVersion" }
+androidx-espresso-core = { group = "androidx.test.espresso", name = "espresso-core", version.ref = "espressoCore" }
 
 [plugins]
+android-library = { id = "com.android.library", version.ref = "agp" }
+jetbrains-kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }

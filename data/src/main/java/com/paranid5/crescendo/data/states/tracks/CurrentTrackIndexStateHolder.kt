@@ -1,6 +1,6 @@
 package com.paranid5.crescendo.data.states.tracks
 
-import com.paranid5.crescendo.data.StorageHandler
+import com.paranid5.crescendo.data.StorageRepository
 import com.paranid5.crescendo.data.properties.currentTrackIndexFlow
 import com.paranid5.crescendo.data.properties.storeCurrentTrackIndex
 import kotlinx.coroutines.flow.Flow
@@ -13,15 +13,15 @@ interface CurrentTrackIndexStatePublisher {
     suspend fun setCurrentTrackIndex(index: Int)
 }
 
-class CurrentTrackIndexStateSubscriberImpl(private val storageHandler: StorageHandler) :
+class CurrentTrackIndexStateSubscriberImpl(private val storageRepository: StorageRepository) :
     CurrentTrackIndexStateSubscriber {
     override val currentTrackIndexFlow by lazy {
-        storageHandler.currentTrackIndexFlow
+        storageRepository.currentTrackIndexFlow
     }
 }
 
-class CurrentTrackIndexStatePublisherImpl(private val storageHandler: StorageHandler) :
+class CurrentTrackIndexStatePublisherImpl(private val storageRepository: StorageRepository) :
     CurrentTrackIndexStatePublisher {
     override suspend fun setCurrentTrackIndex(index: Int) =
-        storageHandler.storeCurrentTrackIndex(index)
+        storageRepository.storeCurrentTrackIndex(index)
 }

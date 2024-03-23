@@ -1,17 +1,16 @@
 package com.paranid5.crescendo.data.properties
 
-import com.paranid5.crescendo.data.StorageHandler
-import com.paranid5.crescendo.core.common.metadata.VideoMetadata
+import com.paranid5.crescendo.data.StorageRepository
 
-inline val StorageHandler.currentUrlFlow
-    get() = streamStateProvider.currentUrlFlow
+inline val StorageRepository.currentUrlFlow
+    get() = streamStateDataSource.currentUrlFlow
 
-suspend inline fun StorageHandler.storeCurrentUrl(url: String) =
-    streamStateProvider.storeCurrentUrl(url)
+suspend inline fun StorageRepository.storeCurrentUrl(url: String) =
+    streamStateDataSource.storeCurrentUrl(url)
 
-inline val StorageHandler.currentMetadataFlow
-    get() = streamStateProvider.currentMetadataFlow
+inline val StorageRepository.currentMetadataFlow
+    get() = streamStateDataSource.currentMetadataFlow
 
-suspend inline fun StorageHandler.storeCurrentMetadata(metadata: com.paranid5.crescendo.core.common.metadata.VideoMetadata?) =
-    streamStateProvider.storeCurrentMetadata(metadata)
+suspend inline fun StorageRepository.storeCurrentMetadata(metadata: com.paranid5.crescendo.core.common.metadata.VideoMetadata?) =
+    streamStateDataSource.storeCurrentMetadata(metadata)
 

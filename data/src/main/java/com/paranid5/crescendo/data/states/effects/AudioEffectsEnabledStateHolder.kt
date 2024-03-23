@@ -1,6 +1,6 @@
 package com.paranid5.crescendo.data.states.effects
 
-import com.paranid5.crescendo.data.StorageHandler
+import com.paranid5.crescendo.data.StorageRepository
 import com.paranid5.crescendo.data.properties.areAudioEffectsEnabledFlow
 import com.paranid5.crescendo.data.properties.storeAudioEffectsEnabled
 import kotlinx.coroutines.flow.Flow
@@ -13,15 +13,15 @@ interface AudioEffectsEnabledStatePublisher {
     suspend fun setAudioEffectsEnabled(areAudioEffectsEnabled: Boolean)
 }
 
-class AudioEffectsEnabledStateSubscriberImpl(private val storageHandler: StorageHandler) :
+class AudioEffectsEnabledStateSubscriberImpl(private val storageRepository: StorageRepository) :
     AudioEffectsEnabledStateSubscriber {
     override val areAudioEffectsEnabledFlow by lazy {
-        storageHandler.areAudioEffectsEnabledFlow
+        storageRepository.areAudioEffectsEnabledFlow
     }
 }
 
-class AudioEffectsEnabledStatePublisherImpl(private val storageHandler: StorageHandler) :
+class AudioEffectsEnabledStatePublisherImpl(private val storageRepository: StorageRepository) :
     AudioEffectsEnabledStatePublisher {
     override suspend fun setAudioEffectsEnabled(areAudioEffectsEnabled: Boolean) =
-        storageHandler.storeAudioEffectsEnabled(areAudioEffectsEnabled)
+        storageRepository.storeAudioEffectsEnabled(areAudioEffectsEnabled)
 }

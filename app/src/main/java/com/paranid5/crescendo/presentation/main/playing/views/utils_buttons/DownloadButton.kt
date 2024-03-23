@@ -31,16 +31,16 @@ fun DownloadButton(
 ) {
     val paletteColor = palette.getLightMutedOrPrimary()
 
-    val isCashPropertiesDialogShownState = remember {
+    val isCachePropertiesDialogShownState = remember {
         mutableStateOf(false)
     }
 
-    val isCashPropertiesDialogShown by isCashPropertiesDialogShownState
+    val isCachePropertiesDialogShown by isCachePropertiesDialogShownState
 
     Box(modifier) {
         val (areStoragePermissionsGranted, launchStoragePermissions) =
             externalStoragePermissionsRequestLauncher(
-                isCashPropertiesDialogShownState,
+                isCachePropertiesDialogShownState,
                 modifier = Modifier.align(Alignment.Center)
             )
 
@@ -49,13 +49,13 @@ fun DownloadButton(
             paletteColor = paletteColor,
             areStoragePermissionsGranted = areStoragePermissionsGranted,
             launchStoragePermissions = launchStoragePermissions,
-            isCashPropertiesDialogShownState = isCashPropertiesDialogShownState,
+            isCachePropertiesDialogShownState = isCachePropertiesDialogShownState,
             modifier = Modifier.align(Alignment.Center)
         )
 
-        if (isCashPropertiesDialogShown && areStoragePermissionsGranted)
+        if (isCachePropertiesDialogShown && areStoragePermissionsGranted)
             CacheDialog(
-                isDialogShownState = isCashPropertiesDialogShownState,
+                isDialogShownState = isCachePropertiesDialogShownState,
                 modifier = Modifier.align(Alignment.Center)
             )
     }
@@ -67,10 +67,10 @@ private inline fun DownloadButtonImpl(
     paletteColor: Color,
     areStoragePermissionsGranted: Boolean,
     crossinline launchStoragePermissions: () -> Unit,
-    isCashPropertiesDialogShownState: MutableState<Boolean>,
+    isCachePropertiesDialogShownState: MutableState<Boolean>,
     modifier: Modifier = Modifier
 ) {
-    var isCashPropertiesDialogShown by isCashPropertiesDialogShownState
+    var isCachePropertiesDialogShown by isCachePropertiesDialogShownState
 
     IconButton(
         enabled = !isLiveStreaming,
@@ -81,7 +81,7 @@ private inline fun DownloadButtonImpl(
                 return@IconButton
             }
 
-            isCashPropertiesDialogShown = true
+            isCachePropertiesDialogShown = true
         }
     ) {
         DownloadIcon(

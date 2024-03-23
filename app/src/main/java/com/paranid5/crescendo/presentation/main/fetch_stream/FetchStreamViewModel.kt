@@ -2,7 +2,7 @@ package com.paranid5.crescendo.presentation.main.fetch_stream
 
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
-import com.paranid5.crescendo.data.StorageHandler
+import com.paranid5.crescendo.data.StorageRepository
 import com.paranid5.crescendo.data.states.playback.AudioStatusStatePublisher
 import com.paranid5.crescendo.data.states.playback.AudioStatusStatePublisherImpl
 import com.paranid5.crescendo.data.states.stream.CurrentUrlStatePublisher
@@ -14,9 +14,9 @@ import com.paranid5.crescendo.presentation.main.fetch_stream.states.UrlStateHold
 
 class FetchStreamViewModel(
     savedStateHandle: SavedStateHandle,
-    storageHandler: StorageHandler,
+    storageRepository: StorageRepository,
 ) : ViewModel(),
-    CurrentUrlStateSubscriber by CurrentUrlStateSubscriberImpl(storageHandler),
-    CurrentUrlStatePublisher by CurrentUrlStatePublisherImpl(storageHandler),
+    CurrentUrlStateSubscriber by CurrentUrlStateSubscriberImpl(storageRepository),
+    CurrentUrlStatePublisher by CurrentUrlStatePublisherImpl(storageRepository),
     UrlStateHolder by UrlStateHolderImpl(savedStateHandle),
-    AudioStatusStatePublisher by AudioStatusStatePublisherImpl(storageHandler)
+    AudioStatusStatePublisher by AudioStatusStatePublisherImpl(storageRepository)

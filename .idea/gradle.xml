@@ -21,6 +21,14 @@
             <option value="$PROJECT_DIR$/features/about_app" />
             <option value="$PROJECT_DIR$/features/audio_effects" />
             <option value="$PROJECT_DIR$/navigation" />
+            <option value="$PROJECT_DIR$/system" />
+            <option value="$PROJECT_DIR$/system/common" />
+            <option value="$PROJECT_DIR$/system/receivers" />
+            <option value="$PROJECT_DIR$/system/services" />
+            <option value="$PROJECT_DIR$/system/services/common" />
+            <option value="$PROJECT_DIR$/system/services/stream" />
+            <option value="$PROJECT_DIR$/system/services/track" />
+            <option value="$PROJECT_DIR$/system/services/video_cache" />
           </set>
         </option>
         <option name="resolveExternalAnnotations" value="false" />

@@ -1,7 +1,7 @@
 package com.paranid5.crescendo.data.states.playback
 
 import com.paranid5.crescendo.core.common.AudioStatus
-import com.paranid5.crescendo.data.StorageHandler
+import com.paranid5.crescendo.data.StorageRepository
 import com.paranid5.crescendo.data.properties.audioStatusFlow
 import com.paranid5.crescendo.data.properties.storeAudioStatus
 import kotlinx.coroutines.flow.Flow
@@ -14,15 +14,15 @@ interface AudioStatusStatePublisher {
     suspend fun setAudioStatus(audioStatus: AudioStatus)
 }
 
-class AudioStatusStateSubscriberImpl(private val storageHandler: StorageHandler) :
+class AudioStatusStateSubscriberImpl(private val storageRepository: StorageRepository) :
     AudioStatusStateSubscriber {
     override val audioStatusFlow by lazy {
-        storageHandler.audioStatusFlow
+        storageRepository.audioStatusFlow
     }
 }
 
-class AudioStatusStatePublisherImpl(private val storageHandler: StorageHandler) :
+class AudioStatusStatePublisherImpl(private val storageRepository: StorageRepository) :
     AudioStatusStatePublisher {
     override suspend fun setAudioStatus(audioStatus: AudioStatus) =
-        storageHandler.storeAudioStatus(audioStatus)
+        storageRepository.storeAudioStatus(audioStatus)
 }

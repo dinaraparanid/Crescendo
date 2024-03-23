@@ -1,28 +1,28 @@
 package com.paranid5.crescendo.data.properties
 
 import com.paranid5.crescendo.core.common.AudioStatus
-import com.paranid5.crescendo.data.StorageHandler
+import com.paranid5.crescendo.data.StorageRepository
 
-inline val StorageHandler.tracksPlaybackPositionFlow
-    get() = playbackStateProvider.tracksPlaybackPositionFlow
+inline val StorageRepository.tracksPlaybackPositionFlow
+    get() = playbackStateDataSource.tracksPlaybackPositionFlow
 
-suspend inline fun StorageHandler.storeTracksPlaybackPosition(position: Long) =
-    playbackStateProvider.storeTracksPlaybackPosition(position)
+suspend inline fun StorageRepository.storeTracksPlaybackPosition(position: Long) =
+    playbackStateDataSource.storeTracksPlaybackPosition(position)
 
-inline val StorageHandler.streamPlaybackPositionFlow
-    get() = playbackStateProvider.streamPlaybackPositionFlow
+inline val StorageRepository.streamPlaybackPositionFlow
+    get() = playbackStateDataSource.streamPlaybackPositionFlow
 
-suspend inline fun StorageHandler.storeStreamPlaybackPosition(position: Long) =
-    playbackStateProvider.storeStreamPlaybackPosition(position)
+suspend inline fun StorageRepository.storeStreamPlaybackPosition(position: Long) =
+    playbackStateDataSource.storeStreamPlaybackPosition(position)
 
-inline val StorageHandler.isRepeatingFlow
-    get() = playbackStateProvider.isRepeatingFlow
+inline val StorageRepository.isRepeatingFlow
+    get() = playbackStateDataSource.isRepeatingFlow
 
-suspend inline fun StorageHandler.storeRepeating(isRepeating: Boolean) =
-    playbackStateProvider.storeIsRepeating(isRepeating)
+suspend inline fun StorageRepository.storeRepeating(isRepeating: Boolean) =
+    playbackStateDataSource.storeIsRepeating(isRepeating)
 
-inline val StorageHandler.audioStatusFlow
-    get() = playbackStateProvider.audioStatusFlow
+inline val StorageRepository.audioStatusFlow
+    get() = playbackStateDataSource.audioStatusFlow
 
-suspend inline fun StorageHandler.storeAudioStatus(audioStatus: AudioStatus) =
-    playbackStateProvider.storeAudioStatus(audioStatus)
+suspend inline fun StorageRepository.storeAudioStatus(audioStatus: AudioStatus) =
+    playbackStateDataSource.storeAudioStatus(audioStatus)

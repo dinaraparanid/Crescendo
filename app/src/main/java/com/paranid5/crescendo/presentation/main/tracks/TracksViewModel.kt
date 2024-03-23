@@ -1,7 +1,7 @@
 package com.paranid5.crescendo.presentation.main.tracks
 
 import androidx.lifecycle.ViewModel
-import com.paranid5.crescendo.data.StorageHandler
+import com.paranid5.crescendo.data.StorageRepository
 import com.paranid5.crescendo.data.current_playlist.CurrentPlaylistRepository
 import com.paranid5.crescendo.data.states.playback.AudioStatusStatePublisher
 import com.paranid5.crescendo.data.states.playback.AudioStatusStatePublisherImpl
@@ -24,15 +24,15 @@ import com.paranid5.crescendo.presentation.main.tracks.states.TracksStateHolderI
 
 @Suppress("IncorrectFormatting")
 class TracksViewModel(
-    storageHandler: StorageHandler,
+    storageRepository: StorageRepository,
     currentPlaylistRepository: CurrentPlaylistRepository
 ) : ViewModel(),
-    AudioStatusStatePublisher by AudioStatusStatePublisherImpl(storageHandler),
-    TrackOrderStateSubscriber by TrackOrderStateSubscriberImpl(storageHandler),
-    TrackOrderStatePublisher by TrackOrderStatePublisherImpl(storageHandler),
+    AudioStatusStatePublisher by AudioStatusStatePublisherImpl(storageRepository),
+    TrackOrderStateSubscriber by TrackOrderStateSubscriberImpl(storageRepository),
+    TrackOrderStatePublisher by TrackOrderStatePublisherImpl(storageRepository),
     CurrentPlaylistStatePublisher by CurrentPlaylistStatePublisherImpl(currentPlaylistRepository),
-    CurrentTrackIndexStatePublisher by CurrentTrackIndexStatePublisherImpl(storageHandler),
-    CurrentTrackStateSubscriber by CurrentTrackStateSubscriberImpl(storageHandler, currentPlaylistRepository),
+    CurrentTrackIndexStatePublisher by CurrentTrackIndexStatePublisherImpl(storageRepository),
+    CurrentTrackStateSubscriber by CurrentTrackStateSubscriberImpl(storageRepository, currentPlaylistRepository),
     QueryStateHolder by QueryStateHolderImpl(),
     SearchBarStateHolder by SearchBarStateHolderImpl(),
-    TracksStateHolder by TracksStateHolderImpl(storageHandler)
+    TracksStateHolder by TracksStateHolderImpl(storageRepository)

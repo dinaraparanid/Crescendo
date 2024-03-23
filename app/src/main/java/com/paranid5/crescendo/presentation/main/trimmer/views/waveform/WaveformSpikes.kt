@@ -20,8 +20,8 @@ import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.unit.Dp
 import com.paranid5.crescendo.utils.extensions.forEachIndexedStepped
 import com.paranid5.crescendo.koinActivityViewModel
-import com.paranid5.crescendo.core.impl.presentation.composition_locals.trimmer.LocalTrimmerFocusPoints
-import com.paranid5.crescendo.core.impl.presentation.composition_locals.trimmer.LocalTrimmerWaveformScrollState
+import com.paranid5.crescendo.presentation.main.trimmer.composition_locals.LocalTrimmerFocusPoints
+import com.paranid5.crescendo.presentation.main.trimmer.composition_locals.LocalTrimmerWaveformScrollState
 import com.paranid5.crescendo.presentation.main.trimmer.CONTROLLER_CIRCLE_RADIUS
 import com.paranid5.crescendo.presentation.main.trimmer.CONTROLLER_HEIGHT_OFFSET
 import com.paranid5.crescendo.presentation.main.trimmer.DEFAULT_GRAPHICS_LAYER_ALPHA

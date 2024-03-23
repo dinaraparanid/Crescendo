@@ -1,6 +1,6 @@
 package com.paranid5.crescendo.data.states.effects
 
-import com.paranid5.crescendo.data.StorageHandler
+import com.paranid5.crescendo.data.StorageRepository
 import com.paranid5.crescendo.data.properties.bassStrengthFlow
 import com.paranid5.crescendo.data.properties.storeBassStrength
 import kotlinx.coroutines.flow.Flow
@@ -13,15 +13,15 @@ interface BassStrengthStatePublisher {
     suspend fun setBassStrength(bassStrength: Short)
 }
 
-class BassStrengthStateSubscriberImpl(private val storageHandler: StorageHandler) :
+class BassStrengthStateSubscriberImpl(private val storageRepository: StorageRepository) :
     BassStrengthStateSubscriber {
     override val bassStrengthFlow by lazy {
-        storageHandler.bassStrengthFlow
+        storageRepository.bassStrengthFlow
     }
 }
 
-class BassStrengthStatePublisherImpl(private val storageHandler: StorageHandler) :
+class BassStrengthStatePublisherImpl(private val storageRepository: StorageRepository) :
     BassStrengthStatePublisher {
     override suspend fun setBassStrength(bassStrength: Short) =
-        storageHandler.storeBassStrength(bassStrength)
+        storageRepository.storeBassStrength(bassStrength)
 }

@@ -3,7 +3,7 @@ package com.paranid5.crescendo.presentation.main.trimmer.effects.playback
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.media3.common.Player
-import com.paranid5.crescendo.core.impl.presentation.composition_locals.trimmer.LocalTrimmerPositionBroadcast
+import com.paranid5.crescendo.presentation.main.trimmer.composition_locals.LocalTrimmerPositionBroadcast
 import kotlinx.coroutines.flow.collectLatest
 
 @Composable

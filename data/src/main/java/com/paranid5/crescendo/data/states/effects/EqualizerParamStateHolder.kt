@@ -1,9 +1,8 @@
 package com.paranid5.crescendo.data.states.effects
 
-import com.paranid5.crescendo.data.StorageHandler
+import com.paranid5.crescendo.data.StorageRepository
 import com.paranid5.crescendo.data.properties.equalizerParamFlow
 import com.paranid5.crescendo.data.properties.storeEqualizerParam
-import com.paranid5.crescendo.core.common.eq.EqualizerBandsPreset
 import kotlinx.coroutines.flow.Flow
 
 interface EqualizerParamStateSubscriber {
@@ -14,15 +13,15 @@ interface EqualizerParamStatePublisher {
     suspend fun setEqualizerParam(param: com.paranid5.crescendo.core.common.eq.EqualizerBandsPreset)
 }
 
-class EqualizerParamStateSubscriberImpl(private val storageHandler: StorageHandler) :
+class EqualizerParamStateSubscriberImpl(private val storageRepository: StorageRepository) :
     EqualizerParamStateSubscriber {
     override val equalizerParamFlow by lazy {
-        storageHandler.equalizerParamFlow
+        storageRepository.equalizerParamFlow
     }
 }
 
-class EqualizerParamStatePublisherImpl(private val storageHandler: StorageHandler) :
+class EqualizerParamStatePublisherImpl(private val storageRepository: StorageRepository) :
     EqualizerParamStatePublisher {
     override suspend fun setEqualizerParam(param: com.paranid5.crescendo.core.common.eq.EqualizerBandsPreset) =
-        storageHandler.storeEqualizerParam(param)
+        storageRepository.storeEqualizerParam(param)
 }

@@ -31,7 +31,7 @@ import com.paranid5.crescendo.presentation.main.tracks.views.item.TrackInfo
 import com.paranid5.crescendo.core.resources.ui.theme.LocalAppColors
 import com.paranid5.crescendo.presentation.ui.permissions.requests.audioRecordingPermissionsRequestLauncher
 import com.paranid5.crescendo.presentation.ui.permissions.requests.foregroundServicePermissionsRequestLauncherCompat
-import com.paranid5.crescendo.services.track_service.TrackServiceAccessor
+import com.paranid5.crescendo.system.services.track.TrackServiceAccessor
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.coroutines.launch
 import org.koin.compose.koinInject

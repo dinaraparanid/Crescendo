@@ -7,24 +7,22 @@ import com.paranid5.crescendo.core.common.caching.Formats
 import com.paranid5.crescendo.core.common.trimming.TrimRange
 import com.paranid5.crescendo.core.impl.di.AUDIO_SESSION_ID
 import com.paranid5.crescendo.core.resources.R
-import com.paranid5.crescendo.data.StorageHandler
-import com.paranid5.crescendo.presentation.UIHandler
 import com.paranid5.crescendo.navigation.NavHostController
 import com.paranid5.crescendo.navigation.Screens
-import com.paranid5.crescendo.services.stream_service.StreamServiceAccessor
-import com.paranid5.crescendo.services.stream_service.sendPauseBroadcast
-import com.paranid5.crescendo.services.stream_service.sendSeekTo10SecsBackBroadcast
-import com.paranid5.crescendo.services.stream_service.sendSeekTo10SecsForwardBroadcast
-import com.paranid5.crescendo.services.stream_service.sendSeekToBroadcast
-import com.paranid5.crescendo.services.track_service.TrackServiceAccessor
-import com.paranid5.crescendo.services.video_cache_service.VideoCacheServiceAccessor
+import com.paranid5.crescendo.presentation.UIHandler
+import com.paranid5.crescendo.system.services.stream.StreamServiceAccessor
+import com.paranid5.crescendo.system.services.stream.sendPauseBroadcast
+import com.paranid5.crescendo.system.services.stream.sendSeekTo10SecsBackBroadcast
+import com.paranid5.crescendo.system.services.stream.sendSeekTo10SecsForwardBroadcast
+import com.paranid5.crescendo.system.services.stream.sendSeekToBroadcast
+import com.paranid5.crescendo.system.services.track.TrackServiceAccessor
+import com.paranid5.crescendo.system.services.video_cache.VideoCacheServiceAccessor
 import kotlinx.coroutines.flow.MutableStateFlow
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import org.koin.core.qualifier.named
 
 class PlayingUIHandler(
-    private val storageHandler: StorageHandler,
     private val streamServiceAccessor: StreamServiceAccessor,
     private val trackServiceAccessor: TrackServiceAccessor,
     private val videoCacheServiceAccessor: VideoCacheServiceAccessor

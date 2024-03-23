@@ -1,6 +1,6 @@
 package com.paranid5.crescendo.data.states.playback
 
-import com.paranid5.crescendo.data.StorageHandler
+import com.paranid5.crescendo.data.StorageRepository
 import com.paranid5.crescendo.data.properties.storeTracksPlaybackPosition
 import com.paranid5.crescendo.data.properties.tracksPlaybackPositionFlow
 import kotlinx.coroutines.flow.Flow
@@ -13,15 +13,15 @@ interface TracksPlaybackPositionStatePublisher {
     suspend fun setTracksPlaybackPosition(position: Long)
 }
 
-class TracksPlaybackPositionStateSubscriberImpl(private val storageHandler: StorageHandler) :
+class TracksPlaybackPositionStateSubscriberImpl(private val storageRepository: StorageRepository) :
     TracksPlaybackPositionStateSubscriber {
     override val tracksPlaybackPositionFlow by lazy {
-        storageHandler.tracksPlaybackPositionFlow
+        storageRepository.tracksPlaybackPositionFlow
     }
 }
 
-class TracksPlaybackPositionStatePublisherImpl(private val storageHandler: StorageHandler) :
+class TracksPlaybackPositionStatePublisherImpl(private val storageRepository: StorageRepository) :
     TracksPlaybackPositionStatePublisher {
     override suspend fun setTracksPlaybackPosition(position: Long) =
-        storageHandler.storeTracksPlaybackPosition(position)
+        storageRepository.storeTracksPlaybackPosition(position)
 }

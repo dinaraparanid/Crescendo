@@ -1,6 +1,6 @@
 package com.paranid5.crescendo.data.states.playback
 
-import com.paranid5.crescendo.data.StorageHandler
+import com.paranid5.crescendo.data.StorageRepository
 import com.paranid5.crescendo.data.properties.storeStreamPlaybackPosition
 import com.paranid5.crescendo.data.properties.streamPlaybackPositionFlow
 import kotlinx.coroutines.flow.Flow
@@ -13,15 +13,15 @@ interface StreamPlaybackPositionStatePublisher {
     suspend fun setStreamPlaybackPosition(position: Long)
 }
 
-class StreamPlaybackPositionStateSubscriberImpl(private val storageHandler: StorageHandler) :
+class StreamPlaybackPositionStateSubscriberImpl(private val storageRepository: StorageRepository) :
     StreamPlaybackPositionStateSubscriber {
     override val streamPlaybackPositionFlow by lazy {
-        storageHandler.streamPlaybackPositionFlow
+        storageRepository.streamPlaybackPositionFlow
     }
 }
 
-class StreamPlaybackPositionStatePublisherImpl(private val storageHandler: StorageHandler) :
+class StreamPlaybackPositionStatePublisherImpl(private val storageRepository: StorageRepository) :
     StreamPlaybackPositionStatePublisher {
     override suspend fun setStreamPlaybackPosition(position: Long) =
-        storageHandler.storeStreamPlaybackPosition(position)
+        storageRepository.storeStreamPlaybackPosition(position)
 }

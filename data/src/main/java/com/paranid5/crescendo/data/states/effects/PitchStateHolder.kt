@@ -1,6 +1,6 @@
 package com.paranid5.crescendo.data.states.effects
 
-import com.paranid5.crescendo.data.StorageHandler
+import com.paranid5.crescendo.data.StorageRepository
 import com.paranid5.crescendo.data.properties.pitchFlow
 import com.paranid5.crescendo.data.properties.storePitch
 import kotlinx.coroutines.flow.Flow
@@ -13,13 +13,13 @@ interface PitchStatePublisher {
     suspend fun setPitch(pitch: Float)
 }
 
-class PitchStateSubscriberImpl(private val storageHandler: StorageHandler) : PitchStateSubscriber {
+class PitchStateSubscriberImpl(private val storageRepository: StorageRepository) : PitchStateSubscriber {
     override val pitchFlow by lazy {
-        storageHandler.pitchFlow
+        storageRepository.pitchFlow
     }
 }
 
-class PitchStatePublisherImpl(private val storageHandler: StorageHandler) : PitchStatePublisher {
+class PitchStatePublisherImpl(private val storageRepository: StorageRepository) : PitchStatePublisher {
     override suspend fun setPitch(pitch: Float) =
-        storageHandler.storePitch(pitch)
+        storageRepository.storePitch(pitch)
 }

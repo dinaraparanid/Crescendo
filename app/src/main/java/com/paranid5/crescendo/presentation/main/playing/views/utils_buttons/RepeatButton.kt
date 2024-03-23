@@ -21,11 +21,11 @@ import com.paranid5.crescendo.koinActivityViewModel
 import com.paranid5.crescendo.presentation.main.playing.PlayingViewModel
 import com.paranid5.crescendo.presentation.main.playing.properties.compose.collectAudioStatusAsState
 import com.paranid5.crescendo.presentation.main.playing.properties.compose.collectIsRepeatingAsState
+import com.paranid5.crescendo.system.services.stream.StreamServiceAccessor
+import com.paranid5.crescendo.system.services.stream.sendChangeRepeatBroadcast
+import com.paranid5.crescendo.system.services.track.TrackServiceAccessor
 import com.paranid5.crescendo.utils.extensions.getLightMutedOrPrimary
 import com.paranid5.crescendo.utils.extensions.simpleShadow
-import com.paranid5.crescendo.services.stream_service.StreamServiceAccessor
-import com.paranid5.crescendo.services.stream_service.sendChangeRepeatBroadcast
-import com.paranid5.crescendo.services.track_service.TrackServiceAccessor
 import org.koin.compose.koinInject
 
 @Composable

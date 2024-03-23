@@ -1,7 +1,7 @@
 package com.paranid5.crescendo.presentation.main.current_playlist
 
 import androidx.lifecycle.ViewModel
-import com.paranid5.crescendo.data.StorageHandler
+import com.paranid5.crescendo.data.StorageRepository
 import com.paranid5.crescendo.data.current_playlist.CurrentPlaylistRepository
 import com.paranid5.crescendo.data.states.playback.AudioStatusStatePublisher
 import com.paranid5.crescendo.data.states.playback.AudioStatusStatePublisherImpl
@@ -17,12 +17,12 @@ import com.paranid5.crescendo.presentation.main.current_playlist.states.TrackDis
 import com.paranid5.crescendo.presentation.main.current_playlist.states.TrackDismissStateHolderImpl
 
 class CurrentPlaylistViewModel(
-    storageHandler: StorageHandler,
+    storageRepository: StorageRepository,
     currentPlaylistRepository: CurrentPlaylistRepository
 ) : ViewModel(),
-    AudioStatusStatePublisher by AudioStatusStatePublisherImpl(storageHandler),
+    AudioStatusStatePublisher by AudioStatusStatePublisherImpl(storageRepository),
     CurrentPlaylistStateSubscriber by CurrentPlaylistStateSubscriberImpl(currentPlaylistRepository),
     CurrentPlaylistStatePublisher by CurrentPlaylistStatePublisherImpl(currentPlaylistRepository),
-    CurrentTrackIndexStateSubscriber by CurrentTrackIndexStateSubscriberImpl(storageHandler),
-    CurrentTrackIndexStatePublisher by CurrentTrackIndexStatePublisherImpl(storageHandler),
+    CurrentTrackIndexStateSubscriber by CurrentTrackIndexStateSubscriberImpl(storageRepository),
+    CurrentTrackIndexStatePublisher by CurrentTrackIndexStatePublisherImpl(storageRepository),
     TrackDismissStateHolder by TrackDismissStateHolderImpl()

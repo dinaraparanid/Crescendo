@@ -1,6 +1,6 @@
 package com.paranid5.crescendo.data.states.stream
 
-import com.paranid5.crescendo.data.StorageHandler
+import com.paranid5.crescendo.data.StorageRepository
 import com.paranid5.crescendo.data.properties.currentUrlFlow
 import com.paranid5.crescendo.data.properties.storeCurrentUrl
 import kotlinx.coroutines.flow.Flow
@@ -13,15 +13,15 @@ interface CurrentUrlStatePublisher {
     suspend fun setCurrentUrl(url: String)
 }
 
-class CurrentUrlStateSubscriberImpl(private val storageHandler: StorageHandler) :
+class CurrentUrlStateSubscriberImpl(private val storageRepository: StorageRepository) :
     CurrentUrlStateSubscriber {
     override val currentUrlFlow by lazy {
-        storageHandler.currentUrlFlow
+        storageRepository.currentUrlFlow
     }
 }
 
-class CurrentUrlStatePublisherImpl(private val storageHandler: StorageHandler) :
+class CurrentUrlStatePublisherImpl(private val storageRepository: StorageRepository) :
     CurrentUrlStatePublisher {
     override suspend fun setCurrentUrl(url: String) =
-        storageHandler.storeCurrentUrl(url)
+        storageRepository.storeCurrentUrl(url)
 }

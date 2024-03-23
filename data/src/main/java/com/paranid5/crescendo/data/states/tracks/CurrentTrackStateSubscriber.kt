@@ -1,9 +1,8 @@
 package com.paranid5.crescendo.data.states.tracks
 
-import com.paranid5.crescendo.data.StorageHandler
+import com.paranid5.crescendo.data.StorageRepository
 import com.paranid5.crescendo.data.current_playlist.CurrentPlaylistRepository
 import com.paranid5.crescendo.data.properties.currentTrackIndexFlow
-import com.paranid5.crescendo.core.common.tracks.Track
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
 
@@ -12,13 +11,13 @@ interface CurrentTrackStateSubscriber {
 }
 
 class CurrentTrackStateSubscriberImpl(
-    storageHandler: StorageHandler,
+    storageRepository: StorageRepository,
     currentPlaylistRepository: CurrentPlaylistRepository
 ) : CurrentTrackStateSubscriber {
     override val currentTrackFlow by lazy {
         combine(
             currentPlaylistRepository.tracksFlow,
-            storageHandler.currentTrackIndexFlow
+            storageRepository.currentTrackIndexFlow
         ) { tracks, index ->
             tracks.getOrNull(index)
         }

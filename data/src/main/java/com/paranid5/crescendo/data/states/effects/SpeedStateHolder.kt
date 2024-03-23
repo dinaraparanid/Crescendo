@@ -1,6 +1,6 @@
 package com.paranid5.crescendo.data.states.effects
 
-import com.paranid5.crescendo.data.StorageHandler
+import com.paranid5.crescendo.data.StorageRepository
 import com.paranid5.crescendo.data.properties.speedFlow
 import com.paranid5.crescendo.data.properties.storeSpeed
 import kotlinx.coroutines.flow.Flow
@@ -13,13 +13,13 @@ interface SpeedStatePublisher {
     suspend fun setSpeed(speed: Float)
 }
 
-class SpeedStateSubscriberImpl(private val storageHandler: StorageHandler) : SpeedStateSubscriber {
+class SpeedStateSubscriberImpl(private val storageRepository: StorageRepository) : SpeedStateSubscriber {
     override val speedFlow by lazy {
-        storageHandler.speedFlow
+        storageRepository.speedFlow
     }
 }
 
-class SpeedStatePublisherImpl(private val storageHandler: StorageHandler) : SpeedStatePublisher {
+class SpeedStatePublisherImpl(private val storageRepository: StorageRepository) : SpeedStatePublisher {
     override suspend fun setSpeed(speed: Float) =
-        storageHandler.storeSpeed(speed)
+        storageRepository.storeSpeed(speed)
 }

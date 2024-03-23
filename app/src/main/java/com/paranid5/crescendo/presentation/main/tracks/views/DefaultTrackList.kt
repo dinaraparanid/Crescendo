@@ -8,22 +8,19 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import com.paranid5.crescendo.core.common.AudioStatus
 import com.paranid5.crescendo.core.common.tracks.Track
-import com.paranid5.crescendo.core.impl.di.IS_PLAYING
+import com.paranid5.crescendo.core.impl.presentation.composition_locals.playing.LocalPlayingPagerState
 import com.paranid5.crescendo.data.states.playback.AudioStatusStatePublisher
 import com.paranid5.crescendo.data.states.tracks.CurrentPlaylistStatePublisher
 import com.paranid5.crescendo.data.states.tracks.CurrentTrackIndexStatePublisher
 import com.paranid5.crescendo.koinActivityViewModel
-import com.paranid5.crescendo.core.impl.presentation.composition_locals.playing.LocalPlayingPagerState
 import com.paranid5.crescendo.presentation.main.tracks.TracksViewModel
 import com.paranid5.crescendo.presentation.main.tracks.properties.compose.collectShownTracksAsState
 import com.paranid5.crescendo.presentation.main.tracks.properties.compose.currentTrackState
-import com.paranid5.crescendo.services.track_service.TrackServiceAccessor
-import com.paranid5.crescendo.services.track_service.TrackServiceStart
+import com.paranid5.crescendo.system.services.track.TrackServiceAccessor
+import com.paranid5.crescendo.system.services.track.TrackServiceStart
 import kotlinx.collections.immutable.ImmutableList
-import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
 import org.koin.compose.koinInject
-import org.koin.core.qualifier.named
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
@@ -33,7 +30,6 @@ fun DefaultTrackList(
     trackItemModifier: Modifier = Modifier,
     viewModel: TracksViewModel = koinActivityViewModel(),
     trackServiceAccessor: TrackServiceAccessor = koinInject(),
-    isPlayingState: MutableStateFlow<Boolean> = koinInject(named(IS_PLAYING)),
 ) {
     val playingPagerState = LocalPlayingPagerState.current
     val shownTracks by viewModel.collectShownTracksAsState()

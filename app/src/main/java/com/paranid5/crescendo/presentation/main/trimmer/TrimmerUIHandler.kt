@@ -15,19 +15,19 @@ import com.paranid5.crescendo.core.common.trimming.PitchAndSpeed
 import com.paranid5.crescendo.core.common.trimming.TrimRange
 import com.paranid5.crescendo.core.media.tags.setAudioTags
 import com.paranid5.crescendo.presentation.UIHandler
-import com.paranid5.crescendo.receivers.TrimmingStatusReceiver
+import com.paranid5.crescendo.system.receivers.TrimmingStatusReceiver
 import java.io.File
 
 @Immutable
 class TrimmerUIHandler : UIHandler {
     suspend fun trimTrackAndSendBroadcast(
         context: Context,
-        track: com.paranid5.crescendo.core.common.tracks.Track,
+        track: Track,
         outputFilename: String,
-        audioFormat: com.paranid5.crescendo.core.common.caching.Formats,
-        trimRange: com.paranid5.crescendo.core.common.trimming.TrimRange,
-        pitchAndSpeed: com.paranid5.crescendo.core.common.trimming.PitchAndSpeed,
-        fadeDurations: com.paranid5.crescendo.core.common.trimming.FadeDurations
+        audioFormat: Formats,
+        trimRange: TrimRange,
+        pitchAndSpeed: PitchAndSpeed,
+        fadeDurations: FadeDurations
     ) = context.sendTrimmingStatusBroadcast(
         trimTrackResult(
             context = context,
@@ -42,13 +42,13 @@ class TrimmerUIHandler : UIHandler {
 
     private suspend inline fun trimTrackResult(
         context: Context,
-        track: com.paranid5.crescendo.core.common.tracks.Track,
+        track: Track,
         outputFilename: String,
-        audioFormat: com.paranid5.crescendo.core.common.caching.Formats,
-        trimRange: com.paranid5.crescendo.core.common.trimming.TrimRange,
-        pitchAndSpeed: com.paranid5.crescendo.core.common.trimming.PitchAndSpeed,
-        fadeDurations: com.paranid5.crescendo.core.common.trimming.FadeDurations
-    ) = com.paranid5.crescendo.core.media.files.MediaFile.AudioFile(File(track.path))
+        audioFormat: Formats,
+        trimRange: TrimRange,
+        pitchAndSpeed: PitchAndSpeed,
+        fadeDurations: FadeDurations
+    ) = MediaFile.AudioFile(File(track.path))
         .trimmedCatching(outputFilename, audioFormat, trimRange, pitchAndSpeed, fadeDurations)
         .onRight { file ->
             setAudioTags(
@@ -59,7 +59,7 @@ class TrimmerUIHandler : UIHandler {
             )
         }
 
-    private fun Context.sendTrimmingStatusBroadcast(trimmingResult: Either<Throwable, com.paranid5.crescendo.core.media.files.MediaFile.AudioFile>) =
+    private fun Context.sendTrimmingStatusBroadcast(trimmingResult: Either<Throwable, MediaFile.AudioFile>) =
         sendBroadcast(
             Intent(applicationContext, TrimmingStatusReceiver::class.java)
                 .setAction(TrimmingStatusReceiver.Broadcast_TRIMMING_COMPLETED)
@@ -69,7 +69,7 @@ class TrimmerUIHandler : UIHandler {
                 )
         )
 
-    private fun Context.trimmingStatusMessage(trimmingResult: Either<Throwable, com.paranid5.crescendo.core.media.files.MediaFile.AudioFile>) =
+    private fun Context.trimmingStatusMessage(trimmingResult: Either<Throwable, MediaFile.AudioFile>) =
         when (trimmingResult) {
             is Either.Right -> getString(R.string.file_trimmed)
 

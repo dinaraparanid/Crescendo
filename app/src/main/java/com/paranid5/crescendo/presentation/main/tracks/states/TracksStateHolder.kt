@@ -1,7 +1,6 @@
 package com.paranid5.crescendo.presentation.main.tracks.states
 
-import com.paranid5.crescendo.data.StorageHandler
-import com.paranid5.crescendo.core.common.tracks.Track
+import com.paranid5.crescendo.data.StorageRepository
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -17,7 +16,7 @@ interface TracksStateHolder {
     fun setFilteredTracks(tracks: ImmutableList<com.paranid5.crescendo.core.common.tracks.Track>)
 }
 
-class TracksStateHolderImpl(private val storageHandler: StorageHandler) : TracksStateHolder {
+class TracksStateHolderImpl(private val storageRepository: StorageRepository) : TracksStateHolder {
     private val _tracksState: MutableStateFlow<ImmutableList<com.paranid5.crescendo.core.common.tracks.Track>> by lazy {
         MutableStateFlow(persistentListOf())
     }

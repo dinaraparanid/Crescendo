@@ -1,6 +1,6 @@
 package com.paranid5.crescendo.data.states.waveform
 
-import com.paranid5.crescendo.data.StorageHandler
+import com.paranid5.crescendo.data.StorageRepository
 import com.paranid5.crescendo.data.properties.amplitudesFlow
 import com.paranid5.crescendo.data.properties.storeAmplitudes
 import kotlinx.collections.immutable.ImmutableList
@@ -14,15 +14,15 @@ interface AmplitudesStatePublisher {
     suspend fun setAmplitudes(amplitudes: ImmutableList<Int>)
 }
 
-class AmplitudesStateSubscriberImpl(private val storageHandler: StorageHandler) :
+class AmplitudesStateSubscriberImpl(private val storageRepository: StorageRepository) :
     AmplitudesStateSubscriber {
     override val amplitudesFlow by lazy {
-        storageHandler.amplitudesFlow
+        storageRepository.amplitudesFlow
     }
 }
 
-class AmplitudesStatePublisherImpl(private val storageHandler: StorageHandler) :
+class AmplitudesStatePublisherImpl(private val storageRepository: StorageRepository) :
     AmplitudesStatePublisher {
     override suspend fun setAmplitudes(amplitudes: ImmutableList<Int>) =
-        storageHandler.storeAmplitudes(amplitudes)
+        storageRepository.storeAmplitudes(amplitudes)
 }

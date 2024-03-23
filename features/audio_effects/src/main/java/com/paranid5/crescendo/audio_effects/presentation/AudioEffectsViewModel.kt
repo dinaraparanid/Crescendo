@@ -1,7 +1,7 @@
 package com.paranid5.crescendo.audio_effects.presentation
 
 import androidx.lifecycle.ViewModel
-import com.paranid5.crescendo.data.StorageHandler
+import com.paranid5.crescendo.data.StorageRepository
 import com.paranid5.crescendo.data.states.effects.AudioEffectsEnabledStatePublisher
 import com.paranid5.crescendo.data.states.effects.AudioEffectsEnabledStatePublisherImpl
 import com.paranid5.crescendo.data.states.effects.AudioEffectsEnabledStateSubscriber
@@ -31,18 +31,18 @@ import com.paranid5.crescendo.data.states.effects.ReverbPresetStatePublisherImpl
 import com.paranid5.crescendo.data.states.effects.SpeedTextStateSubscriber
 import com.paranid5.crescendo.data.states.effects.SpeedTextStateSubscriberImpl
 
-class AudioEffectsViewModel(storageHandler: StorageHandler) : ViewModel(),
-    AudioStatusStateSubscriber by AudioStatusStateSubscriberImpl(storageHandler),
-    AudioEffectsEnabledStateSubscriber by AudioEffectsEnabledStateSubscriberImpl(storageHandler),
-    AudioEffectsEnabledStatePublisher by AudioEffectsEnabledStatePublisherImpl(storageHandler),
-    EqualizerParamStatePublisher by EqualizerParamStatePublisherImpl(storageHandler),
-    EqualizerPresetStatePublisher by EqualizerPresetStatePublisherImpl(storageHandler),
-    EqualizerBandsStatePublisher by EqualizerBandsStatePublisherImpl(storageHandler),
-    BassStrengthStateSubscriber by BassStrengthStateSubscriberImpl(storageHandler),
-    BassStrengthStatePublisher by BassStrengthStatePublisherImpl(storageHandler),
-    ReverbPresetStateSubscriber by ReverbPresetStateSubscriberImpl(storageHandler),
-    ReverbPresetStatePublisher by ReverbPresetStatePublisherImpl(storageHandler),
-    PitchStatePublisher by PitchStatePublisherImpl(storageHandler),
-    SpeedStatePublisher by SpeedStatePublisherImpl(storageHandler),
-    PitchTextStateSubscriber by PitchTextStateSubscriberImpl(storageHandler),
-    SpeedTextStateSubscriber by SpeedTextStateSubscriberImpl(storageHandler)
+class AudioEffectsViewModel(storageRepository: StorageRepository) : ViewModel(),
+    AudioStatusStateSubscriber by AudioStatusStateSubscriberImpl(storageRepository),
+    AudioEffectsEnabledStateSubscriber by AudioEffectsEnabledStateSubscriberImpl(storageRepository),
+    AudioEffectsEnabledStatePublisher by AudioEffectsEnabledStatePublisherImpl(storageRepository),
+    EqualizerParamStatePublisher by EqualizerParamStatePublisherImpl(storageRepository),
+    EqualizerPresetStatePublisher by EqualizerPresetStatePublisherImpl(storageRepository),
+    EqualizerBandsStatePublisher by EqualizerBandsStatePublisherImpl(storageRepository),
+    BassStrengthStateSubscriber by BassStrengthStateSubscriberImpl(storageRepository),
+    BassStrengthStatePublisher by BassStrengthStatePublisherImpl(storageRepository),
+    ReverbPresetStateSubscriber by ReverbPresetStateSubscriberImpl(storageRepository),
+    ReverbPresetStatePublisher by ReverbPresetStatePublisherImpl(storageRepository),
+    PitchStatePublisher by PitchStatePublisherImpl(storageRepository),
+    SpeedStatePublisher by SpeedStatePublisherImpl(storageRepository),
+    PitchTextStateSubscriber by PitchTextStateSubscriberImpl(storageRepository),
+    SpeedTextStateSubscriber by SpeedTextStateSubscriberImpl(storageRepository)
