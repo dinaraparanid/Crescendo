@@ -20,6 +20,9 @@
             <option value="$PROJECT_DIR$/features" />
             <option value="$PROJECT_DIR$/features/about_app" />
             <option value="$PROJECT_DIR$/features/audio_effects" />
+            <option value="$PROJECT_DIR$/features/favourites" />
+            <option value="$PROJECT_DIR$/features/fetch_stream" />
+            <option value="$PROJECT_DIR$/features/settings" />
             <option value="$PROJECT_DIR$/navigation" />
             <option value="$PROJECT_DIR$/system" />
             <option value="$PROJECT_DIR$/system/common" />

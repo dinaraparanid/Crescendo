@@ -23,9 +23,9 @@ import com.paranid5.crescendo.navigation.Screens
 import com.paranid5.crescendo.presentation.composition_locals.LocalActivity
 import com.paranid5.crescendo.about_app.AboutApp
 import com.paranid5.crescendo.audio_effects.presentation.AudioEffectsScreen
-import com.paranid5.crescendo.presentation.main.favourites.FavouritesScreen
-import com.paranid5.crescendo.presentation.main.fetch_stream.FetchStreamScreen
-import com.paranid5.crescendo.presentation.main.settings.SettingsScreen
+import com.paranid5.crescendo.favourites.FavouritesScreen
+import com.paranid5.crescendo.fetch_stream.presentation.FetchStreamScreen
+import com.paranid5.crescendo.settings.SettingsScreen
 import com.paranid5.crescendo.presentation.main.track_collections.AlbumsScreen
 import com.paranid5.crescendo.presentation.main.tracks.TracksScreen
 import com.paranid5.crescendo.presentation.main.trimmer.TrimmerScreen

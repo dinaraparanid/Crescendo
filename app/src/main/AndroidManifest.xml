@@ -61,7 +61,7 @@
                 android:foregroundServiceType="mediaPlayback" />
         <service android:name=".system.services.track.TrackService"
                 android:foregroundServiceType="mediaPlayback" />
-        <service android:name=".services.video_cache_service.VideoCacheService" />
+        <service android:name=".system.services.video_cache.VideoCacheService" />
         <receiver
                 android:name=".system.receivers.CacheStatusReceiver"
                 android:exported="false">

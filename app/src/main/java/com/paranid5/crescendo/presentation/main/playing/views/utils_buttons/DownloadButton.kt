@@ -21,7 +21,7 @@ import com.paranid5.crescendo.core.resources.R
 import com.paranid5.crescendo.presentation.main.playing.views.CacheDialog
 import com.paranid5.crescendo.utils.extensions.getLightMutedOrPrimary
 import com.paranid5.crescendo.utils.extensions.simpleShadow
-import com.paranid5.crescendo.presentation.ui.permissions.requests.externalStoragePermissionsRequestLauncher
+import com.paranid5.crescendo.core.impl.presentation.permissions.requests.externalStoragePermissionsRequestLauncher
 
 @Composable
 fun DownloadButton(

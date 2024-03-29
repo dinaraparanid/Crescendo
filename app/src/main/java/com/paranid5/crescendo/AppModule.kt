@@ -23,19 +23,18 @@ import com.paranid5.crescendo.data.ktor_client.KtorClient
 import com.paranid5.crescendo.data.sqlDelightModule
 import com.paranid5.crescendo.presentation.composition_locals.LocalActivity
 import com.paranid5.crescendo.presentation.main.current_playlist.CurrentPlaylistViewModel
-import com.paranid5.crescendo.presentation.main.fetch_stream.FetchStreamUIHandler
-import com.paranid5.crescendo.presentation.main.fetch_stream.FetchStreamViewModel
 import com.paranid5.crescendo.presentation.main.playing.PlayingUIHandler
 import com.paranid5.crescendo.presentation.main.playing.PlayingViewModel
 import com.paranid5.crescendo.presentation.main.tracks.TracksViewModel
 import com.paranid5.crescendo.presentation.main.trimmer.TrimmerUIHandler
 import com.paranid5.crescendo.presentation.main.trimmer.TrimmerViewModel
-import com.paranid5.crescendo.presentation.ui.permissions.audioRecordingPermissionQueue
-import com.paranid5.crescendo.presentation.ui.permissions.description_providers.AudioRecordingDescriptionProvider
-import com.paranid5.crescendo.presentation.ui.permissions.description_providers.ExternalStorageDescriptionProvider
-import com.paranid5.crescendo.presentation.ui.permissions.description_providers.ForegroundServiceDescriptionProvider
-import com.paranid5.crescendo.presentation.ui.permissions.externalStoragePermissionQueue
-import com.paranid5.crescendo.presentation.ui.permissions.foregroundServicePermissionQueue
+import com.paranid5.crescendo.core.impl.presentation.permissions.audioRecordingPermissionQueue
+import com.paranid5.crescendo.core.impl.presentation.permissions.description_providers.AudioRecordingDescriptionProvider
+import com.paranid5.crescendo.core.impl.presentation.permissions.description_providers.ExternalStorageDescriptionProvider
+import com.paranid5.crescendo.core.impl.presentation.permissions.description_providers.ForegroundServiceDescriptionProvider
+import com.paranid5.crescendo.core.impl.presentation.permissions.externalStoragePermissionQueue
+import com.paranid5.crescendo.core.impl.presentation.permissions.foregroundServicePermissionQueue
+import com.paranid5.crescendo.fetch_stream.di.fetchStreamModule
 import com.paranid5.crescendo.system.services.stream.di.streamServiceModule
 import com.paranid5.crescendo.system.services.track.di.trackServiceModule
 import com.paranid5.crescendo.system.services.video_cache.di.videoCacheServiceModule
@@ -115,11 +114,6 @@ private val globalsModule = module {
     single(named(EQUALIZER_DATA)) { MutableStateFlow<EqualizerData?>(null) }
 }
 
-private val searchStreamModule = module {
-    singleOf(::FetchStreamUIHandler)
-    viewModelOf(::FetchStreamViewModel)
-}
-
 private val playingModule = module {
     singleOf(::PlayingUIHandler)
     viewModelOf(::PlayingViewModel)
@@ -140,7 +134,7 @@ private val tracksModule = module {
 
 private val uiModule = module {
     includes(
-        searchStreamModule, playingModule,
+        fetchStreamModule, playingModule,
         audioEffectsModule, trimmerModule,
         tracksModule, currentPlaylistModule
     )

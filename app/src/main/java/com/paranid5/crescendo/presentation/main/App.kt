@@ -23,7 +23,7 @@ import com.paranid5.crescendo.core.impl.presentation.composition_locals.LocalCur
 import com.paranid5.crescendo.core.impl.presentation.composition_locals.playing.LocalPlayingPagerState
 import com.paranid5.crescendo.core.impl.presentation.composition_locals.playing.LocalPlayingSheetState
 import com.paranid5.crescendo.presentation.main.appbar.appBarHeight
-import com.paranid5.crescendo.presentation.ui.permissions.requests.externalStoragePermissionsRequestLauncher
+import com.paranid5.crescendo.core.impl.presentation.permissions.requests.externalStoragePermissionsRequestLauncher
 import com.paranid5.crescendo.core.resources.ui.theme.LocalAppColors
 
 @Composable

@@ -41,13 +41,18 @@ android {
 
 dependencies {
     implementation(project(":core:common"))
+    implementation(project(":core:utils"))
 
     implementation(libs.androidx.core.ktx)
+    implementation(libs.androidx.activity.compose)
     implementation(libs.androidx.appcompat)
     implementation(libs.androidx.ui)
     implementation(libs.androidx.foundation.android)
     implementation(libs.androidx.material)
+    implementation(libs.androidx.material3)
     implementation(libs.material)
 
     implementation(libs.kotlinx.collections.immutable)
+    implementation(libs.koin.androidx.compose)
+    implementation(project(":core:resources"))
 }
