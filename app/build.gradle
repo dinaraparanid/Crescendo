@@ -69,6 +69,7 @@ dependencies {
     implementation project(':features:fetch_stream')
     implementation project(':features:favourites')
     implementation project(':features:splash')
+    implementation project(':features:track_collections')
     implementation project(':system:common')
     implementation project(':system:receivers')
     implementation project(':system:services:common')

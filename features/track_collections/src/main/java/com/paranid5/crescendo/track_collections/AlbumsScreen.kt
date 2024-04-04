@@ -1,4 +1,4 @@
-package com.paranid5.crescendo.presentation.main.track_collections
+package com.paranid5.crescendo.track_collections
 
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable

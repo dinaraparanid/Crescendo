@@ -26,7 +26,7 @@ import com.paranid5.crescendo.audio_effects.presentation.AudioEffectsScreen
 import com.paranid5.crescendo.favourites.FavouritesScreen
 import com.paranid5.crescendo.fetch_stream.presentation.FetchStreamScreen
 import com.paranid5.crescendo.settings.SettingsScreen
-import com.paranid5.crescendo.presentation.main.track_collections.AlbumsScreen
+import com.paranid5.crescendo.track_collections.AlbumsScreen
 import com.paranid5.crescendo.presentation.main.tracks.TracksScreen
 import com.paranid5.crescendo.presentation.main.trimmer.TrimmerScreen
 import com.paranid5.crescendo.utils.OnBackPressed
