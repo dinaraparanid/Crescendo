@@ -39,7 +39,7 @@
                 android:authorities="${applicationId}.androidx-startup"
                 tools:node="remove" />
         <activity
-                android:name=".presentation.splash.SplashActivity"
+                android:name=".splash.SplashActivity"
                 android:exported="true"
                 android:theme="@style/Theme.MediaStreamerSplash">
             <intent-filter>

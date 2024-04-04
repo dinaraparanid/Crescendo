@@ -1,4 +1,4 @@
-package com.paranid5.crescendo.presentation.splash.views
+package com.paranid5.crescendo.splash.views
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -16,7 +16,7 @@ import com.paranid5.crescendo.core.resources.R
 import com.paranid5.crescendo.core.resources.ui.theme.LocalAppColors
 
 @Composable
-fun VersionLabels(modifier: Modifier = Modifier) {
+internal fun VersionLabels(modifier: Modifier = Modifier) {
     val colors = LocalAppColors.current
 
     Column(modifier) {

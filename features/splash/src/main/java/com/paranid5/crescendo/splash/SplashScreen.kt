@@ -1,4 +1,4 @@
-package com.paranid5.crescendo.presentation.splash
+package com.paranid5.crescendo.splash
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -8,12 +8,12 @@ import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import com.paranid5.crescendo.presentation.splash.views.SplashBackgroundImage
-import com.paranid5.crescendo.presentation.splash.views.VersionLabels
+import com.paranid5.crescendo.splash.views.SplashBackgroundImage
+import com.paranid5.crescendo.splash.views.VersionLabels
 import com.paranid5.crescendo.core.resources.ui.theme.LocalAppColors
 
 @Composable
-fun SplashScreen(modifier: Modifier = Modifier) {
+internal fun SplashScreen(modifier: Modifier = Modifier) {
     val colors = LocalAppColors.current
 
     Surface(

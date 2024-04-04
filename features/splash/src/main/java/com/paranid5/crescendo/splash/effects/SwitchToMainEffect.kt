@@ -1,15 +1,15 @@
-package com.paranid5.crescendo.presentation.splash.effects
+package com.paranid5.crescendo.splash.effects
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.platform.LocalContext
-import com.paranid5.crescendo.presentation.ui.extensions.openMainActivity
+import com.paranid5.crescendo.system.common.intent.openMainActivity
 import kotlinx.coroutines.delay
 
 private const val SPLASH_SCREEN_DELAY_MS = 1000L
 
 @Composable
-fun SwitchToMainEffect() {
+internal fun SwitchToMainEffect() {
     val context = LocalContext.current
 
     LaunchedEffect(Unit) {

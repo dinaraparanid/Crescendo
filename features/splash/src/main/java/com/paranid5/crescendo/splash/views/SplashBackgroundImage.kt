@@ -1,4 +1,4 @@
-package com.paranid5.crescendo.presentation.splash.views
+package com.paranid5.crescendo.splash.views
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Box
@@ -11,7 +11,7 @@ import androidx.compose.ui.res.painterResource
 import com.paranid5.crescendo.core.resources.R
 
 @Composable
-fun SplashBackgroundImage(modifier: Modifier = Modifier) =
+internal fun SplashBackgroundImage(modifier: Modifier = Modifier) =
     Box(modifier) {
         Image(
             painter = painterResource(R.drawable.splash),
