@@ -13,26 +13,31 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewModelScope
+import com.paranid5.crescendo.core.common.caching.Formats
+import com.paranid5.crescendo.core.common.tracks.Track
+import com.paranid5.crescendo.core.common.trimming.FadeDurations
+import com.paranid5.crescendo.core.common.trimming.PitchAndSpeed
+import com.paranid5.crescendo.core.common.trimming.TrimRange
 import com.paranid5.crescendo.core.resources.R
-import com.paranid5.crescendo.koinActivityViewModel
+import com.paranid5.crescendo.core.resources.ui.theme.LocalAppColors
 import com.paranid5.crescendo.presentation.main.trimmer.TrimmerUIHandler
 import com.paranid5.crescendo.presentation.main.trimmer.TrimmerViewModel
-import com.paranid5.crescendo.core.resources.ui.theme.LocalAppColors
 import kotlinx.coroutines.launch
+import org.koin.androidx.compose.koinViewModel
 import org.koin.compose.koinInject
 
 @Composable
 fun ConfirmButton(
     isSaveButtonClickable: Boolean,
-    track: com.paranid5.crescendo.core.common.tracks.Track,
+    track: Track,
     outputFilename: String,
-    audioFormat: com.paranid5.crescendo.core.common.caching.Formats,
-    trimRange: com.paranid5.crescendo.core.common.trimming.TrimRange,
-    pitchAndSpeed: com.paranid5.crescendo.core.common.trimming.PitchAndSpeed,
-    fadeDurations: com.paranid5.crescendo.core.common.trimming.FadeDurations,
+    audioFormat: Formats,
+    trimRange: TrimRange,
+    pitchAndSpeed: PitchAndSpeed,
+    fadeDurations: FadeDurations,
     isDialogShownState: MutableState<Boolean>,
     modifier: Modifier = Modifier,
-    viewModel: TrimmerViewModel = koinActivityViewModel(),
+    viewModel: TrimmerViewModel = koinViewModel(),
     trimmerUIHandler: TrimmerUIHandler = koinInject()
 ) {
     val context = LocalContext.current

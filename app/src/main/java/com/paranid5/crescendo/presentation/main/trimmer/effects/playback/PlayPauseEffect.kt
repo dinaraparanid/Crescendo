@@ -4,16 +4,16 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.media3.common.Player
-import com.paranid5.crescendo.koinActivityViewModel
 import com.paranid5.crescendo.presentation.main.trimmer.TrimmerViewModel
 import com.paranid5.crescendo.presentation.main.trimmer.properties.compose.collectIsPlayerInitializedAsState
 import com.paranid5.crescendo.presentation.main.trimmer.properties.compose.collectIsPlayingAsState
 import com.paranid5.crescendo.presentation.main.trimmer.properties.compose.collectStartPosInMillisAsState
+import org.koin.androidx.compose.koinViewModel
 
 @Composable
 fun PlayPauseEffect(
     player: Player,
-    viewModel: TrimmerViewModel = koinActivityViewModel(),
+    viewModel: TrimmerViewModel = koinViewModel(),
 ) {
     val isPlayerInitialized by viewModel.collectIsPlayerInitializedAsState()
     val isPlaying by viewModel.collectIsPlayingAsState()

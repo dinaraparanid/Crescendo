@@ -11,9 +11,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.graphics.vector.ImageVector
 import com.paranid5.crescendo.navigation.Screens
-import com.paranid5.crescendo.core.impl.presentation.composition_locals.LocalCurrentPlaylistSheetState
+import com.paranid5.crescendo.ui.composition_locals.LocalCurrentPlaylistSheetState
 import com.paranid5.crescendo.navigation.LocalNavController
-import com.paranid5.crescendo.core.impl.presentation.composition_locals.playing.LocalPlayingSheetState
+import com.paranid5.crescendo.ui.composition_locals.playing.LocalPlayingSheetState
 import com.paranid5.crescendo.core.resources.ui.theme.LocalAppColors
 
 @Composable

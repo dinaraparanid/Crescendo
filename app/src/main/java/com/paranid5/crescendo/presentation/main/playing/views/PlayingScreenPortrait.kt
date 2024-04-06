@@ -15,8 +15,8 @@ import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.constraintlayout.compose.Dimension
 import com.paranid5.crescendo.core.common.AudioStatus
 import com.paranid5.crescendo.core.media.images.ImageSize
-import com.paranid5.crescendo.presentation.main.coverModelWithPalette
 import com.paranid5.crescendo.presentation.main.playing.rememberIsWaveformEnabled
+import com.paranid5.crescendo.ui.covers.coverModelWithPalette
 
 @Composable
 fun PlayingScreenPortrait(
@@ -27,7 +27,10 @@ fun PlayingScreenPortrait(
     modifier: Modifier = Modifier,
 ) {
     var coverSize by remember { mutableStateOf(ImageSize(1, 1)) }
-    val (coverModel, palette) = coverModelWithPalette(audioStatus, coverSize)
+    val (coverModel, palette) = coverModelWithPalette(
+        audioStatus,
+        coverSize
+    )
     val isWaveformEnabled by rememberIsWaveformEnabled(audioStatus)
 
     ConstraintLayout(modifier) {

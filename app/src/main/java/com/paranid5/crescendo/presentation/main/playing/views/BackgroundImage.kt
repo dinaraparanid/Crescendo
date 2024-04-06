@@ -12,10 +12,10 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import com.paranid5.crescendo.core.common.AudioStatus
-import com.paranid5.crescendo.core.resources.R
 import com.paranid5.crescendo.core.media.images.ImageSize
-import com.paranid5.crescendo.presentation.main.currentTrackCoverModel
-import com.paranid5.crescendo.presentation.main.videoCoverModel
+import com.paranid5.crescendo.core.resources.R
+import com.paranid5.crescendo.ui.covers.currentTrackCoverModel
+import com.paranid5.crescendo.ui.covers.videoCoverModel
 import com.paranid5.crescendo.utils.extensions.increaseDarkness
 
 @Composable

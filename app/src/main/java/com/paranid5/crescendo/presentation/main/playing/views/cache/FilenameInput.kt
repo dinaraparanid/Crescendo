@@ -11,7 +11,7 @@ import com.paranid5.crescendo.koinActivityViewModel
 import com.paranid5.crescendo.presentation.main.playing.PlayingViewModel
 import com.paranid5.crescendo.presentation.main.playing.properties.compose.collectFilenameAsState
 import com.paranid5.crescendo.core.resources.ui.theme.LocalAppColors
-import com.paranid5.crescendo.utils.DefaultOutlinedTextField
+import com.paranid5.crescendo.ui.utils.DefaultOutlinedTextField
 
 @Composable
 fun FilenameInput(

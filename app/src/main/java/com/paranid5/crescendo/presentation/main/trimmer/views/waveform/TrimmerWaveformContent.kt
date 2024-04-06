@@ -23,7 +23,6 @@ import androidx.compose.ui.focus.onFocusEvent
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
-import com.paranid5.crescendo.koinActivityViewModel
 import com.paranid5.crescendo.presentation.main.trimmer.composition_locals.LocalTrimmerFocusPoints
 import com.paranid5.crescendo.presentation.main.trimmer.composition_locals.LocalTrimmerWaveformScrollState
 import com.paranid5.crescendo.presentation.main.trimmer.CONTROLLER_CIRCLE_RADIUS
@@ -39,6 +38,7 @@ import com.paranid5.crescendo.presentation.main.trimmer.properties.compose.colle
 import com.paranid5.crescendo.utils.extensions.pxToDp
 import com.paranid5.crescendo.utils.extensions.toPx
 import kotlinx.coroutines.launch
+import org.koin.androidx.compose.koinViewModel
 
 @Composable
 fun TrimmerWaveformContent(
@@ -46,7 +46,7 @@ fun TrimmerWaveformContent(
     canvasSizeState: MutableState<Size>,
     spikesState: MutableFloatState,
     modifier: Modifier = Modifier,
-    viewModel: TrimmerViewModel = koinActivityViewModel(),
+    viewModel: TrimmerViewModel = koinViewModel(),
     spikeWidthRatio: Int = WAVEFORM_SPIKE_WIDTH_RATIO
 ) {
     val waveformWidth by viewModel.collectWaveformWidthAsState(spikeWidthRatio)
@@ -93,7 +93,7 @@ private fun Modifier.waveformModifier(waveformWidth: Int) =
 @Composable
 private fun Modifier.startBorderModifier(
     waveformWidth: Int,
-    viewModel: TrimmerViewModel = koinActivityViewModel(),
+    viewModel: TrimmerViewModel = koinViewModel(),
 ): Modifier {
     val focusPoints = LocalTrimmerFocusPoints.current!!
     val waveformScrollState = LocalTrimmerWaveformScrollState.current!!
@@ -126,7 +126,7 @@ private fun Modifier.startBorderModifier(
 @Composable
 private fun Modifier.endBorderModifier(
     waveformWidth: Int,
-    viewModel: TrimmerViewModel = koinActivityViewModel(),
+    viewModel: TrimmerViewModel = koinViewModel(),
 ): Modifier {
     val focusPoints = LocalTrimmerFocusPoints.current!!
     val waveformScrollState = LocalTrimmerWaveformScrollState.current!!
@@ -160,7 +160,7 @@ private fun Modifier.endBorderModifier(
 @Composable
 private fun Modifier.playbackOffsetModifier(
     waveformWidth: Int,
-    viewModel: TrimmerViewModel = koinActivityViewModel(),
+    viewModel: TrimmerViewModel = koinViewModel(),
 ): Modifier {
     val focusPoints = LocalTrimmerFocusPoints.current!!
     val waveformScrollState = LocalTrimmerWaveformScrollState.current!!
@@ -197,7 +197,7 @@ private fun Modifier.playbackOffsetModifier(
 @Composable
 internal fun rememberStartBorderOffsetAsState(
     waveformWidth: Int,
-    viewModel: TrimmerViewModel = koinActivityViewModel(),
+    viewModel: TrimmerViewModel = koinViewModel(),
 ): State<Int> {
     val startOffset by viewModel.collectStartOffsetAsState()
 
@@ -209,7 +209,7 @@ internal fun rememberStartBorderOffsetAsState(
 @Composable
 internal fun rememberEndBorderOffsetAsState(
     waveformWidth: Int,
-    viewModel: TrimmerViewModel = koinActivityViewModel(),
+    viewModel: TrimmerViewModel = koinViewModel(),
 ): State<Int> {
     val endOffset by viewModel.collectEndOffsetAsState()
 
@@ -221,7 +221,7 @@ internal fun rememberEndBorderOffsetAsState(
 @Composable
 private fun rememberPlaybackPositionOffsetAsState(
     waveformWidth: Int,
-    viewModel: TrimmerViewModel = koinActivityViewModel(),
+    viewModel: TrimmerViewModel = koinViewModel(),
 ): State<Int> {
     val playbackOffset by viewModel.collectPlaybackOffsetAsState()
 
@@ -232,7 +232,7 @@ private fun rememberPlaybackPositionOffsetAsState(
 
 @Composable
 private fun animatePlaybackAlphaAsState(
-    viewModel: TrimmerViewModel = koinActivityViewModel(),
+    viewModel: TrimmerViewModel = koinViewModel(),
 ): State<Float> {
     val playbackAlpha by viewModel.collectPlaybackAlphaAsState()
     return animateFloatAsState(playbackAlpha, label = "")

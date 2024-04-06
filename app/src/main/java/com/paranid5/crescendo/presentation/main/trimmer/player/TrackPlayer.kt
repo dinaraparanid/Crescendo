@@ -20,7 +20,7 @@ private const val TRANSITION_DURATION = 10_000L
 @OptIn(UnstableApi::class)
 fun TrackPlayer(
     context: Context,
-    track: com.paranid5.crescendo.core.common.tracks.Track,
+    track: Track,
     viewModel: TrimmerViewModel,
     onCompletion: (Player) -> Unit
 ) = ExoPlayer.Builder(context)
@@ -37,16 +37,18 @@ fun TrackPlayer(
     }
 
 fun TrackPlayer(context: Context, viewModel: TrimmerViewModel) =
-    TrackPlayer(
-        context = context,
-        track = viewModel.trackState.value!!,
-        viewModel = viewModel,
-        onCompletion = {
-            viewModel.viewModelScope.launch {
-                viewModel.pausePlayback()
+    viewModel.trackState.value?.let {
+        TrackPlayer(
+            context = context,
+            track = it,
+            viewModel = viewModel,
+            onCompletion = {
+                viewModel.viewModelScope.launch {
+                    viewModel.pausePlayback()
+                }
             }
-        }
-    )
+        )
+    }
 
 @OptIn(UnstableApi::class)
 private inline val newAudioAttributes

@@ -41,6 +41,7 @@ android {
 dependencies {
     implementation(project(":core:common"))
     implementation(project(":core:impl"))
+    implementation(project(":core:ui"))
     implementation(project(":core:media"))
     implementation(project(":core:utils"))
     implementation(project(":core:resources"))

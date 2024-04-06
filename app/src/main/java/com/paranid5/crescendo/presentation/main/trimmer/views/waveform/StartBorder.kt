@@ -32,6 +32,7 @@ import com.paranid5.crescendo.presentation.main.trimmer.effects.waveform.Request
 import com.paranid5.crescendo.presentation.main.trimmer.properties.compose.collectEndPosInMillisAsState
 import com.paranid5.crescendo.presentation.main.trimmer.properties.compose.collectStartPosInMillisAsState
 import com.paranid5.crescendo.core.resources.ui.theme.LocalAppColors
+import org.koin.androidx.compose.koinViewModel
 
 @Composable
 fun StartBorder(
@@ -76,7 +77,7 @@ private fun Modifier.startBorderDragInput(
     isDraggedState: MutableState<Boolean>,
     isPositionedState: MutableState<Boolean>,
     spikeWidthRatio: Int,
-    viewModel: TrimmerViewModel = koinActivityViewModel(),
+    viewModel: TrimmerViewModel = koinViewModel(),
 ): Modifier {
     val startMillis by viewModel.collectStartPosInMillisAsState()
     val endMillis by viewModel.collectEndPosInMillisAsState()

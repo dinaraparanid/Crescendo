@@ -7,19 +7,19 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 
 interface TrackStateHolder {
-    val trackState: StateFlow<com.paranid5.crescendo.core.common.tracks.Track?>
-    fun setTrack(track: com.paranid5.crescendo.core.common.tracks.Track)
+    val trackState: StateFlow<Track?>
+    fun setTrack(track: Track)
 }
 
 class TrackStateHolderImpl : TrackStateHolder {
     private val _trackState by lazy {
-        MutableStateFlow<com.paranid5.crescendo.core.common.tracks.Track?>(null)
+        MutableStateFlow<Track?>(null)
     }
 
     override val trackState by lazy {
         _trackState.asStateFlow()
     }
 
-    override fun setTrack(track: com.paranid5.crescendo.core.common.tracks.Track) =
+    override fun setTrack(track: Track) =
         _trackState.update { track }
 }

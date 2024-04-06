@@ -11,10 +11,10 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.paranid5.crescendo.core.resources.R
-import com.paranid5.crescendo.koinActivityViewModel
 import com.paranid5.crescendo.presentation.main.trimmer.TrimmerViewModel
 import com.paranid5.crescendo.presentation.main.trimmer.properties.compose.collectPitchAsState
 import com.paranid5.crescendo.presentation.main.trimmer.properties.compose.collectSpeedAsState
+import org.koin.androidx.compose.koinViewModel
 
 @Composable
 fun PitchSpeedScreen(modifier: Modifier = Modifier) =
@@ -27,7 +27,7 @@ fun PitchSpeedScreen(modifier: Modifier = Modifier) =
 @Composable
 private fun PitchController(
     modifier: Modifier = Modifier,
-    viewModel: TrimmerViewModel = koinActivityViewModel(),
+    viewModel: TrimmerViewModel = koinViewModel(),
 ) {
     val pitch by viewModel.collectPitchAsState()
 
@@ -49,7 +49,7 @@ private fun pitchLabel(pitch: Float) =
 @Composable
 private fun SpeedController(
     modifier: Modifier = Modifier,
-    viewModel: TrimmerViewModel = koinActivityViewModel(),
+    viewModel: TrimmerViewModel = koinViewModel(),
 ) {
     val speed by viewModel.collectSpeedAsState()
 

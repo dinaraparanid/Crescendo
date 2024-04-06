@@ -13,11 +13,11 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.paranid5.crescendo.core.resources.R
-import com.paranid5.crescendo.koinActivityViewModel
 import com.paranid5.crescendo.presentation.main.trimmer.TrimmerViewModel
 import com.paranid5.crescendo.presentation.main.trimmer.properties.compose.collectFadeInSecsAsState
 import com.paranid5.crescendo.presentation.main.trimmer.properties.compose.collectFadeOutAsState
 import com.paranid5.crescendo.presentation.main.trimmer.properties.compose.collectTrackDurationInMillisAsState
+import org.koin.androidx.compose.koinViewModel
 
 @Composable
 fun FadeScreen(modifier: Modifier = Modifier) =
@@ -30,7 +30,7 @@ fun FadeScreen(modifier: Modifier = Modifier) =
 @Composable
 private fun FadeInController(
     modifier: Modifier = Modifier,
-    viewModel: TrimmerViewModel = koinActivityViewModel(),
+    viewModel: TrimmerViewModel = koinViewModel(),
 ) {
     val fadeInSecs by viewModel.collectFadeInSecsAsState()
     val trackDurationMillis by viewModel.collectTrackDurationInMillisAsState()
@@ -62,7 +62,7 @@ private fun fadeInLabel(fadeInSecs: Long) =
 @Composable
 private fun FadeOutController(
     modifier: Modifier = Modifier,
-    viewModel: TrimmerViewModel = koinActivityViewModel(),
+    viewModel: TrimmerViewModel = koinViewModel(),
 ) {
     val fadeOutSecs by viewModel.collectFadeOutAsState()
     val trackDurationMillis by viewModel.collectTrackDurationInMillisAsState()

@@ -20,11 +20,11 @@ import com.paranid5.crescendo.core.common.trimming.TrimRange
 @Composable
 fun FileSaveDialogContent(
     fileSaveOptions: Array<String>,
-    track: com.paranid5.crescendo.core.common.tracks.Track,
-    audioFormat: com.paranid5.crescendo.core.common.caching.Formats,
-    pitchAndSpeed: com.paranid5.crescendo.core.common.trimming.PitchAndSpeed,
-    trimRange: com.paranid5.crescendo.core.common.trimming.TrimRange,
-    fadeDurations: com.paranid5.crescendo.core.common.trimming.FadeDurations,
+    track: Track,
+    audioFormat: Formats,
+    pitchAndSpeed: PitchAndSpeed,
+    trimRange: TrimRange,
+    fadeDurations: FadeDurations,
     isSaveButtonClickable: Boolean,
     isDialogShownState: MutableState<Boolean>,
     filenameState: MutableState<String>,

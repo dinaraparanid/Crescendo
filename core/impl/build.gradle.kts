@@ -42,6 +42,7 @@ android {
 dependencies {
     implementation(project(":core:common"))
     implementation(project(":core:utils"))
+    implementation(project(":core:resources"))
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.activity.compose)
@@ -54,5 +55,4 @@ dependencies {
 
     implementation(libs.kotlinx.collections.immutable)
     implementation(libs.koin.androidx.compose)
-    implementation(project(":core:resources"))
 }

@@ -19,7 +19,6 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.paranid5.crescendo.koinActivityViewModel
 import com.paranid5.crescendo.presentation.main.trimmer.composition_locals.LocalTrimmerWaveformScrollState
 import com.paranid5.crescendo.presentation.main.trimmer.PLAYBACK_CIRCLE_CENTER
 import com.paranid5.crescendo.presentation.main.trimmer.TrimmerViewModel
@@ -30,7 +29,8 @@ import com.paranid5.crescendo.presentation.main.trimmer.properties.compose.colle
 import com.paranid5.crescendo.presentation.main.trimmer.properties.playbackControllerOffsetFlow
 import com.paranid5.crescendo.presentation.main.trimmer.views.waveform.TrimWaveform
 import com.paranid5.crescendo.core.resources.ui.theme.LocalAppColors
-import com.paranid5.crescendo.utils.textWidth
+import com.paranid5.crescendo.ui.utils.textWidth
+import org.koin.androidx.compose.koinViewModel
 
 @Composable
 fun WaveformWithPosition(
@@ -57,7 +57,7 @@ fun WaveformWithPosition(
 @Composable
 private fun PlaybackPositionText(
     modifier: Modifier = Modifier,
-    viewModel: TrimmerViewModel = koinActivityViewModel(),
+    viewModel: TrimmerViewModel = koinViewModel(),
 ) {
     val colors = LocalAppColors.current
     val playbackText by viewModel.collectPlaybackTextAsState()
@@ -74,7 +74,7 @@ private fun PlaybackPositionText(
 @Composable
 private fun animatePlaybackTextOffsetAsState(
     spikeWidthRatio: Int,
-    viewModel: TrimmerViewModel = koinActivityViewModel(),
+    viewModel: TrimmerViewModel = koinViewModel(),
 ): Int {
     val playbackControllerOffset by viewModel
         .playbackControllerOffsetFlow(spikeWidthRatio)

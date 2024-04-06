@@ -18,13 +18,13 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import com.paranid5.crescendo.presentation.UpdateCheckerDialog
-import com.paranid5.crescendo.core.impl.presentation.composition_locals.LocalCurrentPlaylistSheetState
-import com.paranid5.crescendo.core.impl.presentation.composition_locals.playing.LocalPlayingPagerState
-import com.paranid5.crescendo.core.impl.presentation.composition_locals.playing.LocalPlayingSheetState
-import com.paranid5.crescendo.presentation.main.appbar.appBarHeight
-import com.paranid5.crescendo.core.impl.presentation.permissions.requests.externalStoragePermissionsRequestLauncher
 import com.paranid5.crescendo.core.resources.ui.theme.LocalAppColors
+import com.paranid5.crescendo.presentation.UpdateCheckerDialog
+import com.paranid5.crescendo.ui.appbar.appBarHeight
+import com.paranid5.crescendo.ui.composition_locals.LocalCurrentPlaylistSheetState
+import com.paranid5.crescendo.ui.composition_locals.playing.LocalPlayingPagerState
+import com.paranid5.crescendo.ui.composition_locals.playing.LocalPlayingSheetState
+import com.paranid5.crescendo.ui.permissions.requests.externalStoragePermissionsRequestLauncher
 
 @Composable
 fun App(modifier: Modifier = Modifier) {

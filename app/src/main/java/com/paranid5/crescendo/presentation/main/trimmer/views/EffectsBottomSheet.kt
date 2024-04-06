@@ -14,17 +14,17 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.unit.dp
-import com.paranid5.crescendo.koinActivityViewModel
 import com.paranid5.crescendo.presentation.main.trimmer.TrimmerViewModel
 import com.paranid5.crescendo.presentation.main.trimmer.properties.compose.collectShownEffectsAsState
 import com.paranid5.crescendo.presentation.main.trimmer.views.effects.EffectsScreen
+import com.paranid5.crescendo.ui.utils.PushUpButton
 import com.paranid5.crescendo.utils.extensions.pxToDp
-import com.paranid5.crescendo.utils.PushUpButton
+import org.koin.androidx.compose.koinViewModel
 
 @Composable
 fun EffectsBottomSheet(
     modifier: Modifier = Modifier,
-    viewModel: TrimmerViewModel = koinActivityViewModel()
+    viewModel: TrimmerViewModel = koinViewModel()
 ) {
     val effects by viewModel.collectShownEffectsAsState()
     var buttonSizePx by remember { mutableIntStateOf(1) }

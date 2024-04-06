@@ -17,7 +17,7 @@ import androidx.compose.ui.unit.dp
 import androidx.palette.graphics.Palette
 import com.paranid5.crescendo.core.resources.R
 import com.paranid5.crescendo.navigation.LocalNavController
-import com.paranid5.crescendo.core.impl.presentation.composition_locals.playing.LocalPlayingSheetState
+import com.paranid5.crescendo.ui.composition_locals.playing.LocalPlayingSheetState
 import com.paranid5.crescendo.presentation.main.playing.PlayingUIHandler
 import com.paranid5.crescendo.utils.extensions.getLightMutedOrPrimary
 import com.paranid5.crescendo.utils.extensions.simpleShadow

@@ -5,13 +5,13 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.media3.common.Player
-import com.paranid5.crescendo.koinActivityViewModel
 import com.paranid5.crescendo.presentation.main.trimmer.TrimmerViewModel
 import com.paranid5.crescendo.presentation.main.trimmer.effects.playback.CleanUpEffect
 import com.paranid5.crescendo.presentation.main.trimmer.effects.playback.OutOfBordersEffect
@@ -19,29 +19,32 @@ import com.paranid5.crescendo.presentation.main.trimmer.effects.playback.PlayPau
 import com.paranid5.crescendo.presentation.main.trimmer.effects.playback.PlaybackParamsEffect
 import com.paranid5.crescendo.presentation.main.trimmer.effects.playback.PlaybackPositionTappedEffect
 import com.paranid5.crescendo.presentation.main.trimmer.player.TrackPlayer
+import com.paranid5.crescendo.presentation.main.trimmer.properties.compose.collectTrackAsState
 import com.paranid5.crescendo.presentation.main.trimmer.views.playback.PlayPauseButton
 import com.paranid5.crescendo.presentation.main.trimmer.views.playback.TenSecsBackButton
 import com.paranid5.crescendo.presentation.main.trimmer.views.playback.TenSecsForwardButton
+import org.koin.androidx.compose.koinViewModel
 
 @Composable
 fun PlaybackButtons(
     modifier: Modifier = Modifier,
-    viewModel: TrimmerViewModel = koinActivityViewModel(),
+    viewModel: TrimmerViewModel = koinViewModel(),
 ) {
     val context = LocalContext.current
+    val track by viewModel.collectTrackAsState()
 
-    val player by remember {
+    val player by remember(track) {
         lazy { TrackPlayer(context, viewModel) }
     }
 
     OutOfBordersEffect()
-    PlayPauseEffect(player)
-    CleanUpEffect(player)
-    PlaybackParamsEffect(player)
-    PlaybackPositionTappedEffect(player)
+    PlayPauseEffect(player ?: return)
+    CleanUpEffect(player ?: return)
+    PlaybackParamsEffect(player ?: return)
+    PlaybackPositionTappedEffect(player ?: return)
 
     PlaybackButtonsContent(
-        player = player,
+        player = player ?: return,
         modifier = modifier
     )
 }

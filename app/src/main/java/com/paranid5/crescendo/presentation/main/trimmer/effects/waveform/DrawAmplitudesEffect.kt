@@ -6,7 +6,6 @@ import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.geometry.Size
-import com.paranid5.crescendo.koinActivityViewModel
 import com.paranid5.crescendo.presentation.main.trimmer.CONTROLLER_HEIGHT_OFFSET
 import com.paranid5.crescendo.presentation.main.trimmer.MIN_SPIKE_HEIGHT
 import com.paranid5.crescendo.presentation.main.trimmer.TrimmerViewModel
@@ -16,6 +15,7 @@ import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import org.koin.androidx.compose.koinViewModel
 import kotlin.math.ceil
 import kotlin.math.roundToInt
 
@@ -24,7 +24,7 @@ fun DrawAmplitudesEffect(
     spikes: Float,
     canvasSize: Size,
     spikesAmplitudesState: MutableState<ImmutableList<Float>>,
-    viewModel: TrimmerViewModel = koinActivityViewModel(),
+    viewModel: TrimmerViewModel = koinViewModel(),
 ) {
     val amplitudes by viewModel.collectAmplitudesAsState()
     var spikesAmplitudes by spikesAmplitudesState

@@ -25,7 +25,7 @@ import com.paranid5.crescendo.core.common.eq.EqualizerData
 import com.paranid5.crescendo.core.impl.di.EQUALIZER_DATA
 import com.paranid5.crescendo.core.resources.R
 import com.paranid5.crescendo.core.resources.ui.theme.LocalAppColors
-import com.paranid5.crescendo.utils.Spinner
+import com.paranid5.crescendo.ui.utils.Spinner
 import com.paranid5.crescendo.utils.extensions.collectLatestAsState
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.toImmutableList
@@ -66,7 +66,7 @@ private fun PresetSpinnerImpl(
     val presets = (builtInPresets + stringResource(R.string.custom)).toImmutableList()
     val selectedItemIndices by rememberSelectedItemIndices(curItemIndex)
 
-    Spinner(
+    com.paranid5.crescendo.ui.utils.Spinner(
         items = presets,
         selectedItemIndices = selectedItemIndices,
         modifier = modifier,

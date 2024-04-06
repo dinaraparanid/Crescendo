@@ -19,7 +19,6 @@ import androidx.compose.ui.graphics.drawscope.Fill
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.unit.Dp
 import com.paranid5.crescendo.utils.extensions.forEachIndexedStepped
-import com.paranid5.crescendo.koinActivityViewModel
 import com.paranid5.crescendo.presentation.main.trimmer.composition_locals.LocalTrimmerFocusPoints
 import com.paranid5.crescendo.presentation.main.trimmer.composition_locals.LocalTrimmerWaveformScrollState
 import com.paranid5.crescendo.presentation.main.trimmer.CONTROLLER_CIRCLE_RADIUS
@@ -34,6 +33,7 @@ import com.paranid5.crescendo.presentation.main.trimmer.properties.compose.colle
 import com.paranid5.crescendo.presentation.main.trimmer.properties.compose.collectZoomAsState
 import com.paranid5.crescendo.utils.extensions.pxToDp
 import com.paranid5.crescendo.core.resources.ui.theme.LocalAppColors
+import org.koin.androidx.compose.koinViewModel
 
 @Composable
 fun WaveformSpikes(
@@ -41,7 +41,7 @@ fun WaveformSpikes(
     canvasSizeState: MutableState<Size>,
     spikesState: MutableFloatState,
     modifier: Modifier = Modifier,
-    viewModel: TrimmerViewModel = koinActivityViewModel(),
+    viewModel: TrimmerViewModel = koinViewModel(),
     spikeWidthRatio: Int = WAVEFORM_SPIKE_WIDTH_RATIO
 ) {
     val colors = LocalAppColors.current
@@ -78,7 +78,7 @@ fun WaveformSpikes(
 @Composable
 private fun BorderSeekers(
     spikeWidthRatio: Int,
-    viewModel: TrimmerViewModel = koinActivityViewModel(),
+    viewModel: TrimmerViewModel = koinViewModel(),
 ) {
     val waveformWidth by viewModel.collectWaveformWidthAsState(spikeWidthRatio)
     val startBorderOffset by rememberStartBorderOffsetAsState(waveformWidth)

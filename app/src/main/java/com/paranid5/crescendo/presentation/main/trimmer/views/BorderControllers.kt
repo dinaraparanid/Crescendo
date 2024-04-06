@@ -16,12 +16,12 @@ import androidx.compose.ui.unit.sp
 import com.paranid5.crescendo.core.resources.R
 import com.paranid5.crescendo.utils.extensions.timeStringMs
 import com.paranid5.crescendo.utils.extensions.toTimeOrNull
-import com.paranid5.crescendo.koinActivityViewModel
 import com.paranid5.crescendo.presentation.main.trimmer.TrimmerViewModel
 import com.paranid5.crescendo.presentation.main.trimmer.properties.compose.collectEndPosInMillisAsState
 import com.paranid5.crescendo.presentation.main.trimmer.properties.compose.collectStartPosInMillisAsState
 import com.paranid5.crescendo.core.resources.ui.theme.LocalAppColors
-import com.paranid5.crescendo.utils.DefaultOutlinedTextField
+import com.paranid5.crescendo.ui.utils.DefaultOutlinedTextField
+import org.koin.androidx.compose.koinViewModel
 
 /** hh:mm:ss.xxx */
 private const val CORRECT_TIME_INPUT_LENGTH = 2 + 1 + 2 + 1 + 2 + 1 + 3
@@ -39,7 +39,7 @@ fun BorderControllers(modifier: Modifier = Modifier) =
 @Composable
 private fun StartController(
     modifier: Modifier = Modifier,
-    viewModel: TrimmerViewModel = koinActivityViewModel(),
+    viewModel: TrimmerViewModel = koinViewModel(),
 ) {
     val startMillis by viewModel.collectStartPosInMillisAsState()
 
@@ -54,7 +54,7 @@ private fun StartController(
 @Composable
 private fun EndController(
     modifier: Modifier = Modifier,
-    viewModel: TrimmerViewModel = koinActivityViewModel(),
+    viewModel: TrimmerViewModel = koinViewModel(),
 ) {
     val endMillis by viewModel.collectEndPosInMillisAsState()
 

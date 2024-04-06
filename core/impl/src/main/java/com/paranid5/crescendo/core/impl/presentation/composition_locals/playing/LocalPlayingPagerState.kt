@@ -1,8 +1,0 @@
-package com.paranid5.crescendo.core.impl.presentation.composition_locals.playing
-
-import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.foundation.pager.PagerState
-import androidx.compose.runtime.compositionLocalOf
-
-@OptIn(ExperimentalFoundationApi::class)
-val LocalPlayingPagerState = compositionLocalOf<PagerState?> { null }

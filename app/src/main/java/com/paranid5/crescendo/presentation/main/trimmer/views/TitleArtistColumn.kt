@@ -14,16 +14,16 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.paranid5.crescendo.koinActivityViewModel
+import com.paranid5.crescendo.core.resources.ui.theme.LocalAppColors
 import com.paranid5.crescendo.presentation.main.trimmer.TrimmerViewModel
 import com.paranid5.crescendo.presentation.main.trimmer.properties.compose.collectTrackAsState
-import com.paranid5.crescendo.core.resources.ui.theme.LocalAppColors
+import org.koin.androidx.compose.koinViewModel
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun TitleArtistColumn(
     modifier: Modifier = Modifier,
-    viewModel: TrimmerViewModel = koinActivityViewModel(),
+    viewModel: TrimmerViewModel = koinViewModel(),
     spaceBetween: Dp = 8.dp
 ) {
     val colors = LocalAppColors.current
@@ -31,7 +31,7 @@ fun TitleArtistColumn(
 
     Column(modifier) {
         Text(
-            text = track!!.title,
+            text = track?.title ?: "",
             fontSize = 20.sp,
             color = colors.fontColor,
             fontWeight = FontWeight.Bold,
@@ -43,7 +43,7 @@ fun TitleArtistColumn(
         Spacer(Modifier.height(spaceBetween))
 
         Text(
-            text = track!!.artist,
+            text = track?.artist ?: "",
             fontSize = 16.sp,
             color = colors.fontColor,
             modifier = Modifier

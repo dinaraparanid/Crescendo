@@ -20,7 +20,6 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.paranid5.crescendo.core.resources.R
-import com.paranid5.crescendo.koinActivityViewModel
 import com.paranid5.crescendo.presentation.main.trimmer.TrimmerViewModel
 import com.paranid5.crescendo.presentation.main.trimmer.WAVEFORM_SPIKE_WIDTH_RATIO
 import com.paranid5.crescendo.presentation.main.trimmer.effects.waveform.InitZoomStepsEffect
@@ -30,6 +29,7 @@ import com.paranid5.crescendo.presentation.main.trimmer.properties.compose.colle
 import com.paranid5.crescendo.presentation.main.trimmer.properties.zoomIn
 import com.paranid5.crescendo.presentation.main.trimmer.properties.zoomOut
 import com.paranid5.crescendo.core.resources.ui.theme.LocalAppColors
+import org.koin.androidx.compose.koinViewModel
 
 @Composable
 fun ZoomControllers(
@@ -72,7 +72,7 @@ private fun ZoomControllersContent(modifier: Modifier = Modifier) =
 @Composable
 private fun ZoomInButton(
     modifier: Modifier = Modifier,
-    viewModel: TrimmerViewModel = koinActivityViewModel(),
+    viewModel: TrimmerViewModel = koinViewModel(),
 ) {
     val canZoomIn by viewModel.collectCanZoomInAsState()
 
@@ -88,7 +88,7 @@ private fun ZoomInButton(
 @Composable
 private fun ZoomOutButton(
     modifier: Modifier = Modifier,
-    viewModel: TrimmerViewModel = koinActivityViewModel(),
+    viewModel: TrimmerViewModel = koinViewModel(),
 ) {
     val canZoomOut by viewModel.collectCanZoomOutAsState()
 
@@ -128,7 +128,7 @@ private fun ZoomButton(
 @Composable
 private fun ZoomRatioLabel(
     modifier: Modifier = Modifier,
-    viewModel: TrimmerViewModel = koinActivityViewModel(),
+    viewModel: TrimmerViewModel = koinViewModel(),
 ) {
     val colors = LocalAppColors.current
     val zoom by viewModel.collectZoomAsState()

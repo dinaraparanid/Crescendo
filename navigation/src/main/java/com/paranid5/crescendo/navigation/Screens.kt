@@ -1,6 +1,7 @@
 package com.paranid5.crescendo.navigation
 
 import android.os.Parcelable
+import kotlinx.parcelize.IgnoredOnParcel
 import kotlinx.parcelize.Parcelize
 
 sealed class Screens(val title: String) : Parcelable {
@@ -27,7 +28,13 @@ sealed class Screens(val title: String) : Parcelable {
         data object AudioEffects : Audio("audio_effects")
 
         @Parcelize
-        data object Trimmer : Audio("trimmer")
+        data class Trimmer(val trackPath: String) : Audio("trimmer/$trackPath") {
+            @Parcelize
+            companion object : Audio("trimmer/{trackPath}") {
+                @IgnoredOnParcel
+                const val TRACK_PATH_KEY = "trackPath"
+            }
+        }
     }
 
     @Parcelize

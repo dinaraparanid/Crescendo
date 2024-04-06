@@ -6,11 +6,8 @@ import androidx.compose.runtime.Composable
 import androidx.lifecycle.ViewModel
 import com.paranid5.crescendo.audio_effects.di.audioEffectsModule
 import com.paranid5.crescendo.core.common.eq.EqualizerData
-import com.paranid5.crescendo.core.impl.di.AUDIO_RECORDING_PERMISSION_QUEUE
 import com.paranid5.crescendo.core.impl.di.AUDIO_SESSION_ID
 import com.paranid5.crescendo.core.impl.di.EQUALIZER_DATA
-import com.paranid5.crescendo.core.impl.di.EXTERNAL_STORAGE_PERMISSION_QUEUE
-import com.paranid5.crescendo.core.impl.di.FOREGROUND_SERVICE_PERMISSION_QUEUE
 import com.paranid5.crescendo.core.impl.di.IS_PLAYING
 import com.paranid5.crescendo.core.impl.di.STREAM_SERVICE_CONNECTION
 import com.paranid5.crescendo.core.impl.di.STREAM_WITH_NO_NAME
@@ -21,23 +18,22 @@ import com.paranid5.crescendo.core.resources.R
 import com.paranid5.crescendo.data.StorageRepository
 import com.paranid5.crescendo.data.ktor_client.KtorClient
 import com.paranid5.crescendo.data.sqlDelightModule
+import com.paranid5.crescendo.fetch_stream.di.fetchStreamModule
 import com.paranid5.crescendo.presentation.composition_locals.LocalActivity
 import com.paranid5.crescendo.presentation.main.current_playlist.CurrentPlaylistViewModel
 import com.paranid5.crescendo.presentation.main.playing.PlayingUIHandler
 import com.paranid5.crescendo.presentation.main.playing.PlayingViewModel
-import com.paranid5.crescendo.presentation.main.tracks.TracksViewModel
 import com.paranid5.crescendo.presentation.main.trimmer.TrimmerUIHandler
 import com.paranid5.crescendo.presentation.main.trimmer.TrimmerViewModel
-import com.paranid5.crescendo.core.impl.presentation.permissions.audioRecordingPermissionQueue
-import com.paranid5.crescendo.core.impl.presentation.permissions.description_providers.AudioRecordingDescriptionProvider
-import com.paranid5.crescendo.core.impl.presentation.permissions.description_providers.ExternalStorageDescriptionProvider
-import com.paranid5.crescendo.core.impl.presentation.permissions.description_providers.ForegroundServiceDescriptionProvider
-import com.paranid5.crescendo.core.impl.presentation.permissions.externalStoragePermissionQueue
-import com.paranid5.crescendo.core.impl.presentation.permissions.foregroundServicePermissionQueue
-import com.paranid5.crescendo.fetch_stream.di.fetchStreamModule
 import com.paranid5.crescendo.system.services.stream.di.streamServiceModule
 import com.paranid5.crescendo.system.services.track.di.trackServiceModule
 import com.paranid5.crescendo.system.services.video_cache.di.videoCacheServiceModule
+import com.paranid5.crescendo.tracks.TracksViewModel
+import com.paranid5.crescendo.tracks.di.tracksModule
+import com.paranid5.crescendo.ui.permissions.description_providers.AudioRecordingDescriptionProvider
+import com.paranid5.crescendo.ui.permissions.description_providers.ExternalStorageDescriptionProvider
+import com.paranid5.crescendo.ui.permissions.description_providers.ForegroundServiceDescriptionProvider
+import com.paranid5.crescendo.ui.permissions.di.permissionQueuesModule
 import kotlinx.coroutines.flow.MutableStateFlow
 import org.koin.android.ext.koin.androidApplication
 import org.koin.android.ext.koin.androidContext
@@ -90,16 +86,8 @@ private val permissionDescriptionProviders = module {
     }
 }
 
-private val permissionQueues = module {
-    single(named(EXTERNAL_STORAGE_PERMISSION_QUEUE)) { externalStoragePermissionQueue }
-    single(named(AUDIO_RECORDING_PERMISSION_QUEUE)) { audioRecordingPermissionQueue }
-
-    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU)
-        single(named(FOREGROUND_SERVICE_PERMISSION_QUEUE)) { foregroundServicePermissionQueue }
-}
-
 private val permissionsModule = module {
-    includes(permissionDescriptionProviders, permissionQueues)
+    includes(permissionDescriptionProviders, permissionQueuesModule)
 }
 
 private val globalsModule = module {
@@ -126,10 +114,6 @@ private val currentPlaylistModule = module {
 private val trimmerModule = module {
     singleOf(::TrimmerUIHandler)
     viewModelOf(::TrimmerViewModel)
-}
-
-private val tracksModule = module {
-    viewModelOf(::TracksViewModel)
 }
 
 private val uiModule = module {

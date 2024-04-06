@@ -20,10 +20,10 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
 import com.paranid5.crescendo.core.common.AudioStatus
 import com.paranid5.crescendo.core.resources.R
-import com.paranid5.crescendo.core.impl.presentation.composition_locals.playing.LocalPlayingPagerState
-import com.paranid5.crescendo.core.impl.presentation.composition_locals.playing.LocalPlayingSheetState
-import com.paranid5.crescendo.core.impl.presentation.permissions.requests.audioRecordingPermissionsRequestLauncher
-import com.paranid5.crescendo.core.impl.presentation.permissions.requests.foregroundServicePermissionsRequestLauncherCompat
+import com.paranid5.crescendo.ui.composition_locals.playing.LocalPlayingPagerState
+import com.paranid5.crescendo.ui.composition_locals.playing.LocalPlayingSheetState
+import com.paranid5.crescendo.ui.permissions.requests.audioRecordingPermissionsRequestLauncher
+import com.paranid5.crescendo.ui.permissions.requests.foregroundServicePermissionsRequestLauncherCompat
 import com.paranid5.crescendo.fetch_stream.domain.FetchStreamInteractor
 import com.paranid5.crescendo.fetch_stream.presentation.FetchStreamViewModel
 import com.paranid5.crescendo.fetch_stream.presentation.properties.compose.collectCurrentTextAsState
@@ -40,13 +40,13 @@ internal fun ConfirmButton(modifier: Modifier = Modifier) {
 
     Box(modifier) {
         val (areForegroundPermissionsGranted, launchFSPermissions) =
-            foregroundServicePermissionsRequestLauncherCompat(
+            com.paranid5.crescendo.ui.permissions.requests.foregroundServicePermissionsRequestLauncherCompat(
                 isForegroundServicePermissionDialogShownState,
                 Modifier.align(Alignment.Center)
             )
 
         val (isRecordingPermissionGranted, launchRecordPermissions) =
-            audioRecordingPermissionsRequestLauncher(
+            com.paranid5.crescendo.ui.permissions.requests.audioRecordingPermissionsRequestLauncher(
                 isAudioRecordingPermissionDialogShownState,
                 Modifier.align(Alignment.Center)
             )
@@ -73,8 +73,8 @@ private inline fun ConfirmButtonImpl(
     fetchStreamInteractor: FetchStreamInteractor = koinInject()
 ) {
     val colors = LocalAppColors.current
-    val playingSheetState = LocalPlayingSheetState.current
-    val playingPagerState = LocalPlayingPagerState.current
+    val playingSheetState = com.paranid5.crescendo.ui.composition_locals.playing.LocalPlayingSheetState.current
+    val playingPagerState = com.paranid5.crescendo.ui.composition_locals.playing.LocalPlayingPagerState.current
 
     val currentText by viewModel.collectCurrentTextAsState()
     val isConfirmButtonActive by viewModel.collectIsConfirmButtonActiveAsState()

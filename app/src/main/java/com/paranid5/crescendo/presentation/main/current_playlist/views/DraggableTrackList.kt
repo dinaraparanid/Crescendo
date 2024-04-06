@@ -3,8 +3,8 @@ package com.paranid5.crescendo.presentation.main.current_playlist.views
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import com.paranid5.crescendo.core.common.tracks.Track
-import com.paranid5.crescendo.utils.drag.DraggableList
-import com.paranid5.crescendo.utils.drag.DraggableListItemView
+import com.paranid5.crescendo.ui.drag.DraggableList
+import com.paranid5.crescendo.ui.drag.DraggableListItemView
 import kotlinx.collections.immutable.ImmutableList
 
 @Composable

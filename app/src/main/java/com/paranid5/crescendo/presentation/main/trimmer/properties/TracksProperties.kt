@@ -10,7 +10,7 @@ inline val TrimmerViewModel.trackDurationInMillisFlow
 inline val TrimmerViewModel.trackPathOrNullFlow
     get() = trackState.map { it?.path }
 
-fun TrimmerViewModel.setTrackAndResetPositions(track: com.paranid5.crescendo.core.common.tracks.Track) {
+fun TrimmerViewModel.setTrackAndResetPositions(track: Track) {
     setTrack(track)
     setStartPosInMillis(0)
     setEndPosInMillis(track.durationMillis)

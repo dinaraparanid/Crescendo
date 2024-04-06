@@ -13,23 +13,26 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
-import com.paranid5.crescendo.core.impl.presentation.composition_locals.LocalCurrentPlaylistSheetState
-import com.paranid5.crescendo.core.impl.presentation.composition_locals.playing.LocalPlayingSheetState
+import androidx.navigation.navArgument
+import com.paranid5.crescendo.about_app.AboutApp
+import com.paranid5.crescendo.audio_effects.presentation.AudioEffectsScreen
+import com.paranid5.crescendo.ui.composition_locals.LocalCurrentPlaylistSheetState
+import com.paranid5.crescendo.ui.composition_locals.playing.LocalPlayingSheetState
 import com.paranid5.crescendo.core.resources.R
+import com.paranid5.crescendo.favourites.FavouritesScreen
+import com.paranid5.crescendo.fetch_stream.presentation.FetchStreamScreen
 import com.paranid5.crescendo.navigation.LocalNavController
 import com.paranid5.crescendo.navigation.Screens
 import com.paranid5.crescendo.presentation.composition_locals.LocalActivity
-import com.paranid5.crescendo.about_app.AboutApp
-import com.paranid5.crescendo.audio_effects.presentation.AudioEffectsScreen
-import com.paranid5.crescendo.favourites.FavouritesScreen
-import com.paranid5.crescendo.fetch_stream.presentation.FetchStreamScreen
+import com.paranid5.crescendo.presentation.main.trimmer.PrepareTrimmerScreen
 import com.paranid5.crescendo.settings.SettingsScreen
 import com.paranid5.crescendo.track_collections.AlbumsScreen
-import com.paranid5.crescendo.presentation.main.tracks.TracksScreen
-import com.paranid5.crescendo.presentation.main.trimmer.TrimmerScreen
-import com.paranid5.crescendo.utils.OnBackPressed
+import com.paranid5.crescendo.tracks.presentation.TracksScreen
+import com.paranid5.crescendo.ui.utils.OnBackPressed
+import kotlinx.collections.immutable.persistentListOf
 import kotlinx.coroutines.delay
 import java.util.concurrent.atomic.AtomicInteger
 
@@ -117,11 +120,19 @@ fun ContentScreen(padding: PaddingValues) {
             AudioEffectsScreen(Modifier.screenDefaultPadding())
         }
 
-        composable(route = Screens.Audio.Trimmer.title) {
+        composable(
+            route = Screens.Audio.Trimmer.title,
+            arguments = persistentListOf(
+                navArgument(Screens.Audio.Trimmer.TRACK_PATH_KEY) {
+                    type = NavType.StringType
+                }
+            )
+        ) {
             navigator.setCurScreen(Screens.Audio.Trimmer)
 
-            TrimmerScreen(
-                Modifier
+            PrepareTrimmerScreen(
+                backStackEntry = it,
+                modifier = Modifier
                     .fillMaxSize()
                     .screenDefaultPadding()
             )

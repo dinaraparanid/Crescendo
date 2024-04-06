@@ -15,18 +15,18 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.paranid5.crescendo.core.resources.R
-import com.paranid5.crescendo.koinActivityViewModel
+import com.paranid5.crescendo.core.resources.ui.theme.LocalAppColors
+import com.paranid5.crescendo.presentation.main.trimmer.TrimmerViewModel
 import com.paranid5.crescendo.presentation.main.trimmer.composition_locals.LocalTrimmerEffectSheetState
 import com.paranid5.crescendo.presentation.main.trimmer.entities.ShownEffects
-import com.paranid5.crescendo.presentation.main.trimmer.TrimmerViewModel
-import com.paranid5.crescendo.core.resources.ui.theme.LocalAppColors
 import kotlinx.coroutines.launch
+import org.koin.androidx.compose.koinViewModel
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun PitchSpeedButton(
     modifier: Modifier = Modifier,
-    viewModel: TrimmerViewModel = koinActivityViewModel()
+    viewModel: TrimmerViewModel = koinViewModel()
 ) {
     val effectsScaffoldState = LocalTrimmerEffectSheetState.current
     val coroutineScope = rememberCoroutineScope()

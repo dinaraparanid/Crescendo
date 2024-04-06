@@ -8,12 +8,17 @@ import androidx.compose.material.ModalBottomSheetValue
 import androidx.compose.material.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import com.paranid5.crescendo.core.common.tracks.Track
+import com.paranid5.crescendo.core.resources.ui.theme.LocalAppColors
 import com.paranid5.crescendo.presentation.main.trimmer.composition_locals.LocalTrimmerEffectSheetState
+import com.paranid5.crescendo.presentation.main.trimmer.effects.PrepareForNewTrack
+import com.paranid5.crescendo.presentation.main.trimmer.properties.compose.collectTrackAsState
 import com.paranid5.crescendo.presentation.main.trimmer.views.EffectsBottomSheet
 import com.paranid5.crescendo.presentation.main.trimmer.views.TrimmerScreenContent
-import com.paranid5.crescendo.core.resources.ui.theme.LocalAppColors
+import org.koin.androidx.compose.koinViewModel
 
 internal const val MIN_SPIKE_HEIGHT = 1F
 internal const val DEFAULT_GRAPHICS_LAYER_ALPHA = 0.99F
@@ -44,12 +49,18 @@ internal const val WAVEFORM_PADDING =
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
-fun TrimmerScreen(modifier: Modifier = Modifier) {
+fun TrimmerScreen(
+    track: Track,
+    modifier: Modifier = Modifier,
+    viewModel: TrimmerViewModel = koinViewModel(),
+) {
     val colors = LocalAppColors.current
 
     val effectsScaffoldState = rememberModalBottomSheetState(
         initialValue = ModalBottomSheetValue.Hidden,
     )
+
+    PrepareForNewTrack(track)
 
     ModalBottomSheetLayout(
         modifier = modifier,
