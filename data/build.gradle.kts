@@ -42,12 +42,6 @@ android {
         jvmTarget = "1.8"
         freeCompilerArgs = listOf("-Xcontext-receivers")
     }
-    buildFeatures {
-        compose = true
-    }
-    composeOptions {
-        kotlinCompilerExtensionVersion = "1.5.7"
-    }
 }
 
 dependencies {
