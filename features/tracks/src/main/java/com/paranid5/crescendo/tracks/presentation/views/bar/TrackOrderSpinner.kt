@@ -13,7 +13,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import com.paranid5.crescendo.core.resources.R
 import com.paranid5.crescendo.core.common.tracks.TrackOrder
-import com.paranid5.crescendo.tracks.TracksViewModel
+import com.paranid5.crescendo.tracks.presentation.TracksViewModel
 import com.paranid5.crescendo.tracks.presentation.properties.compose.collectTrackOrderAsState
 import com.paranid5.crescendo.ui.utils.Spinner
 import kotlinx.collections.immutable.ImmutableList

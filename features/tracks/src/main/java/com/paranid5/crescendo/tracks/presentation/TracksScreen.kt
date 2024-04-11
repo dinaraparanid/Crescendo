@@ -22,7 +22,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.paranid5.crescendo.core.resources.ui.theme.LocalAppColors
-import com.paranid5.crescendo.tracks.TracksViewModel
 import com.paranid5.crescendo.tracks.presentation.effects.LoadTracksFromMediaStoreEffect
 import com.paranid5.crescendo.tracks.presentation.properties.compose.collectSearchBarHeightDpAsState
 import com.paranid5.crescendo.tracks.presentation.views.DefaultTrackList

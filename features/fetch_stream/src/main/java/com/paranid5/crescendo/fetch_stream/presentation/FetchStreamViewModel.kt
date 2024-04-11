@@ -9,8 +9,8 @@ import com.paranid5.crescendo.data.states.stream.CurrentUrlStatePublisher
 import com.paranid5.crescendo.data.states.stream.CurrentUrlStatePublisherImpl
 import com.paranid5.crescendo.data.states.stream.CurrentUrlStateSubscriber
 import com.paranid5.crescendo.data.states.stream.CurrentUrlStateSubscriberImpl
-import com.paranid5.crescendo.fetch_stream.presentation.states.UrlStateHolder
-import com.paranid5.crescendo.fetch_stream.presentation.states.UrlStateHolderImpl
+import com.paranid5.crescendo.fetch_stream.data.UrlDataSource
+import com.paranid5.crescendo.fetch_stream.data.UrlDataSourceImpl
 
 class FetchStreamViewModel(
     savedStateHandle: SavedStateHandle,
@@ -18,5 +18,5 @@ class FetchStreamViewModel(
 ) : ViewModel(),
     CurrentUrlStateSubscriber by CurrentUrlStateSubscriberImpl(storageRepository),
     CurrentUrlStatePublisher by CurrentUrlStatePublisherImpl(storageRepository),
-    UrlStateHolder by UrlStateHolderImpl(savedStateHandle),
+    UrlDataSource by UrlDataSourceImpl(savedStateHandle),
     AudioStatusStatePublisher by AudioStatusStatePublisherImpl(storageRepository)

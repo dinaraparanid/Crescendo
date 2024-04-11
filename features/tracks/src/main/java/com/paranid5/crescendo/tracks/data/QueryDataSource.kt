@@ -1,4 +1,4 @@
-package com.paranid5.crescendo.tracks.domain
+package com.paranid5.crescendo.tracks.data
 
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow

@@ -1,4 +1,4 @@
-package com.paranid5.crescendo.tracks.domain
+package com.paranid5.crescendo.tracks.data
 
 import com.paranid5.crescendo.core.common.tracks.Track
 import kotlinx.collections.immutable.ImmutableList

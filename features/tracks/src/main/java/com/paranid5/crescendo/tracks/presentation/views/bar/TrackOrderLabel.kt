@@ -7,7 +7,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.sp
 import com.paranid5.crescendo.core.resources.ui.theme.LocalAppColors
-import com.paranid5.crescendo.tracks.TracksViewModel
+import com.paranid5.crescendo.tracks.presentation.TracksViewModel
 import com.paranid5.crescendo.tracks.presentation.properties.compose.collectTrackOrderAsState
 import com.paranid5.crescendo.utils.extensions.toString
 import org.koin.androidx.compose.koinViewModel

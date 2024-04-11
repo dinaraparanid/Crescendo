@@ -1,4 +1,4 @@
-package com.paranid5.crescendo.tracks
+package com.paranid5.crescendo.tracks.presentation
 
 import androidx.lifecycle.ViewModel
 import com.paranid5.crescendo.data.StorageRepository
@@ -15,12 +15,12 @@ import com.paranid5.crescendo.data.states.tracks.TrackOrderStatePublisher
 import com.paranid5.crescendo.data.states.tracks.TrackOrderStatePublisherImpl
 import com.paranid5.crescendo.data.states.tracks.TrackOrderStateSubscriber
 import com.paranid5.crescendo.data.states.tracks.TrackOrderStateSubscriberImpl
-import com.paranid5.crescendo.tracks.domain.QueryDataSource
-import com.paranid5.crescendo.tracks.domain.QueryDataSourceImpl
-import com.paranid5.crescendo.tracks.domain.SearchBarActiveDataSource
-import com.paranid5.crescendo.tracks.domain.SearchBarActiveDataSourceImpl
-import com.paranid5.crescendo.tracks.domain.TracksDataSource
-import com.paranid5.crescendo.tracks.domain.TracksDataSourceImpl
+import com.paranid5.crescendo.tracks.data.QueryDataSource
+import com.paranid5.crescendo.tracks.data.QueryDataSourceImpl
+import com.paranid5.crescendo.tracks.data.SearchBarActiveDataSource
+import com.paranid5.crescendo.tracks.data.SearchBarActiveDataSourceImpl
+import com.paranid5.crescendo.tracks.data.TracksDataSource
+import com.paranid5.crescendo.tracks.data.TracksDataSourceImpl
 
 @Suppress("IncorrectFormatting")
 class TracksViewModel(

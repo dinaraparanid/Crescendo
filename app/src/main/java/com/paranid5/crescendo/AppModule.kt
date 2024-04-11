@@ -26,7 +26,6 @@ import com.paranid5.crescendo.presentation.main.playing.PlayingViewModel
 import com.paranid5.crescendo.system.services.stream.di.streamServiceModule
 import com.paranid5.crescendo.system.services.track.di.trackServiceModule
 import com.paranid5.crescendo.system.services.video_cache.di.videoCacheServiceModule
-import com.paranid5.crescendo.tracks.TracksViewModel
 import com.paranid5.crescendo.tracks.di.tracksModule
 import com.paranid5.crescendo.trimmer.di.trimmerModule
 import com.paranid5.crescendo.ui.permissions.description_providers.AudioRecordingDescriptionProvider

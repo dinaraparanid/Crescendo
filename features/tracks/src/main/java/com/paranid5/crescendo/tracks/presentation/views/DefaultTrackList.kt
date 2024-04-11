@@ -13,7 +13,7 @@ import com.paranid5.crescendo.data.states.tracks.CurrentPlaylistStatePublisher
 import com.paranid5.crescendo.data.states.tracks.CurrentTrackIndexStatePublisher
 import com.paranid5.crescendo.system.services.track.TrackServiceAccessor
 import com.paranid5.crescendo.system.services.track.TrackServiceStart
-import com.paranid5.crescendo.tracks.TracksViewModel
+import com.paranid5.crescendo.tracks.presentation.TracksViewModel
 import com.paranid5.crescendo.tracks.presentation.properties.compose.collectShownTracksAsState
 import com.paranid5.crescendo.ui.composition_locals.playing.LocalPlayingPagerState
 import com.paranid5.crescendo.ui.track.TrackList

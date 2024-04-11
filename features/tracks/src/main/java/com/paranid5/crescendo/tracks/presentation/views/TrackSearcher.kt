@@ -4,7 +4,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import com.paranid5.crescendo.core.common.tracks.Track
-import com.paranid5.crescendo.tracks.TracksViewModel
+import com.paranid5.crescendo.tracks.presentation.TracksViewModel
 import com.paranid5.crescendo.tracks.presentation.properties.compose.collectIsSearchBarActiveAsState
 import com.paranid5.crescendo.tracks.presentation.properties.compose.collectQueryAsState
 import com.paranid5.crescendo.tracks.presentation.properties.compose.collectShownTracksAsState

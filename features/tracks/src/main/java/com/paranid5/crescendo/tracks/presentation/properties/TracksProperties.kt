@@ -1,7 +1,7 @@
 package com.paranid5.crescendo.tracks.presentation.properties
 
 import com.paranid5.crescendo.core.common.tracks.sortedBy
-import com.paranid5.crescendo.tracks.TracksViewModel
+import com.paranid5.crescendo.tracks.presentation.TracksViewModel
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.map
 
