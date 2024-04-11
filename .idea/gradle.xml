@@ -27,6 +27,7 @@
             <option value="$PROJECT_DIR$/features/splash" />
             <option value="$PROJECT_DIR$/features/track_collections" />
             <option value="$PROJECT_DIR$/features/tracks" />
+            <option value="$PROJECT_DIR$/features/trimmer" />
             <option value="$PROJECT_DIR$/navigation" />
             <option value="$PROJECT_DIR$/system" />
             <option value="$PROJECT_DIR$/system/common" />

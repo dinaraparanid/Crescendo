@@ -19,18 +19,18 @@ import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
 import com.paranid5.crescendo.about_app.AboutApp
 import com.paranid5.crescendo.audio_effects.presentation.AudioEffectsScreen
-import com.paranid5.crescendo.ui.composition_locals.LocalCurrentPlaylistSheetState
-import com.paranid5.crescendo.ui.composition_locals.playing.LocalPlayingSheetState
 import com.paranid5.crescendo.core.resources.R
 import com.paranid5.crescendo.favourites.FavouritesScreen
 import com.paranid5.crescendo.fetch_stream.presentation.FetchStreamScreen
 import com.paranid5.crescendo.navigation.LocalNavController
 import com.paranid5.crescendo.navigation.Screens
 import com.paranid5.crescendo.presentation.composition_locals.LocalActivity
-import com.paranid5.crescendo.presentation.main.trimmer.PrepareTrimmerScreen
 import com.paranid5.crescendo.settings.SettingsScreen
 import com.paranid5.crescendo.track_collections.AlbumsScreen
 import com.paranid5.crescendo.tracks.presentation.TracksScreen
+import com.paranid5.crescendo.trimmer.presentation.TrimmerScreen
+import com.paranid5.crescendo.ui.composition_locals.LocalCurrentPlaylistSheetState
+import com.paranid5.crescendo.ui.composition_locals.playing.LocalPlayingSheetState
 import com.paranid5.crescendo.ui.utils.OnBackPressed
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.coroutines.delay
@@ -130,7 +130,7 @@ fun ContentScreen(padding: PaddingValues) {
         ) {
             navigator.setCurScreen(Screens.Audio.Trimmer)
 
-            PrepareTrimmerScreen(
+            TrimmerScreen(
                 backStackEntry = it,
                 modifier = Modifier
                     .fillMaxSize()

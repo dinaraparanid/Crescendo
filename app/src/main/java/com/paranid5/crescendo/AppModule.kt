@@ -23,13 +23,12 @@ import com.paranid5.crescendo.presentation.composition_locals.LocalActivity
 import com.paranid5.crescendo.presentation.main.current_playlist.CurrentPlaylistViewModel
 import com.paranid5.crescendo.presentation.main.playing.PlayingUIHandler
 import com.paranid5.crescendo.presentation.main.playing.PlayingViewModel
-import com.paranid5.crescendo.presentation.main.trimmer.TrimmerUIHandler
-import com.paranid5.crescendo.presentation.main.trimmer.TrimmerViewModel
 import com.paranid5.crescendo.system.services.stream.di.streamServiceModule
 import com.paranid5.crescendo.system.services.track.di.trackServiceModule
 import com.paranid5.crescendo.system.services.video_cache.di.videoCacheServiceModule
 import com.paranid5.crescendo.tracks.TracksViewModel
 import com.paranid5.crescendo.tracks.di.tracksModule
+import com.paranid5.crescendo.trimmer.di.trimmerModule
 import com.paranid5.crescendo.ui.permissions.description_providers.AudioRecordingDescriptionProvider
 import com.paranid5.crescendo.ui.permissions.description_providers.ExternalStorageDescriptionProvider
 import com.paranid5.crescendo.ui.permissions.description_providers.ForegroundServiceDescriptionProvider
@@ -109,11 +108,6 @@ private val playingModule = module {
 
 private val currentPlaylistModule = module {
     viewModelOf(::CurrentPlaylistViewModel)
-}
-
-private val trimmerModule = module {
-    singleOf(::TrimmerUIHandler)
-    viewModelOf(::TrimmerViewModel)
 }
 
 private val uiModule = module {
