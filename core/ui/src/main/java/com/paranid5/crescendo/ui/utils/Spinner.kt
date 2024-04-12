@@ -37,11 +37,9 @@ fun Spinner(
     var isExpanded by remember { mutableStateOf(false) }
 
     Box(modifier.clickable { isExpanded = true }) {
-        previewItemFactory(
-            previewItemIndex,
-            items[previewItemIndex],
-            modifier,
-        )
+        items.getOrNull(previewItemIndex)?.let {
+            previewItemFactory(previewItemIndex, it, modifier,)
+        }
 
         DropdownMenu(
             expanded = isExpanded,

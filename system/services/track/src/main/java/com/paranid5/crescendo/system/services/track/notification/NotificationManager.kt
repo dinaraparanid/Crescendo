@@ -5,8 +5,8 @@ import androidx.media3.common.Player
 import androidx.media3.common.util.UnstableApi
 import com.paranid5.crescendo.data.StorageRepository
 import com.paranid5.crescendo.data.current_playlist.CurrentPlaylistRepository
-import com.paranid5.crescendo.data.states.tracks.CurrentTrackStateSubscriber
-import com.paranid5.crescendo.data.states.tracks.CurrentTrackStateSubscriberImpl
+import com.paranid5.crescendo.data.sources.tracks.CurrentTrackStateSubscriber
+import com.paranid5.crescendo.data.sources.tracks.CurrentTrackStateSubscriberImpl
 import com.paranid5.crescendo.system.services.track.TrackService
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.stateIn

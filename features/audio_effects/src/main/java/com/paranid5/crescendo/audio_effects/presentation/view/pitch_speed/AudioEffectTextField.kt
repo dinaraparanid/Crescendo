@@ -19,9 +19,8 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.paranid5.crescendo.audio_effects.domain.AudioEffectsInteractor
+import com.paranid5.crescendo.audio_effects.domain.isParamInputValid
 import com.paranid5.crescendo.core.resources.ui.theme.LocalAppColors
-import org.koin.compose.koinInject
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -31,7 +30,6 @@ internal fun AudioEffectTextField(
     effectValState: MutableFloatState,
     onValueChanged: (effectVal: Float) -> Unit,
     modifier: Modifier = Modifier,
-    interactor: AudioEffectsInteractor = koinInject(),
 ) {
     val colors = LocalAppColors.current
 
@@ -57,7 +55,6 @@ internal fun AudioEffectTextField(
                 newEffectStr = newEffectStr,
                 effectInputState = effectInputState,
                 effectValState = effectValState,
-                interactor = interactor,
                 onValueChanged = onValueChanged
             )
         },
@@ -111,7 +108,6 @@ private fun tryUpdateEffect(
     newEffectStr: String,
     effectInputState: MutableState<String>,
     effectValState: MutableFloatState,
-    interactor: AudioEffectsInteractor,
     onValueChanged: (effectVal: Float) -> Unit
 ) {
     if (newEffectStr.length > MAX_INPUT_LENGTH)
@@ -119,7 +115,7 @@ private fun tryUpdateEffect(
 
     effectInputState.value = newEffectStr
 
-    if (interactor.isParamInputValid(newEffectStr)) {
+    if (isParamInputValid(newEffectStr)) {
         val newEffectVal = newEffectStr.toFloat()
         onValueChanged(newEffectVal)
         effectValState.floatValue = newEffectVal

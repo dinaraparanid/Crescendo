@@ -20,6 +20,7 @@ import com.paranid5.crescendo.core.common.trimming.PitchAndSpeed
 import com.paranid5.crescendo.core.common.trimming.TrimRange
 import com.paranid5.crescendo.core.resources.R
 import com.paranid5.crescendo.core.resources.ui.theme.LocalAppColors
+import com.paranid5.crescendo.trimmer.domain.trimTrackAndSendBroadcast
 import com.paranid5.crescendo.trimmer.presentation.TrimmerViewModel
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
@@ -49,7 +50,7 @@ internal fun ConfirmButton(
         ),
         onClick = {
             viewModel.viewModelScope.launch {
-                viewModel.trimTrackAndSendBroadcast(
+                trimTrackAndSendBroadcast(
                     context = context.applicationContext,
                     track = track,
                     outputFilename = outputFilename.trim(),

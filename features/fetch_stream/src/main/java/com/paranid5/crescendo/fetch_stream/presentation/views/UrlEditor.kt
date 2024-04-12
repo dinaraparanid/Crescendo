@@ -20,7 +20,7 @@ internal fun UrlEditor(
 ) {
     val currentText by viewModel.collectCurrentTextAsState()
 
-    com.paranid5.crescendo.ui.utils.DefaultOutlinedTextField(
+    DefaultOutlinedTextField(
         value = currentText,
         modifier = modifier,
         label = { UrlEditorLabel() },

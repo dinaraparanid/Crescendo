@@ -2,11 +2,11 @@ package com.paranid5.crescendo.data
 
 import android.content.Context
 import androidx.datastore.preferences.preferencesDataStore
-import com.paranid5.crescendo.data.states.AudioEffectsStateDataSource
-import com.paranid5.crescendo.data.states.PlaybackStateDataSource
-import com.paranid5.crescendo.data.states.StreamStateDataSource
-import com.paranid5.crescendo.data.states.TracksStateDataSource
-import com.paranid5.crescendo.data.states.WaveformStateDataSource
+import com.paranid5.crescendo.data.sources.AudioEffectsStateDataSource
+import com.paranid5.crescendo.data.sources.PlaybackStateDataSource
+import com.paranid5.crescendo.data.sources.StreamStateDataSource
+import com.paranid5.crescendo.data.sources.TracksStateDataSource
+import com.paranid5.crescendo.data.sources.WaveformStateDataSource
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 

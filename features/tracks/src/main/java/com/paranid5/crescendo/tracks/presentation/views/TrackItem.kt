@@ -21,9 +21,10 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import com.paranid5.crescendo.core.common.tracks.Track
 import com.paranid5.crescendo.core.resources.ui.theme.LocalAppColors
-import com.paranid5.crescendo.data.states.playback.AudioStatusStatePublisher
-import com.paranid5.crescendo.data.states.tracks.CurrentPlaylistStatePublisher
-import com.paranid5.crescendo.data.states.tracks.CurrentTrackIndexStatePublisher
+import com.paranid5.crescendo.data.sources.playback.AudioStatusStatePublisher
+import com.paranid5.crescendo.data.sources.tracks.CurrentPlaylistStatePublisher
+import com.paranid5.crescendo.data.sources.tracks.CurrentTrackIndexStatePublisher
+import com.paranid5.crescendo.domain.interactors.TracksInteractor
 import com.paranid5.crescendo.system.services.track.TrackServiceAccessor
 import com.paranid5.crescendo.ui.track.clickableTrackWithPermissions
 import com.paranid5.crescendo.ui.track.currentTrackState
@@ -72,7 +73,7 @@ internal fun <VM> TrackItem(
         modifier = modifier,
         onClick = {
             coroutineScope.launch {
-                startPlaylistPlayback(
+                TracksInteractor.startPlaylistPlayback(
                     newTracks = tracks,
                     newTrackIndex = trackInd,
                     currentTrack = currentTrack,

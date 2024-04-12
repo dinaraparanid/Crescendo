@@ -2,16 +2,16 @@ package com.paranid5.crescendo.system.services.stream.playback
 
 import androidx.annotation.MainThread
 import com.paranid5.crescendo.data.StorageRepository
-import com.paranid5.crescendo.data.states.playback.StreamPlaybackPositionStatePublisher
-import com.paranid5.crescendo.data.states.playback.StreamPlaybackPositionStatePublisherImpl
-import com.paranid5.crescendo.data.states.playback.StreamPlaybackPositionStateSubscriber
-import com.paranid5.crescendo.data.states.playback.StreamPlaybackPositionStateSubscriberImpl
-import com.paranid5.crescendo.data.states.stream.CurrentMetadataStateSubscriber
-import com.paranid5.crescendo.data.states.stream.CurrentMetadataStateSubscriberImpl
-import com.paranid5.crescendo.data.states.stream.CurrentUrlStatePublisher
-import com.paranid5.crescendo.data.states.stream.CurrentUrlStatePublisherImpl
-import com.paranid5.crescendo.data.states.stream.CurrentUrlStateSubscriber
-import com.paranid5.crescendo.data.states.stream.CurrentUrlStateSubscriberImpl
+import com.paranid5.crescendo.data.sources.playback.StreamPlaybackPositionStatePublisher
+import com.paranid5.crescendo.data.sources.playback.StreamPlaybackPositionStatePublisherImpl
+import com.paranid5.crescendo.data.sources.playback.StreamPlaybackPositionStateSubscriber
+import com.paranid5.crescendo.data.sources.playback.StreamPlaybackPositionStateSubscriberImpl
+import com.paranid5.crescendo.data.sources.stream.CurrentMetadataStateSubscriber
+import com.paranid5.crescendo.data.sources.stream.CurrentMetadataStateSubscriberImpl
+import com.paranid5.crescendo.data.sources.stream.CurrentUrlStatePublisher
+import com.paranid5.crescendo.data.sources.stream.CurrentUrlStatePublisherImpl
+import com.paranid5.crescendo.data.sources.stream.CurrentUrlStateSubscriber
+import com.paranid5.crescendo.data.sources.stream.CurrentUrlStateSubscriberImpl
 import com.paranid5.crescendo.system.services.stream.StreamService
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.asSharedFlow

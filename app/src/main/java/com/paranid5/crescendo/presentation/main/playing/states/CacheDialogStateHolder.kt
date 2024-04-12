@@ -1,9 +1,9 @@
 package com.paranid5.crescendo.presentation.main.playing.states
 
 import com.paranid5.crescendo.data.StorageRepository
-import com.paranid5.crescendo.data.states.stream.CurrentMetadataStateSubscriber
-import com.paranid5.crescendo.data.states.stream.CurrentMetadataStateSubscriberImpl
-import com.paranid5.crescendo.data.states.stream.currentMetadataDurationMillisFlow
+import com.paranid5.crescendo.data.sources.stream.CurrentMetadataStateSubscriber
+import com.paranid5.crescendo.data.sources.stream.CurrentMetadataStateSubscriberImpl
+import com.paranid5.crescendo.data.sources.stream.currentMetadataDurationMillisFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow

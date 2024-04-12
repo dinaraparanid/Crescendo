@@ -30,11 +30,11 @@ class CurrentPlaylistRepository(driver: SqlDriver) :
             .mapToList(Dispatchers.IO)
             .map { it.map(CurrentPlaylistTrack::toTrack).toImmutableList() }
 
-    fun replacePlaylistAsync(playlist: List<com.paranid5.crescendo.core.common.tracks.Track>): Job {
+    fun replacePlaylistAsync(playlist: List<Track>): Job {
         return launch(Dispatchers.IO) { replacePlaylist(playlist) }
     }
 
-    private fun replacePlaylist(playlist: List<com.paranid5.crescendo.core.common.tracks.Track>) =
+    private fun replacePlaylist(playlist: List<Track>) =
         queries.transaction {
             queries.clearPlaylist()
 

@@ -4,8 +4,8 @@ import androidx.annotation.OptIn
 import androidx.media3.common.Player
 import androidx.media3.common.util.UnstableApi
 import com.paranid5.crescendo.data.StorageRepository
-import com.paranid5.crescendo.data.states.stream.CurrentMetadataStateSubscriber
-import com.paranid5.crescendo.data.states.stream.CurrentMetadataStateSubscriberImpl
+import com.paranid5.crescendo.data.sources.stream.CurrentMetadataStateSubscriber
+import com.paranid5.crescendo.data.sources.stream.CurrentMetadataStateSubscriberImpl
 import com.paranid5.crescendo.system.services.stream.StreamService
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.stateIn

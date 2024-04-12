@@ -6,12 +6,12 @@ import android.support.v4.media.session.MediaSessionCompat
 import android.support.v4.media.session.PlaybackStateCompat
 import com.paranid5.crescendo.data.StorageRepository
 import com.paranid5.crescendo.data.current_playlist.CurrentPlaylistRepository
-import com.paranid5.crescendo.data.states.stream.CurrentMetadataStatePublisher
-import com.paranid5.crescendo.data.states.stream.CurrentMetadataStatePublisherImpl
-import com.paranid5.crescendo.data.states.stream.CurrentMetadataStateSubscriber
-import com.paranid5.crescendo.data.states.stream.CurrentMetadataStateSubscriberImpl
-import com.paranid5.crescendo.data.states.tracks.CurrentTrackStateSubscriber
-import com.paranid5.crescendo.data.states.tracks.CurrentTrackStateSubscriberImpl
+import com.paranid5.crescendo.data.sources.stream.CurrentMetadataStatePublisher
+import com.paranid5.crescendo.data.sources.stream.CurrentMetadataStatePublisherImpl
+import com.paranid5.crescendo.data.sources.stream.CurrentMetadataStateSubscriber
+import com.paranid5.crescendo.data.sources.stream.CurrentMetadataStateSubscriberImpl
+import com.paranid5.crescendo.data.sources.tracks.CurrentTrackStateSubscriber
+import com.paranid5.crescendo.data.sources.tracks.CurrentTrackStateSubscriberImpl
 
 class MediaSessionManager(
     storageRepository: StorageRepository,

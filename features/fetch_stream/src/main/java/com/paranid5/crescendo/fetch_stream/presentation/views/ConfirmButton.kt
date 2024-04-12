@@ -2,8 +2,6 @@ package com.paranid5.crescendo.fetch_stream.presentation.views
 
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.pager.PagerState
-import androidx.compose.material.BottomSheetScaffoldState
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -18,17 +16,17 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
-import com.paranid5.crescendo.core.common.AudioStatus
 import com.paranid5.crescendo.core.resources.R
+import com.paranid5.crescendo.core.resources.ui.theme.LocalAppColors
+import com.paranid5.crescendo.fetch_stream.domain.startStreaming
+import com.paranid5.crescendo.fetch_stream.presentation.FetchStreamViewModel
+import com.paranid5.crescendo.fetch_stream.presentation.properties.compose.collectCurrentTextAsState
+import com.paranid5.crescendo.fetch_stream.presentation.properties.compose.collectIsConfirmButtonActiveAsState
+import com.paranid5.crescendo.system.services.stream.StreamServiceAccessor
 import com.paranid5.crescendo.ui.composition_locals.playing.LocalPlayingPagerState
 import com.paranid5.crescendo.ui.composition_locals.playing.LocalPlayingSheetState
 import com.paranid5.crescendo.ui.permissions.requests.audioRecordingPermissionsRequestLauncher
 import com.paranid5.crescendo.ui.permissions.requests.foregroundServicePermissionsRequestLauncherCompat
-import com.paranid5.crescendo.fetch_stream.domain.FetchStreamInteractor
-import com.paranid5.crescendo.fetch_stream.presentation.FetchStreamViewModel
-import com.paranid5.crescendo.fetch_stream.presentation.properties.compose.collectCurrentTextAsState
-import com.paranid5.crescendo.fetch_stream.presentation.properties.compose.collectIsConfirmButtonActiveAsState
-import com.paranid5.crescendo.core.resources.ui.theme.LocalAppColors
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
 import org.koin.compose.koinInject
@@ -40,13 +38,13 @@ internal fun ConfirmButton(modifier: Modifier = Modifier) {
 
     Box(modifier) {
         val (areForegroundPermissionsGranted, launchFSPermissions) =
-            com.paranid5.crescendo.ui.permissions.requests.foregroundServicePermissionsRequestLauncherCompat(
+            foregroundServicePermissionsRequestLauncherCompat(
                 isForegroundServicePermissionDialogShownState,
                 Modifier.align(Alignment.Center)
             )
 
         val (isRecordingPermissionGranted, launchRecordPermissions) =
-            com.paranid5.crescendo.ui.permissions.requests.audioRecordingPermissionsRequestLauncher(
+            audioRecordingPermissionsRequestLauncher(
                 isAudioRecordingPermissionDialogShownState,
                 Modifier.align(Alignment.Center)
             )
@@ -70,11 +68,11 @@ private inline fun ConfirmButtonImpl(
     crossinline launchRecordPermissions: () -> Unit,
     modifier: Modifier = Modifier,
     viewModel: FetchStreamViewModel = koinViewModel(),
-    fetchStreamInteractor: FetchStreamInteractor = koinInject()
+    streamServiceAccessor: StreamServiceAccessor = koinInject()
 ) {
     val colors = LocalAppColors.current
-    val playingSheetState = com.paranid5.crescendo.ui.composition_locals.playing.LocalPlayingSheetState.current
-    val playingPagerState = com.paranid5.crescendo.ui.composition_locals.playing.LocalPlayingPagerState.current
+    val playingSheetState = LocalPlayingSheetState.current
+    val playingPagerState = LocalPlayingPagerState.current
 
     val currentText by viewModel.collectCurrentTextAsState()
     val isConfirmButtonActive by viewModel.collectIsConfirmButtonActiveAsState()
@@ -97,11 +95,11 @@ private inline fun ConfirmButtonImpl(
 
                 else -> coroutineScope.launch {
                     startStreaming(
+                        publisher = viewModel,
+                        streamServiceAccessor = streamServiceAccessor,
                         currentText = currentText,
                         playingPagerState = playingPagerState,
                         playingSheetState = playingSheetState,
-                        viewModel = viewModel,
-                        fetchStreamInteractor = fetchStreamInteractor
                     )
                 }
             }
@@ -120,20 +118,4 @@ private fun ConfirmButtonLabel(modifier: Modifier = Modifier) {
         fontWeight = FontWeight.Bold,
         modifier = modifier
     )
-}
-
-@OptIn(ExperimentalFoundationApi::class, ExperimentalMaterialApi::class)
-private suspend fun startStreaming(
-    currentText: String,
-    playingPagerState: PagerState?,
-    playingSheetState: BottomSheetScaffoldState?,
-    viewModel: FetchStreamViewModel,
-    fetchStreamInteractor: FetchStreamInteractor,
-) {
-    val url = currentText.trim()
-    viewModel.setAudioStatus(AudioStatus.STREAMING)
-    viewModel.setCurrentUrl(url)
-    fetchStreamInteractor.startStreaming(url)
-    playingPagerState?.animateScrollToPage(1)
-    playingSheetState?.bottomSheetState?.expand()
 }

@@ -18,15 +18,15 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewModelScope
-import com.paranid5.crescendo.audio_effects.domain.AudioEffectsInteractor
+import com.paranid5.crescendo.audio_effects.domain.updatedEQBandLevels
 import com.paranid5.crescendo.audio_effects.presentation.AudioEffectsViewModel
+import com.paranid5.crescendo.core.common.eq.EqualizerBandsPreset
 import com.paranid5.crescendo.core.common.eq.EqualizerData
 import com.paranid5.crescendo.core.resources.R
 import com.paranid5.crescendo.core.resources.ui.theme.LocalAppColors
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
-import org.koin.compose.koinInject
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -43,7 +43,6 @@ internal fun BandSlider(
     modifier: Modifier = Modifier,
     thumbModifier: Modifier = Modifier,
     viewModel: AudioEffectsViewModel = koinViewModel(),
-    audioEffectsInteractor: AudioEffectsInteractor = koinInject(),
 ) {
     val colors = LocalAppColors.current
 
@@ -58,7 +57,7 @@ internal fun BandSlider(
         ),
         onValueChange = { level ->
             viewModel.viewModelScope.launch(Dispatchers.IO) {
-                val bands = audioEffectsInteractor.updatedEQBandLevels(
+                val bands = updatedEQBandLevels(
                     level = level,
                     index = index,
                     presentLvlsDbState = presentLvlsDbState,
@@ -66,7 +65,7 @@ internal fun BandSlider(
                 )
 
                 viewModel.setEqualizerBands(bands)
-                viewModel.setEqualizerParam(com.paranid5.crescendo.core.common.eq.EqualizerBandsPreset.CUSTOM)
+                viewModel.setEqualizerParam(EqualizerBandsPreset.CUSTOM)
             }
         },
         thumb = {

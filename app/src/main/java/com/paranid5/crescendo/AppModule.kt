@@ -15,12 +15,12 @@ import com.paranid5.crescendo.core.impl.di.TRACK_SERVICE_CONNECTION
 import com.paranid5.crescendo.core.impl.di.UNKNOWN_STREAMER
 import com.paranid5.crescendo.core.impl.di.VIDEO_CACHE_SERVICE_CONNECTION
 import com.paranid5.crescendo.core.resources.R
+import com.paranid5.crescendo.current_playlist.di.currentPlaylistModule
 import com.paranid5.crescendo.data.StorageRepository
 import com.paranid5.crescendo.data.ktor_client.KtorClient
 import com.paranid5.crescendo.data.sqlDelightModule
 import com.paranid5.crescendo.fetch_stream.di.fetchStreamModule
 import com.paranid5.crescendo.presentation.composition_locals.LocalActivity
-import com.paranid5.crescendo.presentation.main.current_playlist.CurrentPlaylistViewModel
 import com.paranid5.crescendo.presentation.main.playing.PlayingUIHandler
 import com.paranid5.crescendo.presentation.main.playing.PlayingViewModel
 import com.paranid5.crescendo.system.services.stream.di.streamServiceModule
@@ -103,10 +103,6 @@ private val globalsModule = module {
 private val playingModule = module {
     singleOf(::PlayingUIHandler)
     viewModelOf(::PlayingViewModel)
-}
-
-private val currentPlaylistModule = module {
-    viewModelOf(::CurrentPlaylistViewModel)
 }
 
 private val uiModule = module {
