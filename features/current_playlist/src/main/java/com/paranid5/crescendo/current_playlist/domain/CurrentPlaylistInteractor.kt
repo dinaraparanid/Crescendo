@@ -2,8 +2,8 @@ package com.paranid5.crescendo.current_playlist.domain
 
 import com.paranid5.crescendo.core.common.tracks.Track
 import com.paranid5.crescendo.current_playlist.data.TrackDismissDataSource
-import com.paranid5.crescendo.data.sources.tracks.CurrentPlaylistStatePublisher
-import com.paranid5.crescendo.data.sources.tracks.CurrentTrackIndexStatePublisher
+import com.paranid5.crescendo.domain.sources.tracks.CurrentPlaylistPublisher
+import com.paranid5.crescendo.domain.sources.tracks.CurrentTrackIndexPublisher
 import com.paranid5.crescendo.system.services.track.TrackServiceAccessor
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.toImmutableList
@@ -34,7 +34,7 @@ internal suspend fun <P> updateCurrentPlaylistAfterDrag(
     newTracks: ImmutableList<Track>,
     newCurTrackIndex: Int,
     trackServiceAccessor: TrackServiceAccessor
-) where P : CurrentTrackIndexStatePublisher, P : CurrentPlaylistStatePublisher {
+) where P : CurrentTrackIndexPublisher, P : CurrentPlaylistPublisher {
     publisher.setCurrentTrackIndex(newCurTrackIndex)
     publisher.setCurrentPlaylist(newTracks)
 

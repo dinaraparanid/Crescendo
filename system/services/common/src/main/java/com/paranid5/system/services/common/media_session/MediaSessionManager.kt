@@ -5,20 +5,20 @@ import android.support.v4.media.MediaMetadataCompat
 import android.support.v4.media.session.MediaSessionCompat
 import android.support.v4.media.session.PlaybackStateCompat
 import com.paranid5.crescendo.data.StorageRepository
-import com.paranid5.crescendo.data.current_playlist.CurrentPlaylistRepository
-import com.paranid5.crescendo.data.sources.stream.CurrentMetadataStatePublisher
-import com.paranid5.crescendo.data.sources.stream.CurrentMetadataStatePublisherImpl
-import com.paranid5.crescendo.data.sources.stream.CurrentMetadataStateSubscriber
-import com.paranid5.crescendo.data.sources.stream.CurrentMetadataStateSubscriberImpl
-import com.paranid5.crescendo.data.sources.tracks.CurrentTrackStateSubscriber
-import com.paranid5.crescendo.data.sources.tracks.CurrentTrackStateSubscriberImpl
+import com.paranid5.crescendo.data.sources.stream.CurrentMetadataPublisherImpl
+import com.paranid5.crescendo.data.sources.stream.CurrentMetadataSubscriberImpl
+import com.paranid5.crescendo.data.sources.tracks.CurrentTrackSubscriberImpl
+import com.paranid5.crescendo.domain.repositories.CurrentPlaylistRepository
+import com.paranid5.crescendo.domain.sources.stream.CurrentMetadataPublisher
+import com.paranid5.crescendo.domain.sources.stream.CurrentMetadataSubscriber
+import com.paranid5.crescendo.domain.sources.tracks.CurrentTrackSubscriber
 
 class MediaSessionManager(
     storageRepository: StorageRepository,
     currentPlaylistRepository: CurrentPlaylistRepository
-) : CurrentMetadataStateSubscriber by CurrentMetadataStateSubscriberImpl(storageRepository),
-    CurrentMetadataStatePublisher by CurrentMetadataStatePublisherImpl(storageRepository),
-    CurrentTrackStateSubscriber by CurrentTrackStateSubscriberImpl(
+) : CurrentMetadataSubscriber by CurrentMetadataSubscriberImpl(storageRepository),
+    CurrentMetadataPublisher by CurrentMetadataPublisherImpl(storageRepository),
+    CurrentTrackSubscriber by CurrentTrackSubscriberImpl(
         storageRepository,
         currentPlaylistRepository
     ) {

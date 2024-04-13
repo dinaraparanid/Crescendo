@@ -9,22 +9,8 @@ import com.paranid5.crescendo.core.impl.di.EQUALIZER_DATA
 import com.paranid5.crescendo.core.media.eq.EqualizerData.fromEqualizer
 import com.paranid5.crescendo.core.media.eq.usePreset
 import com.paranid5.crescendo.data.StorageRepository
-import com.paranid5.crescendo.data.sources.effects.AudioEffectsEnabledStateSubscriber
-import com.paranid5.crescendo.data.sources.effects.AudioEffectsEnabledStateSubscriberImpl
-import com.paranid5.crescendo.data.sources.effects.BassStrengthStateSubscriber
-import com.paranid5.crescendo.data.sources.effects.BassStrengthStateSubscriberImpl
-import com.paranid5.crescendo.data.sources.effects.EqualizerBandsStateSubscriber
-import com.paranid5.crescendo.data.sources.effects.EqualizerBandsStateSubscriberImpl
-import com.paranid5.crescendo.data.sources.effects.EqualizerParamStateSubscriber
-import com.paranid5.crescendo.data.sources.effects.EqualizerParamStateSubscriberImpl
-import com.paranid5.crescendo.data.sources.effects.EqualizerPresetStateSubscriber
-import com.paranid5.crescendo.data.sources.effects.EqualizerPresetStateSubscriberImpl
-import com.paranid5.crescendo.data.sources.effects.PitchStateSubscriber
-import com.paranid5.crescendo.data.sources.effects.PitchStateSubscriberImpl
-import com.paranid5.crescendo.data.sources.effects.ReverbPresetStateSubscriber
-import com.paranid5.crescendo.data.sources.effects.ReverbPresetStateSubscriberImpl
-import com.paranid5.crescendo.data.sources.effects.SpeedStateSubscriber
-import com.paranid5.crescendo.data.sources.effects.SpeedStateSubscriberImpl
+import com.paranid5.crescendo.data.sources.effects.*
+import com.paranid5.crescendo.domain.sources.effects.*
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.update
 import org.koin.core.component.KoinComponent
@@ -32,14 +18,14 @@ import org.koin.core.component.inject
 import org.koin.core.qualifier.named
 
 interface AudioEffectsController :
-    AudioEffectsEnabledStateSubscriber,
-    PitchStateSubscriber,
-    SpeedStateSubscriber,
-    EqualizerParamStateSubscriber,
-    EqualizerBandsStateSubscriber,
-    EqualizerPresetStateSubscriber,
-    BassStrengthStateSubscriber,
-    ReverbPresetStateSubscriber {
+    AudioEffectsEnabledSubscriber,
+    PitchSubscriber,
+    SpeedSubscriber,
+    EqualizerParamSubscriber,
+    EqualizerBandsSubscriber,
+    EqualizerPresetSubscriber,
+    BassStrengthSubscriber,
+    ReverbPresetSubscriber {
     val equalizer: Equalizer
     val bassBoost: BassBoost
     val reverb: PresetReverb
@@ -61,14 +47,14 @@ interface AudioEffectsController :
 
 class AudioEffectsControllerImpl(storageRepository: StorageRepository) :
     AudioEffectsController, KoinComponent,
-    AudioEffectsEnabledStateSubscriber by AudioEffectsEnabledStateSubscriberImpl(storageRepository),
-    PitchStateSubscriber by PitchStateSubscriberImpl(storageRepository),
-    SpeedStateSubscriber by SpeedStateSubscriberImpl(storageRepository),
-    EqualizerParamStateSubscriber by EqualizerParamStateSubscriberImpl(storageRepository),
-    EqualizerBandsStateSubscriber by EqualizerBandsStateSubscriberImpl(storageRepository),
-    EqualizerPresetStateSubscriber by EqualizerPresetStateSubscriberImpl(storageRepository),
-    BassStrengthStateSubscriber by BassStrengthStateSubscriberImpl(storageRepository),
-    ReverbPresetStateSubscriber by ReverbPresetStateSubscriberImpl(storageRepository) {
+    AudioEffectsEnabledSubscriber by AudioEffectsEnabledSubscriberImpl(storageRepository),
+    PitchSubscriber by PitchSubscriberImpl(storageRepository),
+    SpeedSubscriber by SpeedSubscriberImpl(storageRepository),
+    EqualizerParamSubscriber by EqualizerParamSubscriberImpl(storageRepository),
+    EqualizerBandsSubscriber by EqualizerBandsSubscriberImpl(storageRepository),
+    EqualizerPresetSubscriber by EqualizerPresetStateSubscriberImpl(storageRepository),
+    BassStrengthSubscriber by BassStrengthSubscriberImpl(storageRepository),
+    ReverbPresetSubscriber by ReverbPresetSubscriberImpl(storageRepository) {
     private val equalizerDataState by inject<MutableStateFlow<EqualizerData?>>(
         named(EQUALIZER_DATA)
     )

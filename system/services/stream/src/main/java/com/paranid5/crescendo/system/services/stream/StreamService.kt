@@ -2,7 +2,7 @@ package com.paranid5.crescendo.system.services.stream
 
 import android.content.Intent
 import com.paranid5.crescendo.data.StorageRepository
-import com.paranid5.crescendo.data.current_playlist.CurrentPlaylistRepository
+import com.paranid5.crescendo.domain.repositories.CurrentPlaylistRepository
 import com.paranid5.crescendo.system.common.broadcast.StreamServiceBroadcasts.POSITION_ARG
 import com.paranid5.crescendo.system.common.broadcast.StreamServiceBroadcasts.URL_ARG
 import com.paranid5.crescendo.system.services.stream.extractor.UrlExtractor

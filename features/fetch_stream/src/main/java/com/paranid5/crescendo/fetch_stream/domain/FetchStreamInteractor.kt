@@ -5,8 +5,8 @@ import androidx.compose.foundation.pager.PagerState
 import androidx.compose.material.BottomSheetScaffoldState
 import androidx.compose.material.ExperimentalMaterialApi
 import com.paranid5.crescendo.core.common.AudioStatus
-import com.paranid5.crescendo.data.sources.playback.AudioStatusStatePublisher
-import com.paranid5.crescendo.data.sources.stream.CurrentUrlStatePublisher
+import com.paranid5.crescendo.domain.sources.playback.AudioStatusPublisher
+import com.paranid5.crescendo.domain.sources.stream.CurrentUrlPublisher
 import com.paranid5.crescendo.system.services.stream.StreamServiceAccessor
 
 @OptIn(ExperimentalFoundationApi::class, ExperimentalMaterialApi::class)
@@ -16,7 +16,7 @@ internal suspend fun <P> startStreaming(
     currentText: String,
     playingPagerState: PagerState?,
     playingSheetState: BottomSheetScaffoldState?,
-) where P : AudioStatusStatePublisher, P : CurrentUrlStatePublisher {
+) where P : AudioStatusPublisher, P : CurrentUrlPublisher {
     val url = currentText.trim()
     publisher.setAudioStatus(AudioStatus.STREAMING)
     publisher.setCurrentUrl(url)

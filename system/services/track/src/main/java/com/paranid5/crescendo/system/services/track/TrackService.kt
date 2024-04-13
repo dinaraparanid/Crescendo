@@ -4,7 +4,8 @@ import android.content.Intent
 import android.os.Build
 import com.paranid5.crescendo.core.common.tracks.Track
 import com.paranid5.crescendo.data.StorageRepository
-import com.paranid5.crescendo.data.current_playlist.CurrentPlaylistRepository
+import com.paranid5.crescendo.domain.interactor.tracks.TrackServiceStart
+import com.paranid5.crescendo.domain.repositories.CurrentPlaylistRepository
 import com.paranid5.crescendo.system.common.broadcast.TrackServiceBroadcasts
 import com.paranid5.crescendo.system.services.track.media_session.MediaSessionCallback
 import com.paranid5.crescendo.system.services.track.media_session.startMetadataMonitoring

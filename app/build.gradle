@@ -129,4 +129,5 @@ dependencies {
     implementation libs.yt.url.extractor.kt
 
     implementation files('libs/jave-1.0.2.jar')
+    implementation project(':domain')
 }

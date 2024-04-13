@@ -2,40 +2,40 @@ package com.paranid5.crescendo.presentation.main.playing
 
 import androidx.lifecycle.ViewModel
 import com.paranid5.crescendo.data.StorageRepository
-import com.paranid5.crescendo.data.current_playlist.CurrentPlaylistRepository
-import com.paranid5.crescendo.data.sources.playback.AudioStatusStatePublisher
-import com.paranid5.crescendo.data.sources.playback.AudioStatusStatePublisherImpl
-import com.paranid5.crescendo.data.sources.playback.AudioStatusStateSubscriber
-import com.paranid5.crescendo.data.sources.playback.AudioStatusStateSubscriberImpl
-import com.paranid5.crescendo.data.sources.playback.RepeatingStateSubscriber
-import com.paranid5.crescendo.data.sources.playback.RepeatingStateSubscriberImpl
-import com.paranid5.crescendo.data.sources.playback.StreamPlaybackPositionStatePublisher
-import com.paranid5.crescendo.data.sources.playback.StreamPlaybackPositionStatePublisherImpl
-import com.paranid5.crescendo.data.sources.playback.StreamPlaybackPositionStateSubscriber
-import com.paranid5.crescendo.data.sources.playback.StreamPlaybackPositionStateSubscriberImpl
-import com.paranid5.crescendo.data.sources.playback.TracksPlaybackPositionStatePublisher
-import com.paranid5.crescendo.data.sources.playback.TracksPlaybackPositionStatePublisherImpl
-import com.paranid5.crescendo.data.sources.playback.TracksPlaybackPositionStateSubscriber
-import com.paranid5.crescendo.data.sources.playback.TracksPlaybackPositionStateSubscriberImpl
-import com.paranid5.crescendo.data.sources.stream.CurrentUrlStateSubscriber
-import com.paranid5.crescendo.data.sources.stream.CurrentUrlStateSubscriberImpl
-import com.paranid5.crescendo.data.sources.tracks.CurrentTrackStateSubscriber
-import com.paranid5.crescendo.data.sources.tracks.CurrentTrackStateSubscriberImpl
-import com.paranid5.crescendo.presentation.main.playing.states.CacheDialogStateHolder
-import com.paranid5.crescendo.presentation.main.playing.states.CacheDialogStateHolderImpl
+import com.paranid5.crescendo.data.sources.playback.AudioStatusPublisherImpl
+import com.paranid5.crescendo.data.sources.playback.AudioStatusSubscriberImpl
+import com.paranid5.crescendo.data.sources.playback.RepeatingSubscriberImpl
+import com.paranid5.crescendo.data.sources.playback.StreamPlaybackPositionPublisherImpl
+import com.paranid5.crescendo.data.sources.playback.StreamPlaybackPositionSubscriberImpl
+import com.paranid5.crescendo.data.sources.playback.TracksPlaybackPositionPublisherImpl
+import com.paranid5.crescendo.data.sources.playback.TracksPlaybackPositionSubscriberImpl
+import com.paranid5.crescendo.data.sources.stream.CurrentUrlSubscriberImpl
+import com.paranid5.crescendo.data.sources.tracks.CurrentTrackSubscriberImpl
+import com.paranid5.crescendo.domain.repositories.CurrentPlaylistRepository
+import com.paranid5.crescendo.domain.sources.playback.AudioStatusPublisher
+import com.paranid5.crescendo.domain.sources.playback.AudioStatusSubscriber
+import com.paranid5.crescendo.domain.sources.playback.RepeatingSubscriber
+import com.paranid5.crescendo.domain.sources.playback.StreamPlaybackPositionPublisher
+import com.paranid5.crescendo.domain.sources.playback.StreamPlaybackPositionSubscriber
+import com.paranid5.crescendo.domain.sources.playback.TracksPlaybackPositionPublisher
+import com.paranid5.crescendo.domain.sources.playback.TracksPlaybackPositionSubscriber
+import com.paranid5.crescendo.domain.sources.stream.CurrentUrlSubscriber
+import com.paranid5.crescendo.domain.sources.tracks.CurrentTrackSubscriber
+import com.paranid5.crescendo.presentation.main.playing.states.CacheDialogDataSource
+import com.paranid5.crescendo.presentation.main.playing.states.CacheDialogDataSourceImpl
 
 @Suppress("IncorrectFormatting")
 class PlayingViewModel(
     storageRepository: StorageRepository,
     currentPlaylistRepository: CurrentPlaylistRepository,
 ) : ViewModel(),
-    AudioStatusStateSubscriber by AudioStatusStateSubscriberImpl(storageRepository),
-    AudioStatusStatePublisher by AudioStatusStatePublisherImpl(storageRepository),
-    StreamPlaybackPositionStateSubscriber by StreamPlaybackPositionStateSubscriberImpl(storageRepository),
-    StreamPlaybackPositionStatePublisher by StreamPlaybackPositionStatePublisherImpl(storageRepository),
-    TracksPlaybackPositionStateSubscriber by TracksPlaybackPositionStateSubscriberImpl(storageRepository),
-    TracksPlaybackPositionStatePublisher by TracksPlaybackPositionStatePublisherImpl(storageRepository),
-    RepeatingStateSubscriber by RepeatingStateSubscriberImpl(storageRepository),
-    CurrentTrackStateSubscriber by CurrentTrackStateSubscriberImpl(storageRepository, currentPlaylistRepository),
-    CurrentUrlStateSubscriber by CurrentUrlStateSubscriberImpl(storageRepository),
-    CacheDialogStateHolder by CacheDialogStateHolderImpl(storageRepository)
+    AudioStatusSubscriber by AudioStatusSubscriberImpl(storageRepository),
+    AudioStatusPublisher by AudioStatusPublisherImpl(storageRepository),
+    StreamPlaybackPositionSubscriber by StreamPlaybackPositionSubscriberImpl(storageRepository),
+    StreamPlaybackPositionPublisher by StreamPlaybackPositionPublisherImpl(storageRepository),
+    TracksPlaybackPositionSubscriber by TracksPlaybackPositionSubscriberImpl(storageRepository),
+    TracksPlaybackPositionPublisher by TracksPlaybackPositionPublisherImpl(storageRepository),
+    RepeatingSubscriber by RepeatingSubscriberImpl(storageRepository),
+    CurrentTrackSubscriber by CurrentTrackSubscriberImpl(storageRepository, currentPlaylistRepository),
+    CurrentUrlSubscriber by CurrentUrlSubscriberImpl(storageRepository),
+    CacheDialogDataSource by CacheDialogDataSourceImpl(storageRepository)

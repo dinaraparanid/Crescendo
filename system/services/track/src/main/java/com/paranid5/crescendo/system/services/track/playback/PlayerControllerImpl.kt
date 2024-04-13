@@ -7,17 +7,17 @@ import androidx.media3.common.AudioAttributes
 import androidx.media3.common.C
 import androidx.media3.common.util.UnstableApi
 import androidx.media3.exoplayer.ExoPlayer
-import com.paranid5.crescendo.data.StorageRepository
-import com.paranid5.crescendo.data.sources.playback.RepeatingStatePublisher
-import com.paranid5.crescendo.data.sources.playback.RepeatingStatePublisherImpl
-import com.paranid5.crescendo.data.sources.playback.RepeatingStateSubscriber
-import com.paranid5.crescendo.data.sources.playback.RepeatingStateSubscriberImpl
 import com.paranid5.crescendo.core.common.tracks.Track
 import com.paranid5.crescendo.core.impl.di.AUDIO_SESSION_ID
 import com.paranid5.crescendo.core.impl.di.IS_PLAYING
+import com.paranid5.crescendo.data.StorageRepository
+import com.paranid5.crescendo.data.sources.playback.RepeatingPublisherImpl
+import com.paranid5.crescendo.data.sources.playback.RepeatingSubscriberImpl
+import com.paranid5.crescendo.domain.sources.playback.RepeatingPublisher
+import com.paranid5.crescendo.domain.sources.playback.RepeatingSubscriber
+import com.paranid5.crescendo.system.services.track.TrackService
 import com.paranid5.crescendo.utils.extensions.toMediaItem
 import com.paranid5.crescendo.utils.extensions.toMediaItemList
-import com.paranid5.crescendo.system.services.track.TrackService
 import com.paranid5.system.services.common.playback.AudioEffectsController
 import com.paranid5.system.services.common.playback.AudioEffectsControllerImpl
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -33,8 +33,8 @@ import org.koin.core.qualifier.named
 internal class PlayerControllerImpl(service: TrackService, storageRepository: StorageRepository) :
     PlayerController, KoinComponent,
     AudioEffectsController by AudioEffectsControllerImpl(storageRepository),
-    RepeatingStateSubscriber by RepeatingStateSubscriberImpl(storageRepository),
-    RepeatingStatePublisher by RepeatingStatePublisherImpl(storageRepository) {
+    RepeatingSubscriber by RepeatingSubscriberImpl(storageRepository),
+    RepeatingPublisher by RepeatingPublisherImpl(storageRepository) {
     private val _isPlayingState by inject<MutableStateFlow<Boolean>>(named(IS_PLAYING))
 
     private val audioSessionIdState by inject<MutableStateFlow<Int>>(named(AUDIO_SESSION_ID))

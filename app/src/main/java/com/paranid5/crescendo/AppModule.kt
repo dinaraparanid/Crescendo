@@ -18,7 +18,7 @@ import com.paranid5.crescendo.core.resources.R
 import com.paranid5.crescendo.current_playlist.di.currentPlaylistModule
 import com.paranid5.crescendo.data.StorageRepository
 import com.paranid5.crescendo.data.ktor_client.KtorClient
-import com.paranid5.crescendo.data.sqlDelightModule
+import com.paranid5.crescendo.data.dataModule
 import com.paranid5.crescendo.fetch_stream.di.fetchStreamModule
 import com.paranid5.crescendo.presentation.composition_locals.LocalActivity
 import com.paranid5.crescendo.presentation.main.playing.PlayingUIHandler
@@ -114,7 +114,7 @@ private val uiModule = module {
 }
 
 val appModule = module {
-    includes(globalsModule, uiModule, sqlDelightModule)
+    includes(globalsModule, uiModule, dataModule)
 }
 
 @Composable

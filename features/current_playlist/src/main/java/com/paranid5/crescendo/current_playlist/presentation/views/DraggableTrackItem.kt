@@ -21,7 +21,7 @@ import androidx.compose.ui.unit.dp
 import com.paranid5.crescendo.core.common.tracks.Track
 import com.paranid5.crescendo.core.resources.ui.theme.LocalAppColors
 import com.paranid5.crescendo.current_playlist.presentation.CurrentPlaylistViewModel
-import com.paranid5.crescendo.domain.interactors.TracksInteractor
+import com.paranid5.crescendo.domain.interactor.tracks.startPlaylistPlayback
 import com.paranid5.crescendo.system.services.track.TrackServiceAccessor
 import com.paranid5.crescendo.ui.track.clickableTrackWithPermissions
 import com.paranid5.crescendo.ui.track.currentTrackState
@@ -81,12 +81,11 @@ internal fun <T : Track> DraggableTrackItem(
         modifier = modifier,
         onClick = {
             coroutineScope.launch {
-                TracksInteractor.startPlaylistPlayback(
+                trackServiceAccessor.startPlaylistPlayback(
                     newTracks = tracks,
                     newTrackIndex = trackIndex,
                     currentTrack = currentTrack,
-                    viewModel = viewModel,
-                    trackServiceAccessor = trackServiceAccessor
+                    source = viewModel,
                 )
             }
         }

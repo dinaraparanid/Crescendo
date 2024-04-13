@@ -2,15 +2,15 @@ package com.paranid5.crescendo.system.services.track.playback
 
 import androidx.media3.common.Player
 import com.paranid5.crescendo.core.common.tracks.Track
-import com.paranid5.crescendo.data.sources.playback.RepeatingStatePublisher
-import com.paranid5.crescendo.data.sources.playback.RepeatingStateSubscriber
+import com.paranid5.crescendo.domain.sources.playback.RepeatingPublisher
+import com.paranid5.crescendo.domain.sources.playback.RepeatingSubscriber
 import com.paranid5.system.services.common.playback.AudioEffectsController
 import kotlinx.coroutines.flow.StateFlow
 
 interface PlayerController :
     AudioEffectsController,
-    RepeatingStateSubscriber,
-    RepeatingStatePublisher {
+    RepeatingSubscriber,
+    RepeatingPublisher {
     val player: Player
 
     var isPlaying: Boolean

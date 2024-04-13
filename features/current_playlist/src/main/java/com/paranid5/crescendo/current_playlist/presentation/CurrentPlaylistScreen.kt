@@ -11,7 +11,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.unit.dp
-import com.paranid5.crescendo.current_playlist.effects.TrackDismissEffect
+import com.paranid5.crescendo.current_playlist.presentation.effects.TrackDismissEffect
 import com.paranid5.crescendo.current_playlist.presentation.views.CurrentPlaylistBar
 import com.paranid5.crescendo.current_playlist.presentation.views.CurrentPlaylistTrackList
 import com.paranid5.crescendo.core.resources.ui.theme.TransparentUtility

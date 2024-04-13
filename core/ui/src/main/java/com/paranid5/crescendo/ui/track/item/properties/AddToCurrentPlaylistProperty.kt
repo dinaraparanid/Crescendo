@@ -10,7 +10,7 @@ import androidx.compose.ui.res.stringResource
 import com.paranid5.crescendo.core.common.tracks.DefaultTrack
 import com.paranid5.crescendo.core.common.tracks.Track
 import com.paranid5.crescendo.core.resources.R
-import com.paranid5.crescendo.data.current_playlist.CurrentPlaylistRepository
+import com.paranid5.crescendo.domain.repositories.CurrentPlaylistRepository
 import com.paranid5.crescendo.system.services.track.TrackServiceAccessor
 import com.paranid5.crescendo.utils.extensions.collectLatestAsState
 import kotlinx.collections.immutable.persistentListOf

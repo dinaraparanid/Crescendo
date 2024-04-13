@@ -2,16 +2,16 @@ package com.paranid5.crescendo.system.services.stream.playback
 
 import androidx.annotation.MainThread
 import com.paranid5.crescendo.data.StorageRepository
-import com.paranid5.crescendo.data.sources.playback.StreamPlaybackPositionStatePublisher
-import com.paranid5.crescendo.data.sources.playback.StreamPlaybackPositionStatePublisherImpl
-import com.paranid5.crescendo.data.sources.playback.StreamPlaybackPositionStateSubscriber
-import com.paranid5.crescendo.data.sources.playback.StreamPlaybackPositionStateSubscriberImpl
-import com.paranid5.crescendo.data.sources.stream.CurrentMetadataStateSubscriber
-import com.paranid5.crescendo.data.sources.stream.CurrentMetadataStateSubscriberImpl
-import com.paranid5.crescendo.data.sources.stream.CurrentUrlStatePublisher
-import com.paranid5.crescendo.data.sources.stream.CurrentUrlStatePublisherImpl
-import com.paranid5.crescendo.data.sources.stream.CurrentUrlStateSubscriber
-import com.paranid5.crescendo.data.sources.stream.CurrentUrlStateSubscriberImpl
+import com.paranid5.crescendo.data.sources.playback.StreamPlaybackPositionPublisherImpl
+import com.paranid5.crescendo.data.sources.playback.StreamPlaybackPositionSubscriberImpl
+import com.paranid5.crescendo.data.sources.stream.CurrentMetadataSubscriberImpl
+import com.paranid5.crescendo.data.sources.stream.CurrentUrlPublisherImpl
+import com.paranid5.crescendo.data.sources.stream.CurrentUrlSubscriberImpl
+import com.paranid5.crescendo.domain.sources.playback.StreamPlaybackPositionPublisher
+import com.paranid5.crescendo.domain.sources.playback.StreamPlaybackPositionSubscriber
+import com.paranid5.crescendo.domain.sources.stream.CurrentMetadataSubscriber
+import com.paranid5.crescendo.domain.sources.stream.CurrentUrlPublisher
+import com.paranid5.crescendo.domain.sources.stream.CurrentUrlSubscriber
 import com.paranid5.crescendo.system.services.stream.StreamService
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
@@ -21,11 +21,11 @@ import org.koin.core.component.KoinComponent
 internal class PlayerProvider(service: StreamService, storageRepository: StorageRepository) :
     KoinComponent,
     PlayerController by PlayerControllerImpl(service, storageRepository),
-    CurrentUrlStateSubscriber by CurrentUrlStateSubscriberImpl(storageRepository),
-    CurrentUrlStatePublisher by CurrentUrlStatePublisherImpl(storageRepository),
-    CurrentMetadataStateSubscriber by CurrentMetadataStateSubscriberImpl(storageRepository),
-    StreamPlaybackPositionStateSubscriber by StreamPlaybackPositionStateSubscriberImpl(storageRepository),
-    StreamPlaybackPositionStatePublisher by StreamPlaybackPositionStatePublisherImpl(storageRepository) {
+    CurrentUrlSubscriber by CurrentUrlSubscriberImpl(storageRepository),
+    CurrentUrlPublisher by CurrentUrlPublisherImpl(storageRepository),
+    CurrentMetadataSubscriber by CurrentMetadataSubscriberImpl(storageRepository),
+    StreamPlaybackPositionSubscriber by StreamPlaybackPositionSubscriberImpl(storageRepository),
+    StreamPlaybackPositionPublisher by StreamPlaybackPositionPublisherImpl(storageRepository) {
     private val _playbackEventFlow by lazy {
         MutableSharedFlow<PlaybackEvent>()
     }

@@ -4,8 +4,8 @@ import androidx.annotation.OptIn
 import androidx.media3.common.Player
 import androidx.media3.common.util.UnstableApi
 import com.paranid5.crescendo.data.StorageRepository
-import com.paranid5.crescendo.data.sources.stream.CurrentMetadataStateSubscriber
-import com.paranid5.crescendo.data.sources.stream.CurrentMetadataStateSubscriberImpl
+import com.paranid5.crescendo.data.sources.stream.CurrentMetadataSubscriberImpl
+import com.paranid5.crescendo.domain.sources.stream.CurrentMetadataSubscriber
 import com.paranid5.crescendo.system.services.stream.StreamService
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.stateIn
@@ -14,7 +14,7 @@ internal const val STREAM_NOTIFICATION_ID = 101
 internal const val STREAM_CHANNEL_ID = "stream_channel"
 
 internal class NotificationManager(service: StreamService, storageRepository: StorageRepository) :
-    CurrentMetadataStateSubscriber by CurrentMetadataStateSubscriberImpl(storageRepository) {
+    CurrentMetadataSubscriber by CurrentMetadataSubscriberImpl(storageRepository) {
     internal val currentMetadataState by lazy {
         currentMetadataFlow.stateIn(
             service.serviceScope,

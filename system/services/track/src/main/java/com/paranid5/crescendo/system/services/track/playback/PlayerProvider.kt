@@ -3,19 +3,13 @@ package com.paranid5.crescendo.system.services.track.playback
 import androidx.annotation.MainThread
 import com.paranid5.crescendo.core.common.tracks.Track
 import com.paranid5.crescendo.data.StorageRepository
-import com.paranid5.crescendo.data.current_playlist.CurrentPlaylistRepository
-import com.paranid5.crescendo.data.sources.playback.TracksPlaybackPositionStatePublisher
-import com.paranid5.crescendo.data.sources.playback.TracksPlaybackPositionStatePublisherImpl
-import com.paranid5.crescendo.data.sources.playback.TracksPlaybackPositionStateSubscriber
-import com.paranid5.crescendo.data.sources.playback.TracksPlaybackPositionStateSubscriberImpl
-import com.paranid5.crescendo.data.sources.tracks.CurrentPlaylistStatePublisher
-import com.paranid5.crescendo.data.sources.tracks.CurrentPlaylistStatePublisherImpl
-import com.paranid5.crescendo.data.sources.tracks.CurrentPlaylistStateSubscriber
-import com.paranid5.crescendo.data.sources.tracks.CurrentPlaylistStateSubscriberImpl
-import com.paranid5.crescendo.data.sources.tracks.CurrentTrackIndexStatePublisher
-import com.paranid5.crescendo.data.sources.tracks.CurrentTrackIndexStatePublisherImpl
-import com.paranid5.crescendo.data.sources.tracks.CurrentTrackIndexStateSubscriber
-import com.paranid5.crescendo.data.sources.tracks.CurrentTrackIndexStateSubscriberImpl
+import com.paranid5.crescendo.data.sources.playback.TracksPlaybackPositionPublisherImpl
+import com.paranid5.crescendo.data.sources.playback.TracksPlaybackPositionSubscriberImpl
+import com.paranid5.crescendo.data.sources.tracks.*
+import com.paranid5.crescendo.domain.repositories.CurrentPlaylistRepository
+import com.paranid5.crescendo.domain.sources.playback.TracksPlaybackPositionPublisher
+import com.paranid5.crescendo.domain.sources.playback.TracksPlaybackPositionSubscriber
+import com.paranid5.crescendo.domain.sources.tracks.*
 import com.paranid5.crescendo.system.services.track.TrackService
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
@@ -28,12 +22,12 @@ internal class PlayerProvider(
     currentPlaylistRepository: CurrentPlaylistRepository
 ) : KoinComponent,
     PlayerController by PlayerControllerImpl(service, storageRepository),
-    CurrentPlaylistStateSubscriber by CurrentPlaylistStateSubscriberImpl(currentPlaylistRepository),
-    CurrentPlaylistStatePublisher by CurrentPlaylistStatePublisherImpl(currentPlaylistRepository),
-    CurrentTrackIndexStateSubscriber by CurrentTrackIndexStateSubscriberImpl(storageRepository),
-    CurrentTrackIndexStatePublisher by CurrentTrackIndexStatePublisherImpl(storageRepository),
-    TracksPlaybackPositionStateSubscriber by TracksPlaybackPositionStateSubscriberImpl(storageRepository),
-    TracksPlaybackPositionStatePublisher by TracksPlaybackPositionStatePublisherImpl(storageRepository) {
+    CurrentPlaylistSubscriber by CurrentPlaylistSubscriberImpl(currentPlaylistRepository),
+    CurrentPlaylistPublisher by CurrentPlaylistPublisherImpl(currentPlaylistRepository),
+    CurrentTrackIndexSubscriber by CurrentTrackIndexSubscriberImpl(storageRepository),
+    CurrentTrackIndexPublisher by CurrentTrackIndexPublisherImpl(storageRepository),
+    TracksPlaybackPositionSubscriber by TracksPlaybackPositionSubscriberImpl(storageRepository),
+    TracksPlaybackPositionPublisher by TracksPlaybackPositionPublisherImpl(storageRepository) {
     private val _playbackEventFlow by lazy {
         MutableSharedFlow<PlaybackEvent>()
     }

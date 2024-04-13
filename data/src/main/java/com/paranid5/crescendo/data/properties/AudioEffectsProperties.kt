@@ -1,62 +1,60 @@
 package com.paranid5.crescendo.data.properties
 
+import com.paranid5.crescendo.core.common.eq.EqualizerBandsPreset
 import com.paranid5.crescendo.data.StorageRepository
 import kotlinx.collections.immutable.ImmutableList
-import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.flow.mapLatest
+import kotlinx.coroutines.flow.map
 
-inline val StorageRepository.areAudioEffectsEnabledFlow
+val StorageRepository.areAudioEffectsEnabledFlow
     get() = audioEffectsStateDataSource.areAudioEffectsEnabledFlow
 
-suspend inline fun StorageRepository.storeAudioEffectsEnabled(areAudioEffectsEnabled: Boolean) =
+suspend fun StorageRepository.storeAudioEffectsEnabled(areAudioEffectsEnabled: Boolean) =
     audioEffectsStateDataSource.storeAudioEffectsEnabled(areAudioEffectsEnabled)
 
-inline val StorageRepository.pitchFlow
+val StorageRepository.pitchFlow
     get() = audioEffectsStateDataSource.pitchFlow
 
-@OptIn(ExperimentalCoroutinesApi::class)
-inline val StorageRepository.pitchTextFlow
-    get() = pitchFlow.mapLatest { it.toString() }
+val StorageRepository.pitchTextFlow
+    get() = pitchFlow.map(Float::toString)
 
-suspend inline fun StorageRepository.storePitch(pitch: Float) =
+suspend fun StorageRepository.storePitch(pitch: Float) =
     audioEffectsStateDataSource.storePitch(pitch)
 
-inline val StorageRepository.speedFlow
+val StorageRepository.speedFlow
     get() = audioEffectsStateDataSource.speedFlow
 
-@OptIn(ExperimentalCoroutinesApi::class)
-inline val StorageRepository.speedTextFlow
-    get() = speedFlow.mapLatest { it.toString() }
+val StorageRepository.speedTextFlow
+    get() = speedFlow.map(Float::toString)
 
-suspend inline fun StorageRepository.storeSpeed(speed: Float) =
+suspend fun StorageRepository.storeSpeed(speed: Float) =
     audioEffectsStateDataSource.storeSpeed(speed)
 
-inline val StorageRepository.equalizerBandsFlow
+val StorageRepository.equalizerBandsFlow
     get() = audioEffectsStateDataSource.equalizerBandsFlow
 
-suspend inline fun StorageRepository.storeEqualizerBands(bands: ImmutableList<Short>) =
+suspend fun StorageRepository.storeEqualizerBands(bands: ImmutableList<Short>) =
     audioEffectsStateDataSource.storeEqualizerBands(bands)
 
-inline val StorageRepository.equalizerPresetFlow
+val StorageRepository.equalizerPresetFlow
     get() = audioEffectsStateDataSource.equalizerPresetFlow
 
-suspend inline fun StorageRepository.storeEqualizerPreset(preset: Short) =
+suspend fun StorageRepository.storeEqualizerPreset(preset: Short) =
     audioEffectsStateDataSource.storeEqualizerPreset(preset)
 
-inline val StorageRepository.equalizerParamFlow
+val StorageRepository.equalizerParamFlow
     get() = audioEffectsStateDataSource.equalizerParamFlow
 
-suspend inline fun StorageRepository.storeEqualizerParam(param: com.paranid5.crescendo.core.common.eq.EqualizerBandsPreset) =
+suspend fun StorageRepository.storeEqualizerParam(param: EqualizerBandsPreset) =
     audioEffectsStateDataSource.storeEqualizerParam(param)
 
-inline val StorageRepository.bassStrengthFlow
+val StorageRepository.bassStrengthFlow
     get() = audioEffectsStateDataSource.bassStrengthFlow
 
-suspend inline fun StorageRepository.storeBassStrength(bassStrength: Short) =
+suspend fun StorageRepository.storeBassStrength(bassStrength: Short) =
     audioEffectsStateDataSource.storeBassStrength(bassStrength)
 
-inline val StorageRepository.reverbPresetFlow
+val StorageRepository.reverbPresetFlow
     get() = audioEffectsStateDataSource.reverbPresetFlow
 
-suspend inline fun StorageRepository.storeReverbPreset(reverbPreset: Short) =
+suspend fun StorageRepository.storeReverbPreset(reverbPreset: Short) =
     audioEffectsStateDataSource.storeReverbPreset(reverbPreset)

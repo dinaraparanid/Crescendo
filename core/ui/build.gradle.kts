@@ -44,6 +44,7 @@ dependencies {
     implementation(project(":core:media"))
     implementation(project(":core:utils"))
     implementation(project(":core:resources"))
+    implementation(project(":domain"))
     implementation(project(":data"))
     implementation(project(":navigation"))
     implementation(project(":system:services:common"))

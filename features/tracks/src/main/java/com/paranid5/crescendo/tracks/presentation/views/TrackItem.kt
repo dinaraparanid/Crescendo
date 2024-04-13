@@ -21,10 +21,10 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import com.paranid5.crescendo.core.common.tracks.Track
 import com.paranid5.crescendo.core.resources.ui.theme.LocalAppColors
-import com.paranid5.crescendo.data.sources.playback.AudioStatusStatePublisher
-import com.paranid5.crescendo.data.sources.tracks.CurrentPlaylistStatePublisher
-import com.paranid5.crescendo.data.sources.tracks.CurrentTrackIndexStatePublisher
-import com.paranid5.crescendo.domain.interactors.TracksInteractor
+import com.paranid5.crescendo.domain.interactor.tracks.startPlaylistPlayback
+import com.paranid5.crescendo.domain.sources.playback.AudioStatusPublisher
+import com.paranid5.crescendo.domain.sources.tracks.CurrentPlaylistPublisher
+import com.paranid5.crescendo.domain.sources.tracks.CurrentTrackIndexPublisher
 import com.paranid5.crescendo.system.services.track.TrackServiceAccessor
 import com.paranid5.crescendo.ui.track.clickableTrackWithPermissions
 import com.paranid5.crescendo.ui.track.currentTrackState
@@ -61,9 +61,9 @@ internal fun <VM> TrackItem(
     trackInd: Int,
     modifier: Modifier = Modifier,
     trackServiceAccessor: TrackServiceAccessor = koinInject(),
-) where VM : AudioStatusStatePublisher,
-        VM : CurrentPlaylistStatePublisher,
-        VM : CurrentTrackIndexStatePublisher {
+) where VM : AudioStatusPublisher,
+        VM : CurrentPlaylistPublisher,
+        VM : CurrentTrackIndexPublisher {
     val coroutineScope = rememberCoroutineScope()
     val currentTrack by currentTrackState()
 
@@ -73,12 +73,11 @@ internal fun <VM> TrackItem(
         modifier = modifier,
         onClick = {
             coroutineScope.launch {
-                TracksInteractor.startPlaylistPlayback(
+                trackServiceAccessor.startPlaylistPlayback(
                     newTracks = tracks,
                     newTrackIndex = trackInd,
                     currentTrack = currentTrack,
-                    viewModel = viewModel,
-                    trackServiceAccessor = trackServiceAccessor,
+                    source = viewModel,
                 )
             }
         }

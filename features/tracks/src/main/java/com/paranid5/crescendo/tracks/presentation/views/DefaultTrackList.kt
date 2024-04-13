@@ -6,7 +6,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
-import com.paranid5.crescendo.domain.interactors.TracksInteractor
+import com.paranid5.crescendo.domain.interactor.tracks.startPlaylistPlayback
 import com.paranid5.crescendo.system.services.track.TrackServiceAccessor
 import com.paranid5.crescendo.tracks.presentation.TracksViewModel
 import com.paranid5.crescendo.tracks.presentation.properties.compose.collectShownTracksAsState
@@ -44,12 +44,11 @@ internal fun DefaultTrackList(
                 coroutineScope.launch {
                     playingPagerState?.animateScrollToPage(0)
 
-                    TracksInteractor.startPlaylistPlayback(
+                    trackServiceAccessor.startPlaylistPlayback(
                         newTracks = shownTracks,
                         newTrackIndex = trackInd,
                         currentTrack = currentTrack,
-                        viewModel = viewModel,
-                        trackServiceAccessor = trackServiceAccessor
+                        source = viewModel,
                     )
                 }
             }

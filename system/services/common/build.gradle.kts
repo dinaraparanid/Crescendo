@@ -37,6 +37,7 @@ dependencies {
     implementation(project(":core:impl"))
     implementation(project(":core:media"))
     implementation(project(":core:resources"))
+    implementation(project(":domain"))
     implementation(project(":data"))
     implementation(project(":system:common"))
 

@@ -4,9 +4,9 @@ import androidx.annotation.OptIn
 import androidx.media3.common.Player
 import androidx.media3.common.util.UnstableApi
 import com.paranid5.crescendo.data.StorageRepository
-import com.paranid5.crescendo.data.current_playlist.CurrentPlaylistRepository
-import com.paranid5.crescendo.data.sources.tracks.CurrentTrackStateSubscriber
-import com.paranid5.crescendo.data.sources.tracks.CurrentTrackStateSubscriberImpl
+import com.paranid5.crescendo.data.sources.tracks.CurrentTrackSubscriberImpl
+import com.paranid5.crescendo.domain.repositories.CurrentPlaylistRepository
+import com.paranid5.crescendo.domain.sources.tracks.CurrentTrackSubscriber
 import com.paranid5.crescendo.system.services.track.TrackService
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.stateIn
@@ -18,7 +18,7 @@ internal class NotificationManager(
     service: TrackService,
     storageRepository: StorageRepository,
     currentPlaylistRepository: CurrentPlaylistRepository
-) : CurrentTrackStateSubscriber by CurrentTrackStateSubscriberImpl(
+) : CurrentTrackSubscriber by CurrentTrackSubscriberImpl(
     storageRepository,
     currentPlaylistRepository,
 ) {

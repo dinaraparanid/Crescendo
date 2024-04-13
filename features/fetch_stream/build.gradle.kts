@@ -45,6 +45,7 @@ dependencies {
     implementation(project(":core:utils"))
     implementation(project(":core:resources"))
     implementation(project(":data"))
+    implementation(project(":domain"))
     implementation(project(":system:services:common"))
     implementation(project(":system:services:stream"))
 

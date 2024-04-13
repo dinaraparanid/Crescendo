@@ -7,6 +7,8 @@ import android.util.Log
 import com.paranid5.crescendo.core.common.tracks.DefaultTrack
 import com.paranid5.crescendo.core.impl.di.TRACK_SERVICE_CONNECTION
 import com.paranid5.crescendo.core.impl.tracks.DefaultTrackModel
+import com.paranid5.crescendo.domain.interactor.tracks.TrackServiceInteractor
+import com.paranid5.crescendo.domain.interactor.tracks.TrackServiceStart
 import com.paranid5.crescendo.system.common.broadcast.StreamServiceBroadcasts
 import com.paranid5.crescendo.system.common.broadcast.TrackServiceBroadcasts
 import com.paranid5.system.services.common.ServiceAccessor
@@ -17,6 +19,7 @@ import org.koin.core.component.inject
 import org.koin.core.qualifier.named
 
 class TrackServiceAccessor(context: Context) : KoinComponent,
+    TrackServiceInteractor,
     ServiceAccessor by ServiceAccessorImpl(context) {
     private companion object {
         private val TAG = TrackServiceAccessor::class.simpleName!!
@@ -50,12 +53,12 @@ class TrackServiceAccessor(context: Context) : KoinComponent,
         )
     }
 
-    fun addToPlaylist(track: DefaultTrack) {
+    override fun addToPlaylist(track: DefaultTrack) {
         Log.d(TAG, "Send track $track to playlist")
         sendBroadcast(Intent(TrackServiceBroadcasts.Broadcast_ADD_TRACK).putTrack(track))
     }
 
-    fun removeFromPlaylist(trackInd: Int) {
+    override fun removeFromPlaylist(trackInd: Int) {
         Log.d(TAG, "Send remove track at $trackInd")
 
         sendBroadcast(
@@ -64,7 +67,7 @@ class TrackServiceAccessor(context: Context) : KoinComponent,
         )
     }
 
-    fun updatePlaylistAfterDrag() {
+    override fun updatePlaylistAfterDrag() {
         Log.d(TAG, "Send update playlist after drag")
         sendBroadcast(Intent(TrackServiceBroadcasts.Broadcast_PLAYLIST_DRAGGED))
     }
@@ -77,29 +80,29 @@ class TrackServiceAccessor(context: Context) : KoinComponent,
     private fun stopStreamService() =
         sendBroadcast(StreamServiceBroadcasts.Broadcast_STOP)
 
-    fun startPlaying(startType: TrackServiceStart) {
+    override fun startPlaying(startType: TrackServiceStart) {
         stopStreamService()
         launchTrackService(startType)
     }
 
-    fun sendSwitchToPrevTrackBroadcast() =
+    override fun sendSwitchToPrevTrackBroadcast() =
         sendBroadcast(TrackServiceBroadcasts.Broadcast_PREV_TRACK)
 
-    fun sendSwitchToNextTrackBroadcast() =
+    override fun sendSwitchToNextTrackBroadcast() =
         sendBroadcast(TrackServiceBroadcasts.Broadcast_NEXT_TRACK)
 
-    fun sendSeekToBroadcast(position: Long) = sendBroadcast(
+    override fun sendSeekToBroadcast(position: Long) = sendBroadcast(
         Intent(TrackServiceBroadcasts.Broadcast_SEEK_TO)
             .putExtra(TrackServiceBroadcasts.POSITION_ARG, position)
     )
 
-    fun sendPauseBroadcast() =
+    override fun sendPauseBroadcast() =
         sendBroadcast(TrackServiceBroadcasts.Broadcast_PAUSE)
 
     private fun sendResumeBroadcast() =
         sendBroadcast(TrackServiceBroadcasts.Broadcast_RESUME)
 
-    fun startStreamingOrSendResumeBroadcast() {
+    override fun startStreamingOrSendResumeBroadcast() {
         stopStreamService()
 
         when {
@@ -108,7 +111,7 @@ class TrackServiceAccessor(context: Context) : KoinComponent,
         }
     }
 
-    fun sendChangeRepeatBroadcast() =
+    override fun sendChangeRepeatBroadcast() =
         sendBroadcast(TrackServiceBroadcasts.Broadcast_REPEAT_CHANGED)
 }
 
