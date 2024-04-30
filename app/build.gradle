@@ -63,6 +63,7 @@ dependencies {
     implementation project(':core:resources')
     implementation project(':core:utils')
     implementation project(':data')
+    implementation project(':domain')
     implementation project(':navigation')
     implementation project(':features:about_app')
     implementation project(':features:audio_effects')
@@ -74,9 +75,9 @@ dependencies {
     implementation project(':features:track_collections')
     implementation project(':features:current_playlist')
     implementation project(':features:trimmer')
+    implementation project(':features:playing')
     implementation project(':system:common')
     implementation project(':system:receivers')
-    implementation project(':system:services:common')
     implementation project(':system:services:stream')
     implementation project(':system:services:track')
     implementation project(':system:services:video_cache')
@@ -129,5 +130,4 @@ dependencies {
     implementation libs.yt.url.extractor.kt
 
     implementation files('libs/jave-1.0.2.jar')
-    implementation project(':domain')
 }

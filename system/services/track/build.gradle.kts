@@ -42,7 +42,7 @@ dependencies {
     implementation(project(":data"))
     implementation(project(":system:common"))
     implementation(project(":system:receivers"))
-    implementation(project(":system:services:common"))
+    api(project(":system:services:common"))
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)

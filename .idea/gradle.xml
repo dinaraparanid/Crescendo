@@ -25,6 +25,7 @@
             <option value="$PROJECT_DIR$/features/current_playlist" />
             <option value="$PROJECT_DIR$/features/favourites" />
             <option value="$PROJECT_DIR$/features/fetch_stream" />
+            <option value="$PROJECT_DIR$/features/playing" />
             <option value="$PROJECT_DIR$/features/settings" />
             <option value="$PROJECT_DIR$/features/splash" />
             <option value="$PROJECT_DIR$/features/track_collections" />

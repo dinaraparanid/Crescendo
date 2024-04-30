@@ -20,7 +20,7 @@ import com.paranid5.crescendo.core.resources.ui.theme.LocalAppColors
 fun AppBarItem(
     title: String,
     image: ImageVector,
-    screen: com.paranid5.crescendo.navigation.Screens,
+    screen: Screens,
     modifier: Modifier = Modifier,
 ) = AppBarItemInternal(
     screen = screen,
@@ -32,7 +32,7 @@ fun AppBarItem(
 fun AppBarItem(
     title: String,
     image: Painter,
-    screen: com.paranid5.crescendo.navigation.Screens,
+    screen: Screens,
     modifier: Modifier = Modifier,
 ) = AppBarItemInternal(
     screen = screen,
@@ -75,11 +75,11 @@ private fun AppBarIcon(
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
 private fun AppBarItemInternal(
-    screen: com.paranid5.crescendo.navigation.Screens,
+    screen: Screens,
     icon: @Composable () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    val navHostController = com.paranid5.crescendo.navigation.LocalNavController.current
+    val navHostController = LocalNavController.current
     val playingSheetState = LocalPlayingSheetState.current
     val curPlaylistSheetState = LocalCurrentPlaylistSheetState.current
 

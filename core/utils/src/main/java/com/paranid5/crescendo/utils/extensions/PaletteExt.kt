@@ -17,3 +17,16 @@ fun Palette?.getLightMutedOrPrimary(): Color {
 
     return Color(resultColor)
 }
+
+@Composable
+fun Palette?.getVibrantOrBackground(): Color {
+    val colors = LocalAppColors.current
+    val backgroundColorVal = colors.background.value.toInt()
+
+    val resultColor = this
+        ?.run { getVibrantColor(getDominantColor(backgroundColorVal)) }
+        ?.run(Int::increaseBrightness)
+        ?: backgroundColorVal.increaseBrightness()
+
+    return Color(resultColor)
+}

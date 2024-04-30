@@ -20,7 +20,7 @@ import com.paranid5.crescendo.core.resources.ui.theme.LocalAppColors
 import com.paranid5.crescendo.trimmer.presentation.TrimmerViewModel
 import com.paranid5.crescendo.trimmer.presentation.properties.compose.collectEndPosInMillisAsState
 import com.paranid5.crescendo.trimmer.presentation.properties.compose.collectStartPosInMillisAsState
-import com.paranid5.crescendo.ui.utils.DefaultOutlinedTextField
+import com.paranid5.crescendo.ui.utils.AppOutlinedTextField
 import org.koin.androidx.compose.koinViewModel
 
 /** hh:mm:ss.xxx */
@@ -77,7 +77,7 @@ private fun BorderController(
         mutableStateOf(millis.timeStringMs)
     }
 
-    DefaultOutlinedTextField(
+    AppOutlinedTextField(
         value = millisStr,
         modifier = modifier,
         onValueChange = {

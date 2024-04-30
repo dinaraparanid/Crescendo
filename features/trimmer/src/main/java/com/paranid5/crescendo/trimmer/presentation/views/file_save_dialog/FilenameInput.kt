@@ -13,13 +13,13 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.paranid5.crescendo.core.resources.R
 import com.paranid5.crescendo.core.resources.ui.theme.LocalAppColors
-import com.paranid5.crescendo.ui.utils.DefaultOutlinedTextField
+import com.paranid5.crescendo.ui.utils.AppOutlinedTextField
 
 @Composable
 internal fun FilenameInput(filenameState: MutableState<String>, modifier: Modifier = Modifier) {
     var filename by filenameState
 
-    DefaultOutlinedTextField(
+    AppOutlinedTextField(
         value = filename,
         onValueChange = { filename = it },
         label = { FilenameLabel() },

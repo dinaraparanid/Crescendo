@@ -10,7 +10,7 @@ import com.paranid5.crescendo.core.resources.R
 import com.paranid5.crescendo.core.resources.ui.theme.LocalAppColors
 import com.paranid5.crescendo.fetch_stream.presentation.FetchStreamViewModel
 import com.paranid5.crescendo.fetch_stream.presentation.properties.compose.collectCurrentTextAsState
-import com.paranid5.crescendo.ui.utils.DefaultOutlinedTextField
+import com.paranid5.crescendo.ui.utils.AppOutlinedTextField
 import org.koin.androidx.compose.koinViewModel
 
 @Composable
@@ -20,7 +20,7 @@ internal fun UrlEditor(
 ) {
     val currentText by viewModel.collectCurrentTextAsState()
 
-    DefaultOutlinedTextField(
+    AppOutlinedTextField(
         value = currentText,
         modifier = modifier,
         label = { UrlEditorLabel() },

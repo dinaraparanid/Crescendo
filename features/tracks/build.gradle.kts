@@ -46,8 +46,8 @@ dependencies {
     implementation(project(":core:utils"))
     implementation(project(":core:resources"))
     implementation(project(":data"))
+    implementation(project(":domain"))
     implementation(project(":navigation"))
-    implementation(project(":system:services:common"))
     implementation(project(":system:services:track"))
 
     implementation(libs.androidx.core.ktx)
@@ -63,5 +63,4 @@ dependencies {
     implementation(libs.koin.androidx.compose)
     implementation(libs.coil.compose)
     implementation(libs.arrow.fx.coroutines)
-    implementation(project(":domain"))
 }

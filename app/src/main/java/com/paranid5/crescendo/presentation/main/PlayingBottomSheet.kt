@@ -16,26 +16,24 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.unit.dp
 import com.paranid5.crescendo.core.common.AudioStatus
+import com.paranid5.crescendo.core.resources.ui.theme.LocalAppColors
+import com.paranid5.crescendo.current_playlist.presentation.CurrentPlaylistScreen
+import com.paranid5.crescendo.playing.presentation.PlayingScreen
+import com.paranid5.crescendo.presentation.main.appbar.AppBar
 import com.paranid5.crescendo.ui.composition_locals.LocalCurrentPlaylistSheetState
 import com.paranid5.crescendo.ui.composition_locals.playing.LocalPlayingPagerState
 import com.paranid5.crescendo.ui.composition_locals.playing.LocalPlayingSheetState
-import com.paranid5.crescendo.presentation.main.appbar.AppBar
-import com.paranid5.crescendo.presentation.main.playing.PlayingScreen
-import com.paranid5.crescendo.presentation.main.playing.PlayingViewModel
-import com.paranid5.crescendo.core.resources.ui.theme.LocalAppColors
-import com.paranid5.crescendo.current_playlist.presentation.CurrentPlaylistScreen
 import com.paranid5.crescendo.ui.utils.PushUpButton
-import org.koin.androidx.compose.koinViewModel
 
 @OptIn(ExperimentalMaterialApi::class, ExperimentalFoundationApi::class)
 @Composable
 fun PlayingBottomSheet(
     alpha: Float,
     modifier: Modifier = Modifier,
-    playingViewModel: PlayingViewModel = koinViewModel()
 ) {
     val backgroundColor = LocalAppColors.current.background
     val curPlaylistSheetState = LocalCurrentPlaylistSheetState.current
@@ -59,20 +57,18 @@ fun PlayingBottomSheet(
                 )
             },
             sheetBackgroundColor = backgroundColor,
-            sheetShape = RoundedCornerShape(topStart = 20.dp, topEnd = 20.dp)
+            sheetShape = RoundedCornerShape(topStart = 24.dp, topEnd = 24.dp)
         ) {
             Box {
                 HorizontalPager(state = playingPagerState!!) { page ->
                     when (page) {
                         0 -> PlayingScreen(
-                            viewModel = playingViewModel,
                             coverAlpha = 1 - alpha,
                             audioStatus = AudioStatus.PLAYING,
                             modifier = modifier.fillMaxSize()
                         )
 
                         else -> PlayingScreen(
-                            viewModel = playingViewModel,
                             coverAlpha = 1 - alpha,
                             audioStatus = AudioStatus.STREAMING,
                             modifier = modifier.fillMaxSize()

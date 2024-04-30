@@ -43,7 +43,6 @@ dependencies {
     implementation(project(":core:resources"))
     implementation(project(":core:utils"))
     implementation(project(":data"))
-    implementation(project(":system:services:common"))
     implementation(project(":system:services:track"))
 
     implementation(libs.androidx.core.ktx)

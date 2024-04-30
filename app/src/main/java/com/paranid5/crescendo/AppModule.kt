@@ -17,12 +17,11 @@ import com.paranid5.crescendo.core.impl.di.VIDEO_CACHE_SERVICE_CONNECTION
 import com.paranid5.crescendo.core.resources.R
 import com.paranid5.crescendo.current_playlist.di.currentPlaylistModule
 import com.paranid5.crescendo.data.StorageRepository
-import com.paranid5.crescendo.data.ktor_client.KtorClient
 import com.paranid5.crescendo.data.dataModule
+import com.paranid5.crescendo.data.ktor_client.KtorClient
 import com.paranid5.crescendo.fetch_stream.di.fetchStreamModule
+import com.paranid5.crescendo.playing.di.playingModule
 import com.paranid5.crescendo.presentation.composition_locals.LocalActivity
-import com.paranid5.crescendo.presentation.main.playing.PlayingUIHandler
-import com.paranid5.crescendo.presentation.main.playing.PlayingViewModel
 import com.paranid5.crescendo.system.services.stream.di.streamServiceModule
 import com.paranid5.crescendo.system.services.track.di.trackServiceModule
 import com.paranid5.crescendo.system.services.video_cache.di.videoCacheServiceModule
@@ -36,7 +35,6 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import org.koin.android.ext.koin.androidApplication
 import org.koin.android.ext.koin.androidContext
 import org.koin.androidx.compose.koinViewModel
-import org.koin.androidx.viewmodel.dsl.viewModelOf
 import org.koin.core.module.dsl.singleOf
 import org.koin.core.qualifier.named
 import org.koin.core.scope.Scope
@@ -98,11 +96,6 @@ private val globalsModule = module {
     single(named(IS_PLAYING)) { MutableStateFlow(false) }
     single(named(AUDIO_SESSION_ID)) { MutableStateFlow(0) }
     single(named(EQUALIZER_DATA)) { MutableStateFlow<EqualizerData?>(null) }
-}
-
-private val playingModule = module {
-    singleOf(::PlayingUIHandler)
-    viewModelOf(::PlayingViewModel)
 }
 
 private val uiModule = module {
