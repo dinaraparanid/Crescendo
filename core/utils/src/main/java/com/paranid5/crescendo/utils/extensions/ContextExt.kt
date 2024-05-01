@@ -10,6 +10,8 @@ import android.net.Uri
 import android.os.Build
 import android.provider.Settings
 import androidx.activity.ComponentActivity
+import androidx.annotation.ColorInt
+import androidx.annotation.ColorRes
 
 tailrec fun Context.getActivity(): ComponentActivity? =
     when (this) {
@@ -46,3 +48,10 @@ fun Context.registerReceiverCompat(
 
 fun Context.sendBroadcast(action: String) =
     sendBroadcast(Intent(action))
+
+@ColorInt
+@Suppress("DEPRECATION")
+fun Context.getColorCompat(@ColorRes id: Int) = when {
+    Build.VERSION.SDK_INT >= Build.VERSION_CODES.M -> getColor(id)
+    else -> resources.getColor(id)
+}

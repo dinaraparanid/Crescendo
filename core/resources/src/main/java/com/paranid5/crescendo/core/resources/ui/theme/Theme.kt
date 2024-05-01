@@ -25,7 +25,7 @@ private val DarkColorTheme = object : Theme {
     )
 
     override val backgroundGradient = Brush.linearGradient(
-        listOf(colorScheme.background, colorScheme.background.resetContrast(0.5F))
+        listOf(colorScheme.background, colorScheme.onBackground.resetContrast(0.75F))
     )
 }
 
@@ -39,7 +39,7 @@ private val LightColorTheme = object : Theme {
         inverseSurface = Color.White
     )
     override val backgroundGradient = Brush.linearGradient(
-        listOf(colorScheme.background.resetContrast(1.25F), colorScheme.background)
+        listOf(colorScheme.background, colorScheme.onBackground.resetContrast(ratio = 1.25F))
     )
 }
 

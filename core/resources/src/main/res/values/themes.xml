@@ -4,7 +4,7 @@
         <item name="android:colorPrimary">@color/crescendo_primary</item>
         <item name="android:colorBackground">@color/crescendo_background</item>
         <item name="android:statusBarColor">@color/crescendo_background</item>
-        <item name="android:navigationBarColor">@color/crescendo_primary</item>
+        <item name="android:navigationBarColor">@android:color/transparent</item>
     </style>
     <style name="Theme.MediaStreamerSplash" parent="Theme.MaterialComponents.DayNight.NoActionBar" >
         <item name="android:colorPrimary">@color/splash_background</item>

@@ -58,10 +58,6 @@ fun App(modifier: Modifier = Modifier) {
 private fun ScreenScaffold(modifier: Modifier = Modifier) {
     val colors = LocalAppColors.current
 
-    val gradientBackground by remember {
-        derivedStateOf { persistentListOf(colors.background, colors.backgroundAlternative) }
-    }
-
     val playingScaffoldState = rememberBottomSheetScaffoldState()
 
     val curPlaylistScaffoldState = rememberModalBottomSheetState(
@@ -78,7 +74,7 @@ private fun ScreenScaffold(modifier: Modifier = Modifier) {
         LocalPlayingPagerState provides playingPagerState
     ) {
         BottomSheetScaffold(
-            modifier = modifier.background(Brush.linearGradient(gradientBackground)),
+            modifier = modifier.background(colors.backgroundGradient),
             scaffoldState = playingScaffoldState,
             sheetPeekHeight = appBarHeight,
             backgroundColor = Color.Transparent,
