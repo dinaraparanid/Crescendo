@@ -2,6 +2,7 @@ package com.paranid5.crescendo.presentation.main
 
 import android.content.res.Configuration
 import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -16,7 +17,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
-import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.unit.dp
 import com.paranid5.crescendo.core.common.AudioStatus
@@ -35,7 +36,7 @@ fun PlayingBottomSheet(
     alpha: Float,
     modifier: Modifier = Modifier,
 ) {
-    val backgroundColor = LocalAppColors.current.background
+    val colors = LocalAppColors.current
     val curPlaylistSheetState = LocalCurrentPlaylistSheetState.current
     val playingPagerState = LocalPlayingPagerState.current
 
@@ -53,10 +54,11 @@ fun PlayingBottomSheet(
             sheetContent = {
                 CurrentPlaylistBottomSheet(
                     alpha = alpha,
-                    state = curPlaylistScaffoldState
+                    state = curPlaylistScaffoldState,
+                    modifier = Modifier.background(colors.backgroundGradient)
                 )
             },
-            sheetBackgroundColor = backgroundColor,
+            sheetBackgroundColor = Color.Transparent,
             sheetShape = RoundedCornerShape(topStart = 24.dp, topEnd = 24.dp)
         ) {
             Box {

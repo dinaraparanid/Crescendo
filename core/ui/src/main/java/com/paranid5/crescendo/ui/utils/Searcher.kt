@@ -91,7 +91,7 @@ fun <T> Searcher(
 
 @Composable
 private fun SearchIcon(modifier: Modifier = Modifier) {
-    val primaryColor = LocalAppColors.current.colorScheme.primary
+    val primaryColor = LocalAppColors.current.primary
 
     Icon(
         painter = painterResource(R.drawable.search_icon),

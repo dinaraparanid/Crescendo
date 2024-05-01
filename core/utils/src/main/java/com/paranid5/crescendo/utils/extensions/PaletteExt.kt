@@ -11,7 +11,7 @@ fun Palette?.getLightMutedOrPrimary(): Color {
     val primaryColorVal = colors.primary.value.toInt()
 
     val resultColor = this
-        ?.run { getLightMutedColor(getDominantColor(primaryColorVal)) }
+        ?.run { getDominantColor(primaryColorVal) }
         ?.run(Int::increaseBrightness)
         ?: primaryColorVal.increaseBrightness()
 
@@ -21,12 +21,12 @@ fun Palette?.getLightMutedOrPrimary(): Color {
 @Composable
 fun Palette?.getVibrantOrBackground(): Color {
     val colors = LocalAppColors.current
-    val backgroundColorVal = colors.background.value.toInt()
+    val secondaryColorVal = colors.backgroundAlternative.value.toInt()
 
     val resultColor = this
-        ?.run { getVibrantColor(getDominantColor(backgroundColorVal)) }
-        ?.run(Int::increaseBrightness)
-        ?: backgroundColorVal.increaseBrightness()
+        ?.run { getLightVibrantColor(secondaryColorVal) }
+        ?.run { increaseBrightness(increase = 0.5F) }
+        ?: secondaryColorVal.increaseBrightness()
 
     return Color(resultColor)
 }

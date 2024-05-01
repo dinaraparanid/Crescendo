@@ -9,6 +9,8 @@ import androidx.compose.ui.Modifier
 import androidx.palette.graphics.Palette
 import com.paranid5.crescendo.core.common.AudioStatus
 import com.paranid5.crescendo.core.impl.di.IS_PLAYING
+import com.paranid5.crescendo.core.resources.ui.theme.LocalAppColors
+import com.paranid5.crescendo.core.resources.ui.theme.resetContrast
 import com.paranid5.crescendo.playing.presentation.PlayingViewModel
 import com.paranid5.crescendo.playing.presentation.properties.compose.collectAudioStatusAsState
 import com.paranid5.crescendo.utils.extensions.collectLatestAsState
@@ -25,8 +27,19 @@ internal fun PlayPauseButton(
     palette: Palette?,
     modifier: Modifier = Modifier,
 ) {
+    val colors = LocalAppColors.current
     val primaryPaletteColor = palette.getLightMutedOrPrimary()
-    val backgroundPaletteColor = palette.getVibrantOrBackground()
+    val backgroundAttemptColor = palette.getVibrantOrBackground()
+
+    val backgroundPaletteColor by remember(primaryPaletteColor, backgroundAttemptColor) {
+        derivedStateOf {
+            when (backgroundAttemptColor) {
+                primaryPaletteColor -> colors.backgroundAlternative.resetContrast(ratio = 1.25F)
+                else -> backgroundAttemptColor
+            }
+        }
+    }
+
     val isPlaying by rememberIsPlaying(audioStatus)
 
     when {

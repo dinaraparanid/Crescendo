@@ -5,29 +5,49 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.staticCompositionLocalOf
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import org.koin.compose.KoinContext
 
-private val DarkColorScheme = darkColorScheme(
-    primary = Primary,
-    secondary = SecondaryAlternative,
-    onSecondary = Secondary,
-    background = BackgroundAlternative,
-    onBackground = Background,
-    inverseSurface = Color.White
-)
+interface Theme {
+    val colorScheme: ColorScheme
+    val backgroundGradient: Brush
+}
 
-private val LightColorScheme = lightColorScheme(
-    primary = Primary,
-    secondary = Secondary,
-    onSecondary = SecondaryAlternative,
-    background = Background,
-    onBackground = BackgroundAlternative,
-    inverseSurface = Color.White
-)
+private val DarkColorTheme = object : Theme {
+    override val colorScheme = darkColorScheme(
+        primary = Primary,
+        secondary = SecondaryAlternative,
+        onSecondary = Secondary,
+        background = BackgroundAlternative,
+        onBackground = Background,
+        inverseSurface = Color.White
+    )
+
+    override val backgroundGradient = Brush.linearGradient(
+        listOf(colorScheme.background, colorScheme.background.resetContrast(0.5F))
+    )
+}
+
+private val LightColorTheme = object : Theme {
+    override val colorScheme = lightColorScheme(
+        primary = Primary,
+        secondary = Secondary,
+        onSecondary = SecondaryAlternative,
+        background = Background,
+        onBackground = BackgroundAlternative,
+        inverseSurface = Color.White
+    )
+    override val backgroundGradient = Brush.linearGradient(
+        listOf(colorScheme.background.resetContrast(1.25F), colorScheme.background)
+    )
+}
 
 @JvmInline
-value class AppColors(val colorScheme: ColorScheme = DarkColorScheme) {
+value class AppColors(val theme: Theme = DarkColorTheme) {
+    private inline val colorScheme
+        get() = theme.colorScheme
+
     val primary
         get() = colorScheme.primary
 
@@ -45,6 +65,9 @@ value class AppColors(val colorScheme: ColorScheme = DarkColorScheme) {
 
     val fontColor
         get() = colorScheme.inverseSurface
+
+    val backgroundGradient
+        get() = theme.backgroundGradient
 }
 
 val LocalAppColors = staticCompositionLocalOf { AppColors() }
@@ -54,12 +77,12 @@ fun CrescendoTheme(
     darkTheme: Boolean = isSystemInDarkTheme(),
     content: @Composable () -> Unit
 ) {
-    val appColors = AppColors(if (darkTheme) DarkColorScheme else LightColorScheme)
+    val appColors = AppColors(if (darkTheme) DarkColorTheme else LightColorTheme)
 
     KoinContext {
         CompositionLocalProvider(LocalAppColors provides appColors) {
             MaterialTheme(
-                colorScheme = appColors.colorScheme,
+                colorScheme = appColors.theme.colorScheme,
                 typography = Typography,
                 content = content
             )
