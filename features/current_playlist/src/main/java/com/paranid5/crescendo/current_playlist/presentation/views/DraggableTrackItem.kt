@@ -1,5 +1,6 @@
 package com.paranid5.crescendo.current_playlist.presentation.views
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -103,36 +104,41 @@ private inline fun <T : Track> CurrentPlaylistTrackItemContent(
 
     Box(modifier) {
         Row(
-            modifier.clickableTrackWithPermissions(
-                onClick = onClick,
-                permissionModifier = Modifier.align(Alignment.Center)
-            )
+            modifier
+                .clip(RoundedCornerShape(size = 16.dp))
+                .background(brush = colors.itemBackgroundGradient)
+                .clickableTrackWithPermissions(
+                    onClick = onClick,
+                    permissionModifier = Modifier.align(Alignment.Center)
+                )
         ) {
             CurrentPlaylistTrackCover(
                 track = track,
                 modifier = Modifier
-                    .size(50.dp)
+                    .padding(top = 8.dp, bottom = 8.dp, start = 8.dp)
+                    .size(64.dp)
                     .align(Alignment.CenterVertically)
+                    .clip(RoundedCornerShape(8.dp))
             )
 
-            Spacer(Modifier.width(5.dp))
+            Spacer(Modifier.width(8.dp))
 
             TrackInfo(
                 track = track,
                 textColor = textColor,
                 modifier = Modifier
                     .weight(1F)
-                    .padding(start = 5.dp)
+                    .padding(start = 8.dp)
                     .align(Alignment.CenterVertically)
             )
 
-            Spacer(Modifier.width(5.dp))
+            Spacer(Modifier.width(8.dp))
 
             TrackPropertiesButton(
                 track = track,
                 tint = colors.fontColor,
                 modifier = Modifier.align(Alignment.CenterVertically),
-                iconModifier = Modifier.height(20.dp)
+                iconModifier = Modifier.height(18.dp)
             )
         }
     }
@@ -144,5 +150,5 @@ private fun <T : Track> CurrentPlaylistTrackCover(
     modifier: Modifier = Modifier
 ) = TrackCover(
     trackPath = track.path,
-    modifier = modifier.clip(RoundedCornerShape(7.dp))
+    modifier = modifier
 )

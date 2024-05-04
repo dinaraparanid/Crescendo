@@ -13,7 +13,7 @@ import androidx.palette.graphics.Palette
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import com.paranid5.crescendo.core.resources.R
-import com.paranid5.crescendo.utils.extensions.getLightMutedOrPrimary
+import com.paranid5.crescendo.utils.extensions.getBrightDominantOrPrimary
 
 @Composable
 internal fun Cover(
@@ -21,7 +21,7 @@ internal fun Cover(
     palette: Palette?,
     modifier: Modifier = Modifier
 ) {
-    val paletteColor = palette.getLightMutedOrPrimary()
+    val paletteColor = palette.getBrightDominantOrPrimary()
 
     AsyncImage(
         model = coverModel,

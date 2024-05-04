@@ -1,5 +1,6 @@
 package com.paranid5.crescendo.tracks.presentation.views
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -91,40 +92,45 @@ private inline fun TrackItemContent(
     permissionModifier: Modifier = Modifier,
     crossinline onClick: () -> Unit
 ) {
+    val colors = LocalAppColors.current
     val textColor by rememberTextColor(track)
 
     Row(
-        modifier.clickableTrackWithPermissions(
-            onClick = onClick,
-            permissionModifier = permissionModifier
-        )
+        modifier
+            .clip(RoundedCornerShape(size = 16.dp))
+            .background(brush = colors.itemBackgroundGradient)
+            .clickableTrackWithPermissions(
+                onClick = onClick,
+                permissionModifier = permissionModifier
+            )
     ) {
         TrackCover(
             trackPath = track.path,
             modifier = Modifier
-                .size(50.dp)
+                .padding(top = 8.dp, bottom = 8.dp, start = 8.dp)
+                .size(64.dp)
                 .align(Alignment.CenterVertically)
-                .clip(RoundedCornerShape(7.dp))
+                .clip(RoundedCornerShape(8.dp))
         )
 
-        Spacer(Modifier.width(5.dp))
+        Spacer(Modifier.width(8.dp))
 
         TrackInfo(
             track = track,
             textColor = textColor,
             modifier = Modifier
                 .weight(1F)
-                .padding(start = 5.dp)
+                .padding(start = 8.dp)
                 .align(Alignment.CenterVertically)
         )
 
-        Spacer(Modifier.width(5.dp))
+        Spacer(Modifier.width(8.dp))
 
         TrackPropertiesButton(
             track = track,
             tint = textColor,
             modifier = Modifier.align(Alignment.CenterVertically),
-            iconModifier = Modifier.height(20.dp),
+            iconModifier = Modifier.height(18.dp),
         )
     }
 }

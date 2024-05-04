@@ -23,7 +23,7 @@ import com.paranid5.crescendo.playing.presentation.properties.compose.collectIsR
 import com.paranid5.crescendo.system.services.stream.StreamServiceAccessor
 import com.paranid5.crescendo.system.services.stream.sendChangeRepeatBroadcast
 import com.paranid5.crescendo.system.services.track.TrackServiceAccessor
-import com.paranid5.crescendo.utils.extensions.getLightMutedOrPrimary
+import com.paranid5.crescendo.utils.extensions.getBrightDominantOrPrimary
 import com.paranid5.crescendo.utils.extensions.simpleShadow
 import org.koin.androidx.compose.koinViewModel
 import org.koin.compose.koinInject
@@ -36,7 +36,7 @@ internal fun RepeatButton(
     streamServiceAccessor: StreamServiceAccessor = koinInject(),
     trackServiceAccessor: TrackServiceAccessor = koinInject()
 ) {
-    val paletteColor = palette.getLightMutedOrPrimary()
+    val paletteColor = palette.getBrightDominantOrPrimary()
     val audioStatus by viewModel.collectAudioStatusAsState()
 
     Box(modifier) {

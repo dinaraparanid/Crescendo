@@ -14,5 +14,5 @@ fun TrackTitle(
     modifier = modifier,
     text = trackTitle,
     textColor = textColor,
-    fontSize = 18.sp,
+    fontSize = 20.sp,
 )

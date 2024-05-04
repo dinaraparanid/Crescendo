@@ -14,5 +14,5 @@ fun TrackArtistAlbum(
     modifier = modifier,
     text = trackArtistAlbum,
     textColor = textColor,
-    fontSize = 15.sp,
+    fontSize = 16.sp,
 )

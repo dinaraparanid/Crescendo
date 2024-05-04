@@ -9,13 +9,10 @@ import androidx.compose.ui.Modifier
 import androidx.palette.graphics.Palette
 import com.paranid5.crescendo.core.common.AudioStatus
 import com.paranid5.crescendo.core.impl.di.IS_PLAYING
-import com.paranid5.crescendo.core.resources.ui.theme.LocalAppColors
-import com.paranid5.crescendo.core.resources.ui.theme.resetContrast
 import com.paranid5.crescendo.playing.presentation.PlayingViewModel
 import com.paranid5.crescendo.playing.presentation.properties.compose.collectAudioStatusAsState
 import com.paranid5.crescendo.utils.extensions.collectLatestAsState
-import com.paranid5.crescendo.utils.extensions.getLightMutedOrPrimary
-import com.paranid5.crescendo.utils.extensions.getVibrantOrBackground
+import com.paranid5.crescendo.utils.extensions.getBrightDominantOrPrimary
 import kotlinx.coroutines.flow.MutableStateFlow
 import org.koin.androidx.compose.koinViewModel
 import org.koin.compose.koinInject
@@ -27,33 +24,19 @@ internal fun PlayPauseButton(
     palette: Palette?,
     modifier: Modifier = Modifier,
 ) {
-    val colors = LocalAppColors.current
-    val primaryPaletteColor = palette.getLightMutedOrPrimary()
-    val backgroundAttemptColor = palette.getVibrantOrBackground()
-
-    val backgroundPaletteColor by remember(primaryPaletteColor, backgroundAttemptColor) {
-        derivedStateOf {
-            when (backgroundAttemptColor) {
-                primaryPaletteColor -> colors.backgroundAlternative.resetContrast(ratio = 1.25F)
-                else -> backgroundAttemptColor
-            }
-        }
-    }
-
+    val paletteColor = palette.getBrightDominantOrPrimary()
     val isPlaying by rememberIsPlaying(audioStatus)
 
     when {
         isPlaying -> PauseButton(
             audioStatus = audioStatus,
-            primaryPaletteColor = primaryPaletteColor,
-            backgroundPaletteColor = backgroundPaletteColor,
+            paletteColor = paletteColor,
             modifier = modifier
         )
 
         else -> PlayButton(
             audioStatus = audioStatus,
-            primaryPaletteColor = primaryPaletteColor,
-            backgroundPaletteColor = backgroundPaletteColor,
+            paletteColor = paletteColor,
             modifier = modifier
         )
     }

@@ -16,7 +16,7 @@ import com.paranid5.crescendo.core.impl.di.AUDIO_SESSION_ID
 import com.paranid5.crescendo.core.impl.di.IS_PLAYING
 import com.paranid5.crescendo.core.resources.R
 import com.paranid5.crescendo.utils.extensions.collectLatestAsState
-import com.paranid5.crescendo.utils.extensions.getLightMutedOrPrimary
+import com.paranid5.crescendo.utils.extensions.getBrightDominantOrPrimary
 import kotlinx.coroutines.flow.MutableStateFlow
 import org.koin.compose.koinInject
 import org.koin.core.qualifier.named
@@ -29,7 +29,7 @@ internal fun AudioWaveform(
     audioSessionIdState: MutableStateFlow<Int> = koinInject(named(AUDIO_SESSION_ID)),
     isPlayingState: MutableStateFlow<Boolean> = koinInject(named(IS_PLAYING))
 ) {
-    val color = palette.getLightMutedOrPrimary()
+    val color = palette.getBrightDominantOrPrimary()
     val audioSessionId by audioSessionIdState.collectLatestAsState()
     val isPlaying by isPlayingState.collectLatestAsState()
     var visualizer: WaveVisualizer? = null

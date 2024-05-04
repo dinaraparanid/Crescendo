@@ -18,12 +18,12 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.palette.graphics.Palette
 import com.paranid5.crescendo.core.resources.R
-import com.paranid5.crescendo.utils.extensions.getLightMutedOrPrimary
+import com.paranid5.crescendo.utils.extensions.getBrightDominantOrPrimary
 import com.paranid5.crescendo.utils.extensions.simpleShadow
 
 @Composable
 internal fun LikeButton(palette: Palette?, modifier: Modifier = Modifier) {
-    val paletteColor = palette.getLightMutedOrPrimary()
+    val paletteColor = palette.getBrightDominantOrPrimary()
     var isLiked by remember { mutableStateOf(false) }
 
     Box(modifier) {

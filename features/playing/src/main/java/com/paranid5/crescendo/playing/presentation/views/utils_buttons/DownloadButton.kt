@@ -20,7 +20,7 @@ import androidx.palette.graphics.Palette
 import com.paranid5.crescendo.core.resources.R
 import com.paranid5.crescendo.playing.presentation.views.CacheDialog
 import com.paranid5.crescendo.ui.permissions.requests.externalStoragePermissionsRequestLauncher
-import com.paranid5.crescendo.utils.extensions.getLightMutedOrPrimary
+import com.paranid5.crescendo.utils.extensions.getBrightDominantOrPrimary
 import com.paranid5.crescendo.utils.extensions.simpleShadow
 
 @Composable
@@ -29,7 +29,7 @@ internal fun DownloadButton(
     isLiveStreaming: Boolean,
     modifier: Modifier = Modifier
 ) {
-    val paletteColor = palette.getLightMutedOrPrimary()
+    val paletteColor = palette.getBrightDominantOrPrimary()
 
     val isCachePropertiesDialogShownState = remember {
         mutableStateOf(false)

@@ -12,6 +12,7 @@ import org.koin.compose.KoinContext
 interface Theme {
     val colorScheme: ColorScheme
     val backgroundGradient: Brush
+    val itemBackgroundGradient: Brush
 }
 
 private val DarkColorTheme = object : Theme {
@@ -27,6 +28,13 @@ private val DarkColorTheme = object : Theme {
     override val backgroundGradient = Brush.linearGradient(
         listOf(colorScheme.background, colorScheme.onBackground.resetContrast(0.75F))
     )
+
+    override val itemBackgroundGradient = Brush.linearGradient(
+        listOf(
+            colorScheme.background.resetContrast(0.5F).copy(alpha = 0.5F),
+            colorScheme.onBackground.resetContrast(0.5F).copy(alpha = 0.5F)
+        )
+    )
 }
 
 private val LightColorTheme = object : Theme {
@@ -38,8 +46,16 @@ private val LightColorTheme = object : Theme {
         onBackground = BackgroundAlternative,
         inverseSurface = Color.White
     )
+
     override val backgroundGradient = Brush.linearGradient(
         listOf(colorScheme.background, colorScheme.onBackground.resetContrast(ratio = 1.25F))
+    )
+
+    override val itemBackgroundGradient = Brush.linearGradient(
+        listOf(
+            colorScheme.onBackground.resetContrast(1.25F).copy(alpha = 0.5F),
+            colorScheme.background.resetContrast(0.75F).copy(alpha = 0.5F)
+        )
     )
 }
 
@@ -68,6 +84,9 @@ value class AppColors(val theme: Theme = DarkColorTheme) {
 
     val backgroundGradient
         get() = theme.backgroundGradient
+
+    val itemBackgroundGradient
+        get() = theme.itemBackgroundGradient
 }
 
 val LocalAppColors = staticCompositionLocalOf { AppColors() }

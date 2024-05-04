@@ -18,7 +18,7 @@ import com.paranid5.crescendo.core.media.images.ImageSize
 import com.paranid5.crescendo.playing.presentation.rememberIsWaveformEnabled
 import com.paranid5.crescendo.playing.presentation.views.properties.PropertiesButton
 import com.paranid5.crescendo.ui.covers.coverModelWithPalette
-import com.paranid5.crescendo.utils.extensions.getLightMutedOrPrimary
+import com.paranid5.crescendo.utils.extensions.getBrightDominantOrPrimary
 
 @Composable
 internal fun PlayingScreenLandscape(
@@ -95,7 +95,7 @@ internal fun PlayingScreenLandscape(
 
         if (isLiveStreaming)
             LiveSeeker(
-                color = palette.getLightMutedOrPrimary(),
+                color = palette.getBrightDominantOrPrimary(),
                 modifier = Modifier.constrainAs(liveSeeker) {
                     top.linkTo(parent.top, margin = 8.dp)
                     start.linkTo(parent.start, margin = 5.dp)

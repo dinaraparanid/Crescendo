@@ -11,7 +11,7 @@ import com.paranid5.crescendo.core.common.AudioStatus
 import com.paranid5.crescendo.playing.presentation.PlayingViewModel
 import com.paranid5.crescendo.playing.presentation.properties.compose.collectCurrentTrackAsState
 import com.paranid5.crescendo.ui.track.item.TrackPropertiesButton
-import com.paranid5.crescendo.utils.extensions.getLightMutedOrPrimary
+import com.paranid5.crescendo.utils.extensions.getBrightDominantOrPrimary
 import org.koin.androidx.compose.koinViewModel
 
 @Composable
@@ -25,7 +25,7 @@ internal fun PropertiesButton(
 
     when (audioStatus) {
         AudioStatus.STREAMING -> VideoPropertiesButton(
-            tint = palette.getLightMutedOrPrimary(),
+            tint = palette.getBrightDominantOrPrimary(),
             modifier = modifier
         )
 
@@ -33,7 +33,7 @@ internal fun PropertiesButton(
             if (currentTrack != null)
                 TrackPropertiesButton(
                     track = currentTrack!!,
-                    tint = palette.getLightMutedOrPrimary(),
+                    tint = palette.getBrightDominantOrPrimary(),
                     modifier = modifier,
                     iconModifier = Modifier
                         .height(48.dp)

@@ -9,7 +9,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.palette.graphics.Palette
 import com.paranid5.crescendo.core.common.AudioStatus
-import com.paranid5.crescendo.utils.extensions.getLightMutedOrPrimary
+import com.paranid5.crescendo.utils.extensions.getBrightDominantOrPrimary
 
 @Composable
 internal fun TitleAndAuthor(
@@ -18,7 +18,7 @@ internal fun TitleAndAuthor(
     modifier: Modifier = Modifier,
     textAlignment: Alignment.Horizontal = Alignment.Start,
 ) {
-    val paletteColor = palette.getLightMutedOrPrimary()
+    val paletteColor = palette.getBrightDominantOrPrimary()
 
     Column(modifier) {
         Title(

@@ -29,7 +29,7 @@ import com.paranid5.crescendo.playing.presentation.effects.PlaybackPositionFetch
 import com.paranid5.crescendo.playing.presentation.properties.compose.collectAudioStatusAsState
 import com.paranid5.crescendo.playing.presentation.properties.setPlaybackPosition
 import com.paranid5.crescendo.playing.presentation.rememberIsLiveStreaming
-import com.paranid5.crescendo.utils.extensions.getLightMutedOrPrimary
+import com.paranid5.crescendo.utils.extensions.getBrightDominantOrPrimary
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
 import org.koin.compose.koinInject
@@ -42,7 +42,7 @@ internal fun PlaybackSlider(
     modifier: Modifier = Modifier,
     content: @Composable RowScope.(curPosition: Long, videoLength: Long, color: Color) -> Unit
 ) {
-    val paletteColor = palette.getLightMutedOrPrimary()
+    val paletteColor = palette.getBrightDominantOrPrimary()
 
     val isLiveStreaming by rememberIsLiveStreaming(audioStatus)
     val isSliderEnabled by rememberIsSliderEnabled(audioStatus)

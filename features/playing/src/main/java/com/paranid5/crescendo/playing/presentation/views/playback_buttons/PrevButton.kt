@@ -17,7 +17,7 @@ import com.paranid5.crescendo.core.resources.R
 import com.paranid5.crescendo.data.StorageRepository
 import com.paranid5.crescendo.data.properties.storeAudioStatus
 import com.paranid5.crescendo.playing.domain.PlayingInteractor
-import com.paranid5.crescendo.utils.extensions.getLightMutedOrPrimary
+import com.paranid5.crescendo.utils.extensions.getBrightDominantOrPrimary
 import com.paranid5.crescendo.utils.extensions.simpleShadow
 import kotlinx.coroutines.launch
 import org.koin.compose.koinInject
@@ -31,7 +31,7 @@ internal fun PrevButton(
     playingUIHandler: PlayingInteractor = koinInject(),
     storageRepository: StorageRepository = koinInject()
 ) {
-    val paletteColor = palette.getLightMutedOrPrimary()
+    val paletteColor = palette.getBrightDominantOrPrimary()
     val coroutineScope = rememberCoroutineScope()
 
     IconButton(
