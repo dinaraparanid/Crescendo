@@ -24,7 +24,7 @@ internal fun <T : Track> DraggableTrackList(
     itemView = trackItemView,
     modifier = modifier,
     itemModifier = trackItemModifier,
-    key = { index, track -> track.hashCode() + index }
+    key = { index, track -> "${track.hashCode()}$index" }
 )
 
 @Composable

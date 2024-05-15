@@ -32,7 +32,7 @@ fun TrackList(
     ) {
         itemsIndexed(
             items = tracks,
-            key = { ind, track -> track.path.hashCode() + ind }
+            key = { ind, track -> "${track.hashCode()}$ind" }
         ) { ind, _ ->
             trackItemView(
                 tracks,

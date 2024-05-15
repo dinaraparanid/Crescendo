@@ -140,7 +140,7 @@ inline fun getBitmapFromUrlWithPaletteBlockingCatching(
     getBitmapFromUrlWithPaletteBlocking(context, url, size, bitmapSettings)
 }
 
-private fun getCoverDataByPath(path: String?): ByteArray? {
+internal fun getCoverDataByPath(path: String?): ByteArray? {
     fun legacyCoverDataByPath(path: String) =
         AudioFileIO
             .read(File(path))

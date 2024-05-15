@@ -8,7 +8,6 @@ import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableFloatState
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.State
@@ -31,12 +30,11 @@ import com.paranid5.crescendo.trimmer.presentation.WAVEFORM_SPIKE_WIDTH_RATIO
 import com.paranid5.crescendo.trimmer.presentation.composition_locals.LocalTrimmerFocusPoints
 import com.paranid5.crescendo.trimmer.presentation.composition_locals.LocalTrimmerWaveformScrollState
 import com.paranid5.crescendo.trimmer.presentation.properties.compose.collectEndOffsetAsState
-import com.paranid5.crescendo.trimmer.presentation.properties.compose.collectFocusEventAsState
-import com.paranid5.crescendo.trimmer.presentation.properties.compose.collectIsPlayingAsState
 import com.paranid5.crescendo.trimmer.presentation.properties.compose.collectPlaybackAlphaAsState
 import com.paranid5.crescendo.trimmer.presentation.properties.compose.collectPlaybackOffsetAsState
 import com.paranid5.crescendo.trimmer.presentation.properties.compose.collectStartOffsetAsState
 import com.paranid5.crescendo.trimmer.presentation.properties.compose.collectWaveformWidthAsState
+import com.paranid5.crescendo.trimmer.presentation.views.effects.AnimateWaveformScrollOnPlaybackEffect
 import com.paranid5.crescendo.utils.extensions.pxToDp
 import com.paranid5.crescendo.utils.extensions.toPx
 import kotlinx.coroutines.launch
@@ -165,10 +163,6 @@ private fun Modifier.playbackOffsetModifier(
     viewModel: TrimmerViewModel = koinViewModel(),
 ): Modifier {
     val focusPoints = LocalTrimmerFocusPoints.current!!
-    val waveformScrollState = LocalTrimmerWaveformScrollState.current!!
-
-    val isPlaying by viewModel.collectIsPlayingAsState()
-    val focusEvent by viewModel.collectFocusEventAsState()
 
     val playbackPositionOffset by rememberPlaybackPositionOffsetAsState(
         viewModel = viewModel,
@@ -176,15 +170,9 @@ private fun Modifier.playbackOffsetModifier(
     )
 
     val playbackPositionOffsetPx = playbackPositionOffset.dp.toPx().toInt()
-    val waveformViewport = waveformScrollState.viewportSize
     val playbackAlphaAnim by animatePlaybackAlphaAsState()
 
-    LaunchedEffect(isPlaying, focusEvent, playbackPositionOffsetPx, waveformViewport) {
-        if (isPlaying && focusEvent?.isFocused == true)
-            waveformScrollState.animateScrollTo(
-                maxOf(playbackPositionOffsetPx - waveformViewport / 2, 0)
-            )
-    }
+    AnimateWaveformScrollOnPlaybackEffect(playbackPositionOffsetPx = playbackPositionOffsetPx)
 
     return this
         .offset(x = playbackPositionOffset.dp)
