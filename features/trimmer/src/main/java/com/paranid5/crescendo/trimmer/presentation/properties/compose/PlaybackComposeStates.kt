@@ -8,25 +8,29 @@ import com.paranid5.crescendo.trimmer.presentation.properties.playbackAlphaFlow
 import com.paranid5.crescendo.utils.extensions.collectLatestAsState
 
 @Composable
-fun TrimmerViewModel.collectIsPlayerInitializedAsState() =
+internal fun TrimmerViewModel.collectIsPlayerInitializedAsState() =
     isPlayerInitializedState.collectLatestAsState()
 
 @Composable
-fun TrimmerViewModel.collectIsPlayingAsState() =
+internal fun TrimmerViewModel.collectIsPlayingAsState() =
     isPlayingState.collectLatestAsState()
 
 @Composable
-fun TrimmerViewModel.collectPitchAsState() =
+internal fun TrimmerViewModel.collectPitchAsState() =
     pitchState.collectLatestAsState()
 
 @Composable
-fun TrimmerViewModel.collectSpeedAsState() =
+internal fun TrimmerViewModel.collectSpeedAsState() =
     speedState.collectLatestAsState()
 
 @Composable
-fun TrimmerViewModel.collectPlaybackAlphaAsState(initial: Float = 0F) =
+internal fun TrimmerViewModel.collectPlaybackAlphaAsState(initial: Float = 0F) =
     playbackAlphaFlow.collectLatestAsState(initial)
 
 @Composable
-fun TrimmerViewModel.collectPitchAndSpeedAsState(initial: PitchAndSpeed = PitchAndSpeed()) =
+internal fun TrimmerViewModel.collectPitchAndSpeedAsState(initial: PitchAndSpeed = PitchAndSpeed()) =
     pitchAndSpeedFlow.collectLatestAsState(initial)
+
+@Composable
+internal fun TrimmerViewModel.collectFocusEventAsState() =
+    focusEventState.collectLatestAsState()

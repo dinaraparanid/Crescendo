@@ -6,6 +6,8 @@ import com.paranid5.crescendo.data.sources.waveform.AmplitudesPublisherImpl
 import com.paranid5.crescendo.data.sources.waveform.AmplitudesSubscriberImpl
 import com.paranid5.crescendo.domain.sources.waveform.AmplitudesPublisher
 import com.paranid5.crescendo.domain.sources.waveform.AmplitudesSubscriber
+import com.paranid5.crescendo.trimmer.data.FocusEventDataSource
+import com.paranid5.crescendo.trimmer.data.FocusEventDataSourceImpl
 import com.paranid5.crescendo.trimmer.data.PlaybackDataSource
 import com.paranid5.crescendo.trimmer.data.PlaybackDataSourceImpl
 import com.paranid5.crescendo.trimmer.data.PlaybackPositionsDataSource
@@ -27,7 +29,8 @@ class TrimmerViewModel(storageRepository: StorageRepository) : ViewModel(),
     PlaybackDataSource by PlaybackDataSourceImpl(),
     TrackDataSource by TrackDataSourceImpl(),
     WaveformZoomDataSource by WaveformZoomDataSourceImpl(),
-    ShownEffectsDataSource by ShownEffectsDataSourceImpl() {
+    ShownEffectsDataSource by ShownEffectsDataSourceImpl(),
+    FocusEventDataSource by FocusEventDataSourceImpl() {
     val resetPlaybackPosCondVar by lazy { AsyncCondVar() }
 
     override fun onCleared() {

@@ -37,7 +37,11 @@ class MainActivity : ComponentActivity() {
     }
 }
 
-private fun MainActivity.setNavigationBarColorToTransparent() {
-    window.setFlags(WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS, WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS)
-    window.navigationBarColor = getColorCompat(android.R.color.transparent)
+private fun MainActivity.setNavigationBarColorToTransparent() = window.run {
+    setFlags(
+        WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS,
+        WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS
+    )
+
+    navigationBarColor = getColorCompat(android.R.color.transparent)
 }

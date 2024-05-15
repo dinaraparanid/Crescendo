@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableFloatState
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.State
@@ -30,6 +31,7 @@ import com.paranid5.crescendo.trimmer.presentation.WAVEFORM_SPIKE_WIDTH_RATIO
 import com.paranid5.crescendo.trimmer.presentation.composition_locals.LocalTrimmerFocusPoints
 import com.paranid5.crescendo.trimmer.presentation.composition_locals.LocalTrimmerWaveformScrollState
 import com.paranid5.crescendo.trimmer.presentation.properties.compose.collectEndOffsetAsState
+import com.paranid5.crescendo.trimmer.presentation.properties.compose.collectFocusEventAsState
 import com.paranid5.crescendo.trimmer.presentation.properties.compose.collectIsPlayingAsState
 import com.paranid5.crescendo.trimmer.presentation.properties.compose.collectPlaybackAlphaAsState
 import com.paranid5.crescendo.trimmer.presentation.properties.compose.collectPlaybackOffsetAsState
@@ -166,7 +168,7 @@ private fun Modifier.playbackOffsetModifier(
     val waveformScrollState = LocalTrimmerWaveformScrollState.current!!
 
     val isPlaying by viewModel.collectIsPlayingAsState()
-    val coroutineScope = rememberCoroutineScope()
+    val focusEvent by viewModel.collectFocusEventAsState()
 
     val playbackPositionOffset by rememberPlaybackPositionOffsetAsState(
         viewModel = viewModel,
@@ -177,20 +179,20 @@ private fun Modifier.playbackOffsetModifier(
     val waveformViewport = waveformScrollState.viewportSize
     val playbackAlphaAnim by animatePlaybackAlphaAsState()
 
+    LaunchedEffect(isPlaying, focusEvent, playbackPositionOffsetPx, waveformViewport) {
+        if (isPlaying && focusEvent?.isFocused == true)
+            waveformScrollState.animateScrollTo(
+                maxOf(playbackPositionOffsetPx - waveformViewport / 2, 0)
+            )
+    }
+
     return this
         .offset(x = playbackPositionOffset.dp)
         .alpha(playbackAlphaAnim)
         .fillMaxHeight()
         .zIndex(8F)
         .focusRequester(focusPoints.playbackFocusRequester)
-        .onFocusEvent {
-            if (isPlaying && it.isFocused)
-                coroutineScope.launch {
-                    waveformScrollState.animateScrollTo(
-                        maxOf(playbackPositionOffsetPx - waveformViewport / 2, 0)
-                    )
-                }
-        }
+        .onFocusEvent(viewModel::setFocusEvent)
         .focusTarget()
 }
 
