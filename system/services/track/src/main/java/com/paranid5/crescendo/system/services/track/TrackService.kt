@@ -116,7 +116,7 @@ class TrackService : SuspendService(), KoinComponent,
 
         when (intent!!.startType) {
             TrackServiceStart.RESUME -> startResumingAsync()
-            TrackServiceStart.NEW_PLAYLIST -> playPlaylistAsync()
+            TrackServiceStart.NEW_TRACK -> playPlaylistAsync()
         }
 
         return START_STICKY

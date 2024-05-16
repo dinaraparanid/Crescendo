@@ -13,7 +13,7 @@ internal fun RepeatChangedReceiver(service: TrackService) =
             val playerProvider = service.playerProvider
 
             service.serviceScope.launch {
-                playerProvider.setAndStoreRepeating(!playerProvider.isRepeating)
+                playerProvider.updateAndStoreRepeating(!playerProvider.isRepeating)
                 service.notificationManager.updateNotification()
             }
         }

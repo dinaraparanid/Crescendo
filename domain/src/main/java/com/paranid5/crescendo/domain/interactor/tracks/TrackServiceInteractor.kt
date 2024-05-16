@@ -52,5 +52,5 @@ private fun startType(
     newCurrentTrack: Track?,
 ) = when {
     currentTrack?.path == newCurrentTrack?.path -> TrackServiceStart.RESUME
-    else -> TrackServiceStart.NEW_PLAYLIST
+    else -> TrackServiceStart.NEW_TRACK
 }

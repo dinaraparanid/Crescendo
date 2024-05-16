@@ -80,7 +80,7 @@ internal class PlayerControllerImpl(service: TrackService, storageRepository: St
     override fun updateCurrentPosition() =
         _currentPositionState.update { player.currentPosition }
 
-    override suspend fun setAndStoreRepeating(isRepeating: Boolean) {
+    override suspend fun updateAndStoreRepeating(isRepeating: Boolean) {
         repeatMode = repeatMode(isRepeating)
         setRepeating(isRepeating)
     }

@@ -19,7 +19,7 @@ interface PlayerController :
     val currentPositionState: StateFlow<Long>
     fun updateCurrentPosition()
 
-    suspend fun setAndStoreRepeating(isRepeating: Boolean)
+    suspend fun updateAndStoreRepeating(isRepeating: Boolean)
 
     fun playPlaylistViaPlayer(
         playlist: List<Track>,

@@ -3,6 +3,7 @@ package com.paranid5.crescendo.system.services.track.playback
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.repeatOnLifecycle
 import arrow.core.Tuple4
+import com.paranid5.crescendo.core.common.tracks.Track
 import com.paranid5.crescendo.core.resources.R
 import com.paranid5.crescendo.system.services.track.TrackService
 import com.paranid5.crescendo.system.services.track.showErrNotificationAndSendBroadcast
@@ -35,7 +36,7 @@ private suspend inline fun TrackService.onEvent(
     event: PlaybackEvent,
     trackInd: Int,
     position: Long,
-    playlist: List<com.paranid5.crescendo.core.common.tracks.Track>,
+    playlist: List<Track>,
 ) = when (event) {
     is PlaybackEvent.StartSamePlaylist -> onPlayPlaylist(
         playlist = playlist,
@@ -75,7 +76,7 @@ private suspend inline fun TrackService.onEvent(
 }
 
 private fun TrackService.onPlayPlaylist(
-    playlist: List<com.paranid5.crescendo.core.common.tracks.Track>,
+    playlist: List<Track>,
     trackIndex: Int,
     initialPosition: Long = 0
 ) {
@@ -83,12 +84,11 @@ private fun TrackService.onPlayPlaylist(
         return showErrNotificationAndSendBroadcast(Exception(getString(R.string.playlist_empty_err)))
 
     playerProvider.resetAudioSessionIdIfNotPlaying()
-
     playerProvider.playPlaylistViaPlayer(playlist, trackIndex, initialPosition)
 }
 
 private fun TrackService.onStartNewPlaylist(
-    newPlaylist: List<com.paranid5.crescendo.core.common.tracks.Track>,
+    newPlaylist: List<Track>,
     newTrackIndex: Int,
 ) = onPlayPlaylist(
     playlist = newPlaylist,
@@ -101,21 +101,17 @@ private suspend inline fun TrackService.onPause() {
 }
 
 private fun TrackService.onResume(
-    playlist: List<com.paranid5.crescendo.core.common.tracks.Track>,
+    playlist: List<Track>,
     trackIndex: Int,
     initialPosition: Long
-) = when {
-    playerProvider.isStoppedWithError -> {
-        onPlayPlaylist(
-            playlist = playlist,
-            trackIndex = trackIndex,
-            initialPosition = initialPosition
-        )
+) {
+    onPlayPlaylist(
+        playlist = playlist,
+        trackIndex = trackIndex,
+        initialPosition = initialPosition
+    )
 
-        playerProvider.isStoppedWithError = false
-    }
-
-    else -> playerProvider.resumePlayer()
+    playerProvider.isStoppedWithError = false
 }
 
 private fun TrackService.onSeekTo(position: Long) {
@@ -135,7 +131,7 @@ private suspend inline fun TrackService.onSeekToNextTrack() {
     playerProvider.setCurrentTrackIndex(newCurTrackInd)
 }
 
-private fun TrackService.onAddTrackToPlaylist(track: com.paranid5.crescendo.core.common.tracks.Track) =
+private fun TrackService.onAddTrackToPlaylist(track: Track) =
     playerProvider.addTrackToPlaylistViaPlayer(track)
 
 private fun TrackService.onRemoveTrackFromPlaylist(index: Int) {
@@ -144,7 +140,7 @@ private fun TrackService.onRemoveTrackFromPlaylist(index: Int) {
 
 private fun TrackService.onReplacePlaylist(
     newCurrentTrackIndex: Int,
-    newCurrentPlaylist: List<com.paranid5.crescendo.core.common.tracks.Track>
+    newCurrentPlaylist: List<Track>
 ) {
     playerProvider.replacePlaylistViaPlayer(newCurrentPlaylist, newCurrentTrackIndex)
 }

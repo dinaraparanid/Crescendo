@@ -16,7 +16,7 @@ internal fun SwitchPlaylistReceiver(service: TrackService) =
             val startType = intent.startType
 
             when {
-                startType == TrackServiceStart.NEW_PLAYLIST ->
+                startType == TrackServiceStart.NEW_TRACK ->
                     service.playPlaylistAsync()
 
                 startType == TrackServiceStart.RESUME && service.playerProvider.isPlaying ->
