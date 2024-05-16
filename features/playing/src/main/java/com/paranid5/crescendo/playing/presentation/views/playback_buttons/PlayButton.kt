@@ -2,14 +2,13 @@ package com.paranid5.crescendo.playing.presentation.views.playback_buttons
 
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.paranid5.crescendo.core.common.AudioStatus
@@ -45,7 +44,7 @@ internal fun PlayButton(
             color = paletteColor,
             modifier = Modifier
                 .fillMaxSize()
-                .padding(8.dp)
+                .padding(16.dp)
         )
     }
 }
@@ -54,7 +53,7 @@ internal fun PlayButton(
 private fun PlayIcon(color: Color, modifier: Modifier = Modifier) =
     Icon(
         modifier = modifier,
-        imageVector = Icons.Filled.PlayArrow,
+        painter = painterResource(R.drawable.play),
         contentDescription = stringResource(R.string.play),
         tint = color
     )

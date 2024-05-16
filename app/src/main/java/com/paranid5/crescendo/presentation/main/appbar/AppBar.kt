@@ -41,7 +41,7 @@ fun AppBar(modifier: Modifier = Modifier) {
 
         AppBarItem(
             title = stringResource(R.string.track_collections),
-            image = painterResource(R.drawable.playlists),
+            image = painterResource(R.drawable.playlist),
             screen = Screens.TrackCollections.Albums,
             modifier = Modifier
                 .weight(1F)

@@ -57,7 +57,7 @@ internal fun PrevButton(
 @Composable
 private fun PrevIcon(paletteColor: Color, modifier: Modifier = Modifier) =
     Icon(
-        painter = painterResource(R.drawable.prev_track),
+        painter = painterResource(R.drawable.previous_track),
         contentDescription = stringResource(R.string.ten_secs_back),
         tint = paletteColor,
         modifier = modifier

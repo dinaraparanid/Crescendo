@@ -11,16 +11,16 @@ import androidx.media3.common.Player
 import androidx.media3.common.util.NotificationUtil
 import androidx.media3.common.util.UnstableApi
 import androidx.media3.ui.PlayerNotificationManager
-import com.paranid5.crescendo.core.resources.R
-import com.paranid5.crescendo.utils.extensions.artistAlbum
-import com.paranid5.crescendo.utils.extensions.sendBroadcast
 import com.paranid5.crescendo.core.media.images.getThumbnailBitmap
 import com.paranid5.crescendo.core.media.images.getTrackCoverBitmapAsync
+import com.paranid5.crescendo.core.resources.R
 import com.paranid5.crescendo.system.common.intent.mainActivityIntent
 import com.paranid5.crescendo.system.services.track.ACTION_DISMISS
 import com.paranid5.crescendo.system.services.track.ACTION_REPEAT
 import com.paranid5.crescendo.system.services.track.ACTION_UNREPEAT
 import com.paranid5.crescendo.system.services.track.TrackService
+import com.paranid5.crescendo.utils.extensions.artistAlbum
+import com.paranid5.crescendo.utils.extensions.sendBroadcast
 import com.paranid5.system.services.common.notification.detachNotification
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
@@ -41,7 +41,7 @@ internal fun PlayerNotificationManager(service: TrackService) =
         .setMediaDescriptionAdapter(MediaDescriptionProvider(service))
         .setCustomActionReceiver(CustomActionsReceiver(service))
         .setFastForwardActionIconResourceId(R.drawable.next_track)
-        .setRewindActionIconResourceId(R.drawable.prev_track)
+        .setRewindActionIconResourceId(R.drawable.previous_track)
         .setPlayActionIconResourceId(R.drawable.play)
         .setPauseActionIconResourceId(R.drawable.pause)
         .build()

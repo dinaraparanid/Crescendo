@@ -40,7 +40,7 @@ internal fun PlayerNotificationManager(service: StreamService) =
         .setMediaDescriptionAdapter(MediaDescriptionProvider(service))
         .setCustomActionReceiver(CustomActionsReceiver(service))
         .setFastForwardActionIconResourceId(R.drawable.next_track)
-        .setRewindActionIconResourceId(R.drawable.prev_track)
+        .setRewindActionIconResourceId(R.drawable.previous_track)
         .setPlayActionIconResourceId(R.drawable.play)
         .setPauseActionIconResourceId(R.drawable.pause)
         .build()

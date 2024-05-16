@@ -53,8 +53,8 @@ private val LightColorTheme = object : Theme {
 
     override val itemBackgroundGradient = Brush.linearGradient(
         listOf(
-            colorScheme.onBackground.resetContrast(1.25F).copy(alpha = 0.5F),
-            colorScheme.background.resetContrast(0.75F).copy(alpha = 0.5F)
+            colorScheme.background.resetContrast(0.5F).copy(alpha = 0.5F),
+            colorScheme.onBackground.resetContrast(0.75F).copy(alpha = 0.5F)
         )
     )
 }

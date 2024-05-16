@@ -32,7 +32,7 @@ internal fun TenSecsForwardButton(
         modifier = modifier.size(40.dp)
     ) {
         Icon(
-            painter = painterResource(id = R.drawable.next),
+            painter = painterResource(id = R.drawable.next_track),
             contentDescription = stringResource(id = R.string.ten_secs_forward),
             tint = colors.primary,
             modifier = Modifier.fillMaxSize()

@@ -49,7 +49,7 @@ internal fun CurrentPlaylistButton(
 private fun CurrentPlaylistIcon(paletteColor: Color, modifier: Modifier = Modifier) =
     Icon(
         modifier = modifier,
-        painter = painterResource(R.drawable.playlists),
+        painter = painterResource(R.drawable.playlist),
         contentDescription = stringResource(R.string.current_playlist),
         tint = paletteColor
     )

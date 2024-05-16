@@ -28,17 +28,11 @@ import kotlinx.coroutines.launch
 import org.koin.android.ext.android.inject
 import org.koin.core.parameter.parametersOf
 
-class VideoCacheService : SuspendService(),
-    ConnectionManager by ConnectionManagerImpl() {
+class VideoCacheService : SuspendService(), ConnectionManager by ConnectionManagerImpl() {
     internal val videoQueueManager by inject<VideoQueueManager>()
-
-    internal val notificationManager by inject<NotificationManager> {
-        parametersOf(this)
-    }
+    internal val notificationManager by inject<NotificationManager> { parametersOf(this) }
     internal val cacheManager by inject<CacheManager>()
-
     internal val urlExtractor by inject<UrlExtractor>()
-
     internal val mediaFileDownloader by inject<MediaFileDownloader>()
 
     internal val cacheNextVideoReceiver = CacheNextVideoReceiver(this)

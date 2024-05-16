@@ -54,14 +54,8 @@ internal const val ACTION_DISMISS = "dismiss"
 
 class TrackService : SuspendService(), KoinComponent, ConnectionManager by ConnectionManagerImpl() {
     internal val mediaSessionManager by inject<MediaSessionManager>()
-
-    internal val playerProvider by inject<PlayerProvider> {
-        parametersOf(this)
-    }
-
-    internal val notificationManager by inject<NotificationManager> {
-        parametersOf(this)
-    }
+    internal val playerProvider by inject<PlayerProvider> { parametersOf(this) }
+    internal val notificationManager by inject<NotificationManager> { parametersOf(this) }
 
     internal val commandsToActions = mapOf(
         ACTION_PAUSE to Actions.Pause,
