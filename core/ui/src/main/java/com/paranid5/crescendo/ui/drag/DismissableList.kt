@@ -1,7 +1,9 @@
 package com.paranid5.crescendo.ui.drag
 
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.itemsIndexed
@@ -11,6 +13,7 @@ import androidx.compose.material3.SwipeToDismissBoxValue
 import androidx.compose.material3.rememberSwipeToDismissBoxState
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import kotlinx.collections.immutable.ImmutableList
 
@@ -22,6 +25,7 @@ internal inline fun <T> DismissableList(
     crossinline itemView: ListItemView<T>,
     modifier: Modifier = Modifier,
     itemModifier: Modifier = Modifier,
+    bottomPadding: Dp = 16.dp,
     noinline key: ((index: Int, item: T) -> Any)? = null,
 ) = LazyColumn(
     verticalArrangement = Arrangement.spacedBy(10.dp),
@@ -37,6 +41,8 @@ internal inline fun <T> DismissableList(
             itemModifier = itemModifier.fillMaxWidth()
         )
     }
+
+    item { Spacer(Modifier.height(bottomPadding)) }
 }
 
 @OptIn(ExperimentalMaterial3Api::class)

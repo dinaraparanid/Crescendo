@@ -3,6 +3,7 @@ package com.paranid5.crescendo.current_playlist.presentation.views
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
 import com.paranid5.crescendo.current_playlist.presentation.CurrentPlaylistViewModel
 import com.paranid5.crescendo.current_playlist.domain.tryDismissTrack
 import com.paranid5.crescendo.current_playlist.domain.updateCurrentPlaylistAfterDrag
@@ -25,6 +26,7 @@ internal fun CurrentPlaylistTrackList(
         tracks = currentPlaylist,
         currentTrackIndex = currentTrackIndex,
         modifier = modifier,
+        bottomPadding = 24.dp,
         onTrackDismissed = { index, track ->
             tryDismissTrack(
                 source = viewModel,

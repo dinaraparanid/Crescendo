@@ -17,6 +17,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
 import arrow.core.curried
 import kotlinx.collections.immutable.ImmutableList
@@ -39,6 +41,7 @@ fun <T> DraggableList(
     modifier: Modifier = Modifier,
     itemModifier: Modifier = Modifier,
     scrollingState: LazyListState = rememberLazyListState(),
+    bottomPadding: Dp = 16.dp,
     key: ((index: Int, item: T) -> Any)? = null,
 ) {
     val draggableItemsState = remember(items) {
@@ -80,6 +83,7 @@ fun <T> DraggableList(
     DismissableList(
         items = draggableItems,
         scrollingState = scrollingState,
+        bottomPadding = bottomPadding,
         onDismissed = onDismissed,
         modifier = modifier.handleTracksMovement(
             items = draggableItems,

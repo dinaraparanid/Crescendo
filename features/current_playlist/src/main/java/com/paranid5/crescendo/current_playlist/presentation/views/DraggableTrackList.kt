@@ -2,6 +2,8 @@ package com.paranid5.crescendo.current_playlist.presentation.views
 
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.dp
 import com.paranid5.crescendo.core.common.tracks.Track
 import com.paranid5.crescendo.ui.drag.DraggableList
 import com.paranid5.crescendo.ui.drag.DraggableListItemView
@@ -16,6 +18,7 @@ internal fun <T : Track> DraggableTrackList(
     trackItemView: DraggableListItemView<T>,
     modifier: Modifier = Modifier,
     trackItemModifier: Modifier = Modifier,
+    bottomPadding: Dp = 16.dp,
 ) = DraggableList(
     items = tracks,
     currentItemIndex = currentTrackIndex,
@@ -24,6 +27,7 @@ internal fun <T : Track> DraggableTrackList(
     itemView = trackItemView,
     modifier = modifier,
     itemModifier = trackItemModifier,
+    bottomPadding = bottomPadding,
     key = { index, track -> "${track.hashCode()}$index" }
 )
 
@@ -35,6 +39,7 @@ internal fun <T : Track> DraggableTrackList(
     onTrackDragged: suspend (draggedItems: ImmutableList<T>, dragIndex: Int) -> Unit,
     modifier: Modifier = Modifier,
     trackItemModifier: Modifier = Modifier,
+    bottomPadding: Dp = 16.dp,
 ) = DraggableTrackList(
     tracks = tracks,
     currentTrackIndex = currentTrackIndex,
@@ -42,6 +47,7 @@ internal fun <T : Track> DraggableTrackList(
     onTrackDragged = onTrackDragged,
     modifier = modifier,
     trackItemModifier = trackItemModifier,
+    bottomPadding = bottomPadding,
     trackItemView = { trackList, trackInd, currentTrackDragIndex, trackModifier ->
         DraggableTrackItem(
             tracks = trackList,

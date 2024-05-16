@@ -69,19 +69,18 @@ fun TracksScreen(
             TracksBar(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(horizontal = 5.dp)
+                    .padding(horizontal = 8.dp)
             )
 
-            Spacer(Modifier.height(10.dp))
+            Spacer(Modifier.height(16.dp))
 
             DefaultTrackList(
                 scrollingState = tracksScrollingState,
+                bottomPadding = 8.dp,
                 modifier = Modifier
                     .fillMaxSize(1F)
-                    .padding(horizontal = 5.dp)
+                    .padding(horizontal = 8.dp)
             )
-
-            Spacer(Modifier.height(appBarHeight))
         }
     }
 }

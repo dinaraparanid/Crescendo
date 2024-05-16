@@ -6,6 +6,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.dp
 import com.paranid5.crescendo.domain.interactor.tracks.startPlaylistPlayback
 import com.paranid5.crescendo.system.services.track.TrackServiceAccessor
 import com.paranid5.crescendo.tracks.presentation.TracksViewModel
@@ -23,6 +25,7 @@ internal fun DefaultTrackList(
     scrollingState: LazyListState,
     modifier: Modifier = Modifier,
     trackItemModifier: Modifier = Modifier,
+    bottomPadding: Dp = 16.dp,
     viewModel: TracksViewModel = koinViewModel(),
     trackServiceAccessor: TrackServiceAccessor = koinInject(),
 ) {
@@ -35,6 +38,7 @@ internal fun DefaultTrackList(
         tracks = shownTracks,
         scrollingState = scrollingState,
         modifier = modifier,
+        bottomPadding = bottomPadding,
         trackItemView = { trackList, trackInd, trackModifier ->
             TrackItem(
                 modifier = trackModifier then trackItemModifier,
