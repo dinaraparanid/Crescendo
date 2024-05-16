@@ -13,6 +13,7 @@ data class DefaultTrack(
     override val displayName: String,
     override val dateAdded: Long,
     override val numberInAlbum: Int,
+    private val timestamp: Long = System.currentTimeMillis() // required for cover updates
 ) : Track {
     constructor(track: Track) : this(
         androidId = track.androidId,
