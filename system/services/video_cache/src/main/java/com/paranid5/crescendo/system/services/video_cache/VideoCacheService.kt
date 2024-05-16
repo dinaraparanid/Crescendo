@@ -25,28 +25,21 @@ import com.paranid5.system.services.common.SuspendService
 import com.paranid5.system.services.common.connect
 import com.paranid5.system.services.common.disconnect
 import kotlinx.coroutines.launch
+import org.koin.android.ext.android.inject
+import org.koin.core.parameter.parametersOf
 
 class VideoCacheService : SuspendService(),
     ConnectionManager by ConnectionManagerImpl() {
-    internal val videoQueueManager by lazy {
-        VideoQueueManager()
-    }
+    internal val videoQueueManager by inject<VideoQueueManager>()
 
-    internal val notificationManager by lazy {
-        NotificationManager(this)
+    internal val notificationManager by inject<NotificationManager> {
+        parametersOf(this)
     }
+    internal val cacheManager by inject<CacheManager>()
 
-    internal val cacheManager by lazy {
-        CacheManager()
-    }
+    internal val urlExtractor by inject<UrlExtractor>()
 
-    internal val urlExtractor by lazy {
-        UrlExtractor()
-    }
-
-    internal val mediaFileDownloader by lazy {
-        MediaFileDownloader()
-    }
+    internal val mediaFileDownloader by inject<MediaFileDownloader>()
 
     internal val cacheNextVideoReceiver = CacheNextVideoReceiver(this)
     internal val cancelCurrentVideoReceiver = CancelCurrentVideoReceiver(this)

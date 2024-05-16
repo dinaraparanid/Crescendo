@@ -1,8 +1,6 @@
 package com.paranid5.crescendo.system.services.stream
 
 import android.content.Intent
-import com.paranid5.crescendo.data.StorageRepository
-import com.paranid5.crescendo.domain.repositories.CurrentPlaylistRepository
 import com.paranid5.crescendo.system.common.broadcast.StreamServiceBroadcasts.POSITION_ARG
 import com.paranid5.crescendo.system.common.broadcast.StreamServiceBroadcasts.URL_ARG
 import com.paranid5.crescendo.system.services.stream.extractor.UrlExtractor
@@ -39,6 +37,7 @@ import com.paranid5.system.services.common.receivers.StopReceiver
 import kotlinx.coroutines.launch
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
+import org.koin.core.parameter.parametersOf
 
 private const val ACTION_PAUSE = "pause"
 private const val ACTION_RESUME = "resume"
@@ -51,26 +50,16 @@ internal const val ACTION_DISMISS = "dismiss"
 
 class StreamService : SuspendService(), KoinComponent,
     ConnectionManager by ConnectionManagerImpl() {
-    private val storageRepository by inject<StorageRepository>()
-    private val currentPlaylistRepository by inject<CurrentPlaylistRepository>()
+    internal val mediaSessionManager by inject<MediaSessionManager>()
 
-    internal val mediaSessionManager by lazy {
-        MediaSessionManager(
-            storageRepository,
-            currentPlaylistRepository
-        )
+    internal val playerProvider by inject<PlayerProvider> {
+        parametersOf(this)
     }
 
-    internal val playerProvider by lazy {
-        PlayerProvider(this, storageRepository)
-    }
+    internal val urlExtractor by inject<UrlExtractor>()
 
-    internal val urlExtractor by lazy {
-        UrlExtractor()
-    }
-
-    internal val notificationManager by lazy {
-        NotificationManager(this, storageRepository)
+    internal val notificationManager by inject<NotificationManager> {
+        parametersOf(this)
     }
 
     internal val commandsToActions = mapOf(

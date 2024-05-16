@@ -31,6 +31,7 @@ import com.paranid5.crescendo.ui.permissions.description_providers.AudioRecordin
 import com.paranid5.crescendo.ui.permissions.description_providers.ExternalStorageDescriptionProvider
 import com.paranid5.crescendo.ui.permissions.description_providers.ForegroundServiceDescriptionProvider
 import com.paranid5.crescendo.ui.permissions.di.permissionQueuesModule
+import com.paranid5.system.services.common.di.commonServiceModule
 import kotlinx.coroutines.flow.MutableStateFlow
 import org.koin.android.ext.koin.androidApplication
 import org.koin.android.ext.koin.androidContext
@@ -49,7 +50,12 @@ private val resourcesModule = module {
 }
 
 private val serviceAccessorsModule = module {
-    includes(streamServiceModule, trackServiceModule, videoCacheServiceModule)
+    includes(
+        commonServiceModule,
+        streamServiceModule,
+        trackServiceModule,
+        videoCacheServiceModule
+    )
 }
 
 private val serviceConnectionsModule = module {

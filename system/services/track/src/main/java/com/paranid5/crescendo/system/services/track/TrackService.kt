@@ -3,9 +3,7 @@ package com.paranid5.crescendo.system.services.track
 import android.content.Intent
 import android.os.Build
 import com.paranid5.crescendo.core.common.tracks.Track
-import com.paranid5.crescendo.data.StorageRepository
 import com.paranid5.crescendo.domain.interactor.tracks.TrackServiceStart
-import com.paranid5.crescendo.domain.repositories.CurrentPlaylistRepository
 import com.paranid5.crescendo.system.common.broadcast.TrackServiceBroadcasts
 import com.paranid5.crescendo.system.services.track.media_session.MediaSessionCallback
 import com.paranid5.crescendo.system.services.track.media_session.startMetadataMonitoring
@@ -43,6 +41,7 @@ import com.paranid5.system.services.common.receivers.StopReceiver
 import kotlinx.coroutines.launch
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
+import org.koin.core.parameter.parametersOf
 
 private const val ACTION_PAUSE = "pause"
 private const val ACTION_RESUME = "resume"
@@ -53,24 +52,15 @@ internal const val ACTION_REPEAT = "repeat"
 internal const val ACTION_UNREPEAT = "unrepeat"
 internal const val ACTION_DISMISS = "dismiss"
 
-class TrackService : SuspendService(), KoinComponent,
-    ConnectionManager by ConnectionManagerImpl() {
-    private val storageRepository by inject<StorageRepository>()
-    private val currentPlaylistRepository by inject<CurrentPlaylistRepository>()
+class TrackService : SuspendService(), KoinComponent, ConnectionManager by ConnectionManagerImpl() {
+    internal val mediaSessionManager by inject<MediaSessionManager>()
 
-    internal val mediaSessionManager by lazy {
-        MediaSessionManager(
-            storageRepository,
-            currentPlaylistRepository
-        )
+    internal val playerProvider by inject<PlayerProvider> {
+        parametersOf(this)
     }
 
-    internal val playerProvider by lazy {
-        PlayerProvider(this, storageRepository, currentPlaylistRepository)
-    }
-
-    internal val notificationManager by lazy {
-        NotificationManager(this, storageRepository, currentPlaylistRepository)
+    internal val notificationManager by inject<NotificationManager> {
+        parametersOf(this)
     }
 
     internal val commandsToActions = mapOf(
