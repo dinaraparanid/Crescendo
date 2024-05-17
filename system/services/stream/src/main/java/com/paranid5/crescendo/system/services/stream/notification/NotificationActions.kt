@@ -24,7 +24,7 @@ internal fun UnrepeatActionCompat(context: Context) =
 
 internal fun DismissNotificationActionCompat(context: Context) =
     NotificationCompat.Action.Builder(
-        IconCompat.createWithResource(context, R.drawable.dismiss),
+        IconCompat.createWithResource(context, R.drawable.cross),
         context.getString(R.string.cancel),
         Actions.Dismiss.playbackIntent(context)
     ).build()

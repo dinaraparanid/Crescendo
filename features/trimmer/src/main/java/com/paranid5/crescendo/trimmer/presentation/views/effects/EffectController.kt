@@ -81,6 +81,7 @@ private inline fun <V : Number> EffectIconSlider(
     EffectIcon(
         iconPainter = iconPainter,
         contentDescription = contentDescription,
+        modifier = Modifier.align(Alignment.CenterVertically)
     )
 
     Spacer(Modifier.width(8.dp))
@@ -91,7 +92,7 @@ private inline fun <V : Number> EffectIconSlider(
         maxValue = maxValue,
         steps = steps,
         setEffect = setEffect,
-        modifier = Modifier.weight(1F)
+        modifier = Modifier.weight(1F).align(Alignment.CenterVertically)
     )
 }
 
@@ -107,7 +108,7 @@ private fun EffectIcon(
         painter = iconPainter,
         contentDescription = contentDescription,
         tint = colors.primary,
-        modifier = modifier.size(20.dp)
+        modifier = modifier
     )
 }
 

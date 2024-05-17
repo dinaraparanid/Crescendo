@@ -2,6 +2,7 @@ package com.paranid5.crescendo.trimmer.presentation.views.playback
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Icon
@@ -36,14 +37,14 @@ internal fun PlayPauseButton(
             .background(color = colors.secondary, shape = CircleShape)
     ) {
         when {
-            isPlaying -> PlayIcon(Modifier.fillMaxSize())
-            else -> PauseIcon(Modifier.fillMaxSize())
+            isPlaying -> PauseIcon(Modifier.fillMaxSize().padding(4.dp))
+            else -> PlayIcon(Modifier.fillMaxSize().padding(12.dp))
         }
     }
 }
 
 @Composable
-private fun PlayIcon(modifier: Modifier = Modifier) {
+private fun PauseIcon(modifier: Modifier = Modifier) {
     val colors = LocalAppColors.current
 
     Icon(
@@ -55,7 +56,7 @@ private fun PlayIcon(modifier: Modifier = Modifier) {
 }
 
 @Composable
-private fun PauseIcon(modifier: Modifier = Modifier) {
+private fun PlayIcon(modifier: Modifier = Modifier) {
     val colors = LocalAppColors.current
 
     Icon(

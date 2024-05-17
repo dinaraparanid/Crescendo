@@ -95,5 +95,5 @@ private fun CancelAction(context: Context) =
     PlaybackStateCompat.CustomAction.Builder(
         ACTION_DISMISS,
         context.getString(R.string.cancel),
-        R.drawable.dismiss
+        R.drawable.cross
     ).build()

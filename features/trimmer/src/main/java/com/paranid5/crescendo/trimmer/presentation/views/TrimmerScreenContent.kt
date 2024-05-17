@@ -174,6 +174,8 @@ private fun TrimmerScreenContentPortrait(
         textModifier = Modifier.padding(vertical = 4.dp),
         modifier = Modifier.constrainAs(saveButton) {
             top.linkTo(controllers.bottom, margin = 32.dp)
+            start.linkTo(parent.start, margin = 16.dp)
+            end.linkTo(parent.end, margin = 16.dp)
             width = Dimension.matchParent
         }
     )

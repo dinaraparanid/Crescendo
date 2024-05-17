@@ -91,7 +91,7 @@ fun ContentScreen(padding: PaddingValues) {
             TracksScreen(
                 Modifier
                     .fillMaxSize()
-                    .screenDefaultPadding()
+                    .screenPaddingDefault()
             )
         }
 
@@ -101,7 +101,7 @@ fun ContentScreen(padding: PaddingValues) {
             AlbumsScreen(
                 Modifier
                     .fillMaxSize()
-                    .screenDefaultPadding()
+                    .screenPaddingDefault()
             )
         }
 
@@ -111,13 +111,13 @@ fun ContentScreen(padding: PaddingValues) {
             FetchStreamScreen(
                 Modifier
                     .fillMaxSize()
-                    .screenDefaultPadding()
+                    .screenPaddingDefault()
             )
         }
 
         composable(route = Screens.Audio.AudioEffects.title) {
             navigator.setCurScreen(Screens.Audio.AudioEffects)
-            AudioEffectsScreen(Modifier.screenDefaultPadding())
+            AudioEffectsScreen(Modifier.screenPaddingDefault())
         }
 
         composable(
@@ -134,7 +134,7 @@ fun ContentScreen(padding: PaddingValues) {
                 backStackEntry = it,
                 modifier = Modifier
                     .fillMaxSize()
-                    .screenDefaultPadding()
+                    .screenPaddingRequired()
             )
         }
 
@@ -144,7 +144,7 @@ fun ContentScreen(padding: PaddingValues) {
             AboutApp(
                 Modifier
                     .fillMaxSize()
-                    .screenDefaultPadding()
+                    .screenPaddingDefault()
             )
         }
 
@@ -154,7 +154,7 @@ fun ContentScreen(padding: PaddingValues) {
             FavouritesScreen(
                 Modifier
                     .fillMaxSize()
-                    .screenDefaultPadding()
+                    .screenPaddingDefault()
             )
         }
 
@@ -164,30 +164,59 @@ fun ContentScreen(padding: PaddingValues) {
             SettingsScreen(
                 Modifier
                     .fillMaxSize()
-                    .screenDefaultPadding()
+                    .screenPaddingDefault()
             )
         }
     }
 }
 
 @Composable
-private fun Modifier.screenDefaultPadding() =
+private fun Modifier.screenPaddingDefault() =
     this.padding(
-        top = topPadding,
+        top = topPaddingDefault,
         start = 8.dp,
-        end = endPadding
+        end = endPaddingDefault
     )
 
-private inline val topPadding
+@Composable
+private fun Modifier.screenPaddingRequired() =
+    this.padding(
+        top = topPaddingRequired,
+        start = startPaddingRequired,
+        end = endPaddingRequired
+    )
+
+private inline val topPaddingDefault
     @Composable
     get() = when (LocalConfiguration.current.orientation) {
         Configuration.ORIENTATION_LANDSCAPE -> 16.dp
         else -> 48.dp
     }
 
-private inline val endPadding
+private inline val endPaddingDefault
     @Composable
     get() = when (LocalConfiguration.current.orientation) {
         Configuration.ORIENTATION_LANDSCAPE -> 40.dp
         else -> 8.dp
+    }
+
+private inline val topPaddingRequired
+    @Composable
+    get() = when (LocalConfiguration.current.orientation) {
+        Configuration.ORIENTATION_LANDSCAPE -> 0.dp
+        else -> 48.dp
+    }
+
+private inline val startPaddingRequired
+    @Composable
+    get() = when (LocalConfiguration.current.orientation) {
+        Configuration.ORIENTATION_LANDSCAPE -> 28.dp
+        else -> 0.dp
+    }
+
+private inline val endPaddingRequired
+    @Composable
+    get() = when (LocalConfiguration.current.orientation) {
+        Configuration.ORIENTATION_LANDSCAPE -> 40.dp
+        else -> 0.dp
     }

@@ -29,7 +29,7 @@ internal fun TenSecsBackButton(
 
     IconButton(
         onClick = { player.seekTenSecsBack(startPos) },
-        modifier = modifier.size(40.dp)
+        modifier = modifier.size(48.dp)
     ) {
         Icon(
             painter = painterResource(id = R.drawable.previous_track),

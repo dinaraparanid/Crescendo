@@ -29,7 +29,7 @@ internal fun TenSecsForwardButton(
 
     IconButton(
         onClick = { player.seekTenSecsForward(durationInMillis) },
-        modifier = modifier.size(40.dp)
+        modifier = modifier.size(48.dp)
     ) {
         Icon(
             painter = painterResource(id = R.drawable.next_track),
