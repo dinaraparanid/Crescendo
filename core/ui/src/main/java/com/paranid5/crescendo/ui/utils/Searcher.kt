@@ -5,7 +5,6 @@ import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -58,14 +57,13 @@ fun <T> Searcher(
     SearchBar(
         modifier = modifier,
         query = query ?: "",
-        leadingIcon = { SearchIcon(Modifier.size(30.dp)) },
+        leadingIcon = { SearchIcon() },
         trailingIcon = {
             if (isSearchBarActive)
                 CancelSearchIcon(
                     query = query,
                     setQuery = setQuery,
                     setSearchBarActive = setSearchBarActive,
-                    modifier = Modifier.size(20.dp)
                 )
         },
         placeholder = {
@@ -84,7 +82,7 @@ fun <T> Searcher(
         onSearch = { setSearchBarActive(false) },
         onActiveChange = { setSearchBarActive(it) },
     ) {
-        Spacer(Modifier.height(10.dp))
+        Spacer(Modifier.height(8.dp))
         filteredContent(shownItems, trackListState)
     }
 }
@@ -94,7 +92,7 @@ private fun SearchIcon(modifier: Modifier = Modifier) {
     val primaryColor = LocalAppColors.current.primary
 
     Icon(
-        painter = painterResource(R.drawable.search_icon),
+        painter = painterResource(R.drawable.search),
         contentDescription = null,
         tint = primaryColor,
         modifier = modifier

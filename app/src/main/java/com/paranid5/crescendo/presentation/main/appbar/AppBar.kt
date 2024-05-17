@@ -28,7 +28,7 @@ fun AppBar(modifier: Modifier = Modifier) {
         modifier = modifier
             .fillMaxWidth()
             .height(appBarHeight)
-            .clip(RoundedCornerShape(topStart = 20.dp, topEnd = 20.dp))
+            .clip(RoundedCornerShape(topStart = 24.dp, topEnd = 24.dp))
     ) {
         AppBarItem(
             title = stringResource(R.string.tracks),
@@ -50,7 +50,7 @@ fun AppBar(modifier: Modifier = Modifier) {
 
         AppBarItem(
             title = stringResource(R.string.streaming),
-            image = painterResource(R.drawable.stream_icon),
+            image = painterResource(R.drawable.stream),
             screen = Screens.StreamFetching,
             modifier = Modifier
                 .weight(1F)

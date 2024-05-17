@@ -1,6 +1,7 @@
 package com.paranid5.crescendo.playing.presentation.views.properties
 
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -26,7 +27,8 @@ internal fun PropertiesButton(
     when (audioStatus) {
         AudioStatus.STREAMING -> VideoPropertiesButton(
             tint = palette.getBrightDominantOrPrimary(),
-            modifier = modifier
+            modifier = modifier,
+            iconModifier = Modifier.size(28.dp)
         )
 
         AudioStatus.PLAYING ->
@@ -35,9 +37,7 @@ internal fun PropertiesButton(
                     track = currentTrack!!,
                     tint = palette.getBrightDominantOrPrimary(),
                     modifier = modifier,
-                    iconModifier = Modifier
-                        .height(48.dp)
-                        .width(24.dp),
+                    iconModifier = Modifier.size(28.dp)
                 )
     }
 }

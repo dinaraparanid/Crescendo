@@ -95,7 +95,7 @@ private inline fun DownloadButtonImpl(
 private fun DownloadIcon(paletteColor: Color, modifier: Modifier = Modifier) =
     Icon(
         modifier = modifier,
-        painter = painterResource(R.drawable.save_icon),
+        painter = painterResource(R.drawable.save),
         contentDescription = stringResource(R.string.download_as_mp3),
         tint = paletteColor
     )

@@ -138,7 +138,6 @@ private inline fun <T : Track> CurrentPlaylistTrackItemContent(
                 track = track,
                 tint = colors.fontColor,
                 modifier = Modifier.align(Alignment.CenterVertically),
-                iconModifier = Modifier.height(18.dp)
             )
         }
     }

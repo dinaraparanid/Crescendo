@@ -130,7 +130,6 @@ private inline fun TrackItemContent(
             track = track,
             tint = textColor,
             modifier = Modifier.align(Alignment.CenterVertically),
-            iconModifier = Modifier.height(18.dp),
         )
     }
 }

@@ -21,6 +21,7 @@ fun TrackPropertiesButton(
     track: Track,
     tint: Color,
     modifier: Modifier = Modifier,
+    buttonModifier: Modifier = Modifier,
     iconModifier: Modifier = Modifier,
     itemModifier: Modifier = Modifier,
 ) {
@@ -36,7 +37,8 @@ fun TrackPropertiesButton(
         TrackPropertiesButtonImpl(
             tint = tint,
             isPropertiesMenuShownState = isPropertiesMenuShownState,
-            modifier = iconModifier
+            modifier = buttonModifier,
+            iconModifier = iconModifier
         )
     }
 }
@@ -45,7 +47,8 @@ fun TrackPropertiesButton(
 private fun TrackPropertiesButtonImpl(
     tint: Color,
     isPropertiesMenuShownState: MutableState<Boolean>,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    iconModifier: Modifier = Modifier
 ) {
     var isPropertiesMenuShown by isPropertiesMenuShownState
 
@@ -53,11 +56,15 @@ private fun TrackPropertiesButtonImpl(
         modifier = modifier,
         onClick = { isPropertiesMenuShown = true }
     ) {
-        Icon(
-            modifier = modifier,
-            painter = painterResource(R.drawable.three_dots),
-            contentDescription = stringResource(R.string.settings),
-            tint = tint
-        )
+        PropertiesIcon(tint = tint, modifier = iconModifier)
     }
 }
+
+@Composable
+private fun PropertiesIcon(tint: Color, modifier: Modifier = Modifier) =
+    Icon(
+        modifier = modifier,
+        painter = painterResource(R.drawable.kebab_menu),
+        contentDescription = stringResource(R.string.settings),
+        tint = tint
+    )

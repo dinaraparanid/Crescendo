@@ -49,7 +49,7 @@ private fun MessageNotificationBuilder(context: Context, message: String) =
 
 private fun NotificationBuilder(context: Context) =
     NotificationBuilderCompat(context)
-        .setSmallIcon(R.drawable.save_icon)
+        .setSmallIcon(R.drawable.save)
         .setContentIntent(
             PendingIntent.getActivity(
                 context,

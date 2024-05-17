@@ -26,7 +26,7 @@ internal fun TitleAndPropertiesButton(
         modifier = Modifier.weight(1F)
     )
 
-    Spacer(Modifier.width(10.dp))
+    Spacer(Modifier.width(8.dp))
 
     PropertiesButton(
         palette = palette,
