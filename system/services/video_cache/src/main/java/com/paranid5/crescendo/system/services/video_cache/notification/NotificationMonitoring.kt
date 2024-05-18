@@ -28,10 +28,10 @@ internal suspend inline fun VideoCacheService.startNotificationMonitoring() =
                 queueLen,
                 System.currentTimeMillis()
             )
-        }.distinctUntilChanged { prev, cur ->
+        }.distinctUntilChanged { (_, _, _, _, _, prevTimestamp), (_, _, curCacheSt, _, _, curTimestamp) ->
             when {
-                cur.third != CachingStatus.NONE -> false
-                else -> cur.sixth - prev.sixth < TOO_FREQUENT_UPDATES
+                curCacheSt != CachingStatus.NONE -> false
+                else -> curTimestamp - prevTimestamp < TOO_FREQUENT_UPDATES
             }
         }.collectLatest { (downloadSt, progress, cacheSt, meta, qLen) ->
             notificationManager.showNotification(

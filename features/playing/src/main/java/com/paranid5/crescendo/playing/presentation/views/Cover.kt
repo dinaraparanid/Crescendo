@@ -31,10 +31,10 @@ internal fun Cover(
         modifier = modifier
             .shadow(
                 elevation = 80.dp,
-                shape = RoundedCornerShape(5.dp),
+                shape = RoundedCornerShape(4.dp),
                 ambientColor = paletteColor,
                 spotColor = paletteColor
             )
-            .clip(RoundedCornerShape(20.dp)),
+            .clip(RoundedCornerShape(24.dp)),
     )
 }
