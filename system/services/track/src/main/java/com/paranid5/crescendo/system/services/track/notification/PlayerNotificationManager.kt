@@ -20,8 +20,9 @@ import com.paranid5.crescendo.system.services.track.ACTION_REPEAT
 import com.paranid5.crescendo.system.services.track.ACTION_UNREPEAT
 import com.paranid5.crescendo.system.services.track.TrackService
 import com.paranid5.crescendo.utils.extensions.artistAlbum
-import com.paranid5.crescendo.utils.extensions.sendBroadcast
+import com.paranid5.crescendo.utils.extensions.sendAppBroadcast
 import com.paranid5.system.services.common.notification.detachNotification
+import com.paranid5.system.services.common.startMediaForeground
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
@@ -72,7 +73,7 @@ private fun NotificationListener(service: TrackService) =
             ongoing: Boolean
         ) {
             super.onNotificationPosted(notificationId, notification, ongoing)
-            service.startForeground(notificationId, notification)
+            service.startMediaForeground(notificationId, notification)
         }
     }
 
@@ -126,7 +127,7 @@ private fun CustomActionsReceiver(service: TrackService) =
             CustomActions(player.repeatMode)
 
         override fun onCustomAction(player: Player, action: String, intent: Intent) {
-            service.sendBroadcast(service.commandsToActions[action]!!.playbackAction)
+            service.sendAppBroadcast(service.commandsToActions[action]!!.playbackAction)
         }
     }
 

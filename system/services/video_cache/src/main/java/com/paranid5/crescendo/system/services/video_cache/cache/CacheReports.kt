@@ -5,6 +5,7 @@ import com.paranid5.crescendo.core.media.caching.CachingResult
 import com.paranid5.crescendo.core.media.caching.VideoCacheResponse
 import com.paranid5.crescendo.system.receivers.CacheStatusReceiver
 import com.paranid5.crescendo.system.services.video_cache.VideoCacheService
+import com.paranid5.crescendo.utils.extensions.sendAppBroadcast
 
 internal fun VideoCacheService.reportCachingResult(cachingResult: CachingResult) =
     when (cachingResult) {
@@ -24,44 +25,39 @@ internal fun VideoCacheService.reportCachingResult(cachingResult: CachingResult)
         is CachingResult.Success -> reportVideoCacheSuccessful()
     }
 
-private fun VideoCacheService.reportVideoCacheSuccessful() =
-    sendBroadcast(
-        Intent(this, CacheStatusReceiver::class.java)
-            .setAction(CacheStatusReceiver.Broadcast_VIDEO_CACHE_COMPLETED)
-            .putExtra(
-                CacheStatusReceiver.VIDEO_CACHE_STATUS_ARG,
-                VideoCacheResponse.Success
-            )
-    )
-
-private fun VideoCacheService.reportVideoCacheCanceled() =
-    sendBroadcast(
-        Intent(CacheStatusReceiver.Broadcast_VIDEO_CACHE_COMPLETED).putExtra(
+private fun VideoCacheService.reportVideoCacheSuccessful() = sendAppBroadcast(
+    Intent(this, CacheStatusReceiver::class.java)
+        .setAction(CacheStatusReceiver.Broadcast_VIDEO_CACHE_COMPLETED)
+        .putExtra(
             CacheStatusReceiver.VIDEO_CACHE_STATUS_ARG,
-            VideoCacheResponse.Canceled
+            VideoCacheResponse.Success
         )
-    )
+)
 
-private fun VideoCacheService.reportAudioConversionError() =
-    sendBroadcast(
-        Intent(CacheStatusReceiver.Broadcast_VIDEO_CACHE_COMPLETED).putExtra(
-            CacheStatusReceiver.VIDEO_CACHE_STATUS_ARG,
-            VideoCacheResponse.AudioConversionError
-        )
+private fun VideoCacheService.reportVideoCacheCanceled() = sendAppBroadcast(
+    Intent(CacheStatusReceiver.Broadcast_VIDEO_CACHE_COMPLETED).putExtra(
+        CacheStatusReceiver.VIDEO_CACHE_STATUS_ARG,
+        VideoCacheResponse.Canceled
     )
+)
 
-private fun VideoCacheService.reportFileCreationError() =
-    sendBroadcast(
-        Intent(CacheStatusReceiver.Broadcast_VIDEO_CACHE_COMPLETED).putExtra(
-            CacheStatusReceiver.VIDEO_CACHE_STATUS_ARG,
-            VideoCacheResponse.FileCreationError
-        )
+private fun VideoCacheService.reportAudioConversionError() = sendAppBroadcast(
+    Intent(CacheStatusReceiver.Broadcast_VIDEO_CACHE_COMPLETED).putExtra(
+        CacheStatusReceiver.VIDEO_CACHE_STATUS_ARG,
+        VideoCacheResponse.AudioConversionError
     )
+)
 
-private fun VideoCacheService.reportConnectionLostError() =
-    sendBroadcast(
-        Intent(CacheStatusReceiver.Broadcast_VIDEO_CACHE_COMPLETED).putExtra(
-            CacheStatusReceiver.VIDEO_CACHE_STATUS_ARG,
-            VideoCacheResponse.ConnectionLostError
-        )
+private fun VideoCacheService.reportFileCreationError() = sendAppBroadcast(
+    Intent(CacheStatusReceiver.Broadcast_VIDEO_CACHE_COMPLETED).putExtra(
+        CacheStatusReceiver.VIDEO_CACHE_STATUS_ARG,
+        VideoCacheResponse.FileCreationError
     )
+)
+
+private fun VideoCacheService.reportConnectionLostError() = sendAppBroadcast(
+    Intent(CacheStatusReceiver.Broadcast_VIDEO_CACHE_COMPLETED).putExtra(
+        CacheStatusReceiver.VIDEO_CACHE_STATUS_ARG,
+        VideoCacheResponse.ConnectionLostError
+    )
+)

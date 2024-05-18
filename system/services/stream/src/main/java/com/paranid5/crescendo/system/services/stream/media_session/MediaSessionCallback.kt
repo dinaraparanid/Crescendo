@@ -8,7 +8,7 @@ import com.paranid5.crescendo.system.services.stream.playback.resumeAsync
 import com.paranid5.crescendo.system.services.stream.playback.seekTenSecsBackAsync
 import com.paranid5.crescendo.system.services.stream.playback.seekTenSecsForwardAsync
 import com.paranid5.crescendo.system.services.stream.playback.seekToAsync
-import com.paranid5.crescendo.utils.extensions.sendBroadcast
+import com.paranid5.crescendo.utils.extensions.sendAppBroadcast
 
 internal fun MediaSessionCallback(service: StreamService) =
     object : MediaSessionCompat.Callback() {
@@ -39,6 +39,6 @@ internal fun MediaSessionCallback(service: StreamService) =
 
         override fun onCustomAction(action: String, extras: Bundle?) {
             super.onCustomAction(action, extras)
-            service.sendBroadcast(service.commandsToActions[action]!!.playbackAction)
+            service.sendAppBroadcast(service.commandsToActions[action]!!.playbackAction)
         }
     }

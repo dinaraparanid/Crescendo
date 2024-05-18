@@ -8,7 +8,7 @@ import com.paranid5.crescendo.system.services.track.playback.resumeAsync
 import com.paranid5.crescendo.system.services.track.playback.seekToAsync
 import com.paranid5.crescendo.system.services.track.playback.seekToNextTrackAsync
 import com.paranid5.crescendo.system.services.track.playback.seekToPrevTrackAsync
-import com.paranid5.crescendo.utils.extensions.sendBroadcast
+import com.paranid5.crescendo.utils.extensions.sendAppBroadcast
 
 internal fun MediaSessionCallback(service: TrackService) =
     object : MediaSessionCompat.Callback() {
@@ -39,6 +39,6 @@ internal fun MediaSessionCallback(service: TrackService) =
 
         override fun onCustomAction(action: String, extras: Bundle?) {
             super.onCustomAction(action, extras)
-            service.sendBroadcast(service.commandsToActions[action]!!.playbackAction)
+            service.sendAppBroadcast(service.commandsToActions[action]!!.playbackAction)
         }
     }

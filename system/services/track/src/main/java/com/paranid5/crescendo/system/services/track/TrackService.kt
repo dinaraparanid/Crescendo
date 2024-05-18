@@ -31,6 +31,7 @@ import com.paranid5.crescendo.system.services.track.receivers.SwitchPlaylistRece
 import com.paranid5.crescendo.system.services.track.receivers.registerReceivers
 import com.paranid5.crescendo.system.services.track.receivers.unregisterReceivers
 import com.paranid5.system.services.common.ConnectionManager
+import com.paranid5.system.services.common.PlaybackForegroundService
 import com.paranid5.system.services.common.SuspendService
 import com.paranid5.system.services.common.connect
 import com.paranid5.system.services.common.disconnect
@@ -52,7 +53,8 @@ internal const val ACTION_REPEAT = "repeat"
 internal const val ACTION_UNREPEAT = "unrepeat"
 internal const val ACTION_DISMISS = "dismiss"
 
-class TrackService : SuspendService(), KoinComponent, ConnectionManager by ConnectionManagerImpl() {
+class TrackService : SuspendService(), PlaybackForegroundService, KoinComponent,
+    ConnectionManager by ConnectionManagerImpl() {
     internal val mediaSessionManager by inject<MediaSessionManager>()
     internal val playerProvider by inject<PlayerProvider> { parametersOf(this) }
     internal val notificationManager by inject<NotificationManager> { parametersOf(this) }

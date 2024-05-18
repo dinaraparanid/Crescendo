@@ -21,14 +21,17 @@ import com.paranid5.crescendo.system.services.video_cache.receivers.CancelCurren
 import com.paranid5.crescendo.system.services.video_cache.receivers.registerReceivers
 import com.paranid5.crescendo.system.services.video_cache.receivers.unregisterReceivers
 import com.paranid5.system.services.common.ConnectionManager
+import com.paranid5.system.services.common.PlaybackForegroundService
 import com.paranid5.system.services.common.SuspendService
 import com.paranid5.system.services.common.connect
 import com.paranid5.system.services.common.disconnect
 import kotlinx.coroutines.launch
 import org.koin.android.ext.android.inject
+import org.koin.core.component.KoinComponent
 import org.koin.core.parameter.parametersOf
 
-class VideoCacheService : SuspendService(), ConnectionManager by ConnectionManagerImpl() {
+class VideoCacheService : SuspendService(), PlaybackForegroundService, KoinComponent,
+    ConnectionManager by ConnectionManagerImpl() {
     internal val videoQueueManager by inject<VideoQueueManager>()
     internal val notificationManager by inject<NotificationManager> { parametersOf(this) }
     internal val cacheManager by inject<CacheManager>()

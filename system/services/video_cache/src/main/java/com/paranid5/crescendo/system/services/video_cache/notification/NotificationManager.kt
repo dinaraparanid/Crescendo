@@ -12,6 +12,7 @@ import com.paranid5.crescendo.core.common.caching.DownloadingStatus
 import com.paranid5.crescendo.core.common.metadata.VideoMetadata
 import com.paranid5.crescendo.core.resources.R
 import com.paranid5.crescendo.system.services.video_cache.VideoCacheService
+import com.paranid5.system.services.common.startMediaForeground
 
 internal const val VIDEO_CACHE_NOTIFICATION_ID = 103
 internal const val VIDEO_CACHE_CHANNEL_ID = "video_cache_channel"
@@ -106,7 +107,7 @@ internal class NotificationManager(service: VideoCacheService) {
         service: VideoCacheService,
         videoTitle: String,
         videoQueueLen: Int,
-    ) = service.startForeground(
+    ) = service.startMediaForeground(
         VIDEO_CACHE_NOTIFICATION_ID,
         StartDownloadNotificationBuilder(
             context = service,

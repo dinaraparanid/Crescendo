@@ -7,7 +7,7 @@ import android.net.Uri
 
 class MediaScannerClient(context: Context, private val filePath: String) :
     MediaScannerConnectionClient {
-    private val connection = MediaScannerConnection(context, this)
+    private val connection = MediaScannerConnection(context.applicationContext, this)
     fun scan() = connection.connect()
 
     override fun onMediaScannerConnected() = connection.scanFile(filePath, null)

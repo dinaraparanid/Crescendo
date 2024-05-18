@@ -46,8 +46,11 @@ fun Context.registerReceiverCompat(
     filter = IntentFilter().also { actions.forEach(it::addAction) }
 )
 
-fun Context.sendBroadcast(action: String) =
-    sendBroadcast(Intent(action))
+fun Context.sendAppBroadcast(action: String) =
+    sendBroadcast(Intent(action).apply { `package` = packageName })
+
+fun Context.sendAppBroadcast(intent: Intent) =
+    sendBroadcast(intent.apply { `package` = packageName })
 
 @ColorInt
 @Suppress("DEPRECATION")

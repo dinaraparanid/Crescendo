@@ -17,47 +17,47 @@ Crescendo provides multiple features to move your music experience to a new leve
 **Playback of local tracks**
 
 <p>
-    <img src="https://i.ibb.co/JkdSjn2/playing-track.jpg" alt="playing_preview" width="100">
+    <img src="https://i.ibb.co/jk3m0wW/image.png" alt="playing_preview" width="100">
     &nbsp;
-    <img src="https://i.ibb.co/XVYpVkT/image.png" alt="tracks" width="100">
+    <img src="https://i.ibb.co/TqBY8SD/image.png" alt="tracks" width="100">
     &nbsp;
-    <img src="https://i.ibb.co/2qhMsYs/image.png" alt="track_sort" width="100">
+    <img src="https://i.ibb.co/HrfWkdV/image.png" alt="track_sort" width="100">
 </p>
 
 **Support of audio effects (Equalizer, Bass, Reverb, Pitch and Speed shifter)**
 
 <p>
-    <img src="https://i.ibb.co/DLzWBzx/image.png" alt="audio_effects" width="100">
+    <img src="https://i.ibb.co/85jzbx4/image.png" alt="audio_effects" width="100">
     &nbsp;
-    <img src="https://i.ibb.co/GxMZRCk/image.png" alt="audio_effects" width="250">
+    <img src="https://i.ibb.co/wy68hdZ/image.png" alt="audio_effects" width="250">
 </p>
 
 **Customize your current playlist**
 
-<img src="https://i.ibb.co/jWtyPCD/image.png" alt="cur_playlist" width="100">
+<img src="https://i.ibb.co/ZcXdSPV/image.png" alt="cur_playlist" width="100">
 
 **Stream tracks and live streams from the YouTube, cache your favourites**
 
 <p>
-    <img src="https://i.ibb.co/fGvZ4MC/image.png" alt="fetch_youtube" width="100">
+    <img src="https://i.ibb.co/G9qHPvS/image.png" alt="fetch_youtube" width="100">
     &nbsp;
-    <img src="https://i.ibb.co/w7xF658/image.png" alt="playing_youtube" width="100">
+    <img src="https://i.ibb.co/kxzHbfF/image.png" alt="playing_youtube" width="100">
     &nbsp;
-    <img src="https://i.ibb.co/7k4MV6s/livestreaming.jpg" alt="live_streaming" width="100">
+    <img src="https://i.ibb.co/Pm3418Z/image.png" alt="live_streaming" width="100">
 </p>
 
 **Control playback and caching with notifications**
 
-<img src="https://i.ibb.co/k2VjrjF/image.png" alt="notifications" width="100">
+<img src="https://i.ibb.co/QQJZ82b/image.png" alt="notifications" width="100">
 
 **Trim tracks and convert  to different audio formats**
 
 <p>
-    <img src="https://i.ibb.co/j8KSDZM/image.png" alt="landscape" width="100">
+    <img src="https://i.ibb.co/xMZtnK2/image.png" alt="landscape" width="100">
     &nbsp;
-    <img src="https://i.ibb.co/T4fzgF7/image.png" alt="landscape" width="100">
+    <img src="https://i.ibb.co/rxmsKCW/image.png" alt="landscape" width="100">
     &nbsp;
-    <img src="https://i.ibb.co/LYHg5Xr/image.png" alt="landscape" width="250">
+    <img src="https://i.ibb.co/6BkSwcc/image.png" alt="landscape" width="250">
 </p>
 
 ## **Stack**
@@ -108,7 +108,7 @@ Crescendo provides multiple features to move your music experience to a new leve
 
 ## **Current Status:**
 
-**Beta V 0.3.0.2**
+**Beta V 0.4.0.0**
 
 ### **Implemented features:**
 1. Media playback of YouTube videos and live streams
@@ -121,9 +121,9 @@ Crescendo provides multiple features to move your music experience to a new leve
 
 ### **TODO:**
 1. Recently listened videos/livestreams
-2. Artists, albums and custom playlists
-3. Favourites
-4. Tags changing
+2. Tags changing
+3. Artists, albums and custom playlists
+4. Favourites
 5. Lyrics
 6. App customization and settings
 

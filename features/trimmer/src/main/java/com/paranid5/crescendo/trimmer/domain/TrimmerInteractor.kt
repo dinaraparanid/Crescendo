@@ -14,6 +14,7 @@ import com.paranid5.crescendo.core.common.trimming.PitchAndSpeed
 import com.paranid5.crescendo.core.common.trimming.TrimRange
 import com.paranid5.crescendo.core.media.tags.setAudioTags
 import com.paranid5.crescendo.system.receivers.TrimmingStatusReceiver
+import com.paranid5.crescendo.utils.extensions.sendAppBroadcast
 import java.io.File
 
 internal suspend fun trimTrackAndSendBroadcast(
@@ -56,7 +57,7 @@ private suspend inline fun trimTrackResult(
     }
 
 private fun Context.sendTrimmingStatusBroadcast(trimmingResult: Either<Throwable, MediaFile.AudioFile>) =
-    sendBroadcast(
+    sendAppBroadcast(
         Intent(applicationContext, TrimmingStatusReceiver::class.java)
             .setAction(TrimmingStatusReceiver.Broadcast_TRIMMING_COMPLETED)
             .putExtra(

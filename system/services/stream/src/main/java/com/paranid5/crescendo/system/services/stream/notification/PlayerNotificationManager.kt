@@ -12,7 +12,7 @@ import androidx.media3.common.util.NotificationUtil
 import androidx.media3.common.util.UnstableApi
 import androidx.media3.ui.PlayerNotificationManager
 import com.paranid5.crescendo.core.resources.R
-import com.paranid5.crescendo.utils.extensions.sendBroadcast
+import com.paranid5.crescendo.utils.extensions.sendAppBroadcast
 import com.paranid5.crescendo.core.media.images.getThumbnailBitmap
 import com.paranid5.crescendo.core.media.images.getVideoCoverBitmapAsync
 import com.paranid5.crescendo.system.common.intent.mainActivityIntent
@@ -21,6 +21,7 @@ import com.paranid5.crescendo.system.services.stream.ACTION_REPEAT
 import com.paranid5.crescendo.system.services.stream.ACTION_UNREPEAT
 import com.paranid5.crescendo.system.services.stream.StreamService
 import com.paranid5.system.services.common.notification.detachNotification
+import com.paranid5.system.services.common.startMediaForeground
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
@@ -71,7 +72,7 @@ private fun NotificationListener(service: StreamService) =
             ongoing: Boolean
         ) {
             super.onNotificationPosted(notificationId, notification, ongoing)
-            service.startForeground(notificationId, notification)
+            service.startMediaForeground(notificationId, notification)
         }
     }
 
@@ -125,7 +126,7 @@ private fun CustomActionsReceiver(service: StreamService) =
             CustomActions(player.repeatMode)
 
         override fun onCustomAction(player: Player, action: String, intent: Intent) {
-            service.sendBroadcast(service.commandsToActions[action]!!.playbackAction)
+            service.sendAppBroadcast(service.commandsToActions[action]!!.playbackAction)
         }
     }
 

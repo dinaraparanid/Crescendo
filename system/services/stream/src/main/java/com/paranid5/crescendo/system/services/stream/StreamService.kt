@@ -27,6 +27,7 @@ import com.paranid5.crescendo.system.services.stream.receivers.TenSecsForwardRec
 import com.paranid5.crescendo.system.services.stream.receivers.registerReceivers
 import com.paranid5.crescendo.system.services.stream.receivers.unregisterReceivers
 import com.paranid5.system.services.common.ConnectionManager
+import com.paranid5.system.services.common.PlaybackForegroundService
 import com.paranid5.system.services.common.SuspendService
 import com.paranid5.system.services.common.connect
 import com.paranid5.system.services.common.disconnect
@@ -48,7 +49,7 @@ internal const val ACTION_REPEAT = "repeat"
 internal const val ACTION_UNREPEAT = "unrepeat"
 internal const val ACTION_DISMISS = "dismiss"
 
-class StreamService : SuspendService(), KoinComponent,
+class StreamService : SuspendService(), PlaybackForegroundService, KoinComponent,
     ConnectionManager by ConnectionManagerImpl() {
     internal val mediaSessionManager by inject<MediaSessionManager>()
     internal val playerProvider by inject<PlayerProvider> { parametersOf(this) }
