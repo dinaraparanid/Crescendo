@@ -10,9 +10,7 @@ import com.paranid5.crescendo.system.services.video_cache.extractor.extractMedia
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.filterNot
 
-private const val TAG = "CacheEventLoop"
-
-internal suspend fun VideoCacheService.startCacheEventLoop() =
+internal suspend inline fun VideoCacheService.startCacheEventLoop() =
     lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
         videoQueueManager.videoQueueFlow
             .distinctUntilChanged()

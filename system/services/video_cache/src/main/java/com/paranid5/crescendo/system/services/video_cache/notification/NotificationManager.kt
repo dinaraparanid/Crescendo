@@ -44,9 +44,16 @@ internal class NotificationManager(service: VideoCacheService) {
         downloadedBytes: Long,
         totalBytes: Long,
     ) = when (downloadStatus) {
+        DownloadingStatus.None ->
+            showPrepareNotification(
+                service = service,
+                videoTitle = service videoTitleOf videoMetadata,
+                videoQueueLen = videoQueueLen,
+            )
+
         DownloadingStatus.Downloading ->
             showDownloadNotification(
-                service = service,
+                context = service,
                 videoTitle = service videoTitleOf videoMetadata,
                 videoQueueLen = videoQueueLen,
                 downloadedBytes = downloadedBytes,
@@ -69,7 +76,7 @@ internal class NotificationManager(service: VideoCacheService) {
                 videoMetadata = videoMetadata,
             )
 
-        else -> Unit
+        DownloadingStatus.Error -> Unit
     }
 
     private fun showCachingNotification(
@@ -95,16 +102,29 @@ internal class NotificationManager(service: VideoCacheService) {
         else -> Unit
     }
 
-    private fun showDownloadNotification(
+    private fun showPrepareNotification(
         service: VideoCacheService,
+        videoTitle: String,
+        videoQueueLen: Int,
+    ) = service.startForeground(
+        VIDEO_CACHE_NOTIFICATION_ID,
+        StartDownloadNotificationBuilder(
+            context = service,
+            videoTitle = videoTitle,
+            videoQueueLen = videoQueueLen,
+        ).build(),
+    )
+
+    private fun showDownloadNotification(
+        context: Context,
         videoTitle: String,
         videoQueueLen: Int,
         downloadedBytes: Long,
         totalBytes: Long
-    ) = service.startForeground(
+    ) = manager.notify(
         VIDEO_CACHE_NOTIFICATION_ID,
         DownloadNotificationBuilder(
-            context = service,
+            context = context,
             videoTitle = videoTitle,
             videoQueueLen = videoQueueLen,
             downloadedBytes = downloadedBytes,

@@ -7,7 +7,7 @@ import com.paranid5.crescendo.system.services.video_cache.VideoCacheService
 import com.paranid5.crescendo.system.services.video_cache.cache.cacheNewVideoAsync
 import com.paranid5.crescendo.system.services.video_cache.videoCacheDataArg
 
-fun CacheNextVideoReceiver(service: VideoCacheService) =
+internal fun CacheNextVideoReceiver(service: VideoCacheService) =
     object : BroadcastReceiver() {
         override fun onReceive(context: Context?, intent: Intent) {
             service.mediaFileDownloader.resetDownloadStatus()

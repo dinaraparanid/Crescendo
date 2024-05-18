@@ -7,17 +7,23 @@ import android.os.Build
 import com.paranid5.crescendo.core.resources.R
 import com.paranid5.crescendo.system.common.intent.mainActivityIntent
 
+internal fun StartDownloadNotificationBuilder(
+    context: Context,
+    videoTitle: String,
+    videoQueueLen: Int,
+) = BusyNotificationBuilder(context, "${context.getString(R.string.downloading)}: $videoTitle")
+    .setContentText("${context.getString(R.string.tracks_in_queue)}: $videoQueueLen")
+    .addAction(CancelCurVideoAction(context))
+    .addAction(CancelAllActionCompat(context))
+
 internal fun DownloadNotificationBuilder(
     context: Context,
     videoTitle: String,
     videoQueueLen: Int,
     downloadedBytes: Long,
     totalBytes: Long
-) = BusyNotificationBuilder(context, "${context.getString(R.string.downloading)}: $videoTitle")
-    .setContentText("${context.getString(R.string.tracks_in_queue)}: $videoQueueLen")
+) = StartDownloadNotificationBuilder(context, videoTitle, videoQueueLen)
     .setProgress(totalBytes.toInt(), downloadedBytes.toInt(), false)
-    .addAction(CancelCurVideoAction(context))
-    .addAction(CancelAllActionCompat(context))
 
 internal fun ConvertingNotificationBuilder(context: Context, videoTitle: String) =
     BusyNotificationBuilder(context, "${context.getString(R.string.converting)}: $videoTitle")

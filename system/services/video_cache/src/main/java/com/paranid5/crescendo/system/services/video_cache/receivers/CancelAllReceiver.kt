@@ -5,7 +5,7 @@ import android.content.Context
 import android.content.Intent
 import com.paranid5.crescendo.system.services.video_cache.VideoCacheService
 
-fun CancelAllReceiver(service: VideoCacheService) =
+internal fun CancelAllReceiver(service: VideoCacheService) =
     object : BroadcastReceiver() {
         override fun onReceive(context: Context?, intent: Intent?) {
             service.mediaFileDownloader.onCanceledAll()
