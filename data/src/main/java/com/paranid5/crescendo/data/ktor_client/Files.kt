@@ -29,7 +29,7 @@ import kotlinx.coroutines.withTimeoutOrNull
 import java.io.File
 import java.util.concurrent.atomic.AtomicLong
 
-private const val TAG = "Ktor Client"
+private const val TAG = "KtorClient"
 
 private const val NEXT_PACKET_TIMEOUT = 3000L
 

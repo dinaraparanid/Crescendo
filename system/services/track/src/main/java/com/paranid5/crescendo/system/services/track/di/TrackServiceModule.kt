@@ -8,6 +8,6 @@ import org.koin.dsl.module
 
 val trackServiceModule = module {
     singleOf(::TrackServiceAccessor)
-    single { params -> PlayerProvider(params.get(), get(), get()) }
-    single { params -> NotificationManager(params.get(), get(), get()) }
+    factory { params -> PlayerProvider(params.get(), get(), get()) }
+    factory { params -> NotificationManager(params.get(), get(), get()) }
 }
