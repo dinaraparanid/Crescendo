@@ -19,7 +19,7 @@ internal fun PlayPauseEffect(
     val isPlaying by viewModel.collectIsPlayingAsState()
     val startPos by viewModel.collectStartPosInMillisAsState()
 
-    LaunchedEffect(isPlaying) {
+    LaunchedEffect(isPlaying, player) {
         when {
             isPlaying -> {
                 viewModel.setPlayerInitialized(true)

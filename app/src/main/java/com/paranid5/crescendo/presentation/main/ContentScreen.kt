@@ -203,7 +203,7 @@ private inline val endPaddingDefault
 private inline val topPaddingRequired
     @Composable
     get() = when (LocalConfiguration.current.orientation) {
-        Configuration.ORIENTATION_LANDSCAPE -> 0.dp
+        Configuration.ORIENTATION_LANDSCAPE -> 16.dp
         else -> 48.dp
     }
 

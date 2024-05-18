@@ -10,7 +10,7 @@ import kotlinx.coroutines.flow.collectLatest
 internal fun PlaybackPositionTappedEffect(player: Player) {
     val positionBroadcast = LocalTrimmerPositionBroadcast.current
 
-    LaunchedEffect(Unit) {
+    LaunchedEffect(player) {
         positionBroadcast.collectLatest {
             player.seekTo(it)
         }

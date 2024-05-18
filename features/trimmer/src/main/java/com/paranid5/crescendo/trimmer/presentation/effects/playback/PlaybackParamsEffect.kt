@@ -18,7 +18,7 @@ internal fun PlaybackParamsEffect(
     val pitch by viewModel.collectPitchAsState()
     val speed by viewModel.collectSpeedAsState()
 
-    LaunchedEffect(pitch, speed) {
+    LaunchedEffect(pitch, speed, player) {
         player.playbackParameters = PlaybackParameters(speed, pitch)
     }
 }
