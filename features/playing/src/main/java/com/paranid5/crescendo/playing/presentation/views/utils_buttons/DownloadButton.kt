@@ -17,19 +17,24 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.palette.graphics.Palette
+import com.paranid5.crescendo.cache.presentation.CacheDialog
 import com.paranid5.crescendo.core.resources.R
-import com.paranid5.crescendo.playing.presentation.views.CacheDialog
+import com.paranid5.crescendo.playing.presentation.PlayingViewModel
+import com.paranid5.crescendo.playing.presentation.properties.compose.collectPlayingUrlAsState
 import com.paranid5.crescendo.ui.permissions.requests.externalStoragePermissionsRequestLauncher
 import com.paranid5.crescendo.utils.extensions.getBrightDominantOrPrimary
 import com.paranid5.crescendo.utils.extensions.simpleShadow
+import org.koin.androidx.compose.koinViewModel
 
 @Composable
 internal fun DownloadButton(
     palette: Palette?,
     isLiveStreaming: Boolean,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    viewModel: PlayingViewModel = koinViewModel(),
 ) {
     val paletteColor = palette.getBrightDominantOrPrimary()
+    val playingUrl by viewModel.collectPlayingUrlAsState()
 
     val isCachePropertiesDialogShownState = remember {
         mutableStateOf(false)
@@ -55,6 +60,7 @@ internal fun DownloadButton(
 
         if (isCachePropertiesDialogShown && areStoragePermissionsGranted)
             CacheDialog(
+                url = playingUrl,
                 isDialogShownState = isCachePropertiesDialogShownState,
                 modifier = Modifier.align(Alignment.Center)
             )

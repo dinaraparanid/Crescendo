@@ -22,6 +22,7 @@
             <option value="$PROJECT_DIR$/features" />
             <option value="$PROJECT_DIR$/features/about_app" />
             <option value="$PROJECT_DIR$/features/audio_effects" />
+            <option value="$PROJECT_DIR$/features/cache" />
             <option value="$PROJECT_DIR$/features/current_playlist" />
             <option value="$PROJECT_DIR$/features/favourites" />
             <option value="$PROJECT_DIR$/features/fetch_stream" />

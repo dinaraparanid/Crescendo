@@ -4,7 +4,7 @@ plugins {
 }
 
 android {
-    namespace = "com.paranid5.crescendo.fetch_stream"
+    namespace = "com.paranid5.crescendo.cache"
     compileSdk = 34
 
     defaultConfig {
@@ -40,22 +40,20 @@ android {
 
 dependencies {
     implementation(project(":core:common"))
-    implementation(project(":core:impl"))
-    implementation(project(":core:ui"))
-    implementation(project(":core:utils"))
     implementation(project(":core:resources"))
-    implementation(project(":data"))
+    implementation(project(":core:ui"))
     implementation(project(":domain"))
-    implementation(project(":system:services:stream"))
+    implementation(project(":data"))
+    implementation(project(":system:services:video_cache"))
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)
-    implementation(libs.androidx.foundation.android)
+    implementation(libs.material)
     implementation(libs.androidx.ui)
-    implementation(libs.androidx.material)
     implementation(libs.androidx.material3)
     implementation(libs.material)
 
+    implementation(libs.kotlinx.collections.immutable)
     implementation(libs.koin.androidx.compose)
-    implementation(project(":features:cache"))
+    implementation(project(":core:utils"))
 }

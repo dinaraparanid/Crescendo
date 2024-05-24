@@ -9,7 +9,8 @@ import com.paranid5.crescendo.data.sources.playback.StreamPlaybackPositionPublis
 import com.paranid5.crescendo.data.sources.playback.StreamPlaybackPositionSubscriberImpl
 import com.paranid5.crescendo.data.sources.playback.TracksPlaybackPositionPublisherImpl
 import com.paranid5.crescendo.data.sources.playback.TracksPlaybackPositionSubscriberImpl
-import com.paranid5.crescendo.data.sources.stream.CurrentUrlSubscriberImpl
+import com.paranid5.crescendo.data.sources.stream.CurrentMetadataSubscriberImpl
+import com.paranid5.crescendo.data.sources.stream.PlayingUrlSubscriberImpl
 import com.paranid5.crescendo.data.sources.tracks.CurrentTrackSubscriberImpl
 import com.paranid5.crescendo.domain.repositories.CurrentPlaylistRepository
 import com.paranid5.crescendo.domain.sources.playback.AudioStatusPublisher
@@ -19,10 +20,9 @@ import com.paranid5.crescendo.domain.sources.playback.StreamPlaybackPositionPubl
 import com.paranid5.crescendo.domain.sources.playback.StreamPlaybackPositionSubscriber
 import com.paranid5.crescendo.domain.sources.playback.TracksPlaybackPositionPublisher
 import com.paranid5.crescendo.domain.sources.playback.TracksPlaybackPositionSubscriber
-import com.paranid5.crescendo.domain.sources.stream.CurrentUrlSubscriber
+import com.paranid5.crescendo.domain.sources.stream.CurrentMetadataSubscriber
+import com.paranid5.crescendo.domain.sources.stream.PlayingUrlSubscriber
 import com.paranid5.crescendo.domain.sources.tracks.CurrentTrackSubscriber
-import com.paranid5.crescendo.playing.data.CacheDialogDataSource
-import com.paranid5.crescendo.playing.data.CacheDialogDataSourceImpl
 
 @Suppress("IncorrectFormatting")
 class PlayingViewModel(
@@ -37,5 +37,5 @@ class PlayingViewModel(
     TracksPlaybackPositionPublisher by TracksPlaybackPositionPublisherImpl(storageRepository),
     RepeatingSubscriber by RepeatingSubscriberImpl(storageRepository),
     CurrentTrackSubscriber by CurrentTrackSubscriberImpl(storageRepository, currentPlaylistRepository),
-    CurrentUrlSubscriber by CurrentUrlSubscriberImpl(storageRepository),
-    CacheDialogDataSource by CacheDialogDataSourceImpl(storageRepository)
+    CurrentMetadataSubscriber by CurrentMetadataSubscriberImpl(storageRepository),
+    PlayingUrlSubscriber by PlayingUrlSubscriberImpl(storageRepository)

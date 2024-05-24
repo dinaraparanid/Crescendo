@@ -66,4 +66,5 @@ dependencies {
     implementation(libs.coil.compose)
 
     implementation(libs.audiovisualizer)
+    implementation(project(":features:cache"))
 }

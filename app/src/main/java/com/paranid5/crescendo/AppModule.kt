@@ -2,9 +2,8 @@ package com.paranid5.crescendo
 
 import android.os.Build
 import androidx.annotation.StringRes
-import androidx.compose.runtime.Composable
-import androidx.lifecycle.ViewModel
 import com.paranid5.crescendo.audio_effects.di.audioEffectsModule
+import com.paranid5.crescendo.cache.di.cacheModule
 import com.paranid5.crescendo.core.common.eq.EqualizerData
 import com.paranid5.crescendo.core.impl.di.AUDIO_SESSION_ID
 import com.paranid5.crescendo.core.impl.di.EQUALIZER_DATA
@@ -21,7 +20,6 @@ import com.paranid5.crescendo.data.dataModule
 import com.paranid5.crescendo.data.ktor_client.KtorClient
 import com.paranid5.crescendo.fetch_stream.di.fetchStreamModule
 import com.paranid5.crescendo.playing.di.playingModule
-import com.paranid5.crescendo.presentation.composition_locals.LocalActivity
 import com.paranid5.crescendo.system.services.stream.di.streamServiceModule
 import com.paranid5.crescendo.system.services.track.di.trackServiceModule
 import com.paranid5.crescendo.system.services.video_cache.di.videoCacheServiceModule
@@ -35,7 +33,6 @@ import com.paranid5.system.services.common.di.commonServiceModule
 import kotlinx.coroutines.flow.MutableStateFlow
 import org.koin.android.ext.koin.androidApplication
 import org.koin.android.ext.koin.androidContext
-import org.koin.androidx.compose.koinViewModel
 import org.koin.core.module.dsl.singleOf
 import org.koin.core.qualifier.named
 import org.koin.core.scope.Scope
@@ -108,14 +105,11 @@ private val uiModule = module {
     includes(
         fetchStreamModule, playingModule,
         audioEffectsModule, trimmerModule,
-        tracksModule, currentPlaylistModule
+        tracksModule, currentPlaylistModule,
+        cacheModule
     )
 }
 
 val appModule = module {
     includes(globalsModule, uiModule, dataModule)
 }
-
-@Composable
-inline fun <reified V : ViewModel> koinActivityViewModel() =
-    koinViewModel<V>(viewModelStoreOwner = LocalActivity.current!!)

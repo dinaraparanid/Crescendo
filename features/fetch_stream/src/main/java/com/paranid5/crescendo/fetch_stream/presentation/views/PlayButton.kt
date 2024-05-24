@@ -2,6 +2,7 @@ package com.paranid5.crescendo.fetch_stream.presentation.views
 
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -32,7 +33,7 @@ import org.koin.androidx.compose.koinViewModel
 import org.koin.compose.koinInject
 
 @Composable
-internal fun ConfirmButton(modifier: Modifier = Modifier) {
+internal fun PlayButton(modifier: Modifier = Modifier) {
     val isForegroundServicePermissionDialogShownState = remember { mutableStateOf(false) }
     val isAudioRecordingPermissionDialogShownState = remember { mutableStateOf(false) }
 
@@ -49,19 +50,21 @@ internal fun ConfirmButton(modifier: Modifier = Modifier) {
                 Modifier.align(Alignment.Center)
             )
 
-        ConfirmButtonImpl(
+        PlayButtonImpl(
             areForegroundPermissionsGranted = areForegroundPermissionsGranted,
             isRecordingPermissionGranted = isRecordingPermissionGranted,
             launchFSPermissions = launchFSPermissions,
             launchRecordPermissions = launchRecordPermissions,
-            modifier = Modifier.align(Alignment.Center),
+            modifier = Modifier
+                .fillMaxWidth()
+                .align(Alignment.Center),
         )
     }
 }
 
 @OptIn(ExperimentalMaterialApi::class, ExperimentalFoundationApi::class)
 @Composable
-private inline fun ConfirmButtonImpl(
+private inline fun PlayButtonImpl(
     areForegroundPermissionsGranted: Boolean,
     isRecordingPermissionGranted: Boolean,
     crossinline launchFSPermissions: () -> Unit,
@@ -84,7 +87,7 @@ private inline fun ConfirmButtonImpl(
         colors = ButtonDefaults.buttonColors(
             containerColor = colors.backgroundAlternative
         ),
-        content = { ConfirmButtonLabel() },
+        content = { ButtonLabel(stringResource(R.string.play)) },
         onClick = {
             when {
                 !areForegroundPermissionsGranted ->
@@ -104,18 +107,5 @@ private inline fun ConfirmButtonImpl(
                 }
             }
         }
-    )
-}
-
-@Composable
-private fun ConfirmButtonLabel(modifier: Modifier = Modifier) {
-    val colors = LocalAppColors.current
-
-    Text(
-        text = stringResource(R.string.confirm),
-        color = colors.fontColor,
-        fontSize = 14.sp,
-        fontWeight = FontWeight.Bold,
-        modifier = modifier
     )
 }

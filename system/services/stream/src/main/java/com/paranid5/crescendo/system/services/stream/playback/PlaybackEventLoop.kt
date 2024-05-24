@@ -23,7 +23,7 @@ internal suspend fun StreamService.startPlaybackEventLoop() =
 
 private fun ArgsFlow(service: StreamService) =
     combine(
-        service.playerProvider.currentUrlFlow,
+        service.playerProvider.playingUrlFlow,
         service.playerProvider.streamPlaybackPositionFlow,
         service.playerProvider.currentMetadataFlow,
     ) { url, position, metadata ->

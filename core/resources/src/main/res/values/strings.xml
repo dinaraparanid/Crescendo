@@ -8,7 +8,6 @@
     <string name="favourites">Favourites</string>
     <string name="enter_stream_url">Enter YouTube URL to start streaming</string>
     <string name="your_url">YouTube URL link</string>
-    <string name="confirm">Confirm</string>
     <string name="stream_no_name">Unknown Video</string>
     <string name="unknown_streamer">Unknown channel</string>
     <string name="video_cover">Video cover</string>

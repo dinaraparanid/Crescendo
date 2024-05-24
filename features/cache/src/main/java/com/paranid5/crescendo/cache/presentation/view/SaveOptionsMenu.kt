@@ -1,4 +1,4 @@
-package com.paranid5.crescendo.playing.presentation.views.cache
+package com.paranid5.crescendo.cache.presentation.view
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -17,10 +17,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.sp
+import com.paranid5.crescendo.cache.presentation.CacheViewModel
+import com.paranid5.crescendo.cache.presentation.properties.collectSelectedSaveOptionIndexAsState
 import com.paranid5.crescendo.core.resources.R
 import com.paranid5.crescendo.core.resources.ui.theme.LocalAppColors
-import com.paranid5.crescendo.playing.presentation.PlayingViewModel
-import com.paranid5.crescendo.playing.presentation.properties.compose.collectSelectedSaveOptionIndexAsState
 import kotlinx.collections.immutable.persistentListOf
 import org.koin.androidx.compose.koinViewModel
 
@@ -42,7 +42,7 @@ internal fun SaveOptionsMenu(modifier: Modifier = Modifier) {
 private fun OptionLabel(
     isDropdownShownState: MutableState<Boolean>,
     modifier: Modifier = Modifier,
-    viewModel: PlayingViewModel = koinViewModel()
+    viewModel: CacheViewModel = koinViewModel()
 ) {
     val colors = LocalAppColors.current
     val selectedSaveOptionIndex by viewModel.collectSelectedSaveOptionIndexAsState()
@@ -79,7 +79,7 @@ private fun OptionMenuItem(
     index: Int,
     item: String,
     modifier: Modifier = Modifier,
-    viewModel: PlayingViewModel = koinViewModel()
+    viewModel: CacheViewModel = koinViewModel()
 ) {
     val colors = LocalAppColors.current
 

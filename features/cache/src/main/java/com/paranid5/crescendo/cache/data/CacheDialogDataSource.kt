@@ -1,4 +1,4 @@
-package com.paranid5.crescendo.playing.data
+package com.paranid5.crescendo.cache.data
 
 import com.paranid5.crescendo.core.common.caching.Formats
 import com.paranid5.crescendo.core.common.trimming.TrimRange

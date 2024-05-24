@@ -1,4 +1,4 @@
-package com.paranid5.crescendo.playing.presentation.views.cache
+package com.paranid5.crescendo.cache.presentation.view
 
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -6,20 +6,22 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
+import com.paranid5.crescendo.cache.domain.CacheInteractor
+import com.paranid5.crescendo.cache.presentation.CacheViewModel
+import com.paranid5.crescendo.cache.presentation.composition_local.LocalDownloadUrl
+import com.paranid5.crescendo.cache.presentation.properties.collectCacheFormatAsState
+import com.paranid5.crescendo.cache.presentation.properties.collectFilenameAsState
+import com.paranid5.crescendo.cache.presentation.properties.collectIsCacheButtonClickableAsState
+import com.paranid5.crescendo.cache.presentation.properties.collectTrimRangeAsState
 import com.paranid5.crescendo.core.resources.R
 import com.paranid5.crescendo.core.resources.ui.theme.LocalAppColors
-import com.paranid5.crescendo.playing.domain.PlayingInteractor
-import com.paranid5.crescendo.playing.presentation.PlayingViewModel
-import com.paranid5.crescendo.playing.presentation.properties.compose.collectCacheFormatAsState
-import com.paranid5.crescendo.playing.presentation.properties.compose.collectCurrentUrlAsState
-import com.paranid5.crescendo.playing.presentation.properties.compose.collectFilenameAsState
-import com.paranid5.crescendo.playing.presentation.properties.compose.collectIsCacheButtonClickableAsState
-import com.paranid5.crescendo.playing.presentation.properties.compose.collectTrimRangeAsState
+import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
 import org.koin.compose.koinInject
 
@@ -27,17 +29,19 @@ import org.koin.compose.koinInject
 internal fun ConfirmButton(
     isDialogShownState: MutableState<Boolean>,
     modifier: Modifier = Modifier,
-    viewModel: PlayingViewModel = koinViewModel(),
-    interactor: PlayingInteractor = koinInject()
+    viewModel: CacheViewModel = koinViewModel(),
+    interactor: CacheInteractor = koinInject()
 ) {
     val colors = LocalAppColors.current
-    var isDialogShown by isDialogShownState
+    val downloadingUrl = LocalDownloadUrl.current
 
     val isButtonClickable by viewModel.collectIsCacheButtonClickableAsState()
-    val url by viewModel.collectCurrentUrlAsState()
     val filename by viewModel.collectFilenameAsState()
     val format by viewModel.collectCacheFormatAsState()
     val trimRange by viewModel.collectTrimRangeAsState()
+
+    val coroutineScope = rememberCoroutineScope()
+    var isDialogShown by isDialogShownState
 
     Button(
         modifier = modifier,
@@ -47,14 +51,17 @@ internal fun ConfirmButton(
         ),
         content = { ConfirmButtonLabel() },
         onClick = {
-            interactor.launchVideoCacheService(
-                url = url,
-                desiredFilename = filename,
-                format = format,
-                trimRange = trimRange
-            )
+            coroutineScope.launch {
+                interactor.startCaching(
+                    url = downloadingUrl,
+                    desiredFilename = filename,
+                    format = format,
+                    trimRange = trimRange,
+                    viewModel = viewModel
+                )
 
-            isDialogShown = false
+                isDialogShown = false
+            }
         },
     )
 }

@@ -11,7 +11,7 @@ private val youtubeUrlRegex = Regex(
 internal inline val FetchStreamViewModel.currentTextFlow
     get() = combine(
         savedUrlState,
-        currentUrlFlow,
+        playingUrlFlow,
     ) { saved, current ->
         saved ?: current
     }

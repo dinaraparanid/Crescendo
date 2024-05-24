@@ -76,6 +76,7 @@ dependencies {
     implementation project(':features:current_playlist')
     implementation project(':features:trimmer')
     implementation project(':features:playing')
+    implementation project(':features:cache')
     implementation project(':system:common')
     implementation project(':system:receivers')
     implementation project(':system:services:stream')

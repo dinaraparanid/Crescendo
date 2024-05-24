@@ -11,22 +11,31 @@ import kotlinx.serialization.json.Json
 
 class StreamStateDataSource(private val dataStore: DataStore<Preferences>) {
     private companion object {
-        private val CURRENT_URL = stringPreferencesKey("current_url")
+        private val PLAYING_URL = stringPreferencesKey("current_url")
+        private val DOWNLOADING_URL = stringPreferencesKey("download_url")
         private val CURRENT_METADATA = stringPreferencesKey("current_metadata")
     }
 
     private val json by lazy { Json { ignoreUnknownKeys = true } }
 
-    val currentUrlFlow by lazy {
+    val playingUrlFlow by lazy {
         dataStore.data
-            .map { preferences -> preferences[CURRENT_URL] }
+            .map { preferences -> preferences[PLAYING_URL] }
             .map { it ?: "" }
     }
 
-    suspend fun storeCurrentUrl(url: String) {
-        dataStore.edit { preferences ->
-            preferences[CURRENT_URL] = url
-        }
+    suspend fun storePlayingUrl(url: String) {
+        dataStore.edit { preferences -> preferences[PLAYING_URL] = url }
+    }
+
+    val downloadingUrlFlow by lazy {
+        dataStore.data
+            .map { preferences -> preferences[DOWNLOADING_URL] }
+            .map { it ?: "" }
+    }
+
+    suspend fun storeDownloadingUrl(url: String) {
+        dataStore.edit { preferences -> preferences[DOWNLOADING_URL] = url }
     }
 
     val currentMetadataFlow by lazy {

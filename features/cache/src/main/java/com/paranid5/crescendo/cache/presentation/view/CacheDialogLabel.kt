@@ -1,4 +1,4 @@
-package com.paranid5.crescendo.playing.presentation.views.cache
+package com.paranid5.crescendo.cache.presentation.view
 
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
