@@ -1,7 +1,7 @@
 **Crescendo**
 -----------------
 
-[![Kotlin](https://img.shields.io/badge/kotlin-1.9.0-blue.svg?logo=kotlin)](http://kotlinlang.org)
+[![Kotlin](https://img.shields.io/badge/kotlin-2.0.0-blue.svg?logo=kotlin)](http://kotlinlang.org)
 
 ## **Developer**
 [Paranid5](https://github.com/dinaraparanid)
@@ -65,7 +65,7 @@ Crescendo provides multiple features to move your music experience to a new leve
 <ul>
     <li>General</li>
     <ul>
-        <li>Kotlin 1.9</li>
+        <li>Kotlin 2.0</li>
         <li>Coroutines + Flow</li>
         <li>Koin</li>
         <li>Ktor + OkHttp (Content Negotiation + Json)</li>

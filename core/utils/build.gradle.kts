@@ -4,6 +4,7 @@ plugins {
     id("kotlin-parcelize")
     id("org.jetbrains.kotlin.plugin.serialization") version "1.9.0"
     id("app.cash.sqldelight") version "2.0.1"
+    alias(libs.plugins.compose.compiler)
 }
 
 sqldelight {
@@ -42,12 +43,6 @@ android {
     kotlinOptions {
         jvmTarget = "1.8"
         freeCompilerArgs = listOf("-Xcontext-receivers")
-    }
-    buildFeatures {
-        compose = true
-    }
-    composeOptions {
-        kotlinCompilerExtensionVersion = "1.5.7"
     }
 }
 
