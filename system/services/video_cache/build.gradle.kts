@@ -53,4 +53,5 @@ dependencies {
     implementation(libs.arrow.fx.coroutines)
 
     implementation(libs.yt.url.extractor.kt)
+    implementation(libs.ytdl.lib)
 }

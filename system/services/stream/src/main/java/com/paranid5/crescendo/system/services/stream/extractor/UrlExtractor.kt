@@ -10,7 +10,11 @@ import com.paranid5.yt_url_extractor_kt.VideoMeta
 import com.paranid5.yt_url_extractor_kt.YtFilesNotFoundException
 import com.paranid5.yt_url_extractor_kt.YtRequestTimeoutException
 import com.paranid5.yt_url_extractor_kt.extractYtFilesWithMeta
+import com.yausername.youtubedl_android.YoutubeDL
+import com.yausername.youtubedl_android.YoutubeDLRequest
 import io.ktor.client.HttpClient
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import kotlinx.coroutines.withTimeout
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
@@ -23,9 +27,9 @@ internal class UrlExtractor : KoinComponent {
 
     suspend fun extractAudioUrlWithMeta(
         context: Context,
-        ytUrl: String
+        ytUrl: String,
     ) = either {
-        val (ytFiles, liveStreamManifestsRes, videoMetaRes) = extractYtFilesWithMeta(context, ytUrl)
+        val (_, liveStreamManifestsRes, videoMetaRes) = extractYtFilesWithMeta(context, ytUrl)
             .mapLeft { YtRequestTimeoutException() }
             .bind()
 
@@ -34,7 +38,7 @@ internal class UrlExtractor : KoinComponent {
 
         val audioUrl = when (videoMeta.isLiveStream) {
             true -> liveStreamManifests?.hlsManifestUrl
-            else -> ytFiles[DEFAULT_AUDIO_TAG]?.url
+            else -> withContext(Dispatchers.IO) { extractWithYtDl(ytUrl) }
         }
 
         ensure(audioUrl != null) {
@@ -53,6 +57,12 @@ internal class UrlExtractor : KoinComponent {
             }
         }
 }
+
+private fun extractWithYtDl(ytUrl: String) =
+    YoutubeDL
+        .getInstance()
+        .getInfo(YoutubeDLRequest(ytUrl).apply { addOption("-f", "best") })
+        .url
 
 internal fun Result<VideoMeta>.getOrDefault() =
     getOrNull()?.let(::fromYtMeta) ?: VideoMetadata()

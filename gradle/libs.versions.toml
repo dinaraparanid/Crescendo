@@ -29,6 +29,7 @@ paletteKtx = "1.0.0"
 ui = "1.6.8"
 ytUrlExtractorKt = "0.1.0.2"
 foundationAndroid = "1.6.8"
+ytdl = "0.15.0"
 agp = "8.4.2"
 kotlin = "2.0.0"
 junit = "4.13.2"
@@ -93,6 +94,9 @@ sqldelight-android-driver = { module = "app.cash.sqldelight:android-driver", ver
 sqldelight-coroutines-extensions = { module = "app.cash.sqldelight:coroutines-extensions", version.ref = "sqlDelight" }
 
 yt-url-extractor-kt = { module = "com.github.dinaraparanid:yt-url-extractor-kt", version.ref = "ytUrlExtractorKt" }
+ytdl-lib = { group = "com.github.yausername.youtubedl-android", name = "library", version.ref = "ytdl" }
+ytdl-ffmpeg = { group = "com.github.yausername.youtubedl-android", name = "ffmpeg", version.ref = "ytdl" }
+ytdl-aria = { group = "com.github.yausername.youtubedl-android", name = "aria2c", version.ref = "ytdl" }
 
 junit = { group = "junit", name = "junit", version.ref = "junit" }
 androidx-junit = { group = "androidx.test.ext", name = "junit", version.ref = "junitVersion" }
@@ -102,3 +106,6 @@ androidx-espresso-core = { group = "androidx.test.espresso", name = "espresso-co
 android-library = { id = "com.android.library", version.ref = "agp" }
 jetbrains-kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
 compose-compiler = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
+
+[bundles]
+ytdl = ["ytdl-lib", "ytdl-ffmpeg", "ytdl-aria"]
