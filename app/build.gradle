@@ -63,9 +63,13 @@ dependencies {
     implementation project(':core:ui')
     implementation project(':core:resources')
     implementation project(':core:utils')
+
     implementation project(':data')
+
     implementation project(':domain')
+
     implementation project(':navigation')
+
     implementation project(':features:about_app')
     implementation project(':features:audio_effects')
     implementation project(':features:settings')
@@ -78,6 +82,7 @@ dependencies {
     implementation project(':features:trimmer')
     implementation project(':features:playing')
     implementation project(':features:cache')
+
     implementation project(':system:common')
     implementation project(':system:receivers')
     implementation project(':system:services:stream')
@@ -107,6 +112,7 @@ dependencies {
     implementation libs.androidx.palette.ktx
 
     implementation libs.koin.androidx.compose
+    implementation libs.koin.test
 
     implementation libs.ktor.client.core
 
@@ -114,6 +120,8 @@ dependencies {
 
     implementation libs.arrow.fx.coroutines
 
+    implementation libs.kotlin.test
+    implementation libs.kotlin.test.junit
     implementation libs.kotlinx.serialization.json
     implementation libs.kotlinx.collections.immutable
 
@@ -133,4 +141,11 @@ dependencies {
     implementation libs.ytdl.lib
 
     implementation files('libs/jave-1.0.2.jar')
+}
+
+tasks.configureEach {
+    final var taskName = it.name
+
+    if (taskName == "assembleDebug" || taskName == "assembleRelease")
+        it.dependsOn("testDebugUnitTest")
 }
