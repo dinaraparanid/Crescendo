@@ -15,7 +15,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.paranid5.crescendo.core.common.eq.EqualizerData
+import com.paranid5.crescendo.domain.audio_effects.entity.EqualizerData
 import com.paranid5.crescendo.core.impl.di.EQUALIZER_DATA
 import com.paranid5.crescendo.core.resources.R
 import com.paranid5.crescendo.core.resources.ui.theme.LocalAppColors
@@ -76,7 +76,7 @@ private fun BandDbLabel(
 private fun BandHzLabel(
     index: Int,
     modifier: Modifier = Modifier,
-    equalizerDataState: MutableStateFlow<EqualizerData?> = koinInject(named(EQUALIZER_DATA)),
+    equalizerDataState: MutableStateFlow<com.paranid5.crescendo.domain.audio_effects.entity.EqualizerData?> = koinInject(named(EQUALIZER_DATA)),
 ) {
     val colors = LocalAppColors.current
     val equalizerData by equalizerDataState.collectLatestAsState()

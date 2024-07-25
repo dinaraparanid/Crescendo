@@ -28,11 +28,13 @@ import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import org.koin.core.qualifier.named
 
-private const val TEN_SECS_AS_MILLIS = 10000
+private const val TEN_SECS_AS_MILLIS = 10_000
 
-internal class PlayerControllerImpl(service: StreamService, storageRepository: StorageRepository) :
-    PlayerController, KoinComponent,
-    AudioEffectsController by AudioEffectsControllerImpl(storageRepository),
+internal class PlayerControllerImpl(
+    service: StreamService,
+    storageRepository: StorageRepository,
+) : PlayerController, KoinComponent,
+    AudioEffectsController by AudioEffectsControllerImpl(),
     RepeatingSubscriber by RepeatingSubscriberImpl(storageRepository),
     RepeatingPublisher by RepeatingPublisherImpl(storageRepository) {
     private val _isPlayingState by inject<MutableStateFlow<Boolean>>(named(IS_PLAYING))

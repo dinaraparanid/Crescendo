@@ -30,9 +30,11 @@ import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import org.koin.core.qualifier.named
 
-internal class PlayerControllerImpl(service: TrackService, storageRepository: StorageRepository) :
-    PlayerController, KoinComponent,
-    AudioEffectsController by AudioEffectsControllerImpl(storageRepository),
+internal class PlayerControllerImpl(
+    service: TrackService,
+    storageRepository: StorageRepository,
+) : PlayerController, KoinComponent,
+    AudioEffectsController by AudioEffectsControllerImpl(),
     RepeatingSubscriber by RepeatingSubscriberImpl(storageRepository),
     RepeatingPublisher by RepeatingPublisherImpl(storageRepository) {
     private val _isPlayingState by inject<MutableStateFlow<Boolean>>(named(IS_PLAYING))

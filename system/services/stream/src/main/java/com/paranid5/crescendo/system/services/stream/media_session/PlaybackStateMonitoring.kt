@@ -33,7 +33,7 @@ internal suspend fun StreamService.startPlaybackStatesMonitoring() =
                     isPlaying = isPlaying,
                     isRepeating = isRepeating,
                     currentPlaybackPosition = position,
-                    speed = speed
+                    speed = speed,
                 )
             }
             .collectLatest {

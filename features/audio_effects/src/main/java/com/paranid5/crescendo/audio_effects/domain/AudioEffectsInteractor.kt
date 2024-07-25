@@ -1,9 +1,8 @@
 package com.paranid5.crescendo.audio_effects.domain
 
-import com.paranid5.crescendo.core.common.eq.EqualizerData
+import com.paranid5.crescendo.domain.audio_effects.entity.EqualizerData
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.toImmutableList
-import org.koin.core.component.KoinComponent
 
 internal fun isParamInputValid(input: String): Boolean {
     val value = input.toFloatOrNull() ?: return false
@@ -14,7 +13,7 @@ internal fun updatedEQBandLevels(
     level: Float,
     index: Int,
     presentLvlsDbState: MutableList<Float>,
-    equalizerData: EqualizerData,
+    equalizerData: com.paranid5.crescendo.domain.audio_effects.entity.EqualizerData,
 ): ImmutableList<Short> {
     presentLvlsDbState[index] = level
 

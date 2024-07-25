@@ -7,11 +7,8 @@ import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.floatPreferencesKey
 import androidx.datastore.preferences.core.intPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
-import com.paranid5.crescendo.core.common.eq.EqualizerBandsPreset
-import com.paranid5.crescendo.core.common.eq.EqualizerData
-import kotlinx.collections.immutable.ImmutableList
-import kotlinx.collections.immutable.persistentListOf
-import kotlinx.collections.immutable.toImmutableList
+import com.paranid5.crescendo.domain.audio_effects.entity.EqualizerBandsPreset
+import com.paranid5.crescendo.domain.audio_effects.entity.EqualizerData
 import kotlinx.coroutines.flow.map
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
@@ -28,6 +25,12 @@ class AudioEffectsStateDataSource(private val dataStore: DataStore<Preferences>)
 
         private val BASS_STRENGTH = intPreferencesKey("bass_strength")
         private val REVERB_PRESET = intPreferencesKey("reverb_preset")
+
+        private const val INITIAL_PITCH = 1.0F
+        private const val INITIAL_SPEED = 1.0F
+        private const val INITIAL_EQ_PRESET = 0
+        private const val INITIAL_BASS_STRENGTH: Short = 0
+        private const val INITIAL_REVERB_PRESET: Short = 0
     }
 
     private val json by lazy { Json { ignoreUnknownKeys = true } }
@@ -47,7 +50,7 @@ class AudioEffectsStateDataSource(private val dataStore: DataStore<Preferences>)
     val pitchFlow by lazy {
         dataStore.data
             .map { preferences -> preferences[PITCH_VALUE] }
-            .map { it ?: 1.0F }
+            .map { it ?: INITIAL_PITCH }
     }
 
     suspend fun storePitch(pitch: Float) {
@@ -59,7 +62,7 @@ class AudioEffectsStateDataSource(private val dataStore: DataStore<Preferences>)
     val speedFlow by lazy {
         dataStore.data
             .map { preferences -> preferences[SPEED_VALUE] }
-            .map { it ?: 1.0F }
+            .map { it ?: INITIAL_SPEED }
     }
 
     suspend fun storeSpeed(speed: Float) {
@@ -72,12 +75,12 @@ class AudioEffectsStateDataSource(private val dataStore: DataStore<Preferences>)
         dataStore.data
             .map { preferences -> preferences[EQ_BANDS] }
             .map { bandsStr -> bandsStr?.let(json::decodeEqBands) }
-            .map { it ?: persistentListOf() }
+            .map { it ?: emptyList() }
     }
 
-    suspend fun storeEqualizerBands(bands: ImmutableList<Short>) {
+    suspend fun storeEqualizerBands(bands: List<Short>) {
         dataStore.edit { preferences ->
-            preferences[EQ_BANDS] = json.encodeToString(bands.toList())
+            preferences[EQ_BANDS] = json.encodeToString(bands)
         }
     }
 
@@ -96,7 +99,7 @@ class AudioEffectsStateDataSource(private val dataStore: DataStore<Preferences>)
 
     val equalizerParamFlow by lazy {
         dataStore.data
-            .map { preferences -> preferences[EQ_PARAM] ?: 0 }
+            .map { preferences -> preferences[EQ_PARAM] ?: INITIAL_EQ_PRESET }
             .map { param -> EqualizerBandsPreset.entries[param] }
     }
 
@@ -109,7 +112,7 @@ class AudioEffectsStateDataSource(private val dataStore: DataStore<Preferences>)
     val bassStrengthFlow by lazy {
         dataStore.data
             .map { preferences -> preferences[BASS_STRENGTH] }
-            .map { strength -> strength?.toShort() ?: 0 }
+            .map { strength -> strength?.toShort() ?: INITIAL_BASS_STRENGTH }
     }
 
     suspend fun storeBassStrength(bassStrength: Short) {
@@ -121,7 +124,7 @@ class AudioEffectsStateDataSource(private val dataStore: DataStore<Preferences>)
     val reverbPresetFlow by lazy {
         dataStore.data
             .map { preferences -> preferences[REVERB_PRESET] }
-            .map { preset -> preset?.toShort() ?: 0 }
+            .map { preset -> preset?.toShort() ?: INITIAL_REVERB_PRESET }
     }
 
     suspend fun storeReverbPreset(reverbPreset: Short) {
@@ -132,4 +135,4 @@ class AudioEffectsStateDataSource(private val dataStore: DataStore<Preferences>)
 }
 
 private fun Json.decodeEqBands(bandsStr: String) =
-    decodeFromString<List<Short>?>(bandsStr)?.toImmutableList()
+    decodeFromString<List<Short>?>(bandsStr)

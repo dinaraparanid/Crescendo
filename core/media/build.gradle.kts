@@ -34,9 +34,11 @@ android {
 }
 
 dependencies {
-    implementation(project(":core:common"))
-    implementation(project(":core:resources"))
-    implementation(project(":core:utils"))
+    api(project(":core:common"))
+    api(project(":core:resources"))
+    api(project(":core:utils"))
+
+    api(project(":domain:audio_effects"))
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)

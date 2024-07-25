@@ -22,7 +22,7 @@ import androidx.compose.ui.unit.Constraints
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import com.paranid5.crescendo.audio_effects.presentation.view.getBandTrackModel
-import com.paranid5.crescendo.core.common.eq.EqualizerData
+import com.paranid5.crescendo.domain.audio_effects.entity.EqualizerData
 import com.paranid5.crescendo.core.impl.di.EQUALIZER_DATA
 import com.paranid5.crescendo.core.resources.R
 import com.paranid5.crescendo.utils.extensions.collectLatestAsState
@@ -36,7 +36,7 @@ internal fun BandController(
     presentLvlsDbState: SnapshotStateList<Float>,
     pointsState: SnapshotStateList<Offset>,
     modifier: Modifier = Modifier,
-    equalizerDataState: MutableStateFlow<EqualizerData?> = koinInject(named(EQUALIZER_DATA)),
+    equalizerDataState: MutableStateFlow<com.paranid5.crescendo.domain.audio_effects.entity.EqualizerData?> = koinInject(named(EQUALIZER_DATA)),
 ) {
     val equalizerData by equalizerDataState.collectLatestAsState()
 

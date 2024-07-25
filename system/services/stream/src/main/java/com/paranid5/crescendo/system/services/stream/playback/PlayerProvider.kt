@@ -7,6 +7,7 @@ import com.paranid5.crescendo.data.sources.playback.StreamPlaybackPositionSubscr
 import com.paranid5.crescendo.data.sources.stream.CurrentMetadataSubscriberImpl
 import com.paranid5.crescendo.data.sources.stream.PlayingUrlPublisherImpl
 import com.paranid5.crescendo.data.sources.stream.PlayingUrlSubscriberImpl
+import com.paranid5.crescendo.domain.audio_effects.AudioEffectsRepository
 import com.paranid5.crescendo.domain.sources.playback.StreamPlaybackPositionPublisher
 import com.paranid5.crescendo.domain.sources.playback.StreamPlaybackPositionSubscriber
 import com.paranid5.crescendo.domain.sources.stream.CurrentMetadataSubscriber
@@ -17,10 +18,11 @@ import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import org.koin.core.component.KoinComponent
 
-@Suppress("IncorrectFormatting")
-internal class PlayerProvider(service: StreamService, storageRepository: StorageRepository) :
-    KoinComponent,
-    PlayerController by PlayerControllerImpl(service, storageRepository),
+internal class PlayerProvider(
+    service: StreamService,
+    storageRepository: StorageRepository,
+    audioEffectsRepository: AudioEffectsRepository,
+) : PlayerController by PlayerControllerImpl(service, storageRepository),
     PlayingUrlSubscriber by PlayingUrlSubscriberImpl(storageRepository),
     PlayingUrlPublisher by PlayingUrlPublisherImpl(storageRepository),
     CurrentMetadataSubscriber by CurrentMetadataSubscriberImpl(storageRepository),
@@ -32,6 +34,38 @@ internal class PlayerProvider(service: StreamService, storageRepository: Storage
 
     val playbackEventFlow by lazy {
         _playbackEventFlow.asSharedFlow()
+    }
+
+    val areAudioEffectsEnabledFlow by lazy {
+        audioEffectsRepository.areAudioEffectsEnabledFlow
+    }
+
+    val speedFlow by lazy {
+        audioEffectsRepository.speedFlow
+    }
+
+    val pitchFlow by lazy {
+        audioEffectsRepository.pitchFlow
+    }
+
+    val equalizerBandsFlow by lazy {
+        audioEffectsRepository.equalizerBandsFlow
+    }
+
+    val equalizerPresetFlow by lazy {
+        audioEffectsRepository.equalizerPresetFlow
+    }
+
+    val equalizerParamFlow by lazy {
+        audioEffectsRepository.equalizerParamFlow
+    }
+
+    val bassStrengthFlow by lazy {
+        audioEffectsRepository.bassStrengthFlow
+    }
+
+    val reverbPresetFlow by lazy {
+        audioEffectsRepository.reverbPresetFlow
     }
 
     @Volatile

@@ -20,10 +20,10 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewModelScope
 import com.paranid5.crescendo.audio_effects.domain.updatedEQBandLevels
 import com.paranid5.crescendo.audio_effects.presentation.AudioEffectsViewModel
-import com.paranid5.crescendo.core.common.eq.EqualizerBandsPreset
-import com.paranid5.crescendo.core.common.eq.EqualizerData
 import com.paranid5.crescendo.core.resources.R
 import com.paranid5.crescendo.core.resources.ui.theme.LocalAppColors
+import com.paranid5.crescendo.domain.audio_effects.entity.EqualizerBandsPreset
+import com.paranid5.crescendo.domain.audio_effects.entity.EqualizerData
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel

@@ -5,23 +5,28 @@ import com.paranid5.crescendo.core.common.tracks.Track
 import com.paranid5.crescendo.data.StorageRepository
 import com.paranid5.crescendo.data.sources.playback.TracksPlaybackPositionPublisherImpl
 import com.paranid5.crescendo.data.sources.playback.TracksPlaybackPositionSubscriberImpl
-import com.paranid5.crescendo.data.sources.tracks.*
+import com.paranid5.crescendo.data.sources.tracks.CurrentPlaylistPublisherImpl
+import com.paranid5.crescendo.data.sources.tracks.CurrentPlaylistSubscriberImpl
+import com.paranid5.crescendo.data.sources.tracks.CurrentTrackIndexPublisherImpl
+import com.paranid5.crescendo.data.sources.tracks.CurrentTrackIndexSubscriberImpl
+import com.paranid5.crescendo.domain.audio_effects.AudioEffectsRepository
 import com.paranid5.crescendo.domain.repositories.CurrentPlaylistRepository
 import com.paranid5.crescendo.domain.sources.playback.TracksPlaybackPositionPublisher
 import com.paranid5.crescendo.domain.sources.playback.TracksPlaybackPositionSubscriber
-import com.paranid5.crescendo.domain.sources.tracks.*
+import com.paranid5.crescendo.domain.sources.tracks.CurrentPlaylistPublisher
+import com.paranid5.crescendo.domain.sources.tracks.CurrentPlaylistSubscriber
+import com.paranid5.crescendo.domain.sources.tracks.CurrentTrackIndexPublisher
+import com.paranid5.crescendo.domain.sources.tracks.CurrentTrackIndexSubscriber
 import com.paranid5.crescendo.system.services.track.TrackService
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
-import org.koin.core.component.KoinComponent
 
-@Suppress("IncorrectFormatting")
 internal class PlayerProvider(
     service: TrackService,
     storageRepository: StorageRepository,
-    currentPlaylistRepository: CurrentPlaylistRepository
-) : KoinComponent,
-    PlayerController by PlayerControllerImpl(service, storageRepository),
+    currentPlaylistRepository: CurrentPlaylistRepository,
+    audioEffectsRepository: AudioEffectsRepository,
+) : PlayerController by PlayerControllerImpl(service, storageRepository),
     CurrentPlaylistSubscriber by CurrentPlaylistSubscriberImpl(currentPlaylistRepository),
     CurrentPlaylistPublisher by CurrentPlaylistPublisherImpl(currentPlaylistRepository),
     CurrentTrackIndexSubscriber by CurrentTrackIndexSubscriberImpl(storageRepository),
@@ -38,6 +43,38 @@ internal class PlayerProvider(
 
     @Volatile
     var isStoppedWithError = false
+
+    val areAudioEffectsEnabledFlow by lazy {
+        audioEffectsRepository.areAudioEffectsEnabledFlow
+    }
+
+    val speedFlow by lazy {
+        audioEffectsRepository.speedFlow
+    }
+
+    val pitchFlow by lazy {
+        audioEffectsRepository.pitchFlow
+    }
+
+    val equalizerBandsFlow by lazy {
+        audioEffectsRepository.equalizerBandsFlow
+    }
+
+    val equalizerPresetFlow by lazy {
+        audioEffectsRepository.equalizerPresetFlow
+    }
+
+    val equalizerParamFlow by lazy {
+        audioEffectsRepository.equalizerParamFlow
+    }
+
+    val bassStrengthFlow by lazy {
+        audioEffectsRepository.bassStrengthFlow
+    }
+
+    val reverbPresetFlow by lazy {
+        audioEffectsRepository.reverbPresetFlow
+    }
 
     inline val currentPosition
         get() = currentPositionState.value

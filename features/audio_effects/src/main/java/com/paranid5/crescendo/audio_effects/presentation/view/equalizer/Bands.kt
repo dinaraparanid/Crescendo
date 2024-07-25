@@ -12,7 +12,7 @@ import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.unit.dp
-import com.paranid5.crescendo.core.common.eq.EqualizerData
+import com.paranid5.crescendo.domain.audio_effects.entity.EqualizerData
 import com.paranid5.crescendo.core.impl.di.EQUALIZER_DATA
 import com.paranid5.crescendo.utils.extensions.collectLatestAsState
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -23,7 +23,7 @@ import org.koin.core.qualifier.named
 internal fun Bands(
     pointsState: SnapshotStateList<Offset>,
     modifier: Modifier = Modifier,
-    equalizerDataState: MutableStateFlow<EqualizerData?> = koinInject(named(EQUALIZER_DATA))
+    equalizerDataState: MutableStateFlow<com.paranid5.crescendo.domain.audio_effects.entity.EqualizerData?> = koinInject(named(EQUALIZER_DATA))
 ) {
     val equalizerData by equalizerDataState.collectLatestAsState()
     val presentLvlsDbState = rememberPresentLvlsDbState(equalizerData)
@@ -45,7 +45,7 @@ internal fun Bands(
 }
 
 @Composable
-private fun rememberPresentLvlsDbState(equalizerData: EqualizerData?): SnapshotStateList<Float> {
+private fun rememberPresentLvlsDbState(equalizerData: com.paranid5.crescendo.domain.audio_effects.entity.EqualizerData?): SnapshotStateList<Float> {
     val equalizerPreset by remember(equalizerData?.currentPreset) {
         derivedStateOf { equalizerData?.currentPreset }
     }

@@ -4,7 +4,7 @@ import android.os.Build
 import androidx.annotation.StringRes
 import com.paranid5.crescendo.audio_effects.di.audioEffectsModule
 import com.paranid5.crescendo.cache.di.cacheModule
-import com.paranid5.crescendo.core.common.eq.EqualizerData
+import com.paranid5.crescendo.domain.audio_effects.entity.EqualizerData
 import com.paranid5.crescendo.core.impl.di.AUDIO_SESSION_ID
 import com.paranid5.crescendo.core.impl.di.EQUALIZER_DATA
 import com.paranid5.crescendo.core.impl.di.IS_PLAYING
@@ -98,7 +98,7 @@ private val globalsModule = module {
 
     single(named(IS_PLAYING)) { MutableStateFlow(false) }
     single(named(AUDIO_SESSION_ID)) { MutableStateFlow(0) }
-    single(named(EQUALIZER_DATA)) { MutableStateFlow<EqualizerData?>(null) }
+    single(named(EQUALIZER_DATA)) { MutableStateFlow<com.paranid5.crescendo.domain.audio_effects.entity.EqualizerData?>(null) }
 }
 
 private val uiModule = module {

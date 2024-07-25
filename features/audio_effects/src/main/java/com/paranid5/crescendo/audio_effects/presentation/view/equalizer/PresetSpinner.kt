@@ -3,7 +3,6 @@ package com.paranid5.crescendo.audio_effects.presentation.view.equalizer
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.Composable
@@ -22,11 +21,11 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewModelScope
 import com.paranid5.crescendo.audio_effects.presentation.AudioEffectsViewModel
-import com.paranid5.crescendo.core.common.eq.EqualizerBandsPreset
-import com.paranid5.crescendo.core.common.eq.EqualizerData
 import com.paranid5.crescendo.core.impl.di.EQUALIZER_DATA
 import com.paranid5.crescendo.core.resources.R
 import com.paranid5.crescendo.core.resources.ui.theme.LocalAppColors
+import com.paranid5.crescendo.domain.audio_effects.entity.EqualizerBandsPreset
+import com.paranid5.crescendo.domain.audio_effects.entity.EqualizerData
 import com.paranid5.crescendo.ui.utils.Spinner
 import com.paranid5.crescendo.utils.extensions.collectLatestAsState
 import kotlinx.collections.immutable.persistentListOf
@@ -69,7 +68,7 @@ private fun PresetSpinnerImpl(
     val presets = (builtInPresets + stringResource(R.string.custom)).toImmutableList()
     val selectedItemIndices by rememberSelectedItemIndices(curItemIndex)
 
-    com.paranid5.crescendo.ui.utils.Spinner(
+    Spinner(
         items = presets,
         selectedItemIndices = selectedItemIndices,
         modifier = modifier,
