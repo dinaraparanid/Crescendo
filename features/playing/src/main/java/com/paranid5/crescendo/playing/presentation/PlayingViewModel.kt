@@ -1,17 +1,20 @@
 package com.paranid5.crescendo.playing.presentation
 
 import androidx.lifecycle.ViewModel
-import com.paranid5.crescendo.data.StorageRepository
-import com.paranid5.crescendo.data.sources.playback.AudioStatusPublisherImpl
-import com.paranid5.crescendo.data.sources.playback.AudioStatusSubscriberImpl
-import com.paranid5.crescendo.data.sources.playback.RepeatingSubscriberImpl
-import com.paranid5.crescendo.data.sources.playback.StreamPlaybackPositionPublisherImpl
-import com.paranid5.crescendo.data.sources.playback.StreamPlaybackPositionSubscriberImpl
-import com.paranid5.crescendo.data.sources.playback.TracksPlaybackPositionPublisherImpl
-import com.paranid5.crescendo.data.sources.playback.TracksPlaybackPositionSubscriberImpl
-import com.paranid5.crescendo.data.sources.stream.CurrentMetadataSubscriberImpl
-import com.paranid5.crescendo.data.sources.stream.PlayingUrlSubscriberImpl
-import com.paranid5.crescendo.data.sources.tracks.CurrentTrackSubscriberImpl
+import com.paranid5.crescendo.data.datastore.DataStoreProvider
+import com.paranid5.crescendo.data.datastore.sources.playback.AudioStatusPublisherImpl
+import com.paranid5.crescendo.data.datastore.sources.playback.AudioStatusSubscriberImpl
+import com.paranid5.crescendo.data.datastore.sources.playback.RepeatingSubscriberImpl
+import com.paranid5.crescendo.data.datastore.sources.playback.StreamPlaybackPositionPublisherImpl
+import com.paranid5.crescendo.data.datastore.sources.playback.StreamPlaybackPositionSubscriberImpl
+import com.paranid5.crescendo.data.datastore.sources.playback.TracksPlaybackPositionPublisherImpl
+import com.paranid5.crescendo.data.datastore.sources.playback.TracksPlaybackPositionSubscriberImpl
+import com.paranid5.crescendo.data.datastore.sources.stream.CurrentMetadataSubscriberImpl
+import com.paranid5.crescendo.data.datastore.sources.stream.PlayingUrlSubscriberImpl
+import com.paranid5.crescendo.data.datastore.sources.tracks.CurrentTrackSubscriberImpl
+import com.paranid5.crescendo.domain.playback.AudioSessionIdSubscriber
+import com.paranid5.crescendo.domain.playback.PlaybackRepository
+import com.paranid5.crescendo.domain.playback.PlayingStateSubscriber
 import com.paranid5.crescendo.domain.repositories.CurrentPlaylistRepository
 import com.paranid5.crescendo.domain.sources.playback.AudioStatusPublisher
 import com.paranid5.crescendo.domain.sources.playback.AudioStatusSubscriber
@@ -26,16 +29,19 @@ import com.paranid5.crescendo.domain.sources.tracks.CurrentTrackSubscriber
 
 @Suppress("IncorrectFormatting")
 class PlayingViewModel(
-    storageRepository: StorageRepository,
+    dataStoreProvider: DataStoreProvider,
     currentPlaylistRepository: CurrentPlaylistRepository,
+    playbackRepository: PlaybackRepository
 ) : ViewModel(),
-    AudioStatusSubscriber by AudioStatusSubscriberImpl(storageRepository),
-    AudioStatusPublisher by AudioStatusPublisherImpl(storageRepository),
-    StreamPlaybackPositionSubscriber by StreamPlaybackPositionSubscriberImpl(storageRepository),
-    StreamPlaybackPositionPublisher by StreamPlaybackPositionPublisherImpl(storageRepository),
-    TracksPlaybackPositionSubscriber by TracksPlaybackPositionSubscriberImpl(storageRepository),
-    TracksPlaybackPositionPublisher by TracksPlaybackPositionPublisherImpl(storageRepository),
-    RepeatingSubscriber by RepeatingSubscriberImpl(storageRepository),
-    CurrentTrackSubscriber by CurrentTrackSubscriberImpl(storageRepository, currentPlaylistRepository),
-    CurrentMetadataSubscriber by CurrentMetadataSubscriberImpl(storageRepository),
-    PlayingUrlSubscriber by PlayingUrlSubscriberImpl(storageRepository)
+    AudioSessionIdSubscriber by playbackRepository,
+    PlayingStateSubscriber by playbackRepository,
+    AudioStatusSubscriber by AudioStatusSubscriberImpl(dataStoreProvider),
+    AudioStatusPublisher by AudioStatusPublisherImpl(dataStoreProvider),
+    StreamPlaybackPositionSubscriber by StreamPlaybackPositionSubscriberImpl(dataStoreProvider),
+    StreamPlaybackPositionPublisher by StreamPlaybackPositionPublisherImpl(dataStoreProvider),
+    TracksPlaybackPositionSubscriber by TracksPlaybackPositionSubscriberImpl(dataStoreProvider),
+    TracksPlaybackPositionPublisher by TracksPlaybackPositionPublisherImpl(dataStoreProvider),
+    RepeatingSubscriber by RepeatingSubscriberImpl(dataStoreProvider),
+    CurrentTrackSubscriber by CurrentTrackSubscriberImpl(dataStoreProvider, currentPlaylistRepository),
+    CurrentMetadataSubscriber by CurrentMetadataSubscriberImpl(dataStoreProvider),
+    PlayingUrlSubscriber by PlayingUrlSubscriberImpl(dataStoreProvider)

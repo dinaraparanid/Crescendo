@@ -1,13 +1,14 @@
 package com.paranid5.crescendo.system.services.stream.playback
 
 import androidx.annotation.MainThread
-import com.paranid5.crescendo.data.StorageRepository
-import com.paranid5.crescendo.data.sources.playback.StreamPlaybackPositionPublisherImpl
-import com.paranid5.crescendo.data.sources.playback.StreamPlaybackPositionSubscriberImpl
-import com.paranid5.crescendo.data.sources.stream.CurrentMetadataSubscriberImpl
-import com.paranid5.crescendo.data.sources.stream.PlayingUrlPublisherImpl
-import com.paranid5.crescendo.data.sources.stream.PlayingUrlSubscriberImpl
+import com.paranid5.crescendo.data.datastore.DataStoreProvider
+import com.paranid5.crescendo.data.datastore.sources.playback.StreamPlaybackPositionPublisherImpl
+import com.paranid5.crescendo.data.datastore.sources.playback.StreamPlaybackPositionSubscriberImpl
+import com.paranid5.crescendo.data.datastore.sources.stream.CurrentMetadataSubscriberImpl
+import com.paranid5.crescendo.data.datastore.sources.stream.PlayingUrlPublisherImpl
+import com.paranid5.crescendo.data.datastore.sources.stream.PlayingUrlSubscriberImpl
 import com.paranid5.crescendo.domain.audio_effects.AudioEffectsRepository
+import com.paranid5.crescendo.domain.playback.PlaybackRepository
 import com.paranid5.crescendo.domain.sources.playback.StreamPlaybackPositionPublisher
 import com.paranid5.crescendo.domain.sources.playback.StreamPlaybackPositionSubscriber
 import com.paranid5.crescendo.domain.sources.stream.CurrentMetadataSubscriber
@@ -16,18 +17,23 @@ import com.paranid5.crescendo.domain.sources.stream.PlayingUrlSubscriber
 import com.paranid5.crescendo.system.services.stream.StreamService
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
-import org.koin.core.component.KoinComponent
 
 internal class PlayerProvider(
     service: StreamService,
-    storageRepository: StorageRepository,
+    dataStoreProvider: DataStoreProvider,
     audioEffectsRepository: AudioEffectsRepository,
-) : PlayerController by PlayerControllerImpl(service, storageRepository, audioEffectsRepository),
-    PlayingUrlSubscriber by PlayingUrlSubscriberImpl(storageRepository),
-    PlayingUrlPublisher by PlayingUrlPublisherImpl(storageRepository),
-    CurrentMetadataSubscriber by CurrentMetadataSubscriberImpl(storageRepository),
-    StreamPlaybackPositionSubscriber by StreamPlaybackPositionSubscriberImpl(storageRepository),
-    StreamPlaybackPositionPublisher by StreamPlaybackPositionPublisherImpl(storageRepository) {
+    playbackRepository: PlaybackRepository,
+) : PlayerController by PlayerControllerImpl(
+    service = service,
+    dataStoreProvider = dataStoreProvider,
+    audioEffectsRepository = audioEffectsRepository,
+    playbackRepository = playbackRepository
+),
+    PlayingUrlSubscriber by PlayingUrlSubscriberImpl(dataStoreProvider),
+    PlayingUrlPublisher by PlayingUrlPublisherImpl(dataStoreProvider),
+    CurrentMetadataSubscriber by CurrentMetadataSubscriberImpl(dataStoreProvider),
+    StreamPlaybackPositionSubscriber by StreamPlaybackPositionSubscriberImpl(dataStoreProvider),
+    StreamPlaybackPositionPublisher by StreamPlaybackPositionPublisherImpl(dataStoreProvider) {
     private val _playbackEventFlow by lazy {
         MutableSharedFlow<PlaybackEvent>()
     }

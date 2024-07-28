@@ -20,6 +20,7 @@
             <option value="$PROJECT_DIR$/data" />
             <option value="$PROJECT_DIR$/domain" />
             <option value="$PROJECT_DIR$/domain/audio_effects" />
+            <option value="$PROJECT_DIR$/domain/playback" />
             <option value="$PROJECT_DIR$/features" />
             <option value="$PROJECT_DIR$/features/about_app" />
             <option value="$PROJECT_DIR$/features/audio_effects" />

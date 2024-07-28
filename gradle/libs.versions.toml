@@ -1,5 +1,5 @@
 [versions]
-activityCompose = "1.9.0"
+activityCompose = "1.9.1"
 amplituda = "2.2.2"
 sqlDelight = "2.0.2"
 appcompat = "1.7.0"
@@ -106,9 +106,12 @@ androidx-junit = { group = "androidx.test.ext", name = "junit", version.ref = "j
 androidx-espresso-core = { group = "androidx.test.espresso", name = "espresso-core", version.ref = "espressoCore" }
 
 [plugins]
+android-application = { id = "com.android.application", version.ref = "agp" }
 android-library = { id = "com.android.library", version.ref = "agp" }
-jetbrains-kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
+kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
+kotlinx-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
 compose-compiler = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
+sqlDelight = { id = "app.cash.sqldelight", version.ref = "sqlDelight" }
 
 [bundles]
 ytdl = ["ytdl-lib", "ytdl-ffmpeg", "ytdl-aria"]

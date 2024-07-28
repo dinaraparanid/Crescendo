@@ -3,8 +3,8 @@ package com.paranid5.crescendo.system.services.track.notification
 import androidx.annotation.OptIn
 import androidx.media3.common.Player
 import androidx.media3.common.util.UnstableApi
-import com.paranid5.crescendo.data.StorageRepository
-import com.paranid5.crescendo.data.sources.tracks.CurrentTrackSubscriberImpl
+import com.paranid5.crescendo.data.datastore.DataStoreProvider
+import com.paranid5.crescendo.data.datastore.sources.tracks.CurrentTrackSubscriberImpl
 import com.paranid5.crescendo.domain.repositories.CurrentPlaylistRepository
 import com.paranid5.crescendo.domain.sources.tracks.CurrentTrackSubscriber
 import com.paranid5.crescendo.system.services.track.TrackService
@@ -16,10 +16,10 @@ internal const val TRACKS_CHANNEL_ID = "tracks_channel"
 
 internal class NotificationManager(
     service: TrackService,
-    storageRepository: StorageRepository,
+    dataStoreProvider: DataStoreProvider,
     currentPlaylistRepository: CurrentPlaylistRepository
 ) : CurrentTrackSubscriber by CurrentTrackSubscriberImpl(
-    storageRepository,
+    dataStoreProvider,
     currentPlaylistRepository,
 ) {
     internal val currentTrackState by lazy {

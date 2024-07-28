@@ -1,28 +1,28 @@
 package com.paranid5.crescendo.data.properties
 
 import com.paranid5.crescendo.core.common.AudioStatus
-import com.paranid5.crescendo.data.StorageRepository
+import com.paranid5.crescendo.data.datastore.DataStoreProvider
 
-val StorageRepository.tracksPlaybackPositionFlow
+val DataStoreProvider.tracksPlaybackPositionFlow
     get() = playbackStateDataSource.tracksPlaybackPositionFlow
 
-suspend fun StorageRepository.storeTracksPlaybackPosition(position: Long) =
+suspend fun DataStoreProvider.storeTracksPlaybackPosition(position: Long) =
     playbackStateDataSource.storeTracksPlaybackPosition(position)
 
-val StorageRepository.streamPlaybackPositionFlow
+val DataStoreProvider.streamPlaybackPositionFlow
     get() = playbackStateDataSource.streamPlaybackPositionFlow
 
-suspend fun StorageRepository.storeStreamPlaybackPosition(position: Long) =
+suspend fun DataStoreProvider.storeStreamPlaybackPosition(position: Long) =
     playbackStateDataSource.storeStreamPlaybackPosition(position)
 
-val StorageRepository.isRepeatingFlow
+val DataStoreProvider.isRepeatingFlow
     get() = playbackStateDataSource.isRepeatingFlow
 
-suspend fun StorageRepository.storeRepeating(isRepeating: Boolean) =
+suspend fun DataStoreProvider.storeRepeating(isRepeating: Boolean) =
     playbackStateDataSource.storeIsRepeating(isRepeating)
 
-val StorageRepository.audioStatusFlow
+val DataStoreProvider.audioStatusFlow
     get() = playbackStateDataSource.audioStatusFlow
 
-suspend fun StorageRepository.storeAudioStatus(audioStatus: AudioStatus) =
+suspend fun DataStoreProvider.storeAudioStatus(audioStatus: AudioStatus) =
     playbackStateDataSource.storeAudioStatus(audioStatus)

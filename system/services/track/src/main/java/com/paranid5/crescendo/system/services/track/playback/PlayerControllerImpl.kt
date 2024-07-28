@@ -8,12 +8,12 @@ import androidx.media3.common.C
 import androidx.media3.common.util.UnstableApi
 import androidx.media3.exoplayer.ExoPlayer
 import com.paranid5.crescendo.core.common.tracks.Track
-import com.paranid5.crescendo.core.impl.di.AUDIO_SESSION_ID
-import com.paranid5.crescendo.core.impl.di.IS_PLAYING
-import com.paranid5.crescendo.data.StorageRepository
-import com.paranid5.crescendo.data.sources.playback.RepeatingPublisherImpl
-import com.paranid5.crescendo.data.sources.playback.RepeatingSubscriberImpl
+import com.paranid5.crescendo.data.datastore.DataStoreProvider
+import com.paranid5.crescendo.data.datastore.sources.playback.RepeatingPublisherImpl
+import com.paranid5.crescendo.data.datastore.sources.playback.RepeatingSubscriberImpl
 import com.paranid5.crescendo.domain.audio_effects.AudioEffectsRepository
+import com.paranid5.crescendo.domain.playback.PlaybackRepository
+import com.paranid5.crescendo.domain.playback.PlaybackRepository.Companion.UNDEFINED_AUDIO_SESSION_ID
 import com.paranid5.crescendo.domain.sources.playback.RepeatingPublisher
 import com.paranid5.crescendo.domain.sources.playback.RepeatingSubscriber
 import com.paranid5.crescendo.system.services.track.TrackService
@@ -27,21 +27,16 @@ import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import org.koin.core.component.KoinComponent
-import org.koin.core.component.inject
-import org.koin.core.qualifier.named
 
 internal class PlayerControllerImpl(
     service: TrackService,
-    storageRepository: StorageRepository,
+    dataStoreProvider: DataStoreProvider,
     audioEffectsRepository: AudioEffectsRepository,
-) : PlayerController, KoinComponent,
+    private val playbackRepository: PlaybackRepository,
+) : PlayerController,
     AudioEffectsController by AudioEffectsControllerImpl(audioEffectsRepository),
-    RepeatingSubscriber by RepeatingSubscriberImpl(storageRepository),
-    RepeatingPublisher by RepeatingPublisherImpl(storageRepository) {
-    private val _isPlayingState by inject<MutableStateFlow<Boolean>>(named(IS_PLAYING))
-
-    private val audioSessionIdState by inject<MutableStateFlow<Int>>(named(AUDIO_SESSION_ID))
+    RepeatingSubscriber by RepeatingSubscriberImpl(dataStoreProvider),
+    RepeatingPublisher by RepeatingPublisherImpl(dataStoreProvider) {
 
     @OptIn(UnstableApi::class)
     override val player by lazy {
@@ -53,7 +48,7 @@ internal class PlayerControllerImpl(
             .build()
             .apply {
                 addListener(PlayerStateChangedListener(service))
-                audioSessionIdState.update { audioSessionId }
+                playbackRepository.updateAudioSessionId(audioSessionId)
                 initAudioEffects(audioSessionId)
 
                 service.serviceScope.launch {
@@ -63,11 +58,11 @@ internal class PlayerControllerImpl(
     }
 
     override var isPlaying
-        get() = _isPlayingState.value
-        set(value) = _isPlayingState.update { value }
+        get() = playbackRepository.isPlayingState.value
+        set(value) = playbackRepository.updatePlaying(isPlaying = value)
 
     override val isPlayingState by lazy {
-        _isPlayingState.asStateFlow()
+        playbackRepository.isPlayingState
     }
 
     private val _currentPositionState by lazy {
@@ -92,7 +87,7 @@ internal class PlayerControllerImpl(
     override fun playPlaylistViaPlayer(
         playlist: List<Track>,
         currentTrackIndex: Int,
-        initialPosition: Long
+        initialPosition: Long,
     ) {
         resetPlaylistForPlayer(playlist)
         player.playWhenReady = true
@@ -122,7 +117,7 @@ internal class PlayerControllerImpl(
 
     @OptIn(UnstableApi::class)
     private fun resetAudioSessionId() =
-        audioSessionIdState.update { player.audioSessionId }
+        playbackRepository.updateAudioSessionId(player.audioSessionId)
 
     override fun seekToViaPlayer(position: Long) {
         resetAudioSessionId()
@@ -176,12 +171,14 @@ internal class PlayerControllerImpl(
         return currentMediaItemIndex
     }
 
-    override fun replacePlaylistViaPlayer(newPlaylist: List<Track>, newCurrentTrackIndex: Int) =
-        player.setMediaItems(
-            newPlaylist.toMediaItemList(),
-            newCurrentTrackIndex,
-            currentPosition
-        )
+    override fun replacePlaylistViaPlayer(
+        newPlaylist: List<Track>,
+        newCurrentTrackIndex: Int,
+    ) = player.setMediaItems(
+        newPlaylist.toMediaItemList(),
+        newCurrentTrackIndex,
+        currentPosition
+    )
 
     private suspend inline fun startRepeatMonitoring(lifecycle: Lifecycle): Unit =
         lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
@@ -194,7 +191,7 @@ internal class PlayerControllerImpl(
         releaseAudioEffects()
         player.stop()
         player.release()
-        audioSessionIdState.update { 0 }
+        playbackRepository.updateAudioSessionId(UNDEFINED_AUDIO_SESSION_ID)
     }
 }
 

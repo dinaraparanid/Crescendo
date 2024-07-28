@@ -1,23 +1,23 @@
 package com.paranid5.crescendo.data.properties
 
 import com.paranid5.crescendo.core.common.metadata.VideoMetadata
-import com.paranid5.crescendo.data.StorageRepository
+import com.paranid5.crescendo.data.datastore.DataStoreProvider
 
-val StorageRepository.playingUrlFlow
+val DataStoreProvider.playingUrlFlow
     get() = streamStateDataSource.playingUrlFlow
 
-suspend fun StorageRepository.storePlayingUrl(url: String) =
+suspend fun DataStoreProvider.storePlayingUrl(url: String) =
     streamStateDataSource.storePlayingUrl(url)
 
-val StorageRepository.downloadingUrlFlow
+val DataStoreProvider.downloadingUrlFlow
     get() = streamStateDataSource.downloadingUrlFlow
 
-suspend fun StorageRepository.storeDownloadingUrl(url: String) =
+suspend fun DataStoreProvider.storeDownloadingUrl(url: String) =
     streamStateDataSource.storeDownloadingUrl(url)
 
-val StorageRepository.currentMetadataFlow
+val DataStoreProvider.currentMetadataFlow
     get() = streamStateDataSource.currentMetadataFlow
 
-suspend fun StorageRepository.storeCurrentMetadata(metadata: VideoMetadata?) =
+suspend fun DataStoreProvider.storeCurrentMetadata(metadata: VideoMetadata?) =
     streamStateDataSource.storeCurrentMetadata(metadata)
 

@@ -2,8 +2,8 @@ package com.paranid5.crescendo.cache.data
 
 import com.paranid5.crescendo.core.common.caching.Formats
 import com.paranid5.crescendo.core.common.trimming.TrimRange
-import com.paranid5.crescendo.data.StorageRepository
-import com.paranid5.crescendo.data.sources.stream.CurrentMetadataSubscriberImpl
+import com.paranid5.crescendo.data.datastore.DataStoreProvider
+import com.paranid5.crescendo.data.datastore.sources.stream.CurrentMetadataSubscriberImpl
 import com.paranid5.crescendo.domain.sources.stream.CurrentMetadataSubscriber
 import com.paranid5.crescendo.domain.sources.stream.currentMetadataDurationMillisFlow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -25,9 +25,9 @@ internal interface CacheDialogDataSource : CurrentMetadataSubscriber {
     fun setSelectedSaveOptionIndex(selectedSaveOptionIndex: Int)
 }
 
-internal class CacheDialogDataSourceImpl(storageRepository: StorageRepository) :
+internal class CacheDialogDataSourceImpl(dataStoreProvider: DataStoreProvider) :
     CacheDialogDataSource,
-    CurrentMetadataSubscriber by CurrentMetadataSubscriberImpl(storageRepository) {
+    CurrentMetadataSubscriber by CurrentMetadataSubscriberImpl(dataStoreProvider) {
     private val _trimOffsetMillisState by lazy {
         MutableStateFlow(0L)
     }

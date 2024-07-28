@@ -10,7 +10,7 @@ import org.koin.dsl.module
 
 val streamServiceModule = module {
     singleOf(::StreamServiceAccessor)
-    factory { params -> PlayerProvider(params.get(), get(), get()) }
+    factory { params -> PlayerProvider(params.get(), get(), get(), get()) }
     factoryOf(::UrlExtractor)
     factory { params -> NotificationManager(params.get(), get()) }
 }

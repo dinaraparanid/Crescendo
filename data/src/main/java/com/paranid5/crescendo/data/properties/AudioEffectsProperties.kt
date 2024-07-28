@@ -1,59 +1,59 @@
 package com.paranid5.crescendo.data.properties
 
-import com.paranid5.crescendo.data.StorageRepository
+import com.paranid5.crescendo.data.datastore.DataStoreProvider
 import com.paranid5.crescendo.domain.audio_effects.entity.EqualizerBandsPreset
 import kotlinx.coroutines.flow.map
 
-val StorageRepository.areAudioEffectsEnabledFlow
+val DataStoreProvider.areAudioEffectsEnabledFlow
     get() = audioEffectsStateDataSource.areAudioEffectsEnabledFlow
 
-suspend fun StorageRepository.storeAudioEffectsEnabled(areAudioEffectsEnabled: Boolean) =
+suspend fun DataStoreProvider.storeAudioEffectsEnabled(areAudioEffectsEnabled: Boolean) =
     audioEffectsStateDataSource.storeAudioEffectsEnabled(areAudioEffectsEnabled)
 
-val StorageRepository.pitchFlow
+val DataStoreProvider.pitchFlow
     get() = audioEffectsStateDataSource.pitchFlow
 
-val StorageRepository.pitchTextFlow
+val DataStoreProvider.pitchTextFlow
     get() = pitchFlow.map(Float::toString)
 
-suspend fun StorageRepository.storePitch(pitch: Float) =
+suspend fun DataStoreProvider.storePitch(pitch: Float) =
     audioEffectsStateDataSource.storePitch(pitch)
 
-val StorageRepository.speedFlow
+val DataStoreProvider.speedFlow
     get() = audioEffectsStateDataSource.speedFlow
 
-val StorageRepository.speedTextFlow
+val DataStoreProvider.speedTextFlow
     get() = speedFlow.map(Float::toString)
 
-suspend fun StorageRepository.storeSpeed(speed: Float) =
+suspend fun DataStoreProvider.storeSpeed(speed: Float) =
     audioEffectsStateDataSource.storeSpeed(speed)
 
-val StorageRepository.equalizerBandsFlow
+val DataStoreProvider.equalizerBandsFlow
     get() = audioEffectsStateDataSource.equalizerBandsFlow
 
-suspend fun StorageRepository.storeEqualizerBands(bands: List<Short>) =
+suspend fun DataStoreProvider.storeEqualizerBands(bands: List<Short>) =
     audioEffectsStateDataSource.storeEqualizerBands(bands)
 
-val StorageRepository.equalizerPresetFlow
+val DataStoreProvider.equalizerPresetFlow
     get() = audioEffectsStateDataSource.equalizerPresetFlow
 
-suspend fun StorageRepository.storeEqualizerPreset(preset: Short) =
+suspend fun DataStoreProvider.storeEqualizerPreset(preset: Short) =
     audioEffectsStateDataSource.storeEqualizerPreset(preset)
 
-val StorageRepository.equalizerParamFlow
+val DataStoreProvider.equalizerParamFlow
     get() = audioEffectsStateDataSource.equalizerParamFlow
 
-suspend fun StorageRepository.storeEqualizerParam(param: EqualizerBandsPreset) =
+suspend fun DataStoreProvider.storeEqualizerParam(param: EqualizerBandsPreset) =
     audioEffectsStateDataSource.storeEqualizerParam(param)
 
-val StorageRepository.bassStrengthFlow
+val DataStoreProvider.bassStrengthFlow
     get() = audioEffectsStateDataSource.bassStrengthFlow
 
-suspend fun StorageRepository.storeBassStrength(bassStrength: Short) =
+suspend fun DataStoreProvider.storeBassStrength(bassStrength: Short) =
     audioEffectsStateDataSource.storeBassStrength(bassStrength)
 
-val StorageRepository.reverbPresetFlow
+val DataStoreProvider.reverbPresetFlow
     get() = audioEffectsStateDataSource.reverbPresetFlow
 
-suspend fun StorageRepository.storeReverbPreset(reverbPreset: Short) =
+suspend fun DataStoreProvider.storeReverbPreset(reverbPreset: Short) =
     audioEffectsStateDataSource.storeReverbPreset(reverbPreset)

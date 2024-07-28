@@ -12,12 +12,12 @@ import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.palette.graphics.Palette
 import com.gauravk.audiovisualizer.visualizer.WaveVisualizer
-import com.paranid5.crescendo.core.impl.di.AUDIO_SESSION_ID
-import com.paranid5.crescendo.core.impl.di.IS_PLAYING
 import com.paranid5.crescendo.core.resources.R
+import com.paranid5.crescendo.playing.presentation.PlayingViewModel
 import com.paranid5.crescendo.utils.extensions.collectLatestAsState
 import com.paranid5.crescendo.utils.extensions.getBrightDominantOrPrimary
 import kotlinx.coroutines.flow.MutableStateFlow
+import org.koin.androidx.compose.koinViewModel
 import org.koin.compose.koinInject
 import org.koin.core.qualifier.named
 
@@ -26,12 +26,11 @@ internal fun AudioWaveform(
     enabled: Boolean,
     modifier: Modifier = Modifier,
     palette: Palette? = null,
-    audioSessionIdState: MutableStateFlow<Int> = koinInject(named(AUDIO_SESSION_ID)),
-    isPlayingState: MutableStateFlow<Boolean> = koinInject(named(IS_PLAYING))
+    viewModel: PlayingViewModel = koinViewModel(),
 ) {
     val color = palette.getBrightDominantOrPrimary()
-    val audioSessionId by audioSessionIdState.collectLatestAsState()
-    val isPlaying by isPlayingState.collectLatestAsState()
+    val audioSessionId by viewModel.audioSessionIdState.collectLatestAsState()
+    val isPlaying by viewModel.isPlayingState.collectLatestAsState()
     var visualizer: WaveVisualizer? = null
 
     DisposableEffect(enabled, color, audioSessionId, isPlaying) {

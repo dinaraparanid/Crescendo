@@ -2,14 +2,15 @@ package com.paranid5.crescendo.system.services.track.playback
 
 import androidx.annotation.MainThread
 import com.paranid5.crescendo.core.common.tracks.Track
-import com.paranid5.crescendo.data.StorageRepository
-import com.paranid5.crescendo.data.sources.playback.TracksPlaybackPositionPublisherImpl
-import com.paranid5.crescendo.data.sources.playback.TracksPlaybackPositionSubscriberImpl
-import com.paranid5.crescendo.data.sources.tracks.CurrentPlaylistPublisherImpl
-import com.paranid5.crescendo.data.sources.tracks.CurrentPlaylistSubscriberImpl
-import com.paranid5.crescendo.data.sources.tracks.CurrentTrackIndexPublisherImpl
-import com.paranid5.crescendo.data.sources.tracks.CurrentTrackIndexSubscriberImpl
+import com.paranid5.crescendo.data.datastore.DataStoreProvider
+import com.paranid5.crescendo.data.datastore.sources.playback.TracksPlaybackPositionPublisherImpl
+import com.paranid5.crescendo.data.datastore.sources.playback.TracksPlaybackPositionSubscriberImpl
+import com.paranid5.crescendo.data.datastore.sources.tracks.CurrentPlaylistPublisherImpl
+import com.paranid5.crescendo.data.datastore.sources.tracks.CurrentPlaylistSubscriberImpl
+import com.paranid5.crescendo.data.datastore.sources.tracks.CurrentTrackIndexPublisherImpl
+import com.paranid5.crescendo.data.datastore.sources.tracks.CurrentTrackIndexSubscriberImpl
 import com.paranid5.crescendo.domain.audio_effects.AudioEffectsRepository
+import com.paranid5.crescendo.domain.playback.PlaybackRepository
 import com.paranid5.crescendo.domain.repositories.CurrentPlaylistRepository
 import com.paranid5.crescendo.domain.sources.playback.TracksPlaybackPositionPublisher
 import com.paranid5.crescendo.domain.sources.playback.TracksPlaybackPositionSubscriber
@@ -23,16 +24,22 @@ import kotlinx.coroutines.flow.asSharedFlow
 
 internal class PlayerProvider(
     service: TrackService,
-    storageRepository: StorageRepository,
+    dataStoreProvider: DataStoreProvider,
     currentPlaylistRepository: CurrentPlaylistRepository,
     audioEffectsRepository: AudioEffectsRepository,
-) : PlayerController by PlayerControllerImpl(service, storageRepository, audioEffectsRepository),
+    playbackRepository: PlaybackRepository,
+) : PlayerController by PlayerControllerImpl(
+    service = service,
+    dataStoreProvider = dataStoreProvider,
+    audioEffectsRepository = audioEffectsRepository,
+    playbackRepository = playbackRepository,
+),
     CurrentPlaylistSubscriber by CurrentPlaylistSubscriberImpl(currentPlaylistRepository),
     CurrentPlaylistPublisher by CurrentPlaylistPublisherImpl(currentPlaylistRepository),
-    CurrentTrackIndexSubscriber by CurrentTrackIndexSubscriberImpl(storageRepository),
-    CurrentTrackIndexPublisher by CurrentTrackIndexPublisherImpl(storageRepository),
-    TracksPlaybackPositionSubscriber by TracksPlaybackPositionSubscriberImpl(storageRepository),
-    TracksPlaybackPositionPublisher by TracksPlaybackPositionPublisherImpl(storageRepository) {
+    CurrentTrackIndexSubscriber by CurrentTrackIndexSubscriberImpl(dataStoreProvider),
+    CurrentTrackIndexPublisher by CurrentTrackIndexPublisherImpl(dataStoreProvider),
+    TracksPlaybackPositionSubscriber by TracksPlaybackPositionSubscriberImpl(dataStoreProvider),
+    TracksPlaybackPositionPublisher by TracksPlaybackPositionPublisherImpl(dataStoreProvider) {
     private val _playbackEventFlow by lazy {
         MutableSharedFlow<PlaybackEvent>()
     }

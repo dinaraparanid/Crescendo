@@ -1,10 +1,10 @@
 plugins {
-    id("com.android.library")
-    id("org.jetbrains.kotlin.android")
-    id("kotlin-parcelize")
-    id("org.jetbrains.kotlin.plugin.serialization") version "1.9.0"
-    id("app.cash.sqldelight") version "2.0.1"
+    alias(libs.plugins.android.library)
+    alias(libs.plugins.kotlin.android)
+    alias(libs.plugins.kotlinx.serialization)
+    alias(libs.plugins.sqlDelight)
     alias(libs.plugins.compose.compiler)
+    id("kotlin-parcelize")
 }
 
 sqldelight {

@@ -1,8 +1,8 @@
 plugins {
-    id("com.android.library")
-    id("org.jetbrains.kotlin.android")
-    id("org.jetbrains.kotlin.plugin.serialization") version "1.9.0"
-    id("app.cash.sqldelight") version "2.0.1"
+    alias(libs.plugins.android.library)
+    alias(libs.plugins.kotlin.android)
+    alias(libs.plugins.kotlinx.serialization)
+    alias(libs.plugins.sqlDelight)
 }
 
 sqldelight {
@@ -51,6 +51,7 @@ dependencies {
 
     api(project(":domain"))
     api(project(":domain:audio_effects"))
+    api(project(":domain:playback"))
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)

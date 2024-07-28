@@ -14,7 +14,7 @@ import androidx.compose.ui.unit.dp
 import androidx.palette.graphics.Palette
 import com.paranid5.crescendo.core.common.AudioStatus
 import com.paranid5.crescendo.core.resources.R
-import com.paranid5.crescendo.data.StorageRepository
+import com.paranid5.crescendo.data.datastore.DataStoreProvider
 import com.paranid5.crescendo.data.properties.storeAudioStatus
 import com.paranid5.crescendo.playing.domain.PlayingInteractor
 import com.paranid5.crescendo.utils.extensions.getBrightDominantOrPrimary
@@ -29,7 +29,7 @@ internal fun PrevButton(
     enabled: Boolean,
     modifier: Modifier = Modifier,
     playingUIHandler: PlayingInteractor = koinInject(),
-    storageRepository: StorageRepository = koinInject()
+    dataStoreProvider: DataStoreProvider = koinInject()
 ) {
     val paletteColor = palette.getBrightDominantOrPrimary()
     val coroutineScope = rememberCoroutineScope()
@@ -39,7 +39,7 @@ internal fun PrevButton(
         modifier = modifier.simpleShadow(color = paletteColor),
         onClick = {
             coroutineScope.launch {
-                storageRepository.storeAudioStatus(audioStatus)
+                dataStoreProvider.storeAudioStatus(audioStatus)
             }
 
             playingUIHandler.sendOnPrevButtonClickedBroadcast(audioStatus)

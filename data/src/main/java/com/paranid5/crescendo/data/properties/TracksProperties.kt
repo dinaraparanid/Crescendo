@@ -1,16 +1,16 @@
 package com.paranid5.crescendo.data.properties
 
 import com.paranid5.crescendo.core.common.tracks.TrackOrder
-import com.paranid5.crescendo.data.StorageRepository
+import com.paranid5.crescendo.data.datastore.DataStoreProvider
 
-val StorageRepository.currentTrackIndexFlow
+val DataStoreProvider.currentTrackIndexFlow
     get() = tracksStateDataSource.currentTrackIndexFlow
 
-suspend fun StorageRepository.storeCurrentTrackIndex(index: Int) =
+suspend fun DataStoreProvider.storeCurrentTrackIndex(index: Int) =
     tracksStateDataSource.storeCurrentTrackIndex(index)
 
-val StorageRepository.trackOrderFlow
+val DataStoreProvider.trackOrderFlow
     get() = tracksStateDataSource.trackOrderFlow
 
-suspend fun StorageRepository.storeTrackOrder(trackOrder: TrackOrder) =
+suspend fun DataStoreProvider.storeTrackOrder(trackOrder: TrackOrder) =
     tracksStateDataSource.storeTrackOrder(trackOrder)
