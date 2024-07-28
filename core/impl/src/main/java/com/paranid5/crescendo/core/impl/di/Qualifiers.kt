@@ -7,7 +7,6 @@ const val STREAM_WITH_NO_NAME = "stream_no_name"
 const val UNKNOWN_STREAMER = "unknown_streamer"
 const val IS_PLAYING = "is_playing_state"
 const val AUDIO_SESSION_ID = "audio_session_id"
-const val EQUALIZER_DATA = "equalizer_data"
 
 const val STREAM_SERVICE_CONNECTION = "stream_service_connection"
 const val TRACK_SERVICE_CONNECTION = "track_service_connection"

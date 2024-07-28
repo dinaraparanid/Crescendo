@@ -6,6 +6,7 @@ import com.paranid5.crescendo.data.audio_effects.BassStrengthDataSourceImpl
 import com.paranid5.crescendo.data.audio_effects.EqualizerBandsDataSourceImpl
 import com.paranid5.crescendo.data.audio_effects.EqualizerParamDataSourceImpl
 import com.paranid5.crescendo.data.audio_effects.EqualizerPresetDataSourceImpl
+import com.paranid5.crescendo.data.audio_effects.EqualizerStateHolderImpl
 import com.paranid5.crescendo.data.audio_effects.PitchDataSourceImpl
 import com.paranid5.crescendo.data.audio_effects.PitchTextDataSourceImpl
 import com.paranid5.crescendo.data.audio_effects.ReverbPresetDataSourceImpl
@@ -17,6 +18,7 @@ import com.paranid5.crescendo.domain.audio_effects.BassStrengthDataSource
 import com.paranid5.crescendo.domain.audio_effects.EqualizerBandsDataSource
 import com.paranid5.crescendo.domain.audio_effects.EqualizerParamDataSource
 import com.paranid5.crescendo.domain.audio_effects.EqualizerPresetDataSource
+import com.paranid5.crescendo.domain.audio_effects.EqualizerStateHolder
 import com.paranid5.crescendo.domain.audio_effects.PitchDataSource
 import com.paranid5.crescendo.domain.audio_effects.PitchTextDataSource
 import com.paranid5.crescendo.domain.audio_effects.ReverbPresetDataSource
@@ -38,4 +40,5 @@ internal val audioEffectsModule = module {
     singleOf(::SpeedDataSourceImpl) bind SpeedDataSource::class
     singleOf(::SpeedTextDataSourceImpl) bind SpeedTextDataSource::class
     singleOf(::AudioEffectsRepositoryImpl) bind AudioEffectsRepository::class
+    singleOf(::EqualizerStateHolderImpl) bind EqualizerStateHolder::class
 }

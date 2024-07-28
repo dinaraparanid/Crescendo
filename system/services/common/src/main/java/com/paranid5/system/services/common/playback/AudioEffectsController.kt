@@ -3,16 +3,11 @@ package com.paranid5.system.services.common.playback
 import android.media.audiofx.BassBoost
 import android.media.audiofx.Equalizer
 import android.media.audiofx.PresetReverb
-import com.paranid5.crescendo.core.impl.di.EQUALIZER_DATA
 import com.paranid5.crescendo.core.media.extensions.fromEqualizer
 import com.paranid5.crescendo.core.media.extensions.usePreset
+import com.paranid5.crescendo.domain.audio_effects.AudioEffectsRepository
 import com.paranid5.crescendo.domain.audio_effects.entity.EqualizerBandsPreset
 import com.paranid5.crescendo.domain.audio_effects.entity.EqualizerData
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.update
-import org.koin.core.component.KoinComponent
-import org.koin.core.component.inject
-import org.koin.core.qualifier.named
 
 interface AudioEffectsController {
     val equalizer: Equalizer
@@ -34,11 +29,9 @@ interface AudioEffectsController {
     fun releaseAudioEffects()
 }
 
-class AudioEffectsControllerImpl : AudioEffectsController, KoinComponent {
-    private val equalizerDataState by inject<MutableStateFlow<EqualizerData?>>(
-        named(EQUALIZER_DATA)
-    )
-
+class AudioEffectsControllerImpl(
+    private val audioEffectsRepository: AudioEffectsRepository,
+) : AudioEffectsController {
     override lateinit var equalizer: Equalizer
         private set
 
@@ -74,19 +67,19 @@ class AudioEffectsControllerImpl : AudioEffectsController, KoinComponent {
         bandLevels: List<Short>?,
         preset: Short,
         parameter: EqualizerBandsPreset,
-    ) = equalizerDataState.update {
+    ) = audioEffectsRepository.updateEqualizerData(
         EqualizerData.fromEqualizer(
             eq = equalizer,
             bandLevels = bandLevels,
             currentPreset = preset,
             currentParameter = parameter,
         )
-    }
+    )
 
     override fun releaseAudioEffects() {
         equalizer.release()
         bassBoost.release()
         reverb.release()
-        equalizerDataState.update { null }
+        audioEffectsRepository.updateEqualizerData(equalizerData = null)
     }
 }

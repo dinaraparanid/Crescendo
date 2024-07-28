@@ -21,7 +21,6 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewModelScope
 import com.paranid5.crescendo.audio_effects.presentation.AudioEffectsViewModel
-import com.paranid5.crescendo.core.impl.di.EQUALIZER_DATA
 import com.paranid5.crescendo.core.resources.R
 import com.paranid5.crescendo.core.resources.ui.theme.LocalAppColors
 import com.paranid5.crescendo.domain.audio_effects.entity.EqualizerBandsPreset
@@ -58,9 +57,8 @@ internal fun PresetSpinner(modifier: Modifier = Modifier) =
 private fun PresetSpinnerImpl(
     modifier: Modifier = Modifier,
     viewModel: AudioEffectsViewModel = koinViewModel(),
-    equalizerDataState: MutableStateFlow<EqualizerData?> = koinInject(named(EQUALIZER_DATA)),
 ) {
-    val equalizerData by equalizerDataState.collectLatestAsState()
+    val equalizerData by viewModel.equalizerState.collectLatestAsState()
     val customPresetIndex by rememberCustomPresetIndex(equalizerData)
     var selectedItemIndex by rememberSelectedItemIndex(equalizerData)
     val curItemIndex by rememberCurrentItemIndex(selectedItemIndex, equalizerData)
@@ -97,7 +95,7 @@ private fun PresetSpinnerArrow(modifier: Modifier = Modifier) {
         painter = painterResource(R.drawable.arrow_down),
         contentDescription = stringResource(R.string.eq_presets),
         colorFilter = ColorFilter.tint(colors.primary),
-        modifier = modifier
+        modifier = modifier,
     )
 }
 

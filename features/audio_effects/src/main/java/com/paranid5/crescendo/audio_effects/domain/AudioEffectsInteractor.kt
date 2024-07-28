@@ -4,16 +4,19 @@ import com.paranid5.crescendo.domain.audio_effects.entity.EqualizerData
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.toImmutableList
 
+private const val MIN_AUDIO_EFFECT_VALUE = 0.25F
+private const val MAX_AUDIO_EFFECT_VALUE = 2F
+
 internal fun isParamInputValid(input: String): Boolean {
     val value = input.toFloatOrNull() ?: return false
-    return value in 0.25F..2F
+    return value in MIN_AUDIO_EFFECT_VALUE..MAX_AUDIO_EFFECT_VALUE
 }
 
 internal fun updatedEQBandLevels(
     level: Float,
     index: Int,
     presentLvlsDbState: MutableList<Float>,
-    equalizerData: com.paranid5.crescendo.domain.audio_effects.entity.EqualizerData,
+    equalizerData: EqualizerData,
 ): ImmutableList<Short> {
     presentLvlsDbState[index] = level
 

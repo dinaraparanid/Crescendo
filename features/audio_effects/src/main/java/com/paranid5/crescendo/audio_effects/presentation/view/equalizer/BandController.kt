@@ -21,14 +21,12 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.Constraints
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
+import com.paranid5.crescendo.audio_effects.presentation.AudioEffectsViewModel
 import com.paranid5.crescendo.audio_effects.presentation.view.getBandTrackModel
-import com.paranid5.crescendo.domain.audio_effects.entity.EqualizerData
-import com.paranid5.crescendo.core.impl.di.EQUALIZER_DATA
 import com.paranid5.crescendo.core.resources.R
+import com.paranid5.crescendo.domain.audio_effects.entity.EqualizerData
 import com.paranid5.crescendo.utils.extensions.collectLatestAsState
-import kotlinx.coroutines.flow.MutableStateFlow
-import org.koin.compose.koinInject
-import org.koin.core.qualifier.named
+import org.koin.androidx.compose.koinViewModel
 
 @Composable
 internal fun BandController(
@@ -36,16 +34,20 @@ internal fun BandController(
     presentLvlsDbState: SnapshotStateList<Float>,
     pointsState: SnapshotStateList<Offset>,
     modifier: Modifier = Modifier,
-    equalizerDataState: MutableStateFlow<com.paranid5.crescendo.domain.audio_effects.entity.EqualizerData?> = koinInject(named(EQUALIZER_DATA)),
+    viewModel: AudioEffectsViewModel = koinViewModel(),
 ) {
-    val equalizerData by equalizerDataState.collectLatestAsState()
+    val equalizerData by viewModel.equalizerState.collectLatestAsState()
 
     val minDb by remember(equalizerData?.minBandLevel) {
-        derivedStateOf { (equalizerData?.minBandLevel ?: 0) / 1000F }
+        derivedStateOf {
+            (equalizerData?.minBandLevel ?: 0).toFloat() / EqualizerData.MILLIBELS_IN_DECIBEL
+        }
     }
 
     val maxDb by remember(equalizerData?.maxBandLevel) {
-        derivedStateOf { (equalizerData?.maxBandLevel ?: 0) / 1000F }
+        derivedStateOf {
+            (equalizerData?.maxBandLevel ?: 0).toFloat() / EqualizerData.MILLIBELS_IN_DECIBEL
+        }
     }
 
     val sliderYPosState = remember { mutableFloatStateOf(0F) }

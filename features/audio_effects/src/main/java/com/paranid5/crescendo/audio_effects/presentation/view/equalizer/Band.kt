@@ -6,7 +6,9 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -15,14 +17,12 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.paranid5.crescendo.domain.audio_effects.entity.EqualizerData
-import com.paranid5.crescendo.core.impl.di.EQUALIZER_DATA
+import com.paranid5.crescendo.audio_effects.presentation.AudioEffectsViewModel
 import com.paranid5.crescendo.core.resources.R
 import com.paranid5.crescendo.core.resources.ui.theme.LocalAppColors
+import com.paranid5.crescendo.domain.audio_effects.entity.EqualizerData
 import com.paranid5.crescendo.utils.extensions.collectLatestAsState
-import kotlinx.coroutines.flow.MutableStateFlow
-import org.koin.compose.koinInject
-import org.koin.core.qualifier.named
+import org.koin.androidx.compose.koinViewModel
 
 @Composable
 internal fun Band(
@@ -76,11 +76,17 @@ private fun BandDbLabel(
 private fun BandHzLabel(
     index: Int,
     modifier: Modifier = Modifier,
-    equalizerDataState: MutableStateFlow<com.paranid5.crescendo.domain.audio_effects.entity.EqualizerData?> = koinInject(named(EQUALIZER_DATA)),
+    viewModel: AudioEffectsViewModel = koinViewModel()
 ) {
     val colors = LocalAppColors.current
-    val equalizerData by equalizerDataState.collectLatestAsState()
-    val bandHz = (equalizerData?.bandFrequencies?.get(index) ?: 0) / 1000
+    val equalizerData by viewModel.equalizerState.collectLatestAsState()
+
+    val bandHz by remember(equalizerData?.bandFrequencies, index) {
+        derivedStateOf {
+            val mdb = equalizerData?.bandFrequencies?.getOrNull(index) ?: 0
+            mdb / EqualizerData.MILLIBELS_IN_DECIBEL
+        }
+    }
 
     Text(
         text = "$bandHz ${stringResource(R.string.hertz)}",
@@ -88,6 +94,6 @@ private fun BandHzLabel(
         color = colors.primary,
         fontSize = 8.sp,
         maxLines = 1,
-        modifier = modifier
+        modifier = modifier,
     )
 }

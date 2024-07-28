@@ -22,7 +22,7 @@ internal class PlayerProvider(
     service: StreamService,
     storageRepository: StorageRepository,
     audioEffectsRepository: AudioEffectsRepository,
-) : PlayerController by PlayerControllerImpl(service, storageRepository),
+) : PlayerController by PlayerControllerImpl(service, storageRepository, audioEffectsRepository),
     PlayingUrlSubscriber by PlayingUrlSubscriberImpl(storageRepository),
     PlayingUrlPublisher by PlayingUrlPublisherImpl(storageRepository),
     CurrentMetadataSubscriber by CurrentMetadataSubscriberImpl(storageRepository),

@@ -26,7 +26,7 @@ internal class PlayerProvider(
     storageRepository: StorageRepository,
     currentPlaylistRepository: CurrentPlaylistRepository,
     audioEffectsRepository: AudioEffectsRepository,
-) : PlayerController by PlayerControllerImpl(service, storageRepository),
+) : PlayerController by PlayerControllerImpl(service, storageRepository, audioEffectsRepository),
     CurrentPlaylistSubscriber by CurrentPlaylistSubscriberImpl(currentPlaylistRepository),
     CurrentPlaylistPublisher by CurrentPlaylistPublisherImpl(currentPlaylistRepository),
     CurrentTrackIndexSubscriber by CurrentTrackIndexSubscriberImpl(storageRepository),

@@ -13,6 +13,7 @@ import com.paranid5.crescendo.core.impl.di.IS_PLAYING
 import com.paranid5.crescendo.data.StorageRepository
 import com.paranid5.crescendo.data.sources.playback.RepeatingPublisherImpl
 import com.paranid5.crescendo.data.sources.playback.RepeatingSubscriberImpl
+import com.paranid5.crescendo.domain.audio_effects.AudioEffectsRepository
 import com.paranid5.crescendo.domain.sources.playback.RepeatingPublisher
 import com.paranid5.crescendo.domain.sources.playback.RepeatingSubscriber
 import com.paranid5.crescendo.system.services.track.TrackService
@@ -33,8 +34,9 @@ import org.koin.core.qualifier.named
 internal class PlayerControllerImpl(
     service: TrackService,
     storageRepository: StorageRepository,
+    audioEffectsRepository: AudioEffectsRepository,
 ) : PlayerController, KoinComponent,
-    AudioEffectsController by AudioEffectsControllerImpl(),
+    AudioEffectsController by AudioEffectsControllerImpl(audioEffectsRepository),
     RepeatingSubscriber by RepeatingSubscriberImpl(storageRepository),
     RepeatingPublisher by RepeatingPublisherImpl(storageRepository) {
     private val _isPlayingState by inject<MutableStateFlow<Boolean>>(named(IS_PLAYING))
@@ -76,7 +78,7 @@ internal class PlayerControllerImpl(
         _currentPositionState.asStateFlow()
     }
 
-    inline val currentPosition
+    private inline val currentPosition
         get() = currentPositionState.value
 
     override fun updateCurrentPosition() =

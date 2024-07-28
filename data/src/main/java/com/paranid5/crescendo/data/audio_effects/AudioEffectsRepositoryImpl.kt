@@ -6,6 +6,7 @@ import com.paranid5.crescendo.domain.audio_effects.BassStrengthDataSource
 import com.paranid5.crescendo.domain.audio_effects.EqualizerBandsDataSource
 import com.paranid5.crescendo.domain.audio_effects.EqualizerParamDataSource
 import com.paranid5.crescendo.domain.audio_effects.EqualizerPresetDataSource
+import com.paranid5.crescendo.domain.audio_effects.EqualizerStateHolder
 import com.paranid5.crescendo.domain.audio_effects.PitchDataSource
 import com.paranid5.crescendo.domain.audio_effects.PitchTextDataSource
 import com.paranid5.crescendo.domain.audio_effects.ReverbPresetDataSource
@@ -15,6 +16,7 @@ import com.paranid5.crescendo.domain.audio_effects.SpeedTextDataSource
 internal class AudioEffectsRepositoryImpl(
     audioEffectsEnabledDataSource: AudioEffectsEnabledDataSource,
     bassStrengthDataSource: BassStrengthDataSource,
+    equalizerStateHolder: EqualizerStateHolder,
     equalizerBandsDataSource: EqualizerBandsDataSource,
     equalizerParamDataSource: EqualizerParamDataSource,
     equalizerPresetDataSource: EqualizerPresetDataSource,
@@ -26,6 +28,7 @@ internal class AudioEffectsRepositoryImpl(
 ) : AudioEffectsRepository,
     AudioEffectsEnabledDataSource by audioEffectsEnabledDataSource,
     BassStrengthDataSource by bassStrengthDataSource,
+    EqualizerStateHolder by equalizerStateHolder,
     EqualizerBandsDataSource by equalizerBandsDataSource,
     EqualizerParamDataSource by equalizerParamDataSource,
     EqualizerPresetDataSource by equalizerPresetDataSource,

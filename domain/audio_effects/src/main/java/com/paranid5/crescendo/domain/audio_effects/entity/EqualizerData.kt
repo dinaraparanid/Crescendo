@@ -12,5 +12,6 @@ data class EqualizerData(
     companion object {
         const val NO_EQ_PRESET: Short = -1
         const val INITIAL_EQ_PRESET: Short = 0
+        const val MILLIBELS_IN_DECIBEL = 1000
     }
 }
