@@ -9,8 +9,8 @@ internal suspend inline fun PlayingViewModel.setPlaybackPosition(
     audioStatus: AudioStatus,
     position: Long
 ) = when (audioStatus) {
-    AudioStatus.STREAMING -> setStreamPlaybackPosition(position)
-    AudioStatus.PLAYING -> setTracksPlaybackPosition(position)
+    AudioStatus.STREAMING -> updateStreamPlaybackPosition(position)
+    AudioStatus.PLAYING -> updateTracksPlaybackPosition(position)
 }
 
 internal inline val PlayingViewModel.streamDurationMillisFlow

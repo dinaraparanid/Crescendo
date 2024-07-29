@@ -1,9 +1,9 @@
 plugins {
-    id 'com.android.application'
-    id 'org.jetbrains.kotlin.android'
-    id 'kotlin-parcelize'
-    id 'org.jetbrains.kotlin.plugin.serialization' version '1.9.0'
+    alias libs.plugins.android.application
+    alias libs.plugins.kotlin.android
+    alias libs.plugins.kotlinx.serialization
     alias libs.plugins.compose.compiler
+    id 'kotlin-parcelize'
 }
 
 android {
@@ -65,8 +65,6 @@ dependencies {
     implementation project(':core:utils')
 
     implementation project(':data')
-
-    implementation project(':domain')
 
     implementation project(':navigation')
 

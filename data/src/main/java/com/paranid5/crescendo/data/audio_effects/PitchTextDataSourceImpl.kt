@@ -1,13 +1,13 @@
 package com.paranid5.crescendo.data.audio_effects
 
-import com.paranid5.crescendo.data.datastore.DataStoreProvider
-import com.paranid5.crescendo.data.properties.pitchTextFlow
+import com.paranid5.crescendo.data.datastore.AudioEffectsDataStore
 import com.paranid5.crescendo.domain.audio_effects.PitchTextDataSource
+import kotlinx.coroutines.flow.map
 
 internal class PitchTextDataSourceImpl(
-    private val dataStoreProvider: DataStoreProvider,
+    private val audioEffectsDataStore: AudioEffectsDataStore,
 ) : PitchTextDataSource {
     override val pitchTextFlow by lazy {
-        dataStoreProvider.pitchTextFlow
+        audioEffectsDataStore.pitchFlow.map(Float::toString)
     }
 }

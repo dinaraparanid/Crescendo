@@ -45,7 +45,7 @@ private fun BassController(
             modifier = modifier,
             onValueChange = { bass ->
                 viewModel.viewModelScope.launch(Dispatchers.IO) {
-                    viewModel.setBassStrength(bass.toInt().toShort())
+                    viewModel.updateBassStrength(bass.toInt().toShort())
                 }
             }
         )
@@ -66,7 +66,7 @@ private fun ReverbController(
             modifier = modifier,
             onValueChange = { reverb ->
                 viewModel.viewModelScope.launch(Dispatchers.IO) {
-                    viewModel.setReverbPreset(reverb.toInt().toShort())
+                    viewModel.updateReverbPreset(reverb.toInt().toShort())
                 }
             }
         )

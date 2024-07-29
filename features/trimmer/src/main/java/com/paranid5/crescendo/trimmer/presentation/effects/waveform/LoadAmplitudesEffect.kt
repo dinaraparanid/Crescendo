@@ -28,7 +28,7 @@ internal fun LoadAmplitudesEffect(
 
     LaunchedEffect(trackPath) {
         withContext(Dispatchers.IO) {
-            if (trackPath != null) viewModel.setAmplitudes(
+            if (trackPath != null) viewModel.updateAmplitudes(
                 amplituda
                     .processAudio(trackPath)
                     .get(AmplitudaErrorListener { it.printStackTrace() })

@@ -68,7 +68,7 @@ private suspend inline fun StreamService.onPlayStream(ytUrl: String, initialPosi
 }
 
 private suspend fun StreamService.onPause() {
-    playerProvider.setStreamPlaybackPosition(playerProvider.currentPosition)
+    playerProvider.updateStreamPlaybackPosition(playerProvider.currentPosition)
     playerProvider.pausePlayer()
 }
 

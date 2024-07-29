@@ -2,6 +2,7 @@ package com.paranid5.crescendo.current_playlist.presentation.views
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.paranid5.crescendo.current_playlist.presentation.CurrentPlaylistViewModel
@@ -9,7 +10,8 @@ import com.paranid5.crescendo.current_playlist.domain.tryDismissTrack
 import com.paranid5.crescendo.current_playlist.domain.updateCurrentPlaylistAfterDrag
 import com.paranid5.crescendo.current_playlist.presentation.properties.compose.collectCurrentPlaylistAsState
 import com.paranid5.crescendo.current_playlist.presentation.properties.compose.collectCurrentTrackIndexAsState
-import com.paranid5.crescendo.system.services.track.TrackServiceAccessor
+import com.paranid5.crescendo.system.services.track.TrackServiceInteractor
+import kotlinx.collections.immutable.toImmutableList
 import org.koin.androidx.compose.koinViewModel
 import org.koin.compose.koinInject
 
@@ -17,13 +19,14 @@ import org.koin.compose.koinInject
 internal fun CurrentPlaylistTrackList(
     modifier: Modifier = Modifier,
     viewModel: CurrentPlaylistViewModel = koinViewModel(),
-    trackServiceAccessor: TrackServiceAccessor = koinInject()
+    trackServiceInteractor: TrackServiceInteractor = koinInject(),
 ) {
-    val currentPlaylist by viewModel.collectCurrentPlaylistAsState()
+    val currentPlaylistRaw by viewModel.collectCurrentPlaylistAsState()
     val currentTrackIndex by viewModel.collectCurrentTrackIndexAsState()
+    val currentPlaylist = remember(currentPlaylistRaw) { currentPlaylistRaw.toImmutableList() }
 
     DraggableTrackList(
-        tracks = currentPlaylist,
+        tracks = currentPlaylistRaw.toImmutableList(),
         currentTrackIndex = currentTrackIndex,
         modifier = modifier,
         bottomPadding = 24.dp,
@@ -41,7 +44,7 @@ internal fun CurrentPlaylistTrackList(
                 publisher = viewModel,
                 newTracks = newTracks,
                 newCurTrackIndex = newCurTrackIndex,
-                trackServiceAccessor = trackServiceAccessor
+                trackServiceInteractor = trackServiceInteractor,
             )
         }
     )

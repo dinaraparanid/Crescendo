@@ -64,7 +64,7 @@ private fun TrackOrderSpinnerImpl(
         modifier = modifier,
         onItemSelected = { ind, _ ->
             scope.launch {
-                viewModel.setTrackOrder(selectedTrackOrder(ind, trackOrder))
+                viewModel.updateTrackOrder(selectedTrackOrder(ind, trackOrder))
             }
         },
         previewItemFactory = { _, _, _ -> },

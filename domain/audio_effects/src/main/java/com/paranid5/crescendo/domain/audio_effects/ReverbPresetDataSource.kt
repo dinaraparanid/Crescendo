@@ -5,5 +5,5 @@ import kotlinx.coroutines.flow.Flow
 interface ReverbPresetDataSource {
     val reverbPresetFlow: Flow<Short>
 
-    suspend fun setReverbPreset(reverbPreset: Short)
+    suspend fun updateReverbPreset(reverbPreset: Short)
 }

@@ -5,29 +5,20 @@ import android.content.Intent
 import android.os.Build
 import android.util.Log
 import com.paranid5.crescendo.core.common.tracks.DefaultTrack
-import com.paranid5.crescendo.core.impl.di.TRACK_SERVICE_CONNECTION
 import com.paranid5.crescendo.core.impl.tracks.DefaultTrackModel
-import com.paranid5.crescendo.domain.interactor.tracks.TrackServiceInteractor
-import com.paranid5.crescendo.domain.interactor.tracks.TrackServiceStart
 import com.paranid5.crescendo.system.common.broadcast.StreamServiceBroadcasts
 import com.paranid5.crescendo.system.common.broadcast.TrackServiceBroadcasts
 import com.paranid5.system.services.common.ServiceAccessor
 import com.paranid5.system.services.common.ServiceAccessorImpl
 import kotlinx.coroutines.flow.MutableStateFlow
-import org.koin.core.component.KoinComponent
-import org.koin.core.component.inject
-import org.koin.core.qualifier.named
 
-class TrackServiceAccessor(context: Context) : KoinComponent,
-    TrackServiceInteractor,
-    ServiceAccessor by ServiceAccessorImpl(context) {
+internal class TrackServiceAccessor(
+    context: Context,
+    private val isTrackServiceConnectedState: MutableStateFlow<Boolean>,
+) : TrackServiceInteractor, ServiceAccessor by ServiceAccessorImpl(context) {
     private companion object {
         private val TAG = TrackServiceAccessor::class.simpleName!!
     }
-
-    private val isTrackServiceConnectedState by inject<MutableStateFlow<Boolean>>(
-        named(TRACK_SERVICE_CONNECTION)
-    )
 
     private inline val isTrackServiceConnected
         get() = isTrackServiceConnectedState.value

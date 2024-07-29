@@ -4,24 +4,8 @@ import android.content.Context
 import android.support.v4.media.MediaMetadataCompat
 import android.support.v4.media.session.MediaSessionCompat
 import android.support.v4.media.session.PlaybackStateCompat
-import com.paranid5.crescendo.data.datastore.DataStoreProvider
-import com.paranid5.crescendo.data.datastore.sources.stream.CurrentMetadataPublisherImpl
-import com.paranid5.crescendo.data.datastore.sources.stream.CurrentMetadataSubscriberImpl
-import com.paranid5.crescendo.data.datastore.sources.tracks.CurrentTrackSubscriberImpl
-import com.paranid5.crescendo.domain.repositories.CurrentPlaylistRepository
-import com.paranid5.crescendo.domain.sources.stream.CurrentMetadataPublisher
-import com.paranid5.crescendo.domain.sources.stream.CurrentMetadataSubscriber
-import com.paranid5.crescendo.domain.sources.tracks.CurrentTrackSubscriber
 
-class MediaSessionManager(
-    dataStoreProvider: DataStoreProvider,
-    currentPlaylistRepository: CurrentPlaylistRepository
-) : CurrentMetadataSubscriber by CurrentMetadataSubscriberImpl(dataStoreProvider),
-    CurrentMetadataPublisher by CurrentMetadataPublisherImpl(dataStoreProvider),
-    CurrentTrackSubscriber by CurrentTrackSubscriberImpl(
-        dataStoreProvider,
-        currentPlaylistRepository
-    ) {
+class MediaSessionManager {
     private lateinit var mediaSession: MediaSessionCompat
 
     val sessionToken: MediaSessionCompat.Token

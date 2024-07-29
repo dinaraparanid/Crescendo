@@ -2,8 +2,8 @@ package com.paranid5.crescendo.system.services.track.playback
 
 import androidx.media3.common.Player
 import com.paranid5.crescendo.core.common.tracks.Track
-import com.paranid5.crescendo.domain.sources.playback.RepeatingPublisher
-import com.paranid5.crescendo.domain.sources.playback.RepeatingSubscriber
+import com.paranid5.crescendo.domain.playback.RepeatingPublisher
+import com.paranid5.crescendo.domain.playback.RepeatingSubscriber
 import com.paranid5.system.services.common.playback.AudioEffectsController
 import kotlinx.coroutines.flow.StateFlow
 

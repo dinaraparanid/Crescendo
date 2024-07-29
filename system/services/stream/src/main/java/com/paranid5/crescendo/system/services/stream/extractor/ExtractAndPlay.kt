@@ -23,11 +23,11 @@ internal suspend inline fun StreamService.extractMediaFilesAndStartPlaying(
     val (audioUrl, metadata) = extractRes.getOrNull()!!
 
     serviceScope.launch(Dispatchers.IO) {
-        mediaSessionManager.setCurrentMetadata(metadata)
+        playerProvider.updateCurrentMetadata(metadata)
     }
 
     serviceScope.launch {
-        playerProvider.setStreamPlaybackPosition(initialPosition)
+        playerProvider.updateStreamPlaybackPosition(initialPosition)
         playerProvider.playStreamViaPlayer(audioUrl, initialPosition)
     }
 }

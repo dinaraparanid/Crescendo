@@ -2,9 +2,9 @@ package com.paranid5.crescendo.current_playlist.domain
 
 import com.paranid5.crescendo.core.common.tracks.Track
 import com.paranid5.crescendo.current_playlist.data.TrackDismissDataSource
-import com.paranid5.crescendo.domain.sources.tracks.CurrentPlaylistPublisher
-import com.paranid5.crescendo.domain.sources.tracks.CurrentTrackIndexPublisher
-import com.paranid5.crescendo.system.services.track.TrackServiceAccessor
+import com.paranid5.crescendo.domain.current_playlist.CurrentPlaylistPublisher
+import com.paranid5.crescendo.domain.tracks.CurrentTrackIndexPublisher
+import com.paranid5.crescendo.system.services.track.TrackServiceInteractor
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.delay
@@ -31,13 +31,13 @@ internal fun tryDismissTrack(
 
 internal suspend fun <P> updateCurrentPlaylistAfterDrag(
     publisher: P,
-    newTracks: ImmutableList<Track>,
+    newTracks: List<Track>,
     newCurTrackIndex: Int,
-    trackServiceAccessor: TrackServiceAccessor
+    trackServiceInteractor: TrackServiceInteractor,
 ) where P : CurrentTrackIndexPublisher, P : CurrentPlaylistPublisher {
-    publisher.setCurrentTrackIndex(newCurTrackIndex)
-    publisher.setCurrentPlaylist(newTracks)
+    publisher.updateCurrentTrackIndex(newCurTrackIndex)
+    publisher.updateCurrentPlaylist(newTracks)
 
     delay(500) // small delay to complete transaction and update event flow
-    trackServiceAccessor.updatePlaylistAfterDrag()
+    trackServiceInteractor.updatePlaylistAfterDrag()
 }

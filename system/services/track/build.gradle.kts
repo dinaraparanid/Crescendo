@@ -1,6 +1,6 @@
 plugins {
-    id("com.android.library")
-    id("org.jetbrains.kotlin.android")
+    alias(libs.plugins.android.library)
+    alias(libs.plugins.kotlin.android)
 }
 
 android {
@@ -38,8 +38,11 @@ dependencies {
     implementation(project(":core:media"))
     implementation(project(":core:utils"))
     implementation(project(":core:resources"))
-    implementation(project(":domain"))
-    implementation(project(":data"))
+
+    implementation(project(":domain:tracks"))
+    implementation(project(":domain:playback"))
+    implementation(project(":domain:current_playlist"))
+
     implementation(project(":system:common"))
     implementation(project(":system:receivers"))
     api(project(":system:services:common"))

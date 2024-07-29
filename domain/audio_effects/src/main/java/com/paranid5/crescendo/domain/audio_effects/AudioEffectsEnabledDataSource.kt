@@ -5,5 +5,5 @@ import kotlinx.coroutines.flow.Flow
 interface AudioEffectsEnabledDataSource {
     val areAudioEffectsEnabledFlow: Flow<Boolean>
 
-    suspend fun setAudioEffectsEnabled(areAudioEffectsEnabled: Boolean)
+    suspend fun updateAudioEffectsEnabled(areAudioEffectsEnabled: Boolean)
 }

@@ -65,7 +65,7 @@ private fun AudioEffectsSwitch(
         ),
         onCheckedChange = {
             viewModel.viewModelScope.launch(Dispatchers.IO) {
-                viewModel.setAudioEffectsEnabled(it)
+                viewModel.updateAudioEffectsEnabled(it)
             }
         }
     )

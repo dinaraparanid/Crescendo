@@ -1,17 +1,15 @@
 package com.paranid5.crescendo.data.audio_effects
 
-import com.paranid5.crescendo.data.datastore.DataStoreProvider
-import com.paranid5.crescendo.data.properties.bassStrengthFlow
-import com.paranid5.crescendo.data.properties.storeBassStrength
+import com.paranid5.crescendo.data.datastore.AudioEffectsDataStore
 import com.paranid5.crescendo.domain.audio_effects.BassStrengthDataSource
 
 internal class BassStrengthDataSourceImpl(
-    private val dataStoreProvider: DataStoreProvider,
+    private val audioEffectsDataStore: AudioEffectsDataStore,
 ) : BassStrengthDataSource {
     override val bassStrengthFlow by lazy {
-        dataStoreProvider.bassStrengthFlow
+        audioEffectsDataStore.bassStrengthFlow
     }
 
-    override suspend fun setBassStrength(bassStrength: Short) =
-        dataStoreProvider.storeBassStrength(bassStrength)
+    override suspend fun updateBassStrength(bassStrength: Short) =
+        audioEffectsDataStore.storeBassStrength(bassStrength)
 }

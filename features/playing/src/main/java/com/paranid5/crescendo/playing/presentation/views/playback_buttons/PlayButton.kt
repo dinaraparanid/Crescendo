@@ -34,7 +34,7 @@ internal fun PlayButton(
         modifier = modifier.simpleShadow(color = paletteColor),
         onClick = {
             coroutineScope.launch {
-                viewModel.setAudioStatus(audioStatus)
+                viewModel.updateAudioStatus(audioStatus)
             }
 
             interactor.startStreamingOrSendResumeBroadcast(audioStatus)

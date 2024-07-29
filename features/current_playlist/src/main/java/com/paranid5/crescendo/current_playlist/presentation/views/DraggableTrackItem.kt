@@ -4,7 +4,6 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -22,8 +21,8 @@ import androidx.compose.ui.unit.dp
 import com.paranid5.crescendo.core.common.tracks.Track
 import com.paranid5.crescendo.core.resources.ui.theme.LocalAppColors
 import com.paranid5.crescendo.current_playlist.presentation.CurrentPlaylistViewModel
-import com.paranid5.crescendo.domain.interactor.tracks.startPlaylistPlayback
-import com.paranid5.crescendo.system.services.track.TrackServiceAccessor
+import com.paranid5.crescendo.system.services.track.TrackServiceInteractor
+import com.paranid5.crescendo.system.services.track.startPlaylistPlayback
 import com.paranid5.crescendo.ui.track.clickableTrackWithPermissions
 import com.paranid5.crescendo.ui.track.currentTrackState
 import com.paranid5.crescendo.ui.track.item.TrackCover
@@ -70,7 +69,7 @@ internal fun <T : Track> DraggableTrackItem(
     currentTrackDragIndex: Int,
     modifier: Modifier = Modifier,
     viewModel: CurrentPlaylistViewModel = koinViewModel(),
-    trackServiceAccessor: TrackServiceAccessor = koinInject(),
+    trackServiceInteractor: TrackServiceInteractor = koinInject(),
 ) {
     val coroutineScope = rememberCoroutineScope()
     val currentTrack by currentTrackState()
@@ -82,7 +81,7 @@ internal fun <T : Track> DraggableTrackItem(
         modifier = modifier,
         onClick = {
             coroutineScope.launch {
-                trackServiceAccessor.startPlaylistPlayback(
+                trackServiceInteractor.startPlaylistPlayback(
                     newTracks = tracks,
                     newTrackIndex = trackIndex,
                     currentTrack = currentTrack,

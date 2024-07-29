@@ -56,4 +56,4 @@ internal inline val TrimmerViewModel.canZoomOutFlow
     get() = zoomState.map { it > 0 }
 
 internal fun TrimmerViewModel.setAmplitudesAsync(amplitudes: ImmutableList<Int>) =
-    viewModelScope.launch(Dispatchers.IO) { setAmplitudes(amplitudes) }
+    viewModelScope.launch(Dispatchers.IO) { updateAmplitudes(amplitudes) }

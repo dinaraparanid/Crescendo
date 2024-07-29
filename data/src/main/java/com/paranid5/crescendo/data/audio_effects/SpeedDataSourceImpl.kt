@@ -1,17 +1,15 @@
 package com.paranid5.crescendo.data.audio_effects
 
-import com.paranid5.crescendo.data.datastore.DataStoreProvider
-import com.paranid5.crescendo.data.properties.speedFlow
-import com.paranid5.crescendo.data.properties.storeSpeed
+import com.paranid5.crescendo.data.datastore.AudioEffectsDataStore
 import com.paranid5.crescendo.domain.audio_effects.SpeedDataSource
 
 internal class SpeedDataSourceImpl(
-    private val dataStoreProvider: DataStoreProvider,
+    private val audioEffectsDataStore: AudioEffectsDataStore,
 ) : SpeedDataSource {
     override val speedFlow by lazy {
-        dataStoreProvider.speedFlow
+        audioEffectsDataStore.speedFlow
     }
 
-    override suspend fun setSpeed(speed: Float) =
-        dataStoreProvider.storeSpeed(speed)
+    override suspend fun updateSpeed(speed: Float) =
+        audioEffectsDataStore.storeSpeed(speed)
 }

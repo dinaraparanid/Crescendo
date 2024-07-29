@@ -17,5 +17,5 @@ internal fun CurrentPlaylistTrack.toTrack(): Track =
         displayName = displayName,
         dateAdded = dateAdded,
         numberInAlbum = numberInAlbum.toInt(),
-        timestamp = TIMESTAMP_NOT_IMPORTANT
+        timestamp = TIMESTAMP_NOT_IMPORTANT,
     )

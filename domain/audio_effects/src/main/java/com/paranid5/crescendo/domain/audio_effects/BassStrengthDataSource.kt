@@ -5,5 +5,5 @@ import kotlinx.coroutines.flow.Flow
 interface BassStrengthDataSource {
     val bassStrengthFlow: Flow<Short>
 
-    suspend fun setBassStrength(bassStrength: Short)
+    suspend fun updateBassStrength(bassStrength: Short)
 }

@@ -8,14 +8,11 @@ import androidx.media3.common.C
 import androidx.media3.common.util.UnstableApi
 import androidx.media3.exoplayer.ExoPlayer
 import com.paranid5.crescendo.core.common.tracks.Track
-import com.paranid5.crescendo.data.datastore.DataStoreProvider
-import com.paranid5.crescendo.data.datastore.sources.playback.RepeatingPublisherImpl
-import com.paranid5.crescendo.data.datastore.sources.playback.RepeatingSubscriberImpl
 import com.paranid5.crescendo.domain.audio_effects.AudioEffectsRepository
 import com.paranid5.crescendo.domain.playback.PlaybackRepository
 import com.paranid5.crescendo.domain.playback.PlaybackRepository.Companion.UNDEFINED_AUDIO_SESSION_ID
-import com.paranid5.crescendo.domain.sources.playback.RepeatingPublisher
-import com.paranid5.crescendo.domain.sources.playback.RepeatingSubscriber
+import com.paranid5.crescendo.domain.playback.RepeatingPublisher
+import com.paranid5.crescendo.domain.playback.RepeatingSubscriber
 import com.paranid5.crescendo.system.services.track.TrackService
 import com.paranid5.crescendo.utils.extensions.toMediaItem
 import com.paranid5.crescendo.utils.extensions.toMediaItemList
@@ -30,13 +27,12 @@ import kotlinx.coroutines.launch
 
 internal class PlayerControllerImpl(
     service: TrackService,
-    dataStoreProvider: DataStoreProvider,
     audioEffectsRepository: AudioEffectsRepository,
     private val playbackRepository: PlaybackRepository,
 ) : PlayerController,
     AudioEffectsController by AudioEffectsControllerImpl(audioEffectsRepository),
-    RepeatingSubscriber by RepeatingSubscriberImpl(dataStoreProvider),
-    RepeatingPublisher by RepeatingPublisherImpl(dataStoreProvider) {
+    RepeatingSubscriber by playbackRepository,
+    RepeatingPublisher by playbackRepository {
 
     @OptIn(UnstableApi::class)
     override val player by lazy {
@@ -81,7 +77,7 @@ internal class PlayerControllerImpl(
 
     override suspend fun updateAndStoreRepeating(isRepeating: Boolean) {
         repeatMode = repeatMode(isRepeating)
-        setRepeating(isRepeating)
+        updateRepeating(isRepeating)
     }
 
     override fun playPlaylistViaPlayer(

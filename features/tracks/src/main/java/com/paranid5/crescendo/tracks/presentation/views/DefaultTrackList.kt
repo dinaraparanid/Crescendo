@@ -8,8 +8,8 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import com.paranid5.crescendo.domain.interactor.tracks.startPlaylistPlayback
-import com.paranid5.crescendo.system.services.track.TrackServiceAccessor
+import com.paranid5.crescendo.system.services.track.TrackServiceInteractor
+import com.paranid5.crescendo.system.services.track.startPlaylistPlayback
 import com.paranid5.crescendo.tracks.presentation.TracksViewModel
 import com.paranid5.crescendo.tracks.presentation.properties.compose.collectShownTracksAsState
 import com.paranid5.crescendo.ui.composition_locals.playing.LocalPlayingPagerState
@@ -27,7 +27,7 @@ internal fun DefaultTrackList(
     trackItemModifier: Modifier = Modifier,
     bottomPadding: Dp = 16.dp,
     viewModel: TracksViewModel = koinViewModel(),
-    trackServiceAccessor: TrackServiceAccessor = koinInject(),
+    trackServiceInteractor: TrackServiceInteractor = koinInject(),
 ) {
     val playingPagerState = LocalPlayingPagerState.current
     val shownTracks by viewModel.collectShownTracksAsState()
@@ -48,7 +48,7 @@ internal fun DefaultTrackList(
                 coroutineScope.launch {
                     playingPagerState?.animateScrollToPage(0)
 
-                    trackServiceAccessor.startPlaylistPlayback(
+                    trackServiceInteractor.startPlaylistPlayback(
                         newTracks = shownTracks,
                         newTrackIndex = trackInd,
                         currentTrack = currentTrack,

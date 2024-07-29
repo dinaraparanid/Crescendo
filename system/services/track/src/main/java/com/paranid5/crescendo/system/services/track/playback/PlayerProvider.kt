@@ -2,44 +2,55 @@ package com.paranid5.crescendo.system.services.track.playback
 
 import androidx.annotation.MainThread
 import com.paranid5.crescendo.core.common.tracks.Track
-import com.paranid5.crescendo.data.datastore.DataStoreProvider
-import com.paranid5.crescendo.data.datastore.sources.playback.TracksPlaybackPositionPublisherImpl
-import com.paranid5.crescendo.data.datastore.sources.playback.TracksPlaybackPositionSubscriberImpl
-import com.paranid5.crescendo.data.datastore.sources.tracks.CurrentPlaylistPublisherImpl
-import com.paranid5.crescendo.data.datastore.sources.tracks.CurrentPlaylistSubscriberImpl
-import com.paranid5.crescendo.data.datastore.sources.tracks.CurrentTrackIndexPublisherImpl
-import com.paranid5.crescendo.data.datastore.sources.tracks.CurrentTrackIndexSubscriberImpl
+import com.paranid5.crescendo.domain.audio_effects.AudioEffectsEnabledDataSource
 import com.paranid5.crescendo.domain.audio_effects.AudioEffectsRepository
+import com.paranid5.crescendo.domain.audio_effects.BassStrengthDataSource
+import com.paranid5.crescendo.domain.audio_effects.EqualizerBandsDataSource
+import com.paranid5.crescendo.domain.audio_effects.EqualizerParamDataSource
+import com.paranid5.crescendo.domain.audio_effects.EqualizerPresetDataSource
+import com.paranid5.crescendo.domain.audio_effects.PitchDataSource
+import com.paranid5.crescendo.domain.audio_effects.ReverbPresetDataSource
+import com.paranid5.crescendo.domain.audio_effects.SpeedDataSource
+import com.paranid5.crescendo.domain.current_playlist.CurrentPlaylistPublisher
+import com.paranid5.crescendo.domain.current_playlist.CurrentPlaylistRepository
+import com.paranid5.crescendo.domain.current_playlist.CurrentPlaylistSubscriber
 import com.paranid5.crescendo.domain.playback.PlaybackRepository
-import com.paranid5.crescendo.domain.repositories.CurrentPlaylistRepository
-import com.paranid5.crescendo.domain.sources.playback.TracksPlaybackPositionPublisher
-import com.paranid5.crescendo.domain.sources.playback.TracksPlaybackPositionSubscriber
-import com.paranid5.crescendo.domain.sources.tracks.CurrentPlaylistPublisher
-import com.paranid5.crescendo.domain.sources.tracks.CurrentPlaylistSubscriber
-import com.paranid5.crescendo.domain.sources.tracks.CurrentTrackIndexPublisher
-import com.paranid5.crescendo.domain.sources.tracks.CurrentTrackIndexSubscriber
+import com.paranid5.crescendo.domain.playback.TracksPlaybackPositionPublisher
+import com.paranid5.crescendo.domain.playback.TracksPlaybackPositionSubscriber
+import com.paranid5.crescendo.domain.tracks.CurrentTrackIndexPublisher
+import com.paranid5.crescendo.domain.tracks.CurrentTrackIndexSubscriber
+import com.paranid5.crescendo.domain.tracks.CurrentTrackSubscriber
+import com.paranid5.crescendo.domain.tracks.TracksRepository
 import com.paranid5.crescendo.system.services.track.TrackService
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
 
 internal class PlayerProvider(
     service: TrackService,
-    dataStoreProvider: DataStoreProvider,
     currentPlaylistRepository: CurrentPlaylistRepository,
     audioEffectsRepository: AudioEffectsRepository,
     playbackRepository: PlaybackRepository,
+    tracksRepository: TracksRepository,
 ) : PlayerController by PlayerControllerImpl(
     service = service,
-    dataStoreProvider = dataStoreProvider,
     audioEffectsRepository = audioEffectsRepository,
     playbackRepository = playbackRepository,
 ),
-    CurrentPlaylistSubscriber by CurrentPlaylistSubscriberImpl(currentPlaylistRepository),
-    CurrentPlaylistPublisher by CurrentPlaylistPublisherImpl(currentPlaylistRepository),
-    CurrentTrackIndexSubscriber by CurrentTrackIndexSubscriberImpl(dataStoreProvider),
-    CurrentTrackIndexPublisher by CurrentTrackIndexPublisherImpl(dataStoreProvider),
-    TracksPlaybackPositionSubscriber by TracksPlaybackPositionSubscriberImpl(dataStoreProvider),
-    TracksPlaybackPositionPublisher by TracksPlaybackPositionPublisherImpl(dataStoreProvider) {
+    AudioEffectsEnabledDataSource by audioEffectsRepository,
+    SpeedDataSource by audioEffectsRepository,
+    PitchDataSource by audioEffectsRepository,
+    EqualizerBandsDataSource by audioEffectsRepository,
+    EqualizerPresetDataSource by audioEffectsRepository,
+    EqualizerParamDataSource by audioEffectsRepository,
+    BassStrengthDataSource by audioEffectsRepository,
+    ReverbPresetDataSource by audioEffectsRepository,
+    CurrentPlaylistSubscriber by currentPlaylistRepository,
+    CurrentPlaylistPublisher by currentPlaylistRepository,
+    CurrentTrackIndexSubscriber by tracksRepository,
+    CurrentTrackIndexPublisher by tracksRepository,
+    CurrentTrackSubscriber by tracksRepository,
+    TracksPlaybackPositionSubscriber by playbackRepository,
+    TracksPlaybackPositionPublisher by playbackRepository {
     private val _playbackEventFlow by lazy {
         MutableSharedFlow<PlaybackEvent>()
     }
@@ -51,43 +62,11 @@ internal class PlayerProvider(
     @Volatile
     var isStoppedWithError = false
 
-    val areAudioEffectsEnabledFlow by lazy {
-        audioEffectsRepository.areAudioEffectsEnabledFlow
-    }
-
-    val speedFlow by lazy {
-        audioEffectsRepository.speedFlow
-    }
-
-    val pitchFlow by lazy {
-        audioEffectsRepository.pitchFlow
-    }
-
-    val equalizerBandsFlow by lazy {
-        audioEffectsRepository.equalizerBandsFlow
-    }
-
-    val equalizerPresetFlow by lazy {
-        audioEffectsRepository.equalizerPresetFlow
-    }
-
-    val equalizerParamFlow by lazy {
-        audioEffectsRepository.equalizerParamFlow
-    }
-
-    val bassStrengthFlow by lazy {
-        audioEffectsRepository.bassStrengthFlow
-    }
-
-    val reverbPresetFlow by lazy {
-        audioEffectsRepository.reverbPresetFlow
-    }
-
     inline val currentPosition
         get() = currentPositionState.value
 
     suspend fun storePlaybackPosition() =
-        setTracksPlaybackPosition(currentPosition)
+        updateTracksPlaybackPosition(currentPosition)
 
     var playbackParameters
         @MainThread get() = player.playbackParameters
@@ -129,4 +108,4 @@ internal class PlayerProvider(
 internal suspend inline fun PlayerProvider.restartPlayer() = startResuming()
 
 internal suspend inline fun PlayerProvider.updateCurrentTrackIndex() =
-    setCurrentTrackIndex(currentMediaItemIndex)
+    updateCurrentTrackIndex(currentMediaItemIndex)

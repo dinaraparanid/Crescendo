@@ -10,11 +10,10 @@ import androidx.compose.ui.res.stringResource
 import com.paranid5.crescendo.core.common.tracks.DefaultTrack
 import com.paranid5.crescendo.core.common.tracks.Track
 import com.paranid5.crescendo.core.resources.R
-import com.paranid5.crescendo.domain.repositories.CurrentPlaylistRepository
-import com.paranid5.crescendo.system.services.track.TrackServiceAccessor
+import com.paranid5.crescendo.domain.current_playlist.CurrentPlaylistRepository
+import com.paranid5.crescendo.system.services.track.TrackServiceInteractor
 import com.paranid5.crescendo.utils.extensions.collectLatestAsState
 import kotlinx.collections.immutable.persistentListOf
-import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.launch
 import org.koin.compose.koinInject
 
@@ -23,12 +22,12 @@ internal fun AddToCurrentPlaylistProperty(
     track: Track,
     modifier: Modifier = Modifier,
     currentPlaylistRepository: CurrentPlaylistRepository = koinInject(),
-    trackServiceAccessor: TrackServiceAccessor = koinInject(),
+    trackServiceAccessor: TrackServiceInteractor = koinInject(),
 ) {
     val coroutineScope = rememberCoroutineScope()
 
     val currentPlaylist by currentPlaylistRepository
-        .tracksFlow
+        .currentPlaylistFlow
         .collectLatestAsState(initial = persistentListOf())
 
     DropdownMenuItem(
@@ -38,10 +37,7 @@ internal fun AddToCurrentPlaylistProperty(
             coroutineScope.launch {
                 val defaultTrack = DefaultTrack(track)
                 trackServiceAccessor.addToPlaylist(defaultTrack)
-
-                currentPlaylistRepository.replacePlaylistAsync(
-                    (currentPlaylist + defaultTrack).toImmutableList()
-                ).join()
+                currentPlaylistRepository.updateCurrentPlaylist((currentPlaylist + defaultTrack))
             }
         }
     )

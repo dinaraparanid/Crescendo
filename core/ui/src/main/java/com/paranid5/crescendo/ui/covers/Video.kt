@@ -19,8 +19,7 @@ import coil.size.Scale
 import com.paranid5.crescendo.core.media.images.ImageSize
 import com.paranid5.crescendo.core.media.images.getVideoCoverAsync
 import com.paranid5.crescendo.core.media.images.getVideoCoverWithPaletteAsync
-import com.paranid5.crescendo.data.datastore.DataStoreProvider
-import com.paranid5.crescendo.data.properties.currentMetadataFlow
+import com.paranid5.crescendo.domain.stream.StreamRepository
 import com.paranid5.crescendo.utils.extensions.collectLatestAsState
 import org.koin.compose.koinInject
 
@@ -31,12 +30,12 @@ fun videoCoverModel(
     isBlured: Boolean = false,
     usePrevCoverAsPlaceholder: Boolean = true,
     animationMillis: Int = 400,
-    dataStoreProvider: DataStoreProvider = koinInject(),
+    streamRepository: StreamRepository = koinInject(),
     bitmapSettings: (Bitmap) -> Unit = {}
 ): ImageRequest {
     val context = LocalContext.current
 
-    val metadata by dataStoreProvider
+    val metadata by streamRepository
         .currentMetadataFlow
         .collectLatestAsState(initial = null)
 
@@ -80,7 +79,6 @@ fun rememberVideoCoverPainter(
     isBlured: Boolean = false,
     usePrevCoverAsPlaceholder: Boolean = true,
     animationMillis: Int = 400,
-    dataStoreProvider: DataStoreProvider = koinInject(),
     bitmapSettings: (Bitmap) -> Unit = {}
 ) = rememberAsyncImagePainter(
     model = videoCoverModel(
@@ -89,7 +87,6 @@ fun rememberVideoCoverPainter(
         isBlured = isBlured,
         usePrevCoverAsPlaceholder = usePrevCoverAsPlaceholder,
         animationMillis = animationMillis,
-        dataStoreProvider = dataStoreProvider,
         bitmapSettings = bitmapSettings
     )
 )
@@ -101,12 +98,12 @@ fun videoCoverModelWithPalette(
     isBlured: Boolean = false,
     usePrevCoverAsPlaceholder: Boolean = true,
     animationMillis: Int = 400,
-    dataStoreProvider: DataStoreProvider = koinInject(),
+    streamRepository: StreamRepository = koinInject(),
     bitmapSettings: (Bitmap) -> Unit = {}
 ): Pair<ImageRequest, Palette?> {
     val context = LocalContext.current
 
-    val metadata by dataStoreProvider
+    val metadata by streamRepository
         .currentMetadataFlow
         .collectLatestAsState(initial = null)
 
@@ -151,7 +148,6 @@ fun rememberVideoCoverPainterWithPalette(
     isBlured: Boolean = false,
     usePrevCoverAsPlaceholder: Boolean = true,
     animationMillis: Int = 400,
-    dataStoreProvider: DataStoreProvider = koinInject(),
     bitmapSettings: (Bitmap) -> Unit = {}
 ): Pair<AsyncImagePainter, Palette?> {
     val (coverModel, palette) = videoCoverModelWithPalette(
@@ -160,7 +156,6 @@ fun rememberVideoCoverPainterWithPalette(
         isBlured = isBlured,
         usePrevCoverAsPlaceholder = usePrevCoverAsPlaceholder,
         animationMillis = animationMillis,
-        dataStoreProvider = dataStoreProvider,
         bitmapSettings = bitmapSettings
     )
 

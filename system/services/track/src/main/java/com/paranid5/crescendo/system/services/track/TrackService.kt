@@ -3,7 +3,6 @@ package com.paranid5.crescendo.system.services.track
 import android.content.Intent
 import android.os.Build
 import com.paranid5.crescendo.core.common.tracks.Track
-import com.paranid5.crescendo.domain.interactor.tracks.TrackServiceStart
 import com.paranid5.crescendo.system.common.broadcast.TrackServiceBroadcasts
 import com.paranid5.crescendo.system.services.track.media_session.MediaSessionCallback
 import com.paranid5.crescendo.system.services.track.media_session.startMetadataMonitoring
@@ -66,7 +65,7 @@ class TrackService : SuspendService(), PlaybackForegroundService, KoinComponent,
         ACTION_NEXT_TRACK to Actions.NextTrack,
         ACTION_REPEAT to Actions.Repeat,
         ACTION_UNREPEAT to Actions.Unrepeat,
-        ACTION_DISMISS to Actions.Dismiss
+        ACTION_DISMISS to Actions.Dismiss,
     )
 
     internal val pauseReceiver = PauseReceiver(this)
@@ -88,7 +87,7 @@ class TrackService : SuspendService(), PlaybackForegroundService, KoinComponent,
 
         mediaSessionManager.initMediaSession(
             context = this,
-            mediaSessionCallback = MediaSessionCallback(this)
+            mediaSessionCallback = MediaSessionCallback(this),
         )
 
         notificationManager.initNotificationManager(playerProvider.player)

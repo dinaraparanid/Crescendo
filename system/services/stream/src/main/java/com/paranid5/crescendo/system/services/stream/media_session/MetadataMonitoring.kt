@@ -13,7 +13,7 @@ import kotlinx.coroutines.flow.map
 
 internal suspend fun StreamService.startMetadataMonitoring() =
     lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
-        mediaSessionManager
+        playerProvider
             .currentMetadataFlow
             .distinctUntilChanged()
             .map { it?.toAndroidMetadata(context = this@startMetadataMonitoring) }

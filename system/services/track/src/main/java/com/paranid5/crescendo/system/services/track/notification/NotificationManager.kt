@@ -3,10 +3,8 @@ package com.paranid5.crescendo.system.services.track.notification
 import androidx.annotation.OptIn
 import androidx.media3.common.Player
 import androidx.media3.common.util.UnstableApi
-import com.paranid5.crescendo.data.datastore.DataStoreProvider
-import com.paranid5.crescendo.data.datastore.sources.tracks.CurrentTrackSubscriberImpl
-import com.paranid5.crescendo.domain.repositories.CurrentPlaylistRepository
-import com.paranid5.crescendo.domain.sources.tracks.CurrentTrackSubscriber
+import com.paranid5.crescendo.domain.tracks.CurrentTrackSubscriber
+import com.paranid5.crescendo.domain.tracks.TracksRepository
 import com.paranid5.crescendo.system.services.track.TrackService
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.stateIn
@@ -16,12 +14,8 @@ internal const val TRACKS_CHANNEL_ID = "tracks_channel"
 
 internal class NotificationManager(
     service: TrackService,
-    dataStoreProvider: DataStoreProvider,
-    currentPlaylistRepository: CurrentPlaylistRepository
-) : CurrentTrackSubscriber by CurrentTrackSubscriberImpl(
-    dataStoreProvider,
-    currentPlaylistRepository,
-) {
+    tracksRepository: TracksRepository,
+) : CurrentTrackSubscriber by tracksRepository {
     internal val currentTrackState by lazy {
         currentTrackFlow.stateIn(
             service.serviceScope,

@@ -1,14 +1,13 @@
 package com.paranid5.crescendo.audio_effects.presentation
 
 import androidx.lifecycle.ViewModel
-import com.paranid5.crescendo.data.datastore.DataStoreProvider
-import com.paranid5.crescendo.data.datastore.sources.playback.AudioStatusSubscriberImpl
 import com.paranid5.crescendo.domain.audio_effects.AudioEffectsRepository
-import com.paranid5.crescendo.domain.sources.playback.AudioStatusSubscriber
+import com.paranid5.crescendo.domain.playback.AudioStatusSubscriber
+import com.paranid5.crescendo.domain.playback.PlaybackRepository
 
 class AudioEffectsViewModel(
-    dataStoreProvider: DataStoreProvider,
     audioEffectsRepository: AudioEffectsRepository,
+    playbackRepository: PlaybackRepository,
 ) : ViewModel(),
-    AudioStatusSubscriber by AudioStatusSubscriberImpl(dataStoreProvider),
+    AudioStatusSubscriber by playbackRepository,
     AudioEffectsRepository by audioEffectsRepository

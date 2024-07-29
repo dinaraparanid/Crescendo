@@ -30,11 +30,8 @@ import com.paranid5.crescendo.utils.extensions.collectLatestAsState
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
-import org.koin.compose.koinInject
-import org.koin.core.qualifier.named
 
 @Composable
 internal fun PresetSpinner(modifier: Modifier = Modifier) =
@@ -75,12 +72,12 @@ private fun PresetSpinnerImpl(
 
             when (ind) {
                 customPresetIndex -> viewModel.viewModelScope.launch(Dispatchers.IO) {
-                    viewModel.setEqualizerParam(EqualizerBandsPreset.CUSTOM)
+                    viewModel.updateEqualizerParam(EqualizerBandsPreset.CUSTOM)
                 }
 
                 else -> viewModel.viewModelScope.launch(Dispatchers.IO) {
-                    viewModel.setEqualizerParam(EqualizerBandsPreset.BUILT_IN)
-                    viewModel.setEqualizerPreset(ind.toShort())
+                    viewModel.updateEqualizerParam(EqualizerBandsPreset.BUILT_IN)
+                    viewModel.updateEqualizerPreset(ind.toShort())
                 }
             }
         }

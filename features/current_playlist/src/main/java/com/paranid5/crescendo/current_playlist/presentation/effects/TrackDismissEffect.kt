@@ -8,14 +8,14 @@ import com.paranid5.crescendo.current_playlist.presentation.properties.compose.c
 import com.paranid5.crescendo.current_playlist.presentation.properties.compose.collectPlaylistDismissMediatorAsState
 import com.paranid5.crescendo.current_playlist.presentation.properties.compose.collectTrackIndexDismissMediatorAsState
 import com.paranid5.crescendo.current_playlist.presentation.properties.compose.collectTrackPathDismissKeyAsState
-import com.paranid5.crescendo.system.services.track.TrackServiceAccessor
+import com.paranid5.crescendo.system.services.track.TrackServiceInteractor
 import org.koin.androidx.compose.koinViewModel
 import org.koin.compose.koinInject
 
 @Composable
 internal fun TrackDismissEffect(
     viewModel: CurrentPlaylistViewModel = koinViewModel(),
-    trackServiceAccessor: TrackServiceAccessor = koinInject()
+    trackServiceInteractor: TrackServiceInteractor = koinInject(),
 ) {
     val currentTrackIndex by viewModel.collectCurrentTrackIndexAsState()
     val playlistDismissMediator by viewModel.collectPlaylistDismissMediatorAsState()
@@ -24,12 +24,12 @@ internal fun TrackDismissEffect(
 
     LaunchedEffect(trackPathDismissKey) {
         if (trackPathDismissKey.isNotEmpty()) {
-            viewModel.setCurrentPlaylist(playlistDismissMediator)
+            viewModel.updateCurrentPlaylist(playlistDismissMediator)
 
             if (trackIndexDismissMediator < currentTrackIndex)
-                viewModel.setCurrentTrackIndex(currentTrackIndex - 1)
+                viewModel.updateCurrentTrackIndex(currentTrackIndex - 1)
 
-            trackServiceAccessor.removeFromPlaylist(trackIndexDismissMediator)
+            trackServiceInteractor.removeFromPlaylist(trackIndexDismissMediator)
         }
     }
 }

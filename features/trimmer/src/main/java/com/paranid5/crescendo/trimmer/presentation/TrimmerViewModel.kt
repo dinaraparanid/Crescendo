@@ -1,11 +1,9 @@
 package com.paranid5.crescendo.trimmer.presentation
 
 import androidx.lifecycle.ViewModel
-import com.paranid5.crescendo.data.datastore.DataStoreProvider
-import com.paranid5.crescendo.data.datastore.sources.waveform.AmplitudesPublisherImpl
-import com.paranid5.crescendo.data.datastore.sources.waveform.AmplitudesSubscriberImpl
-import com.paranid5.crescendo.domain.sources.waveform.AmplitudesPublisher
-import com.paranid5.crescendo.domain.sources.waveform.AmplitudesSubscriber
+import com.paranid5.crescendo.domain.waveform.AmplitudesPublisher
+import com.paranid5.crescendo.domain.waveform.AmplitudesSubscriber
+import com.paranid5.crescendo.domain.waveform.WaveformRepository
 import com.paranid5.crescendo.trimmer.data.FocusEventDataSource
 import com.paranid5.crescendo.trimmer.data.FocusEventDataSourceImpl
 import com.paranid5.crescendo.trimmer.data.PlaybackDataSource
@@ -22,9 +20,11 @@ import com.paranid5.crescendo.trimmer.presentation.properties.setAmplitudesAsync
 import com.paranid5.crescendo.utils.AsyncCondVar
 import kotlinx.collections.immutable.persistentListOf
 
-class TrimmerViewModel(dataStoreProvider: DataStoreProvider) : ViewModel(),
-    AmplitudesSubscriber by AmplitudesSubscriberImpl(dataStoreProvider),
-    AmplitudesPublisher by AmplitudesPublisherImpl(dataStoreProvider),
+class TrimmerViewModel(
+    waveformRepository: WaveformRepository,
+) : ViewModel(),
+    AmplitudesSubscriber by waveformRepository,
+    AmplitudesPublisher by waveformRepository,
     PlaybackPositionsDataSource by PlaybackPositionsDataSourceImpl(),
     PlaybackDataSource by PlaybackDataSourceImpl(),
     TrackDataSource by TrackDataSourceImpl(),

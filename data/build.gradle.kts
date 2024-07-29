@@ -49,9 +49,12 @@ dependencies {
     api(project(":core:utils"))
     api(project(":core:resources"))
 
-    api(project(":domain"))
     api(project(":domain:audio_effects"))
     api(project(":domain:playback"))
+    api(project(":domain:stream"))
+    api(project(":domain:tracks"))
+    api(project(":domain:current_playlist"))
+    api(project(":domain:waveform"))
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)

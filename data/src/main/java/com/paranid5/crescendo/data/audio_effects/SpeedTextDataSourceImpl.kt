@@ -1,13 +1,13 @@
 package com.paranid5.crescendo.data.audio_effects
 
-import com.paranid5.crescendo.data.datastore.DataStoreProvider
-import com.paranid5.crescendo.data.properties.speedTextFlow
+import com.paranid5.crescendo.data.datastore.AudioEffectsDataStore
 import com.paranid5.crescendo.domain.audio_effects.SpeedTextDataSource
+import kotlinx.coroutines.flow.map
 
 internal class SpeedTextDataSourceImpl(
-    private val dataStoreProvider: DataStoreProvider,
+    private val audioEffectsDataStore: AudioEffectsDataStore,
 ) : SpeedTextDataSource {
     override val speedTextState by lazy {
-        dataStoreProvider.speedTextFlow
+        audioEffectsDataStore.speedFlow.map(Float::toString)
     }
 }

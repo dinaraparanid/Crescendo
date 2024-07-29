@@ -5,5 +5,5 @@ import kotlinx.coroutines.flow.Flow
 interface EqualizerPresetDataSource {
     val equalizerPresetFlow: Flow<Short>
 
-    suspend fun setEqualizerPreset(preset: Short)
+    suspend fun updateEqualizerPreset(preset: Short)
 }

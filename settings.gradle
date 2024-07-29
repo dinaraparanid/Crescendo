@@ -5,25 +5,37 @@ pluginManagement {
         mavenCentral()
     }
 }
+
 dependencyResolutionManagement {
-    // repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
     repositories {
         google()
         mavenCentral()
         maven { url 'https://jitpack.io' }
     }
 }
+
 rootProject.name = 'Crescendo'
+
 include ':app'
-include ':data'
-include ':domain'
-include ':navigation'
+
 include ':core:common'
 include ':core:resources'
 include ':core:media'
 include ':core:impl'
 include ':core:ui'
 include ':core:utils'
+
+include ':data'
+
+include ':domain:audio_effects'
+include ':domain:playback'
+include ':domain:stream'
+include ':domain:tracks'
+include ':domain:current_playlist'
+include ':domain:waveform'
+
+include ':navigation'
+
 include ':features:about_app'
 include ':features:audio_effects'
 include ':features:favourites'
@@ -37,11 +49,10 @@ include ':features:trimmer'
 include ':features:current_playlist'
 include ':features:playing'
 include ':features:cache'
+
 include ':system:common'
 include ':system:receivers'
 include ':system:services:common'
 include ':system:services:stream'
 include ':system:services:track'
 include ':system:services:video_cache'
-include ':domain:audio_effects'
-include ':domain:playback'

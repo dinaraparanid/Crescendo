@@ -1,17 +1,15 @@
 package com.paranid5.crescendo.data.audio_effects
 
-import com.paranid5.crescendo.data.datastore.DataStoreProvider
-import com.paranid5.crescendo.data.properties.equalizerPresetFlow
-import com.paranid5.crescendo.data.properties.storeEqualizerPreset
+import com.paranid5.crescendo.data.datastore.AudioEffectsDataStore
 import com.paranid5.crescendo.domain.audio_effects.EqualizerPresetDataSource
 
 internal class EqualizerPresetDataSourceImpl(
-    private val dataStoreProvider: DataStoreProvider,
+    private val audioEffectsDataStore: AudioEffectsDataStore,
 ) : EqualizerPresetDataSource {
     override val equalizerPresetFlow by lazy {
-        dataStoreProvider.equalizerPresetFlow
+        audioEffectsDataStore.equalizerPresetFlow
     }
 
-    override suspend fun setEqualizerPreset(preset: Short) =
-        dataStoreProvider.storeEqualizerPreset(preset)
+    override suspend fun updateEqualizerPreset(preset: Short) =
+        audioEffectsDataStore.storeEqualizerPreset(preset)
 }

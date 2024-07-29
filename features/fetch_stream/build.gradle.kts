@@ -1,6 +1,6 @@
 plugins {
-    id("com.android.library")
-    id("org.jetbrains.kotlin.android")
+    alias(libs.plugins.android.library)
+    alias(libs.plugins.kotlin.android)
     alias(libs.plugins.compose.compiler)
 }
 
@@ -39,8 +39,12 @@ dependencies {
     implementation(project(":core:ui"))
     implementation(project(":core:utils"))
     implementation(project(":core:resources"))
-    implementation(project(":data"))
-    implementation(project(":domain"))
+
+    implementation(project(":domain:stream"))
+    implementation(project(":domain:playback"))
+
+    implementation(project(":features:cache"))
+
     implementation(project(":system:services:stream"))
 
     implementation(libs.androidx.core.ktx)
@@ -52,5 +56,4 @@ dependencies {
     implementation(libs.material)
 
     implementation(libs.koin.androidx.compose)
-    implementation(project(":features:cache"))
 }

@@ -1,6 +1,6 @@
 plugins {
-    id("com.android.library")
-    id("org.jetbrains.kotlin.android")
+    alias(libs.plugins.android.library)
+    alias(libs.plugins.kotlin.android)
 }
 
 android {
@@ -38,7 +38,9 @@ dependencies {
     implementation(project(":core:media"))
     implementation(project(":core:utils"))
     implementation(project(":core:resources"))
-    implementation(project(":data"))
+
+    implementation(project(":data")) // TODO: убрать
+
     implementation(project(":system:common"))
     implementation(project(":system:receivers"))
     api(project(":system:services:common"))

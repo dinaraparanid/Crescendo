@@ -6,5 +6,5 @@ import kotlinx.coroutines.flow.Flow
 interface EqualizerParamDataSource {
     val equalizerParamFlow: Flow<EqualizerBandsPreset>
 
-    suspend fun setEqualizerParam(param: EqualizerBandsPreset)
+    suspend fun updateEqualizerParam(param: EqualizerBandsPreset)
 }

@@ -50,7 +50,7 @@ private fun PitchEditor(
             effectTitle = stringResource(R.string.pitch),
             onValueChanged = { newPitch ->
                 viewModel.viewModelScope.launch {
-                    viewModel.setPitch(newPitch)
+                    viewModel.updatePitch(newPitch)
                 }
             }
         )
@@ -70,7 +70,7 @@ private fun SpeedEditor(
             effectTitle = stringResource(R.string.speed),
             onValueChanged = { newSpeed ->
                 viewModel.viewModelScope.launch {
-                    viewModel.setSpeed(newSpeed)
+                    viewModel.updateSpeed(newSpeed)
                 }
             }
         )

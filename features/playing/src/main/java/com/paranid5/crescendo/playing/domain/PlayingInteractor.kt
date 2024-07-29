@@ -13,36 +13,36 @@ import com.paranid5.crescendo.system.services.stream.sendPauseBroadcast
 import com.paranid5.crescendo.system.services.stream.sendSeekTo10SecsBackBroadcast
 import com.paranid5.crescendo.system.services.stream.sendSeekTo10SecsForwardBroadcast
 import com.paranid5.crescendo.system.services.stream.sendSeekToBroadcast
-import com.paranid5.crescendo.system.services.track.TrackServiceAccessor
+import com.paranid5.crescendo.system.services.track.TrackServiceInteractor
 
 class PlayingInteractor(
     private val streamServiceAccessor: StreamServiceAccessor,
-    private val trackServiceAccessor: TrackServiceAccessor,
+    private val trackServiceInteractor: TrackServiceInteractor,
     private val playbackRepository: PlaybackRepository,
 ) {
     internal fun sendOnPrevButtonClickedBroadcast(audioStatus: AudioStatus) = audioStatus.handle(
         streamAction = streamServiceAccessor::sendSeekTo10SecsBackBroadcast,
-        trackAction = trackServiceAccessor::sendSwitchToPrevTrackBroadcast
+        trackAction = trackServiceInteractor::sendSwitchToPrevTrackBroadcast
     )
 
     internal fun sendOnNextButtonClickedBroadcast(audioStatus: AudioStatus) = audioStatus.handle(
         streamAction = streamServiceAccessor::sendSeekTo10SecsForwardBroadcast,
-        trackAction = trackServiceAccessor::sendSwitchToNextTrackBroadcast
+        trackAction = trackServiceInteractor::sendSwitchToNextTrackBroadcast
     )
 
     internal fun sendSeekToBroadcast(audioStatus: AudioStatus, position: Long) = audioStatus.handle(
         streamAction = { streamServiceAccessor.sendSeekToBroadcast(position) },
-        trackAction = { trackServiceAccessor.sendSeekToBroadcast(position) }
+        trackAction = { trackServiceInteractor.sendSeekToBroadcast(position) }
     )
 
     internal fun sendPauseBroadcast(audioStatus: AudioStatus) = audioStatus.handle(
         streamAction = streamServiceAccessor::sendPauseBroadcast,
-        trackAction = trackServiceAccessor::sendPauseBroadcast
+        trackAction = trackServiceInteractor::sendPauseBroadcast
     )
 
     internal fun startStreamingOrSendResumeBroadcast(audioStatus: AudioStatus) = audioStatus.handle(
         streamAction = streamServiceAccessor::startStreamingOrSendResumeBroadcast,
-        trackAction = trackServiceAccessor::startStreamingOrSendResumeBroadcast
+        trackAction = trackServiceInteractor::startStreamingOrSendResumeBroadcast
     )
 
     internal fun navigateToAudioEffects(context: Context, navHostController: NavHostController) {

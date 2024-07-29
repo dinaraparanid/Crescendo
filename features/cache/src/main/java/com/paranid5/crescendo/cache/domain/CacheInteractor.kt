@@ -13,7 +13,7 @@ internal class CacheInteractor(private val videoCacheServiceAccessor: VideoCache
         trimRange: TrimRange,
         viewModel: CacheViewModel
     ) {
-        viewModel.setDownloadingUrl(url)
+        viewModel.updateDownloadingUrl(url)
 
         launchVideoCacheService(
             url = url,

@@ -6,8 +6,8 @@ import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.LocalContext
-import com.paranid5.crescendo.tracks.presentation.TracksViewModel
 import com.paranid5.crescendo.data.media_store.tracks.allTracksFromMediaStore
+import com.paranid5.crescendo.tracks.presentation.TracksViewModel
 import kotlinx.coroutines.delay
 import org.koin.androidx.compose.koinViewModel
 

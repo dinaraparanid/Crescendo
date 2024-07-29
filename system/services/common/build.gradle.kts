@@ -1,6 +1,6 @@
 plugins {
-    id("com.android.library")
-    id("org.jetbrains.kotlin.android")
+    alias(libs.plugins.android.library)
+    alias(libs.plugins.kotlin.android)
 }
 
 android {
@@ -38,10 +38,7 @@ dependencies {
     api(project(":core:media"))
     api(project(":core:resources"))
 
-    api(project(":domain"))
     api(project(":domain:audio_effects"))
-
-    api(project(":data"))
 
     api(project(":system:common"))
 

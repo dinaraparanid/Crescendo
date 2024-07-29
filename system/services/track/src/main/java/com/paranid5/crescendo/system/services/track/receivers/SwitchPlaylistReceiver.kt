@@ -4,7 +4,7 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import com.paranid5.crescendo.system.services.track.TrackService
-import com.paranid5.crescendo.domain.interactor.tracks.TrackServiceStart
+import com.paranid5.crescendo.system.services.track.TrackServiceStart
 import com.paranid5.crescendo.system.services.track.playback.pauseAsync
 import com.paranid5.crescendo.system.services.track.playback.playPlaylistAsync
 import com.paranid5.crescendo.system.services.track.playback.resumeAsync

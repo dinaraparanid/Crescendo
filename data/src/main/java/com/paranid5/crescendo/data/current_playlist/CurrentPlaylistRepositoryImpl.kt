@@ -3,19 +3,15 @@ package com.paranid5.crescendo.data.current_playlist
 import app.cash.sqldelight.coroutines.asFlow
 import app.cash.sqldelight.coroutines.mapToList
 import app.cash.sqldelight.db.SqlDriver
+import com.paranid5.crescendo.core.common.tracks.Track
 import com.paranid5.crescendo.data.CurrentPlaylist
 import com.paranid5.crescendo.data.CurrentPlaylistTrack
-import com.paranid5.crescendo.core.common.tracks.Track
-import com.paranid5.crescendo.domain.repositories.CurrentPlaylistRepository
-import kotlinx.collections.immutable.toImmutableList
-import kotlinx.coroutines.CoroutineScope
+import com.paranid5.crescendo.domain.current_playlist.CurrentPlaylistRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
-class CurrentPlaylistRepositoryImpl(driver: SqlDriver) :
-    CurrentPlaylistRepository,
-    CoroutineScope by CoroutineScope(Dispatchers.IO) {
+internal class CurrentPlaylistRepositoryImpl(driver: SqlDriver) : CurrentPlaylistRepository {
     private val database by lazy {
         CurrentPlaylist(driver)
     }
@@ -24,33 +20,32 @@ class CurrentPlaylistRepositoryImpl(driver: SqlDriver) :
         database.currentPlaylistTrackQueries
     }
 
-    override val tracksFlow
+    override val currentPlaylistFlow
         get() = queries
             .selectAll()
             .asFlow()
             .mapToList(Dispatchers.IO)
-            .map { it.map(CurrentPlaylistTrack::toTrack).toImmutableList() }
+            .map { it.map(CurrentPlaylistTrack::toTrack) }
 
-    override fun replacePlaylistAsync(playlist: List<Track>) =
-        launch(Dispatchers.IO) { replacePlaylist(playlist) }
+    override suspend fun updateCurrentPlaylist(playlist: List<Track>) =
+        withContext(Dispatchers.IO) {
+            queries.transaction {
+                queries.clearPlaylist()
 
-    private fun replacePlaylist(playlist: List<Track>) =
-        queries.transaction {
-            queries.clearPlaylist()
-
-            playlist.forEach {
-                queries.insertTrack(
-                    id = null,
-                    androidId = it.androidId,
-                    title = it.title,
-                    artist = it.artist,
-                    album = it.album,
-                    path = it.path,
-                    durationMillis = it.durationMillis,
-                    displayName = it.displayName,
-                    dateAdded = it.dateAdded,
-                    numberInAlbum = it.numberInAlbum.toLong()
-                )
+                playlist.forEach { track ->
+                    queries.insertTrack(
+                        id = null,
+                        androidId = track.androidId,
+                        title = track.title,
+                        artist = track.artist,
+                        album = track.album,
+                        path = track.path,
+                        durationMillis = track.durationMillis,
+                        displayName = track.displayName,
+                        dateAdded = track.dateAdded,
+                        numberInAlbum = track.numberInAlbum.toLong(),
+                    )
+                }
             }
         }
 }

@@ -5,5 +5,5 @@ import kotlinx.coroutines.flow.Flow
 interface SpeedDataSource {
     val speedFlow: Flow<Float>
 
-    suspend fun setSpeed(speed: Float)
+    suspend fun updateSpeed(speed: Float)
 }

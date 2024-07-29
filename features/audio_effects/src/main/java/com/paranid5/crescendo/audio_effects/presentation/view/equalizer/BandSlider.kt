@@ -64,8 +64,8 @@ internal fun BandSlider(
                     equalizerData = equalizerData!!,
                 )
 
-                viewModel.setEqualizerBands(bands)
-                viewModel.setEqualizerParam(EqualizerBandsPreset.CUSTOM)
+                viewModel.updateEqualizerBands(bands)
+                viewModel.updateEqualizerParam(EqualizerBandsPreset.CUSTOM)
             }
         },
         thumb = {

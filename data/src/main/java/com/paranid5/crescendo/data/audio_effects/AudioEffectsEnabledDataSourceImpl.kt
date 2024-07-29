@@ -1,17 +1,15 @@
 package com.paranid5.crescendo.data.audio_effects
 
-import com.paranid5.crescendo.data.datastore.DataStoreProvider
-import com.paranid5.crescendo.data.properties.areAudioEffectsEnabledFlow
-import com.paranid5.crescendo.data.properties.storeAudioEffectsEnabled
+import com.paranid5.crescendo.data.datastore.AudioEffectsDataStore
 import com.paranid5.crescendo.domain.audio_effects.AudioEffectsEnabledDataSource
 
 internal class AudioEffectsEnabledDataSourceImpl(
-    private val dataStoreProvider: DataStoreProvider,
+    private val audioEffectsDataStore: AudioEffectsDataStore,
 ) : AudioEffectsEnabledDataSource {
     override val areAudioEffectsEnabledFlow by lazy {
-        dataStoreProvider.areAudioEffectsEnabledFlow
+        audioEffectsDataStore.areAudioEffectsEnabledFlow
     }
 
-    override suspend fun setAudioEffectsEnabled(areAudioEffectsEnabled: Boolean) =
-        dataStoreProvider.storeAudioEffectsEnabled(areAudioEffectsEnabled)
+    override suspend fun updateAudioEffectsEnabled(areAudioEffectsEnabled: Boolean) =
+        audioEffectsDataStore.storeAudioEffectsEnabled(areAudioEffectsEnabled)
 }

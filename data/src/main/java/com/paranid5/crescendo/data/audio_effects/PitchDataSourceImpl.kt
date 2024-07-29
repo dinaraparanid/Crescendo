@@ -1,17 +1,15 @@
 package com.paranid5.crescendo.data.audio_effects
 
-import com.paranid5.crescendo.data.datastore.DataStoreProvider
-import com.paranid5.crescendo.data.properties.pitchFlow
-import com.paranid5.crescendo.data.properties.storePitch
+import com.paranid5.crescendo.data.datastore.AudioEffectsDataStore
 import com.paranid5.crescendo.domain.audio_effects.PitchDataSource
 
 internal class PitchDataSourceImpl(
-    private val dataStoreProvider: DataStoreProvider,
+    private val audioEffectsDataStore: AudioEffectsDataStore,
 ) : PitchDataSource {
     override val pitchFlow by lazy {
-        dataStoreProvider.pitchFlow
+        audioEffectsDataStore.pitchFlow
     }
 
-    override suspend fun setPitch(pitch: Float) =
-        dataStoreProvider.storePitch(pitch)
+    override suspend fun updatePitch(pitch: Float) =
+        audioEffectsDataStore.storePitch(pitch)
 }
