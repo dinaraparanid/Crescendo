@@ -23,7 +23,9 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.paranid5.crescendo.audio_effects.presentation.view.rememberBandTrackPainter
 import com.paranid5.crescendo.core.resources.R
-import com.paranid5.crescendo.core.resources.ui.theme.LocalAppColors
+import com.paranid5.crescendo.core.resources.ui.theme.AppTheme.colors
+
+private val SliderHeight = 20.dp
 
 @Composable
 internal fun AudioEffectBand(
@@ -49,14 +51,14 @@ internal fun AudioEffectBand(
             modifier = Modifier.align(Alignment.Center),
             thumbModifier = Modifier
                 .align(Alignment.Center)
-                .height(20.dp)
+                .height(SliderHeight),
         )
 
         BandTrack(
             sliderWidth = sliderWidth,
             sliderHeight = sliderHeight,
             effectTitle = effectTitle,
-            modifier = Modifier.fillMaxSize()
+            modifier = Modifier.fillMaxSize(),
         )
     }
 }
@@ -72,8 +74,6 @@ private fun AudioEffectSlider(
     modifier: Modifier = Modifier,
     thumbModifier: Modifier = Modifier,
 ) {
-    val colors = LocalAppColors.current
-
     var sliderWidth by sliderWidthState
     var sliderHeight by sliderHeightState
 

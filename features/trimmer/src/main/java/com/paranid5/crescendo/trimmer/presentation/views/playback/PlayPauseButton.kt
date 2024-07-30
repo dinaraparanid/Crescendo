@@ -3,7 +3,6 @@ package com.paranid5.crescendo.trimmer.presentation.views.playback
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -12,12 +11,12 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.unit.dp
 import com.paranid5.crescendo.core.resources.R
-import com.paranid5.crescendo.core.resources.ui.theme.LocalAppColors
+import com.paranid5.crescendo.core.resources.ui.theme.AppTheme.colors
+import com.paranid5.crescendo.core.resources.ui.theme.AppTheme.dimensions
+import com.paranid5.crescendo.trimmer.domain.entities.FocusPoints
 import com.paranid5.crescendo.trimmer.presentation.TrimmerViewModel
 import com.paranid5.crescendo.trimmer.presentation.composition_locals.LocalTrimmerFocusPoints
-import com.paranid5.crescendo.trimmer.domain.entities.FocusPoints
 import com.paranid5.crescendo.trimmer.presentation.properties.compose.collectIsPlayingAsState
 import org.koin.androidx.compose.koinViewModel
 
@@ -26,46 +25,46 @@ internal fun PlayPauseButton(
     modifier: Modifier = Modifier,
     viewModel: TrimmerViewModel = koinViewModel(),
 ) {
-    val colors = LocalAppColors.current
     val focusPoints = LocalTrimmerFocusPoints.current!!
     val isPlaying by viewModel.collectIsPlayingAsState()
 
     IconButton(
         onClick = { onClick(isPlaying, viewModel, focusPoints) },
-        modifier = modifier
-            .size(48.dp)
-            .background(color = colors.secondary, shape = CircleShape)
+        modifier = modifier.background(color = colors.secondary, shape = CircleShape)
     ) {
         when {
-            isPlaying -> PauseIcon(Modifier.fillMaxSize().padding(4.dp))
-            else -> PlayIcon(Modifier.fillMaxSize().padding(12.dp))
+            isPlaying -> PauseIcon(
+                Modifier
+                    .fillMaxSize()
+                    .padding(dimensions.padding.extraSmall)
+            )
+
+            else -> PlayIcon(
+                Modifier
+                    .fillMaxSize()
+                    .padding(dimensions.padding.medium)
+            )
         }
     }
 }
 
 @Composable
-private fun PauseIcon(modifier: Modifier = Modifier) {
-    val colors = LocalAppColors.current
-
+private fun PauseIcon(modifier: Modifier = Modifier) =
     Icon(
         painter = painterResource(id = R.drawable.pause),
         contentDescription = stringResource(id = R.string.pause),
-        tint = colors.background,
-        modifier = modifier
+        tint = colors.background.primary,
+        modifier = modifier,
     )
-}
 
 @Composable
-private fun PlayIcon(modifier: Modifier = Modifier) {
-    val colors = LocalAppColors.current
-
+private fun PlayIcon(modifier: Modifier = Modifier) =
     Icon(
         painter = painterResource(id = R.drawable.play),
         contentDescription = stringResource(id = R.string.play),
-        tint = colors.background,
-        modifier = modifier
+        tint = colors.background.primary,
+        modifier = modifier,
     )
-}
 
 private fun onClick(
     isPlaying: Boolean,

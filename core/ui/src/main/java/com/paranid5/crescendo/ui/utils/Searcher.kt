@@ -22,14 +22,15 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.paranid5.crescendo.core.resources.R
-import com.paranid5.crescendo.core.resources.ui.theme.LocalAppColors
+import com.paranid5.crescendo.core.resources.ui.theme.AppTheme.colors
+import com.paranid5.crescendo.core.resources.ui.theme.AppTheme.dimensions
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.launch
 
 typealias FilteredContent<T> = @Composable ColumnScope.(
     filtered: ImmutableList<T>,
-    scrollingState: LazyListState
+    scrollingState: LazyListState,
 ) -> Unit
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -46,7 +47,6 @@ fun <T> Searcher(
     modifier: Modifier = Modifier,
     filteredContent: FilteredContent<T>
 ) {
-    val colors = LocalAppColors.current
     val scrollListScope = rememberCoroutineScope()
     val trackListState = rememberLazyListState()
 
@@ -56,7 +56,7 @@ fun <T> Searcher(
 
     SearchBar(
         modifier = modifier,
-        query = query ?: "",
+        query = query.orEmpty(),
         leadingIcon = { SearchIcon() },
         trailingIcon = {
             if (isSearchBarActive)
@@ -69,7 +69,7 @@ fun <T> Searcher(
         placeholder = {
             Text(
                 text = stringResource(R.string.track_input_filter_hint),
-                color = colors.fontColor
+                color = colors.text.primary
             )
         },
         colors = searcherColors,
@@ -82,22 +82,19 @@ fun <T> Searcher(
         onSearch = { setSearchBarActive(false) },
         onActiveChange = { setSearchBarActive(it) },
     ) {
-        Spacer(Modifier.height(8.dp))
+        Spacer(Modifier.height(dimensions.padding.small))
         filteredContent(shownItems, trackListState)
     }
 }
 
 @Composable
-private fun SearchIcon(modifier: Modifier = Modifier) {
-    val primaryColor = LocalAppColors.current.primary
-
+private fun SearchIcon(modifier: Modifier = Modifier) =
     Icon(
         painter = painterResource(R.drawable.search),
         contentDescription = null,
-        tint = primaryColor,
-        modifier = modifier
+        tint = colors.primary,
+        modifier = modifier,
     )
-}
 
 @Composable
 private inline fun CancelSearchIcon(
@@ -105,21 +102,17 @@ private inline fun CancelSearchIcon(
     crossinline setSearchBarActive: (Boolean) -> Unit,
     modifier: Modifier = Modifier,
     crossinline setQuery: (String?) -> Unit
-) {
-    val colors = LocalAppColors.current
-
-    Icon(
-        painter = painterResource(R.drawable.cross),
-        contentDescription = null,
-        tint = colors.primary,
-        modifier = modifier.clickable {
-            when {
-                query.isNullOrEmpty() -> setSearchBarActive(false)
-                else -> setQuery(null)
-            }
+) = Icon(
+    painter = painterResource(R.drawable.cross),
+    contentDescription = null,
+    tint = colors.primary,
+    modifier = modifier.clickable {
+        when {
+            query.isNullOrEmpty() -> setSearchBarActive(false)
+            else -> setQuery(null)
         }
-    )
-}
+    },
+)
 
 @OptIn(ExperimentalMaterial3Api::class)
 private inline val searcherColors
@@ -128,7 +121,7 @@ private inline val searcherColors
         containerColor = Color.Transparent,
         inputFieldColors = TextFieldDefaults.colors(
             focusedTextColor = Color.White,
-            unfocusedTextColor = Color.Gray
+            unfocusedTextColor = Color.Gray,
         )
     )
 

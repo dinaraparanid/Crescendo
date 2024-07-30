@@ -12,9 +12,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.Dp
-import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
-import com.paranid5.crescendo.core.resources.ui.theme.LocalAppColors
+import com.paranid5.crescendo.core.resources.ui.theme.AppTheme.colors
+import com.paranid5.crescendo.core.resources.ui.theme.AppTheme.dimensions
+import com.paranid5.crescendo.core.resources.ui.theme.AppTheme.typography
 import com.paranid5.crescendo.trimmer.presentation.TrimmerViewModel
 import com.paranid5.crescendo.trimmer.presentation.properties.compose.collectTrackAsState
 import org.koin.androidx.compose.koinViewModel
@@ -24,16 +24,15 @@ import org.koin.androidx.compose.koinViewModel
 internal fun TitleArtistColumn(
     modifier: Modifier = Modifier,
     viewModel: TrimmerViewModel = koinViewModel(),
-    spaceBetween: Dp = 8.dp
+    spaceBetween: Dp = dimensions.padding.small,
 ) {
-    val colors = LocalAppColors.current
     val track by viewModel.collectTrackAsState()
 
     Column(modifier) {
         Text(
-            text = track?.title ?: "",
-            fontSize = 20.sp,
-            color = colors.fontColor,
+            text = track?.title.orEmpty(),
+            style = typography.h.h2,
+            color = colors.text.primary,
             fontWeight = FontWeight.Bold,
             modifier = Modifier
                 .basicMarquee(iterations = Int.MAX_VALUE)
@@ -43,9 +42,9 @@ internal fun TitleArtistColumn(
         Spacer(Modifier.height(spaceBetween))
 
         Text(
-            text = track?.artist ?: "",
-            fontSize = 16.sp,
-            color = colors.fontColor,
+            text = track?.artist.orEmpty(),
+            style = typography.body,
+            color = colors.text.primary,
             modifier = Modifier
                 .basicMarquee(iterations = Int.MAX_VALUE)
                 .align(Alignment.CenterHorizontally)

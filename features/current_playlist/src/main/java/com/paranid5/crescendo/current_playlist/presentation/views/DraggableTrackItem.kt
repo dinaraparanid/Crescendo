@@ -19,7 +19,8 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import com.paranid5.crescendo.core.common.tracks.Track
-import com.paranid5.crescendo.core.resources.ui.theme.LocalAppColors
+import com.paranid5.crescendo.core.resources.ui.theme.AppTheme.colors
+import com.paranid5.crescendo.core.resources.ui.theme.AppTheme.dimensions
 import com.paranid5.crescendo.current_playlist.presentation.CurrentPlaylistViewModel
 import com.paranid5.crescendo.system.services.track.TrackServiceInteractor
 import com.paranid5.crescendo.system.services.track.startPlaylistPlayback
@@ -33,6 +34,8 @@ import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
 import org.koin.compose.koinInject
 
+private val TrackCoverSize = 64.dp
+
 @Composable
 internal inline fun <T : Track> DraggableTrackItem(
     tracks: ImmutableList<T>,
@@ -41,25 +44,28 @@ internal inline fun <T : Track> DraggableTrackItem(
     modifier: Modifier = Modifier,
     crossinline onClick: () -> Unit
 ) {
-    val colors = LocalAppColors.current
-
-    val track = tracks.getOrNull(trackIndex)
+    val track by remember(tracks, trackIndex) {
+        derivedStateOf { tracks.getOrNull(trackIndex) }
+    }
 
     val isTrackCurrent by remember(trackIndex, currentTrackDragIndex) {
         derivedStateOf { trackIndex == currentTrackDragIndex }
     }
 
-    val textColor by remember(isTrackCurrent) {
-        derivedStateOf { if (isTrackCurrent) colors.primary else colors.fontColor }
+    val colors = colors
+
+    val textColor by remember(isTrackCurrent, colors) {
+        derivedStateOf { if (isTrackCurrent) colors.primary else colors.text.primary }
     }
 
-    if (track != null)
+    track?.let {
         CurrentPlaylistTrackItemContent(
-            track = track,
+            track = it,
             textColor = textColor,
             onClick = onClick,
-            modifier = modifier
+            modifier = modifier,
         )
+    }
 }
 
 @Composable
@@ -99,43 +105,45 @@ private inline fun <T : Track> CurrentPlaylistTrackItemContent(
     crossinline onClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    val colors = LocalAppColors.current
-
     Box(modifier) {
         Row(
             modifier
-                .clip(RoundedCornerShape(size = 16.dp))
-                .background(brush = colors.itemBackgroundGradient)
+                .clip(RoundedCornerShape(size = dimensions.padding.extraMedium))
+                .background(brush = colors.background.itemGradient)
                 .clickableTrackWithPermissions(
                     onClick = onClick,
-                    permissionModifier = Modifier.align(Alignment.Center)
+                    permissionModifier = Modifier.align(Alignment.Center),
                 )
         ) {
             CurrentPlaylistTrackCover(
                 track = track,
                 modifier = Modifier
-                    .padding(top = 8.dp, bottom = 8.dp, start = 8.dp)
-                    .size(64.dp)
+                    .padding(
+                        top = dimensions.padding.small,
+                        bottom = dimensions.padding.small,
+                        start = dimensions.padding.small,
+                    )
+                    .size(TrackCoverSize)
                     .align(Alignment.CenterVertically)
-                    .clip(RoundedCornerShape(8.dp))
+                    .clip(RoundedCornerShape(dimensions.padding.small))
             )
 
-            Spacer(Modifier.width(8.dp))
+            Spacer(Modifier.width(dimensions.padding.small))
 
             TrackInfo(
                 track = track,
                 textColor = textColor,
                 modifier = Modifier
                     .weight(1F)
-                    .padding(start = 8.dp)
+                    .padding(start = dimensions.padding.small)
                     .align(Alignment.CenterVertically)
             )
 
-            Spacer(Modifier.width(8.dp))
+            Spacer(Modifier.width(dimensions.padding.small))
 
             TrackPropertiesButton(
                 track = track,
-                tint = colors.fontColor,
+                tint = colors.text.primary,
                 modifier = Modifier.align(Alignment.CenterVertically),
             )
         }
@@ -148,5 +156,5 @@ private fun <T : Track> CurrentPlaylistTrackCover(
     modifier: Modifier = Modifier
 ) = TrackCover(
     trackPath = track.path,
-    modifier = modifier
+    modifier = modifier,
 )

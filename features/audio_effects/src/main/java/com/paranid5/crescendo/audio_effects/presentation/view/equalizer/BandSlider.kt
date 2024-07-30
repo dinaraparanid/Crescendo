@@ -21,12 +21,14 @@ import androidx.lifecycle.viewModelScope
 import com.paranid5.crescendo.audio_effects.domain.updatedEQBandLevels
 import com.paranid5.crescendo.audio_effects.presentation.AudioEffectsViewModel
 import com.paranid5.crescendo.core.resources.R
-import com.paranid5.crescendo.core.resources.ui.theme.LocalAppColors
+import com.paranid5.crescendo.core.resources.ui.theme.AppTheme.colors
 import com.paranid5.crescendo.domain.audio_effects.entity.EqualizerBandsPreset
 import com.paranid5.crescendo.domain.audio_effects.entity.EqualizerData
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
+
+private val EqualizerThumbHeight = 20.dp
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -44,8 +46,6 @@ internal fun BandSlider(
     thumbModifier: Modifier = Modifier,
     viewModel: AudioEffectsViewModel = koinViewModel(),
 ) {
-    val colors = LocalAppColors.current
-
     Slider(
         value = presentLvlsDbState[index],
         valueRange = minDb..maxDb,
@@ -92,7 +92,7 @@ private fun EqualizerThumb(
     contentDescription = stringResource(R.string.equalizer_band),
     contentScale = ContentScale.FillHeight,
     modifier = modifier
-        .height(20.dp)
+        .height(EqualizerThumbHeight)
         .onGloballyPositioned {
             pointsState[index] = it
                 .positionInWindow()

@@ -14,13 +14,12 @@ import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import com.paranid5.crescendo.audio_effects.domain.isParamInputValid
-import com.paranid5.crescendo.core.resources.ui.theme.LocalAppColors
+import com.paranid5.crescendo.core.resources.ui.theme.AppTheme.colors
+import com.paranid5.crescendo.core.resources.ui.theme.AppTheme.typography
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -31,7 +30,7 @@ internal fun AudioEffectTextField(
     onValueChanged: (effectVal: Float) -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    val colors = LocalAppColors.current
+    val colors = colors
 
     val textFieldInteractionSource = remember {
         MutableInteractionSource()
@@ -42,20 +41,20 @@ internal fun AudioEffectTextField(
     BasicTextField(
         value = value,
         maxLines = 1,
-        textStyle = TextStyle(color = colors.primary, fontSize = 12.sp),
+        textStyle = typography.caption.copy(color = colors.text.primary),
         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
         modifier = modifier.indicatorLine(
             enabled = true,
             isError = false,
             interactionSource = textFieldInteractionSource,
-            colors = textColors
+            colors = textColors,
         ),
         onValueChange = { newEffectStr ->
             tryUpdateEffect(
                 newEffectStr = newEffectStr,
                 effectInputState = effectInputState,
                 effectValState = effectValState,
-                onValueChanged = onValueChanged
+                onValueChanged = onValueChanged,
             )
         },
     ) {
@@ -63,25 +62,21 @@ internal fun AudioEffectTextField(
             value = value,
             innerTextField = it,
             textFieldInteractionSource = textFieldInteractionSource,
-            colors = textColors
+            colors = textColors,
         )
     }
 }
 
 @Composable
-private fun textColors(): TextFieldColors {
-    val colors = LocalAppColors.current
-
-    return TextFieldDefaults.colors(
-        cursorColor = colors.primary,
-        focusedTextColor = colors.primary,
-        unfocusedTextColor = colors.primary,
-        focusedIndicatorColor = colors.primary,
-        unfocusedIndicatorColor = colors.primary,
-        focusedContainerColor = Color.Transparent,
-        unfocusedContainerColor = Color.Transparent,
-    )
-}
+private fun textColors() = TextFieldDefaults.colors(
+    cursorColor = colors.primary,
+    focusedTextColor = colors.primary,
+    unfocusedTextColor = colors.primary,
+    focusedIndicatorColor = colors.primary,
+    unfocusedIndicatorColor = colors.primary,
+    focusedContainerColor = Color.Transparent,
+    unfocusedContainerColor = Color.Transparent,
+)
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

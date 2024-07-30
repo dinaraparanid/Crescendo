@@ -16,16 +16,17 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.unit.dp
 import com.paranid5.crescendo.core.common.caching.Formats
 import com.paranid5.crescendo.core.resources.R
-import com.paranid5.crescendo.core.resources.ui.theme.LocalAppColors
+import com.paranid5.crescendo.core.resources.ui.theme.AppTheme.colors
+import com.paranid5.crescendo.core.resources.ui.theme.AppTheme.dimensions
 import com.paranid5.crescendo.trimmer.presentation.TrimmerViewModel
 import com.paranid5.crescendo.trimmer.presentation.properties.compose.collectFadeDurationsAsState
 import com.paranid5.crescendo.trimmer.presentation.properties.compose.collectPitchAndSpeedAsState
 import com.paranid5.crescendo.trimmer.presentation.properties.compose.collectTrackAsState
 import com.paranid5.crescendo.trimmer.presentation.properties.compose.collectTrimRangeAsState
 import com.paranid5.crescendo.trimmer.presentation.views.file_save_dialog.FileSaveDialogContent
+import kotlinx.collections.immutable.persistentListOf
 import org.koin.androidx.compose.koinViewModel
 import java.io.File
 
@@ -36,8 +37,6 @@ internal fun FileSaveDialog(
     modifier: Modifier = Modifier,
     viewModel: TrimmerViewModel = koinViewModel(),
 ) {
-    val colors = LocalAppColors.current
-
     val track by viewModel.collectTrackAsState()
     val trimRange by viewModel.collectTrimRangeAsState()
     val fadeDurations by viewModel.collectFadeDurationsAsState()
@@ -65,21 +64,23 @@ internal fun FileSaveDialog(
         BasicAlertDialog(onDismissRequest = { isDialogShown = false }) {
             Card(
                 modifier = modifier.fillMaxWidth(),
-                shape = RoundedCornerShape(20.dp),
-                colors = CardDefaults.cardColors(containerColor = colors.background)
+                shape = RoundedCornerShape(dimensions.corners.medium),
+                colors = CardDefaults.cardColors(containerColor = colors.background.primary),
             ) {
-                FileSaveDialogContent(
-                    isDialogShownState = isDialogShownState,
-                    filenameState = filenameState,
-                    fileSaveOptions = fileSaveOptions,
-                    selectedSaveOptionIndexState = selectedSaveOptionIndexState,
-                    track = track!!,
-                    audioFormat = audioFormat,
-                    trimRange = trimRange,
-                    pitchAndSpeed = pitchAndSpeed,
-                    fadeDurations = fadeDurations,
-                    isSaveButtonClickable = isDialogSaveButtonClickable
-                )
+                track?.let {
+                    FileSaveDialogContent(
+                        isDialogShownState = isDialogShownState,
+                        filenameState = filenameState,
+                        fileSaveOptions = fileSaveOptions,
+                        selectedSaveOptionIndexState = selectedSaveOptionIndexState,
+                        track = it,
+                        audioFormat = audioFormat,
+                        trimRange = trimRange,
+                        pitchAndSpeed = pitchAndSpeed,
+                        fadeDurations = fadeDurations,
+                        isSaveButtonClickable = isDialogSaveButtonClickable,
+                    )
+                }
             }
         }
 }
@@ -91,14 +92,14 @@ private fun rememberInitialFilename(trackPath: String?): MutableState<String> {
     }
 
     val initialFilename by remember(initialFile) {
-        derivedStateOf { initialFile?.nameWithoutExtension ?: "" }
+        derivedStateOf { initialFile?.nameWithoutExtension.orEmpty() }
     }
 
     return remember(initialFilename) { mutableStateOf(initialFilename) }
 }
 
 @Composable
-private fun audioFileSaveOptions() = arrayOf(
+private fun audioFileSaveOptions() = persistentListOf(
     stringResource(R.string.mp3),
     stringResource(R.string.wav),
     stringResource(R.string.aac),

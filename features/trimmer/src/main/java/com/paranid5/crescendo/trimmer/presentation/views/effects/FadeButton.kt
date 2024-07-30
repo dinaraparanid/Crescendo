@@ -13,14 +13,16 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import com.paranid5.crescendo.core.resources.R
-import com.paranid5.crescendo.core.resources.ui.theme.LocalAppColors
+import com.paranid5.crescendo.core.resources.ui.theme.AppTheme.colors
+import com.paranid5.crescendo.core.resources.ui.theme.AppTheme.typography
+import com.paranid5.crescendo.trimmer.domain.entities.ShownEffects
 import com.paranid5.crescendo.trimmer.presentation.TrimmerViewModel
 import com.paranid5.crescendo.trimmer.presentation.composition_locals.LocalTrimmerEffectSheetState
-import com.paranid5.crescendo.trimmer.domain.entities.ShownEffects
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
+
+private val FadeIconSize = 20.dp
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
@@ -44,24 +46,19 @@ internal fun FadeButton(
 
 @Composable
 private fun FadeIcon(modifier: Modifier = Modifier) {
-    val colors = LocalAppColors.current
-
     Icon(
         painter = painterResource(R.drawable.equalizer),
         contentDescription = stringResource(R.string.fade),
         tint = colors.primary,
-        modifier = modifier.size(20.dp)
+        modifier = modifier.size(FadeIconSize),
     )
 }
 
 @Composable
-private fun EffectLabel(modifier: Modifier = Modifier) {
-    val colors = LocalAppColors.current
-
+private fun EffectLabel(modifier: Modifier = Modifier) =
     Text(
         text = stringResource(R.string.fade),
         color = colors.primary,
-        fontSize = 8.sp,
-        modifier = modifier
+        style = typography.captionSm,
+        modifier = modifier,
     )
-}

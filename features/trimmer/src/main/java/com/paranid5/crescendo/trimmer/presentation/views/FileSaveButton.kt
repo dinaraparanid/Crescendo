@@ -13,10 +13,10 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import com.paranid5.crescendo.core.resources.R
-import com.paranid5.crescendo.core.resources.ui.theme.LocalAppColors
+import com.paranid5.crescendo.core.resources.ui.theme.AppTheme.colors
+import com.paranid5.crescendo.core.resources.ui.theme.AppTheme.dimensions
+import com.paranid5.crescendo.core.resources.ui.theme.AppTheme.typography
 import com.paranid5.crescendo.trimmer.presentation.TrimmerViewModel
 import com.paranid5.crescendo.trimmer.presentation.properties.compose.collectTrackDurationInMillisAsState
 import com.paranid5.crescendo.trimmer.presentation.properties.compose.collectTrimRangeAsState
@@ -29,8 +29,6 @@ internal fun FileSaveButton(
     textModifier: Modifier = Modifier,
     viewModel: TrimmerViewModel = koinViewModel(),
 ) {
-    val colors = LocalAppColors.current
-
     val trimRange by viewModel.collectTrimRangeAsState()
     val trackDurationMillis by viewModel.collectTrackDurationInMillisAsState()
 
@@ -43,9 +41,9 @@ internal fun FileSaveButton(
     Button(
         modifier = modifier,
         enabled = isClickable,
-        shape = RoundedCornerShape(24.dp),
+        shape = RoundedCornerShape(dimensions.corners.extraMedium),
         colors = ButtonDefaults.buttonColors(
-            containerColor = colors.backgroundAlternative
+            containerColor = colors.background.alternative,
         ),
         onClick = { isFileSaveDialogShown = true },
         content = { FileSaveButtonLabel(textModifier) }
@@ -53,14 +51,11 @@ internal fun FileSaveButton(
 }
 
 @Composable
-private fun FileSaveButtonLabel(modifier: Modifier = Modifier) {
-    val colors = LocalAppColors.current
-
+private fun FileSaveButtonLabel(modifier: Modifier = Modifier) =
     Text(
         text = stringResource(R.string.save),
-        color = colors.fontColor,
-        fontSize = 16.sp,
+        color = colors.text.primary,
+        style = typography.body,
         fontWeight = FontWeight.Bold,
-        modifier = modifier
+        modifier = modifier,
     )
-}

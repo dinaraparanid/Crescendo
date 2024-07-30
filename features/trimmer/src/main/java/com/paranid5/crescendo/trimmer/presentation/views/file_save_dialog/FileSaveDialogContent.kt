@@ -10,16 +10,17 @@ import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.unit.dp
 import com.paranid5.crescendo.core.common.caching.Formats
 import com.paranid5.crescendo.core.common.tracks.Track
 import com.paranid5.crescendo.core.common.trimming.FadeDurations
 import com.paranid5.crescendo.core.common.trimming.PitchAndSpeed
 import com.paranid5.crescendo.core.common.trimming.TrimRange
+import com.paranid5.crescendo.core.resources.ui.theme.AppTheme.dimensions
+import kotlinx.collections.immutable.ImmutableList
 
 @Composable
 internal fun FileSaveDialogContent(
-    fileSaveOptions: Array<String>,
+    fileSaveOptions: ImmutableList<String>,
     track: Track,
     audioFormat: Formats,
     pitchAndSpeed: PitchAndSpeed,
@@ -35,20 +36,20 @@ internal fun FileSaveDialogContent(
 
     Column(modifier) {
         Title(Modifier.align(Alignment.CenterHorizontally))
-        Spacer(Modifier.height(10.dp))
+        Spacer(Modifier.height(dimensions.padding.medium))
 
         FilenameInput(filenameState = filenameState)
-        Spacer(Modifier.height(10.dp))
+        Spacer(Modifier.height(dimensions.padding.medium))
 
         FileSaveOptionsMenu(
             fileSaveOptions = fileSaveOptions,
             selectedSaveOptionIndexState = selectedSaveOptionIndexState,
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(horizontal = 10.dp)
+                .padding(horizontal = dimensions.padding.medium)
         )
 
-        Spacer(Modifier.height(10.dp))
+        Spacer(Modifier.height(dimensions.padding.medium))
 
         ConfirmButton(
             isSaveButtonClickable = isSaveButtonClickable,
@@ -60,7 +61,7 @@ internal fun FileSaveDialogContent(
             pitchAndSpeed = pitchAndSpeed,
             isDialogShownState = isDialogShownState,
             modifier = Modifier
-                .padding(vertical = 10.dp)
+                .padding(vertical = dimensions.padding.medium)
                 .align(Alignment.CenterHorizontally)
         )
     }

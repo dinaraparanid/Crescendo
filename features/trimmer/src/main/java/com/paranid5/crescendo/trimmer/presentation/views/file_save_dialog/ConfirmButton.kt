@@ -19,7 +19,8 @@ import com.paranid5.crescendo.core.common.trimming.FadeDurations
 import com.paranid5.crescendo.core.common.trimming.PitchAndSpeed
 import com.paranid5.crescendo.core.common.trimming.TrimRange
 import com.paranid5.crescendo.core.resources.R
-import com.paranid5.crescendo.core.resources.ui.theme.LocalAppColors
+import com.paranid5.crescendo.core.resources.ui.theme.AppTheme.colors
+import com.paranid5.crescendo.core.resources.ui.theme.AppTheme.typography
 import com.paranid5.crescendo.trimmer.domain.trimTrackAndSendBroadcast
 import com.paranid5.crescendo.trimmer.presentation.TrimmerViewModel
 import kotlinx.coroutines.launch
@@ -39,14 +40,12 @@ internal fun ConfirmButton(
     viewModel: TrimmerViewModel = koinViewModel(),
 ) {
     val context = LocalContext.current
-    val colors = LocalAppColors.current
-
     var isDialogShown by isDialogShownState
 
     Button(
         modifier = modifier,
         colors = ButtonDefaults.buttonColors(
-            containerColor = colors.backgroundAlternative
+            containerColor = colors.background.alternative
         ),
         onClick = {
             viewModel.viewModelScope.launch {
@@ -57,7 +56,7 @@ internal fun ConfirmButton(
                     audioFormat = audioFormat,
                     trimRange = trimRange,
                     pitchAndSpeed = pitchAndSpeed,
-                    fadeDurations = fadeDurations
+                    fadeDurations = fadeDurations,
                 )
             }
 
@@ -69,14 +68,12 @@ internal fun ConfirmButton(
 }
 
 @Composable
-private fun TrimLabel(modifier: Modifier = Modifier) {
-    val colors = LocalAppColors.current
-
+private fun TrimLabel(modifier: Modifier = Modifier) =
     Text(
         text = stringResource(R.string.trim),
-        color = colors.fontColor,
+        color = colors.text.primary,
+        style = typography.regular,
         fontSize = 14.sp,
         fontWeight = FontWeight.Bold,
-        modifier = modifier
+        modifier = modifier,
     )
-}

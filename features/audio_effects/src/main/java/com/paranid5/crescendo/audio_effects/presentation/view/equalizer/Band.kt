@@ -15,11 +15,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import com.paranid5.crescendo.audio_effects.presentation.AudioEffectsViewModel
 import com.paranid5.crescendo.core.resources.R
-import com.paranid5.crescendo.core.resources.ui.theme.LocalAppColors
+import com.paranid5.crescendo.core.resources.ui.theme.AppTheme.colors
+import com.paranid5.crescendo.core.resources.ui.theme.AppTheme.dimensions
+import com.paranid5.crescendo.core.resources.ui.theme.AppTheme.typography
 import com.paranid5.crescendo.domain.audio_effects.entity.EqualizerData
 import com.paranid5.crescendo.utils.extensions.collectLatestAsState
 import org.koin.androidx.compose.koinViewModel
@@ -37,7 +37,7 @@ internal fun Band(
         modifier = Modifier.align(Alignment.CenterHorizontally)
     )
 
-    Spacer(Modifier.height(10.dp))
+    Spacer(Modifier.height(dimensions.padding.medium))
 
     BandController(
         index = index,
@@ -48,7 +48,7 @@ internal fun Band(
             .weight(1F)
     )
 
-    Spacer(Modifier.height(10.dp))
+    Spacer(Modifier.height(dimensions.padding.medium))
 
     BandHzLabel(index, Modifier.align(Alignment.CenterHorizontally))
 }
@@ -59,16 +59,15 @@ private fun BandDbLabel(
     presentLvlsDbState: SnapshotStateList<Float>,
     modifier: Modifier = Modifier,
 ) {
-    val colors = LocalAppColors.current
     val realLvlDb = presentLvlsDbState[index]
 
     Text(
         text = String.format("%.2f %s", realLvlDb, stringResource(R.string.decibel)),
         textAlign = TextAlign.Center,
         color = colors.primary,
-        fontSize = 8.sp,
+        style = typography.captionSm,
         maxLines = 1,
-        modifier = modifier
+        modifier = modifier,
     )
 }
 
@@ -78,7 +77,6 @@ private fun BandHzLabel(
     modifier: Modifier = Modifier,
     viewModel: AudioEffectsViewModel = koinViewModel()
 ) {
-    val colors = LocalAppColors.current
     val equalizerData by viewModel.equalizerState.collectLatestAsState()
 
     val bandHz by remember(equalizerData?.bandFrequencies, index) {
@@ -92,7 +90,7 @@ private fun BandHzLabel(
         text = "$bandHz ${stringResource(R.string.hertz)}",
         textAlign = TextAlign.Center,
         color = colors.primary,
-        fontSize = 8.sp,
+        style = typography.captionSm,
         maxLines = 1,
         modifier = modifier,
     )

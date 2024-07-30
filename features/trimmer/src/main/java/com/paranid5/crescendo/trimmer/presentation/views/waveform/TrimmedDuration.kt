@@ -7,8 +7,8 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.unit.sp
-import com.paranid5.crescendo.core.resources.ui.theme.LocalAppColors
+import com.paranid5.crescendo.core.resources.ui.theme.AppTheme.colors
+import com.paranid5.crescendo.core.resources.ui.theme.AppTheme.typography
 import com.paranid5.crescendo.trimmer.presentation.TrimmerViewModel
 import com.paranid5.crescendo.trimmer.presentation.properties.compose.collectSpeedAsState
 import com.paranid5.crescendo.trimmer.presentation.properties.compose.collectTrimmedDurationInMillisAsState
@@ -20,8 +20,6 @@ internal fun TrimmedDuration(
     modifier: Modifier = Modifier,
     viewModel: TrimmerViewModel = koinViewModel(),
 ) {
-    val colors = LocalAppColors.current
-
     val duration by viewModel.collectTrimmedDurationInMillisAsState()
     val speed by viewModel.collectSpeedAsState()
 
@@ -31,9 +29,9 @@ internal fun TrimmedDuration(
 
     Text(
         text = trimmedDuration.timeString,
-        fontSize = 16.sp,
+        style = typography.body,
         fontWeight = FontWeight.Bold,
         color = colors.primary,
-        modifier = modifier
+        modifier = modifier,
     )
 }

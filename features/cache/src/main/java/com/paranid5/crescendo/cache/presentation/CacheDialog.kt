@@ -12,10 +12,10 @@ import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.unit.dp
 import com.paranid5.crescendo.cache.presentation.composition_local.LocalDownloadUrl
 import com.paranid5.crescendo.cache.presentation.view.CacheDialogContent
-import com.paranid5.crescendo.core.resources.ui.theme.LocalAppColors
+import com.paranid5.crescendo.core.resources.ui.theme.AppTheme.colors
+import com.paranid5.crescendo.core.resources.ui.theme.AppTheme.dimensions
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -24,7 +24,6 @@ fun CacheDialog(
     isDialogShownState: MutableState<Boolean>,
     modifier: Modifier = Modifier,
 ) {
-    val colors = LocalAppColors.current
     var isDialogShown by isDialogShownState
 
     if (isDialogShown)
@@ -35,12 +34,12 @@ fun CacheDialog(
             ) {
                 Card(
                     modifier = modifier.fillMaxWidth(),
-                    shape = RoundedCornerShape(24.dp),
-                    colors = CardDefaults.cardColors(containerColor = colors.background)
+                    shape = RoundedCornerShape(dimensions.corners.extraMedium),
+                    colors = CardDefaults.cardColors(containerColor = colors.background.primary)
                 ) {
                     CacheDialogContent(
                         isDialogShownState = isDialogShownState,
-                        modifier = Modifier.fillMaxWidth()
+                        modifier = Modifier.fillMaxWidth(),
                     )
                 }
             }

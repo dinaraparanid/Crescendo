@@ -5,7 +5,6 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Slider
@@ -19,10 +18,9 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.painter.Painter
-import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
-import com.paranid5.crescendo.core.resources.ui.theme.LocalAppColors
-import com.paranid5.crescendo.core.resources.ui.theme.TransparentUtility
+import com.paranid5.crescendo.core.resources.ui.theme.AppTheme.colors
+import com.paranid5.crescendo.core.resources.ui.theme.AppTheme.dimensions
+import com.paranid5.crescendo.core.resources.ui.theme.AppTheme.typography
 
 @Composable
 internal fun <V : Number> EffectController(
@@ -37,7 +35,7 @@ internal fun <V : Number> EffectController(
 ) = Column(modifier) {
     EffectLabel(label)
 
-    Spacer(Modifier.height(4.dp))
+    Spacer(Modifier.height(dimensions.padding.extraSmall))
 
     EffectIconSlider(
         iconPainter = iconPainter,
@@ -55,17 +53,13 @@ internal fun <V : Number> EffectController(
 @Composable
 private fun EffectLabel(
     text: String,
-    modifier: Modifier = Modifier
-) {
-    val colors = LocalAppColors.current
-
-    Text(
-        text = text,
-        modifier = modifier,
-        color = colors.fontColor,
-        fontSize = 12.sp
-    )
-}
+    modifier: Modifier = Modifier,
+) = Text(
+    text = text,
+    modifier = modifier,
+    color = colors.text.primary,
+    style = typography.caption,
+)
 
 @Composable
 private inline fun <V : Number> EffectIconSlider(
@@ -81,10 +75,10 @@ private inline fun <V : Number> EffectIconSlider(
     EffectIcon(
         iconPainter = iconPainter,
         contentDescription = contentDescription,
-        modifier = Modifier.align(Alignment.CenterVertically)
+        modifier = Modifier.align(Alignment.CenterVertically),
     )
 
-    Spacer(Modifier.width(8.dp))
+    Spacer(Modifier.width(dimensions.padding.small))
 
     EffectSlider(
         initialValue = initialValue,
@@ -92,7 +86,9 @@ private inline fun <V : Number> EffectIconSlider(
         maxValue = maxValue,
         steps = steps,
         setEffect = setEffect,
-        modifier = Modifier.weight(1F).align(Alignment.CenterVertically)
+        modifier = Modifier
+            .weight(1F)
+            .align(Alignment.CenterVertically),
     )
 }
 
@@ -101,16 +97,12 @@ private fun EffectIcon(
     iconPainter: Painter,
     modifier: Modifier = Modifier,
     contentDescription: String? = null,
-) {
-    val colors = LocalAppColors.current
-
-    Icon(
-        painter = iconPainter,
-        contentDescription = contentDescription,
-        tint = colors.primary,
-        modifier = modifier
-    )
-}
+) = Icon(
+    painter = iconPainter,
+    contentDescription = contentDescription,
+    tint = colors.primary,
+    modifier = modifier,
+)
 
 @Composable
 private inline fun <V : Number> EffectSlider(
@@ -121,8 +113,6 @@ private inline fun <V : Number> EffectSlider(
     crossinline setEffect: (Float) -> Unit,
     modifier: Modifier = Modifier
 ) {
-    val colors = LocalAppColors.current
-
     var curPosition by remember {
         mutableFloatStateOf(initialValue.toFloat())
     }
@@ -135,7 +125,7 @@ private inline fun <V : Number> EffectSlider(
         colors = SliderDefaults.colors(
             thumbColor = colors.primary,
             activeTrackColor = colors.primary,
-            inactiveTrackColor = TransparentUtility
+            inactiveTrackColor = colors.utils.transparentUtility,
         ),
         onValueChange = {
             curPosition = it

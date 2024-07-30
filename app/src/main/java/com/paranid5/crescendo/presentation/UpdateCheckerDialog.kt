@@ -27,23 +27,25 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import com.paranid5.crescendo.core.resources.R
+import com.paranid5.crescendo.core.resources.ui.theme.AppTheme.colors
+import com.paranid5.crescendo.core.resources.ui.theme.AppTheme.dimensions
+import com.paranid5.crescendo.core.resources.ui.theme.AppTheme.typography
 import com.paranid5.crescendo.data.ktor_client.github.Release
 import com.paranid5.crescendo.data.ktor_client.github.checkForUpdates
-import com.paranid5.crescendo.utils.extensions.simpleShadow
-import com.paranid5.crescendo.core.resources.ui.theme.LocalAppColors
 import com.paranid5.crescendo.presentation.composition_locals.LocalActivity
+import com.paranid5.crescendo.utils.extensions.simpleShadow
 import dev.jeziellago.compose.markdowntext.MarkdownText
 import io.ktor.client.HttpClient
 import org.koin.compose.koinInject
 
 private const val TAG = "UpdateCheckerDialog"
 
+private val TitleShadow = 25.dp
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun UpdateCheckerDialog(modifier: Modifier = Modifier, ktorClient: HttpClient = koinInject()) {
-    val colors = LocalAppColors.current
     var newVersion by remember { mutableStateOf<Release?>(null) }
     val isUpdateAvailable by remember { derivedStateOf { newVersion != null } }
     var isDialogShown by remember { mutableStateOf(false) }
@@ -60,13 +62,13 @@ fun UpdateCheckerDialog(modifier: Modifier = Modifier, ktorClient: HttpClient = 
     if (isDialogShown)
         BasicAlertDialog(onDismissRequest = { isDialogShown = false }) {
             Card(
-                shape = RoundedCornerShape(20.dp),
-                colors = CardDefaults.cardColors(containerColor = colors.background),
-                modifier = modifier.fillMaxWidth()
+                shape = RoundedCornerShape(dimensions.corners.medium),
+                colors = CardDefaults.cardColors(containerColor = colors.background.primary),
+                modifier = modifier.fillMaxWidth(),
             ) {
                 UpdateCheckerDialogContent(
                     newVersion = newVersion!!,
-                    modifier = Modifier.padding(10.dp)
+                    modifier = Modifier.padding(dimensions.padding.medium),
                 )
             }
         }
@@ -80,11 +82,11 @@ private fun UpdateCheckerDialogContent(newVersion: Release, modifier: Modifier =
             modifier = Modifier.align(Alignment.CenterHorizontally)
         )
 
-        Spacer(Modifier.height(20.dp))
+        Spacer(Modifier.height(dimensions.padding.big))
 
         VersionContent(versionBody = newVersion.body)
 
-        Spacer(Modifier.height(12.dp))
+        Spacer(Modifier.height(dimensions.padding.medium))
 
         DownloadButton(
             versionUrl = newVersion.htmlUrl,
@@ -94,25 +96,21 @@ private fun UpdateCheckerDialogContent(newVersion: Release, modifier: Modifier =
 
 @Composable
 private fun VersionLabel(versionName: String, modifier: Modifier = Modifier) {
-    val colors = LocalAppColors.current
-
     MarkdownText(
         markdown = "# ${stringResource(R.string.update_available)}: $versionName",
         color = colors.primary,
-        fontSize = 8.sp,
+        style = typography.captionSm,
         maxLines = 1,
-        modifier = modifier.simpleShadow(elevation = 25.dp)
+        modifier = modifier.simpleShadow(elevation = TitleShadow),
     )
 }
 
 @Composable
 private fun VersionContent(versionBody: String, modifier: Modifier = Modifier) {
-    val colors = LocalAppColors.current
-
     MarkdownText(
         markdown = versionBody,
         color = colors.primary,
-        fontSize = 11.sp,
+        style = typography.caption,
         modifier = modifier
     )
 }
@@ -123,11 +121,10 @@ private fun DownloadButton(
     modifier: Modifier = Modifier
 ) {
     val activity = LocalActivity.current
-    val colors = LocalAppColors.current
 
     Button(
         modifier = modifier,
-        colors = ButtonDefaults.buttonColors(containerColor = colors.backgroundAlternative),
+        colors = ButtonDefaults.buttonColors(containerColor = colors.background.alternative),
         content = { DownloadLabel() },
         onClick = {
             activity?.startActivity(
@@ -139,13 +136,9 @@ private fun DownloadButton(
 }
 
 @Composable
-private fun DownloadLabel(modifier: Modifier = Modifier) {
-    val colors = LocalAppColors.current
-
-    Text(
-        text = stringResource(R.string.download),
-        fontSize = 14.sp,
-        color = colors.primary,
-        modifier = modifier
-    )
-}
+private fun DownloadLabel(modifier: Modifier = Modifier) = Text(
+    text = stringResource(R.string.download),
+    color = colors.primary,
+    style = typography.regular,
+    modifier = modifier,
+)

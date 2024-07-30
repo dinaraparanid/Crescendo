@@ -15,22 +15,18 @@ import androidx.compose.material.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.derivedStateOf
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
-import com.paranid5.crescendo.core.resources.ui.theme.LocalAppColors
+import com.paranid5.crescendo.core.resources.ui.theme.AppTheme.colors
 import com.paranid5.crescendo.presentation.UpdateCheckerDialog
 import com.paranid5.crescendo.ui.appbar.appBarHeight
 import com.paranid5.crescendo.ui.composition_locals.LocalCurrentPlaylistSheetState
 import com.paranid5.crescendo.ui.composition_locals.playing.LocalPlayingPagerState
 import com.paranid5.crescendo.ui.composition_locals.playing.LocalPlayingSheetState
 import com.paranid5.crescendo.ui.permissions.requests.externalStoragePermissionsRequestLauncher
-import kotlinx.collections.immutable.persistentListOf
 
 @Composable
 fun App(modifier: Modifier = Modifier) {
@@ -56,8 +52,6 @@ fun App(modifier: Modifier = Modifier) {
 @OptIn(ExperimentalMaterialApi::class, ExperimentalFoundationApi::class)
 @Composable
 private fun ScreenScaffold(modifier: Modifier = Modifier) {
-    val colors = LocalAppColors.current
-
     val playingScaffoldState = rememberBottomSheetScaffoldState()
 
     val curPlaylistScaffoldState = rememberModalBottomSheetState(
@@ -74,13 +68,13 @@ private fun ScreenScaffold(modifier: Modifier = Modifier) {
         LocalPlayingPagerState provides playingPagerState
     ) {
         BottomSheetScaffold(
-            modifier = modifier.background(colors.backgroundGradient),
+            modifier = modifier.background(colors.background.gradient),
             scaffoldState = playingScaffoldState,
             sheetPeekHeight = appBarHeight,
             backgroundColor = Color.Transparent,
             sheetBackgroundColor = Color.Transparent,
             sheetContent = { PlayingBottomSheet(alpha) },
-            content = { ContentScreen(padding = it) }
+            content = { ContentScreen(padding = it) },
         )
     }
 }

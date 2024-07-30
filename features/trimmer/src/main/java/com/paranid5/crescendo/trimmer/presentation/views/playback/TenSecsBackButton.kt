@@ -1,7 +1,6 @@
 package com.paranid5.crescendo.trimmer.presentation.views.playback
 
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.size
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.runtime.Composable
@@ -9,12 +8,11 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.unit.dp
 import androidx.media3.common.Player
 import com.paranid5.crescendo.core.resources.R
-import com.paranid5.crescendo.core.resources.ui.theme.LocalAppColors
-import com.paranid5.crescendo.trimmer.presentation.TrimmerViewModel
+import com.paranid5.crescendo.core.resources.ui.theme.AppTheme.colors
 import com.paranid5.crescendo.trimmer.domain.player.seekTenSecsBack
+import com.paranid5.crescendo.trimmer.presentation.TrimmerViewModel
 import com.paranid5.crescendo.trimmer.presentation.properties.compose.collectStartPosInMillisAsState
 import org.koin.androidx.compose.koinViewModel
 
@@ -24,12 +22,11 @@ internal fun TenSecsBackButton(
     modifier: Modifier = Modifier,
     viewModel: TrimmerViewModel = koinViewModel(),
 ) {
-    val colors = LocalAppColors.current
     val startPos by viewModel.collectStartPosInMillisAsState()
 
     IconButton(
         onClick = { player.seekTenSecsBack(startPos) },
-        modifier = modifier.size(48.dp)
+        modifier = modifier,
     ) {
         Icon(
             painter = painterResource(id = R.drawable.previous_track),

@@ -15,11 +15,11 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
-import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
-import com.paranid5.crescendo.core.resources.ui.theme.LocalAppColors
+import com.paranid5.crescendo.core.resources.ui.theme.AppTheme.colors
+import com.paranid5.crescendo.core.resources.ui.theme.AppTheme.dimensions
+import com.paranid5.crescendo.core.resources.ui.theme.AppTheme.typography
 import com.paranid5.crescendo.trimmer.presentation.PLAYBACK_CIRCLE_CENTER
 import com.paranid5.crescendo.trimmer.presentation.TrimmerViewModel
 import com.paranid5.crescendo.trimmer.presentation.WAVEFORM_SPIKE_WIDTH_RATIO
@@ -36,7 +36,7 @@ import org.koin.androidx.compose.koinViewModel
 internal fun WaveformWithPosition(
     modifier: Modifier = Modifier,
     spikeWidthRatio: Int = WAVEFORM_SPIKE_WIDTH_RATIO,
-    spaceBetween: Dp = 2.dp
+    spaceBetween: Dp = dimensions.padding.minimum,
 ) {
     val waveformScrollState = LocalTrimmerWaveformScrollState.current!!
     val playbackTextOffsetAnim = animatePlaybackTextOffsetAsState(spikeWidthRatio)
@@ -59,14 +59,13 @@ private fun PlaybackPositionText(
     modifier: Modifier = Modifier,
     viewModel: TrimmerViewModel = koinViewModel(),
 ) {
-    val colors = LocalAppColors.current
     val playbackText by viewModel.collectPlaybackTextAsState()
     val playbackAlpha by viewModel.collectPlaybackAlphaAsState()
 
     Text(
         text = playbackText,
-        color = colors.fontColor,
-        fontSize = 10.sp,
+        color = colors.text.primary,
+        style = typography.captionSm,
         modifier = modifier.alpha(playbackAlpha)
     )
 }
@@ -85,7 +84,7 @@ private fun animatePlaybackTextOffsetAsState(
 
     val playbackTextWidth = textWidth(
         text = playbackText,
-        style = TextStyle(fontSize = 10.sp)
+        style = typography.captionSm,
     )
 
     val playbackTextOffset by remember(

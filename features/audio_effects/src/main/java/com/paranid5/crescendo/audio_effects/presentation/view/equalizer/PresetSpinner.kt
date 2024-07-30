@@ -22,7 +22,8 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewModelScope
 import com.paranid5.crescendo.audio_effects.presentation.AudioEffectsViewModel
 import com.paranid5.crescendo.core.resources.R
-import com.paranid5.crescendo.core.resources.ui.theme.LocalAppColors
+import com.paranid5.crescendo.core.resources.ui.theme.AppTheme.colors
+import com.paranid5.crescendo.core.resources.ui.theme.AppTheme.dimensions
 import com.paranid5.crescendo.domain.audio_effects.entity.EqualizerBandsPreset
 import com.paranid5.crescendo.domain.audio_effects.entity.EqualizerData
 import com.paranid5.crescendo.ui.utils.Spinner
@@ -32,6 +33,8 @@ import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
+
+private val IconSize = 24.dp
 
 @Composable
 internal fun PresetSpinner(modifier: Modifier = Modifier) =
@@ -45,8 +48,8 @@ internal fun PresetSpinner(modifier: Modifier = Modifier) =
         PresetSpinnerArrow(
             Modifier
                 .align(Alignment.CenterEnd)
-                .size(24.dp)
-                .padding(end = 8.dp)
+                .size(IconSize)
+                .padding(end = dimensions.padding.small),
         )
     }
 
@@ -85,16 +88,13 @@ private fun PresetSpinnerImpl(
 }
 
 @Composable
-private fun PresetSpinnerArrow(modifier: Modifier = Modifier) {
-    val colors = LocalAppColors.current
-
+private fun PresetSpinnerArrow(modifier: Modifier = Modifier) =
     Image(
         painter = painterResource(R.drawable.arrow_down),
         contentDescription = stringResource(R.string.eq_presets),
         colorFilter = ColorFilter.tint(colors.primary),
         modifier = modifier,
     )
-}
 
 @Composable
 private fun rememberCustomPresetIndex(equalizerData: EqualizerData?) =

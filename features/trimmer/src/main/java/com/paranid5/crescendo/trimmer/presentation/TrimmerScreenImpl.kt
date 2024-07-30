@@ -10,9 +10,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.unit.dp
 import com.paranid5.crescendo.core.common.tracks.Track
-import com.paranid5.crescendo.core.resources.ui.theme.LocalAppColors
+import com.paranid5.crescendo.core.resources.ui.theme.AppTheme.colors
+import com.paranid5.crescendo.core.resources.ui.theme.AppTheme.dimensions
 import com.paranid5.crescendo.trimmer.presentation.composition_locals.LocalTrimmerEffectSheetState
 import com.paranid5.crescendo.trimmer.presentation.effects.PrepareForNewTrack
 import com.paranid5.crescendo.trimmer.presentation.views.EffectsBottomSheet
@@ -24,8 +24,6 @@ internal fun TrimmerScreenImpl(
     track: Track,
     modifier: Modifier = Modifier,
 ) {
-    val colors = LocalAppColors.current
-
     val effectsScaffoldState = rememberModalBottomSheetState(
         initialValue = ModalBottomSheetValue.Hidden,
         skipHalfExpanded = true
@@ -37,8 +35,11 @@ internal fun TrimmerScreenImpl(
         modifier = modifier,
         sheetBackgroundColor = Color.Transparent,
         sheetState = effectsScaffoldState,
-        sheetShape = RoundedCornerShape(topStart = 24.dp, topEnd = 24.dp),
-        sheetContent = { EffectsBottomSheet(Modifier.background(colors.backgroundGradient)) },
+        sheetShape = RoundedCornerShape(
+            topStart = dimensions.padding.extraBig,
+            topEnd = dimensions.padding.extraBig,
+        ),
+        sheetContent = { EffectsBottomSheet(Modifier.background(colors.background.gradient)) },
     ) {
         CompositionLocalProvider(LocalTrimmerEffectSheetState provides effectsScaffoldState) {
             TrimmerScreenContent()

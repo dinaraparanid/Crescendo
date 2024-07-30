@@ -18,7 +18,7 @@ import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.drawscope.Fill
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.onGloballyPositioned
-import com.paranid5.crescendo.core.resources.ui.theme.LocalAppColors
+import com.paranid5.crescendo.core.resources.ui.theme.AppTheme.colors
 import com.paranid5.crescendo.trimmer.presentation.CONTROLLER_ARROW_CORNER_BACK_OFFSET
 import com.paranid5.crescendo.trimmer.presentation.CONTROLLER_ARROW_CORNER_FRONT_OFFSET
 import com.paranid5.crescendo.trimmer.presentation.CONTROLLER_ARROW_CORNER_OFFSET
@@ -38,14 +38,13 @@ internal fun StartBorder(
     modifier: Modifier = Modifier,
     spikeWidthRatio: Int = WAVEFORM_SPIKE_WIDTH_RATIO,
 ) {
-    val colors = LocalAppColors.current
     val progressBrush = SolidColor(colors.primary)
-    val iconBrush = SolidColor(colors.fontColor)
+    val iconBrush = SolidColor(colors.text.primary)
 
     Canvas(modifier.startBorderHorizontalDrag(spikeWidthRatio)) {
         drawBorder(progressBrush)
 
-        drawStartToucher(
+        drawStartTouchPad(
             progressBrush = progressBrush,
             iconBrush = iconBrush
         )
@@ -116,19 +115,19 @@ private fun DrawScope.drawBorder(progressBrush: SolidColor) =
         style = Fill
     )
 
-internal fun DrawScope.drawStartToucher(progressBrush: SolidColor, iconBrush: SolidColor) {
-    drawToucherCircle(progressBrush)
-    drawToucherIcon(iconBrush)
+internal fun DrawScope.drawStartTouchPad(progressBrush: SolidColor, iconBrush: SolidColor) {
+    drawTouchPadCircle(progressBrush)
+    drawTouchPadIcon(iconBrush)
 }
 
-private fun DrawScope.drawToucherCircle(brush: SolidColor) =
+private fun DrawScope.drawTouchPadCircle(brush: SolidColor) =
     drawCircle(
         brush = brush,
         radius = CONTROLLER_CIRCLE_RADIUS,
         center = Offset(CONTROLLER_CIRCLE_CENTER, size.height - CONTROLLER_CIRCLE_CENTER)
     )
 
-private fun DrawScope.drawToucherIcon(brush: SolidColor) =
+private fun DrawScope.drawTouchPadIcon(brush: SolidColor) =
     drawPath(
         path = IconPath(size),
         brush = brush,

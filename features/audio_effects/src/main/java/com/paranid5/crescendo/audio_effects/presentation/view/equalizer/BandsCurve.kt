@@ -11,20 +11,22 @@ import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.unit.dp
-import com.paranid5.crescendo.core.resources.ui.theme.LocalAppColors
+import com.paranid5.crescendo.core.resources.ui.theme.AppTheme.colors
+
+private val BandsCurveStrokeWidth = 3.dp
 
 @Composable
 internal fun BandsCurve(
     pointsState: SnapshotStateList<Offset>,
     modifier: Modifier = Modifier
 ) {
-    val colors = LocalAppColors.current
+    val colors = colors
     val path = BandsPath(pointsState)
 
     Canvas(modifier) {
         drawBandsCurve(
             path = path,
-            color = colors.primary
+            color = colors.primary,
         )
     }
 }
@@ -63,7 +65,7 @@ private fun Path.cubicToPoint(
         x2 = conX2,
         y2 = conY2,
         x3 = nextX,
-        y3 = nextY
+        y3 = nextY,
     )
 }
 
@@ -72,7 +74,7 @@ private fun DrawScope.drawBandsCurve(path: Path, color: Color) =
         path = path,
         color = color,
         style = Stroke(
-            width = 3.dp.toPx(),
-            cap = StrokeCap.Round
+            width = BandsCurveStrokeWidth.toPx(),
+            cap = StrokeCap.Round,
         )
     )

@@ -20,7 +20,8 @@ import com.paranid5.crescendo.cache.presentation.properties.collectFilenameAsSta
 import com.paranid5.crescendo.cache.presentation.properties.collectIsCacheButtonClickableAsState
 import com.paranid5.crescendo.cache.presentation.properties.collectTrimRangeAsState
 import com.paranid5.crescendo.core.resources.R
-import com.paranid5.crescendo.core.resources.ui.theme.LocalAppColors
+import com.paranid5.crescendo.core.resources.ui.theme.AppTheme.colors
+import com.paranid5.crescendo.core.resources.ui.theme.AppTheme.typography
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
 import org.koin.compose.koinInject
@@ -32,7 +33,6 @@ internal fun ConfirmButton(
     viewModel: CacheViewModel = koinViewModel(),
     interactor: CacheInteractor = koinInject()
 ) {
-    val colors = LocalAppColors.current
     val downloadingUrl = LocalDownloadUrl.current
 
     val isButtonClickable by viewModel.collectIsCacheButtonClickableAsState()
@@ -46,9 +46,7 @@ internal fun ConfirmButton(
     Button(
         modifier = modifier,
         enabled = isButtonClickable,
-        colors = ButtonDefaults.buttonColors(
-            containerColor = colors.backgroundAlternative
-        ),
+        colors = ButtonDefaults.buttonColors(containerColor = colors.background.alternative),
         content = { ConfirmButtonLabel() },
         onClick = {
             coroutineScope.launch {
@@ -57,7 +55,7 @@ internal fun ConfirmButton(
                     desiredFilename = filename,
                     format = format,
                     trimRange = trimRange,
-                    viewModel = viewModel
+                    viewModel = viewModel,
                 )
 
                 isDialogShown = false
@@ -67,14 +65,12 @@ internal fun ConfirmButton(
 }
 
 @Composable
-private fun ConfirmButtonLabel(modifier: Modifier = Modifier) {
-    val colors = LocalAppColors.current
-
+private fun ConfirmButtonLabel(modifier: Modifier = Modifier) =
     Text(
         text = stringResource(R.string.start_caching),
-        color = colors.fontColor,
+        color = colors.text.primary,
+        style = typography.regular,
         fontSize = 14.sp,
         fontWeight = FontWeight.Bold,
-        modifier = modifier
+        modifier = modifier,
     )
-}

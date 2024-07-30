@@ -10,7 +10,7 @@ import androidx.compose.ui.graphics.BlendMode
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.graphicsLayer
-import com.paranid5.crescendo.core.resources.ui.theme.LocalAppColors
+import com.paranid5.crescendo.core.resources.ui.theme.AppTheme.colors
 import com.paranid5.crescendo.trimmer.presentation.CONTROLLER_CIRCLE_CENTER
 import com.paranid5.crescendo.trimmer.presentation.CONTROLLER_CIRCLE_RADIUS
 import com.paranid5.crescendo.trimmer.presentation.CONTROLLER_HEIGHT_OFFSET
@@ -23,13 +23,12 @@ import com.paranid5.crescendo.trimmer.presentation.PLAYBACK_RECT_WIDTH
 
 @Composable
 internal fun PlaybackPosition(modifier: Modifier = Modifier) {
-    val colors = LocalAppColors.current
-    val playbackBrush = SolidColor(colors.backgroundAlternative)
+    val playbackBrush = SolidColor(colors.background.alternative)
 
     Canvas(modifier.graphicsLayer(alpha = DEFAULT_GRAPHICS_LAYER_ALPHA)) {
-        drawUpperToucher(playbackBrush)
+        drawUpperTouchPad(playbackBrush)
         drawPlaybackPositionController(playbackBrush)
-        drawLowerToucher(playbackBrush)
+        drawLowerTouchPad(playbackBrush)
     }
 }
 
@@ -38,11 +37,11 @@ internal fun PlaybackPositionOffset(playbackOffset: Float, waveformWidth: Int) =
             playbackOffset * (waveformWidth - CONTROLLER_CIRCLE_RADIUS - CONTROLLER_RECT_OFFSET) +
             CONTROLLER_RECT_OFFSET).toInt()
 
-private fun DrawScope.drawUpperToucher(brush: SolidColor) =
+private fun DrawScope.drawUpperTouchPad(brush: SolidColor) =
     drawCircle(
         brush = brush,
         radius = PLAYBACK_CIRCLE_RADIUS,
-        center = Offset(PLAYBACK_CIRCLE_CENTER, 0F)
+        center = Offset(PLAYBACK_CIRCLE_CENTER, 0F),
     )
 
 private fun DrawScope.drawPlaybackPositionController(brush: SolidColor) =
@@ -54,12 +53,12 @@ private fun DrawScope.drawPlaybackPositionController(brush: SolidColor) =
             height = size.height - CONTROLLER_HEIGHT_OFFSET
         ),
         cornerRadius = CornerRadius(2F, 2F),
-        blendMode = BlendMode.SrcAtop
+        blendMode = BlendMode.SrcAtop,
     )
 
-private fun DrawScope.drawLowerToucher(brush: SolidColor) =
+private fun DrawScope.drawLowerTouchPad(brush: SolidColor) =
     drawCircle(
         brush = brush,
         radius = PLAYBACK_CIRCLE_RADIUS,
-        center = Offset(PLAYBACK_CIRCLE_CENTER, size.height - CONTROLLER_HEIGHT_OFFSET)
+        center = Offset(PLAYBACK_CIRCLE_CENTER, size.height - CONTROLLER_HEIGHT_OFFSET),
     )

@@ -21,8 +21,7 @@ import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import com.paranid5.crescendo.core.resources.R
-import com.paranid5.crescendo.core.resources.ui.theme.Disabled
-import com.paranid5.crescendo.core.resources.ui.theme.LocalAppColors
+import com.paranid5.crescendo.core.resources.ui.theme.AppTheme.colors
 import kotlin.math.PI
 import kotlin.math.atan2
 
@@ -80,20 +79,21 @@ private fun ProgressBar(
     arcStartAngle: Float,
     angleRangeDistance: Float,
     fixedRotationAngle: Float,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
-    val colors = LocalAppColors.current
+    val colors = colors
 
     Canvas(modifier) {
         drawFullBarArc(
+            color = colors.utils.disabled,
             arcStartAngle = arcStartAngle,
-            angleRangeDistance = angleRangeDistance
+            angleRangeDistance = angleRangeDistance,
         )
 
         drawProgressBarArc(
             color = colors.primary,
             arcStartAngle = arcStartAngle,
-            fixedRotationAngle = fixedRotationAngle
+            fixedRotationAngle = fixedRotationAngle,
         )
     }
 }
@@ -199,13 +199,14 @@ private inline fun Modifier.controllerDragInput(
 }
 
 private fun DrawScope.drawFullBarArc(
+    color: Color,
     arcStartAngle: Float,
     angleRangeDistance: Float
 ) = drawArc(
-    color = Disabled,
+    color = color,
     startAngle = arcStartAngle,
     sweepAngle = angleRangeDistance,
-    useCenter = true
+    useCenter = true,
 )
 
 private fun DrawScope.drawProgressBarArc(

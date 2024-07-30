@@ -9,16 +9,16 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
-import com.paranid5.crescendo.core.resources.ui.theme.LocalAppColors
+import com.paranid5.crescendo.core.resources.ui.theme.AppTheme.colors
+import com.paranid5.crescendo.core.resources.ui.theme.AppTheme.dimensions
+import com.paranid5.crescendo.core.resources.ui.theme.AppTheme.typography
 
 @Composable
 internal fun SelectedOrderItem(item: String, modifier: Modifier = Modifier) =
     Row(modifier) {
         SelectedOrderItemCheckbox(Modifier.align(Alignment.CenterVertically))
 
-        Spacer(Modifier.width(10.dp))
+        Spacer(Modifier.width(dimensions.padding.medium))
 
         SelectedOrderItemLabel(
             item = item,
@@ -27,28 +27,22 @@ internal fun SelectedOrderItem(item: String, modifier: Modifier = Modifier) =
     }
 
 @Composable
-private fun SelectedOrderItemCheckbox(modifier: Modifier = Modifier) {
-    val colors = LocalAppColors.current
-
+private fun SelectedOrderItemCheckbox(modifier: Modifier = Modifier) =
     Checkbox(
         checked = true,
         onCheckedChange = null,
         modifier = modifier,
         colors = CheckboxDefaults.colors(
             checkedColor = colors.primary,
-            checkmarkColor = colors.background,
+            checkmarkColor = colors.background.primary,
         ),
     )
-}
 
 @Composable
-private fun SelectedOrderItemLabel(item: String, modifier: Modifier = Modifier) {
-    val colors = LocalAppColors.current
-
+private fun SelectedOrderItemLabel(item: String, modifier: Modifier = Modifier) =
     Text(
         text = item,
         color = colors.primary,
-        fontSize = 14.sp,
+        style = typography.regular,
         modifier = modifier,
     )
-}

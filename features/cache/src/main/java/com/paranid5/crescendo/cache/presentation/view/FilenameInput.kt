@@ -5,12 +5,12 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.unit.sp
 import com.paranid5.crescendo.cache.presentation.CacheViewModel
 import com.paranid5.crescendo.cache.presentation.properties.collectFilenameAsState
 import com.paranid5.crescendo.core.resources.R
-import com.paranid5.crescendo.core.resources.ui.theme.LocalAppColors
-import com.paranid5.crescendo.ui.utils.AppOutlinedTextField
+import com.paranid5.crescendo.core.resources.ui.theme.AppTheme.colors
+import com.paranid5.crescendo.core.resources.ui.theme.AppTheme.typography
+import com.paranid5.crescendo.ui.foundation.AppOutlinedTextField
 import org.koin.androidx.compose.koinViewModel
 
 @Composable
@@ -24,18 +24,15 @@ internal fun FilenameInput(
         value = filename,
         onValueChange = viewModel::setFilename,
         label = { FilenameInputLabel() },
-        modifier = modifier
+        modifier = modifier,
     )
 }
 
 @Composable
-private fun FilenameInputLabel(modifier: Modifier = Modifier) {
-    val colors = LocalAppColors.current
-
+private fun FilenameInputLabel(modifier: Modifier = Modifier) =
     Text(
         text = stringResource(R.string.filename),
         color = colors.primary,
-        fontSize = 12.sp,
-        modifier = modifier
+        style = typography.caption,
+        modifier = modifier,
     )
-}

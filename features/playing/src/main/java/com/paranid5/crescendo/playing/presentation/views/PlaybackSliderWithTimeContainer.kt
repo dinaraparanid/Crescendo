@@ -15,15 +15,15 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.palette.graphics.Palette
 import com.paranid5.crescendo.core.common.AudioStatus
 import com.paranid5.crescendo.core.resources.R
-import com.paranid5.crescendo.utils.extensions.timeString
-import com.paranid5.crescendo.core.resources.ui.theme.LocalAppColors
+import com.paranid5.crescendo.core.resources.ui.theme.AppTheme.colors
+import com.paranid5.crescendo.core.resources.ui.theme.AppTheme.dimensions
+import com.paranid5.crescendo.core.resources.ui.theme.AppTheme.typography
 import com.paranid5.crescendo.system.services.stream.StreamServiceAccessor
 import com.paranid5.crescendo.system.services.stream.sendSeekToBroadcast
+import com.paranid5.crescendo.utils.extensions.timeString
 import org.koin.compose.koinInject
 
 @Composable
@@ -61,7 +61,7 @@ internal fun TimeText(time: Long, color: Color, modifier: Modifier = Modifier) =
         text = time.timeString,
         color = color,
         modifier = modifier,
-        fontSize = 16.sp
+        style = typography.body,
     )
 
 @Composable
@@ -72,21 +72,18 @@ internal fun LiveSeeker(
 ) = Button(
     modifier = modifier,
     colors = ButtonDefaults.buttonColors(containerColor = color),
-    shape = RoundedCornerShape(20.dp),
+    shape = RoundedCornerShape(dimensions.corners.medium),
     content = { LiveLabel() },
     onClick = { streamServiceAccessor.sendSeekToBroadcast(0) }
 )
 
 @Composable
-private fun LiveLabel(modifier: Modifier = Modifier) {
-    val colors = LocalAppColors.current
-
+private fun LiveLabel(modifier: Modifier = Modifier) =
     Text(
         text = stringResource(R.string.live),
         color = colors.primary,
         fontWeight = FontWeight.Bold,
         fontStyle = FontStyle.Italic,
         textAlign = TextAlign.Center,
-        modifier = modifier
+        modifier = modifier,
     )
-}

@@ -15,11 +15,12 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import com.paranid5.crescendo.core.resources.ui.theme.LocalAppColors
+import com.paranid5.crescendo.core.resources.ui.theme.AppTheme.colors
+import kotlinx.collections.immutable.ImmutableList
 
 @Composable
 internal fun FileSaveOptionsMenu(
-    fileSaveOptions: Array<String>,
+    fileSaveOptions: ImmutableList<String>,
     selectedSaveOptionIndexState: MutableState<Int>,
     modifier: Modifier = Modifier
 ) {
@@ -44,12 +45,11 @@ internal fun FileSaveOptionsMenu(
 
 @Composable
 private fun OptionLabel(
-    fileSaveOptions: Array<String>,
+    fileSaveOptions: ImmutableList<String>,
     selectedSaveOptionIndex: Int,
     isDropdownShownState: MutableState<Boolean>,
     modifier: Modifier = Modifier
 ) {
-    val colors = LocalAppColors.current
     var isDropdownShown by isDropdownShownState
 
     val label by remember(fileSaveOptions, selectedSaveOptionIndex) {
@@ -65,16 +65,15 @@ private fun OptionLabel(
 
 @Composable
 private fun FileOptionsMenu(
-    fileSaveOptions: Array<String>,
+    fileSaveOptions: ImmutableList<String>,
     selectedSaveOptionIndexState: MutableState<Int>,
     isDropdownShownState: MutableState<Boolean>,
     modifier: Modifier = Modifier
 ) {
-    val colors = LocalAppColors.current
     var isDropdownShown by isDropdownShownState
 
     DropdownMenu(
-        modifier = modifier.background(colors.background),
+        modifier = modifier.background(colors.background.primary),
         expanded = isDropdownShown,
         onDismissRequest = { isDropdownShown = false }
     ) {
@@ -95,12 +94,11 @@ private fun FileOption(
     selectedSaveOptionIndexState: MutableState<Int>,
     modifier: Modifier = Modifier
 ) {
-    val colors = LocalAppColors.current
     var selectedSaveOptionIndex by selectedSaveOptionIndexState
 
     DropdownMenuItem(
         modifier = modifier,
-        text = { Text(text = option, color = colors.fontColor) },
+        text = { Text(text = option, color = colors.text.primary) },
         onClick = { selectedSaveOptionIndex = index },
     )
 }

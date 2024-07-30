@@ -18,7 +18,7 @@ import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.drawscope.Fill
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.onGloballyPositioned
-import com.paranid5.crescendo.core.resources.ui.theme.LocalAppColors
+import com.paranid5.crescendo.core.resources.ui.theme.AppTheme.colors
 import com.paranid5.crescendo.trimmer.presentation.CONTROLLER_ARROW_CORNER_BACK_OFFSET
 import com.paranid5.crescendo.trimmer.presentation.CONTROLLER_ARROW_CORNER_FRONT_OFFSET
 import com.paranid5.crescendo.trimmer.presentation.CONTROLLER_ARROW_CORNER_OFFSET
@@ -39,16 +39,15 @@ internal fun EndBorder(
     modifier: Modifier = Modifier,
     spikeWidthRatio: Int = WAVEFORM_SPIKE_WIDTH_RATIO,
 ) {
-    val colors = LocalAppColors.current
     val progressBrush = SolidColor(colors.primary)
-    val iconBrush = SolidColor(colors.fontColor)
+    val iconBrush = SolidColor(colors.text.primary)
 
     Canvas(modifier.endBorderHorizontalDrag(viewModel, spikeWidthRatio)) {
         drawBorder(progressBrush)
 
-        drawEndToucher(
+        drawEndTouchPad(
             progressBrush = progressBrush,
-            iconBrush = iconBrush
+            iconBrush = iconBrush,
         )
     }
 }
@@ -56,7 +55,7 @@ internal fun EndBorder(
 @Composable
 private fun Modifier.endBorderHorizontalDrag(
     viewModel: TrimmerViewModel,
-    spikeWidthRatio: Int
+    spikeWidthRatio: Int,
 ): Modifier {
     val isDraggedState = remember { mutableStateOf(false) }
     val isPositionedState = remember { mutableStateOf(false) }
@@ -79,7 +78,7 @@ private fun Modifier.endBorderDragInput(
     viewModel: TrimmerViewModel,
     isDraggedState: MutableState<Boolean>,
     isPositionedState: MutableState<Boolean>,
-    spikeWidthRatio: Int
+    spikeWidthRatio: Int,
 ): Modifier {
     val startMillis by viewModel.collectStartPosInMillisAsState()
     val endMillis by viewModel.collectEndPosInMillisAsState()
@@ -121,19 +120,19 @@ private fun DrawScope.drawBorder(brush: SolidColor) =
         style = Fill
     )
 
-internal fun DrawScope.drawEndToucher(progressBrush: SolidColor, iconBrush: SolidColor) {
-    drawToucherCircle(progressBrush)
-    drawToucherIcon(iconBrush)
+internal fun DrawScope.drawEndTouchPad(progressBrush: SolidColor, iconBrush: SolidColor) {
+    drawTouchPadCircle(progressBrush)
+    drawTouchPadIcon(iconBrush)
 }
 
-private fun DrawScope.drawToucherCircle(brush: SolidColor) =
+private fun DrawScope.drawTouchPadCircle(brush: SolidColor) =
     drawCircle(
         brush = brush,
         radius = CONTROLLER_CIRCLE_RADIUS,
         center = Offset(-CONTROLLER_CIRCLE_CENTER, size.height - CONTROLLER_CIRCLE_CENTER)
     )
 
-private fun DrawScope.drawToucherIcon(brush: SolidColor) =
+private fun DrawScope.drawTouchPadIcon(brush: SolidColor) =
     drawPath(
         path = IconPath(size),
         brush = brush,

@@ -1,20 +1,18 @@
 package com.paranid5.crescendo.current_playlist.presentation
 
 import android.content.res.Configuration
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalConfiguration
-import androidx.compose.ui.unit.dp
+import com.paranid5.crescendo.core.resources.ui.theme.AppTheme.colors
+import com.paranid5.crescendo.core.resources.ui.theme.AppTheme.dimensions
 import com.paranid5.crescendo.current_playlist.presentation.effects.TrackDismissEffect
 import com.paranid5.crescendo.current_playlist.presentation.views.CurrentPlaylistBar
 import com.paranid5.crescendo.current_playlist.presentation.views.CurrentPlaylistTrackList
-import com.paranid5.crescendo.core.resources.ui.theme.TransparentUtility
 
 @Composable
 fun CurrentPlaylistScreen(modifier: Modifier = Modifier) {
@@ -26,20 +24,20 @@ fun CurrentPlaylistScreen(modifier: Modifier = Modifier) {
                 .fillMaxWidth()
                 .padding(
                     top = topPadding,
-                    bottom = 8.dp,
-                    start = 8.dp,
-                    end = 8.dp,
+                    bottom = dimensions.padding.small,
+                    start = dimensions.padding.small,
+                    end = dimensions.padding.small,
                 )
         )
 
-        CurrentPlaylistBarSeparator(Modifier.height(2.dp))
+        CurrentPlaylistBarSeparator()
 
         CurrentPlaylistTrackList(
             Modifier.padding(
-                top = 16.dp,
-                start = 8.dp,
-                end = 4.dp,
-                bottom = 8.dp
+                top = dimensions.padding.extraMedium,
+                start = dimensions.padding.small,
+                end = dimensions.padding.extraSmall,
+                bottom = dimensions.padding.small,
             )
         )
     }
@@ -47,15 +45,15 @@ fun CurrentPlaylistScreen(modifier: Modifier = Modifier) {
 
 @Composable
 private fun CurrentPlaylistBarSeparator(modifier: Modifier = Modifier) =
-    Spacer(
-        modifier
-            .fillMaxWidth()
-            .background(TransparentUtility)
+    HorizontalDivider(
+        modifier = modifier.fillMaxWidth(),
+        thickness = dimensions.padding.minimum,
+        color = colors.utils.transparentUtility,
     )
 
 private inline val topPadding
     @Composable
     get() = when (LocalConfiguration.current.orientation) {
-        Configuration.ORIENTATION_LANDSCAPE -> 8.dp
-        else -> 32.dp
+        Configuration.ORIENTATION_LANDSCAPE -> dimensions.padding.small
+        else -> dimensions.padding.large
     }

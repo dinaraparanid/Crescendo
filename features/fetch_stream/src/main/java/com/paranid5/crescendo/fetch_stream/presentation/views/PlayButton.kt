@@ -6,7 +6,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -15,10 +14,8 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.unit.sp
 import com.paranid5.crescendo.core.resources.R
-import com.paranid5.crescendo.core.resources.ui.theme.LocalAppColors
+import com.paranid5.crescendo.core.resources.ui.theme.AppTheme.colors
 import com.paranid5.crescendo.fetch_stream.domain.startStreaming
 import com.paranid5.crescendo.fetch_stream.presentation.FetchStreamViewModel
 import com.paranid5.crescendo.fetch_stream.presentation.properties.compose.collectCurrentTextAsState
@@ -73,7 +70,6 @@ private inline fun PlayButtonImpl(
     viewModel: FetchStreamViewModel = koinViewModel(),
     streamServiceAccessor: StreamServiceAccessor = koinInject()
 ) {
-    val colors = LocalAppColors.current
     val playingSheetState = LocalPlayingSheetState.current
     val playingPagerState = LocalPlayingPagerState.current
 
@@ -85,16 +81,14 @@ private inline fun PlayButtonImpl(
         enabled = isConfirmButtonActive,
         modifier = modifier,
         colors = ButtonDefaults.buttonColors(
-            containerColor = colors.backgroundAlternative
+            containerColor = colors.background.alternative,
         ),
         content = { ButtonLabel(stringResource(R.string.play)) },
         onClick = {
             when {
-                !areForegroundPermissionsGranted ->
-                    launchFSPermissions()
+                areForegroundPermissionsGranted.not() -> launchFSPermissions()
 
-                !isRecordingPermissionGranted ->
-                    launchRecordPermissions()
+                isRecordingPermissionGranted.not() -> launchRecordPermissions()
 
                 else -> coroutineScope.launch {
                     startStreaming(

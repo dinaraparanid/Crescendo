@@ -5,12 +5,12 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.unit.sp
 import com.paranid5.crescendo.core.resources.R
-import com.paranid5.crescendo.core.resources.ui.theme.LocalAppColors
+import com.paranid5.crescendo.core.resources.ui.theme.AppTheme.colors
+import com.paranid5.crescendo.core.resources.ui.theme.AppTheme.typography
 import com.paranid5.crescendo.fetch_stream.presentation.FetchStreamViewModel
 import com.paranid5.crescendo.fetch_stream.presentation.properties.compose.collectCurrentTextAsState
-import com.paranid5.crescendo.ui.utils.AppOutlinedTextField
+import com.paranid5.crescendo.ui.foundation.AppOutlinedTextField
 import org.koin.androidx.compose.koinViewModel
 
 @Composable
@@ -24,18 +24,15 @@ internal fun UrlEditor(
         value = currentText,
         modifier = modifier,
         label = { UrlEditorLabel() },
-        onValueChange = { query -> viewModel.setCurrentText(query) }
+        onValueChange = { viewModel.setCurrentText(currentText = it) },
     )
 }
 
 @Composable
-private fun UrlEditorLabel(modifier: Modifier = Modifier) {
-    val colors = LocalAppColors.current
-
+private fun UrlEditorLabel(modifier: Modifier = Modifier) =
     Text(
         text = stringResource(R.string.enter_stream_url),
         color = colors.primary,
-        fontSize = 12.sp,
-        modifier = modifier
+        style = typography.caption,
+        modifier = modifier,
     )
-}

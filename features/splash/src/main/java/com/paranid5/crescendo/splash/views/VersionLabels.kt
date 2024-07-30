@@ -10,33 +10,30 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import com.paranid5.crescendo.core.resources.R
-import com.paranid5.crescendo.core.resources.ui.theme.LocalAppColors
+import com.paranid5.crescendo.core.resources.ui.theme.AppTheme.colors
+import com.paranid5.crescendo.core.resources.ui.theme.AppTheme.dimensions
+import com.paranid5.crescendo.core.resources.ui.theme.AppTheme.typography
 
 @Composable
-internal fun VersionLabels(modifier: Modifier = Modifier) {
-    val colors = LocalAppColors.current
-
+internal fun VersionLabels(modifier: Modifier = Modifier) =
     Column(modifier) {
         Text(
             text = stringResource(id = R.string.app_name),
             color = colors.primary,
-            fontSize = 24.sp,
+            style = typography.h.h2,
             fontWeight = FontWeight.Bold,
             fontStyle = FontStyle.Italic,
-            modifier = Modifier.align(Alignment.CenterHorizontally)
+            modifier = Modifier.align(Alignment.CenterHorizontally),
         )
 
-        Spacer(Modifier.height(4.dp))
+        Spacer(Modifier.height(dimensions.padding.extraSmall))
 
         Text(
-            text = stringResource(id = R.string.version),
+            text = stringResource(R.string.version),
             color = colors.primary,
-            fontSize = 14.sp,
+            style = typography.regular,
             fontStyle = FontStyle.Italic,
-            modifier = Modifier.align(Alignment.CenterHorizontally)
+            modifier = Modifier.align(Alignment.CenterHorizontally),
         )
     }
-}

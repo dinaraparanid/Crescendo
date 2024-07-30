@@ -22,7 +22,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.palette.graphics.Palette
 import com.paranid5.crescendo.core.common.AudioStatus
-import com.paranid5.crescendo.core.resources.ui.theme.TransparentUtility
+import com.paranid5.crescendo.core.resources.ui.theme.AppTheme.colors
+import com.paranid5.crescendo.core.resources.ui.theme.AppTheme.dimensions
 import com.paranid5.crescendo.playing.domain.PlayingInteractor
 import com.paranid5.crescendo.playing.presentation.PlayingViewModel
 import com.paranid5.crescendo.playing.presentation.effects.PlaybackPositionFetcher
@@ -99,7 +100,7 @@ internal fun PlaybackSliderContent(
         Row(
             Modifier
                 .fillMaxWidth()
-                .padding(top = if (isLiveStreaming) 10.dp else 0.dp)
+                .padding(top = if (isLiveStreaming) dimensions.padding.medium else 0.dp)
         ) {
             content(currentPosition, durationMillis, paletteColor)
         }
@@ -130,7 +131,7 @@ private fun PlaybackSliderImpl(
         colors = SliderDefaults.colors(
             thumbColor = paletteColor,
             activeTrackColor = paletteColor,
-            inactiveTrackColor = TransparentUtility
+            inactiveTrackColor = colors.utils.transparentUtility,
         ),
         onValueChange = {
             isDragging = true

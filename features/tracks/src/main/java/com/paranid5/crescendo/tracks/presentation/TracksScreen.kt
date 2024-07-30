@@ -20,14 +20,13 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.unit.dp
-import com.paranid5.crescendo.core.resources.ui.theme.LocalAppColors
+import com.paranid5.crescendo.core.resources.ui.theme.AppTheme.colors
+import com.paranid5.crescendo.core.resources.ui.theme.AppTheme.dimensions
 import com.paranid5.crescendo.tracks.presentation.effects.LoadTracksFromMediaStoreEffect
 import com.paranid5.crescendo.tracks.presentation.properties.compose.collectSearchBarHeightDpAsState
 import com.paranid5.crescendo.tracks.presentation.views.DefaultTrackList
 import com.paranid5.crescendo.tracks.presentation.views.TrackSearcher
 import com.paranid5.crescendo.tracks.presentation.views.TracksBar
-import com.paranid5.crescendo.ui.appbar.appBarHeight
 import org.koin.androidx.compose.koinViewModel
 
 @OptIn(ExperimentalMaterialApi::class)
@@ -60,7 +59,7 @@ fun TracksScreen(
             TrackSearcher(
                 Modifier
                     .fillMaxWidth()
-                    .height(searchBarHeight)
+                    .height(searchBarHeight),
             ) { filtered, scrollingState ->
                 viewModel.setFilteredTracks(filtered)
                 tracksScrollingState = scrollingState
@@ -69,17 +68,17 @@ fun TracksScreen(
             TracksBar(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(horizontal = 8.dp)
+                    .padding(horizontal = dimensions.padding.small),
             )
 
-            Spacer(Modifier.height(16.dp))
+            Spacer(Modifier.height(dimensions.padding.extraMedium))
 
             DefaultTrackList(
                 scrollingState = tracksScrollingState,
-                bottomPadding = 8.dp,
+                bottomPadding = dimensions.padding.small,
                 modifier = Modifier
                     .fillMaxSize(1F)
-                    .padding(horizontal = 8.dp)
+                    .padding(horizontal = dimensions.padding.small),
             )
         }
     }
@@ -90,15 +89,11 @@ fun TracksScreen(
 private fun RefreshIndicator(
     refreshing: Boolean,
     refreshState: PullRefreshState,
-    modifier: Modifier = Modifier
-) {
-    val colors = LocalAppColors.current
-
-    PullRefreshIndicator(
-        refreshing = refreshing,
-        state = refreshState,
-        modifier = modifier,
-        backgroundColor = colors.backgroundAlternative,
-        contentColor = colors.primary
-    )
-}
+    modifier: Modifier = Modifier,
+) = PullRefreshIndicator(
+    refreshing = refreshing,
+    state = refreshState,
+    modifier = modifier,
+    backgroundColor = colors.background.alternative,
+    contentColor = colors.primary,
+)

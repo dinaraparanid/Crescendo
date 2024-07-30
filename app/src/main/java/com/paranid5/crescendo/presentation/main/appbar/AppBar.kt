@@ -13,22 +13,25 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.unit.dp
 import com.paranid5.crescendo.core.resources.R
-import com.paranid5.crescendo.core.resources.ui.theme.LocalAppColors
+import com.paranid5.crescendo.core.resources.ui.theme.AppTheme.colors
+import com.paranid5.crescendo.core.resources.ui.theme.AppTheme.dimensions
 import com.paranid5.crescendo.navigation.Screens
 import com.paranid5.crescendo.ui.appbar.appBarHeight
 
 @Composable
-fun AppBar(modifier: Modifier = Modifier) {
-    val colors = LocalAppColors.current
-
+fun AppBar(modifier: Modifier = Modifier) =
     BottomAppBar(
         containerColor = colors.primary,
         modifier = modifier
             .fillMaxWidth()
             .height(appBarHeight)
-            .clip(RoundedCornerShape(topStart = 24.dp, topEnd = 24.dp))
+            .clip(
+                RoundedCornerShape(
+                    topStart = dimensions.corners.extraMedium,
+                    topEnd = dimensions.corners.extraMedium,
+                )
+            )
     ) {
         AppBarItem(
             title = stringResource(R.string.tracks),
@@ -36,7 +39,7 @@ fun AppBar(modifier: Modifier = Modifier) {
             screen = Screens.Tracks,
             modifier = Modifier
                 .weight(1F)
-                .padding(top = 12.dp)
+                .padding(top = dimensions.corners.medium)
         )
 
         AppBarItem(
@@ -45,7 +48,7 @@ fun AppBar(modifier: Modifier = Modifier) {
             screen = Screens.TrackCollections.Albums,
             modifier = Modifier
                 .weight(1F)
-                .padding(top = 12.dp)
+                .padding(top = dimensions.corners.medium)
         )
 
         AppBarItem(
@@ -54,7 +57,7 @@ fun AppBar(modifier: Modifier = Modifier) {
             screen = Screens.StreamFetching,
             modifier = Modifier
                 .weight(1F)
-                .padding(top = 12.dp)
+                .padding(top = dimensions.corners.medium)
         )
 
         AppBarItem(
@@ -63,7 +66,7 @@ fun AppBar(modifier: Modifier = Modifier) {
             screen = Screens.Favourites,
             modifier = Modifier
                 .weight(1F)
-                .padding(top = 12.dp)
+                .padding(top = dimensions.corners.medium)
         )
 
         AppBarItem(
@@ -72,7 +75,6 @@ fun AppBar(modifier: Modifier = Modifier) {
             screen = Screens.Settings,
             modifier = Modifier
                 .weight(1F)
-                .padding(top = 12.dp)
+                .padding(top = dimensions.corners.medium)
         )
     }
-}

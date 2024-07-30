@@ -15,7 +15,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import com.paranid5.crescendo.cache.presentation.CacheDialog
 import com.paranid5.crescendo.core.resources.R
-import com.paranid5.crescendo.core.resources.ui.theme.LocalAppColors
+import com.paranid5.crescendo.core.resources.ui.theme.AppTheme.colors
 import com.paranid5.crescendo.fetch_stream.presentation.FetchStreamViewModel
 import com.paranid5.crescendo.fetch_stream.presentation.properties.compose.collectCurrentTextAsState
 import com.paranid5.crescendo.fetch_stream.presentation.properties.compose.collectIsConfirmButtonActiveAsState
@@ -38,15 +38,15 @@ internal fun DownloadButton(
     Box(modifier) {
         val (areStoragePermissionsGranted, launchStoragePermissions) =
             externalStoragePermissionsRequestLauncher(
-                isCachePropertiesDialogShownState,
-                modifier = Modifier.align(Alignment.Center)
+                isExternalStoragePermissionDialogShownState = isCachePropertiesDialogShownState,
+                modifier = Modifier.align(Alignment.Center),
             )
 
         if (isCachePropertiesDialogShown && areStoragePermissionsGranted)
             CacheDialog(
                 url = text,
                 isDialogShownState = isCachePropertiesDialogShownState,
-                modifier = Modifier.align(Alignment.Center)
+                modifier = Modifier.align(Alignment.Center),
             )
 
         DownloadButtonImpl(
@@ -68,7 +68,6 @@ private inline fun DownloadButtonImpl(
     modifier: Modifier = Modifier,
     viewModel: FetchStreamViewModel = koinViewModel(),
 ) {
-    val colors = LocalAppColors.current
     val isConfirmButtonActive by viewModel.collectIsConfirmButtonActiveAsState()
     var isCachePropertiesDialogShown by isCachePropertiesDialogShownState
 
@@ -76,12 +75,12 @@ private inline fun DownloadButtonImpl(
         enabled = isConfirmButtonActive,
         modifier = modifier,
         colors = ButtonDefaults.buttonColors(
-            containerColor = colors.backgroundAlternative
+            containerColor = colors.background.alternative,
         ),
         content = { ButtonLabel(stringResource(R.string.download)) },
         onClick = {
             when {
-                !areStoragePermissionsGranted -> launchStoragePermissions()
+                areStoragePermissionsGranted.not() -> launchStoragePermissions()
                 else -> isCachePropertiesDialogShown = true
             }
         }

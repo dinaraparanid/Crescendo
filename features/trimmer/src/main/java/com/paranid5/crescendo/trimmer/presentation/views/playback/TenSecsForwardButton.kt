@@ -12,11 +12,13 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.media3.common.Player
 import com.paranid5.crescendo.core.resources.R
-import com.paranid5.crescendo.core.resources.ui.theme.LocalAppColors
+import com.paranid5.crescendo.core.resources.ui.theme.AppTheme.colors
 import com.paranid5.crescendo.trimmer.presentation.TrimmerViewModel
 import com.paranid5.crescendo.trimmer.domain.player.seekTenSecsForward
 import com.paranid5.crescendo.trimmer.presentation.properties.compose.collectTrackDurationInMillisAsState
 import org.koin.androidx.compose.koinViewModel
+
+private val ButtonSize = 48.dp
 
 @Composable
 internal fun TenSecsForwardButton(
@@ -24,18 +26,17 @@ internal fun TenSecsForwardButton(
     modifier: Modifier = Modifier,
     viewModel: TrimmerViewModel = koinViewModel(),
 ) {
-    val colors = LocalAppColors.current
     val durationInMillis by viewModel.collectTrackDurationInMillisAsState()
 
     IconButton(
         onClick = { player.seekTenSecsForward(durationInMillis) },
-        modifier = modifier.size(48.dp)
+        modifier = modifier.size(ButtonSize)
     ) {
         Icon(
             painter = painterResource(id = R.drawable.next_track),
             contentDescription = stringResource(id = R.string.ten_secs_forward),
             tint = colors.primary,
-            modifier = Modifier.fillMaxSize()
+            modifier = Modifier.fillMaxSize(),
         )
     }
 }

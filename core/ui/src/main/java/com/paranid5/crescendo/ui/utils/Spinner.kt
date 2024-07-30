@@ -13,8 +13,8 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.unit.sp
-import com.paranid5.crescendo.core.resources.ui.theme.LocalAppColors
+import com.paranid5.crescendo.core.resources.ui.theme.AppTheme.colors
+import com.paranid5.crescendo.core.resources.ui.theme.AppTheme.typography
 import kotlinx.collections.immutable.ImmutableList
 
 @Composable
@@ -33,26 +33,23 @@ fun Spinner(
         DefaultItem(text, mod)
     },
 ) {
-    val colors = LocalAppColors.current
     var isExpanded by remember { mutableStateOf(false) }
 
     Box(modifier.clickable { isExpanded = true }) {
         items.getOrNull(previewItemIndex)?.let {
-            previewItemFactory(previewItemIndex, it, modifier,)
+            previewItemFactory(previewItemIndex, it, modifier)
         }
 
         DropdownMenu(
             expanded = isExpanded,
             onDismissRequest = { isExpanded = false },
-            modifier = dropdownModifier.background(colors.background)
+            modifier = dropdownModifier.background(colors.background.primary)
         ) {
             items.forEachIndexed { index, element ->
                 DropdownMenuItem(
                     text = {
                         when (index) {
-                            in selectedItemIndices ->
-                                selectedItemFactory(index, element, Modifier)
-
+                            in selectedItemIndices -> selectedItemFactory(index, element, Modifier)
                             else -> dropdownItemFactory(index, element, Modifier)
                         }
                     },
@@ -68,26 +65,24 @@ fun Spinner(
 
 @Composable
 private fun DefaultSelectedItem(text: String, modifier: Modifier = Modifier) {
-    val colors = LocalAppColors.current
     val updText by rememberUpdatedState(text)
 
     Text(
         text = updText,
         modifier = modifier,
         color = colors.primary,
-        fontSize = 14.sp
+        style = typography.regular,
     )
 }
 
 @Composable
 private fun DefaultItem(text: String, modifier: Modifier = Modifier) {
-    val colors = LocalAppColors.current
     val updText by rememberUpdatedState(text)
 
     Text(
         text = updText,
         modifier = modifier,
-        color = colors.fontColor,
-        fontSize = 14.sp
+        color = colors.text.primary,
+        style = typography.regular,
     )
 }

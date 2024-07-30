@@ -10,11 +10,11 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.graphics.vector.ImageVector
+import com.paranid5.crescendo.core.resources.ui.theme.AppTheme.colors
 import com.paranid5.crescendo.navigation.Screens
 import com.paranid5.crescendo.ui.composition_locals.LocalCurrentPlaylistSheetState
 import com.paranid5.crescendo.navigation.LocalNavController
 import com.paranid5.crescendo.ui.composition_locals.playing.LocalPlayingSheetState
-import com.paranid5.crescendo.core.resources.ui.theme.LocalAppColors
 
 @Composable
 fun AppBarItem(
@@ -45,32 +45,24 @@ private fun AppBarIcon(
     title: String,
     image: ImageVector,
     modifier: Modifier = Modifier
-) {
-    val colors = LocalAppColors.current
-
-    Icon(
-        imageVector = image,
-        contentDescription = title,
-        tint = colors.backgroundAlternative,
-        modifier = modifier
-    )
-}
+) = Icon(
+    imageVector = image,
+    contentDescription = title,
+    tint = colors.background.alternative,
+    modifier = modifier
+)
 
 @Composable
 private fun AppBarIcon(
     title: String,
     image: Painter,
     modifier: Modifier = Modifier
-) {
-    val colors = LocalAppColors.current
-
-    Icon(
-        painter = image,
-        contentDescription = title,
-        tint = colors.backgroundAlternative,
-        modifier = modifier
-    )
-}
+) = Icon(
+    painter = image,
+    contentDescription = title,
+    tint = colors.background.alternative,
+    modifier = modifier
+)
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable

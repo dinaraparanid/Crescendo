@@ -4,6 +4,7 @@ import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
@@ -11,7 +12,7 @@ import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.pointer.pointerInput
-import com.paranid5.crescendo.core.resources.ui.theme.LocalAppColors
+import com.paranid5.crescendo.core.resources.ui.theme.AppTheme.colors
 import com.paranid5.crescendo.trimmer.presentation.CONTROLLER_HEIGHT_OFFSET
 import com.paranid5.crescendo.trimmer.presentation.DEFAULT_GRAPHICS_LAYER_ALPHA
 import com.paranid5.crescendo.trimmer.presentation.TrimmerViewModel
@@ -30,11 +31,13 @@ internal fun TrimmedZone(
     modifier: Modifier = Modifier,
     viewModel: TrimmerViewModel = koinViewModel(),
 ) {
-    val colors = LocalAppColors.current
-    val progressBrush = SolidColor(colors.primary.copy(alpha = 0.25F))
-
     val startOffset by viewModel.collectStartOffsetAsState()
     val endOffset by viewModel.collectEndOffsetAsState()
+
+    val progressColor = colors.primary
+    val progressBrush = remember(colors.primary) {
+        SolidColor(progressColor.copy(alpha = 0.25F))
+    }
 
     Canvas(modifier.trimmedZoneModifier()) {
         drawRect(

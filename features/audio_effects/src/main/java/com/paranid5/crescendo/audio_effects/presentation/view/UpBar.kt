@@ -13,14 +13,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewModelScope
 import com.paranid5.crescendo.audio_effects.presentation.AudioEffectsViewModel
 import com.paranid5.crescendo.audio_effects.presentation.properties.compose.collectAreAudioEffectsEnabledAsState
 import com.paranid5.crescendo.core.resources.R
+import com.paranid5.crescendo.core.resources.ui.theme.AppTheme.colors
+import com.paranid5.crescendo.core.resources.ui.theme.AppTheme.typography
 import com.paranid5.crescendo.utils.extensions.decreaseBrightness
 import com.paranid5.crescendo.utils.extensions.simpleShadow
-import com.paranid5.crescendo.core.resources.ui.theme.LocalAppColors
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
@@ -32,24 +32,19 @@ internal fun UpBar(modifier: Modifier = Modifier) = Box(modifier) {
 }
 
 @Composable
-private fun AudioEffectsLabel(modifier: Modifier = Modifier) {
-    val colors = LocalAppColors.current
-
+private fun AudioEffectsLabel(modifier: Modifier = Modifier) =
     Text(
         text = stringResource(R.string.audio_effects),
         color = colors.primary,
-        fontSize = 20.sp,
-        modifier = modifier.simpleShadow(color = colors.primary)
+        style = typography.h.h2,
+        modifier = modifier.simpleShadow(color = colors.primary),
     )
-}
 
 @Composable
 private fun AudioEffectsSwitch(
     modifier: Modifier = Modifier,
     viewModel: AudioEffectsViewModel = koinViewModel(),
 ) {
-    val colors = LocalAppColors.current
-
     val primaryColor = colors.primary
     val argbPrimaryColor by rememberArgbPrimaryColor(primaryColor)
 

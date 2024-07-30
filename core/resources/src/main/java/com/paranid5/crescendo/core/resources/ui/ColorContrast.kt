@@ -1,4 +1,4 @@
-package com.paranid5.crescendo.core.resources.ui.theme
+package com.paranid5.crescendo.core.resources.ui
 
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb

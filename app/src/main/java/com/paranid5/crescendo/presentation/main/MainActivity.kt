@@ -9,7 +9,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Modifier
 import androidx.navigation.compose.rememberNavController
-import com.paranid5.crescendo.core.resources.ui.theme.CrescendoTheme
+import com.paranid5.crescendo.core.resources.ui.theme.AppTheme
 import com.paranid5.crescendo.navigation.LocalNavController
 import com.paranid5.crescendo.navigation.NavHostController
 import com.paranid5.crescendo.presentation.composition_locals.LocalActivity
@@ -23,7 +23,7 @@ class MainActivity : ComponentActivity() {
         setNavigationBarColorToTransparent()
 
         setContent {
-            CrescendoTheme {
+            AppTheme {
                 val mainNavController = NavHostController(rememberNavController())
 
                 CompositionLocalProvider(

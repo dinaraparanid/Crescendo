@@ -18,9 +18,9 @@ import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.drawscope.Fill
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.unit.Dp
+import com.paranid5.crescendo.core.resources.ui.theme.AppTheme.colors
 import com.paranid5.crescendo.utils.extensions.forEachIndexedStepped
 import com.paranid5.crescendo.utils.extensions.pxToDp
-import com.paranid5.crescendo.core.resources.ui.theme.LocalAppColors
 import com.paranid5.crescendo.trimmer.presentation.CONTROLLER_CIRCLE_RADIUS
 import com.paranid5.crescendo.trimmer.presentation.CONTROLLER_HEIGHT_OFFSET
 import com.paranid5.crescendo.trimmer.presentation.DEFAULT_GRAPHICS_LAYER_ALPHA
@@ -33,19 +33,19 @@ import com.paranid5.crescendo.trimmer.presentation.properties.compose.collectIsP
 import com.paranid5.crescendo.trimmer.presentation.properties.compose.collectStartOffsetAsState
 import com.paranid5.crescendo.trimmer.presentation.properties.compose.collectWaveformWidthAsState
 import com.paranid5.crescendo.trimmer.presentation.properties.compose.collectZoomAsState
+import kotlinx.collections.immutable.ImmutableList
 import org.koin.androidx.compose.koinViewModel
 
 @Composable
 internal fun WaveformSpikes(
-    spikesAmplitudes: List<Float>,
+    spikesAmplitudes: ImmutableList<Float>,
     canvasSizeState: MutableState<Size>,
     spikesState: MutableFloatState,
     modifier: Modifier = Modifier,
     viewModel: TrimmerViewModel = koinViewModel(),
     spikeWidthRatio: Int = WAVEFORM_SPIKE_WIDTH_RATIO
 ) {
-    val colors = LocalAppColors.current
-    val waveformBrush = SolidColor(colors.backgroundAlternative)
+    val waveformBrush = SolidColor(colors.background.alternative)
     val progressWaveformBrush = SolidColor(colors.secondary)
 
     val startOffset by viewModel.collectStartOffsetAsState()
@@ -71,8 +71,7 @@ internal fun WaveformSpikes(
         )
     }
 
-    if (!isPlaying)
-        BorderSeekers(spikeWidthRatio)
+    if (isPlaying.not()) BorderSeekers(spikeWidthRatio)
 }
 
 @Composable
@@ -196,11 +195,10 @@ private fun EBSBefore(
 
 @Composable
 private fun StartBorderSeeker(modifier: Modifier = Modifier) {
-    val colors = LocalAppColors.current
     val focusPoints = LocalTrimmerFocusPoints.current!!
 
     val progressBrush = SolidColor(colors.primary)
-    val iconBrush = SolidColor(colors.fontColor)
+    val iconBrush = SolidColor(colors.text.primary)
 
     Canvas(
         modifier.clickable {
@@ -209,17 +207,16 @@ private fun StartBorderSeeker(modifier: Modifier = Modifier) {
                 .requestFocus()
         }
     ) {
-        drawStartToucher(progressBrush, iconBrush)
+        drawStartTouchPad(progressBrush, iconBrush)
     }
 }
 
 @Composable
 private fun EndBorderSeeker(modifier: Modifier = Modifier) {
-    val colors = LocalAppColors.current
     val focusPoints = LocalTrimmerFocusPoints.current!!
 
     val progressBrush = SolidColor(colors.primary)
-    val iconBrush = SolidColor(colors.fontColor)
+    val iconBrush = SolidColor(colors.text.primary)
 
     Canvas(
         modifier.clickable {
@@ -228,7 +225,7 @@ private fun EndBorderSeeker(modifier: Modifier = Modifier) {
                 .requestFocus()
         }
     ) {
-        drawEndToucher(progressBrush, iconBrush)
+        drawEndTouchPad(progressBrush, iconBrush)
     }
 }
 
@@ -257,5 +254,5 @@ private fun DrawScope.highlightProgressWaveform(
         width = (endPoint - startPoint) * size.width,
         height = size.height - CONTROLLER_HEIGHT_OFFSET
     ),
-    blendMode = BlendMode.SrcAtop
+    blendMode = BlendMode.SrcAtop,
 )

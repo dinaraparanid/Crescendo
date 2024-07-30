@@ -3,6 +3,7 @@ package com.paranid5.crescendo.trimmer.presentation.views
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -24,6 +25,8 @@ import com.paranid5.crescendo.trimmer.presentation.views.playback.PlayPauseButto
 import com.paranid5.crescendo.trimmer.presentation.views.playback.TenSecsBackButton
 import com.paranid5.crescendo.trimmer.presentation.views.playback.TenSecsForwardButton
 import org.koin.androidx.compose.koinViewModel
+
+private val ButtonSize = 48.dp
 
 @Composable
 internal fun PlaybackButtons(
@@ -57,6 +60,7 @@ private fun PlaybackButtonsContent(
     TenSecsBackButton(
         player = player,
         modifier = Modifier
+            .size(ButtonSize)
             .padding(4.dp)
             .align(Alignment.CenterVertically)
     )
@@ -65,6 +69,7 @@ private fun PlaybackButtonsContent(
 
     PlayPauseButton(
         Modifier
+            .size(ButtonSize)
             .padding(4.dp)
             .align(Alignment.CenterVertically)
     )
@@ -74,6 +79,7 @@ private fun PlaybackButtonsContent(
     TenSecsForwardButton(
         player = player,
         modifier = Modifier
+            .size(ButtonSize)
             .padding(4.dp)
             .align(Alignment.CenterVertically)
     )

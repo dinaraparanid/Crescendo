@@ -12,15 +12,15 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.unit.sp
 import com.paranid5.crescendo.core.resources.R
-import com.paranid5.crescendo.utils.extensions.timeStringMs
-import com.paranid5.crescendo.utils.extensions.toTimeOrNull
-import com.paranid5.crescendo.core.resources.ui.theme.LocalAppColors
+import com.paranid5.crescendo.core.resources.ui.theme.AppTheme.colors
+import com.paranid5.crescendo.core.resources.ui.theme.AppTheme.typography
 import com.paranid5.crescendo.trimmer.presentation.TrimmerViewModel
 import com.paranid5.crescendo.trimmer.presentation.properties.compose.collectEndPosInMillisAsState
 import com.paranid5.crescendo.trimmer.presentation.properties.compose.collectStartPosInMillisAsState
-import com.paranid5.crescendo.ui.utils.AppOutlinedTextField
+import com.paranid5.crescendo.ui.foundation.AppOutlinedTextField
+import com.paranid5.crescendo.utils.extensions.timeStringMs
+import com.paranid5.crescendo.utils.extensions.toTimeOrNull
 import org.koin.androidx.compose.koinViewModel
 
 /** hh:mm:ss.xxx */
@@ -47,7 +47,7 @@ private fun StartController(
         label = stringResource(R.string.start_time),
         millis = startMillis,
         setMillis = viewModel::setStartPosInMillis,
-        modifier = modifier
+        modifier = modifier,
     )
 }
 
@@ -62,7 +62,7 @@ private fun EndController(
         label = stringResource(R.string.end_time),
         millis = endMillis,
         setMillis = viewModel::setEndPosInMillis,
-        modifier = modifier
+        modifier = modifier,
     )
 }
 
@@ -85,18 +85,15 @@ private fun BorderController(
             it.toTimeOrNull()?.let(setMillis)
         },
         label = { BorderControllerLabel(label) },
-        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Ascii)
+        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Ascii),
     )
 }
 
 @Composable
-private fun BorderControllerLabel(text: String, modifier: Modifier = Modifier) {
-    val colors = LocalAppColors.current
-
+private fun BorderControllerLabel(text: String, modifier: Modifier = Modifier) =
     Text(
         text = text,
         color = colors.primary,
-        fontSize = 12.sp,
-        modifier = modifier
+        style = typography.caption,
+        modifier = modifier,
     )
-}

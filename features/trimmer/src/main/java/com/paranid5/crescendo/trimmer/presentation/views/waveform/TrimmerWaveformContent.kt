@@ -37,12 +37,13 @@ import com.paranid5.crescendo.trimmer.presentation.properties.compose.collectWav
 import com.paranid5.crescendo.trimmer.presentation.views.effects.AnimateWaveformScrollOnPlaybackEffect
 import com.paranid5.crescendo.utils.extensions.pxToDp
 import com.paranid5.crescendo.utils.extensions.toPx
+import kotlinx.collections.immutable.ImmutableList
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
 
 @Composable
 internal fun TrimmerWaveformContent(
-    spikesAmplitudes: List<Float>,
+    spikesAmplitudes: ImmutableList<Float>,
     canvasSizeState: MutableState<Size>,
     spikesState: MutableFloatState,
     modifier: Modifier = Modifier,

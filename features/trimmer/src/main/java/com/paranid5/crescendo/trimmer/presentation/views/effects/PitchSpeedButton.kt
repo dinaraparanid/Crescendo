@@ -12,13 +12,13 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import com.paranid5.crescendo.core.resources.R
-import com.paranid5.crescendo.core.resources.ui.theme.LocalAppColors
+import com.paranid5.crescendo.core.resources.ui.theme.AppTheme.colors
+import com.paranid5.crescendo.core.resources.ui.theme.AppTheme.dimensions
+import com.paranid5.crescendo.core.resources.ui.theme.AppTheme.typography
+import com.paranid5.crescendo.trimmer.domain.entities.ShownEffects
 import com.paranid5.crescendo.trimmer.presentation.TrimmerViewModel
 import com.paranid5.crescendo.trimmer.presentation.composition_locals.LocalTrimmerEffectSheetState
-import com.paranid5.crescendo.trimmer.domain.entities.ShownEffects
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
 
@@ -43,28 +43,22 @@ internal fun PitchSpeedButton(
 }
 
 @Composable
-private fun PitchSpeedIcon(modifier: Modifier = Modifier) {
-    val colors = LocalAppColors.current
-
+private fun PitchSpeedIcon(modifier: Modifier = Modifier) =
     Icon(
         painter = painterResource(R.drawable.pitch_speed),
         contentDescription = labelMessage(),
         tint = colors.primary,
-        modifier = modifier.size(20.dp)
+        modifier = modifier.size(dimensions.padding.big),
     )
-}
 
 @Composable
-private fun PitchSpeedLabel(modifier: Modifier) {
-    val colors = LocalAppColors.current
-
+private fun PitchSpeedLabel(modifier: Modifier) =
     Text(
         text = labelMessage(),
         color = colors.primary,
-        fontSize = 8.sp,
-        modifier = modifier
+        style = typography.captionSm,
+        modifier = modifier,
     )
-}
 
 @Composable
 private fun labelMessage() =

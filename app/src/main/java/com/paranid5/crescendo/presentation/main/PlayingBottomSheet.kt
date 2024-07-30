@@ -21,7 +21,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.unit.dp
 import com.paranid5.crescendo.core.common.AudioStatus
-import com.paranid5.crescendo.core.resources.ui.theme.LocalAppColors
+import com.paranid5.crescendo.core.resources.ui.theme.AppTheme.colors
+import com.paranid5.crescendo.core.resources.ui.theme.AppTheme.dimensions
 import com.paranid5.crescendo.current_playlist.presentation.CurrentPlaylistScreen
 import com.paranid5.crescendo.playing.presentation.PlayingScreen
 import com.paranid5.crescendo.presentation.main.appbar.AppBar
@@ -30,13 +31,15 @@ import com.paranid5.crescendo.ui.composition_locals.playing.LocalPlayingPagerSta
 import com.paranid5.crescendo.ui.composition_locals.playing.LocalPlayingSheetState
 import com.paranid5.crescendo.ui.utils.PushUpButton
 
+private const val COLLAPSED_PADDING = 8F
+private const val EXPANDED_PADDING = 24F
+
 @OptIn(ExperimentalMaterialApi::class, ExperimentalFoundationApi::class)
 @Composable
 fun PlayingBottomSheet(
     alpha: Float,
     modifier: Modifier = Modifier,
 ) {
-    val colors = LocalAppColors.current
     val curPlaylistSheetState = LocalCurrentPlaylistSheetState.current
     val playingPagerState = LocalPlayingPagerState.current
 
@@ -55,11 +58,14 @@ fun PlayingBottomSheet(
                 CurrentPlaylistBottomSheet(
                     alpha = alpha,
                     state = curPlaylistScaffoldState,
-                    modifier = Modifier.background(colors.backgroundGradient)
+                    modifier = Modifier.background(colors.background.gradient)
                 )
             },
             sheetBackgroundColor = Color.Transparent,
-            sheetShape = RoundedCornerShape(topStart = 24.dp, topEnd = 24.dp)
+            sheetShape = RoundedCornerShape(
+                topStart = dimensions.corners.extraMedium,
+                topEnd = dimensions.corners.extraMedium,
+            )
         ) {
             Box {
                 HorizontalPager(state = playingPagerState!!) { page ->
@@ -67,13 +73,13 @@ fun PlayingBottomSheet(
                         0 -> PlayingScreen(
                             coverAlpha = 1 - alpha,
                             audioStatus = AudioStatus.PLAYING,
-                            modifier = modifier.fillMaxSize()
+                            modifier = modifier.fillMaxSize(),
                         )
 
                         else -> PlayingScreen(
                             coverAlpha = 1 - alpha,
                             audioStatus = AudioStatus.STREAMING,
-                            modifier = modifier.fillMaxSize()
+                            modifier = modifier.fillMaxSize(),
                         )
                     }
                 }
@@ -106,7 +112,7 @@ private fun CurrentPlaylistBottomSheet(
     PushUpButton(
         alpha = alpha,
         modifier = Modifier
-            .padding(top = 12.dp)
+            .padding(top = dimensions.padding.medium)
             .align(Alignment.TopCenter)
     )
 
@@ -121,7 +127,7 @@ private fun CurrentPlaylistBottomSheet(
 @Composable
 private fun contentTopPadding(sheetState: ModalBottomSheetState) =
     when (LocalConfiguration.current.orientation) {
-        Configuration.ORIENTATION_LANDSCAPE -> 24.dp
+        Configuration.ORIENTATION_LANDSCAPE -> dimensions.padding.extraBig
 
         else -> {
             val progress = sheetState.progress
@@ -129,19 +135,32 @@ private fun contentTopPadding(sheetState: ModalBottomSheetState) =
             val currentValue = sheetState.currentValue
 
             when {
-                targetValue == ModalBottomSheetValue.Hidden -> 8.dp
-                currentValue == ModalBottomSheetValue.Hidden && targetValue == ModalBottomSheetValue.HalfExpanded -> 8.dp
-                currentValue == ModalBottomSheetValue.HalfExpanded && targetValue == ModalBottomSheetValue.HalfExpanded -> 8.dp
-                currentValue == ModalBottomSheetValue.Expanded && targetValue == ModalBottomSheetValue.Expanded -> 32.dp
-                currentValue == ModalBottomSheetValue.Expanded && targetValue == ModalBottomSheetValue.HalfExpanded -> ((1 - progress) * 24 + 8).dp
-                else -> (progress * 24 + 8).dp
-            }
+                targetValue == ModalBottomSheetValue.Hidden -> COLLAPSED_PADDING
+
+                currentValue == ModalBottomSheetValue.Hidden &&
+                        targetValue == ModalBottomSheetValue.HalfExpanded ->
+                    EXPANDED_PADDING + COLLAPSED_PADDING
+
+                currentValue == ModalBottomSheetValue.HalfExpanded &&
+                        targetValue == ModalBottomSheetValue.HalfExpanded ->
+                    COLLAPSED_PADDING
+
+                currentValue == ModalBottomSheetValue.Expanded &&
+                        targetValue == ModalBottomSheetValue.Expanded ->
+                    EXPANDED_PADDING + COLLAPSED_PADDING
+
+                currentValue == ModalBottomSheetValue.Expanded &&
+                        targetValue == ModalBottomSheetValue.HalfExpanded ->
+                    (1 - progress) * EXPANDED_PADDING + COLLAPSED_PADDING
+
+                else -> progress * EXPANDED_PADDING + COLLAPSED_PADDING
+            }.dp
         }
     }
 
 private inline val pushUpPadding
     @Composable
     get() = when (LocalConfiguration.current.orientation) {
-        Configuration.ORIENTATION_LANDSCAPE -> 6.dp
-        else -> 12.dp
+        Configuration.ORIENTATION_LANDSCAPE -> dimensions.padding.small
+        else -> dimensions.padding.medium
     }
