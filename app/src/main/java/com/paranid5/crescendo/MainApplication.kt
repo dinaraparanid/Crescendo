@@ -1,6 +1,7 @@
 package com.paranid5.crescendo
 
 import android.app.Application
+import com.paranid5.crescendo.di.appModule
 import com.yausername.youtubedl_android.YoutubeDL
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers

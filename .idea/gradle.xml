@@ -21,10 +21,12 @@
             <option value="$PROJECT_DIR$/domain" />
             <option value="$PROJECT_DIR$/domain/audio_effects" />
             <option value="$PROJECT_DIR$/domain/current_playlist" />
+            <option value="$PROJECT_DIR$/domain/github" />
             <option value="$PROJECT_DIR$/domain/playback" />
             <option value="$PROJECT_DIR$/domain/stream" />
             <option value="$PROJECT_DIR$/domain/tracks" />
             <option value="$PROJECT_DIR$/domain/waveform" />
+            <option value="$PROJECT_DIR$/domain/web" />
             <option value="$PROJECT_DIR$/features" />
             <option value="$PROJECT_DIR$/features/about_app" />
             <option value="$PROJECT_DIR$/features/audio_effects" />

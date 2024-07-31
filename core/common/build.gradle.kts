@@ -1,7 +1,7 @@
 plugins {
+    alias(libs.plugins.kotlin.jvm)
+    alias(libs.plugins.kotlinx.serialization)
     id("java-library")
-    id("org.jetbrains.kotlin.jvm")
-    id("org.jetbrains.kotlin.plugin.serialization") version "2.0.0"
 }
 
 java {
@@ -10,6 +10,7 @@ java {
 }
 
 dependencies {
-    implementation(libs.kotlinx.collections.immutable)
-    implementation(libs.kotlinx.serialization.json)
+    api(libs.kotlinx.collections.immutable)
+    api(libs.kotlinx.serialization.json)
+    api(libs.arrow.fx.coroutines)
 }

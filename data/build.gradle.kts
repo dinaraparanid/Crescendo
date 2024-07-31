@@ -55,6 +55,8 @@ dependencies {
     api(project(":domain:tracks"))
     api(project(":domain:current_playlist"))
     api(project(":domain:waveform"))
+    api(project(":domain:web"))
+    api(project(":domain:github"))
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)

@@ -12,7 +12,7 @@ private const val SPLASH_SCREEN_DELAY_MS = 1000L
 internal fun SwitchToMainEffect() {
     val context = LocalContext.current
 
-    LaunchedEffect(Unit) {
+    LaunchedEffect(context) {
         delay(SPLASH_SCREEN_DELAY_MS)
         context.openMainActivity()
     }

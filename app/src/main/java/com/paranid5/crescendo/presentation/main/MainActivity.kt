@@ -12,10 +12,13 @@ import androidx.navigation.compose.rememberNavController
 import com.paranid5.crescendo.core.resources.ui.theme.AppTheme
 import com.paranid5.crescendo.navigation.LocalNavController
 import com.paranid5.crescendo.navigation.NavHostController
-import com.paranid5.crescendo.presentation.composition_locals.LocalActivity
 import com.paranid5.crescendo.utils.extensions.getColorCompat
+import com.paranid5.crescendo.view_model.MainViewModelImpl
+import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class MainActivity : ComponentActivity() {
+    private val viewModel by viewModel<MainViewModelImpl>()
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -28,9 +31,11 @@ class MainActivity : ComponentActivity() {
 
                 CompositionLocalProvider(
                     LocalNavController provides mainNavController,
-                    LocalActivity provides this,
                 ) {
-                    App(Modifier.fillMaxSize())
+                    App(
+                        viewModel = viewModel,
+                        modifier = Modifier.fillMaxSize(),
+                    )
                 }
             }
         }

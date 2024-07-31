@@ -33,6 +33,8 @@ include ':domain:stream'
 include ':domain:tracks'
 include ':domain:current_playlist'
 include ':domain:waveform'
+include ':domain:web'
+include ':domain:github'
 
 include ':navigation'
 

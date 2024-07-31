@@ -39,7 +39,7 @@ fun AppBar(modifier: Modifier = Modifier) =
             screen = Screens.Tracks,
             modifier = Modifier
                 .weight(1F)
-                .padding(top = dimensions.corners.medium)
+                .padding(top = dimensions.corners.medium),
         )
 
         AppBarItem(
@@ -48,7 +48,7 @@ fun AppBar(modifier: Modifier = Modifier) =
             screen = Screens.TrackCollections.Albums,
             modifier = Modifier
                 .weight(1F)
-                .padding(top = dimensions.corners.medium)
+                .padding(top = dimensions.corners.medium),
         )
 
         AppBarItem(
@@ -57,7 +57,7 @@ fun AppBar(modifier: Modifier = Modifier) =
             screen = Screens.StreamFetching,
             modifier = Modifier
                 .weight(1F)
-                .padding(top = dimensions.corners.medium)
+                .padding(top = dimensions.corners.medium),
         )
 
         AppBarItem(
@@ -66,7 +66,7 @@ fun AppBar(modifier: Modifier = Modifier) =
             screen = Screens.Favourites,
             modifier = Modifier
                 .weight(1F)
-                .padding(top = dimensions.corners.medium)
+                .padding(top = dimensions.corners.medium),
         )
 
         AppBarItem(
@@ -75,6 +75,6 @@ fun AppBar(modifier: Modifier = Modifier) =
             screen = Screens.Settings,
             modifier = Modifier
                 .weight(1F)
-                .padding(top = dimensions.corners.medium)
+                .padding(top = dimensions.corners.medium),
         )
     }

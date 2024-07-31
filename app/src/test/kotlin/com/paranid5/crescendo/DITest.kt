@@ -1,6 +1,7 @@
 package com.paranid5.crescendo
 
 import androidx.lifecycle.SavedStateHandle
+import com.paranid5.crescendo.di.appModule
 import io.ktor.client.HttpClientConfig
 import io.ktor.client.engine.HttpClientEngine
 import org.koin.test.verify.verify

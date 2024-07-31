@@ -15,11 +15,13 @@ import androidx.compose.material.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import com.paranid5.crescendo.view_model.MainViewModel
 import com.paranid5.crescendo.core.resources.ui.theme.AppTheme.colors
 import com.paranid5.crescendo.presentation.UpdateCheckerDialog
 import com.paranid5.crescendo.ui.appbar.appBarHeight
@@ -27,13 +29,23 @@ import com.paranid5.crescendo.ui.composition_locals.LocalCurrentPlaylistSheetSta
 import com.paranid5.crescendo.ui.composition_locals.playing.LocalPlayingPagerState
 import com.paranid5.crescendo.ui.composition_locals.playing.LocalPlayingSheetState
 import com.paranid5.crescendo.ui.permissions.requests.externalStoragePermissionsRequestLauncher
+import com.paranid5.crescendo.utils.extensions.collectLatestAsState
 
 @Composable
-fun App(modifier: Modifier = Modifier) {
+fun App(
+    viewModel: MainViewModel,
+    modifier: Modifier = Modifier,
+) {
+    val state by viewModel.stateFlow.collectLatestAsState()
+    val onUiIntent = viewModel::onUiIntent
     val isExternalStoragePermissionDialogShownState = remember { mutableStateOf(true) }
 
     Box(modifier) {
-        UpdateCheckerDialog(Modifier.align(Alignment.Center))
+        UpdateCheckerDialog(
+            state = state,
+            onUiIntent = onUiIntent,
+            modifier = Modifier.align(Alignment.Center),
+        )
 
         val (areStoragePermissionsGranted, launchStoragePermissions) = externalStoragePermissionsRequestLauncher(
             isExternalStoragePermissionDialogShownState,
