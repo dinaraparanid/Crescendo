@@ -93,7 +93,7 @@ data class AppBackgroundColors(
             itemGradient = Brush.linearGradient(
                 listOf(
                     Background.resetContrast(ratio = 0.5F).copy(alpha = 0.5F),
-                    BackgroundAlternative.resetContrast(ratio = 0.5F).copy(alpha = 0.5F),
+                    Background.resetContrast(ratio = 0.5F).copy(alpha = 0.5F),
                 )
             )
         )
@@ -107,7 +107,7 @@ data class AppBackgroundColors(
             itemGradient = Brush.linearGradient(
                 listOf(
                     BackgroundAlternative.resetContrast(ratio = 0.5F).copy(alpha = 0.5F),
-                    Background.resetContrast(ratio = 0.75F).copy(alpha = 0.5F),
+                    BackgroundAlternative.resetContrast(ratio = 0.5F).copy(alpha = 0.5F),
                 )
             )
         )
