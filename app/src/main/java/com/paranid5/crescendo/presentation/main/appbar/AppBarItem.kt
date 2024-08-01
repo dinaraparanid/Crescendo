@@ -1,5 +1,6 @@
 package com.paranid5.crescendo.presentation.main.appbar
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -71,8 +72,11 @@ fun AppBarItem(
                 imageVector = icon,
                 contentDescription = title,
                 tint = itemColor,
-                modifier = modifier.align(Alignment.CenterHorizontally),
+                modifier = Modifier
+                    .align(Alignment.CenterHorizontally),
             )
+
+            Spacer(Modifier.height(dimensions.padding.minimum))
 
             Text(
                 text = title,
