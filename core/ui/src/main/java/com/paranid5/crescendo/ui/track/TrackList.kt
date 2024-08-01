@@ -12,7 +12,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.paranid5.crescendo.core.common.tracks.Track
-import com.paranid5.crescendo.ui.appbar.appBarHeight
+import com.paranid5.crescendo.core.resources.ui.theme.AppTheme.dimensions
 import kotlinx.collections.immutable.ImmutableList
 
 typealias TrackItemView = @Composable (
@@ -31,7 +31,7 @@ fun TrackList(
     bottomPadding: Dp = 16.dp
 ) {
     LazyColumn(
-        verticalArrangement = Arrangement.spacedBy(10.dp),
+        verticalArrangement = Arrangement.spacedBy(dimensions.padding.medium),
         state = scrollingState,
         modifier = modifier
     ) {

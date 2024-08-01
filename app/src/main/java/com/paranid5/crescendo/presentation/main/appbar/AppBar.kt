@@ -1,23 +1,21 @@
 package com.paranid5.crescendo.presentation.main.appbar
 
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.BottomAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.res.vectorResource
 import com.paranid5.crescendo.core.resources.R
 import com.paranid5.crescendo.core.resources.ui.theme.AppTheme.colors
 import com.paranid5.crescendo.core.resources.ui.theme.AppTheme.dimensions
 import com.paranid5.crescendo.navigation.Screens
-import com.paranid5.crescendo.ui.appbar.appBarHeight
 
 @Composable
 fun AppBar(modifier: Modifier = Modifier) =
@@ -25,7 +23,6 @@ fun AppBar(modifier: Modifier = Modifier) =
         containerColor = colors.primary,
         modifier = modifier
             .fillMaxWidth()
-            .height(appBarHeight)
             .clip(
                 RoundedCornerShape(
                     topStart = dimensions.corners.extraMedium,
@@ -33,48 +30,28 @@ fun AppBar(modifier: Modifier = Modifier) =
                 )
             )
     ) {
-        AppBarItem(
-            title = stringResource(R.string.tracks),
-            image = painterResource(R.drawable.tracks),
-            screen = Screens.Tracks,
-            modifier = Modifier
-                .weight(1F)
-                .padding(top = dimensions.corners.medium),
-        )
+        val itemModifier = Modifier
+            .weight(1F)
+            .padding(vertical = dimensions.padding.extraSmall)
 
         AppBarItem(
-            title = stringResource(R.string.track_collections),
-            image = painterResource(R.drawable.playlist),
-            screen = Screens.TrackCollections.Albums,
-            modifier = Modifier
-                .weight(1F)
-                .padding(top = dimensions.corners.medium),
+            title = stringResource(R.string.tracks),
+            icon = ImageVector.vectorResource(R.drawable.tracks),
+            screen = Screens.Tracks,
+            modifier = itemModifier,
         )
 
         AppBarItem(
             title = stringResource(R.string.streaming),
-            image = painterResource(R.drawable.stream),
+            icon = ImageVector.vectorResource(R.drawable.stream),
             screen = Screens.StreamFetching,
-            modifier = Modifier
-                .weight(1F)
-                .padding(top = dimensions.corners.medium),
-        )
-
-        AppBarItem(
-            title = stringResource(R.string.favourites),
-            image = Icons.Filled.Favorite,
-            screen = Screens.Favourites,
-            modifier = Modifier
-                .weight(1F)
-                .padding(top = dimensions.corners.medium),
+            modifier = itemModifier,
         )
 
         AppBarItem(
             title = stringResource(R.string.settings),
-            image = Icons.Filled.Settings,
+            icon = Icons.Filled.Settings,
             screen = Screens.Settings,
-            modifier = Modifier
-                .weight(1F)
-                .padding(top = dimensions.corners.medium),
+            modifier = itemModifier,
         )
     }

@@ -18,7 +18,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLayoutDirection
-import androidx.compose.ui.unit.dp
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -26,9 +25,10 @@ import androidx.navigation.navArgument
 import com.paranid5.crescendo.about_app.AboutApp
 import com.paranid5.crescendo.audio_effects.presentation.AudioEffectsScreen
 import com.paranid5.crescendo.core.resources.R
+import com.paranid5.crescendo.core.resources.ui.theme.AppTheme.dimensions
 import com.paranid5.crescendo.favourites.FavouritesScreen
 import com.paranid5.crescendo.fetch_stream.presentation.FetchStreamScreen
-import com.paranid5.crescendo.navigation.LocalNavController
+import com.paranid5.crescendo.navigation.LocalNavigator
 import com.paranid5.crescendo.navigation.Screens
 import com.paranid5.crescendo.settings.SettingsScreen
 import com.paranid5.crescendo.track_collections.AlbumsScreen
@@ -39,20 +39,23 @@ import com.paranid5.crescendo.ui.composition_locals.playing.LocalPlayingSheetSta
 import com.paranid5.crescendo.ui.utils.OnBackPressed
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.coroutines.delay
-import java.util.concurrent.atomic.AtomicInteger
 
 private const val CLICKS_FOR_EXIT = 2
 private const val BACK_TOAST_DELAY = 500L
 
 @Composable
 fun ContentScreen(padding: PaddingValues) {
-    val navigator = LocalNavController.current
+    val navigator = LocalNavigator.current
     val layoutDirection = LocalLayoutDirection.current
 
     BackHandler()
 
+    val screenModifier = Modifier
+        .fillMaxSize()
+        .screenPaddingDefault()
+
     NavHost(
-        navController = navigator.value!!,
+        navController = navigator.navHost!!,
         startDestination = Screens.Tracks.title,
         modifier = Modifier.padding(
             top = padding.calculateTopPadding(),
@@ -62,37 +65,22 @@ fun ContentScreen(padding: PaddingValues) {
         )
     ) {
         composable(route = Screens.Tracks.title) {
-            navigator.setCurScreen(Screens.Tracks)
-
-            TracksScreen(
-                Modifier
-                    .fillMaxSize()
-                    .screenPaddingDefault()
-            )
+            navigator.updateCurrentScreen(Screens.Tracks)
+            TracksScreen(modifier = screenModifier)
         }
 
         composable(route = Screens.TrackCollections.Albums.title) {
-            navigator.setCurScreen(Screens.TrackCollections.Albums)
-
-            AlbumsScreen(
-                Modifier
-                    .fillMaxSize()
-                    .screenPaddingDefault()
-            )
+            navigator.updateCurrentScreen(Screens.TrackCollections.Albums)
+            AlbumsScreen(modifier = screenModifier)
         }
 
         composable(route = Screens.StreamFetching.title) {
-            navigator.setCurScreen(Screens.StreamFetching)
-
-            FetchStreamScreen(
-                Modifier
-                    .fillMaxSize()
-                    .screenPaddingDefault()
-            )
+            navigator.updateCurrentScreen(Screens.StreamFetching)
+            FetchStreamScreen(modifier = screenModifier)
         }
 
         composable(route = Screens.Audio.AudioEffects.title) {
-            navigator.setCurScreen(Screens.Audio.AudioEffects)
+            navigator.updateCurrentScreen(Screens.Audio.AudioEffects)
             AudioEffectsScreen(Modifier.screenPaddingDefault())
         }
 
@@ -104,44 +92,27 @@ fun ContentScreen(padding: PaddingValues) {
                 }
             )
         ) {
-            navigator.setCurScreen(Screens.Audio.Trimmer)
+            navigator.updateCurrentScreen(Screens.Audio.Trimmer)
 
             TrimmerScreen(
                 backStackEntry = it,
-                modifier = Modifier
-                    .fillMaxSize()
-                    .screenPaddingRequired()
+                modifier = screenModifier,
             )
         }
 
         composable(route = Screens.AboutApp.title) {
-            navigator.setCurScreen(Screens.AboutApp)
-
-            AboutApp(
-                Modifier
-                    .fillMaxSize()
-                    .screenPaddingDefault()
-            )
+            navigator.updateCurrentScreen(Screens.AboutApp)
+            AboutApp(modifier = screenModifier)
         }
 
         composable(route = Screens.Favourites.title) {
-            navigator.setCurScreen(Screens.Favourites)
-
-            FavouritesScreen(
-                Modifier
-                    .fillMaxSize()
-                    .screenPaddingDefault()
-            )
+            navigator.updateCurrentScreen(Screens.Favourites)
+            FavouritesScreen(modifier = screenModifier)
         }
 
         composable(route = Screens.Settings.title) {
-            navigator.setCurScreen(Screens.Settings)
-
-            SettingsScreen(
-                Modifier
-                    .fillMaxSize()
-                    .screenPaddingDefault()
-            )
+            navigator.updateCurrentScreen(Screens.Settings)
+            SettingsScreen(modifier = screenModifier)
         }
     }
 }
@@ -189,49 +160,20 @@ private fun BackHandler() {
 private fun Modifier.screenPaddingDefault() =
     this.padding(
         top = topPaddingDefault,
-        start = 8.dp,
+        start = dimensions.padding.small,
         end = endPaddingDefault
-    )
-
-@Composable
-private fun Modifier.screenPaddingRequired() =
-    this.padding(
-        top = topPaddingRequired,
-        start = startPaddingRequired,
-        end = endPaddingRequired
     )
 
 private inline val topPaddingDefault
     @Composable
     get() = when (LocalConfiguration.current.orientation) {
-        Configuration.ORIENTATION_LANDSCAPE -> 16.dp
-        else -> 48.dp
+        Configuration.ORIENTATION_LANDSCAPE -> dimensions.padding.extraMedium
+        else -> dimensions.padding.extraLarge
     }
 
 private inline val endPaddingDefault
     @Composable
     get() = when (LocalConfiguration.current.orientation) {
-        Configuration.ORIENTATION_LANDSCAPE -> 40.dp
-        else -> 8.dp
-    }
-
-private inline val topPaddingRequired
-    @Composable
-    get() = when (LocalConfiguration.current.orientation) {
-        Configuration.ORIENTATION_LANDSCAPE -> 16.dp
-        else -> 48.dp
-    }
-
-private inline val startPaddingRequired
-    @Composable
-    get() = when (LocalConfiguration.current.orientation) {
-        Configuration.ORIENTATION_LANDSCAPE -> 28.dp
-        else -> 0.dp
-    }
-
-private inline val endPaddingRequired
-    @Composable
-    get() = when (LocalConfiguration.current.orientation) {
-        Configuration.ORIENTATION_LANDSCAPE -> 40.dp
-        else -> 0.dp
+        Configuration.ORIENTATION_LANDSCAPE -> dimensions.padding.extraLarge
+        else -> dimensions.padding.small
     }

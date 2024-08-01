@@ -6,7 +6,7 @@ import com.paranid5.crescendo.core.common.AudioStatus
 import com.paranid5.crescendo.core.resources.R
 import com.paranid5.crescendo.domain.playback.PlaybackRepository
 import com.paranid5.crescendo.domain.playback.PlaybackRepository.Companion.UNDEFINED_AUDIO_SESSION_ID
-import com.paranid5.crescendo.navigation.NavHostController
+import com.paranid5.crescendo.navigation.Navigator
 import com.paranid5.crescendo.navigation.Screens
 import com.paranid5.crescendo.system.services.stream.StreamServiceAccessor
 import com.paranid5.crescendo.system.services.stream.sendPauseBroadcast
@@ -45,7 +45,7 @@ class PlayingInteractor(
         trackAction = trackServiceInteractor::startStreamingOrSendResumeBroadcast
     )
 
-    internal fun navigateToAudioEffects(context: Context, navHostController: NavHostController) {
+    internal fun navigateToAudioEffects(context: Context, navigator: Navigator) {
         when (playbackRepository.audioSessionIdState.value) {
             UNDEFINED_AUDIO_SESSION_ID -> Toast.makeText(
                 context,
@@ -53,7 +53,7 @@ class PlayingInteractor(
                 Toast.LENGTH_LONG
             ).show()
 
-            else -> navHostController.navigateIfNotSame(Screens.Audio.AudioEffects)
+            else -> navigator.navigateIfNotSame(Screens.Audio.AudioEffects)
         }
     }
 }

@@ -10,19 +10,22 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.unit.dp
 import androidx.palette.graphics.Palette
 import com.paranid5.crescendo.core.resources.R
-import com.paranid5.crescendo.navigation.LocalNavController
+import com.paranid5.crescendo.navigation.LocalNavigator
 import com.paranid5.crescendo.playing.domain.PlayingInteractor
 import com.paranid5.crescendo.ui.composition_locals.playing.LocalPlayingSheetState
 import com.paranid5.crescendo.utils.extensions.getBrightDominantOrPrimary
 import com.paranid5.crescendo.utils.extensions.simpleShadow
 import kotlinx.coroutines.launch
 import org.koin.compose.koinInject
+
+private val EqualizerIconSize = 32.dp
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
@@ -32,7 +35,7 @@ internal fun EqualizerButton(
     interactor: PlayingInteractor = koinInject()
 ) {
     val context = LocalContext.current
-    val navHostController = LocalNavController.current
+    val navigator = LocalNavigator.current
     val playingSheetState = LocalPlayingSheetState.current
 
     val paletteColor = palette.getBrightDominantOrPrimary()
@@ -44,13 +47,13 @@ internal fun EqualizerButton(
                 .simpleShadow(color = paletteColor)
                 .align(Alignment.Center),
             onClick = {
-                interactor.navigateToAudioEffects(context, navHostController)
+                interactor.navigateToAudioEffects(context, navigator)
                 scope.launch { playingSheetState?.bottomSheetState?.collapse() }
             }
         ) {
             EqualizerIcon(
                 paletteColor = paletteColor,
-                modifier = Modifier.size(32.dp)
+                modifier = Modifier.size(EqualizerIconSize),
             )
         }
     }
@@ -60,7 +63,7 @@ internal fun EqualizerButton(
 private fun EqualizerIcon(paletteColor: Color, modifier: Modifier = Modifier) =
     Icon(
         modifier = modifier,
-        painter = painterResource(R.drawable.equalizer),
+        imageVector = ImageVector.vectorResource(R.drawable.equalizer),
         contentDescription = stringResource(R.string.equalizer),
-        tint = paletteColor
+        tint = paletteColor,
     )

@@ -1,77 +1,45 @@
 package com.paranid5.crescendo.presentation.main.appbar
 
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.sizeIn
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.State
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.painter.Painter
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.unit.dp
 import com.paranid5.crescendo.core.resources.ui.theme.AppTheme.colors
+import com.paranid5.crescendo.core.resources.ui.theme.AppTheme.dimensions
+import com.paranid5.crescendo.core.resources.ui.theme.AppTheme.typography
+import com.paranid5.crescendo.navigation.LocalNavigator
 import com.paranid5.crescendo.navigation.Screens
 import com.paranid5.crescendo.ui.composition_locals.LocalCurrentPlaylistSheetState
-import com.paranid5.crescendo.navigation.LocalNavController
 import com.paranid5.crescendo.ui.composition_locals.playing.LocalPlayingSheetState
+import com.paranid5.crescendo.ui.utils.clickableWithRipple
+import com.paranid5.crescendo.utils.extensions.collectLatestAsState
 
-@Composable
-fun AppBarItem(
-    title: String,
-    image: ImageVector,
-    screen: Screens,
-    modifier: Modifier = Modifier,
-) = AppBarItemInternal(
-    screen = screen,
-    modifier = modifier,
-    icon = { AppBarIcon(title, image) }
-)
-
-@Composable
-fun AppBarItem(
-    title: String,
-    image: Painter,
-    screen: Screens,
-    modifier: Modifier = Modifier,
-) = AppBarItemInternal(
-    screen = screen,
-    modifier = modifier,
-    icon = { AppBarIcon(title, image) }
-)
-
-@Composable
-private fun AppBarIcon(
-    title: String,
-    image: ImageVector,
-    modifier: Modifier = Modifier
-) = Icon(
-    imageVector = image,
-    contentDescription = title,
-    tint = colors.background.alternative,
-    modifier = modifier
-)
-
-@Composable
-private fun AppBarIcon(
-    title: String,
-    image: Painter,
-    modifier: Modifier = Modifier
-) = Icon(
-    painter = image,
-    contentDescription = title,
-    tint = colors.background.alternative,
-    modifier = modifier
-)
+private val IconSize = 24.dp
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
-private fun AppBarItemInternal(
+fun AppBarItem(
+    title: String,
+    icon: ImageVector,
     screen: Screens,
-    icon: @Composable () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    val navHostController = LocalNavController.current
+    val navigator = LocalNavigator.current
     val playingSheetState = LocalPlayingSheetState.current
     val curPlaylistSheetState = LocalCurrentPlaylistSheetState.current
 
@@ -82,9 +50,49 @@ private fun AppBarItemInternal(
         }
     }
 
-    IconButton(
-        modifier = modifier,
-        enabled = isEnabled,
-        onClick = { navHostController.navigateIfNotSame(screen) }
-    ) { icon() }
+    val currentScreen by navigator.currentScreenState.collectLatestAsState()
+
+    val isScreenCurrent by remember(currentScreen, screen) {
+        derivedStateOf { currentScreen == screen }
+    }
+
+    val itemColor by rememberItemColor(isScreenCurrent = isScreenCurrent)
+
+    Box(
+        modifier = modifier.clickableWithRipple(enabled = isEnabled) {
+            navigator.navigateIfNotSame(screen)
+        }
+    ) {
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
+            modifier = Modifier.align(Alignment.Center),
+        ) {
+            Icon(
+                imageVector = icon,
+                contentDescription = title,
+                tint = itemColor,
+                modifier = modifier.align(Alignment.CenterHorizontally),
+            )
+
+            Text(
+                text = title,
+                style = typography.regular,
+                color = itemColor,
+            )
+        }
+    }
+}
+
+@Composable
+private fun rememberItemColor(isScreenCurrent: Boolean): State<Color> {
+    val appColors = colors
+
+    return remember(isScreenCurrent, appColors) {
+        derivedStateOf {
+            when {
+                isScreenCurrent -> appColors.secondary
+                else -> appColors.background.alternative
+            }
+        }
+    }
 }
