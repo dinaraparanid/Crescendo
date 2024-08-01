@@ -5,6 +5,7 @@ import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -17,6 +18,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.unit.dp
@@ -67,7 +69,7 @@ fun PlayingBottomSheet(
                 topEnd = dimensions.corners.extraMedium,
             )
         ) {
-            Box {
+            Box(Modifier.fillMaxWidth()) {
                 HorizontalPager(state = playingPagerState!!) { page ->
                     when (page) {
                         0 -> PlayingScreen(
@@ -87,8 +89,15 @@ fun PlayingBottomSheet(
                 if (!isBarNotVisible)
                     AppBar(
                         Modifier
+                            .fillMaxWidth()
                             .align(Alignment.TopCenter)
                             .alpha(alpha)
+                            .clip(
+                                RoundedCornerShape(
+                                    topStart = dimensions.corners.extraMedium,
+                                    topEnd = dimensions.corners.extraMedium,
+                                )
+                            )
                     )
 
                 PushUpButton(
@@ -161,6 +170,6 @@ private fun contentTopPadding(sheetState: ModalBottomSheetState) =
 private inline val pushUpPadding
     @Composable
     get() = when (LocalConfiguration.current.orientation) {
-        Configuration.ORIENTATION_LANDSCAPE -> dimensions.padding.small
-        else -> dimensions.padding.medium
+        Configuration.ORIENTATION_LANDSCAPE -> dimensions.padding.extraSmall
+        else -> dimensions.padding.small
     }

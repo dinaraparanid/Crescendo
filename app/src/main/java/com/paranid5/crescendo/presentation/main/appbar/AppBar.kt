@@ -1,14 +1,12 @@
 package com.paranid5.crescendo.presentation.main.appbar
 
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.BottomAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
@@ -20,19 +18,12 @@ import com.paranid5.crescendo.navigation.Screens
 @Composable
 fun AppBar(modifier: Modifier = Modifier) =
     BottomAppBar(
+        modifier = modifier,
         containerColor = colors.primary,
-        modifier = modifier
-            .fillMaxWidth()
-            .clip(
-                RoundedCornerShape(
-                    topStart = dimensions.corners.extraMedium,
-                    topEnd = dimensions.corners.extraMedium,
-                )
-            )
+        contentPadding = PaddingValues(vertical = dimensions.padding.extraSmall),
+        windowInsets = WindowInsets(bottom = dimensions.padding.large),
     ) {
-        val itemModifier = Modifier
-            .weight(1F)
-            .padding(vertical = dimensions.padding.extraSmall)
+        val itemModifier = Modifier.weight(1F)
 
         AppBarItem(
             title = stringResource(R.string.tracks),
