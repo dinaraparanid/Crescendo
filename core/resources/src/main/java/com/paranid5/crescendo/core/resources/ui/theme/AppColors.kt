@@ -5,15 +5,16 @@ import androidx.compose.material3.darkColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.compositionLocalOf
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import com.paranid5.crescendo.core.resources.ui.Background
 import com.paranid5.crescendo.core.resources.ui.BackgroundAlternative
 import com.paranid5.crescendo.core.resources.ui.Disabled
 import com.paranid5.crescendo.core.resources.ui.Error
+import com.paranid5.crescendo.core.resources.ui.NotSelected
 import com.paranid5.crescendo.core.resources.ui.Primary
-import com.paranid5.crescendo.core.resources.ui.Secondary
-import com.paranid5.crescendo.core.resources.ui.SecondaryAlternative
+import com.paranid5.crescendo.core.resources.ui.Selected
 import com.paranid5.crescendo.core.resources.ui.TransparentUtility
 import com.paranid5.crescendo.core.resources.ui.resetContrast
 
@@ -25,6 +26,7 @@ data class AppColors(
     val error: Color,
     val disabled: Color,
     val background: AppBackgroundColors,
+    val selection: AppSelectionColors,
     val text: AppTextColors,
     val button: AppButtonColors,
     val utils: AppUtilsColors,
@@ -32,8 +34,8 @@ data class AppColors(
     companion object {
         private val LightColorScheme = lightColorScheme(
             primary = Primary,
-            secondary = Secondary,
-            onSecondary = SecondaryAlternative,
+            secondary = Selected,
+            onSecondary = NotSelected,
             background = Background,
             onBackground = BackgroundAlternative,
             inverseSurface = Color.White,
@@ -41,8 +43,8 @@ data class AppColors(
 
         private val DarkColorScheme = darkColorScheme(
             primary = Primary,
-            secondary = SecondaryAlternative,
-            onSecondary = Secondary,
+            secondary = NotSelected,
+            onSecondary = Selected,
             background = BackgroundAlternative,
             onBackground = Background,
             inverseSurface = Color.White,
@@ -52,10 +54,11 @@ data class AppColors(
             ThemeColors.Dark -> AppColors(
                 colorScheme = DarkColorScheme,
                 primary = Primary,
-                secondary = SecondaryAlternative,
+                secondary = Selected,
                 error = Error,
                 disabled = Disabled,
                 background = AppBackgroundColors.dark,
+                selection = AppSelectionColors.default,
                 text = AppTextColors.default,
                 button = AppButtonColors.default,
                 utils = AppUtilsColors.default,
@@ -64,10 +67,11 @@ data class AppColors(
             ThemeColors.Light -> AppColors(
                 colorScheme = LightColorScheme,
                 primary = Primary,
-                secondary = Secondary,
+                secondary = NotSelected,
                 error = Error,
                 disabled = Disabled,
                 background = AppBackgroundColors.light,
+                selection = AppSelectionColors.default,
                 text = AppTextColors.default,
                 button = AppButtonColors.default,
                 utils = AppUtilsColors.default,
@@ -84,11 +88,16 @@ data class AppBackgroundColors(
     val itemGradient: Brush,
 ) {
     companion object {
-        internal val light = AppBackgroundColors(
+        private val BackgroundGradientStart = Offset(x = 0F, y = Float.POSITIVE_INFINITY)
+        private val BackgroundGradientEnd = Offset(x = Float.POSITIVE_INFINITY, y = 0F)
+
+        internal val dark = AppBackgroundColors(
             primary = Background,
             alternative = BackgroundAlternative,
             gradient = Brush.linearGradient(
-                listOf(Background, BackgroundAlternative.resetContrast(ratio = 1.25F))
+                colors = listOf(Background, BackgroundAlternative),
+                start = BackgroundGradientStart,
+                end = BackgroundGradientEnd,
             ),
             itemGradient = Brush.linearGradient(
                 listOf(
@@ -98,11 +107,13 @@ data class AppBackgroundColors(
             )
         )
 
-        internal val dark = AppBackgroundColors(
+        internal val light = AppBackgroundColors(
             primary = BackgroundAlternative,
             alternative = Background,
             gradient = Brush.linearGradient(
-                listOf(BackgroundAlternative, Background.resetContrast(ratio = 0.75F))
+                colors = listOf(BackgroundAlternative, Background),
+                start = BackgroundGradientStart,
+                end = BackgroundGradientEnd,
             ),
             itemGradient = Brush.linearGradient(
                 listOf(
@@ -110,6 +121,19 @@ data class AppBackgroundColors(
                     BackgroundAlternative.resetContrast(ratio = 0.5F).copy(alpha = 0.5F),
                 )
             )
+        )
+    }
+}
+
+@Immutable
+data class AppSelectionColors(
+    val selected: Color,
+    val notSelected: Color,
+) {
+    companion object {
+        internal val default = AppSelectionColors(
+            selected = Selected,
+            notSelected = NotSelected,
         )
     }
 }

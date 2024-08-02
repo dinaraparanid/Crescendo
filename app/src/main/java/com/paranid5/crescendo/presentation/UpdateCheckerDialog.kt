@@ -1,5 +1,6 @@
 package com.paranid5.crescendo.presentation
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -9,17 +10,14 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.BasicAlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import com.paranid5.crescendo.view_model.MainState
-import com.paranid5.crescendo.view_model.MainUiIntent
 import com.paranid5.crescendo.core.resources.R
 import com.paranid5.crescendo.core.resources.ui.theme.AppTheme.colors
 import com.paranid5.crescendo.core.resources.ui.theme.AppTheme.dimensions
@@ -27,6 +25,8 @@ import com.paranid5.crescendo.core.resources.ui.theme.AppTheme.typography
 import com.paranid5.crescendo.presentation.entity.ReleaseUiState
 import com.paranid5.crescendo.ui.foundation.getOrNull
 import com.paranid5.crescendo.utils.extensions.simpleShadow
+import com.paranid5.crescendo.view_model.MainState
+import com.paranid5.crescendo.view_model.MainUiIntent
 import dev.jeziellago.compose.markdowntext.MarkdownText
 
 private val TitleShadow = 25.dp
@@ -40,18 +40,19 @@ fun UpdateCheckerDialog(
 ) {
     if (state.isUpdateDialogShown)
         state.releaseState.getOrNull()?.let { release ->
-            BasicAlertDialog(onDismissRequest = { onUiIntent(MainUiIntent.DismissVersionDialog) }) {
-                Card(
-                    shape = RoundedCornerShape(dimensions.corners.medium),
-                    colors = CardDefaults.cardColors(containerColor = colors.background.primary),
-                    modifier = modifier.fillMaxWidth(),
-                ) {
-                    UpdateCheckerDialogContent(
-                        newVersion = release,
-                        onUiIntent = onUiIntent,
-                        modifier = Modifier.padding(dimensions.padding.medium),
-                    )
-                }
+            BasicAlertDialog(
+                modifier = modifier,
+                onDismissRequest = { onUiIntent(MainUiIntent.DismissVersionDialog) },
+            ) {
+                UpdateCheckerDialogContent(
+                    newVersion = release,
+                    onUiIntent = onUiIntent,
+                    modifier = modifier
+                        .fillMaxWidth()
+                        .padding(dimensions.padding.medium)
+                        .clip(RoundedCornerShape(dimensions.corners.medium))
+                        .background(brush = colors.background.gradient),
+                )
             }
         }
 }

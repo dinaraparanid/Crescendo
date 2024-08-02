@@ -8,6 +8,6 @@ import androidx.compose.ui.unit.dp
 val appBarHeight
     @Composable
     get() = when (LocalConfiguration.current.orientation) {
-        Configuration.ORIENTATION_LANDSCAPE -> 80.dp
-        else -> 110.dp
+        Configuration.ORIENTATION_LANDSCAPE -> 90.dp
+        else -> 120.dp
     }

@@ -100,4 +100,9 @@
     <string name="zoom_out">Zoom Out</string>
     <string name="playlist_empty_err">Playlist is empty</string>
     <string name="converting">Converting</string>
+
+    <!-- App Bar -->
+    <string name="appbar_play">Play</string>
+    <string name="appbar_stream">Stream</string>
+    <string name="appbar_preferences">Preferences</string>
 </resources>

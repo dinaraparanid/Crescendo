@@ -21,7 +21,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import com.paranid5.crescendo.view_model.MainViewModel
 import com.paranid5.crescendo.core.resources.ui.theme.AppTheme.colors
 import com.paranid5.crescendo.presentation.UpdateCheckerDialog
 import com.paranid5.crescendo.ui.appbar.appBarHeight
@@ -30,6 +29,9 @@ import com.paranid5.crescendo.ui.composition_locals.playing.LocalPlayingPagerSta
 import com.paranid5.crescendo.ui.composition_locals.playing.LocalPlayingSheetState
 import com.paranid5.crescendo.ui.permissions.requests.externalStoragePermissionsRequestLauncher
 import com.paranid5.crescendo.utils.extensions.collectLatestAsState
+import com.paranid5.crescendo.view_model.MainViewModel
+
+private const val PLAYING_PAGER_SCREENS_AMOUNT = 2
 
 @Composable
 fun App(
@@ -47,13 +49,14 @@ fun App(
             modifier = Modifier.align(Alignment.Center),
         )
 
-        val (areStoragePermissionsGranted, launchStoragePermissions) = externalStoragePermissionsRequestLauncher(
-            isExternalStoragePermissionDialogShownState,
-            modifier = Modifier.align(Alignment.Center)
-        )
+        val (areStoragePermissionsGranted, launchStoragePermissions) =
+            externalStoragePermissionsRequestLauncher(
+                isExternalStoragePermissionDialogShownState,
+                modifier = Modifier.align(Alignment.Center),
+            )
 
-        LaunchedEffect(Unit) {
-            if (!areStoragePermissionsGranted)
+        LaunchedEffect(areStoragePermissionsGranted) {
+            if (areStoragePermissionsGranted.not())
                 launchStoragePermissions()
         }
 
@@ -70,14 +73,14 @@ private fun ScreenScaffold(modifier: Modifier = Modifier) {
         initialValue = ModalBottomSheetValue.Hidden,
     )
 
-    val playingPagerState = rememberPagerState { 2 }
+    val playingPagerState = rememberPagerState { PLAYING_PAGER_SCREENS_AMOUNT }
 
     val alpha = bottomSheetPushAlpha(playingScaffoldState)
 
     CompositionLocalProvider(
         LocalPlayingSheetState provides playingScaffoldState,
         LocalCurrentPlaylistSheetState provides curPlaylistScaffoldState,
-        LocalPlayingPagerState provides playingPagerState
+        LocalPlayingPagerState provides playingPagerState,
     ) {
         BottomSheetScaffold(
             modifier = modifier.background(colors.background.gradient),

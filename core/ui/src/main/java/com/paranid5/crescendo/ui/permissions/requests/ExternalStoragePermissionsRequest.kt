@@ -12,18 +12,14 @@ import java.util.Queue
 @Composable
 fun externalStoragePermissionsRequestLauncher(
     isExternalStoragePermissionDialogShownState: MutableState<Boolean>,
-    modifier: Modifier = Modifier
-): Pair<Boolean, () -> Unit> {
-    val externalStoragePermissionQueue = koinInject<Queue<String>>(
+    modifier: Modifier = Modifier,
+    externalStoragePermissionQueue: Queue<String> = koinInject(
         named(EXTERNAL_STORAGE_PERMISSION_QUEUE)
-    )
-
-    val externalStorageDescriptionProvider = koinInject<ExternalStorageDescriptionProvider>()
-
-    return permissionsRequestLauncher(
-        modifier = modifier,
-        permissionQueue = externalStoragePermissionQueue,
-        descriptionProvider = externalStorageDescriptionProvider,
-        isPermissionDialogShownState = isExternalStoragePermissionDialogShownState,
-    )
-}
+    ),
+    externalStorageDescriptionProvider: ExternalStorageDescriptionProvider = koinInject(),
+): Pair<Boolean, () -> Unit> = permissionsRequestLauncher(
+    modifier = modifier,
+    permissionQueue = externalStoragePermissionQueue,
+    descriptionProvider = externalStorageDescriptionProvider,
+    isPermissionDialogShownState = isExternalStoragePermissionDialogShownState,
+)

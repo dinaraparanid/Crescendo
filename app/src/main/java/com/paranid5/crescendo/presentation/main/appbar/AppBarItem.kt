@@ -1,12 +1,8 @@
 package com.paranid5.crescendo.presentation.main.appbar
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.sizeIn
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
@@ -19,9 +15,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.unit.dp
 import com.paranid5.crescendo.core.resources.ui.theme.AppTheme.colors
-import com.paranid5.crescendo.core.resources.ui.theme.AppTheme.dimensions
 import com.paranid5.crescendo.core.resources.ui.theme.AppTheme.typography
 import com.paranid5.crescendo.navigation.LocalNavigator
 import com.paranid5.crescendo.navigation.Screens
@@ -29,8 +23,6 @@ import com.paranid5.crescendo.ui.composition_locals.LocalCurrentPlaylistSheetSta
 import com.paranid5.crescendo.ui.composition_locals.playing.LocalPlayingSheetState
 import com.paranid5.crescendo.ui.utils.clickableWithRipple
 import com.paranid5.crescendo.utils.extensions.collectLatestAsState
-
-private val IconSize = 24.dp
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
@@ -72,16 +64,16 @@ fun AppBarItem(
                 imageVector = icon,
                 contentDescription = title,
                 tint = itemColor,
-                modifier = Modifier
-                    .align(Alignment.CenterHorizontally),
+                modifier = Modifier.align(Alignment.CenterHorizontally),
             )
 
-            Spacer(Modifier.height(dimensions.padding.minimum))
+            Spacer(Modifier.weight(1F))
 
             Text(
                 text = title,
                 style = typography.regular,
                 color = itemColor,
+                modifier = Modifier.align(Alignment.CenterHorizontally),
             )
         }
     }
@@ -94,8 +86,8 @@ private fun rememberItemColor(isScreenCurrent: Boolean): State<Color> {
     return remember(isScreenCurrent, appColors) {
         derivedStateOf {
             when {
-                isScreenCurrent -> appColors.secondary
-                else -> appColors.background.alternative
+                isScreenCurrent -> appColors.selection.selected
+                else -> appColors.selection.notSelected
             }
         }
     }

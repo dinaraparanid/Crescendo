@@ -7,7 +7,7 @@ import kotlinx.parcelize.Parcelize
 sealed class Screens(val title: String) : Parcelable {
 
     @Parcelize
-    data object Tracks : Screens("tracks")
+    data object Play : Screens("tracks")
 
     sealed class TrackCollections(title: String) : Screens("track_collections/$title") {
         @Parcelize
@@ -21,7 +21,7 @@ sealed class Screens(val title: String) : Parcelable {
     data object Artists : Screens("artists")
 
     @Parcelize
-    data object StreamFetching : Screens("you_tube_fetching")
+    data object StreamFetching : Screens("stream_fetching")
 
     sealed class Audio(title: String) : Screens("audio/$title") {
         @Parcelize

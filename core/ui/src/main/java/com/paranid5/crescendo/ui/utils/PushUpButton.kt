@@ -13,7 +13,7 @@ import androidx.compose.ui.unit.dp
 import com.paranid5.crescendo.core.resources.ui.theme.AppTheme.colors
 import com.paranid5.crescendo.core.resources.ui.theme.AppTheme.dimensions
 
-private val DefaultPushUpWidth = 35.dp
+private val DefaultPushUpWidth = 44.dp
 private val DefaultPushUpHeight = 4.dp
 
 @Composable

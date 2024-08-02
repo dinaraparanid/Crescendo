@@ -14,6 +14,8 @@ Crescendo provides multiple features to move your music experience to a new leve
 
 ### **Preview**
 
+[*Figma Design Frame*](https://www.figma.com/design/SHLuNtTvCyh6HSVVWxtThS/Crescendo?node-id=0-1&m=dev&t=riock3EVbBVkipzT-1)
+
 **Playback of local tracks**
 
 <p>

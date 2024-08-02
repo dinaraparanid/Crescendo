@@ -56,16 +56,16 @@ fun ContentScreen(padding: PaddingValues) {
 
     NavHost(
         navController = navigator.navHost!!,
-        startDestination = Screens.Tracks.title,
+        startDestination = Screens.Play.title,
         modifier = Modifier.padding(
             top = padding.calculateTopPadding(),
             bottom = padding.calculateBottomPadding(),
             start = padding.calculateStartPadding(layoutDirection),
-            end = padding.calculateEndPadding(layoutDirection)
+            end = padding.calculateEndPadding(layoutDirection),
         )
     ) {
-        composable(route = Screens.Tracks.title) {
-            navigator.updateCurrentScreen(Screens.Tracks)
+        composable(route = Screens.Play.title) {
+            navigator.updateCurrentScreen(Screens.Play)
             TracksScreen(modifier = screenModifier)
         }
 
@@ -161,7 +161,7 @@ private fun Modifier.screenPaddingDefault() =
     this.padding(
         top = topPaddingDefault,
         start = dimensions.padding.small,
-        end = endPaddingDefault
+        end = endPaddingDefault,
     )
 
 private inline val topPaddingDefault

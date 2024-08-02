@@ -8,7 +8,7 @@ import kotlinx.coroutines.flow.update
 
 class Navigator(val navHost: NavHostController? = null) {
     private val _currentScreenState by lazy {
-        MutableStateFlow<Screens>(Screens.Tracks)
+        MutableStateFlow<Screens>(Screens.Play)
     }
 
     val currentScreenState by lazy {

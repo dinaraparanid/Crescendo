@@ -1,11 +1,13 @@
 package com.paranid5.crescendo.presentation.main
 
 import android.content.res.Configuration
+import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -15,6 +17,7 @@ import androidx.compose.material.ModalBottomSheetLayout
 import androidx.compose.material.ModalBottomSheetState
 import androidx.compose.material.ModalBottomSheetValue
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
@@ -28,6 +31,7 @@ import com.paranid5.crescendo.core.resources.ui.theme.AppTheme.dimensions
 import com.paranid5.crescendo.current_playlist.presentation.CurrentPlaylistScreen
 import com.paranid5.crescendo.playing.presentation.PlayingScreen
 import com.paranid5.crescendo.presentation.main.appbar.AppBar
+import com.paranid5.crescendo.ui.appbar.appBarHeight
 import com.paranid5.crescendo.ui.composition_locals.LocalCurrentPlaylistSheetState
 import com.paranid5.crescendo.ui.composition_locals.playing.LocalPlayingPagerState
 import com.paranid5.crescendo.ui.composition_locals.playing.LocalPlayingSheetState
@@ -60,7 +64,7 @@ fun PlayingBottomSheet(
                 CurrentPlaylistBottomSheet(
                     alpha = alpha,
                     state = curPlaylistScaffoldState,
-                    modifier = Modifier.background(colors.background.gradient)
+                    modifier = Modifier.background(colors.background.gradient),
                 )
             },
             sheetBackgroundColor = Color.Transparent,
@@ -86,25 +90,26 @@ fun PlayingBottomSheet(
                     }
                 }
 
-                if (!isBarNotVisible)
+                if (isBarNotVisible.not())
                     AppBar(
                         Modifier
-                            .fillMaxWidth()
-                            .align(Alignment.TopCenter)
-                            .alpha(alpha)
                             .clip(
                                 RoundedCornerShape(
                                     topStart = dimensions.corners.extraMedium,
                                     topEnd = dimensions.corners.extraMedium,
                                 )
                             )
+                            .fillMaxWidth()
+                            .heightIn(min = appBarHeight)
+                            .align(Alignment.TopCenter)
+                            .alpha(alpha),
                     )
 
                 PushUpButton(
                     alpha = alpha,
                     modifier = Modifier
                         .align(Alignment.TopCenter)
-                        .padding(top = pushUpPadding)
+                        .padding(top = pushUpTopPadding),
                 )
             }
         }
@@ -117,24 +122,28 @@ private fun CurrentPlaylistBottomSheet(
     alpha: Float,
     state: ModalBottomSheetState,
     modifier: Modifier = Modifier,
-) = Box(modifier) {
-    PushUpButton(
-        alpha = alpha,
-        modifier = Modifier
-            .padding(top = dimensions.padding.medium)
-            .align(Alignment.TopCenter)
-    )
+) {
+    val contentTopPadding by animateContentTopPaddingAsState(state)
 
-    CurrentPlaylistScreen(
-        Modifier
-            .fillMaxSize()
-            .padding(top = contentTopPadding(state))
-    )
+    Box(modifier) {
+        PushUpButton(
+            alpha = alpha,
+            modifier = Modifier
+                .padding(top = dimensions.padding.medium)
+                .align(Alignment.TopCenter)
+        )
+
+        CurrentPlaylistScreen(
+            Modifier
+                .fillMaxSize()
+                .padding(top = contentTopPadding),
+        )
+    }
 }
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
-private fun contentTopPadding(sheetState: ModalBottomSheetState) =
+private fun animateContentTopPaddingAsState(sheetState: ModalBottomSheetState) = animateDpAsState(
     when (LocalConfiguration.current.orientation) {
         Configuration.ORIENTATION_LANDSCAPE -> dimensions.padding.extraBig
 
@@ -147,8 +156,7 @@ private fun contentTopPadding(sheetState: ModalBottomSheetState) =
                 targetValue == ModalBottomSheetValue.Hidden -> COLLAPSED_PADDING
 
                 currentValue == ModalBottomSheetValue.Hidden &&
-                        targetValue == ModalBottomSheetValue.HalfExpanded ->
-                    EXPANDED_PADDING + COLLAPSED_PADDING
+                        targetValue == ModalBottomSheetValue.HalfExpanded -> COLLAPSED_PADDING
 
                 currentValue == ModalBottomSheetValue.HalfExpanded &&
                         targetValue == ModalBottomSheetValue.HalfExpanded ->
@@ -165,11 +173,12 @@ private fun contentTopPadding(sheetState: ModalBottomSheetState) =
                 else -> progress * EXPANDED_PADDING + COLLAPSED_PADDING
             }.dp
         }
-    }
+    }, label = ""
+)
 
-private inline val pushUpPadding
+private inline val pushUpTopPadding
     @Composable
     get() = when (LocalConfiguration.current.orientation) {
-        Configuration.ORIENTATION_LANDSCAPE -> dimensions.padding.extraSmall
-        else -> dimensions.padding.small
+        Configuration.ORIENTATION_LANDSCAPE -> dimensions.padding.small
+        else -> dimensions.padding.medium
     }
