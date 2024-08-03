@@ -7,7 +7,7 @@
     <color name="teal_700">#FF018786</color>
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
-    <color name="crescendo_primary">#FFBCEDF6</color>
-    <color name="crescendo_background">#FF6B7FD7</color>
+    <color name="crescendo_primary">#FF0E0536</color>
+    <color name="crescendo_background">#FF3546D1</color>
     <color name="splash_background">#FF020203</color>
 </resources>

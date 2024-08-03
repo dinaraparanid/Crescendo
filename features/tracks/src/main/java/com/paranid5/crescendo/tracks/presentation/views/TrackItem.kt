@@ -1,6 +1,5 @@
 package com.paranid5.crescendo.tracks.presentation.views
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -19,6 +18,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
+import com.paranid5.crescendo.core.common.AudioStatus
 import com.paranid5.crescendo.core.common.tracks.Track
 import com.paranid5.crescendo.core.resources.ui.theme.AppTheme.colors
 import com.paranid5.crescendo.core.resources.ui.theme.AppTheme.dimensions
@@ -32,6 +32,7 @@ import com.paranid5.crescendo.ui.track.currentTrackState
 import com.paranid5.crescendo.ui.track.item.TrackCover
 import com.paranid5.crescendo.ui.track.item.TrackInfo
 import com.paranid5.crescendo.ui.track.item.TrackPropertiesButton
+import com.paranid5.crescendo.ui.track.ui_state.TrackUiState
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.coroutines.launch
 import org.koin.compose.koinInject
@@ -40,27 +41,30 @@ private val TrackCoverSize = 64.dp
 
 @Composable
 internal fun TrackItem(
-    tracks: ImmutableList<Track>,
+    tracks: ImmutableList<TrackUiState>,
     trackInd: Int,
     modifier: Modifier = Modifier,
-    onClick: () -> Unit
+    onClick: () -> Unit,
 ) {
-    val track = tracks.getOrNull(trackInd)
+    val track by remember(tracks, trackInd) {
+        derivedStateOf { tracks.getOrNull(trackInd) }
+    }
 
-    if (track != null)
+    track?.let {
         Box(modifier) {
             TrackItemContent(
-                track = track,
+                track = it,
                 onClick = onClick,
                 permissionModifier = Modifier.align(Alignment.Center),
             )
         }
+    }
 }
 
 @Composable
 internal fun <VM> TrackItem(
     viewModel: VM,
-    tracks: ImmutableList<Track>,
+    tracks: ImmutableList<TrackUiState>,
     trackInd: Int,
     modifier: Modifier = Modifier,
     trackServiceInteractor: TrackServiceInteractor = koinInject(),
@@ -76,11 +80,13 @@ internal fun <VM> TrackItem(
         modifier = modifier,
         onClick = {
             coroutineScope.launch {
+                viewModel.updateAudioStatus(AudioStatus.PLAYING)
+                viewModel.updateCurrentPlaylist(tracks)
+                viewModel.updateCurrentTrackIndex(trackInd)
+
                 trackServiceInteractor.startPlaylistPlayback(
-                    newTracks = tracks,
-                    newTrackIndex = trackInd,
-                    currentTrack = currentTrack,
-                    source = viewModel,
+                    nextTrack = tracks.getOrNull(trackInd),
+                    prevTrack = currentTrack,
                 )
             }
         }
@@ -88,22 +94,22 @@ internal fun <VM> TrackItem(
 }
 
 @Composable
-private inline fun TrackItemContent(
-    track: Track,
+private fun TrackItemContent(
+    track: TrackUiState,
     modifier: Modifier = Modifier,
     permissionModifier: Modifier = Modifier,
-    crossinline onClick: () -> Unit
+    onClick: () -> Unit
 ) {
-    val textColor by rememberTextColor(track)
+    val isTrackCurrent by rememberIsTrackCurrent(track = track)
+    val textColor by rememberTrackTextColor(isTrackCurrent = isTrackCurrent)
 
     Row(
         modifier
             .clip(RoundedCornerShape(size = dimensions.padding.extraMedium))
-            .background(brush = colors.background.itemGradient)
             .clickableTrackWithPermissions(
                 onClick = onClick,
                 permissionModifier = permissionModifier,
-            )
+            ),
     ) {
         TrackCover(
             trackPath = track.path,
@@ -115,7 +121,7 @@ private inline fun TrackItemContent(
                 )
                 .size(TrackCoverSize)
                 .align(Alignment.CenterVertically)
-                .clip(RoundedCornerShape(dimensions.padding.small))
+                .clip(RoundedCornerShape(dimensions.padding.small)),
         )
 
         Spacer(Modifier.width(dimensions.padding.small))
@@ -126,7 +132,7 @@ private inline fun TrackItemContent(
             modifier = Modifier
                 .weight(1F)
                 .padding(start = dimensions.padding.small)
-                .align(Alignment.CenterVertically)
+                .align(Alignment.CenterVertically),
         )
 
         Spacer(Modifier.width(dimensions.padding.small))
@@ -140,12 +146,27 @@ private inline fun TrackItemContent(
 }
 
 @Composable
-private fun rememberTextColor(track: Track): State<Color> {
-    val colors = colors
-    val isTrackCurrent by rememberIsTrackCurrent(track)
+fun rememberTrackBackgroundColor(isTrackCurrent: Boolean): State<Color> {
+    val appColors = colors
 
-    return remember(isTrackCurrent, colors) {
-        derivedStateOf { if (isTrackCurrent) colors.primary else colors.text.primary }
+    return remember(isTrackCurrent, appColors) {
+        derivedStateOf {
+            when {
+                isTrackCurrent -> appColors.selection.selected.copy(alpha = 0.25F)
+                else -> Color.Transparent
+            }
+        }
+    }
+}
+
+@Composable
+fun rememberTrackTextColor(isTrackCurrent: Boolean): State<Color> {
+    val appColors = colors
+
+    return remember(isTrackCurrent, appColors) {
+        derivedStateOf {
+            if (isTrackCurrent) appColors.selection.selected else appColors.text.primary
+        }
     }
 }
 

@@ -37,12 +37,14 @@ import com.paranid5.crescendo.ui.composition_locals.playing.LocalPlayingPagerSta
 import com.paranid5.crescendo.ui.composition_locals.playing.LocalPlayingSheetState
 import com.paranid5.crescendo.ui.utils.PushUpButton
 
-private const val COLLAPSED_PADDING = 8F
-private const val EXPANDED_PADDING = 24F
+private const val ContentCollapsedPadding = 8F
+private const val ContentExpandedPadding = 24F
+private const val PushUpCollapsedPadding = 12F
+private const val PushUpExpandedPadding = 32F
 
 @OptIn(ExperimentalMaterialApi::class, ExperimentalFoundationApi::class)
 @Composable
-fun PlayingBottomSheet(
+internal fun PlayingBottomSheet(
     alpha: Float,
     modifier: Modifier = Modifier,
 ) {
@@ -123,13 +125,14 @@ private fun CurrentPlaylistBottomSheet(
     state: ModalBottomSheetState,
     modifier: Modifier = Modifier,
 ) {
+    val pushUpTopPadding by animatePushUpTopPaddingAsState(state)
     val contentTopPadding by animateContentTopPaddingAsState(state)
 
     Box(modifier) {
         PushUpButton(
             alpha = alpha,
             modifier = Modifier
-                .padding(top = dimensions.padding.medium)
+                .padding(top = pushUpTopPadding)
                 .align(Alignment.TopCenter)
         )
 
@@ -153,24 +156,61 @@ private fun animateContentTopPaddingAsState(sheetState: ModalBottomSheetState) =
             val currentValue = sheetState.currentValue
 
             when {
-                targetValue == ModalBottomSheetValue.Hidden -> COLLAPSED_PADDING
+                targetValue == ModalBottomSheetValue.Hidden -> ContentCollapsedPadding
 
                 currentValue == ModalBottomSheetValue.Hidden &&
-                        targetValue == ModalBottomSheetValue.HalfExpanded -> COLLAPSED_PADDING
+                        targetValue == ModalBottomSheetValue.HalfExpanded ->
+                    ContentCollapsedPadding
 
                 currentValue == ModalBottomSheetValue.HalfExpanded &&
                         targetValue == ModalBottomSheetValue.HalfExpanded ->
-                    COLLAPSED_PADDING
+                    ContentCollapsedPadding
 
                 currentValue == ModalBottomSheetValue.Expanded &&
                         targetValue == ModalBottomSheetValue.Expanded ->
-                    EXPANDED_PADDING + COLLAPSED_PADDING
+                    ContentExpandedPadding + ContentCollapsedPadding
 
                 currentValue == ModalBottomSheetValue.Expanded &&
                         targetValue == ModalBottomSheetValue.HalfExpanded ->
-                    (1 - progress) * EXPANDED_PADDING + COLLAPSED_PADDING
+                    (1 - progress) * ContentExpandedPadding + ContentCollapsedPadding
 
-                else -> progress * EXPANDED_PADDING + COLLAPSED_PADDING
+                else -> progress * ContentExpandedPadding + ContentCollapsedPadding
+            }.dp
+        }
+    }, label = ""
+)
+
+@OptIn(ExperimentalMaterialApi::class)
+@Composable
+private fun animatePushUpTopPaddingAsState(sheetState: ModalBottomSheetState) = animateDpAsState(
+    when (LocalConfiguration.current.orientation) {
+        Configuration.ORIENTATION_LANDSCAPE -> dimensions.padding.medium
+
+        else -> {
+            val progress = sheetState.progress
+            val targetValue = sheetState.targetValue
+            val currentValue = sheetState.currentValue
+
+            when {
+                targetValue == ModalBottomSheetValue.Hidden -> PushUpCollapsedPadding
+
+                currentValue == ModalBottomSheetValue.Hidden &&
+                        targetValue == ModalBottomSheetValue.HalfExpanded ->
+                    PushUpCollapsedPadding
+
+                currentValue == ModalBottomSheetValue.HalfExpanded &&
+                        targetValue == ModalBottomSheetValue.HalfExpanded ->
+                    PushUpCollapsedPadding
+
+                currentValue == ModalBottomSheetValue.Expanded &&
+                        targetValue == ModalBottomSheetValue.Expanded ->
+                    PushUpExpandedPadding + PushUpCollapsedPadding
+
+                currentValue == ModalBottomSheetValue.Expanded &&
+                        targetValue == ModalBottomSheetValue.HalfExpanded ->
+                    (1 - progress) * PushUpExpandedPadding + PushUpCollapsedPadding
+
+                else -> progress * PushUpExpandedPadding + PushUpCollapsedPadding
             }.dp
         }
     }, label = ""

@@ -11,14 +11,15 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.res.vectorResource
 import com.paranid5.crescendo.core.resources.R
-import com.paranid5.crescendo.core.common.tracks.Track
+import com.paranid5.crescendo.ui.track.ui_state.TrackUiState
 
 @Composable
 fun TrackPropertiesButton(
-    track: Track,
+    track: TrackUiState,
     tint: Color,
     modifier: Modifier = Modifier,
     buttonModifier: Modifier = Modifier,
@@ -64,7 +65,7 @@ private fun TrackPropertiesButtonImpl(
 private fun PropertiesIcon(tint: Color, modifier: Modifier = Modifier) =
     Icon(
         modifier = modifier,
-        painter = painterResource(R.drawable.kebab_menu),
+        imageVector = ImageVector.vectorResource(R.drawable.ic_kebab_menu),
         contentDescription = stringResource(R.string.settings),
-        tint = tint
+        tint = tint,
     )

@@ -16,5 +16,5 @@ inline val CurrentPlaylistSubscriber.currentPlaylistSizeFlow
 inline val CurrentPlaylistSubscriber.currentPlaylistDurationMillisFlow
     get() = currentPlaylistFlow.map { it.totalDurationMillis }
 
-inline val CurrentPlaylistSubscriber.currentPlaylistDurationStrFlow
+inline val CurrentPlaylistSubscriber.currentPlaylistDurationFormattedFlow
     get() = currentPlaylistDurationMillisFlow.map { it.timeString }

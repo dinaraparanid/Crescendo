@@ -3,7 +3,7 @@ package com.paranid5.crescendo.ui.track.item
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.unit.sp
+import com.paranid5.crescendo.core.resources.ui.theme.AppTheme.typography
 
 @Composable
 fun TrackTitle(
@@ -14,5 +14,5 @@ fun TrackTitle(
     modifier = modifier,
     text = trackTitle,
     textColor = textColor,
-    fontSize = 20.sp,
+    style = typography.h.h3,
 )

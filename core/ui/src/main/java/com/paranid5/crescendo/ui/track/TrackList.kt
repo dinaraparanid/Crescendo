@@ -10,42 +10,35 @@ import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.Dp
-import androidx.compose.ui.unit.dp
-import com.paranid5.crescendo.core.common.tracks.Track
 import com.paranid5.crescendo.core.resources.ui.theme.AppTheme.dimensions
+import com.paranid5.crescendo.ui.track.ui_state.TrackUiState
 import kotlinx.collections.immutable.ImmutableList
 
-typealias TrackItemView = @Composable (
-    tracks: ImmutableList<Track>,
+typealias TrackItemContent = @Composable (
+    tracks: ImmutableList<TrackUiState>,
     trackInd: Int,
     modifier: Modifier
 ) -> Unit
 
 @Composable
 fun TrackList(
-    tracks: ImmutableList<Track>,
+    tracks: ImmutableList<TrackUiState>,
     scrollingState: LazyListState,
     modifier: Modifier = Modifier,
     trackItemModifier: Modifier = Modifier,
-    trackItemView: TrackItemView,
-    bottomPadding: Dp = 16.dp
+    bottomPadding: Dp = dimensions.padding.extraMedium,
+    trackItemContent: TrackItemContent,
+) = LazyColumn(
+    verticalArrangement = Arrangement.spacedBy(dimensions.padding.medium),
+    state = scrollingState,
+    modifier = modifier,
 ) {
-    LazyColumn(
-        verticalArrangement = Arrangement.spacedBy(dimensions.padding.medium),
-        state = scrollingState,
-        modifier = modifier
-    ) {
-        itemsIndexed(
-            items = tracks,
-            key = { ind, track -> "${track.hashCode()}$ind" }
-        ) { ind, _ ->
-            trackItemView(
-                tracks,
-                ind,
-                trackItemModifier.fillMaxWidth()
-            )
-        }
-
-        item { Spacer(Modifier.height(bottomPadding)) }
+    itemsIndexed(
+        items = tracks,
+        key = { ind, track -> "${track.hashCode()}$ind" }
+    ) { ind, _ ->
+        trackItemContent(tracks, ind, trackItemModifier.fillMaxWidth())
     }
+
+    item { Spacer(Modifier.height(bottomPadding)) }
 }

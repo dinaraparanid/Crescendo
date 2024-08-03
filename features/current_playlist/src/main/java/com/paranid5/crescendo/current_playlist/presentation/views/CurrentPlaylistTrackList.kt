@@ -2,50 +2,45 @@ package com.paranid5.crescendo.current_playlist.presentation.views
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.unit.dp
-import com.paranid5.crescendo.current_playlist.presentation.CurrentPlaylistViewModel
-import com.paranid5.crescendo.current_playlist.domain.tryDismissTrack
-import com.paranid5.crescendo.current_playlist.domain.updateCurrentPlaylistAfterDrag
-import com.paranid5.crescendo.current_playlist.presentation.properties.compose.collectCurrentPlaylistAsState
-import com.paranid5.crescendo.current_playlist.presentation.properties.compose.collectCurrentTrackIndexAsState
-import com.paranid5.crescendo.system.services.track.TrackServiceInteractor
-import kotlinx.collections.immutable.toImmutableList
-import org.koin.androidx.compose.koinViewModel
-import org.koin.compose.koinInject
+import com.paranid5.crescendo.core.resources.ui.theme.AppTheme.dimensions
+import com.paranid5.crescendo.current_playlist.presentation.view_model.CurrentPlaylistState
+import com.paranid5.crescendo.current_playlist.presentation.view_model.CurrentPlaylistUiIntent
 
 @Composable
 internal fun CurrentPlaylistTrackList(
+    state: CurrentPlaylistState,
+    onUiIntent: (CurrentPlaylistUiIntent) -> Unit,
     modifier: Modifier = Modifier,
-    viewModel: CurrentPlaylistViewModel = koinViewModel(),
-    trackServiceInteractor: TrackServiceInteractor = koinInject(),
 ) {
-    val currentPlaylistRaw by viewModel.collectCurrentPlaylistAsState()
-    val currentTrackIndex by viewModel.collectCurrentTrackIndexAsState()
-    val currentPlaylist = remember(currentPlaylistRaw) { currentPlaylistRaw.toImmutableList() }
+    val (playlistState, _) = state
+    val currentTrackIndex by rememberUpdatedState(playlistState.currentTrackIndex)
 
     DraggableTrackList(
-        tracks = currentPlaylistRaw.toImmutableList(),
-        currentTrackIndex = currentTrackIndex,
+        tracks = playlistState.playlist,
+        currentTrackIndex = playlistState.currentTrackIndex,
         modifier = modifier,
-        bottomPadding = 24.dp,
-        onTrackDismissed = { index, track ->
-            tryDismissTrack(
-                source = viewModel,
-                index = index,
-                track = track,
-                currentPlaylist = currentPlaylist,
-                currentTrackIndex = currentTrackIndex,
+        bottomPadding = dimensions.padding.extraBig,
+        onTrackDismissed = { index, _ ->
+            when (index) {
+                currentTrackIndex -> false
+                else -> {
+                    onUiIntent(CurrentPlaylistUiIntent.DismissTrack(index))
+                    true
+                }
+            }
+        },
+        onTrackDragged = { newPlaylist, newCurrentTrackIndex ->
+            onUiIntent(
+                CurrentPlaylistUiIntent.UpdateAfterDrag(
+                    newPlaylist = newPlaylist,
+                    newCurrentTrackIndex = newCurrentTrackIndex,
+                )
             )
         },
-        onTrackDragged = { newTracks, newCurTrackIndex ->
-            updateCurrentPlaylistAfterDrag(
-                publisher = viewModel,
-                newTracks = newTracks,
-                newCurTrackIndex = newCurTrackIndex,
-                trackServiceInteractor = trackServiceInteractor,
-            )
-        }
+        onTrackClick = { trackIndex ->
+            onUiIntent(CurrentPlaylistUiIntent.StartPlaylistPlayback(trackIndex = trackIndex))
+        },
     )
 }

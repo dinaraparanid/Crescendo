@@ -20,7 +20,7 @@ import kotlinx.coroutines.flow.combine
 import kotlin.math.absoluteValue
 
 @Composable
-fun <T> DraggingEffect(
+internal fun <T> DraggingEffect(
     position: Float?,
     scrollingState: LazyListState,
     isDragging: Boolean,
@@ -36,11 +36,9 @@ fun <T> DraggingEffect(
     val positionFlow = snapshotFlow { updPosition }
     var nearOffset by remember { mutableStateOf<Int?>(null) }
 
-    LaunchedEffect(Unit) {
+    LaunchedEffect(listFlow, positionFlow) {
         combine(listFlow, positionFlow) { listState, draggedCenter ->
-            draggedCenter
-                ?.let(::nearestVisibleItem.curried()(listState))
-                ?.index
+            draggedCenter?.let(::nearestVisibleItem.curried()(listState))?.index
         }.collectLatest { near ->
             nearOffset = near
         }
@@ -52,7 +50,7 @@ fun <T> DraggingEffect(
                 near = nearOffset,
                 draggedItemIndex = draggedItemIndex,
                 itemsState = itemsState,
-                currentDragIndexState = currentDragIndexState
+                currentDragIndexState = currentDragIndexState,
             )
     }
 }
@@ -74,34 +72,32 @@ private fun <T> nextDragItemIndex(
     draggedItemIndex == null -> near
 
     else -> near.also { toInd ->
-        itemsState.value = itemsState.value.moved(draggedItemIndex, toInd)
+        itemsState.value = itemsState.value.moved(fromIdx = draggedItemIndex, toIdx = toInd)
 
-        currentDragIndexState.intValue = getMoveForCurItem(
+        currentDragIndexState.intValue = getMoveIndexForCurrentItem(
             fromIndex = draggedItemIndex,
             toIndex = toInd,
-            currentTrackDragIndex = currentDragIndexState.intValue
+            currentTrackDragIndex = currentDragIndexState.intValue,
         )
     }
 }
 
-private fun getMoveForCurItem(
+private fun getMoveIndexForCurrentItem(
     fromIndex: Int,
     toIndex: Int,
-    currentTrackDragIndex: Int
-): Int {
-    return when {
-        fromIndex < toIndex -> when (currentTrackDragIndex) {
-            fromIndex -> toIndex
-            in 0 until fromIndex -> currentTrackDragIndex
-            in fromIndex..toIndex -> currentTrackDragIndex - 1
-            else -> currentTrackDragIndex
-        }
+    currentTrackDragIndex: Int,
+): Int = when {
+    fromIndex < toIndex -> when (currentTrackDragIndex) {
+        fromIndex -> toIndex
+        in 0 until fromIndex -> currentTrackDragIndex
+        in fromIndex..toIndex -> currentTrackDragIndex - 1
+        else -> currentTrackDragIndex
+    }
 
-        else -> when (currentTrackDragIndex) {
-            fromIndex -> toIndex
-            in 0 until toIndex -> currentTrackDragIndex
-            in toIndex..fromIndex -> currentTrackDragIndex + 1
-            else -> currentTrackDragIndex
-        }
+    else -> when (currentTrackDragIndex) {
+        fromIndex -> toIndex
+        in 0 until toIndex -> currentTrackDragIndex
+        in toIndex..fromIndex -> currentTrackDragIndex + 1
+        else -> currentTrackDragIndex
     }
 }

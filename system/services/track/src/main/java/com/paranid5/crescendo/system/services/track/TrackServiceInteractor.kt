@@ -1,11 +1,7 @@
 package com.paranid5.crescendo.system.services.track
 
-import com.paranid5.crescendo.core.common.AudioStatus
 import com.paranid5.crescendo.core.common.tracks.DefaultTrack
 import com.paranid5.crescendo.core.common.tracks.Track
-import com.paranid5.crescendo.domain.current_playlist.CurrentPlaylistPublisher
-import com.paranid5.crescendo.domain.playback.AudioStatusPublisher
-import com.paranid5.crescendo.domain.tracks.CurrentTrackIndexPublisher
 
 interface TrackServiceInteractor {
     fun addToPlaylist(track: DefaultTrack)
@@ -29,27 +25,18 @@ interface TrackServiceInteractor {
     fun sendChangeRepeatBroadcast()
 }
 
-suspend fun <S> TrackServiceInteractor.startPlaylistPlayback(
-    newTracks: List<Track>,
-    newTrackIndex: Int,
-    currentTrack: Track?,
-    source: S,
-) where S : AudioStatusPublisher,
-        S : CurrentPlaylistPublisher,
-        S : CurrentTrackIndexPublisher {
-    source.updateAudioStatus(AudioStatus.PLAYING)
-    source.updateCurrentPlaylist(newTracks)
-    source.updateCurrentTrackIndex(newTrackIndex)
-
-    val newCurrentTrack = newTracks.getOrNull(newTrackIndex)
-    val startType = startType(currentTrack, newCurrentTrack)
+fun TrackServiceInteractor.startPlaylistPlayback(
+    nextTrack: Track?,
+    prevTrack: Track?,
+) {
+    val startType = startType(prevTrack, nextTrack)
     startPlaying(startType)
 }
 
 private fun startType(
-    currentTrack: Track?,
-    newCurrentTrack: Track?,
+    nextTrack: Track?,
+    prevTrack: Track?,
 ) = when {
-    currentTrack?.path == newCurrentTrack?.path -> TrackServiceStart.RESUME
+    nextTrack?.path == prevTrack?.path -> TrackServiceStart.RESUME
     else -> TrackServiceStart.NEW_TRACK
 }

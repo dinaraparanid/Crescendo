@@ -19,8 +19,8 @@ import com.paranid5.crescendo.core.resources.ui.theme.AppTheme.typography
 internal fun VersionLabels(modifier: Modifier = Modifier) =
     Column(modifier) {
         Text(
-            text = stringResource(id = R.string.app_name),
-            color = colors.primary,
+            text = stringResource(R.string.app_name),
+            color = colors.selection.selected,
             style = typography.h.h2,
             fontWeight = FontWeight.Bold,
             fontStyle = FontStyle.Italic,
@@ -31,7 +31,7 @@ internal fun VersionLabels(modifier: Modifier = Modifier) =
 
         Text(
             text = stringResource(R.string.version),
-            color = colors.primary,
+            color = colors.selection.selected,
             style = typography.regular,
             fontStyle = FontStyle.Italic,
             modifier = Modifier.align(Alignment.CenterHorizontally),

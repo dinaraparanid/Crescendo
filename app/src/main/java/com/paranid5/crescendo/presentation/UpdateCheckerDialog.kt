@@ -33,7 +33,7 @@ private val TitleShadow = 25.dp
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun UpdateCheckerDialog(
+internal fun UpdateCheckerDialog(
     state: MainState,
     onUiIntent: (MainUiIntent) -> Unit,
     modifier: Modifier = Modifier,

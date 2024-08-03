@@ -8,7 +8,7 @@ import kotlinx.parcelize.Parcelize
 
 @Parcelize
 @Immutable
-data class MainState(
+internal data class MainState(
     val isUpdateDialogShown: Boolean = false,
     val releaseState: UiState<ReleaseUiState> = UiState.Undefined,
 ) : Parcelable

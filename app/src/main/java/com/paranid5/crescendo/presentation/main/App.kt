@@ -34,7 +34,7 @@ import com.paranid5.crescendo.view_model.MainViewModel
 private const val PLAYING_PAGER_SCREENS_AMOUNT = 2
 
 @Composable
-fun App(
+internal fun App(
     viewModel: MainViewModel,
     modifier: Modifier = Modifier,
 ) {

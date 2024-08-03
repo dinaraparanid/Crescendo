@@ -44,7 +44,7 @@ private const val CLICKS_FOR_EXIT = 2
 private const val BACK_TOAST_DELAY = 500L
 
 @Composable
-fun ContentScreen(padding: PaddingValues) {
+internal fun ContentScreen(padding: PaddingValues) {
     val navigator = LocalNavigator.current
     val layoutDirection = LocalLayoutDirection.current
 

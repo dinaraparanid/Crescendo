@@ -19,7 +19,7 @@ import com.paranid5.crescendo.navigation.Screens
 private val AppBarItemHeight = 52.dp
 
 @Composable
-fun AppBar(modifier: Modifier = Modifier) =
+internal fun AppBar(modifier: Modifier = Modifier) =
     BottomAppBar(
         modifier = modifier,
         containerColor = colors.primary,

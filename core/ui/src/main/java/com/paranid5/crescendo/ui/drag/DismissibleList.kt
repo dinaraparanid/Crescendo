@@ -12,55 +12,63 @@ import androidx.compose.material3.SwipeToDismissBox
 import androidx.compose.material3.SwipeToDismissBoxValue
 import androidx.compose.material3.rememberSwipeToDismissBoxState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.Dp
-import androidx.compose.ui.unit.dp
+import com.paranid5.crescendo.core.resources.ui.theme.AppTheme.dimensions
 import kotlinx.collections.immutable.ImmutableList
 
 @Composable
-internal inline fun <T> DismissableList(
+internal fun <T> DismissibleList(
     items: ImmutableList<T>,
     scrollingState: LazyListState,
-    crossinline onDismissed: (index: Int, item: T) -> Boolean,
-    crossinline itemView: ListItemView<T>,
+    onDismissed: (index: Int, item: T) -> Boolean,
     modifier: Modifier = Modifier,
     itemModifier: Modifier = Modifier,
-    bottomPadding: Dp = 16.dp,
-    noinline key: ((index: Int, item: T) -> Any)? = null,
-) = LazyColumn(
-    verticalArrangement = Arrangement.spacedBy(10.dp),
-    state = scrollingState,
-    modifier = modifier
+    verticalArrangement: Arrangement.Vertical = Arrangement.spacedBy(dimensions.padding.extraMedium),
+    bottomPadding: Dp = dimensions.padding.extraMedium,
+    key: ((index: Int, item: T) -> Any)? = null,
+    itemContent: ListItemContent<T>,
 ) {
-    itemsIndexed(items, key) { index, _ ->
-        DismissableItem(
-            items = items,
-            index = index,
-            onDismissed = onDismissed,
-            itemView = itemView,
-            itemModifier = itemModifier.fillMaxWidth()
-        )
-    }
+    val itemSpace = remember(verticalArrangement) { verticalArrangement.spacing }
 
-    item { Spacer(Modifier.height(bottomPadding)) }
+    LazyColumn(
+        state = scrollingState,
+        modifier = modifier,
+    ) {
+        itemsIndexed(items, key) { index, _ ->
+            DismissibleItem(
+                items = items,
+                index = index,
+                onDismissed = onDismissed,
+                itemView = itemContent,
+                itemModifier = itemModifier.fillMaxWidth()
+            )
+
+            if (index != items.lastIndex)
+                Spacer(Modifier.height(itemSpace))
+        }
+
+        item { Spacer(Modifier.height(bottomPadding)) }
+    }
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-private inline fun <T> DismissableItem(
+private fun <T> DismissibleItem(
     items: ImmutableList<T>,
     index: Int,
-    crossinline onDismissed: (index: Int, item: T) -> Boolean,
-    crossinline itemView: ListItemView<T>,
+    onDismissed: (index: Int, item: T) -> Boolean,
     modifier: Modifier = Modifier,
-    itemModifier: Modifier = Modifier
+    itemModifier: Modifier = Modifier,
+    itemView: ListItemContent<T>
 ) {
-    val item = items[index]
+    val item = remember(items, index) { items[index] }
 
     val dismissState = rememberDismissState(
         index = index,
         item = item,
-        onDismissed = onDismissed
+        onDismissed = onDismissed,
     )
 
     SwipeToDismissBox(

@@ -16,7 +16,6 @@ import com.paranid5.crescendo.core.resources.ui.NotSelected
 import com.paranid5.crescendo.core.resources.ui.Primary
 import com.paranid5.crescendo.core.resources.ui.Selected
 import com.paranid5.crescendo.core.resources.ui.TransparentUtility
-import com.paranid5.crescendo.core.resources.ui.resetContrast
 
 @Immutable
 data class AppColors(
@@ -85,7 +84,7 @@ data class AppBackgroundColors(
     val primary: Color,
     val alternative: Color,
     val gradient: Brush,
-    val itemGradient: Brush,
+    val card: Color,
 ) {
     companion object {
         private val BackgroundGradientStart = Offset(x = 0F, y = Float.POSITIVE_INFINITY)
@@ -99,12 +98,7 @@ data class AppBackgroundColors(
                 start = BackgroundGradientStart,
                 end = BackgroundGradientEnd,
             ),
-            itemGradient = Brush.linearGradient(
-                listOf(
-                    Background.resetContrast(ratio = 0.5F).copy(alpha = 0.5F),
-                    Background.resetContrast(ratio = 0.5F).copy(alpha = 0.5F),
-                )
-            )
+            card = Primary,
         )
 
         internal val light = AppBackgroundColors(
@@ -115,12 +109,7 @@ data class AppBackgroundColors(
                 start = BackgroundGradientStart,
                 end = BackgroundGradientEnd,
             ),
-            itemGradient = Brush.linearGradient(
-                listOf(
-                    BackgroundAlternative.resetContrast(ratio = 0.5F).copy(alpha = 0.5F),
-                    BackgroundAlternative.resetContrast(ratio = 0.5F).copy(alpha = 0.5F),
-                )
-            )
+            card = Primary,
         )
     }
 }

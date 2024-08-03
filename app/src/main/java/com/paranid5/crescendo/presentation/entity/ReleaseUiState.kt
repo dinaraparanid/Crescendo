@@ -5,7 +5,7 @@ import com.paranid5.crescendo.domain.github.dto.Release
 import kotlinx.parcelize.Parcelize
 
 @Parcelize
-data class ReleaseUiState(
+internal data class ReleaseUiState(
     val htmlUrl: String,
     val tagName: String,
     val name: String,

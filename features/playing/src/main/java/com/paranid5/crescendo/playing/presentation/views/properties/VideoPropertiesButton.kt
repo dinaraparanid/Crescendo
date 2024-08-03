@@ -24,7 +24,7 @@ internal fun VideoPropertiesButton(
 @Composable
 private fun PropertiesIcon(tint: Color, modifier: Modifier = Modifier) =
     Icon(
-        painter = painterResource(R.drawable.kebab_menu),
+        painter = painterResource(R.drawable.ic_kebab_menu),
         contentDescription = stringResource(R.string.settings),
         tint = tint,
         modifier = modifier

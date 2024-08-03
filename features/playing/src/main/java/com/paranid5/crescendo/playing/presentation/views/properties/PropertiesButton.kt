@@ -13,6 +13,8 @@ import com.paranid5.crescendo.ui.track.item.TrackPropertiesButton
 import com.paranid5.crescendo.utils.extensions.getBrightDominantOrPrimary
 import org.koin.androidx.compose.koinViewModel
 
+private val IconSize = 24.dp
+
 @Composable
 internal fun PropertiesButton(
     audioStatus: AudioStatus,
@@ -26,16 +28,16 @@ internal fun PropertiesButton(
         AudioStatus.STREAMING -> VideoPropertiesButton(
             tint = palette.getBrightDominantOrPrimary(),
             modifier = modifier,
-            iconModifier = Modifier.size(28.dp)
+            iconModifier = Modifier.size(IconSize),
         )
 
-        AudioStatus.PLAYING ->
-            if (currentTrack != null)
-                TrackPropertiesButton(
-                    track = currentTrack!!,
-                    tint = palette.getBrightDominantOrPrimary(),
-                    modifier = modifier,
-                    iconModifier = Modifier.size(28.dp)
-                )
+        AudioStatus.PLAYING -> currentTrack?.let { track ->
+            TrackPropertiesButton(
+                track = track,
+                tint = palette.getBrightDominantOrPrimary(),
+                modifier = modifier,
+                iconModifier = Modifier.size(IconSize),
+            )
+        }
     }
 }

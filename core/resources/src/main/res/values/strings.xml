@@ -105,4 +105,8 @@
     <string name="appbar_play">Play</string>
     <string name="appbar_stream">Stream</string>
     <string name="appbar_preferences">Preferences</string>
+
+    <!-- List Top Bar -->
+    <string name="list_top_bar_total" formatted="false">Total: %d</string>
+    <string name="list_top_bar_duration" formatted="false">Duration: %s</string>
 </resources>

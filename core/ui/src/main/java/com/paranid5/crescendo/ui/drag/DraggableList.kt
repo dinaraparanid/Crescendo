@@ -5,12 +5,12 @@ import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.NonRestartableComposable
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
@@ -18,31 +18,31 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.unit.Dp
-import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
 import arrow.core.curried
+import com.paranid5.crescendo.core.resources.ui.theme.AppTheme.dimensions
 import kotlinx.collections.immutable.ImmutableList
-import kotlinx.coroutines.launch
 
-typealias DraggableListItemView<T> = @Composable (
+typealias DraggableListItemContent<T> = @Composable (
     items: ImmutableList<T>,
     index: Int,
-    currentDragIndex: Int,
-    modifier: Modifier
+    currentTrackIndexAfterDrag: Int,
+    modifier: Modifier,
 ) -> Unit
 
+@NonRestartableComposable
 @Composable
 fun <T> DraggableList(
     items: ImmutableList<T>,
     currentItemIndex: Int,
     onDismissed: (index: Int, item: T) -> Boolean,
-    onDragged: suspend (draggedItems: ImmutableList<T>, dragIndex: Int) -> Unit,
-    itemView: DraggableListItemView<T>,
+    onDragged: (draggedItems: ImmutableList<T>, currentTrackIndexAfterDrag: Int) -> Unit,
     modifier: Modifier = Modifier,
     itemModifier: Modifier = Modifier,
     scrollingState: LazyListState = rememberLazyListState(),
-    bottomPadding: Dp = 16.dp,
+    bottomPadding: Dp = dimensions.padding.extraMedium,
     key: ((index: Int, item: T) -> Any)? = null,
+    itemContent: DraggableListItemContent<T>,
 ) {
     val draggableItemsState = remember(items) {
         mutableStateOf(items)
@@ -50,11 +50,11 @@ fun <T> DraggableList(
 
     val draggableItems by draggableItemsState
 
-    val currentDragIndexState = remember(currentItemIndex) {
+    val currentTrackIndexAfterDragState = remember(currentItemIndex) {
         mutableIntStateOf(currentItemIndex)
     }
 
-    val currentDragIndex by currentDragIndexState
+    val currentTrackIndexAfterDrag by currentTrackIndexAfterDragState
 
     val positionState = remember { mutableStateOf<Float?>(null) }
     val position by positionState
@@ -76,33 +76,33 @@ fun <T> DraggableList(
         scrollingState = scrollingState,
         isDragging = isDragging,
         itemsState = draggableItemsState,
-        currentDragIndexState = currentDragIndexState,
-        draggedItemIndexState = draggedItemIndexState
+        currentDragIndexState = currentTrackIndexAfterDragState,
+        draggedItemIndexState = draggedItemIndexState,
     )
 
-    DismissableList(
+    DismissibleList(
         items = draggableItems,
         scrollingState = scrollingState,
         bottomPadding = bottomPadding,
         onDismissed = onDismissed,
         modifier = modifier.handleTracksMovement(
             items = draggableItems,
-            currentDragIndex = currentDragIndex,
+            currentTrackIndexAfterDrag = currentTrackIndexAfterDrag,
             scrollingState = scrollingState,
             positionState = positionState,
             isDraggingState = isDraggingState,
             draggedItemIndexState = draggedItemIndexState,
-            onDragged = onDragged
+            onDragged = onDragged,
         ),
         itemModifier = itemModifier,
         key = key,
-        itemView = { itemList, index, draggableItemModifier ->
+        itemContent = { itemList, index, draggableItemModifier ->
             DraggableItemList(
                 items = itemList,
                 index = index,
                 indexWithOffset = indexWithOffset,
                 itemView = { itemList2, index2, itemMod2 ->
-                    itemView(itemList2, index2, currentDragIndex, itemMod2)
+                    itemContent(itemList2, index2, currentTrackIndexAfterDrag, itemMod2)
                 },
                 modifier = draggableItemModifier then itemModifier
             )
@@ -124,22 +124,21 @@ private fun rememberItemIndexWithOffset(
 }
 
 @Composable
-private inline fun <T> Modifier.handleTracksMovement(
+private fun <T> Modifier.handleTracksMovement(
     items: ImmutableList<T>,
-    currentDragIndex: Int,
+    currentTrackIndexAfterDrag: Int,
     scrollingState: LazyListState,
     positionState: MutableState<Float?>,
     isDraggingState: MutableState<Boolean>,
     draggedItemIndexState: MutableState<Int?>,
-    crossinline onDragged: suspend (draggedItems: ImmutableList<T>, dragIndex: Int) -> Unit,
+    onDragged: (draggedItems: ImmutableList<T>, currentTrackIndexAfterDrag: Int) -> Unit,
 ): Modifier {
     val draggedItems by rememberUpdatedState(items)
-    val dragIndex by rememberUpdatedState(currentDragIndex)
+    val curTrackIndexAfterDrag by rememberUpdatedState(currentTrackIndexAfterDrag)
 
     var position by positionState
     var isDragging by isDraggingState
     var draggedItemIndex by draggedItemIndexState
-    val coroutineScope = rememberCoroutineScope()
 
     return this then Modifier.pointerInput(Unit) {
         detectDragGesturesAfterLongPress(
@@ -157,11 +156,8 @@ private inline fun <T> Modifier.handleTracksMovement(
             },
             onDragEnd = {
                 isDragging = false
-
-                coroutineScope.launch {
-                    onDragged(draggedItems, dragIndex)
-                    draggedItemIndex = null
-                }
+                onDragged(draggedItems, curTrackIndexAfterDrag)
+                draggedItemIndex = null
             },
         )
     }
@@ -172,7 +168,7 @@ private inline fun <T> DraggableItemList(
     items: ImmutableList<T>,
     index: Int,
     indexWithOffset: Pair<Int, Float>?,
-    crossinline itemView: ListItemView<T>,
+    crossinline itemView: ListItemContent<T>,
     modifier: Modifier = Modifier
 ) {
     val offset by rememberItemOffset(indexWithOffset, index)

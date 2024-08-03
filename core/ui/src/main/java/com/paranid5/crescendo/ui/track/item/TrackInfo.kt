@@ -5,12 +5,12 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import com.paranid5.crescendo.core.common.tracks.Track
+import com.paranid5.crescendo.ui.track.ui_state.TrackUiState
 import com.paranid5.crescendo.utils.extensions.artistAlbum
 
 @Composable
 fun TrackInfo(
-    track: Track,
+    track: TrackUiState,
     textColor: Color,
     modifier: Modifier = Modifier
 ) = Column(modifier) {

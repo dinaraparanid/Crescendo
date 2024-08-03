@@ -4,52 +4,54 @@ import android.content.res.Configuration
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.HorizontalDivider
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.NonRestartableComposable
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalConfiguration
-import com.paranid5.crescendo.core.resources.ui.theme.AppTheme.colors
 import com.paranid5.crescendo.core.resources.ui.theme.AppTheme.dimensions
-import com.paranid5.crescendo.current_playlist.presentation.effects.TrackDismissEffect
+import com.paranid5.crescendo.current_playlist.presentation.effects.SubscribeOnLifecycleEffect
+import com.paranid5.crescendo.current_playlist.presentation.view_model.CurrentPlaylistViewModel
+import com.paranid5.crescendo.current_playlist.presentation.view_model.CurrentPlaylistViewModelImpl
 import com.paranid5.crescendo.current_playlist.presentation.views.CurrentPlaylistBar
 import com.paranid5.crescendo.current_playlist.presentation.views.CurrentPlaylistTrackList
+import com.paranid5.crescendo.utils.extensions.collectLatestAsState
+import org.koin.androidx.compose.koinViewModel
 
+@NonRestartableComposable
 @Composable
-fun CurrentPlaylistScreen(modifier: Modifier = Modifier) {
-    TrackDismissEffect()
+fun CurrentPlaylistScreen(
+    modifier: Modifier = Modifier,
+    viewModel: CurrentPlaylistViewModel = koinViewModel<CurrentPlaylistViewModelImpl>()
+) {
+    val state by viewModel.stateFlow.collectLatestAsState()
+    val onUiIntent = viewModel::onUiIntent
+
+    SubscribeOnLifecycleEffect(onUiIntent = onUiIntent)
 
     Column(modifier) {
         CurrentPlaylistBar(
-            Modifier
-                .fillMaxWidth()
-                .padding(
-                    top = topPadding,
-                    bottom = dimensions.padding.small,
-                    start = dimensions.padding.small,
-                    end = dimensions.padding.small,
-                )
+            state = state,
+            modifier = Modifier.fillMaxWidth().padding(
+                top = topPadding,
+                bottom = dimensions.padding.small,
+                start = dimensions.padding.extraMedium,
+                end = dimensions.padding.extraMedium,
+            ),
         )
 
-        CurrentPlaylistBarSeparator()
-
         CurrentPlaylistTrackList(
-            Modifier.padding(
+            state = state,
+            onUiIntent = onUiIntent,
+            modifier = Modifier.fillMaxWidth().padding(
                 top = dimensions.padding.extraMedium,
-                start = dimensions.padding.small,
-                end = dimensions.padding.extraSmall,
+                start = dimensions.padding.extraMedium,
+                end = dimensions.padding.extraMedium,
                 bottom = dimensions.padding.small,
-            )
+            ),
         )
     }
 }
-
-@Composable
-private fun CurrentPlaylistBarSeparator(modifier: Modifier = Modifier) =
-    HorizontalDivider(
-        modifier = modifier.fillMaxWidth(),
-        thickness = dimensions.padding.minimum,
-        color = colors.utils.transparentUtility,
-    )
 
 private inline val topPadding
     @Composable

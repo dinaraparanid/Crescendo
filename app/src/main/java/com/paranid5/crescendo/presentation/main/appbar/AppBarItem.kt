@@ -26,7 +26,7 @@ import com.paranid5.crescendo.utils.extensions.collectLatestAsState
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
-fun AppBarItem(
+internal fun AppBarItem(
     title: String,
     icon: ImageVector,
     screen: Screens,

@@ -11,7 +11,7 @@ import java.util.Queue
 
 @Composable
 fun audioRecordingPermissionsRequestLauncher(
-    isAudioRecordingPermissionDialogShownState: MutableState<Boolean>,
+    isRecordingPermissionDialogShownState: MutableState<Boolean>,
     modifier: Modifier = Modifier
 ): Pair<Boolean, () -> Unit> {
     val audioRecordingPermissionQueue = koinInject<Queue<String>>(
@@ -24,6 +24,6 @@ fun audioRecordingPermissionsRequestLauncher(
         modifier = modifier,
         permissionQueue = audioRecordingPermissionQueue,
         descriptionProvider = audioRecordingDescriptionProvider,
-        isPermissionDialogShownState = isAudioRecordingPermissionDialogShownState,
+        isPermissionDialogShownState = isRecordingPermissionDialogShownState,
     )
 }

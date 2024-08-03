@@ -4,6 +4,7 @@ import kotlinx.coroutines.flow.StateFlow
 
 interface StateSource<State> {
     val stateFlow: StateFlow<State>
-
-    fun updateState(func: State.() -> State)
 }
+
+inline val <S> StateSource<S>.state
+    get() = stateFlow.value

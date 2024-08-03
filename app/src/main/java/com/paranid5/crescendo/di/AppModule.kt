@@ -4,8 +4,6 @@ import android.os.Build
 import androidx.annotation.StringRes
 import com.paranid5.crescendo.audio_effects.di.audioEffectsModule
 import com.paranid5.crescendo.cache.di.cacheModule
-import com.paranid5.crescendo.view_model.MainViewModel
-import com.paranid5.crescendo.view_model.MainViewModelImpl
 import com.paranid5.crescendo.core.impl.di.STREAM_SERVICE_CONNECTION
 import com.paranid5.crescendo.core.impl.di.TRACK_SERVICE_CONNECTION
 import com.paranid5.crescendo.core.impl.di.VIDEO_CACHE_SERVICE_CONNECTION
@@ -23,13 +21,13 @@ import com.paranid5.crescendo.ui.permissions.description_providers.AudioRecordin
 import com.paranid5.crescendo.ui.permissions.description_providers.ExternalStorageDescriptionProvider
 import com.paranid5.crescendo.ui.permissions.description_providers.ForegroundServiceDescriptionProvider
 import com.paranid5.crescendo.ui.permissions.di.permissionQueuesModule
+import com.paranid5.crescendo.view_model.MainViewModelImpl
 import com.paranid5.system.services.common.di.commonServiceModule
 import kotlinx.coroutines.flow.MutableStateFlow
 import org.koin.android.ext.koin.androidContext
 import org.koin.androidx.viewmodel.dsl.viewModelOf
 import org.koin.core.qualifier.named
 import org.koin.core.scope.Scope
-import org.koin.dsl.bind
 import org.koin.dsl.module
 
 private fun Scope.getString(@StringRes strRes: Int) =
@@ -91,7 +89,7 @@ private val featureModule = module {
     )
 }
 
-val appModule = module {
+internal val appModule = module {
     includes(systemModule, featureModule, dataModule)
     viewModelOf(::MainViewModelImpl)
 }

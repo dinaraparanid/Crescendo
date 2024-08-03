@@ -2,24 +2,33 @@ package com.paranid5.crescendo.utils.extensions
 
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.composed
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import com.paranid5.crescendo.core.resources.ui.theme.AppTheme.colors
-import com.paranid5.crescendo.core.resources.ui.theme.AppTheme.dimensions
 
-private val DEFAULT_ELEVATION = 60.dp
+private val DefaultElevation = 60.dp
+private val DefaultRadius = 12.dp
 
 fun Modifier.simpleShadow(
-    elevation: Dp = DEFAULT_ELEVATION,
-    color: Color? = null,
-) = this.composed {
-    shadow(
-        elevation = elevation,
-        shape = RoundedCornerShape(dimensions.corners.medium),
-        ambientColor = color ?: colors.primary,
-        spotColor = color ?: colors.primary,
-    )
-}
+    elevation: Dp = DefaultElevation,
+    color: Color = Color.Black,
+    radius: Dp = DefaultRadius,
+) = this then shadow(
+    elevation = elevation,
+    shape = RoundedCornerShape(radius),
+    ambientColor = color,
+    spotColor = color,
+)
+
+fun Modifier.simpleShadow(
+    shape: Shape,
+    elevation: Dp = DefaultElevation,
+    color: Color = Color.Black,
+) = this then shadow(
+    elevation = elevation,
+    shape = shape,
+    ambientColor = color,
+    spotColor = color,
+)

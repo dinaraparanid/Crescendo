@@ -4,6 +4,7 @@ import androidx.compose.runtime.Immutable
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.paranid5.crescendo.core.common.udf.StatePublisher
 import com.paranid5.crescendo.domain.github.GitHubApi
 import com.paranid5.crescendo.domain.web.OpenBrowserUseCase
 import com.paranid5.crescendo.presentation.entity.ReleaseUiState
@@ -11,11 +12,11 @@ import com.paranid5.crescendo.ui.foundation.toUiState
 import kotlinx.coroutines.launch
 
 @Immutable
-class MainViewModelImpl(
+internal class MainViewModelImpl(
     private val savedStateHandle: SavedStateHandle,
     private val openBrowserUseCase: OpenBrowserUseCase,
     private val gitHubApi: GitHubApi,
-) : ViewModel(), MainViewModel {
+) : ViewModel(), MainViewModel, StatePublisher<MainState> {
     companion object {
         private const val STATE_KEY = "state"
     }
