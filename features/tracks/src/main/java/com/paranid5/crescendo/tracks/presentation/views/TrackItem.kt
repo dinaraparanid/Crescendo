@@ -141,6 +141,9 @@ private fun TrackItemContent(
             track = track,
             tint = textColor,
             modifier = Modifier.align(Alignment.CenterVertically),
+            navigateToTrimmer = {
+                // TODO: navigate to trimmer
+            }
         )
     }
 }

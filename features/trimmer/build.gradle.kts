@@ -44,8 +44,6 @@ dependencies {
 
     implementation(project(":domain:waveform"))
 
-    implementation(project(":navigation"))
-
     implementation(project(":system:receivers"))
 
     implementation(libs.androidx.core.ktx)

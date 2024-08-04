@@ -37,6 +37,9 @@ internal fun PropertiesButton(
                 tint = palette.getBrightDominantOrPrimary(),
                 modifier = modifier,
                 iconModifier = Modifier.size(IconSize),
+                navigateToTrimmer = {
+                    // TODO: navigate to trimmer
+                }
             )
         }
     }

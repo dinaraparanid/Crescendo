@@ -3,7 +3,10 @@ package com.paranid5.crescendo.presentation.main
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.calculateEndPadding
+import androidx.compose.foundation.layout.calculateStartPadding
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.material.BottomSheetScaffold
 import androidx.compose.material.BottomSheetScaffoldState
@@ -21,6 +24,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalLayoutDirection
 import com.paranid5.crescendo.core.resources.ui.theme.AppTheme.colors
 import com.paranid5.crescendo.presentation.UpdateCheckerDialog
 import com.paranid5.crescendo.ui.appbar.appBarHeight
@@ -89,7 +93,18 @@ private fun ScreenScaffold(modifier: Modifier = Modifier) {
             backgroundColor = Color.Transparent,
             sheetBackgroundColor = Color.Transparent,
             sheetContent = { PlayingBottomSheet(alpha) },
-            content = { ContentScreen(padding = it) },
+            content = { padding ->
+                val layoutDirection = LocalLayoutDirection.current
+
+                ContentScreen(
+                    Modifier.padding(
+                        top = padding.calculateTopPadding(),
+                        bottom = padding.calculateBottomPadding(),
+                        start = padding.calculateStartPadding(layoutDirection),
+                        end = padding.calculateEndPadding(layoutDirection),
+                    )
+                )
+            },
         )
     }
 }

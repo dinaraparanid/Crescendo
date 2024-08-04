@@ -28,7 +28,10 @@ import androidx.compose.ui.unit.dp
 import com.paranid5.crescendo.core.common.AudioStatus
 import com.paranid5.crescendo.core.resources.ui.theme.AppTheme.colors
 import com.paranid5.crescendo.core.resources.ui.theme.AppTheme.dimensions
-import com.paranid5.crescendo.current_playlist.presentation.CurrentPlaylistScreen
+import com.paranid5.crescendo.feature.current_playlist.presentation.CurrentPlaylistScreen
+import com.paranid5.crescendo.feature.current_playlist.view_model.CurrentPlaylistBackResult
+import com.paranid5.crescendo.navigation.AppScreen
+import com.paranid5.crescendo.navigation.LocalNavigator
 import com.paranid5.crescendo.playing.presentation.PlayingScreen
 import com.paranid5.crescendo.presentation.main.appbar.AppBar
 import com.paranid5.crescendo.ui.appbar.appBarHeight
@@ -125,6 +128,7 @@ private fun CurrentPlaylistBottomSheet(
     state: ModalBottomSheetState,
     modifier: Modifier = Modifier,
 ) {
+    val navigator = LocalNavigator.current
     val pushUpTopPadding by animatePushUpTopPaddingAsState(state)
     val contentTopPadding by animateContentTopPaddingAsState(state)
 
@@ -137,10 +141,15 @@ private fun CurrentPlaylistBottomSheet(
         )
 
         CurrentPlaylistScreen(
-            Modifier
+            modifier = Modifier
                 .fillMaxSize()
                 .padding(top = contentTopPadding),
-        )
+        ) { result ->
+            when (result) {
+                is CurrentPlaylistBackResult.ShowTrimmer ->
+                    navigator.navigateIfNotSame(AppScreen.Audio.Trimmer(result.trackUri))
+            }
+        }
     }
 }
 

@@ -6,8 +6,6 @@ import com.paranid5.crescendo.core.common.AudioStatus
 import com.paranid5.crescendo.core.resources.R
 import com.paranid5.crescendo.domain.playback.PlaybackRepository
 import com.paranid5.crescendo.domain.playback.PlaybackRepository.Companion.UNDEFINED_AUDIO_SESSION_ID
-import com.paranid5.crescendo.navigation.Navigator
-import com.paranid5.crescendo.navigation.Screens
 import com.paranid5.crescendo.system.services.stream.StreamServiceAccessor
 import com.paranid5.crescendo.system.services.stream.sendPauseBroadcast
 import com.paranid5.crescendo.system.services.stream.sendSeekTo10SecsBackBroadcast
@@ -15,37 +13,37 @@ import com.paranid5.crescendo.system.services.stream.sendSeekTo10SecsForwardBroa
 import com.paranid5.crescendo.system.services.stream.sendSeekToBroadcast
 import com.paranid5.crescendo.system.services.track.TrackServiceInteractor
 
-class PlayingInteractor(
+internal class PlayingInteractor(
     private val streamServiceAccessor: StreamServiceAccessor,
     private val trackServiceInteractor: TrackServiceInteractor,
     private val playbackRepository: PlaybackRepository,
 ) {
-    internal fun sendOnPrevButtonClickedBroadcast(audioStatus: AudioStatus) = audioStatus.handle(
+    fun sendOnPrevButtonClickedBroadcast(audioStatus: AudioStatus) = audioStatus.handle(
         streamAction = streamServiceAccessor::sendSeekTo10SecsBackBroadcast,
         trackAction = trackServiceInteractor::sendSwitchToPrevTrackBroadcast
     )
 
-    internal fun sendOnNextButtonClickedBroadcast(audioStatus: AudioStatus) = audioStatus.handle(
+    fun sendOnNextButtonClickedBroadcast(audioStatus: AudioStatus) = audioStatus.handle(
         streamAction = streamServiceAccessor::sendSeekTo10SecsForwardBroadcast,
         trackAction = trackServiceInteractor::sendSwitchToNextTrackBroadcast
     )
 
-    internal fun sendSeekToBroadcast(audioStatus: AudioStatus, position: Long) = audioStatus.handle(
+    fun sendSeekToBroadcast(audioStatus: AudioStatus, position: Long) = audioStatus.handle(
         streamAction = { streamServiceAccessor.sendSeekToBroadcast(position) },
         trackAction = { trackServiceInteractor.sendSeekToBroadcast(position) }
     )
 
-    internal fun sendPauseBroadcast(audioStatus: AudioStatus) = audioStatus.handle(
+    fun sendPauseBroadcast(audioStatus: AudioStatus) = audioStatus.handle(
         streamAction = streamServiceAccessor::sendPauseBroadcast,
         trackAction = trackServiceInteractor::sendPauseBroadcast
     )
 
-    internal fun startStreamingOrSendResumeBroadcast(audioStatus: AudioStatus) = audioStatus.handle(
+    fun startStreamingOrSendResumeBroadcast(audioStatus: AudioStatus) = audioStatus.handle(
         streamAction = streamServiceAccessor::startStreamingOrSendResumeBroadcast,
         trackAction = trackServiceInteractor::startStreamingOrSendResumeBroadcast
     )
 
-    internal fun navigateToAudioEffects(context: Context, navigator: Navigator) {
+    fun tryNavigateToAudioEffects(context: Context, navigate: () -> Unit) {
         when (playbackRepository.audioSessionIdState.value) {
             UNDEFINED_AUDIO_SESSION_ID -> Toast.makeText(
                 context,
@@ -53,7 +51,7 @@ class PlayingInteractor(
                 Toast.LENGTH_LONG
             ).show()
 
-            else -> navigator.navigateIfNotSame(Screens.Audio.AudioEffects)
+            else -> navigate()
         }
     }
 }

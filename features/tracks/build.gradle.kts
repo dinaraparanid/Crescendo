@@ -47,8 +47,6 @@ dependencies {
 
     implementation(project(":data"))
 
-    implementation(project(":navigation"))
-
     implementation(project(":system:services:track"))
 
     implementation(libs.androidx.core.ktx)

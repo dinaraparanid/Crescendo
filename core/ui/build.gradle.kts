@@ -45,8 +45,6 @@ dependencies {
     implementation(project(":domain:tracks"))
     implementation(project(":domain:current_playlist"))
 
-    implementation(project(":navigation"))
-
     implementation(project(":system:services:track"))
 
     implementation(libs.androidx.core.ktx)

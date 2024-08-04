@@ -3,9 +3,6 @@ package com.paranid5.crescendo.presentation.main
 import android.app.Activity
 import android.content.res.Configuration
 import android.widget.Toast
-import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.calculateEndPadding
-import androidx.compose.foundation.layout.calculateStartPadding
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.ExperimentalMaterialApi
@@ -17,7 +14,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.LocalLayoutDirection
+import androidx.navigation.NavHostController
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -27,12 +24,13 @@ import com.paranid5.crescendo.audio_effects.presentation.AudioEffectsScreen
 import com.paranid5.crescendo.core.resources.R
 import com.paranid5.crescendo.core.resources.ui.theme.AppTheme.dimensions
 import com.paranid5.crescendo.favourites.FavouritesScreen
+import com.paranid5.crescendo.feature.play.main.presentation.PlayScreen
 import com.paranid5.crescendo.fetch_stream.presentation.FetchStreamScreen
+import com.paranid5.crescendo.navigation.AppNavigator
+import com.paranid5.crescendo.navigation.AppScreen
 import com.paranid5.crescendo.navigation.LocalNavigator
-import com.paranid5.crescendo.navigation.Screens
 import com.paranid5.crescendo.settings.SettingsScreen
 import com.paranid5.crescendo.track_collections.AlbumsScreen
-import com.paranid5.crescendo.tracks.presentation.TracksScreen
 import com.paranid5.crescendo.trimmer.presentation.TrimmerScreen
 import com.paranid5.crescendo.ui.composition_locals.LocalCurrentPlaylistSheetState
 import com.paranid5.crescendo.ui.composition_locals.playing.LocalPlayingSheetState
@@ -44,76 +42,85 @@ private const val CLICKS_FOR_EXIT = 2
 private const val BACK_TOAST_DELAY = 500L
 
 @Composable
-internal fun ContentScreen(padding: PaddingValues) {
+internal fun ContentScreen(modifier: Modifier = Modifier) {
     val navigator = LocalNavigator.current
-    val layoutDirection = LocalLayoutDirection.current
 
     BackHandler()
 
-    val screenModifier = Modifier
-        .fillMaxSize()
-        .screenPaddingDefault()
+    navigator.navHost?.let {
+        ContentScreenNavHost(
+            navigator = navigator,
+            navHostController = it,
+            modifier = modifier,
+            screenModifier = Modifier
+                .fillMaxSize()
+                .screenPaddingDefault()
+        )
+    }
+}
 
-    NavHost(
-        navController = navigator.navHost!!,
-        startDestination = Screens.Play.title,
-        modifier = Modifier.padding(
-            top = padding.calculateTopPadding(),
-            bottom = padding.calculateBottomPadding(),
-            start = padding.calculateStartPadding(layoutDirection),
-            end = padding.calculateEndPadding(layoutDirection),
+@Composable
+private fun ContentScreenNavHost(
+    navigator: AppNavigator,
+    navHostController: NavHostController,
+    modifier: Modifier = Modifier,
+    screenModifier: Modifier = Modifier,
+) = NavHost(
+    navController = navHostController,
+    startDestination = AppScreen.Play.title,
+    modifier = modifier,
+) {
+    // TODO: удалить левое
+
+    composable(route = AppScreen.Play.title) {
+        navigator.updateCurrentScreen(AppScreen.Play)
+        PlayScreen(modifier = screenModifier)
+    }
+
+    composable(route = AppScreen.TrackCollections.Albums.title) {
+        navigator.updateCurrentScreen(AppScreen.TrackCollections.Albums)
+        AlbumsScreen(modifier = screenModifier)
+    }
+
+    composable(route = AppScreen.StreamFetching.title) {
+        navigator.updateCurrentScreen(AppScreen.StreamFetching)
+        FetchStreamScreen(modifier = screenModifier)
+    }
+
+    composable(route = AppScreen.Audio.AudioEffects.title) {
+        navigator.updateCurrentScreen(AppScreen.Audio.AudioEffects)
+        AudioEffectsScreen(Modifier.screenPaddingDefault())
+    }
+
+    composable(
+        route = AppScreen.Audio.Trimmer.title,
+        arguments = persistentListOf(
+            navArgument(AppScreen.Audio.Trimmer.TrackPathKey) {
+                type = NavType.StringType
+            }
         )
     ) {
-        composable(route = Screens.Play.title) {
-            navigator.updateCurrentScreen(Screens.Play)
-            TracksScreen(modifier = screenModifier)
-        }
+        navigator.updateCurrentScreen(AppScreen.Audio.Trimmer)
 
-        composable(route = Screens.TrackCollections.Albums.title) {
-            navigator.updateCurrentScreen(Screens.TrackCollections.Albums)
-            AlbumsScreen(modifier = screenModifier)
-        }
+        TrimmerScreen(
+            backStackEntry = it,
+            modifier = screenModifier,
+        )
+    }
 
-        composable(route = Screens.StreamFetching.title) {
-            navigator.updateCurrentScreen(Screens.StreamFetching)
-            FetchStreamScreen(modifier = screenModifier)
-        }
+    composable(route = AppScreen.AboutApp.title) {
+        navigator.updateCurrentScreen(AppScreen.AboutApp)
+        AboutApp(modifier = screenModifier)
+    }
 
-        composable(route = Screens.Audio.AudioEffects.title) {
-            navigator.updateCurrentScreen(Screens.Audio.AudioEffects)
-            AudioEffectsScreen(Modifier.screenPaddingDefault())
-        }
+    composable(route = AppScreen.Favourites.title) {
+        navigator.updateCurrentScreen(AppScreen.Favourites)
+        FavouritesScreen(modifier = screenModifier)
+    }
 
-        composable(
-            route = Screens.Audio.Trimmer.title,
-            arguments = persistentListOf(
-                navArgument(Screens.Audio.Trimmer.TRACK_PATH_KEY) {
-                    type = NavType.StringType
-                }
-            )
-        ) {
-            navigator.updateCurrentScreen(Screens.Audio.Trimmer)
-
-            TrimmerScreen(
-                backStackEntry = it,
-                modifier = screenModifier,
-            )
-        }
-
-        composable(route = Screens.AboutApp.title) {
-            navigator.updateCurrentScreen(Screens.AboutApp)
-            AboutApp(modifier = screenModifier)
-        }
-
-        composable(route = Screens.Favourites.title) {
-            navigator.updateCurrentScreen(Screens.Favourites)
-            FavouritesScreen(modifier = screenModifier)
-        }
-
-        composable(route = Screens.Settings.title) {
-            navigator.updateCurrentScreen(Screens.Settings)
-            SettingsScreen(modifier = screenModifier)
-        }
+    composable(route = AppScreen.Settings.title) {
+        navigator.updateCurrentScreen(AppScreen.Settings)
+        SettingsScreen(modifier = screenModifier)
     }
 }
 
@@ -121,11 +128,12 @@ internal fun ContentScreen(padding: PaddingValues) {
 @Composable
 private fun BackHandler() {
     val context = LocalContext.current
+    val navigator = LocalNavigator.current
     val playingSheetState = LocalPlayingSheetState.current
     val currentPlaylistSheetState = LocalCurrentPlaylistSheetState.current
     var backPressedCounter by remember { mutableIntStateOf(0) }
 
-    OnBackPressed { isStackEmpty ->
+    OnBackPressed(navigator = navigator) { isStackEmpty ->
         if (currentPlaylistSheetState?.isVisible == true) {
             currentPlaylistSheetState.hide()
             return@OnBackPressed

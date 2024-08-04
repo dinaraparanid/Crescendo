@@ -14,7 +14,7 @@ import androidx.compose.ui.unit.dp
 import com.paranid5.crescendo.core.resources.R
 import com.paranid5.crescendo.core.resources.ui.theme.AppTheme.colors
 import com.paranid5.crescendo.core.resources.ui.theme.AppTheme.dimensions
-import com.paranid5.crescendo.navigation.Screens
+import com.paranid5.crescendo.navigation.AppScreen
 
 private val AppBarItemHeight = 52.dp
 
@@ -34,14 +34,14 @@ internal fun AppBar(modifier: Modifier = Modifier) =
         AppBarItem(
             title = stringResource(R.string.appbar_play),
             icon = ImageVector.vectorResource(R.drawable.tab_play),
-            screen = Screens.Play,
+            screen = AppScreen.Play,
             modifier = itemModifier,
         )
 
         AppBarItem(
             title = stringResource(R.string.appbar_stream),
             icon = ImageVector.vectorResource(R.drawable.tab_stream),
-            screen = Screens.StreamFetching,
+            screen = AppScreen.StreamFetching,
             modifier = itemModifier,
         )
 
@@ -49,6 +49,6 @@ internal fun AppBar(modifier: Modifier = Modifier) =
             title = stringResource(R.string.appbar_preferences),
             icon = ImageVector.vectorResource(R.drawable.tab_preferences),
             modifier = itemModifier,
-            screen = Screens.Settings,
+            screen = AppScreen.Settings,
         )
     }

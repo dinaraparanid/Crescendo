@@ -40,7 +40,7 @@
                 android:authorities="${applicationId}.androidx-startup"
                 tools:node="remove" />
         <activity
-                android:name=".splash.SplashActivity"
+                android:name=".feature.splash.SplashActivity"
                 android:exported="true"
                 android:launchMode="singleTask"
                 android:theme="@style/Theme.MediaStreamerSplash">

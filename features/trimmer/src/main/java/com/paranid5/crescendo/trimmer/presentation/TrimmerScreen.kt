@@ -13,7 +13,6 @@ import androidx.navigation.NavBackStackEntry
 import arrow.core.curried
 import com.paranid5.crescendo.core.common.tracks.Track
 import com.paranid5.crescendo.data.media_store.tracks.getTrackFromMediaStore
-import com.paranid5.crescendo.navigation.Screens
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
@@ -44,6 +43,8 @@ internal const val WAVEFORM_PADDING =
             CONTROLLER_CIRCLE_CENTER / 2 +
             CONTROLLER_RECT_WIDTH).toInt()
 
+private const val TrackPathKey = "trackPath"
+
 @Composable
 fun TrimmerScreen(
     backStackEntry: NavBackStackEntry,
@@ -52,12 +53,8 @@ fun TrimmerScreen(
     val context = LocalContext.current
     var track by remember { mutableStateOf<Track?>(null) }
 
-    val trackPath by remember {
-        derivedStateOf {
-            backStackEntry
-                .arguments
-                ?.getString(Screens.Audio.Trimmer.TRACK_PATH_KEY)
-        }
+    val trackPath by remember(backStackEntry) {
+        derivedStateOf { backStackEntry.arguments?.getString(TrackPathKey) }
     }
 
     LaunchedEffect(trackPath) {

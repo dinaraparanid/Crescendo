@@ -109,4 +109,7 @@
     <!-- List Top Bar -->
     <string name="list_top_bar_total" formatted="false">Total: %d</string>
     <string name="list_top_bar_duration" formatted="false">Duration: %s</string>
+
+    <!-- Play -->
+    <string name="play_search_bar_placeholder">Search by tracks, artists or albums</string>
 </resources>

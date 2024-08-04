@@ -8,13 +8,15 @@ import androidx.compose.runtime.compositionLocalOf
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
-import com.paranid5.crescendo.core.resources.ui.Background
-import com.paranid5.crescendo.core.resources.ui.BackgroundAlternative
+import com.paranid5.crescendo.core.resources.ui.DarkPurple
 import com.paranid5.crescendo.core.resources.ui.Disabled
+import com.paranid5.crescendo.core.resources.ui.Emerald
 import com.paranid5.crescendo.core.resources.ui.Error
-import com.paranid5.crescendo.core.resources.ui.NotSelected
-import com.paranid5.crescendo.core.resources.ui.Primary
-import com.paranid5.crescendo.core.resources.ui.Selected
+import com.paranid5.crescendo.core.resources.ui.PaleCornflowerBlue
+import com.paranid5.crescendo.core.resources.ui.RoyalBlue
+import com.paranid5.crescendo.core.resources.ui.RoyalBlueGradient
+import com.paranid5.crescendo.core.resources.ui.RussianViolet
+import com.paranid5.crescendo.core.resources.ui.Tertiriary
 import com.paranid5.crescendo.core.resources.ui.TransparentUtility
 
 @Immutable
@@ -28,51 +30,54 @@ data class AppColors(
     val selection: AppSelectionColors,
     val text: AppTextColors,
     val button: AppButtonColors,
+    val icon: AppIconColors,
     val utils: AppUtilsColors,
 ) {
     companion object {
         private val LightColorScheme = lightColorScheme(
-            primary = Primary,
-            secondary = Selected,
-            onSecondary = NotSelected,
-            background = Background,
-            onBackground = BackgroundAlternative,
+            primary = RussianViolet,
+            secondary = Emerald,
+            onSecondary = PaleCornflowerBlue,
+            background = RoyalBlue,
+            onBackground = RoyalBlueGradient,
             inverseSurface = Color.White,
         )
 
         private val DarkColorScheme = darkColorScheme(
-            primary = Primary,
-            secondary = NotSelected,
-            onSecondary = Selected,
-            background = BackgroundAlternative,
-            onBackground = Background,
+            primary = RussianViolet,
+            secondary = PaleCornflowerBlue,
+            onSecondary = Emerald,
+            background = RoyalBlueGradient,
+            onBackground = RoyalBlue,
             inverseSurface = Color.White,
         )
 
         internal fun create(theme: ThemeColors) = when (theme) {
             ThemeColors.Dark -> AppColors(
                 colorScheme = DarkColorScheme,
-                primary = Primary,
-                secondary = Selected,
+                primary = RussianViolet,
+                secondary = Emerald,
                 error = Error,
                 disabled = Disabled,
                 background = AppBackgroundColors.dark,
                 selection = AppSelectionColors.default,
                 text = AppTextColors.default,
                 button = AppButtonColors.default,
+                icon = AppIconColors.default,
                 utils = AppUtilsColors.default,
             )
 
             ThemeColors.Light -> AppColors(
                 colorScheme = LightColorScheme,
-                primary = Primary,
-                secondary = NotSelected,
+                primary = RussianViolet,
+                secondary = PaleCornflowerBlue,
                 error = Error,
                 disabled = Disabled,
                 background = AppBackgroundColors.light,
                 selection = AppSelectionColors.default,
                 text = AppTextColors.default,
                 button = AppButtonColors.default,
+                icon = AppIconColors.default,
                 utils = AppUtilsColors.default,
             )
         }
@@ -91,25 +96,25 @@ data class AppBackgroundColors(
         private val BackgroundGradientEnd = Offset(x = Float.POSITIVE_INFINITY, y = 0F)
 
         internal val dark = AppBackgroundColors(
-            primary = Background,
-            alternative = BackgroundAlternative,
+            primary = RoyalBlue,
+            alternative = RoyalBlueGradient,
             gradient = Brush.linearGradient(
-                colors = listOf(Background, BackgroundAlternative),
+                colors = listOf(RoyalBlue, RoyalBlueGradient),
                 start = BackgroundGradientStart,
                 end = BackgroundGradientEnd,
             ),
-            card = Primary,
+            card = RussianViolet,
         )
 
         internal val light = AppBackgroundColors(
-            primary = BackgroundAlternative,
-            alternative = Background,
+            primary = RoyalBlueGradient,
+            alternative = RoyalBlue,
             gradient = Brush.linearGradient(
-                colors = listOf(BackgroundAlternative, Background),
+                colors = listOf(RoyalBlueGradient, RoyalBlue),
                 start = BackgroundGradientStart,
                 end = BackgroundGradientEnd,
             ),
-            card = Primary,
+            card = RussianViolet,
         )
     }
 }
@@ -121,8 +126,8 @@ data class AppSelectionColors(
 ) {
     companion object {
         internal val default = AppSelectionColors(
-            selected = Selected,
-            notSelected = NotSelected,
+            selected = Emerald,
+            notSelected = PaleCornflowerBlue,
         )
     }
 }
@@ -130,9 +135,15 @@ data class AppSelectionColors(
 @Immutable
 data class AppTextColors(
     val primary: Color,
+    val dark: Color,
+    val tertiriary: Color,
 ) {
     companion object {
-        internal val default = AppTextColors(primary = Color.White)
+        internal val default = AppTextColors(
+            primary = Color.White,
+            dark = DarkPurple,
+            tertiriary = Tertiriary,
+        )
     }
 }
 
@@ -141,7 +152,16 @@ data class AppButtonColors(
     val primary: Color,
 ) {
     companion object {
-        internal val default = AppButtonColors(primary = Primary)
+        internal val default = AppButtonColors(primary = RussianViolet)
+    }
+}
+
+@Immutable
+data class AppIconColors(
+    val primary: Color,
+) {
+    companion object {
+        internal val default = AppIconColors(primary = DarkPurple)
     }
 }
 

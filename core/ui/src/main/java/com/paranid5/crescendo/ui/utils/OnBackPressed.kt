@@ -10,15 +10,21 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.LocalLifecycleOwner
-import com.paranid5.crescendo.navigation.LocalNavigator
+import com.paranid5.crescendo.core.common.navigation.Navigator
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 
 @Composable
-fun OnBackPressed(onBackPressedCallback: suspend (isScreenStackEmpty: Boolean) -> Unit = {}) {
+fun OnBackPressed(
+    navigator: Navigator<*>,
+    onBackPressedCallback: suspend (isScreenStackEmpty: Boolean) -> Unit = {},
+) {
     val lifecycleOwner = LocalLifecycleOwner.current
 
-    val callback = rememberBackPressedCallback(onBackPressedCallback)
+    val callback = rememberBackPressedCallback(
+        navigator = navigator,
+        onBackPressedCallback = onBackPressedCallback,
+    )
 
     val backDispatcher =
         LocalOnBackPressedDispatcherOwner.current!!.onBackPressedDispatcher
@@ -31,9 +37,9 @@ fun OnBackPressed(onBackPressedCallback: suspend (isScreenStackEmpty: Boolean) -
 
 @Composable
 private fun rememberBackPressedCallback(
+    navigator: Navigator<*>,
     onBackPressedCallback: suspend (isScreenStackEmpty: Boolean) -> Unit = {}
 ): OnBackPressedCallback {
-    val navigator = LocalNavigator.current
     val coroutineScope = rememberCoroutineScope()
     var task by remember { mutableStateOf<Job?>(null) }
 

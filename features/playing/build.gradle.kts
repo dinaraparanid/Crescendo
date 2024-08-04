@@ -46,8 +46,6 @@ dependencies {
     implementation(project(":domain:tracks"))
     implementation(project(":domain:stream"))
 
-    implementation(project(":navigation"))
-
     implementation(project(":features:cache"))
 
     implementation(project(":system:services:stream"))

@@ -17,7 +17,6 @@ import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.unit.dp
 import androidx.palette.graphics.Palette
 import com.paranid5.crescendo.core.resources.R
-import com.paranid5.crescendo.navigation.LocalNavigator
 import com.paranid5.crescendo.playing.domain.PlayingInteractor
 import com.paranid5.crescendo.ui.composition_locals.playing.LocalPlayingSheetState
 import com.paranid5.crescendo.utils.extensions.getBrightDominantOrPrimary
@@ -35,7 +34,6 @@ internal fun EqualizerButton(
     interactor: PlayingInteractor = koinInject()
 ) {
     val context = LocalContext.current
-    val navigator = LocalNavigator.current
     val playingSheetState = LocalPlayingSheetState.current
 
     val paletteColor = palette.getBrightDominantOrPrimary()
@@ -47,7 +45,8 @@ internal fun EqualizerButton(
                 .simpleShadow(color = paletteColor)
                 .align(Alignment.Center),
             onClick = {
-                interactor.navigateToAudioEffects(context, navigator)
+                // TODO: navigate to audio effects
+                //interactor.tryNavigateToAudioEffects(context, navigator)
                 scope.launch { playingSheetState?.bottomSheetState?.collapse() }
             }
         ) {

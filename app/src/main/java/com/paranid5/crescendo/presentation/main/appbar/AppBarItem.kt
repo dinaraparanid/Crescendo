@@ -17,8 +17,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import com.paranid5.crescendo.core.resources.ui.theme.AppTheme.colors
 import com.paranid5.crescendo.core.resources.ui.theme.AppTheme.typography
+import com.paranid5.crescendo.navigation.AppScreen
 import com.paranid5.crescendo.navigation.LocalNavigator
-import com.paranid5.crescendo.navigation.Screens
 import com.paranid5.crescendo.ui.composition_locals.LocalCurrentPlaylistSheetState
 import com.paranid5.crescendo.ui.composition_locals.playing.LocalPlayingSheetState
 import com.paranid5.crescendo.ui.utils.clickableWithRipple
@@ -29,7 +29,7 @@ import com.paranid5.crescendo.utils.extensions.collectLatestAsState
 internal fun AppBarItem(
     title: String,
     icon: ImageVector,
-    screen: Screens,
+    screen: AppScreen,
     modifier: Modifier = Modifier,
 ) {
     val navigator = LocalNavigator.current

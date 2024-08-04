@@ -21,6 +21,7 @@ import com.paranid5.crescendo.ui.track.ui_state.TrackUiState
 fun TrackPropertiesButton(
     track: TrackUiState,
     tint: Color,
+    navigateToTrimmer: (trackUri: String) -> Unit,
     modifier: Modifier = Modifier,
     buttonModifier: Modifier = Modifier,
     iconModifier: Modifier = Modifier,
@@ -32,6 +33,7 @@ fun TrackPropertiesButton(
         TrackPropertiesMenu(
             track = track,
             isPropertiesMenuShownState = isPropertiesMenuShownState,
+            navigateToTrimmer = navigateToTrimmer,
             itemModifier = itemModifier,
         )
 

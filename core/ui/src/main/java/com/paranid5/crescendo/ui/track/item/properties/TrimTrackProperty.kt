@@ -9,8 +9,6 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import com.paranid5.crescendo.core.resources.R
-import com.paranid5.crescendo.navigation.LocalNavigator
-import com.paranid5.crescendo.navigation.Screens
 import com.paranid5.crescendo.ui.composition_locals.playing.LocalPlayingSheetState
 import kotlinx.coroutines.launch
 
@@ -19,8 +17,8 @@ import kotlinx.coroutines.launch
 internal fun TrimTrackProperty(
     trackPath: String,
     modifier: Modifier = Modifier,
+    navigateToTrimmer: (trackUri: String) -> Unit,
 ) {
-    val navigator = LocalNavigator.current
     val playingSheetState = LocalPlayingSheetState.current
     val coroutineScope = rememberCoroutineScope()
 
@@ -28,7 +26,7 @@ internal fun TrimTrackProperty(
         modifier = modifier,
         text = { Text(stringResource(R.string.trim_track)) },
         onClick = {
-            navigator.navigateIfNotSame(Screens.Audio.Trimmer(Uri.encode(trackPath)))
+            navigateToTrimmer(Uri.encode(trackPath))
             coroutineScope.launch { playingSheetState?.bottomSheetState?.collapse() }
         }
     )

@@ -5,6 +5,7 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.paranid5.crescendo.core.common.udf.StatePublisher
+import com.paranid5.crescendo.core.common.udf.state
 import com.paranid5.crescendo.domain.github.GitHubApi
 import com.paranid5.crescendo.domain.web.OpenBrowserUseCase
 import com.paranid5.crescendo.presentation.entity.ReleaseUiState
@@ -18,18 +19,18 @@ internal class MainViewModelImpl(
     private val gitHubApi: GitHubApi,
 ) : ViewModel(), MainViewModel, StatePublisher<MainState> {
     companion object {
-        private const val STATE_KEY = "state"
+        private const val StateKey = "state"
     }
 
     override val stateFlow =
-        savedStateHandle.getStateFlow(key = STATE_KEY, initialValue = MainState())
+        savedStateHandle.getStateFlow(key = StateKey, initialValue = MainState())
 
     init {
         checkForUpdates()
     }
 
     override fun updateState(func: MainState.() -> MainState) {
-        savedStateHandle[STATE_KEY] = func(stateFlow.value)
+        savedStateHandle[StateKey] = func(state)
     }
 
     override fun onUiIntent(intent: MainUiIntent) {

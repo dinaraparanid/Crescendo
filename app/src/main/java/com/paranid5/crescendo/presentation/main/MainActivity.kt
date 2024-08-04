@@ -10,8 +10,8 @@ import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Modifier
 import androidx.navigation.compose.rememberNavController
 import com.paranid5.crescendo.core.resources.ui.theme.AppTheme
+import com.paranid5.crescendo.navigation.AppNavigator
 import com.paranid5.crescendo.navigation.LocalNavigator
-import com.paranid5.crescendo.navigation.Navigator
 import com.paranid5.crescendo.utils.extensions.getColorCompat
 import com.paranid5.crescendo.view_model.MainViewModelImpl
 import org.koin.androidx.viewmodel.ext.android.viewModel
@@ -27,7 +27,7 @@ class MainActivity : ComponentActivity() {
 
         setContent {
             AppTheme {
-                val mainNavController = Navigator(rememberNavController())
+                val mainNavController = AppNavigator(rememberNavController())
 
                 CompositionLocalProvider(
                     LocalNavigator provides mainNavController,

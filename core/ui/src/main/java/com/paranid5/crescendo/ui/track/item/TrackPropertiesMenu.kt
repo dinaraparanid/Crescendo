@@ -6,14 +6,15 @@ import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import com.paranid5.crescendo.core.common.tracks.Track
 import com.paranid5.crescendo.ui.track.item.properties.AddToCurrentPlaylistProperty
 import com.paranid5.crescendo.ui.track.item.properties.TrimTrackProperty
+import com.paranid5.crescendo.ui.track.ui_state.TrackUiState
 
 @Composable
-fun TrackPropertiesMenu(
-    track: Track,
+internal fun TrackPropertiesMenu(
+    track: TrackUiState,
     isPropertiesMenuShownState: MutableState<Boolean>,
+    navigateToTrimmer: (trackUri: String) -> Unit,
     modifier: Modifier = Modifier,
     itemModifier: Modifier = Modifier
 ) {
@@ -31,7 +32,8 @@ fun TrackPropertiesMenu(
 
         TrimTrackProperty(
             trackPath = track.path,
-            modifier = itemModifier
+            modifier = itemModifier,
+            navigateToTrimmer = navigateToTrimmer,
         )
     }
 }

@@ -44,6 +44,7 @@ dependencies {
     implementation(libs.androidx.appcompat)
     implementation(libs.androidx.ui)
     implementation(libs.androidx.foundation.android)
+    implementation(libs.androidx.navigation.compose)
     implementation(libs.androidx.material)
     implementation(libs.androidx.material3)
     implementation(libs.material)

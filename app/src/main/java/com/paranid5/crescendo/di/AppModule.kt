@@ -8,8 +8,9 @@ import com.paranid5.crescendo.core.impl.di.STREAM_SERVICE_CONNECTION
 import com.paranid5.crescendo.core.impl.di.TRACK_SERVICE_CONNECTION
 import com.paranid5.crescendo.core.impl.di.VIDEO_CACHE_SERVICE_CONNECTION
 import com.paranid5.crescendo.core.resources.R
-import com.paranid5.crescendo.current_playlist.di.currentPlaylistModule
 import com.paranid5.crescendo.data.di.dataModule
+import com.paranid5.crescendo.feature.current_playlist.di.currentPlaylistModule
+import com.paranid5.crescendo.feature.play.main.di.playModule
 import com.paranid5.crescendo.fetch_stream.di.fetchStreamModule
 import com.paranid5.crescendo.playing.di.playingModule
 import com.paranid5.crescendo.system.services.stream.di.streamServiceModule
@@ -85,7 +86,7 @@ private val featureModule = module {
         fetchStreamModule, playingModule,
         audioEffectsModule, trimmerModule,
         tracksModule, currentPlaylistModule,
-        cacheModule,
+        cacheModule, playModule
     )
 }
 
