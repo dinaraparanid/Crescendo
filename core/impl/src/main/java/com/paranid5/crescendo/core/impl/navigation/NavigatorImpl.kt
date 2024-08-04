@@ -41,16 +41,20 @@ class NavigatorImpl<S : Screen>(
     private inline val screensStack
         get() = screensStackState.value
 
-    override fun navigateIfNotSame(screen: S): S {
-        val currentRoute = curScreen
+    override fun pushIfNotSame(screen: S) =
+        navigateIfNotSame(screen) { stack -> stack + screen }
 
-        if (currentRoute == screen)
-            return currentRoute
+    override fun replaceIfNotSame(screen: S) =
+        navigateIfNotSame(screen) { stack -> stack.dropLast(1) + screen }
 
-        _screensStackState.update { it + currentRoute }
+    private inline fun navigateIfNotSame(
+        screen: S,
+        stackTransform: (stack: List<S>) -> List<S>,
+    ) {
+        if (curScreen == screen) return
+        _screensStackState.update(stackTransform)
         updateCurrentScreen(screen)
         navHost?.navigate(screen.title)
-        return screen
     }
 
     override fun onBackPressed() = nullable<S> {

@@ -15,7 +15,7 @@ import com.paranid5.crescendo.core.resources.ui.theme.AppTheme.colors
 fun Modifier.clickableWithRipple(
     bounded: Boolean = false,
     enabled: Boolean = true,
-    color: Color = colors.secondary,
+    color: Color = colors.selection.selected,
     onClick: () -> Unit,
 ) = this.clickable(
     enabled = enabled,

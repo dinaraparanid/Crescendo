@@ -21,6 +21,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
 import com.paranid5.crescendo.about_app.AboutApp
 import com.paranid5.crescendo.audio_effects.presentation.AudioEffectsScreen
+import com.paranid5.crescendo.core.common.navigation.LocalNavigator
 import com.paranid5.crescendo.core.resources.R
 import com.paranid5.crescendo.core.resources.ui.theme.AppTheme.dimensions
 import com.paranid5.crescendo.favourites.FavouritesScreen
@@ -28,7 +29,7 @@ import com.paranid5.crescendo.feature.play.main.presentation.PlayScreen
 import com.paranid5.crescendo.fetch_stream.presentation.FetchStreamScreen
 import com.paranid5.crescendo.navigation.AppNavigator
 import com.paranid5.crescendo.navigation.AppScreen
-import com.paranid5.crescendo.navigation.LocalNavigator
+import com.paranid5.crescendo.navigation.requireAppNavigator
 import com.paranid5.crescendo.settings.SettingsScreen
 import com.paranid5.crescendo.track_collections.AlbumsScreen
 import com.paranid5.crescendo.trimmer.presentation.TrimmerScreen
@@ -43,7 +44,7 @@ private const val BACK_TOAST_DELAY = 500L
 
 @Composable
 internal fun ContentScreen(modifier: Modifier = Modifier) {
-    val navigator = LocalNavigator.current
+    val navigator = LocalNavigator.requireAppNavigator()
 
     BackHandler()
 
@@ -128,7 +129,7 @@ private fun ContentScreenNavHost(
 @Composable
 private fun BackHandler() {
     val context = LocalContext.current
-    val navigator = LocalNavigator.current
+    val navigator = LocalNavigator.requireAppNavigator()
     val playingSheetState = LocalPlayingSheetState.current
     val currentPlaylistSheetState = LocalCurrentPlaylistSheetState.current
     var backPressedCounter by remember { mutableIntStateOf(0) }

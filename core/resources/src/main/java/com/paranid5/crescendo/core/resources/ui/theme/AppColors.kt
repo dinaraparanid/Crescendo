@@ -12,6 +12,7 @@ import com.paranid5.crescendo.core.resources.ui.DarkPurple
 import com.paranid5.crescendo.core.resources.ui.Disabled
 import com.paranid5.crescendo.core.resources.ui.Emerald
 import com.paranid5.crescendo.core.resources.ui.Error
+import com.paranid5.crescendo.core.resources.ui.LightBlue
 import com.paranid5.crescendo.core.resources.ui.PaleCornflowerBlue
 import com.paranid5.crescendo.core.resources.ui.RoyalBlue
 import com.paranid5.crescendo.core.resources.ui.RoyalBlueGradient
@@ -89,6 +90,7 @@ data class AppBackgroundColors(
     val primary: Color,
     val alternative: Color,
     val gradient: Brush,
+    val chips: Color,
     val card: Color,
 ) {
     companion object {
@@ -103,7 +105,8 @@ data class AppBackgroundColors(
                 start = BackgroundGradientStart,
                 end = BackgroundGradientEnd,
             ),
-            card = RussianViolet,
+            chips = RussianViolet,
+            card = LightBlue,
         )
 
         internal val light = AppBackgroundColors(
@@ -114,7 +117,8 @@ data class AppBackgroundColors(
                 start = BackgroundGradientStart,
                 end = BackgroundGradientEnd,
             ),
-            card = RussianViolet,
+            chips = RussianViolet,
+            card = LightBlue,
         )
     }
 }

@@ -15,10 +15,11 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import com.paranid5.crescendo.core.common.navigation.LocalNavigator
 import com.paranid5.crescendo.core.resources.ui.theme.AppTheme.colors
 import com.paranid5.crescendo.core.resources.ui.theme.AppTheme.typography
 import com.paranid5.crescendo.navigation.AppScreen
-import com.paranid5.crescendo.navigation.LocalNavigator
+import com.paranid5.crescendo.navigation.requireAppNavigator
 import com.paranid5.crescendo.ui.composition_locals.LocalCurrentPlaylistSheetState
 import com.paranid5.crescendo.ui.composition_locals.playing.LocalPlayingSheetState
 import com.paranid5.crescendo.ui.utils.clickableWithRipple
@@ -32,7 +33,7 @@ internal fun AppBarItem(
     screen: AppScreen,
     modifier: Modifier = Modifier,
 ) {
-    val navigator = LocalNavigator.current
+    val navigator = LocalNavigator.requireAppNavigator()
     val playingSheetState = LocalPlayingSheetState.current
     val curPlaylistSheetState = LocalCurrentPlaylistSheetState.current
 
@@ -53,7 +54,7 @@ internal fun AppBarItem(
 
     Box(
         modifier = modifier.clickableWithRipple(enabled = isEnabled) {
-            navigator.navigateIfNotSame(screen)
+            navigator.pushIfNotSame(screen)
         }
     ) {
         Column(

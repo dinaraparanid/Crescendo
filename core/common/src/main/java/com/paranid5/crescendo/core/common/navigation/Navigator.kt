@@ -16,7 +16,9 @@ interface Navigator<S : Screen> {
 
     fun updateScreensStack(stack: List<S>)
 
-    fun navigateIfNotSame(screen: S): S
+    fun pushIfNotSame(screen: S)
+
+    fun replaceIfNotSame(screen: S)
 
     /**
      * Pops screen stack, replacing root with deleted element.

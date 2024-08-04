@@ -66,7 +66,7 @@ private fun BarCardLabel(
 ) = Box(
     modifier = modifier
         .clip(RoundedCornerShape(dimensions.padding.extraMedium))
-        .background(colors.background.card)
+        .background(colors.background.chips)
         .simpleShadow(elevation = CardLabelElevation)
 ) {
     Text(

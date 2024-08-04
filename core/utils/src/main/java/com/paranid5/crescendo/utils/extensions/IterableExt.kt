@@ -20,3 +20,10 @@ fun <T> Iterable<T>.exclude(index: Int) =
         listBuilder.addAll(drop(index + 1))
     }
 
+fun <T> Iterable<T>.replace(index: Int, elem: T) =
+    buildList {
+        addAll(this@replace.take(index))
+        add(elem)
+        addAll(drop(index + 1))
+    }
+

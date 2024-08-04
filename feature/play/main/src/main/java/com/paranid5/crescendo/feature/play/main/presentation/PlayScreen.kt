@@ -1,15 +1,14 @@
 package com.paranid5.crescendo.feature.play.main.presentation
 
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
-import com.paranid5.crescendo.core.resources.ui.theme.AppTheme.dimensions
-import com.paranid5.crescendo.feature.play.main.presentation.ui.PlaySearchBar
+import androidx.navigation.compose.rememberNavController
+import com.paranid5.crescendo.core.common.navigation.LocalNavigator
+import com.paranid5.crescendo.feature.play.main.navigation.PlayNavigator
+import com.paranid5.crescendo.feature.play.main.presentation.ui.PlayHost
 import com.paranid5.crescendo.feature.play.main.presentation.view_model.PlayViewModel
 import com.paranid5.crescendo.feature.play.main.presentation.view_model.PlayViewModelImpl
 import com.paranid5.crescendo.utils.extensions.collectLatestAsState
@@ -18,21 +17,19 @@ import org.koin.androidx.compose.koinViewModel
 @Composable
 fun PlayScreen(
     modifier: Modifier = Modifier,
-    viewModel: PlayViewModel = koinViewModel<PlayViewModelImpl>()
+    viewModel: PlayViewModel = koinViewModel<PlayViewModelImpl>(),
 ) {
     val state by viewModel.stateFlow.collectLatestAsState()
     val onUiIntent = viewModel::onUiIntent
 
-    Column(modifier) {
-        PlaySearchBar(
+    val navHost = rememberNavController()
+    val navigator = remember(navHost) { PlayNavigator(navHost) }
+
+    CompositionLocalProvider(LocalNavigator provides navigator) {
+        PlayHost(
             state = state,
             onUiIntent = onUiIntent,
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = dimensions.padding.extraMedium),
+            modifier = modifier,
         )
-
-        Spacer(Modifier.height(dimensions.padding.extraBig))
     }
 }
-

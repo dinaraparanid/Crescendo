@@ -112,4 +112,7 @@
 
     <!-- Play -->
     <string name="play_search_bar_placeholder">Search by tracks, artists or albums</string>
+    <string name="play_favourites">Favourites</string>
+    <string name="play_playlists">Playlists</string>
+    <string name="play_recent">Recent</string>
 </resources>

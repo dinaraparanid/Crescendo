@@ -20,6 +20,7 @@ fun Modifier.simpleShadow(
     shape = RoundedCornerShape(radius),
     ambientColor = color,
     spotColor = color,
+    clip = false,
 )
 
 fun Modifier.simpleShadow(
@@ -31,4 +32,5 @@ fun Modifier.simpleShadow(
     shape = shape,
     ambientColor = color,
     spotColor = color,
+    clip = false,
 )

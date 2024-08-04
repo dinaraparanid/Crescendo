@@ -8,6 +8,7 @@ internal val PaleCornflowerBlue = Color(0xFFA2CCFB)
 internal val RoyalBlue = Color(0xFF1B246B)
 internal val RoyalBlueGradient = Color(0xFF3546D1)
 internal val DarkPurple = Color(0xFF0D0221)
+internal val LightBlue = Color(0xFFB4DBD7)
 
 internal val Tertiriary = Color(0xFF656266)
 internal val Error = Color(0xFFFF0606)

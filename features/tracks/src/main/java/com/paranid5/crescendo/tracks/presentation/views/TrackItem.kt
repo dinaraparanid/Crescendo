@@ -12,21 +12,14 @@ import androidx.compose.runtime.State
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
-import com.paranid5.crescendo.core.common.AudioStatus
 import com.paranid5.crescendo.core.common.tracks.Track
 import com.paranid5.crescendo.core.resources.ui.theme.AppTheme.colors
 import com.paranid5.crescendo.core.resources.ui.theme.AppTheme.dimensions
-import com.paranid5.crescendo.domain.current_playlist.CurrentPlaylistPublisher
-import com.paranid5.crescendo.domain.playback.AudioStatusPublisher
-import com.paranid5.crescendo.domain.tracks.CurrentTrackIndexPublisher
-import com.paranid5.crescendo.system.services.track.TrackServiceInteractor
-import com.paranid5.crescendo.system.services.track.startPlaylistPlayback
 import com.paranid5.crescendo.ui.track.clickableTrackWithPermissions
 import com.paranid5.crescendo.ui.track.currentTrackState
 import com.paranid5.crescendo.ui.track.item.TrackCover
@@ -34,8 +27,6 @@ import com.paranid5.crescendo.ui.track.item.TrackInfo
 import com.paranid5.crescendo.ui.track.item.TrackPropertiesButton
 import com.paranid5.crescendo.ui.track.ui_state.TrackUiState
 import kotlinx.collections.immutable.ImmutableList
-import kotlinx.coroutines.launch
-import org.koin.compose.koinInject
 
 private val TrackCoverSize = 64.dp
 
@@ -59,38 +50,6 @@ internal fun TrackItem(
             )
         }
     }
-}
-
-@Composable
-internal fun <VM> TrackItem(
-    viewModel: VM,
-    tracks: ImmutableList<TrackUiState>,
-    trackInd: Int,
-    modifier: Modifier = Modifier,
-    trackServiceInteractor: TrackServiceInteractor = koinInject(),
-) where VM : AudioStatusPublisher,
-        VM : CurrentPlaylistPublisher,
-        VM : CurrentTrackIndexPublisher {
-    val coroutineScope = rememberCoroutineScope()
-    val currentTrack by currentTrackState()
-
-    TrackItem(
-        tracks = tracks,
-        trackInd = trackInd,
-        modifier = modifier,
-        onClick = {
-            coroutineScope.launch {
-                viewModel.updateAudioStatus(AudioStatus.PLAYING)
-                viewModel.updateCurrentPlaylist(tracks)
-                viewModel.updateCurrentTrackIndex(trackInd)
-
-                trackServiceInteractor.startPlaylistPlayback(
-                    nextTrack = tracks.getOrNull(trackInd),
-                    prevTrack = currentTrack,
-                )
-            }
-        }
-    )
 }
 
 @Composable

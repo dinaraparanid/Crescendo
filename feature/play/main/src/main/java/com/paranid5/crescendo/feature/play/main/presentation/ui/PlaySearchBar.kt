@@ -112,8 +112,5 @@ private fun CancelIcon(
     tint = colors.icon.primary,
     modifier = modifier
         .size(IconSize)
-        .clickableWithRipple(
-            color = colors.selection.selected,
-            onClick = onClick,
-        ),
+        .clickableWithRipple(onClick = onClick),
 )

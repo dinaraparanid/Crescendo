@@ -7,11 +7,12 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.navigation.compose.rememberNavController
+import com.paranid5.crescendo.core.common.navigation.LocalNavigator
 import com.paranid5.crescendo.core.resources.ui.theme.AppTheme
 import com.paranid5.crescendo.navigation.AppNavigator
-import com.paranid5.crescendo.navigation.LocalNavigator
 import com.paranid5.crescendo.utils.extensions.getColorCompat
 import com.paranid5.crescendo.view_model.MainViewModelImpl
 import org.koin.androidx.viewmodel.ext.android.viewModel
@@ -27,11 +28,10 @@ class MainActivity : ComponentActivity() {
 
         setContent {
             AppTheme {
-                val mainNavController = AppNavigator(rememberNavController())
+                val navHost = rememberNavController()
+                val mainNavController = remember(navHost) { AppNavigator(navHost) }
 
-                CompositionLocalProvider(
-                    LocalNavigator provides mainNavController,
-                ) {
+                CompositionLocalProvider(LocalNavigator provides mainNavController) {
                     App(
                         viewModel = viewModel,
                         modifier = Modifier.fillMaxSize(),

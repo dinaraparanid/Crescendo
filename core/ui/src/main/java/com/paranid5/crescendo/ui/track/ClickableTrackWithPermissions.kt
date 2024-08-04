@@ -4,7 +4,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
-import com.paranid5.crescendo.core.resources.ui.theme.AppTheme.colors
 import com.paranid5.crescendo.ui.permissions.requests.audioRecordingPermissionsRequestLauncher
 import com.paranid5.crescendo.ui.permissions.requests.foregroundServicePermissionsRequestLauncherCompat
 import com.paranid5.crescendo.ui.utils.clickableWithRipple
@@ -29,10 +28,7 @@ fun Modifier.clickableTrackWithPermissions(
             modifier = permissionModifier,
         )
 
-    return this.clickableWithRipple(
-        bounded = true,
-        color = colors.selection.selected,
-    ) {
+    return this.clickableWithRipple(bounded = true) {
         when {
             areFSPermissionsGranted.not() -> launchFSPermissions()
             isRecordingPermissionGranted.not() -> launchRecordPermissions()
