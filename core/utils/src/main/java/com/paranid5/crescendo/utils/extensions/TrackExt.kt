@@ -26,3 +26,11 @@ fun Iterable<Track>.toMediaItemList() = map(Track::toMediaItem)
 
 inline val Iterable<Track>.totalDurationMillis
     get() = fold(0L) { acc, track -> acc + track.durationMillis }
+
+infix fun Track.matches(query: String): Boolean {
+    val title = title.lowercase()
+    val artist = artist.lowercase()
+    val album = album.lowercase()
+    val q = query.lowercase()
+    return q in title || q in artist || q in album
+}

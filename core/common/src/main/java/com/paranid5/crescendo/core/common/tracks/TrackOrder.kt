@@ -1,9 +1,16 @@
 package com.paranid5.crescendo.core.common.tracks
 
+import android.os.Parcelable
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.toImmutableList
+import kotlinx.parcelize.Parcelize
 
-data class TrackOrder(val contentOrder: TrackContentOrder, val orderType: TrackOrderType) {
+@Parcelize
+data class TrackOrder(
+    val contentOrder: TrackContentOrder,
+    val orderType: TrackOrderType,
+) : Parcelable {
+
     enum class TrackContentOrder {
         TITLE, ARTIST, ALBUM, DATE, NUMBER_IN_ALBUM
     }

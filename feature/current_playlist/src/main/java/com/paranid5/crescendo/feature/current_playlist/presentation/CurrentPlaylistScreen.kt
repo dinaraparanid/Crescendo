@@ -10,10 +10,10 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalConfiguration
 import com.paranid5.crescendo.core.resources.ui.theme.AppTheme.dimensions
-import com.paranid5.crescendo.feature.current_playlist.presentation.effects.SubscribeOnBackEventsEffect
-import com.paranid5.crescendo.feature.current_playlist.presentation.effects.SubscribeOnLifecycleEffect
-import com.paranid5.crescendo.feature.current_playlist.presentation.views.CurrentPlaylistBar
-import com.paranid5.crescendo.feature.current_playlist.presentation.views.CurrentPlaylistTrackList
+import com.paranid5.crescendo.feature.current_playlist.presentation.effect.SubscribeOnBackEventsEffect
+import com.paranid5.crescendo.feature.current_playlist.presentation.effect.SubscribeOnLifecycleEffect
+import com.paranid5.crescendo.feature.current_playlist.presentation.ui.CurrentPlaylistBar
+import com.paranid5.crescendo.feature.current_playlist.presentation.ui.CurrentPlaylistTrackList
 import com.paranid5.crescendo.feature.current_playlist.view_model.CurrentPlaylistBackResult
 import com.paranid5.crescendo.feature.current_playlist.view_model.CurrentPlaylistViewModel
 import com.paranid5.crescendo.feature.current_playlist.view_model.CurrentPlaylistViewModelImpl

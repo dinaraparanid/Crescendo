@@ -31,6 +31,7 @@
             <option value="$PROJECT_DIR$/feature/current_playlist" />
             <option value="$PROJECT_DIR$/feature/play" />
             <option value="$PROJECT_DIR$/feature/play/main" />
+            <option value="$PROJECT_DIR$/feature/play/tracks" />
             <option value="$PROJECT_DIR$/feature/splash" />
             <option value="$PROJECT_DIR$/features" />
             <option value="$PROJECT_DIR$/features/about_app" />
@@ -41,7 +42,6 @@
             <option value="$PROJECT_DIR$/features/playing" />
             <option value="$PROJECT_DIR$/features/settings" />
             <option value="$PROJECT_DIR$/features/track_collections" />
-            <option value="$PROJECT_DIR$/features/tracks" />
             <option value="$PROJECT_DIR$/features/trimmer" />
             <option value="$PROJECT_DIR$/system" />
             <option value="$PROJECT_DIR$/system/common" />

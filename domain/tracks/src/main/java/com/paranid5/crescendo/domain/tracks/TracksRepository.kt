@@ -5,4 +5,5 @@ interface TracksRepository :
     CurrentTrackIndexPublisher,
     CurrentTrackSubscriber,
     TrackOrderSubscriber,
-    TrackOrderPublisher
+    TrackOrderPublisher,
+    TracksMediaStoreSubscriber

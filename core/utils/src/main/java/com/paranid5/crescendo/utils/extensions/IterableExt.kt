@@ -14,6 +14,11 @@ inline fun <T, R> Iterable<T>.mapToImmutableList(transform: (T) -> R) =
         forEach { listBuilder.add(transform(it)) }
     }
 
+inline fun <T> Iterable<T>.filterToImmutableList(predicate: (T) -> Boolean) =
+    persistentListOf<T>().mutate { listBuilder ->
+        forEach { if (predicate(it)) listBuilder.add(it) }
+    }
+
 fun <T> Iterable<T>.exclude(index: Int) =
     persistentListOf<T>().mutate { listBuilder ->
         listBuilder.addAll(take(index))

@@ -6,7 +6,7 @@ plugins {
 }
 
 android {
-    namespace = "com.paranid5.crescendo.feature.play.main"
+    namespace = "com.paranid5.crescendo.feature.play.tracks"
     compileSdk = 34
 
     defaultConfig {
@@ -37,19 +37,28 @@ android {
 dependencies {
     implementation(project(":core:common"))
     implementation(project(":core:impl"))
-    implementation(project(":core:resources"))
-    implementation(project(":core:utils"))
+    implementation(project(":core:media"))
     implementation(project(":core:ui"))
+    implementation(project(":core:utils"))
+    implementation(project(":core:resources"))
 
-    implementation(project(":feature:play:tracks"))
+    implementation(project(":domain:current_playlist"))
+    implementation(project(":domain:playback"))
+    implementation(project(":domain:tracks"))
+
+    implementation(project(":system:services:track"))
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)
     implementation(libs.androidx.foundation.android)
-    implementation(libs.androidx.navigation.compose)
+    implementation(libs.androidx.ui)
+    implementation(libs.androidx.palette.ktx)
     implementation(libs.androidx.material3)
+    implementation(libs.androidx.material)
     implementation(libs.material)
 
     implementation(libs.kotlinx.collections.immutable)
     implementation(libs.koin.androidx.compose)
+    implementation(libs.coil.compose)
+    implementation(libs.arrow.fx.coroutines)
 }

@@ -169,7 +169,6 @@ private fun BackHandler() {
 private fun Modifier.screenPaddingDefault() =
     this.padding(
         top = topPaddingDefault,
-        start = dimensions.padding.small,
         end = endPaddingDefault,
     )
 
@@ -184,5 +183,5 @@ private inline val endPaddingDefault
     @Composable
     get() = when (LocalConfiguration.current.orientation) {
         Configuration.ORIENTATION_LANDSCAPE -> dimensions.padding.extraLarge
-        else -> dimensions.padding.small
+        else -> dimensions.padding.zero
     }

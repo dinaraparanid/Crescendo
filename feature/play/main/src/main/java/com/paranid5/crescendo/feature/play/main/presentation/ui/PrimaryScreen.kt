@@ -35,8 +35,6 @@ internal fun PrimaryScreen(
     PrimaryPager(
         state = state,
         onUiIntent = onUiIntent,
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(horizontal = dimensions.padding.extraMedium)
+        modifier = Modifier.fillMaxWidth(),
     )
 }

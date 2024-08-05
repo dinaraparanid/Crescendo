@@ -71,7 +71,6 @@ dependencies {
     implementation project(':features:settings')
     implementation project(':features:fetch_stream')
     implementation project(':features:favourites')
-    implementation project(':features:tracks')
     implementation project(':features:track_collections')
     implementation project(':features:trimmer')
     implementation project(':features:playing')
@@ -80,6 +79,7 @@ dependencies {
     implementation project(':feature:current_playlist')
     implementation project(':feature:splash')
     implementation project(':feature:play:main')
+    implementation project(':feature:play:tracks')
 
     implementation project(':system:common')
     implementation project(':system:receivers')

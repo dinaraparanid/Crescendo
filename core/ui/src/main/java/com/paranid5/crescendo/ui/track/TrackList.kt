@@ -5,7 +5,6 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -23,14 +22,12 @@ typealias TrackItemContent = @Composable (
 @Composable
 fun TrackList(
     tracks: ImmutableList<TrackUiState>,
-    scrollingState: LazyListState,
     modifier: Modifier = Modifier,
     trackItemModifier: Modifier = Modifier,
     bottomPadding: Dp = dimensions.padding.extraMedium,
     trackItemContent: TrackItemContent,
 ) = LazyColumn(
     verticalArrangement = Arrangement.spacedBy(dimensions.padding.medium),
-    state = scrollingState,
     modifier = modifier,
 ) {
     itemsIndexed(

@@ -8,13 +8,12 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.navigation.NavBackStackEntry
-import arrow.core.curried
 import com.paranid5.crescendo.core.common.tracks.Track
-import com.paranid5.crescendo.data.media_store.tracks.getTrackFromMediaStore
+import com.paranid5.crescendo.domain.tracks.TracksRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import org.koin.compose.koinInject
 
 internal const val MIN_SPIKE_HEIGHT = 1F
 internal const val DEFAULT_GRAPHICS_LAYER_ALPHA = 0.99F
@@ -48,9 +47,9 @@ private const val TrackPathKey = "trackPath"
 @Composable
 fun TrimmerScreen(
     backStackEntry: NavBackStackEntry,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    tracksRepository: TracksRepository = koinInject(),
 ) {
-    val context = LocalContext.current
     var track by remember { mutableStateOf<Track?>(null) }
 
     val trackPath by remember(backStackEntry) {
@@ -59,7 +58,7 @@ fun TrimmerScreen(
 
     LaunchedEffect(trackPath) {
         track = withContext(Dispatchers.IO) {
-            trackPath?.let(::getTrackFromMediaStore.curried()(context))
+            trackPath?.let { tracksRepository.getTrackFromMediaStore(it) }
         }
     }
 
