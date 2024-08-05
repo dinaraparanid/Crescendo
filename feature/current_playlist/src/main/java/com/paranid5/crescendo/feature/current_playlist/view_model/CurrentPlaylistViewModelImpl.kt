@@ -1,6 +1,5 @@
 package com.paranid5.crescendo.feature.current_playlist.view_model
 
-import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.paranid5.crescendo.core.common.AudioStatus
@@ -23,15 +22,17 @@ import kotlinx.collections.immutable.ImmutableList
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 internal class CurrentPlaylistViewModelImpl(
-    private val savedStateHandle: SavedStateHandle,
     private val currentPlaylistRepository: CurrentPlaylistRepository,
     private val playbackRepository: PlaybackRepository,
     private val tracksRepository: TracksRepository,
@@ -40,19 +41,19 @@ internal class CurrentPlaylistViewModelImpl(
     CurrentPlaylistViewModel,
     StatePublisher<CurrentPlaylistState> {
     companion object {
-        private const val StateKey = "state"
         private const val UpdatePlaylistAfterDragDelay = 500L
     }
 
     private var playlistUpdatesJob: Job? = null
     private var dismissUpdatesJob: Job? = null
 
-    override val stateFlow =
-        savedStateHandle.getStateFlow(StateKey, CurrentPlaylistState())
+    private val _stateFlow = MutableStateFlow(CurrentPlaylistState())
 
-    override fun updateState(func: CurrentPlaylistState.() -> CurrentPlaylistState) {
-        savedStateHandle[StateKey] = func(state)
-    }
+    override val stateFlow =
+        _stateFlow.asStateFlow()
+
+    override fun updateState(func: CurrentPlaylistState.() -> CurrentPlaylistState) =
+        _stateFlow.update(func)
 
     private inline fun updateDismissState(crossinline func: DismissState.() -> DismissState) =
         updateState { copy(dismissState = func(dismissState)) }

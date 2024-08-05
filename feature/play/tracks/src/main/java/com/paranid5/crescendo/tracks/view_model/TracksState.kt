@@ -18,10 +18,10 @@ import kotlinx.parcelize.Parcelize
 @Immutable
 data class TracksState(
     val query: String = "",
-    val allTracksState: UiState<ImmutableList<TrackUiState>> = UiState.Undefined,
-    val trackOrder: TrackOrder = TrackOrder.default,
-    val currentTrack: TrackUiState? = null,
-    val backResult: TracksBackResult? = null,
+    @IgnoredOnParcel val allTracksState: UiState<ImmutableList<TrackUiState>> = UiState.Undefined,
+    @IgnoredOnParcel val trackOrder: TrackOrder = TrackOrder.default,
+    @IgnoredOnParcel val currentTrack: TrackUiState? = null,
+    @IgnoredOnParcel val backResult: TracksBackResult? = null,
 ) : Parcelable {
 
     @IgnoredOnParcel
