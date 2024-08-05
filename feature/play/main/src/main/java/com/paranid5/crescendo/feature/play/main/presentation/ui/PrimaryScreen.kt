@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import com.paranid5.crescendo.core.resources.ui.theme.AppTheme.dimensions
+import com.paranid5.crescendo.feature.play.main.presentation.ui.pager.PrimaryPager
 import com.paranid5.crescendo.feature.play.main.presentation.view_model.PlayState
 import com.paranid5.crescendo.feature.play.main.presentation.view_model.PlayUiIntent
 
@@ -30,4 +31,12 @@ internal fun PrimaryScreen(
     PlayScreenCards(Modifier.fillMaxWidth())
 
     Spacer(Modifier.height(dimensions.padding.big))
+
+    PrimaryPager(
+        state = state,
+        onUiIntent = onUiIntent,
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = dimensions.padding.extraMedium)
+    )
 }
