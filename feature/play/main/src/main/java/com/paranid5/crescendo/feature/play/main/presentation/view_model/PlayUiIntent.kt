@@ -8,4 +8,6 @@ interface PlayUiIntent {
     data object ClearSearchQuery : PlayUiIntent
 
     data class UpdatePagerState(val pagerState: PagerState) : PlayUiIntent
+
+    data class ShowTrimmer(val trackUri: String) : PlayUiIntent
 }

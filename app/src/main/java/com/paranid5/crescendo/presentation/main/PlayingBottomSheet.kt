@@ -34,6 +34,7 @@ import com.paranid5.crescendo.feature.current_playlist.view_model.CurrentPlaylis
 import com.paranid5.crescendo.navigation.AppScreen
 import com.paranid5.crescendo.navigation.requireAppNavigator
 import com.paranid5.crescendo.playing.presentation.PlayingScreen
+import com.paranid5.crescendo.playing.view_model.PlayingBackResult
 import com.paranid5.crescendo.presentation.main.appbar.AppBar
 import com.paranid5.crescendo.ui.appbar.appBarHeight
 import com.paranid5.crescendo.ui.composition_locals.LocalCurrentPlaylistSheetState
@@ -52,6 +53,7 @@ internal fun PlayingBottomSheet(
     alpha: Float,
     modifier: Modifier = Modifier,
 ) {
+    val navigator = LocalNavigator.requireAppNavigator()
     val curPlaylistSheetState = LocalCurrentPlaylistSheetState.current
     val playingPagerState = LocalPlayingPagerState.current
 
@@ -61,6 +63,14 @@ internal fun PlayingBottomSheet(
     val currentValue = sheetState?.currentValue
     val isBarNotVisible = currentValue == BottomSheetValue.Expanded
             && targetValue == BottomSheetValue.Expanded
+
+    fun onBack(result: PlayingBackResult) = when (result) {
+        is PlayingBackResult.ShowAudioEffects ->
+            navigator.pushIfNotSame(AppScreen.Audio.AudioEffects)
+
+        is PlayingBackResult.ShowTrimmer ->
+            navigator.pushIfNotSame(AppScreen.Audio.Trimmer(result.trackUri))
+    }
 
     curPlaylistSheetState?.let { curPlaylistScaffoldState ->
         ModalBottomSheetLayout(
@@ -86,12 +96,14 @@ internal fun PlayingBottomSheet(
                             coverAlpha = 1 - alpha,
                             audioStatus = AudioStatus.PLAYING,
                             modifier = modifier.fillMaxSize(),
+                            onBack = ::onBack,
                         )
 
                         else -> PlayingScreen(
                             coverAlpha = 1 - alpha,
                             audioStatus = AudioStatus.STREAMING,
                             modifier = modifier.fillMaxSize(),
+                            onBack = ::onBack,
                         )
                     }
                 }

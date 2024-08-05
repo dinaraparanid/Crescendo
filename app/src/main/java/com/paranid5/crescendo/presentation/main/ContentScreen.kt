@@ -26,6 +26,7 @@ import com.paranid5.crescendo.core.resources.R
 import com.paranid5.crescendo.core.resources.ui.theme.AppTheme.dimensions
 import com.paranid5.crescendo.favourites.FavouritesScreen
 import com.paranid5.crescendo.feature.play.main.presentation.PlayScreen
+import com.paranid5.crescendo.feature.play.main.presentation.view_model.PlayBackResult
 import com.paranid5.crescendo.fetch_stream.presentation.FetchStreamScreen
 import com.paranid5.crescendo.navigation.AppNavigator
 import com.paranid5.crescendo.navigation.AppScreen
@@ -75,7 +76,12 @@ private fun ContentScreenNavHost(
 
     composable(route = AppScreen.Play.title) {
         navigator.updateCurrentScreen(AppScreen.Play)
-        PlayScreen(modifier = screenModifier)
+        PlayScreen(modifier = screenModifier) { result ->
+            when (result) {
+                is PlayBackResult.ShowTrimmer ->
+                    navigator.pushIfNotSame(AppScreen.Audio.Trimmer(result.trackUri))
+            }
+        }
     }
 
     composable(route = AppScreen.TrackCollections.Albums.title) {

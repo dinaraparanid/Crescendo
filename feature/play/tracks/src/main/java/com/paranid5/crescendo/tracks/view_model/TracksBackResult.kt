@@ -5,5 +5,7 @@ import kotlinx.parcelize.Parcelize
 
 @Parcelize
 sealed interface TracksBackResult : Parcelable {
+
+    @Parcelize
     data class ShowTrimmer(val trackUri: String) : TracksBackResult
 }

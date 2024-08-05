@@ -50,6 +50,10 @@ internal class TracksViewModelImpl(
 
         is TracksUiIntent.OnRefresh -> onRefresh()
 
+        is TracksUiIntent.UpdateSearchQuery -> updateState {
+            copy(query = intent.query)
+        }
+
         is TracksUiIntent.UpdateTrackOrder -> updateState {
             copy(trackOrder = intent.order)
         }

@@ -63,11 +63,13 @@ internal fun PrimaryPager(
             val pageModifier = Modifier.fillMaxSize()
 
             when (PagerState.entries.getOrNull(page)) {
-                PagerState.TRACKS -> TracksScreen(pageModifier) { result ->
+                PagerState.TRACKS -> TracksScreen(
+                    modifier = pageModifier,
+                    searchQuery = state.searchQuery,
+                ) { result ->
                     when (result) {
-                        is TracksBackResult.ShowTrimmer -> {
-                            // TODO: Show trimmer
-                        }
+                        is TracksBackResult.ShowTrimmer ->
+                            onUiIntent(PlayUiIntent.ShowTrimmer(result.trackUri))
                     }
                 }
 

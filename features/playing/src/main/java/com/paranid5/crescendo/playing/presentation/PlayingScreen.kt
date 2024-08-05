@@ -9,11 +9,14 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalConfiguration
 import com.paranid5.crescendo.core.common.AudioStatus
+import com.paranid5.crescendo.playing.presentation.effect.SubscribeOnBackResultEffect
 import com.paranid5.crescendo.playing.presentation.properties.compose.collectAudioStatusAsState
 import com.paranid5.crescendo.playing.presentation.properties.compose.collectCurrentMetadataAsState
 import com.paranid5.crescendo.playing.presentation.properties.compose.collectDurationMillisAsState
-import com.paranid5.crescendo.playing.presentation.views.PlayingScreenLandscape
-import com.paranid5.crescendo.playing.presentation.views.PlayingScreenPortrait
+import com.paranid5.crescendo.playing.presentation.ui.PlayingScreenLandscape
+import com.paranid5.crescendo.playing.presentation.ui.PlayingScreenPortrait
+import com.paranid5.crescendo.playing.view_model.PlayingBackResult
+import com.paranid5.crescendo.playing.view_model.PlayingViewModel
 import org.koin.androidx.compose.koinViewModel
 
 @Composable
@@ -22,10 +25,13 @@ fun PlayingScreen(
     coverAlpha: Float,
     modifier: Modifier = Modifier,
     viewModel: PlayingViewModel = koinViewModel(),
+    onBack: (PlayingBackResult) -> Unit,
 ) {
     val config = LocalConfiguration.current
     val isLiveStreaming by rememberIsLiveStreaming(audioStatus)
     val length by viewModel.collectDurationMillisAsState(audioStatus)
+
+    SubscribeOnBackResultEffect(onBack = onBack)
 
     when (config.orientation) {
         Configuration.ORIENTATION_LANDSCAPE -> PlayingScreenLandscape(

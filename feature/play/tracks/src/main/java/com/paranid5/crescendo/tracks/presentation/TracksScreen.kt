@@ -17,6 +17,7 @@ import androidx.compose.ui.Modifier
 import com.paranid5.crescendo.core.resources.ui.theme.AppTheme.dimensions
 import com.paranid5.crescendo.tracks.presentation.effect.SubscribeOnBackEventsEffect
 import com.paranid5.crescendo.tracks.presentation.effect.SubscribeOnLifecycleEventsEffect
+import com.paranid5.crescendo.tracks.presentation.effect.SubscribeOnQueryUpdatesEffect
 import com.paranid5.crescendo.tracks.presentation.ui.DefaultTrackList
 import com.paranid5.crescendo.tracks.presentation.ui.TracksBar
 import com.paranid5.crescendo.tracks.view_model.TracksBackResult
@@ -31,6 +32,7 @@ import org.koin.androidx.compose.koinViewModel
 @Composable
 fun TracksScreen(
     modifier: Modifier = Modifier,
+    searchQuery: String = "",
     viewModel: TracksViewModel = koinViewModel<TracksViewModelImpl>(),
     onBack: (TracksBackResult) -> Unit,
 ) {
@@ -44,6 +46,7 @@ fun TracksScreen(
 
     SubscribeOnLifecycleEventsEffect(onUiIntent = onUiIntent)
     SubscribeOnBackEventsEffect(state = state, onBack = onBack)
+    SubscribeOnQueryUpdatesEffect(searchQuery, onUiIntent = onUiIntent)
 
     Box(modifier.pullRefresh(refreshState)) {
         Column(Modifier.fillMaxSize()) {

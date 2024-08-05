@@ -4,9 +4,9 @@ import androidx.compose.runtime.Composable
 import com.paranid5.crescendo.core.common.AudioStatus
 import com.paranid5.crescendo.core.common.metadata.VideoMetadata
 import com.paranid5.crescendo.domain.stream.currentMetadataDurationMillisFlow
-import com.paranid5.crescendo.playing.presentation.PlayingViewModel
 import com.paranid5.crescendo.playing.presentation.properties.durationMillisFlow
 import com.paranid5.crescendo.playing.presentation.properties.playbackPositionFlow
+import com.paranid5.crescendo.playing.view_model.PlayingViewModel
 import com.paranid5.crescendo.ui.track.ui_state.TrackUiState
 import com.paranid5.crescendo.utils.extensions.collectLatestAsState
 import kotlinx.coroutines.flow.map

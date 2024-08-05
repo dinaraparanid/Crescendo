@@ -11,6 +11,8 @@ sealed interface TracksUiIntent {
 
     data object OnRefresh : TracksUiIntent
 
+    data class UpdateSearchQuery(val query: String) : TracksUiIntent
+
     data class UpdateTrackOrder(val order: TrackOrder) : TracksUiIntent
 
     data class TrackClick(
