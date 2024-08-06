@@ -21,14 +21,16 @@ internal class PlayViewModelImpl(
 
     override fun onUiIntent(intent: PlayUiIntent) {
         when (intent) {
-            is PlayUiIntent.ClearSearchQuery ->
-                updateState { copy(searchQuery = "") }
+            is PlayUiIntent.SearchCancelClick -> when {
+                state.searchQuery.isEmpty() -> updateState { copy(isSearchActive = false) }
+                else -> updateState { copy(searchQuery = "") }
+            }
 
             is PlayUiIntent.UpdatePagerState ->
                 updateState { copy(pagerState = intent.pagerState) }
 
             is PlayUiIntent.UpdateSearchQuery ->
-                updateState { copy(searchQuery = intent.query) }
+                updateState { copy(searchQuery = intent.query, isSearchActive = true) }
         }
     }
 }
