@@ -6,9 +6,11 @@ import com.paranid5.crescendo.tracks.view_model.TracksBackResult
 import com.paranid5.crescendo.tracks.view_model.TracksState
 
 @Composable
-internal fun SubscribeOnBackEventsEffect(
+internal fun BackResultEffect(
     state: TracksState,
     onBack: (TracksBackResult) -> Unit,
+    onHandled: () -> Unit,
 ) = LaunchedEffect(state, onBack) {
     state.backResult?.let(onBack)
+    onHandled()
 }

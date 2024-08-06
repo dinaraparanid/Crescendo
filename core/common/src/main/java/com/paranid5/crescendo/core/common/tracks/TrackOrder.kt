@@ -1,8 +1,6 @@
 package com.paranid5.crescendo.core.common.tracks
 
 import android.os.Parcelable
-import kotlinx.collections.immutable.ImmutableList
-import kotlinx.collections.immutable.toImmutableList
 import kotlinx.parcelize.Parcelize
 
 @Parcelize
@@ -40,8 +38,3 @@ infix fun <T : Track> Iterable<T>.sortedBy(trackOrder: TrackOrder) = when (track
         TrackOrder.TrackContentOrder.NUMBER_IN_ALBUM -> sortedByDescending(Track::numberInAlbum)
     }
 }
-
-infix fun <T : Track> ImmutableList<T>.sortedBy(trackOrder: TrackOrder) =
-    (this as Iterable<T>)
-        .sortedBy(trackOrder)
-        .toImmutableList()

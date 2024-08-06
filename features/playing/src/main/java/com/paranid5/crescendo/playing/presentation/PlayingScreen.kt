@@ -9,7 +9,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalConfiguration
 import com.paranid5.crescendo.core.common.AudioStatus
-import com.paranid5.crescendo.playing.presentation.effect.SubscribeOnBackResultEffect
+import com.paranid5.crescendo.playing.presentation.effect.BackResultEffect
 import com.paranid5.crescendo.playing.presentation.properties.compose.collectAudioStatusAsState
 import com.paranid5.crescendo.playing.presentation.properties.compose.collectCurrentMetadataAsState
 import com.paranid5.crescendo.playing.presentation.properties.compose.collectDurationMillisAsState
@@ -31,7 +31,7 @@ fun PlayingScreen(
     val isLiveStreaming by rememberIsLiveStreaming(audioStatus)
     val length by viewModel.collectDurationMillisAsState(audioStatus)
 
-    SubscribeOnBackResultEffect(onBack = onBack)
+    BackResultEffect(onBack = onBack)
 
     when (config.orientation) {
         Configuration.ORIENTATION_LANDSCAPE -> PlayingScreenLandscape(

@@ -6,9 +6,11 @@ import com.paranid5.crescendo.feature.current_playlist.view_model.CurrentPlaylis
 import com.paranid5.crescendo.feature.current_playlist.view_model.CurrentPlaylistState
 
 @Composable
-internal fun SubscribeOnBackEventsEffect(
+internal fun BackResultEffect(
     state: CurrentPlaylistState,
     onBack: (CurrentPlaylistBackResult) -> Unit,
+    onHandled: () -> Unit,
 ) = LaunchedEffect(state.backResult, onBack) {
     state.backResult?.let(onBack)
+    onHandled()
 }

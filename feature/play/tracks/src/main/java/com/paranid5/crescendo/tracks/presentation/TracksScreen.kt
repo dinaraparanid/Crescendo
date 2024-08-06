@@ -15,9 +15,9 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import com.paranid5.crescendo.core.resources.ui.theme.AppTheme.dimensions
-import com.paranid5.crescendo.tracks.presentation.effect.SubscribeOnBackEventsEffect
-import com.paranid5.crescendo.tracks.presentation.effect.SubscribeOnLifecycleEventsEffect
-import com.paranid5.crescendo.tracks.presentation.effect.SubscribeOnQueryUpdatesEffect
+import com.paranid5.crescendo.tracks.presentation.effect.BackResultEffect
+import com.paranid5.crescendo.tracks.presentation.effect.LifecycleEffect
+import com.paranid5.crescendo.tracks.presentation.effect.QueryUpdatesEffect
 import com.paranid5.crescendo.tracks.presentation.ui.DefaultTrackList
 import com.paranid5.crescendo.tracks.presentation.ui.TracksBar
 import com.paranid5.crescendo.tracks.view_model.TracksBackResult
@@ -44,9 +44,13 @@ fun TracksScreen(
         onRefresh = { onUiIntent(TracksUiIntent.OnRefresh) },
     )
 
-    SubscribeOnLifecycleEventsEffect(onUiIntent = onUiIntent)
-    SubscribeOnBackEventsEffect(state = state, onBack = onBack)
-    SubscribeOnQueryUpdatesEffect(searchQuery, onUiIntent = onUiIntent)
+    LifecycleEffect(onUiIntent = onUiIntent)
+
+    BackResultEffect(state = state, onBack = onBack) {
+        onUiIntent(TracksUiIntent.ClearBackResult)
+    }
+
+    QueryUpdatesEffect(searchQuery, onUiIntent = onUiIntent)
 
     Box(modifier.pullRefresh(refreshState)) {
         Column(Modifier.fillMaxSize()) {

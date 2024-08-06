@@ -11,7 +11,7 @@ import com.paranid5.crescendo.playing.view_model.PlayingViewModel
 import org.koin.androidx.compose.koinViewModel
 
 @Composable
-internal fun PlaybackPositionFetcher(
+internal fun PlaybackPositionFetcherEffect(
     audioStatus: AudioStatus,
     isDragging: Boolean,
     currentPositionState: MutableState<Long>,

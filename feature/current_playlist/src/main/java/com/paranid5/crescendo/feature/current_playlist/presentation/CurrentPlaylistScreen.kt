@@ -10,11 +10,12 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalConfiguration
 import com.paranid5.crescendo.core.resources.ui.theme.AppTheme.dimensions
-import com.paranid5.crescendo.feature.current_playlist.presentation.effect.SubscribeOnBackEventsEffect
-import com.paranid5.crescendo.feature.current_playlist.presentation.effect.SubscribeOnLifecycleEffect
+import com.paranid5.crescendo.feature.current_playlist.presentation.effect.BackResultEffect
+import com.paranid5.crescendo.feature.current_playlist.presentation.effect.LifecycleEffect
 import com.paranid5.crescendo.feature.current_playlist.presentation.ui.CurrentPlaylistBar
 import com.paranid5.crescendo.feature.current_playlist.presentation.ui.CurrentPlaylistTrackList
 import com.paranid5.crescendo.feature.current_playlist.view_model.CurrentPlaylistBackResult
+import com.paranid5.crescendo.feature.current_playlist.view_model.CurrentPlaylistUiIntent
 import com.paranid5.crescendo.feature.current_playlist.view_model.CurrentPlaylistViewModel
 import com.paranid5.crescendo.feature.current_playlist.view_model.CurrentPlaylistViewModelImpl
 import com.paranid5.crescendo.utils.extensions.collectLatestAsState
@@ -30,8 +31,11 @@ fun CurrentPlaylistScreen(
     val state by viewModel.stateFlow.collectLatestAsState()
     val onUiIntent = viewModel::onUiIntent
 
-    SubscribeOnLifecycleEffect(onUiIntent = onUiIntent)
-    SubscribeOnBackEventsEffect(state = state, onBack = onBack)
+    LifecycleEffect(onUiIntent = onUiIntent)
+
+    BackResultEffect(state = state, onBack = onBack) {
+        onUiIntent(CurrentPlaylistUiIntent.ClearBackResult)
+    }
 
     Column(modifier) {
         CurrentPlaylistBar(

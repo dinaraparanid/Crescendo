@@ -6,9 +6,11 @@ import com.paranid5.crescendo.feature.play.main.presentation.view_model.PlayBack
 import com.paranid5.crescendo.feature.play.main.presentation.view_model.PlayState
 
 @Composable
-internal fun SubscribeOnBackResultEffect(
+internal fun BackResultEffect(
     state: PlayState,
     onBack: (PlayBackResult) -> Unit,
+    onHandled: () -> Unit,
 ) = LaunchedEffect(state.backResult, onBack) {
     state.backResult?.let(onBack)
+    onHandled()
 }

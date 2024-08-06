@@ -25,7 +25,7 @@ import com.paranid5.crescendo.core.common.AudioStatus
 import com.paranid5.crescendo.core.resources.ui.theme.AppTheme.colors
 import com.paranid5.crescendo.core.resources.ui.theme.AppTheme.dimensions
 import com.paranid5.crescendo.playing.domain.PlayingInteractor
-import com.paranid5.crescendo.playing.presentation.effect.PlaybackPositionFetcher
+import com.paranid5.crescendo.playing.presentation.effect.PlaybackPositionFetcherEffect
 import com.paranid5.crescendo.playing.presentation.properties.compose.collectAudioStatusAsState
 import com.paranid5.crescendo.playing.presentation.properties.setPlaybackPosition
 import com.paranid5.crescendo.playing.presentation.rememberIsLiveStreaming
@@ -53,7 +53,7 @@ internal fun PlaybackSlider(
     val isDraggingState = remember { mutableStateOf(false) }
     val isDragging by isDraggingState
 
-    PlaybackPositionFetcher(
+    PlaybackPositionFetcherEffect(
         audioStatus = audioStatus,
         isDragging = isDragging,
         currentPositionState = currentPositionState

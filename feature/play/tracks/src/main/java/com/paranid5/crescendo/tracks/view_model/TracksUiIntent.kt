@@ -21,4 +21,6 @@ sealed interface TracksUiIntent {
     ) : TracksUiIntent
 
     data class ShowTrimmer(val trackUri: String) : TracksUiIntent
+
+    data object ClearBackResult : TracksUiIntent
 }

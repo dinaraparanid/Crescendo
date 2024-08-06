@@ -17,4 +17,6 @@ interface CurrentPlaylistUiIntent {
     data class StartPlaylistPlayback(val trackIndex: Int) : CurrentPlaylistUiIntent
 
     data class ShowTrimmer(val trackUri: String) : CurrentPlaylistUiIntent
+
+    data object ClearBackResult : CurrentPlaylistUiIntent
 }

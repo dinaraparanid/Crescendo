@@ -27,6 +27,7 @@ import com.paranid5.crescendo.core.resources.ui.theme.AppTextSelectionColors
 import com.paranid5.crescendo.core.resources.ui.theme.AppTheme.colors
 import com.paranid5.crescendo.core.resources.ui.theme.AppTheme.dimensions
 import com.paranid5.crescendo.core.resources.ui.theme.AppTheme.typography
+import com.paranid5.crescendo.feature.play.main.presentation.effect.SearchBarFocusEffect
 import com.paranid5.crescendo.feature.play.main.presentation.view_model.PlayState
 import com.paranid5.crescendo.feature.play.main.presentation.view_model.PlayUiIntent
 import com.paranid5.crescendo.ui.utils.clickableWithRipple
@@ -38,19 +39,23 @@ internal fun PlaySearchBar(
     state: PlayState,
     onUiIntent: (PlayUiIntent) -> Unit,
     modifier: Modifier = Modifier,
-) = Box(
-    contentAlignment = Alignment.Center,
-    modifier = modifier
-        .clip(RoundedCornerShape(dimensions.corners.small))
-        .background(Color.White),
 ) {
-    SearchTextField(
-        state = state,
-        onUiIntent = onUiIntent,
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(horizontal = dimensions.padding.small),
-    )
+    SearchBarFocusEffect(state)
+
+    Box(
+        contentAlignment = Alignment.Center,
+        modifier = modifier
+            .clip(RoundedCornerShape(dimensions.corners.small))
+            .background(Color.White),
+    ) {
+        SearchTextField(
+            state = state,
+            onUiIntent = onUiIntent,
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = dimensions.padding.small),
+        )
+    }
 }
 
 @Composable

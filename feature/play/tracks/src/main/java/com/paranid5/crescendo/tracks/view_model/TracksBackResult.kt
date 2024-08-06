@@ -1,11 +1,6 @@
 package com.paranid5.crescendo.tracks.view_model
 
-import android.os.Parcelable
-import kotlinx.parcelize.Parcelize
+sealed interface TracksBackResult {
 
-@Parcelize
-sealed interface TracksBackResult : Parcelable {
-
-    @Parcelize
     data class ShowTrimmer(val trackUri: String) : TracksBackResult
 }

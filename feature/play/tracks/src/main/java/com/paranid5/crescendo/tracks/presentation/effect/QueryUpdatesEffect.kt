@@ -5,7 +5,7 @@ import androidx.compose.runtime.LaunchedEffect
 import com.paranid5.crescendo.tracks.view_model.TracksUiIntent
 
 @Composable
-internal fun SubscribeOnQueryUpdatesEffect(
+internal fun QueryUpdatesEffect(
     searchQuery: String,
     onUiIntent: (TracksUiIntent) -> Unit,
 ) = LaunchedEffect(searchQuery, onUiIntent) {

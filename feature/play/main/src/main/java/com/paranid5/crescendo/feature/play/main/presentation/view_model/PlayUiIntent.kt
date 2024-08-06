@@ -10,4 +10,6 @@ interface PlayUiIntent {
     data class UpdatePagerState(val pagerState: PagerState) : PlayUiIntent
 
     data class ShowTrimmer(val trackUri: String) : PlayUiIntent
+
+    data object ClearBackResult : PlayUiIntent
 }

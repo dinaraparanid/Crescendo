@@ -8,9 +8,10 @@ import androidx.compose.ui.Modifier
 import androidx.navigation.compose.rememberNavController
 import com.paranid5.crescendo.core.common.navigation.LocalNavigator
 import com.paranid5.crescendo.feature.play.main.navigation.PlayNavigator
-import com.paranid5.crescendo.feature.play.main.presentation.effect.SubscribeOnBackResultEffect
+import com.paranid5.crescendo.feature.play.main.presentation.effect.BackResultEffect
 import com.paranid5.crescendo.feature.play.main.presentation.ui.PlayHost
 import com.paranid5.crescendo.feature.play.main.presentation.view_model.PlayBackResult
+import com.paranid5.crescendo.feature.play.main.presentation.view_model.PlayUiIntent
 import com.paranid5.crescendo.feature.play.main.presentation.view_model.PlayViewModel
 import com.paranid5.crescendo.feature.play.main.presentation.view_model.PlayViewModelImpl
 import com.paranid5.crescendo.utils.extensions.collectLatestAsState
@@ -28,7 +29,9 @@ fun PlayScreen(
     val navHost = rememberNavController()
     val navigator = remember(navHost) { PlayNavigator(navHost) }
 
-    SubscribeOnBackResultEffect(state = state, onBack = onBack)
+    BackResultEffect(state = state, onBack = onBack) {
+        onUiIntent(PlayUiIntent.ClearBackResult)
+    }
 
     CompositionLocalProvider(LocalNavigator provides navigator) {
         PlayHost(

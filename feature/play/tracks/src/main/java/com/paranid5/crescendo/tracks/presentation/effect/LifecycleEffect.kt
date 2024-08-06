@@ -5,7 +5,7 @@ import androidx.compose.runtime.DisposableEffect
 import com.paranid5.crescendo.tracks.view_model.TracksUiIntent
 
 @Composable
-internal fun SubscribeOnLifecycleEventsEffect(
+internal fun LifecycleEffect(
     onUiIntent: (TracksUiIntent) -> Unit,
 ) = DisposableEffect(onUiIntent) {
     onUiIntent(TracksUiIntent.OnStart)

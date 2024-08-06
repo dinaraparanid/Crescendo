@@ -31,6 +31,9 @@ internal class PlayViewModelImpl(
 
             is PlayUiIntent.UpdateSearchQuery ->
                 updateState { copy(searchQuery = intent.query, isSearchActive = true) }
+
+            is PlayUiIntent.ClearBackResult ->
+                updateState { copy(backResult = null) }
         }
     }
 }

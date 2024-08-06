@@ -90,6 +90,10 @@ internal class CurrentPlaylistViewModelImpl(
             is CurrentPlaylistUiIntent.ShowTrimmer -> updateState {
                 copy(backResult = CurrentPlaylistBackResult.ShowTrimmer(trackUri = intent.trackUri))
             }
+
+            is CurrentPlaylistUiIntent.ClearBackResult -> updateState {
+                copy(backResult = null)
+            }
         }
     }
 

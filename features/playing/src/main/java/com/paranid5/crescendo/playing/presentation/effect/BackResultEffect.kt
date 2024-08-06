@@ -6,10 +6,11 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import com.paranid5.crescendo.playing.view_model.PlayingBackResult
 import com.paranid5.crescendo.playing.view_model.PlayingViewModel
+import com.paranid5.crescendo.utils.extensions.updateState
 import org.koin.androidx.compose.koinViewModel
 
 @Composable
-internal fun SubscribeOnBackResultEffect(
+internal fun BackResultEffect(
     viewModel: PlayingViewModel = koinViewModel(),
     onBack: (PlayingBackResult) -> Unit,
 ) {
@@ -17,5 +18,6 @@ internal fun SubscribeOnBackResultEffect(
 
     LaunchedEffect(backResult, onBack) {
         backResult?.let(onBack)
+        viewModel.backResultState.updateState { null }
     }
 }

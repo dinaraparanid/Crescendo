@@ -5,6 +5,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.paranid5.crescendo.core.common.AudioStatus
 import com.paranid5.crescendo.core.common.tracks.Track
+import com.paranid5.crescendo.core.common.tracks.sortedBy
 import com.paranid5.crescendo.core.common.udf.StatePublisher
 import com.paranid5.crescendo.core.common.udf.state
 import com.paranid5.crescendo.domain.current_playlist.CurrentPlaylistRepository
@@ -54,8 +55,9 @@ internal class TracksViewModelImpl(
             copy(query = intent.query)
         }
 
-        is TracksUiIntent.UpdateTrackOrder -> updateState {
-            copy(trackOrder = intent.order)
+        is TracksUiIntent.UpdateTrackOrder -> viewModelScope.sideEffect {
+            tracksRepository.updateTrackOrder(intent.order)
+            fetchTracksFromMediaStore()
         }
 
         is TracksUiIntent.TrackClick -> onTrackClick(
@@ -65,6 +67,10 @@ internal class TracksViewModelImpl(
 
         is TracksUiIntent.ShowTrimmer -> updateState {
             copy(backResult = TracksBackResult.ShowTrimmer(intent.trackUri))
+        }
+
+        is TracksUiIntent.ClearBackResult -> updateState {
+            copy(backResult = null)
         }
     }
 
@@ -123,6 +129,7 @@ internal class TracksViewModelImpl(
     private fun fetchTracksFromMediaStore() = viewModelScope.sideEffect(Dispatchers.Default) {
         val tracksState = tracksRepository
             .getAllTracksFromMediaStore()
+            .sortedBy(state.trackOrder)
             .mapToImmutableList(TrackUiState.Companion::fromDTO)
             .toUiState()
 
