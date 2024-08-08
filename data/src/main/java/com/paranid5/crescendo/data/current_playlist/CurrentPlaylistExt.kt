@@ -19,3 +19,6 @@ internal fun CurrentPlaylistTrack.toTrack(): Track =
         numberInAlbum = numberInAlbum.toInt(),
         timestamp = TIMESTAMP_NOT_IMPORTANT,
     )
+
+internal fun List<CurrentPlaylistTrack>.toTracks(): List<Track> =
+    map(CurrentPlaylistTrack::toTrack)

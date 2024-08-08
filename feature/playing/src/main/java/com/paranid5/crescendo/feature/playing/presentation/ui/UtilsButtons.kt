@@ -4,7 +4,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import com.paranid5.crescendo.feature.playing.presentation.ui.composition_local.LocalPalette
-import com.paranid5.crescendo.feature.playing.presentation.ui.utils_buttons.EqualizerButton
+import com.paranid5.crescendo.feature.playing.presentation.ui.utils_buttons.AudioEffectsButton
 import com.paranid5.crescendo.feature.playing.presentation.ui.utils_buttons.LikeButton
 import com.paranid5.crescendo.feature.playing.presentation.ui.utils_buttons.PlaylistOrDownloadButton
 import com.paranid5.crescendo.feature.playing.presentation.ui.utils_buttons.RepeatButton
@@ -20,7 +20,7 @@ internal fun UtilsButtons(
 ) = Row(modifier) {
     val tint = LocalPalette.current.getBrightDominantOrPrimary()
 
-    EqualizerButton(
+    AudioEffectsButton(
         tint = tint,
         modifier = Modifier.weight(1F),
     ) {

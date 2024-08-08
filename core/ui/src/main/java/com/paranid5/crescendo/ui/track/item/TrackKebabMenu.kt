@@ -7,6 +7,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import com.paranid5.crescendo.ui.track.item.properties.AddToCurrentPlaylistProperty
+import com.paranid5.crescendo.ui.track.item.properties.ChangeTrackMetaProperty
 import com.paranid5.crescendo.ui.track.item.properties.TrimTrackProperty
 import com.paranid5.crescendo.ui.track.ui_state.TrackUiState
 
@@ -14,26 +15,32 @@ import com.paranid5.crescendo.ui.track.ui_state.TrackUiState
 internal fun TrackKebabMenu(
     track: TrackUiState,
     isPropertiesMenuShownState: MutableState<Boolean>,
-    navigateToTrimmer: (trackUri: String) -> Unit,
+    showTrimmer: (trackUri: String) -> Unit,
+    showMetaEditor: () -> Unit,
     modifier: Modifier = Modifier,
-    itemModifier: Modifier = Modifier
+    itemModifier: Modifier = Modifier,
 ) {
     var isPropertiesMenuShown by isPropertiesMenuShownState
 
     DropdownMenu(
         expanded = isPropertiesMenuShown,
         onDismissRequest = { isPropertiesMenuShown = false },
-        modifier = modifier
+        modifier = modifier,
     ) {
         AddToCurrentPlaylistProperty(
             track = track,
             modifier = itemModifier,
         )
 
+        ChangeTrackMetaProperty(
+            modifier = itemModifier,
+            showMetaEditor = showMetaEditor,
+        )
+
         TrimTrackProperty(
             trackPath = track.path,
             modifier = itemModifier,
-            navigateToTrimmer = navigateToTrimmer,
+            showTrimmer = showTrimmer,
         )
     }
 }

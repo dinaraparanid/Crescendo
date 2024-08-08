@@ -19,6 +19,7 @@ import androidx.compose.material.ModalBottomSheetState
 import androidx.compose.material.ModalBottomSheetValue
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
@@ -44,6 +45,7 @@ import com.paranid5.crescendo.ui.composition_locals.LocalCurrentPlaylistSheetSta
 import com.paranid5.crescendo.ui.composition_locals.playing.LocalPlayingPagerState
 import com.paranid5.crescendo.ui.composition_locals.playing.LocalPlayingSheetState
 import com.paranid5.crescendo.ui.utils.PushUpButton
+import kotlinx.coroutines.launch
 
 private const val ContentCollapsedPadding = 8F
 private const val ContentExpandedPadding = 24F
@@ -68,9 +70,13 @@ internal fun PlayingBottomSheet(
     val isBarNotVisible = currentValue == BottomSheetValue.Expanded
             && targetValue == BottomSheetValue.Expanded
 
+    val coroutineScope = rememberCoroutineScope()
+
     fun onBack(result: PlayingScreenEffect) = when (result) {
-        is PlayingScreenEffect.ShowAudioEffects ->
+        is PlayingScreenEffect.ShowAudioEffects -> {
+            coroutineScope.launch { playingSheetState?.bottomSheetState?.collapse() }
             navigator.pushIfNotSame(AppScreen.Audio.AudioEffects)
+        }
 
         is PlayingScreenEffect.ShowTrimmer ->
             navigator.pushIfNotSame(AppScreen.Audio.Trimmer(result.trackUri))

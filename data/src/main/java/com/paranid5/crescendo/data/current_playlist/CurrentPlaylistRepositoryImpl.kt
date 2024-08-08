@@ -5,7 +5,6 @@ import app.cash.sqldelight.coroutines.mapToList
 import app.cash.sqldelight.db.SqlDriver
 import com.paranid5.crescendo.core.common.tracks.Track
 import com.paranid5.crescendo.data.CurrentPlaylist
-import com.paranid5.crescendo.data.CurrentPlaylistTrack
 import com.paranid5.crescendo.domain.current_playlist.CurrentPlaylistRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.map
@@ -25,27 +24,42 @@ internal class CurrentPlaylistRepositoryImpl(driver: SqlDriver) : CurrentPlaylis
             .selectAll()
             .asFlow()
             .mapToList(Dispatchers.IO)
-            .map { it.map(CurrentPlaylistTrack::toTrack) }
+            .map { it.toTracks() }
+
+    private inline val currentPlaylist
+        get() = queries.selectAll().executeAsList().toTracks()
 
     override suspend fun updateCurrentPlaylist(playlist: List<Track>) =
         withContext(Dispatchers.IO) {
             queries.transaction {
-                queries.clearPlaylist()
-
-                playlist.forEach { track ->
-                    queries.insertTrack(
-                        id = null,
-                        androidId = track.androidId,
-                        title = track.title,
-                        artist = track.artist,
-                        album = track.album,
-                        path = track.path,
-                        durationMillis = track.durationMillis,
-                        displayName = track.displayName,
-                        dateAdded = track.dateAdded,
-                        numberInAlbum = track.numberInAlbum.toLong(),
-                    )
-                }
+                resetPlaylistImpl(playlist)
             }
         }
+
+    override suspend fun addTrackToPlaylist(track: Track) {
+        withContext(Dispatchers.IO) {
+            queries.transaction {
+                resetPlaylistImpl(currentPlaylist + track)
+            }
+        }
+    }
+
+    private fun resetPlaylistImpl(playlist: List<Track>) {
+        queries.clearPlaylist()
+
+        playlist.forEach { track ->
+            queries.insertTrack(
+                id = null,
+                androidId = track.androidId,
+                title = track.title,
+                artist = track.artist,
+                album = track.album,
+                path = track.path,
+                durationMillis = track.durationMillis,
+                displayName = track.displayName,
+                dateAdded = track.dateAdded,
+                numberInAlbum = track.numberInAlbum.toLong(),
+            )
+        }
+    }
 }

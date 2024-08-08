@@ -22,6 +22,7 @@ fun TrackKebabMenuButton(
     track: TrackUiState,
     tint: Color,
     showTrimmer: (trackUri: String) -> Unit,
+    showMetaEditor: () -> Unit,
     modifier: Modifier = Modifier,
     buttonModifier: Modifier = Modifier,
     iconModifier: Modifier = Modifier,
@@ -33,7 +34,8 @@ fun TrackKebabMenuButton(
         TrackKebabMenu(
             track = track,
             isPropertiesMenuShownState = isPropertiesMenuShownState,
-            navigateToTrimmer = showTrimmer,
+            showTrimmer = showTrimmer,
+            showMetaEditor = showMetaEditor,
             itemModifier = itemModifier,
         )
 

@@ -42,7 +42,7 @@
     <string name="press_twice_to_exit">Press twice to exit</string>
     <string name="unknown_error">Unknown error</string>
     <string name="remove_from_favourite">Remove from favourite</string>
-    <string name="add_to_favourite">Add to favourite"</string>
+    <string name="add_to_favourite">Add to favourite</string>
     <string name="audio_conversion_error">Error when converting to audio file</string>
     <string name="file_creation_error">Error when creating file. Please, try again</string>
     <string name="mp3">Audio: MP3</string>
@@ -83,11 +83,9 @@
     <string name="desc">Descending</string>
     <string name="number_in_album">№ in Album</string>
     <string name="current_playlist">Current playlist</string>
-    <string name="add_to_cur_playlist">Add to current playlist</string>
     <string name="duration">Duration</string>
     <string name="livestream_not_cache">Live streams cannot be cached</string>
     <string name="live">Live</string>
-    <string name="trim_track">Trim track</string>
     <string name="start_time">Start time</string>
     <string name="end_time">End time</string>
     <string name="save">Save</string>
@@ -115,4 +113,10 @@
     <string name="play_favourites">Favourites</string>
     <string name="play_playlists">Playlists</string>
     <string name="play_recent">Recent</string>
+
+    <!-- Track Kebab Menu -->
+    <string name="track_kebab_add_to_cur_playlist">Add to current playlist</string>
+    <string name="track_kebab_trim_track">Trim track</string>
+    <string name="track_kebab_change_meta">Change metadata</string>
+
 </resources>
