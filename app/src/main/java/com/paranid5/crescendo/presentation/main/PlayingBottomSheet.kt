@@ -1,6 +1,7 @@
 package com.paranid5.crescendo.presentation.main
 
 import android.content.res.Configuration
+import android.widget.Toast
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
@@ -24,17 +25,19 @@ import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import com.paranid5.crescendo.core.common.AudioStatus
 import com.paranid5.crescendo.core.common.navigation.LocalNavigator
+import com.paranid5.crescendo.core.resources.R
 import com.paranid5.crescendo.core.resources.ui.theme.AppTheme.colors
 import com.paranid5.crescendo.core.resources.ui.theme.AppTheme.dimensions
 import com.paranid5.crescendo.feature.current_playlist.presentation.CurrentPlaylistScreen
 import com.paranid5.crescendo.feature.current_playlist.view_model.CurrentPlaylistBackResult
+import com.paranid5.crescendo.feature.playing.presentation.PlayingScreen
+import com.paranid5.crescendo.feature.playing.view_model.PlayingScreenEffect
 import com.paranid5.crescendo.navigation.AppScreen
 import com.paranid5.crescendo.navigation.requireAppNavigator
-import com.paranid5.crescendo.playing.presentation.PlayingScreen
-import com.paranid5.crescendo.playing.view_model.PlayingBackResult
 import com.paranid5.crescendo.presentation.main.appbar.AppBar
 import com.paranid5.crescendo.ui.appbar.appBarHeight
 import com.paranid5.crescendo.ui.composition_locals.LocalCurrentPlaylistSheetState
@@ -53,6 +56,7 @@ internal fun PlayingBottomSheet(
     alpha: Float,
     modifier: Modifier = Modifier,
 ) {
+    val context = LocalContext.current
     val navigator = LocalNavigator.requireAppNavigator()
     val curPlaylistSheetState = LocalCurrentPlaylistSheetState.current
     val playingPagerState = LocalPlayingPagerState.current
@@ -64,12 +68,17 @@ internal fun PlayingBottomSheet(
     val isBarNotVisible = currentValue == BottomSheetValue.Expanded
             && targetValue == BottomSheetValue.Expanded
 
-    fun onBack(result: PlayingBackResult) = when (result) {
-        is PlayingBackResult.ShowAudioEffects ->
+    fun onBack(result: PlayingScreenEffect) = when (result) {
+        is PlayingScreenEffect.ShowAudioEffects ->
             navigator.pushIfNotSame(AppScreen.Audio.AudioEffects)
 
-        is PlayingBackResult.ShowTrimmer ->
+        is PlayingScreenEffect.ShowTrimmer ->
             navigator.pushIfNotSame(AppScreen.Audio.Trimmer(result.trackUri))
+
+        PlayingScreenEffect.ShowAudioEffectsNotAllowed ->
+            Toast
+                .makeText(context, R.string.audio_effects_init_error, Toast.LENGTH_LONG)
+                .show()
     }
 
     curPlaylistSheetState?.let { curPlaylistScaffoldState ->
@@ -94,14 +103,14 @@ internal fun PlayingBottomSheet(
                     when (page) {
                         0 -> PlayingScreen(
                             coverAlpha = 1 - alpha,
-                            audioStatus = AudioStatus.PLAYING,
+                            screenAudioStatus = AudioStatus.PLAYING,
                             modifier = modifier.fillMaxSize(),
                             onBack = ::onBack,
                         )
 
                         else -> PlayingScreen(
                             coverAlpha = 1 - alpha,
-                            audioStatus = AudioStatus.STREAMING,
+                            screenAudioStatus = AudioStatus.STREAMING,
                             modifier = modifier.fillMaxSize(),
                             onBack = ::onBack,
                         )

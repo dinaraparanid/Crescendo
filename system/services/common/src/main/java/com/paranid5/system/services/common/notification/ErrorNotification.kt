@@ -9,7 +9,7 @@ import com.paranid5.crescendo.system.common.intent.mainActivityIntent
 
 fun ErrorNotification(context: Context, message: String, channelId: String) =
     NotificationBuilderCompat(context, channelId)
-        .setSmallIcon(R.drawable.save)
+        .setSmallIcon(R.drawable.ic_save)
         .setContentIntent(
             PendingIntent.getActivity(
                 context,

@@ -7,8 +7,8 @@ import com.paranid5.crescendo.domain.playback.StreamPlaybackPositionPublisher
 import com.paranid5.crescendo.domain.playback.StreamPlaybackPositionSubscriber
 import com.paranid5.crescendo.domain.stream.CurrentMetadataPublisher
 import com.paranid5.crescendo.domain.stream.CurrentMetadataSubscriber
-import com.paranid5.crescendo.domain.stream.PlayingUrlPublisher
-import com.paranid5.crescendo.domain.stream.PlayingUrlSubscriber
+import com.paranid5.crescendo.domain.stream.PlayingStreamUrlPublisher
+import com.paranid5.crescendo.domain.stream.PlayingStreamUrlSubscriber
 import com.paranid5.crescendo.domain.stream.StreamRepository
 import com.paranid5.crescendo.system.services.stream.StreamService
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -24,8 +24,8 @@ internal class PlayerProvider(
     audioEffectsRepository = audioEffectsRepository,
     playbackRepository = playbackRepository,
 ),
-    PlayingUrlSubscriber by streamRepository,
-    PlayingUrlPublisher by streamRepository,
+    PlayingStreamUrlSubscriber by streamRepository,
+    PlayingStreamUrlPublisher by streamRepository,
     CurrentMetadataSubscriber by streamRepository,
     CurrentMetadataPublisher by streamRepository,
     StreamPlaybackPositionSubscriber by playbackRepository,

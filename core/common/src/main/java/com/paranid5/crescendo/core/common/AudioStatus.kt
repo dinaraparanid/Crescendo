@@ -3,9 +3,9 @@ package com.paranid5.crescendo.core.common
 enum class AudioStatus {
     STREAMING, PLAYING;
 
-    fun handle(streamAction: () -> Unit, trackAction: () -> Unit) =
+    inline fun <R> fold(ifStream: () -> R, ifTrack: () -> R) =
         when (this) {
-            STREAMING -> streamAction()
-            PLAYING -> trackAction()
+            STREAMING -> ifStream()
+            PLAYING -> ifTrack()
         }
 }

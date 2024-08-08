@@ -5,5 +5,5 @@ interface StreamRepository :
     CurrentMetadataPublisher,
     DownloadingUrlSubscriber,
     DownloadingUrlPublisher,
-    PlayingUrlSubscriber,
-    PlayingUrlPublisher
+    PlayingStreamUrlSubscriber,
+    PlayingStreamUrlPublisher

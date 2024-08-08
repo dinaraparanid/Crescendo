@@ -12,7 +12,7 @@ import com.paranid5.crescendo.data.di.dataModule
 import com.paranid5.crescendo.feature.current_playlist.di.currentPlaylistModule
 import com.paranid5.crescendo.feature.play.main.di.playModule
 import com.paranid5.crescendo.fetch_stream.di.fetchStreamModule
-import com.paranid5.crescendo.playing.di.playingModule
+import com.paranid5.crescendo.feature.playing.di.playingModule
 import com.paranid5.crescendo.system.services.stream.di.streamServiceModule
 import com.paranid5.crescendo.system.services.track.di.trackServiceModule
 import com.paranid5.crescendo.system.services.video_cache.di.videoCacheServiceModule

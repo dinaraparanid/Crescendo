@@ -20,7 +20,7 @@ import com.paranid5.crescendo.tracks.view_model.TracksUiIntent
 import com.paranid5.crescendo.ui.track.clickableTrackWithPermissions
 import com.paranid5.crescendo.ui.track.item.TrackCover
 import com.paranid5.crescendo.ui.track.item.TrackInfo
-import com.paranid5.crescendo.ui.track.item.TrackPropertiesButton
+import com.paranid5.crescendo.ui.track.item.TrackKebabMenuButton
 import com.paranid5.crescendo.ui.track.item.rememberTrackBackgroundColors
 import com.paranid5.crescendo.ui.track.item.rememberTrackContentColor
 import com.paranid5.crescendo.ui.track.ui_state.TrackUiState
@@ -76,11 +76,11 @@ internal fun TrackItem(
 
             Spacer(Modifier.width(dimensions.padding.medium))
 
-            TrackPropertiesButton(
+            TrackKebabMenuButton(
                 track = track,
                 tint = contentColor,
                 modifier = Modifier.align(Alignment.CenterVertically),
-                navigateToTrimmer = { onUiIntent(TracksUiIntent.ShowTrimmer(trackUri = it)) },
+                showTrimmer = { onUiIntent(TracksUiIntent.ShowTrimmer(trackUri = it)) },
             )
         }
     }

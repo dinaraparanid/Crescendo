@@ -15,7 +15,7 @@ internal suspend fun <P> startStreaming(
     currentText: String,
     playingPagerState: PagerState?,
     playingSheetState: BottomSheetScaffoldState?,
-) where P : AudioStatusPublisher, P : com.paranid5.crescendo.domain.stream.PlayingUrlPublisher {
+) where P : AudioStatusPublisher, P : com.paranid5.crescendo.domain.stream.PlayingStreamUrlPublisher {
     val url = currentText.trim()
     publisher.updateAudioStatus(AudioStatus.STREAMING)
     publisher.updatePlayingUrl(url)

@@ -55,7 +55,7 @@ private fun MessageNotificationBuilder(context: Context, message: String) =
 
 private fun NotificationBuilder(context: Context) =
     NotificationBuilderCompat(context)
-        .setSmallIcon(R.drawable.save)
+        .setSmallIcon(R.drawable.ic_save)
         .setContentIntent(
             PendingIntent.getActivity(
                 context,

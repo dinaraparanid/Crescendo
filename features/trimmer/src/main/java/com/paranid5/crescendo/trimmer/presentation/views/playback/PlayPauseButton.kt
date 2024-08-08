@@ -51,7 +51,7 @@ internal fun PlayPauseButton(
 @Composable
 private fun PauseIcon(modifier: Modifier = Modifier) =
     Icon(
-        painter = painterResource(id = R.drawable.pause),
+        painter = painterResource(id = R.drawable.ic_pause),
         contentDescription = stringResource(id = R.string.pause),
         tint = colors.background.primary,
         modifier = modifier,
@@ -60,7 +60,7 @@ private fun PauseIcon(modifier: Modifier = Modifier) =
 @Composable
 private fun PlayIcon(modifier: Modifier = Modifier) =
     Icon(
-        painter = painterResource(id = R.drawable.play),
+        painter = painterResource(id = R.drawable.ic_play),
         contentDescription = stringResource(id = R.string.play),
         tint = colors.background.primary,
         modifier = modifier,

@@ -12,21 +12,17 @@ import com.paranid5.crescendo.utils.BlurTransformation
 @Composable
 fun coverModelWithPalette(
     audioStatus: AudioStatus,
-    size: ImageSize
-): Pair<ImageRequest, Palette?> {
-    val (coverModel, palette) = when (audioStatus) {
-        AudioStatus.STREAMING -> videoCoverModelWithPalette(
-            isPlaceholderRequired = false,
-            size = size
-        )
+    size: ImageSize,
+): Pair<ImageRequest, Palette?> = when (audioStatus) {
+    AudioStatus.STREAMING -> videoCoverModelWithPalette(
+        isPlaceholderRequired = false,
+        size = size,
+    )
 
-        AudioStatus.PLAYING -> currentTrackCoverModelWithPalette(
-            isPlaceholderRequired = true,
-            size = size
-        )
-    }
-
-    return coverModel to palette
+    AudioStatus.PLAYING -> currentTrackCoverModelWithPalette(
+        isPlaceholderRequired = true,
+        size = size,
+    )
 }
 
 internal fun ImageRequest.Builder.prevCoverPlaceholder(prevCoverModel: BitmapDrawable?) =

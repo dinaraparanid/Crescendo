@@ -29,7 +29,7 @@ internal fun TenSecsBackButton(
         modifier = modifier,
     ) {
         Icon(
-            painter = painterResource(id = R.drawable.previous_track),
+            painter = painterResource(id = R.drawable.ic_music_previous),
             contentDescription = stringResource(id = R.string.ten_secs_back),
             tint = colors.primary,
             modifier = Modifier.fillMaxSize()

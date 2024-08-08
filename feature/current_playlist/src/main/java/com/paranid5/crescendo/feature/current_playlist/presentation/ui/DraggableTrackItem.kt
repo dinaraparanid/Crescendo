@@ -21,7 +21,7 @@ import com.paranid5.crescendo.core.resources.ui.theme.AppTheme.dimensions
 import com.paranid5.crescendo.ui.track.clickableTrackWithPermissions
 import com.paranid5.crescendo.ui.track.item.TrackCover
 import com.paranid5.crescendo.ui.track.item.TrackInfo
-import com.paranid5.crescendo.ui.track.item.TrackPropertiesButton
+import com.paranid5.crescendo.ui.track.item.TrackKebabMenuButton
 import com.paranid5.crescendo.ui.track.item.rememberTrackBackgroundColors
 import com.paranid5.crescendo.ui.track.item.rememberTrackContentColor
 import com.paranid5.crescendo.ui.track.ui_state.TrackUiState
@@ -102,10 +102,10 @@ private fun CurrentPlaylistTrackItemContent(
 
             Spacer(Modifier.width(dimensions.padding.medium))
 
-            TrackPropertiesButton(
+            TrackKebabMenuButton(
                 track = track,
                 tint = contentColor,
-                navigateToTrimmer = navigateToTrimmer,
+                showTrimmer = navigateToTrimmer,
                 modifier = Modifier.align(Alignment.CenterVertically),
             )
         }

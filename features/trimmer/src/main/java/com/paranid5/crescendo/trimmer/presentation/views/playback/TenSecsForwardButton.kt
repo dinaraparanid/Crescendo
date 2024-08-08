@@ -13,8 +13,8 @@ import androidx.compose.ui.unit.dp
 import androidx.media3.common.Player
 import com.paranid5.crescendo.core.resources.R
 import com.paranid5.crescendo.core.resources.ui.theme.AppTheme.colors
-import com.paranid5.crescendo.trimmer.presentation.TrimmerViewModel
 import com.paranid5.crescendo.trimmer.domain.player.seekTenSecsForward
+import com.paranid5.crescendo.trimmer.presentation.TrimmerViewModel
 import com.paranid5.crescendo.trimmer.presentation.properties.compose.collectTrackDurationInMillisAsState
 import org.koin.androidx.compose.koinViewModel
 
@@ -33,7 +33,7 @@ internal fun TenSecsForwardButton(
         modifier = modifier.size(ButtonSize)
     ) {
         Icon(
-            painter = painterResource(id = R.drawable.next_track),
+            painter = painterResource(id = R.drawable.ic_music_next),
             contentDescription = stringResource(id = R.string.ten_secs_forward),
             tint = colors.primary,
             modifier = Modifier.fillMaxSize(),
