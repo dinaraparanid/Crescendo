@@ -7,4 +7,6 @@ sealed interface PlayingScreenEffect {
     data object ShowAudioEffectsNotAllowed : PlayingScreenEffect
 
     data class ShowTrimmer(val trackUri: String) : PlayingScreenEffect
+
+    data object ShowMetaEditor : PlayingScreenEffect
 }

@@ -6,6 +6,7 @@ import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import com.paranid5.crescendo.core.common.tracks.Track
 import com.paranid5.crescendo.ui.track.item.properties.AddToCurrentPlaylistProperty
 import com.paranid5.crescendo.ui.track.item.properties.ChangeTrackMetaProperty
 import com.paranid5.crescendo.ui.track.item.properties.TrimTrackProperty
@@ -15,6 +16,7 @@ import com.paranid5.crescendo.ui.track.ui_state.TrackUiState
 internal fun TrackKebabMenu(
     track: TrackUiState,
     isPropertiesMenuShownState: MutableState<Boolean>,
+    addToPlaylist: (track: Track) -> Unit,
     showTrimmer: (trackUri: String) -> Unit,
     showMetaEditor: () -> Unit,
     modifier: Modifier = Modifier,
@@ -30,6 +32,7 @@ internal fun TrackKebabMenu(
         AddToCurrentPlaylistProperty(
             track = track,
             modifier = itemModifier,
+            addToPlaylist = addToPlaylist,
         )
 
         ChangeTrackMetaProperty(

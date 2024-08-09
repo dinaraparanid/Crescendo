@@ -1,6 +1,7 @@
 package com.paranid5.crescendo.feature.playing.view_model
 
 import com.paranid5.crescendo.core.common.AudioStatus
+import com.paranid5.crescendo.core.common.tracks.Track
 
 sealed interface PlayingUiIntent {
 
@@ -11,6 +12,8 @@ sealed interface PlayingUiIntent {
         ) : UpdateState
 
         data object LikeClick : UpdateState
+
+        data class AddTrackToPlaylist(val track: Track) : UpdateState
     }
 
     sealed interface Lifecycle : PlayingUiIntent {
@@ -31,6 +34,7 @@ sealed interface PlayingUiIntent {
     sealed interface ScreenEffect : PlayingUiIntent {
         data class ShowTrimmer(val trackUri: String) : ScreenEffect
         data object ShowAudioEffects : ScreenEffect
+        data object ShowMetaEditor : ScreenEffect
         data object ClearScreenEffect : ScreenEffect
     }
 }

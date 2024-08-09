@@ -6,13 +6,16 @@ import androidx.lifecycle.viewModelScope
 import arrow.core.raise.nullable
 import com.paranid5.crescendo.core.common.AudioStatus
 import com.paranid5.crescendo.core.common.metadata.VideoMetadata
+import com.paranid5.crescendo.core.common.tracks.DefaultTrack
 import com.paranid5.crescendo.core.common.tracks.Track
 import com.paranid5.crescendo.core.common.udf.StatePublisher
 import com.paranid5.crescendo.core.common.udf.state
+import com.paranid5.crescendo.domain.current_playlist.CurrentPlaylistRepository
 import com.paranid5.crescendo.domain.playback.PlaybackRepository
 import com.paranid5.crescendo.domain.stream.StreamRepository
 import com.paranid5.crescendo.domain.tracks.TracksRepository
 import com.paranid5.crescendo.feature.playing.domain.PlayingInteractor
+import com.paranid5.crescendo.system.services.track.TrackServiceInteractor
 import com.paranid5.crescendo.ui.metadata.VideoMetadataUiState
 import com.paranid5.crescendo.ui.track.ui_state.TrackUiState
 import kotlinx.coroutines.Dispatchers
@@ -27,7 +30,9 @@ internal class PlayingViewModelImpl(
     private val playbackRepository: PlaybackRepository,
     private val tracksRepository: TracksRepository,
     private val streamRepository: StreamRepository,
+    private val currentPlaylistRepository: CurrentPlaylistRepository,
     private val interactor: PlayingInteractor,
+    private val trackServiceInteractor: TrackServiceInteractor,
 ) : ViewModel(), PlayingViewModel, StatePublisher<PlayingState> {
     companion object {
         private const val StateKey = "state"
@@ -61,6 +66,8 @@ internal class PlayingViewModelImpl(
         is PlayingUiIntent.UpdateState.LikeClick -> updateState {
             copy(isLiked = isLiked.not())
         }
+
+        is PlayingUiIntent.UpdateState.AddTrackToPlaylist -> addToPlaylist(track = intent.track)
     }
 
     private fun onLifecycleUiIntent(intent: PlayingUiIntent.Lifecycle) = when (intent) {
@@ -88,6 +95,10 @@ internal class PlayingViewModelImpl(
 
         is PlayingUiIntent.ScreenEffect.ShowTrimmer -> updateState {
             copy(screenEffect = PlayingScreenEffect.ShowTrimmer(trackUri = intent.trackUri))
+        }
+
+        PlayingUiIntent.ScreenEffect.ShowMetaEditor -> updateState {
+            copy(screenEffect = PlayingScreenEffect.ShowMetaEditor)
         }
     }
 
@@ -138,6 +149,12 @@ internal class PlayingViewModelImpl(
     private fun onRepeatClick() = nullable {
         val audioStatus = state.screenAudioStatus.bind()
         interactor.sendChangeRepeatBroadcast(audioStatus = audioStatus)
+    }
+
+    private fun addToPlaylist(track: Track) {
+        val defaultTrack = DefaultTrack(track)
+        trackServiceInteractor.addToPlaylist(defaultTrack)
+        viewModelScope.launch { currentPlaylistRepository.addTrackToPlaylist(defaultTrack) }
     }
 
     private fun subscribeOnDataUpdates() {

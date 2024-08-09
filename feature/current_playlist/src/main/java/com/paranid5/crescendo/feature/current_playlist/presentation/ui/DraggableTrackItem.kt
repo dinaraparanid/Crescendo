@@ -17,6 +17,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
+import com.paranid5.crescendo.core.common.tracks.Track
 import com.paranid5.crescendo.core.resources.ui.theme.AppTheme.dimensions
 import com.paranid5.crescendo.ui.track.clickableTrackWithPermissions
 import com.paranid5.crescendo.ui.track.item.TrackCover
@@ -25,7 +26,6 @@ import com.paranid5.crescendo.ui.track.item.TrackKebabMenuButton
 import com.paranid5.crescendo.ui.track.item.rememberTrackBackgroundColors
 import com.paranid5.crescendo.ui.track.item.rememberTrackContentColor
 import com.paranid5.crescendo.ui.track.ui_state.TrackUiState
-import com.paranid5.crescendo.utils.doNothing
 import kotlinx.collections.immutable.ImmutableList
 
 private val TrackCoverSize = 48.dp
@@ -35,7 +35,9 @@ internal fun DraggableTrackItem(
     tracks: ImmutableList<TrackUiState>,
     trackIndex: Int,
     isCurrent: Boolean,
-    navigateToTrimmer: (trackUri: String) -> Unit,
+    addToPlaylist: (track: Track) -> Unit,
+    showTrimmer: (trackUri: String) -> Unit,
+    showMetaEditor: () -> Unit,
     modifier: Modifier = Modifier,
     onClick: () -> Unit
 ) {
@@ -47,7 +49,9 @@ internal fun DraggableTrackItem(
         CurrentPlaylistTrackItemContent(
             track = it,
             isCurrent = isCurrent,
-            navigateToTrimmer = navigateToTrimmer,
+            addToPlaylist = addToPlaylist,
+            showTrimmer = showTrimmer,
+            showMetaEditor = showMetaEditor,
             modifier = modifier,
             onClick = onClick,
         )
@@ -58,7 +62,9 @@ internal fun DraggableTrackItem(
 private fun CurrentPlaylistTrackItemContent(
     track: TrackUiState,
     isCurrent: Boolean,
-    navigateToTrimmer: (trackUri: String) -> Unit,
+    addToPlaylist: (track: Track) -> Unit,
+    showTrimmer: (trackUri: String) -> Unit,
+    showMetaEditor: () -> Unit,
     modifier: Modifier = Modifier,
     onClick: () -> Unit,
 ) {
@@ -106,8 +112,9 @@ private fun CurrentPlaylistTrackItemContent(
             TrackKebabMenuButton(
                 track = track,
                 tint = contentColor,
-                showTrimmer = navigateToTrimmer,
-                showMetaEditor = doNothing, // TODO: show meta editor
+                addToPlaylist = addToPlaylist,
+                showTrimmer = showTrimmer,
+                showMetaEditor = showMetaEditor,
                 modifier = Modifier.align(Alignment.CenterVertically),
             )
         }

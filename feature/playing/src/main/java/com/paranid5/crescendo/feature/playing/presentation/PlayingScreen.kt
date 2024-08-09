@@ -2,6 +2,7 @@ package com.paranid5.crescendo.feature.playing.presentation
 
 import android.content.res.Configuration
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.NonRestartableComposable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalConfiguration
@@ -18,13 +19,14 @@ import com.paranid5.crescendo.feature.playing.view_model.PlayingViewModelImpl
 import com.paranid5.crescendo.utils.extensions.collectLatestAsState
 import org.koin.androidx.compose.koinViewModel
 
+@NonRestartableComposable
 @Composable
 fun PlayingScreen(
     screenAudioStatus: AudioStatus,
     coverAlpha: Float,
     modifier: Modifier = Modifier,
     viewModel: PlayingViewModel = koinViewModel<PlayingViewModelImpl>(),
-    onBack: (PlayingScreenEffect) -> Unit,
+    onScreenEffect: (PlayingScreenEffect) -> Unit,
 ) {
     val config = LocalConfiguration.current
     val state by viewModel.stateFlow.collectLatestAsState()
@@ -38,7 +40,7 @@ fun PlayingScreen(
         onUiIntent = onUiIntent,
     )
 
-    ScreenEffect(state = state, onScreenEffect = onBack) {
+    ScreenEffect(state = state, onScreenEffect = onScreenEffect) {
         onUiIntent(PlayingUiIntent.ScreenEffect.ClearScreenEffect)
     }
 

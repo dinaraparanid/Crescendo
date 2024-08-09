@@ -7,6 +7,6 @@ import com.paranid5.crescendo.feature.current_playlist.view_model.CurrentPlaylis
 @Composable
 internal fun LifecycleEffect(onUiIntent: (CurrentPlaylistUiIntent) -> Unit) =
     DisposableEffect(onUiIntent) {
-        onUiIntent(CurrentPlaylistUiIntent.OnStart)
-        onDispose { onUiIntent(CurrentPlaylistUiIntent.OnStop) }
+        onUiIntent(CurrentPlaylistUiIntent.Lifecycle.OnStart)
+        onDispose { onUiIntent(CurrentPlaylistUiIntent.Lifecycle.OnStop) }
     }

@@ -9,7 +9,7 @@ import kotlinx.collections.immutable.persistentListOf
 data class CurrentPlaylistState(
     val playlistState: PlaylistState = PlaylistState(),
     val dismissState: DismissState = DismissState(),
-    val backResult: CurrentPlaylistBackResult? = null,
+    val screenEffect: CurrentPlaylistScreenEffect? = null,
 ) {
 
     @Immutable

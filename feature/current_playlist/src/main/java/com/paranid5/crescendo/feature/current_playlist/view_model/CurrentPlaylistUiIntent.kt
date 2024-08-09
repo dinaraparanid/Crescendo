@@ -3,20 +3,28 @@ package com.paranid5.crescendo.feature.current_playlist.view_model
 import com.paranid5.crescendo.core.common.tracks.Track
 
 interface CurrentPlaylistUiIntent {
-    data object OnStart : CurrentPlaylistUiIntent
 
-    data object OnStop : CurrentPlaylistUiIntent
+    sealed interface Lifecycle : CurrentPlaylistUiIntent {
+        data object OnStart : Lifecycle
+        data object OnStop : Lifecycle
+    }
 
-    data class DismissTrack(val index: Int) : CurrentPlaylistUiIntent
+    sealed interface Playlist : CurrentPlaylistUiIntent {
+        data class StartPlaylistPlayback(val trackIndex: Int) : Playlist
 
-    data class UpdateAfterDrag(
-        val newPlaylist: List<Track>,
-        val newCurrentTrackIndex: Int,
-    ) : CurrentPlaylistUiIntent
+        data class DismissTrack(val index: Int) : Playlist
 
-    data class StartPlaylistPlayback(val trackIndex: Int) : CurrentPlaylistUiIntent
+        data class UpdateAfterDrag(
+            val newPlaylist: List<Track>,
+            val newCurrentTrackIndex: Int,
+        ) : Playlist
 
-    data class ShowTrimmer(val trackUri: String) : CurrentPlaylistUiIntent
+        data class AddTrackToPlaylist(val track: Track) : Playlist
+    }
 
-    data object ClearBackResult : CurrentPlaylistUiIntent
+    sealed interface Screen : CurrentPlaylistUiIntent {
+        data class ShowTrimmer(val trackUri: String) : Screen
+        data object ShowMetaEditor : Screen
+        data object ClearScreenEffect : Screen
+    }
 }

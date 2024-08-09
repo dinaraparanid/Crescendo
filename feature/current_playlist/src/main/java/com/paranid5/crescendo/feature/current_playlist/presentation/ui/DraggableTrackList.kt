@@ -6,6 +6,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.Dp
+import com.paranid5.crescendo.core.common.tracks.Track
 import com.paranid5.crescendo.core.resources.ui.theme.AppTheme.dimensions
 import com.paranid5.crescendo.ui.drag.DraggableList
 import com.paranid5.crescendo.ui.drag.DraggableListItemContent
@@ -41,7 +42,9 @@ internal fun DraggableTrackList(
     onTrackDismissed: (index: Int, item: TrackUiState) -> Boolean,
     onTrackDragged: (draggedItems: ImmutableList<TrackUiState>, dragIndex: Int) -> Unit,
     onTrackClick: (index: Int) -> Unit,
-    navigateToTrimmer: (trackUri: String) -> Unit,
+    addToPlaylist: (track: Track) -> Unit,
+    showTrimmer: (trackUri: String) -> Unit,
+    showMetaEditor: () -> Unit,
     modifier: Modifier = Modifier,
     trackItemModifier: Modifier = Modifier,
     bottomPadding: Dp = dimensions.padding.extraMedium,
@@ -63,7 +66,9 @@ internal fun DraggableTrackList(
             trackIndex = trackInd,
             isCurrent = isTrackCurrent,
             modifier = trackModifier,
-            navigateToTrimmer = navigateToTrimmer,
+            addToPlaylist = addToPlaylist,
+            showTrimmer = showTrimmer,
+            showMetaEditor = showMetaEditor,
             onClick = { onTrackClick(trackInd) },
         )
     },

@@ -15,12 +15,12 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import com.paranid5.crescendo.core.resources.ui.theme.AppTheme.dimensions
-import com.paranid5.crescendo.tracks.presentation.effect.BackResultEffect
 import com.paranid5.crescendo.tracks.presentation.effect.LifecycleEffect
 import com.paranid5.crescendo.tracks.presentation.effect.QueryUpdatesEffect
+import com.paranid5.crescendo.tracks.presentation.effect.ScreenEffect
 import com.paranid5.crescendo.tracks.presentation.ui.DefaultTrackList
 import com.paranid5.crescendo.tracks.presentation.ui.TracksBar
-import com.paranid5.crescendo.tracks.view_model.TracksBackResult
+import com.paranid5.crescendo.tracks.view_model.TracksScreenEffect
 import com.paranid5.crescendo.tracks.view_model.TracksUiIntent
 import com.paranid5.crescendo.tracks.view_model.TracksViewModel
 import com.paranid5.crescendo.tracks.view_model.TracksViewModelImpl
@@ -34,20 +34,20 @@ fun TracksScreen(
     modifier: Modifier = Modifier,
     searchQuery: String = "",
     viewModel: TracksViewModel = koinViewModel<TracksViewModelImpl>(),
-    onBack: (TracksBackResult) -> Unit,
+    onScreenEffect: (TracksScreenEffect) -> Unit,
 ) {
     val state by viewModel.stateFlow.collectAsState()
     val onUiIntent = viewModel::onUiIntent
 
     val refreshState = rememberPullRefreshState(
         refreshing = state.shownTracksState is UiState.Refreshing,
-        onRefresh = { onUiIntent(TracksUiIntent.OnRefresh) },
+        onRefresh = { onUiIntent(TracksUiIntent.Lifecycle.OnRefresh) },
     )
 
     LifecycleEffect(onUiIntent = onUiIntent)
 
-    BackResultEffect(state = state, onBack = onBack) {
-        onUiIntent(TracksUiIntent.ClearBackResult)
+    ScreenEffect(state = state, onScreenEffect = onScreenEffect) {
+        onUiIntent(TracksUiIntent.ScreenEffect.ClearBackResult)
     }
 
     QueryUpdatesEffect(searchQuery, onUiIntent = onUiIntent)

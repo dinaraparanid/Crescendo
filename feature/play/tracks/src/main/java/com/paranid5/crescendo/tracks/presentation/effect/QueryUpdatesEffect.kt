@@ -9,5 +9,5 @@ internal fun QueryUpdatesEffect(
     searchQuery: String,
     onUiIntent: (TracksUiIntent) -> Unit,
 ) = LaunchedEffect(searchQuery, onUiIntent) {
-    onUiIntent(TracksUiIntent.UpdateSearchQuery(searchQuery))
+    onUiIntent(TracksUiIntent.UpdateState.UpdateSearchQuery(searchQuery))
 }

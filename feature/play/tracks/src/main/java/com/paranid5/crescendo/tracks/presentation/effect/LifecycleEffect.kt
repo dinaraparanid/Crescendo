@@ -8,6 +8,6 @@ import com.paranid5.crescendo.tracks.view_model.TracksUiIntent
 internal fun LifecycleEffect(
     onUiIntent: (TracksUiIntent) -> Unit,
 ) = DisposableEffect(onUiIntent) {
-    onUiIntent(TracksUiIntent.OnStart)
-    onDispose { onUiIntent(TracksUiIntent.OnStop) }
+    onUiIntent(TracksUiIntent.Lifecycle.OnStart)
+    onDispose { onUiIntent(TracksUiIntent.Lifecycle.OnStop) }
 }

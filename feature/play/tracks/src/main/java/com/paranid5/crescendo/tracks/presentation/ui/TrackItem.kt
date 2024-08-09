@@ -24,7 +24,6 @@ import com.paranid5.crescendo.ui.track.item.TrackKebabMenuButton
 import com.paranid5.crescendo.ui.track.item.rememberTrackBackgroundColors
 import com.paranid5.crescendo.ui.track.item.rememberTrackContentColor
 import com.paranid5.crescendo.ui.track.ui_state.TrackUiState
-import com.paranid5.crescendo.utils.doNothing
 
 private val TrackCoverSize = 48.dp
 
@@ -81,8 +80,15 @@ internal fun TrackItem(
                 track = track,
                 tint = contentColor,
                 modifier = Modifier.align(Alignment.CenterVertically),
-                showTrimmer = { onUiIntent(TracksUiIntent.ShowTrimmer(trackUri = it)) },
-                showMetaEditor = doNothing, // TODO: show meta editor
+                addToPlaylist = {
+                    onUiIntent(TracksUiIntent.Tracks.AddTrackToPlaylist(track = it))
+                },
+                showTrimmer = {
+                    onUiIntent(TracksUiIntent.ScreenEffect.ShowTrimmer(trackUri = it))
+                },
+                showMetaEditor = {
+                    onUiIntent(TracksUiIntent.ScreenEffect.ShowMetaEditor)
+                }
             )
         }
     }

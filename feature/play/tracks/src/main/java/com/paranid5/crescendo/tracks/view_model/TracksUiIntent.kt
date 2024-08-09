@@ -5,22 +5,29 @@ import com.paranid5.crescendo.core.common.tracks.TrackOrder
 
 sealed interface TracksUiIntent {
 
-    data object OnStart : TracksUiIntent
+    sealed interface Lifecycle : TracksUiIntent {
+        data object OnStart : Lifecycle
+        data object OnStop : Lifecycle
+        data object OnRefresh : Lifecycle
+    }
 
-    data object OnStop : TracksUiIntent
+    sealed interface Tracks : TracksUiIntent {
+        data class TrackClick(
+            val nextPlaylist: List<Track>,
+            val nextTrackIndex: Int,
+        ) : Tracks
 
-    data object OnRefresh : TracksUiIntent
+        data class AddTrackToPlaylist(val track: Track) : Tracks
+    }
 
-    data class UpdateSearchQuery(val query: String) : TracksUiIntent
+    sealed interface UpdateState : TracksUiIntent {
+        data class UpdateSearchQuery(val query: String) : UpdateState
+        data class UpdateTrackOrder(val order: TrackOrder) : UpdateState
+    }
 
-    data class UpdateTrackOrder(val order: TrackOrder) : TracksUiIntent
-
-    data class TrackClick(
-        val nextPlaylist: List<Track>,
-        val nextTrackIndex: Int,
-    ) : TracksUiIntent
-
-    data class ShowTrimmer(val trackUri: String) : TracksUiIntent
-
-    data object ClearBackResult : TracksUiIntent
+    sealed interface ScreenEffect : TracksUiIntent {
+        data class ShowTrimmer(val trackUri: String) : ScreenEffect
+        data object ShowMetaEditor : ScreenEffect
+        data object ClearBackResult : ScreenEffect
+    }
 }

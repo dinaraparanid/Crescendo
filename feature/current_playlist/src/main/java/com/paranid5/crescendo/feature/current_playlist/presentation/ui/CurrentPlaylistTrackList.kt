@@ -26,24 +26,30 @@ internal fun CurrentPlaylistTrackList(
             when (index) {
                 currentTrackIndex -> false
                 else -> {
-                    onUiIntent(CurrentPlaylistUiIntent.DismissTrack(index))
+                    onUiIntent(CurrentPlaylistUiIntent.Playlist.DismissTrack(index))
                     true
                 }
             }
         },
         onTrackDragged = { newPlaylist, newCurrentTrackIndex ->
             onUiIntent(
-                CurrentPlaylistUiIntent.UpdateAfterDrag(
+                CurrentPlaylistUiIntent.Playlist.UpdateAfterDrag(
                     newPlaylist = newPlaylist,
                     newCurrentTrackIndex = newCurrentTrackIndex,
                 )
             )
         },
         onTrackClick = {
-            onUiIntent(CurrentPlaylistUiIntent.StartPlaylistPlayback(trackIndex = it))
+            onUiIntent(CurrentPlaylistUiIntent.Playlist.StartPlaylistPlayback(trackIndex = it))
         },
-        navigateToTrimmer = {
-            onUiIntent(CurrentPlaylistUiIntent.ShowTrimmer(trackUri = it))
+        addToPlaylist = {
+            onUiIntent(CurrentPlaylistUiIntent.Playlist.AddTrackToPlaylist(track = it))
+        },
+        showTrimmer = {
+            onUiIntent(CurrentPlaylistUiIntent.Screen.ShowTrimmer(trackUri = it))
+        },
+        showMetaEditor = {
+            onUiIntent(CurrentPlaylistUiIntent.Screen.ShowMetaEditor)
         },
     )
 }

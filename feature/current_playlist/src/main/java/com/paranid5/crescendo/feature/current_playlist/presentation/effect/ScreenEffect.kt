@@ -2,15 +2,15 @@ package com.paranid5.crescendo.feature.current_playlist.presentation.effect
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import com.paranid5.crescendo.feature.current_playlist.view_model.CurrentPlaylistBackResult
+import com.paranid5.crescendo.feature.current_playlist.view_model.CurrentPlaylistScreenEffect
 import com.paranid5.crescendo.feature.current_playlist.view_model.CurrentPlaylistState
 
 @Composable
-internal fun BackResultEffect(
+internal fun ScreenEffect(
     state: CurrentPlaylistState,
-    onBack: (CurrentPlaylistBackResult) -> Unit,
+    onScreenEffect: (CurrentPlaylistScreenEffect) -> Unit,
     onHandled: () -> Unit,
-) = LaunchedEffect(state.backResult, onBack) {
-    state.backResult?.let(onBack)
+) = LaunchedEffect(state.screenEffect, onScreenEffect) {
+    state.screenEffect?.let(onScreenEffect)
     onHandled()
 }

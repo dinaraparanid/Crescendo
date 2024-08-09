@@ -14,6 +14,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
+import com.paranid5.crescendo.core.common.tracks.Track
 import com.paranid5.crescendo.core.resources.R
 import com.paranid5.crescendo.ui.track.ui_state.TrackUiState
 
@@ -21,6 +22,7 @@ import com.paranid5.crescendo.ui.track.ui_state.TrackUiState
 fun TrackKebabMenuButton(
     track: TrackUiState,
     tint: Color,
+    addToPlaylist: (track: Track) -> Unit,
     showTrimmer: (trackUri: String) -> Unit,
     showMetaEditor: () -> Unit,
     modifier: Modifier = Modifier,
@@ -34,6 +36,7 @@ fun TrackKebabMenuButton(
         TrackKebabMenu(
             track = track,
             isPropertiesMenuShownState = isPropertiesMenuShownState,
+            addToPlaylist = addToPlaylist,
             showTrimmer = showTrimmer,
             showMetaEditor = showMetaEditor,
             itemModifier = itemModifier,

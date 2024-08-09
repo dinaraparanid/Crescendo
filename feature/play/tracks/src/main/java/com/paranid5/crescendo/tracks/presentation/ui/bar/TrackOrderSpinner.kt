@@ -69,7 +69,11 @@ private fun TrackOrderSpinnerImpl(
     selectedItemIndices = selectedItemIndexes,
     modifier = modifier,
     onItemSelected = { ind, _ ->
-        onUiIntent(TracksUiIntent.UpdateTrackOrder(selectedTrackOrder(ind, currentTrackOrder)))
+        onUiIntent(
+            TracksUiIntent.UpdateState.UpdateTrackOrder(
+                selectedTrackOrder(ind, currentTrackOrder)
+            )
+        )
     },
     previewItemFactory = { _, _, _ -> },
     selectedItemFactory = { _, item, mod ->

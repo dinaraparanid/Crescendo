@@ -54,7 +54,7 @@ internal fun DefaultTrackList(
                         playingPagerState?.animateScrollToPage(PlayingPage.TRACK.ordinal)
 
                         onUiIntent(
-                            TracksUiIntent.TrackClick(
+                            TracksUiIntent.Tracks.TrackClick(
                                 nextPlaylist = trackList,
                                 nextTrackIndex = trackInd,
                             )

@@ -22,7 +22,8 @@ import com.paranid5.crescendo.feature.play.main.presentation.view_model.PlayStat
 import com.paranid5.crescendo.feature.play.main.presentation.view_model.PlayState.PagerState
 import com.paranid5.crescendo.feature.play.main.presentation.view_model.PlayUiIntent
 import com.paranid5.crescendo.tracks.presentation.TracksScreen
-import com.paranid5.crescendo.tracks.view_model.TracksBackResult
+import com.paranid5.crescendo.tracks.view_model.TracksScreenEffect
+import com.paranid5.crescendo.utils.doNothing
 import kotlinx.coroutines.launch
 
 internal const val PagesAmount = 3
@@ -68,8 +69,10 @@ internal fun PrimaryPager(
                     searchQuery = state.searchQuery,
                 ) { result ->
                     when (result) {
-                        is TracksBackResult.ShowTrimmer ->
+                        is TracksScreenEffect.ShowTrimmer ->
                             onUiIntent(PlayUiIntent.ShowTrimmer(result.trackUri))
+
+                        TracksScreenEffect.ShowMetaEditor -> doNothing // TODO: show meta editor
                     }
                 }
 

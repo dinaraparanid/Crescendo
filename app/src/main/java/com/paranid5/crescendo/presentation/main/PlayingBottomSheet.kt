@@ -34,7 +34,7 @@ import com.paranid5.crescendo.core.resources.R
 import com.paranid5.crescendo.core.resources.ui.theme.AppTheme.colors
 import com.paranid5.crescendo.core.resources.ui.theme.AppTheme.dimensions
 import com.paranid5.crescendo.feature.current_playlist.presentation.CurrentPlaylistScreen
-import com.paranid5.crescendo.feature.current_playlist.view_model.CurrentPlaylistBackResult
+import com.paranid5.crescendo.feature.current_playlist.view_model.CurrentPlaylistScreenEffect
 import com.paranid5.crescendo.feature.playing.presentation.PlayingScreen
 import com.paranid5.crescendo.feature.playing.view_model.PlayingScreenEffect
 import com.paranid5.crescendo.navigation.AppScreen
@@ -45,6 +45,7 @@ import com.paranid5.crescendo.ui.composition_locals.LocalCurrentPlaylistSheetSta
 import com.paranid5.crescendo.ui.composition_locals.playing.LocalPlayingPagerState
 import com.paranid5.crescendo.ui.composition_locals.playing.LocalPlayingSheetState
 import com.paranid5.crescendo.ui.utils.PushUpButton
+import com.paranid5.crescendo.utils.doNothing
 import kotlinx.coroutines.launch
 
 private const val ContentCollapsedPadding = 8F
@@ -72,7 +73,7 @@ internal fun PlayingBottomSheet(
 
     val coroutineScope = rememberCoroutineScope()
 
-    fun onBack(result: PlayingScreenEffect) = when (result) {
+    fun onScreenEffect(result: PlayingScreenEffect) = when (result) {
         is PlayingScreenEffect.ShowAudioEffects -> {
             coroutineScope.launch { playingSheetState?.bottomSheetState?.collapse() }
             navigator.pushIfNotSame(AppScreen.Audio.AudioEffects)
@@ -81,10 +82,12 @@ internal fun PlayingBottomSheet(
         is PlayingScreenEffect.ShowTrimmer ->
             navigator.pushIfNotSame(AppScreen.Audio.Trimmer(result.trackUri))
 
-        PlayingScreenEffect.ShowAudioEffectsNotAllowed ->
+        is PlayingScreenEffect.ShowAudioEffectsNotAllowed ->
             Toast
                 .makeText(context, R.string.audio_effects_init_error, Toast.LENGTH_LONG)
                 .show()
+
+        is PlayingScreenEffect.ShowMetaEditor -> doNothing() // TODO: show meta editor
     }
 
     curPlaylistSheetState?.let { curPlaylistScaffoldState ->
@@ -111,14 +114,14 @@ internal fun PlayingBottomSheet(
                             coverAlpha = 1 - alpha,
                             screenAudioStatus = AudioStatus.PLAYING,
                             modifier = modifier.fillMaxSize(),
-                            onBack = ::onBack,
+                            onScreenEffect = ::onScreenEffect,
                         )
 
                         else -> PlayingScreen(
                             coverAlpha = 1 - alpha,
                             screenAudioStatus = AudioStatus.STREAMING,
                             modifier = modifier.fillMaxSize(),
-                            onBack = ::onBack,
+                            onScreenEffect = ::onScreenEffect,
                         )
                     }
                 }
@@ -174,8 +177,11 @@ private fun CurrentPlaylistBottomSheet(
                 .padding(top = contentTopPadding),
         ) { result ->
             when (result) {
-                is CurrentPlaylistBackResult.ShowTrimmer ->
+                is CurrentPlaylistScreenEffect.ShowTrimmer ->
                     navigator.pushIfNotSame(AppScreen.Audio.Trimmer(result.trackUri))
+
+                is CurrentPlaylistScreenEffect.ShowMetaEditor ->
+                    doNothing // TODO: show meta editor
             }
         }
     }

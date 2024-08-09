@@ -10,7 +10,6 @@ import com.paranid5.crescendo.core.common.AudioStatus
 import com.paranid5.crescendo.feature.playing.view_model.PlayingState
 import com.paranid5.crescendo.feature.playing.view_model.PlayingUiIntent
 import com.paranid5.crescendo.ui.track.item.TrackKebabMenuButton
-import com.paranid5.crescendo.utils.doNothing
 
 private val IconSize = 24.dp
 
@@ -34,10 +33,15 @@ internal fun KebabMenuButton(
                 tint = tint,
                 modifier = modifier,
                 iconModifier = Modifier.size(IconSize),
+                addToPlaylist = {
+                    onUiIntent(PlayingUiIntent.UpdateState.AddTrackToPlaylist(track = it))
+                },
                 showTrimmer = {
                     onUiIntent(PlayingUiIntent.ScreenEffect.ShowTrimmer(trackUri = it))
                 },
-                showMetaEditor = doNothing, // TODO: show meta editor
+                showMetaEditor = {
+                    onUiIntent(PlayingUiIntent.ScreenEffect.ShowMetaEditor)
+                }
             )
         }
     }

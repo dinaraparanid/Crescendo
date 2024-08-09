@@ -4,6 +4,7 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.paranid5.crescendo.core.common.AudioStatus
+import com.paranid5.crescendo.core.common.tracks.DefaultTrack
 import com.paranid5.crescendo.core.common.tracks.Track
 import com.paranid5.crescendo.core.common.tracks.sortedBy
 import com.paranid5.crescendo.core.common.udf.StatePublisher
@@ -45,32 +46,48 @@ internal class TracksViewModelImpl(
     }
 
     override fun onUiIntent(intent: TracksUiIntent) = when (intent) {
-        is TracksUiIntent.OnStart -> onStart()
+        is TracksUiIntent.Lifecycle -> onLifecycleUiIntent(intent)
+        is TracksUiIntent.Tracks -> onTracksUiIntent(intent)
+        is TracksUiIntent.UpdateState -> onUpdateStateUiIntent(intent)
+        is TracksUiIntent.ScreenEffect -> onScreenEffectUiIntent(intent)
+    }
 
-        is TracksUiIntent.OnStop -> unsubscribeFromDataUpdates()
+    private fun onLifecycleUiIntent(intent: TracksUiIntent.Lifecycle) = when (intent) {
+        is TracksUiIntent.Lifecycle.OnRefresh -> onRefresh()
+        is TracksUiIntent.Lifecycle.OnStart -> onStart()
+        is TracksUiIntent.Lifecycle.OnStop -> unsubscribeFromDataUpdates()
+    }
 
-        is TracksUiIntent.OnRefresh -> onRefresh()
-
-        is TracksUiIntent.UpdateSearchQuery -> updateState {
-            copy(query = intent.query)
-        }
-
-        is TracksUiIntent.UpdateTrackOrder -> viewModelScope.sideEffect {
-            tracksRepository.updateTrackOrder(intent.order)
-            fetchTracksFromMediaStore()
-        }
-
-        is TracksUiIntent.TrackClick -> onTrackClick(
+    private fun onTracksUiIntent(intent: TracksUiIntent.Tracks) = when (intent) {
+        is TracksUiIntent.Tracks.AddTrackToPlaylist -> addToPlaylist(track = intent.track)
+        is TracksUiIntent.Tracks.TrackClick -> onTrackClick(
             nextPlaylist = intent.nextPlaylist,
             nextTrackIndex = intent.nextTrackIndex,
         )
+    }
 
-        is TracksUiIntent.ShowTrimmer -> updateState {
-            copy(backResult = TracksBackResult.ShowTrimmer(intent.trackUri))
+    private fun onUpdateStateUiIntent(intent: TracksUiIntent.UpdateState) = when (intent) {
+        is TracksUiIntent.UpdateState.UpdateSearchQuery -> updateState {
+            copy(query = intent.query)
         }
 
-        is TracksUiIntent.ClearBackResult -> updateState {
-            copy(backResult = null)
+        is TracksUiIntent.UpdateState.UpdateTrackOrder -> viewModelScope.sideEffect {
+            tracksRepository.updateTrackOrder(intent.order)
+            fetchTracksFromMediaStore()
+        }
+    }
+
+    private fun onScreenEffectUiIntent(intent: TracksUiIntent.ScreenEffect) = when (intent) {
+        is TracksUiIntent.ScreenEffect.ClearBackResult -> updateState {
+            copy(screenEffect = null)
+        }
+
+        is TracksUiIntent.ScreenEffect.ShowMetaEditor -> updateState {
+            copy(screenEffect = TracksScreenEffect.ShowMetaEditor)
+        }
+
+        is TracksUiIntent.ScreenEffect.ShowTrimmer -> updateState {
+            copy(screenEffect = TracksScreenEffect.ShowTrimmer(intent.trackUri))
         }
     }
 
@@ -101,6 +118,12 @@ internal class TracksViewModelImpl(
                 prevTrack = currentTrack,
             )
         }
+    }
+
+    private fun addToPlaylist(track: Track) {
+        val defaultTrack = DefaultTrack(track)
+        trackServiceInteractor.addToPlaylist(defaultTrack)
+        viewModelScope.launch { currentPlaylistRepository.addTrackToPlaylist(defaultTrack) }
     }
 
     private fun subscribeOnDataUpdates() {

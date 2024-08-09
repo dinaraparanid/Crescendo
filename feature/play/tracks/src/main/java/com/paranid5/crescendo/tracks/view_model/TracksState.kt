@@ -21,7 +21,7 @@ data class TracksState(
     @IgnoredOnParcel val allTracksState: UiState<ImmutableList<TrackUiState>> = UiState.Undefined,
     @IgnoredOnParcel val trackOrder: TrackOrder = TrackOrder.default,
     @IgnoredOnParcel val currentTrack: TrackUiState? = null,
-    @IgnoredOnParcel val backResult: TracksBackResult? = null,
+    @IgnoredOnParcel val screenEffect: TracksScreenEffect? = null,
 ) : Parcelable {
 
     @IgnoredOnParcel
