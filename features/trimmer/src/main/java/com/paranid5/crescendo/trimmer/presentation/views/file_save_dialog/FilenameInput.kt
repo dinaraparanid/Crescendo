@@ -25,7 +25,7 @@ internal fun FilenameInput(filenameState: MutableState<String>, modifier: Modifi
         label = { FilenameLabel() },
         modifier = modifier
             .fillMaxWidth()
-            .padding(horizontal = dimensions.padding.medium)
+            .padding(horizontal = dimensions.padding.medium),
     )
 }
 

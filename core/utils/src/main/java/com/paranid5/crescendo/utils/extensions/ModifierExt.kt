@@ -8,14 +8,14 @@ import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 
-private val DefaultElevation = 60.dp
+private val DefaultElevation = 60.dp // TODO: 4.dp
 private val DefaultRadius = 12.dp
 
 fun Modifier.simpleShadow(
     elevation: Dp = DefaultElevation,
     color: Color = Color.Black,
     radius: Dp = DefaultRadius,
-) = this then shadow(
+) = this then Modifier.shadow(
     elevation = elevation,
     shape = RoundedCornerShape(radius),
     ambientColor = color,
@@ -27,7 +27,7 @@ fun Modifier.simpleShadow(
     shape: Shape,
     elevation: Dp = DefaultElevation,
     color: Color = Color.Black,
-) = this then shadow(
+) = this then Modifier.shadow(
     elevation = elevation,
     shape = shape,
     ambientColor = color,

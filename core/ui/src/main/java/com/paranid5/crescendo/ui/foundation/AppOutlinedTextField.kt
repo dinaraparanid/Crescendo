@@ -13,12 +13,15 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.VisualTransformation
 import com.paranid5.crescendo.core.resources.ui.theme.AppTheme.colors
+import com.paranid5.crescendo.core.resources.ui.theme.AppTheme.typography
 
 @Composable
 fun AppOutlinedTextField(
     value: String,
     onValueChange: (String) -> Unit,
     modifier: Modifier = Modifier,
+    color: Color = colors.text.primary,
+    style: TextStyle = typography.regular,
     placeholder: @Composable (() -> Unit)? = null,
     label: @Composable (() -> Unit)? = null,
     keyboardOptions: KeyboardOptions = KeyboardOptions.Default,
@@ -27,10 +30,10 @@ fun AppOutlinedTextField(
     singleLine = true,
     onValueChange = onValueChange,
     modifier = modifier,
-    textStyle = TextStyle(color = colors.text.primary),
+    textStyle = style.copy(color = color),
     keyboardOptions = keyboardOptions,
     decorationBox = @Composable { innerTextField ->
-        outlinedTextFieldDecorationBox(
+        OutlinedTextFieldDecorationBox(
             value = value,
             innerTextField = innerTextField,
             placeholder = placeholder,
@@ -41,8 +44,9 @@ fun AppOutlinedTextField(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-private fun outlinedTextFieldDecorationBox(
+private fun OutlinedTextFieldDecorationBox(
     value: String,
+    textFieldColors: TextFieldColors = outlinedTextColors,
     innerTextField: @Composable () -> Unit,
     placeholder: @Composable (() -> Unit)? = null,
     label: @Composable (() -> Unit)? = null,
@@ -55,7 +59,7 @@ private fun outlinedTextFieldDecorationBox(
     enabled = true,
     interactionSource = remember { MutableInteractionSource() },
     visualTransformation = VisualTransformation.None,
-    colors = outlinedTextColors,
+    colors = textFieldColors,
 )
 
 private inline val outlinedTextColors: TextFieldColors

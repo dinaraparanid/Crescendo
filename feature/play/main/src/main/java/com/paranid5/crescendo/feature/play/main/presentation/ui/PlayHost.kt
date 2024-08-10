@@ -11,8 +11,8 @@ import androidx.navigation.compose.composable
 import com.paranid5.crescendo.core.common.navigation.LocalNavigator
 import com.paranid5.crescendo.feature.play.main.navigation.PlayScreen
 import com.paranid5.crescendo.feature.play.main.navigation.requirePlayNavigator
-import com.paranid5.crescendo.feature.play.main.presentation.view_model.PlayState
-import com.paranid5.crescendo.feature.play.main.presentation.view_model.PlayUiIntent
+import com.paranid5.crescendo.feature.play.main.view_model.PlayState
+import com.paranid5.crescendo.feature.play.main.view_model.PlayUiIntent
 
 @Composable
 internal fun PlayHost(

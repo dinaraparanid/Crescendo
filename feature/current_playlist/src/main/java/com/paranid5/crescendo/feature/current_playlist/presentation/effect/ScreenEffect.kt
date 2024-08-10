@@ -10,7 +10,7 @@ internal fun ScreenEffect(
     state: CurrentPlaylistState,
     onScreenEffect: (CurrentPlaylistScreenEffect) -> Unit,
     onHandled: () -> Unit,
-) = LaunchedEffect(state.screenEffect, onScreenEffect) {
+) = LaunchedEffect(state.screenEffect, onScreenEffect, onHandled) {
     state.screenEffect?.let(onScreenEffect)
     onHandled()
 }

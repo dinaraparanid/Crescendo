@@ -9,8 +9,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import com.paranid5.crescendo.core.resources.ui.theme.AppTheme.colors
-import com.paranid5.crescendo.feature.splash.views.SplashBackgroundImage
-import com.paranid5.crescendo.feature.splash.views.VersionLabels
+import com.paranid5.crescendo.feature.splash.ui.SplashBackgroundImage
+import com.paranid5.crescendo.feature.splash.ui.VersionLabels
 
 private const val TOP_PADDING_RATIO = 6F
 private const val BOTTOM_PADDING_RATIO = 17F

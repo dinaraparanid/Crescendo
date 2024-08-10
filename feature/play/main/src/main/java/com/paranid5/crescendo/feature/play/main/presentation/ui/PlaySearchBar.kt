@@ -28,8 +28,8 @@ import com.paranid5.crescendo.core.resources.ui.theme.AppTheme.colors
 import com.paranid5.crescendo.core.resources.ui.theme.AppTheme.dimensions
 import com.paranid5.crescendo.core.resources.ui.theme.AppTheme.typography
 import com.paranid5.crescendo.feature.play.main.presentation.effect.SearchBarFocusEffect
-import com.paranid5.crescendo.feature.play.main.presentation.view_model.PlayState
-import com.paranid5.crescendo.feature.play.main.presentation.view_model.PlayUiIntent
+import com.paranid5.crescendo.feature.play.main.view_model.PlayState
+import com.paranid5.crescendo.feature.play.main.view_model.PlayUiIntent
 import com.paranid5.crescendo.ui.utils.clickableWithRipple
 
 private val IconSize = 24.dp
@@ -46,7 +46,7 @@ internal fun PlaySearchBar(
         contentAlignment = Alignment.Center,
         modifier = modifier
             .clip(RoundedCornerShape(dimensions.corners.small))
-            .background(Color.White),
+            .background(colors.background.searchBar),
     ) {
         SearchTextField(
             state = state,
@@ -70,8 +70,8 @@ private fun SearchTextField(
     singleLine = true,
     textStyle = typography.body,
     colors = TextFieldDefaults.colors(
-        focusedTextColor = colors.text.dark,
-        unfocusedTextColor = colors.text.dark,
+        focusedTextColor = colors.text.onSearchBar,
+        unfocusedTextColor = colors.text.onSearchBar,
         disabledTextColor = colors.text.tertiriary,
         errorTextColor = colors.error,
         focusedContainerColor = Color.Transparent,
@@ -98,7 +98,7 @@ private fun SearchIcon(modifier: Modifier = Modifier) =
     Icon(
         imageVector = Icons.Default.Search,
         contentDescription = null,
-        tint = colors.icon.primary,
+        tint = colors.icon.onSearchBar,
         modifier = modifier.size(IconSize),
     )
 
@@ -120,7 +120,7 @@ private fun CancelIcon(
 ) = Icon(
     imageVector = Icons.Default.Close,
     contentDescription = null,
-    tint = colors.icon.primary,
+    tint = colors.icon.onSearchBar,
     modifier = modifier
         .size(IconSize)
         .clickableWithRipple(onClick = onClick),

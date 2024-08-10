@@ -73,8 +73,8 @@ dependencies {
     implementation project(':features:favourites')
     implementation project(':features:track_collections')
     implementation project(':features:trimmer')
-    implementation project(':features:cache')
 
+    implementation project(':feature:cache')
     implementation project(':feature:current_playlist')
     implementation project(':feature:splash')
     implementation project(':feature:playing')

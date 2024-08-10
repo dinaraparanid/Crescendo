@@ -1,0 +1,45 @@
+package com.paranid5.crescendo.cache.presentation.ui
+
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
+import com.paranid5.crescendo.cache.view_model.CacheState
+import com.paranid5.crescendo.cache.view_model.CacheUiIntent
+import com.paranid5.crescendo.core.resources.R
+import com.paranid5.crescendo.core.resources.ui.theme.AppTheme.colors
+import com.paranid5.crescendo.core.resources.ui.theme.AppTheme.typography
+
+@Composable
+internal fun ConfirmButton(
+    state: CacheState,
+    onUiIntent: (CacheUiIntent) -> Unit,
+    modifier: Modifier = Modifier,
+    hideDialog: () -> Unit,
+) = Button(
+    modifier = modifier,
+    enabled = state.isCacheButtonClickable,
+    colors = ButtonDefaults.buttonColors(
+        containerColor = colors.button.primary,
+        contentColor = colors.text.primary,
+        disabledContainerColor = colors.button.disabled,
+        disabledContentColor = colors.text.tertiriary,
+    ),
+    content = { ConfirmButtonLabel() },
+    onClick = {
+        onUiIntent(CacheUiIntent.StartCaching)
+        hideDialog()
+    },
+)
+
+@Composable
+private fun ConfirmButtonLabel(modifier: Modifier = Modifier) =
+    Text(
+        text = stringResource(R.string.cache_dialog_accept_button_title),
+        style = typography.regular,
+        fontWeight = FontWeight.Bold,
+        modifier = modifier,
+    )

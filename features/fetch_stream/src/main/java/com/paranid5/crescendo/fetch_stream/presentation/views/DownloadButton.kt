@@ -29,11 +29,8 @@ internal fun DownloadButton(
 ) {
     val text by viewModel.collectCurrentTextAsState()
 
-    val isCachePropertiesDialogShownState = remember {
-        mutableStateOf(false)
-    }
-
-    val isCachePropertiesDialogShown by isCachePropertiesDialogShownState
+    val isCachePropertiesDialogShownState = remember { mutableStateOf(false) }
+    var isCachePropertiesDialogShown by isCachePropertiesDialogShownState
 
     Box(modifier) {
         val (areStoragePermissionsGranted, launchStoragePermissions) =
@@ -45,8 +42,8 @@ internal fun DownloadButton(
         if (isCachePropertiesDialogShown && areStoragePermissionsGranted)
             CacheDialog(
                 url = text,
-                isDialogShownState = isCachePropertiesDialogShownState,
                 modifier = Modifier.align(Alignment.Center),
+                hide = { isCachePropertiesDialogShown = false },
             )
 
         DownloadButtonImpl(

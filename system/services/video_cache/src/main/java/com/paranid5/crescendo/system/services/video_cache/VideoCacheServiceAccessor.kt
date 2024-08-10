@@ -28,7 +28,7 @@ class VideoCacheServiceAccessor(context: Context) : KoinComponent,
         videoUrl: String,
         desiredFilename: String,
         format: Formats,
-        trimRange: TrimRange
+        trimRange: TrimRange,
     ) = apply {
         putExtra(VideoCacheServiceBroadcasts.URL_ARG, videoUrl)
         putExtra(VideoCacheServiceBroadcasts.FILENAME_ARG, desiredFilename)
@@ -40,7 +40,7 @@ class VideoCacheServiceAccessor(context: Context) : KoinComponent,
         videoUrl: String,
         desiredFilename: String,
         format: Formats,
-        trimRange: TrimRange
+        trimRange: TrimRange,
     ) {
         val serviceIntent = Intent(appContext, VideoCacheService::class.java)
             .putVideoCacheDataArgs(videoUrl, desiredFilename, format, trimRange)
@@ -55,32 +55,46 @@ class VideoCacheServiceAccessor(context: Context) : KoinComponent,
         videoUrl: String,
         desiredFilename: String,
         format: Formats,
-        trimRange: TrimRange
+        trimRange: TrimRange,
     ) = sendBroadcast(
-        Intent(VideoCacheServiceBroadcasts.Broadcast_CACHE_NEXT_VIDEO)
-            .putVideoCacheDataArgs(videoUrl, desiredFilename, format, trimRange)
+        Intent(VideoCacheServiceBroadcasts.Broadcast_CACHE_NEXT_VIDEO).putVideoCacheDataArgs(
+            videoUrl = videoUrl,
+            desiredFilename = desiredFilename,
+            format = format,
+            trimRange = trimRange,
+        )
     )
 
     private fun startCaching(
         videoUrl: String,
         desiredFilename: String,
         format: Formats,
-        trimRange: TrimRange
-    ) = startVideoCacheService(videoUrl, desiredFilename, format, trimRange)
+        trimRange: TrimRange,
+    ) = startVideoCacheService(
+        videoUrl = videoUrl,
+        desiredFilename = desiredFilename,
+        format = format,
+        trimRange = trimRange,
+    )
 
     fun startCachingOrAddToQueue(
         videoUrl: String,
         desiredFilename: String,
         format: Formats,
-        trimRange: TrimRange
+        trimRange: TrimRange,
     ) = when {
         isVideoCacheServiceConnected -> cacheNextVideo(
-            videoUrl,
-            desiredFilename,
-            format,
-            trimRange
+            videoUrl = videoUrl,
+            desiredFilename = desiredFilename,
+            format = format,
+            trimRange = trimRange,
         )
 
-        else -> startCaching(videoUrl, desiredFilename, format, trimRange)
+        else -> startCaching(
+            videoUrl = videoUrl,
+            desiredFilename = desiredFilename,
+            format = format,
+            trimRange = trimRange,
+        )
     }
 }

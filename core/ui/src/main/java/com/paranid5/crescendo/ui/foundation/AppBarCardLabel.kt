@@ -11,6 +11,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
 import com.paranid5.crescendo.core.resources.ui.theme.AppTheme
+import com.paranid5.crescendo.core.resources.ui.theme.AppTheme.colors
+import com.paranid5.crescendo.core.resources.ui.theme.AppTheme.dimensions
 import com.paranid5.crescendo.utils.extensions.simpleShadow
 
 private val CardLabelElevation = 4.dp
@@ -19,19 +21,26 @@ private val CardLabelElevation = 4.dp
 fun AppBarCardLabel(
     text: String,
     modifier: Modifier = Modifier,
-) = Box(
-    modifier = Modifier
-        .clip(RoundedCornerShape(AppTheme.dimensions.padding.extraMedium))
-        .background(AppTheme.colors.background.chips)
-        .simpleShadow(elevation = CardLabelElevation)
-        .then(modifier)
 ) {
-    Text(
-        text = text,
-        color = AppTheme.colors.text.primary,
-        style = AppTheme.typography.body,
+    val shape = RoundedCornerShape(dimensions.padding.extraMedium)
+
+    Box(
         modifier = Modifier
-            .align(Alignment.Center)
-            .padding(AppTheme.dimensions.padding.small),
-    )
+            .simpleShadow(
+                elevation = CardLabelElevation,
+                shape = shape,
+            )
+            .clip(shape)
+            .background(colors.background.chips)
+            .then(modifier)
+    ) {
+        Text(
+            text = text,
+            color = colors.text.primary,
+            style = AppTheme.typography.body,
+            modifier = Modifier
+                .align(Alignment.Center)
+                .padding(dimensions.padding.small),
+        )
+    }
 }

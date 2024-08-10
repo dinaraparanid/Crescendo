@@ -31,7 +31,7 @@ private suspend inline fun VideoCacheService.onCaching(videoData: VideoCacheData
             ytUrl = videoData.url,
             desiredFilename = videoData.desiredFilename,
             format = videoData.format,
-            trimRange = videoData.trimRange
+            trimRange = videoData.trimRange,
         )
     )
 }

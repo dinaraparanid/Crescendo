@@ -9,8 +9,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import com.paranid5.crescendo.core.resources.ui.theme.AppTheme.dimensions
 import com.paranid5.crescendo.feature.play.main.presentation.ui.pager.PrimaryPager
-import com.paranid5.crescendo.feature.play.main.presentation.view_model.PlayState
-import com.paranid5.crescendo.feature.play.main.presentation.view_model.PlayUiIntent
+import com.paranid5.crescendo.feature.play.main.view_model.PlayState
+import com.paranid5.crescendo.feature.play.main.view_model.PlayUiIntent
 
 @Composable
 internal fun PrimaryScreen(

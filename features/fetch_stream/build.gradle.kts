@@ -43,7 +43,7 @@ dependencies {
     implementation(project(":domain:stream"))
     implementation(project(":domain:playback"))
 
-    implementation(project(":features:cache"))
+    implementation(project(":feature:cache"))
 
     implementation(project(":system:services:stream"))
 

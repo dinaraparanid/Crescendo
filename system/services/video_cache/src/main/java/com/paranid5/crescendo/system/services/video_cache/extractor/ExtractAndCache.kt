@@ -10,8 +10,8 @@ import com.paranid5.crescendo.core.media.caching.CachingResult
 import com.paranid5.crescendo.core.media.caching.cachingResult
 import com.paranid5.crescendo.core.media.caching.isNotError
 import com.paranid5.crescendo.core.media.caching.onCanceled
-import com.paranid5.crescendo.core.media.files.MediaFile
 import com.paranid5.crescendo.core.media.convertToAudioFileAndSetTagsAsync
+import com.paranid5.crescendo.core.media.files.MediaFile
 import com.paranid5.crescendo.core.media.mergeToMP4AndSetTagsAsync
 import com.paranid5.crescendo.system.services.video_cache.VideoCacheService
 import com.paranid5.crescendo.system.services.video_cache.files.initMediaFile
@@ -25,7 +25,7 @@ internal suspend fun VideoCacheService.extractMediaFilesAndStartCaching(
     ytUrl: String,
     desiredFilename: String,
     format: Formats,
-    trimRange: TrimRange
+    trimRange: TrimRange,
 ): CachingResult {
     suspend fun impl() = either {
         val (urls, metadata) = urlExtractor.extractUrlsWithMeta(
@@ -41,7 +41,7 @@ internal suspend fun VideoCacheService.extractMediaFilesAndStartCaching(
                 desiredFilename = desiredFilename,
                 audioUrl = urls[0],
                 videoUrl = urls[1],
-                videoMetadata = metadata
+                videoMetadata = metadata,
             )
 
             else -> cacheAudioFile(
@@ -49,7 +49,7 @@ internal suspend fun VideoCacheService.extractMediaFilesAndStartCaching(
                 audioUrl = urls[0],
                 videoMetadata = metadata,
                 audioFormat = format,
-                trimRange = trimRange
+                trimRange = trimRange,
             )
         }
     }
@@ -68,7 +68,7 @@ private suspend fun VideoCacheService.cacheAudioFile(
     audioUrl: String,
     videoMetadata: VideoMetadata,
     audioFormat: Formats,
-    trimRange: TrimRange
+    trimRange: TrimRange,
 ): CachingResult {
     suspend fun impl() = cachingResult {
         val result = mediaFileDownloader.downloadAudioFile(
@@ -85,7 +85,7 @@ private suspend fun VideoCacheService.cacheAudioFile(
                 context = this@cacheAudioFile,
                 videoMetadata = videoMetadata,
                 audioFormat = audioFormat,
-                trimRange = trimRange
+                trimRange = trimRange,
             ).await()
 
         ensureNotNull(audioConversionResult) {

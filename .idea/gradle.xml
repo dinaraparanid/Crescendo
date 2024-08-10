@@ -28,6 +28,7 @@
             <option value="$PROJECT_DIR$/domain/waveform" />
             <option value="$PROJECT_DIR$/domain/web" />
             <option value="$PROJECT_DIR$/feature" />
+            <option value="$PROJECT_DIR$/feature/cache" />
             <option value="$PROJECT_DIR$/feature/current_playlist" />
             <option value="$PROJECT_DIR$/feature/play" />
             <option value="$PROJECT_DIR$/feature/play/main" />
@@ -37,7 +38,6 @@
             <option value="$PROJECT_DIR$/features" />
             <option value="$PROJECT_DIR$/features/about_app" />
             <option value="$PROJECT_DIR$/features/audio_effects" />
-            <option value="$PROJECT_DIR$/features/cache" />
             <option value="$PROJECT_DIR$/features/favourites" />
             <option value="$PROJECT_DIR$/features/fetch_stream" />
             <option value="$PROJECT_DIR$/features/settings" />

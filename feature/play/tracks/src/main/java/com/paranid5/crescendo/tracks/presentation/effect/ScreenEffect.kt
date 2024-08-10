@@ -10,7 +10,7 @@ internal fun ScreenEffect(
     state: TracksState,
     onScreenEffect: (TracksScreenEffect) -> Unit,
     onHandled: () -> Unit,
-) = LaunchedEffect(state, onScreenEffect) {
+) = LaunchedEffect(state, onScreenEffect, onHandled) {
     state.screenEffect?.let(onScreenEffect)
     onHandled()
 }

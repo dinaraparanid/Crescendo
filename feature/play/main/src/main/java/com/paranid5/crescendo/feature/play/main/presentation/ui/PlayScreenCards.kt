@@ -28,18 +28,25 @@ import com.paranid5.crescendo.core.resources.ui.theme.AppTheme.typography
 import com.paranid5.crescendo.feature.play.main.navigation.PlayScreen
 import com.paranid5.crescendo.feature.play.main.navigation.requirePlayNavigator
 import com.paranid5.crescendo.ui.utils.clickableWithRipple
+import com.paranid5.crescendo.utils.extensions.simpleShadow
 
 private val CardWidth = 148.dp
 private val CardHeight = 128.dp
+private val CardElevation = 4.dp
 private val IconSize = 24.dp
 
 @Composable
 internal fun PlayScreenCards(modifier: Modifier = Modifier) {
     val navigator = LocalNavigator.requirePlayNavigator()
+    val shape = RoundedCornerShape(dimensions.padding.medium)
 
     val cardModifier = Modifier
         .size(width = CardWidth, height = CardHeight)
-        .clip(RoundedCornerShape(dimensions.padding.medium))
+        .simpleShadow(
+            elevation = CardElevation,
+            shape = shape,
+        )
+        .clip(shape)
         .background(colors.background.card)
 
     Row(modifier.horizontalScroll(rememberScrollState())) {
@@ -93,7 +100,7 @@ private fun PlayScreenCard(
             imageVector = icon,
             contentDescription = title,
             modifier = Modifier.size(IconSize),
-            tint = colors.text.dark,
+            tint = colors.text.onCard,
         )
 
         Spacer(Modifier.width(dimensions.padding.extraSmall))
@@ -101,7 +108,7 @@ private fun PlayScreenCard(
         Text(
             text = title,
             style = typography.h.h3,
-            color = colors.text.dark,
+            color = colors.text.onCard,
         )
     }
 }

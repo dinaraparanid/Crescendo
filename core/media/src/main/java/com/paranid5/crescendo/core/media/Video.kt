@@ -66,17 +66,17 @@ suspend fun MediaFile.VideoFile.convertToAudioFileAndSetTagsAsync(
     context: Context,
     videoMetadata: VideoMetadata,
     audioFormat: Formats,
-    trimRange: TrimRange
+    trimRange: TrimRange,
 ) = coroutineScope {
     async(Dispatchers.IO) {
         val audioFile = toAudioFileAsync(audioFormat, trimRange).await()
             ?: return@async null
 
         setAudioTags(
-            context,
-            audioFile,
-            videoMetadata,
-            audioFormat
+            context = context,
+            audioFile = audioFile,
+            metadata = videoMetadata,
+            audioFormat = audioFormat,
         )
 
         audioFile

@@ -8,17 +8,25 @@ import androidx.compose.runtime.compositionLocalOf
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import com.paranid5.crescendo.core.resources.ui.AirSuperiorityBlue
+import com.paranid5.crescendo.core.resources.ui.Aquamarine
 import com.paranid5.crescendo.core.resources.ui.DarkPurple
+import com.paranid5.crescendo.core.resources.ui.DarkSlateGray
 import com.paranid5.crescendo.core.resources.ui.Disabled
 import com.paranid5.crescendo.core.resources.ui.Emerald
 import com.paranid5.crescendo.core.resources.ui.Error
 import com.paranid5.crescendo.core.resources.ui.LightBlue
 import com.paranid5.crescendo.core.resources.ui.PaleCornflowerBlue
+import com.paranid5.crescendo.core.resources.ui.Pang
 import com.paranid5.crescendo.core.resources.ui.RoyalBlue
 import com.paranid5.crescendo.core.resources.ui.RoyalBlueGradient
 import com.paranid5.crescendo.core.resources.ui.RussianViolet
-import com.paranid5.crescendo.core.resources.ui.Tertiriary
-import com.paranid5.crescendo.core.resources.ui.TransparentUtility
+import com.paranid5.crescendo.core.resources.ui.SlateGray
+import com.paranid5.crescendo.core.resources.ui.TertiriaryDark
+import com.paranid5.crescendo.core.resources.ui.TertiriaryLight
+import com.paranid5.crescendo.core.resources.ui.TiffanyBlue
+import com.paranid5.crescendo.core.resources.ui.TransparentUtilityDark
+import com.paranid5.crescendo.core.resources.ui.TransparentUtilityLight
 
 @Immutable
 data class AppColors(
@@ -36,12 +44,12 @@ data class AppColors(
 ) {
     companion object {
         private val LightColorScheme = lightColorScheme(
-            primary = RussianViolet,
-            secondary = Emerald,
-            onSecondary = PaleCornflowerBlue,
-            background = RoyalBlue,
-            onBackground = RoyalBlueGradient,
-            inverseSurface = Color.White,
+            primary = Aquamarine,
+            secondary = DarkSlateGray,
+            onSecondary = SlateGray,
+            background = Pang,
+            onBackground = Pang,
+            inverseSurface = Color.Black,
         )
 
         private val DarkColorScheme = darkColorScheme(
@@ -61,25 +69,25 @@ data class AppColors(
                 error = Error,
                 disabled = Disabled,
                 background = AppBackgroundColors.dark,
-                selection = AppSelectionColors.default,
-                text = AppTextColors.default,
-                button = AppButtonColors.default,
+                selection = AppSelectionColors.dark,
+                text = AppTextColors.dark,
+                button = AppButtonColors.dark,
                 icon = AppIconColors.default,
-                utils = AppUtilsColors.default,
+                utils = AppUtilsColors.dark,
             )
 
             ThemeColors.Light -> AppColors(
                 colorScheme = LightColorScheme,
-                primary = RussianViolet,
-                secondary = PaleCornflowerBlue,
+                primary = Aquamarine,
+                secondary = DarkSlateGray,
                 error = Error,
                 disabled = Disabled,
                 background = AppBackgroundColors.light,
-                selection = AppSelectionColors.default,
-                text = AppTextColors.default,
-                button = AppButtonColors.default,
+                selection = AppSelectionColors.light,
+                text = AppTextColors.light,
+                button = AppButtonColors.light,
                 icon = AppIconColors.default,
-                utils = AppUtilsColors.default,
+                utils = AppUtilsColors.light,
             )
         }
     }
@@ -92,6 +100,7 @@ data class AppBackgroundColors(
     val gradient: Brush,
     val chips: Color,
     val card: Color,
+    val searchBar: Color,
 ) {
     companion object {
         private val BackgroundGradientStart = Offset(x = 0F, y = Float.POSITIVE_INFINITY)
@@ -107,18 +116,20 @@ data class AppBackgroundColors(
             ),
             chips = RussianViolet,
             card = LightBlue,
+            searchBar = Color.White,
         )
 
         internal val light = AppBackgroundColors(
-            primary = RoyalBlueGradient,
-            alternative = RoyalBlue,
+            primary = Pang,
+            alternative = Pang,
             gradient = Brush.linearGradient(
-                colors = listOf(RoyalBlueGradient, RoyalBlue),
+                colors = listOf(Pang, Pang),
                 start = BackgroundGradientStart,
                 end = BackgroundGradientEnd,
             ),
-            chips = RussianViolet,
-            card = LightBlue,
+            chips = Aquamarine,
+            card = AirSuperiorityBlue,
+            searchBar = Aquamarine.copy(alpha = 0.75F),
         )
     }
 }
@@ -129,9 +140,14 @@ data class AppSelectionColors(
     val notSelected: Color,
 ) {
     companion object {
-        internal val default = AppSelectionColors(
+        internal val dark = AppSelectionColors(
             selected = Emerald,
             notSelected = PaleCornflowerBlue,
+        )
+
+        internal val light = AppSelectionColors(
+            selected = DarkSlateGray,
+            notSelected = SlateGray,
         )
     }
 }
@@ -139,14 +155,23 @@ data class AppSelectionColors(
 @Immutable
 data class AppTextColors(
     val primary: Color,
-    val dark: Color,
+    val onCard: Color,
+    val onSearchBar: Color,
     val tertiriary: Color,
 ) {
     companion object {
-        internal val default = AppTextColors(
+        internal val dark = AppTextColors(
             primary = Color.White,
-            dark = DarkPurple,
-            tertiriary = Tertiriary,
+            onCard = DarkPurple,
+            onSearchBar = DarkPurple,
+            tertiriary = TertiriaryDark,
+        )
+
+        internal val light = AppTextColors(
+            primary = Color.Black,
+            onCard = TiffanyBlue,
+            onSearchBar = Color.Black,
+            tertiriary = TertiriaryLight,
         )
     }
 }
@@ -154,18 +179,26 @@ data class AppTextColors(
 @Immutable
 data class AppButtonColors(
     val primary: Color,
+    val disabled: Color,
 ) {
     companion object {
-        internal val default = AppButtonColors(primary = RussianViolet)
+        internal val dark = AppButtonColors(
+            primary = RoyalBlueGradient,
+            disabled = RussianViolet,
+        )
+        internal val light = AppButtonColors(
+            primary = Aquamarine,
+            disabled = TiffanyBlue,
+        )
     }
 }
 
 @Immutable
 data class AppIconColors(
-    val primary: Color,
+    val onSearchBar: Color,
 ) {
     companion object {
-        internal val default = AppIconColors(primary = DarkPurple)
+        internal val default = AppIconColors(onSearchBar = Color.Black)
     }
 }
 
@@ -175,9 +208,14 @@ data class AppUtilsColors(
     val transparentUtility: Color,
 ) {
     companion object {
-        internal val default = AppUtilsColors(
+        internal val dark = AppUtilsColors(
             disabled = Disabled,
-            transparentUtility = TransparentUtility,
+            transparentUtility = TransparentUtilityDark,
+        )
+
+        internal val light = AppUtilsColors(
+            disabled = Disabled,
+            transparentUtility = TransparentUtilityLight,
         )
     }
 }

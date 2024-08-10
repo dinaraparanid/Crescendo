@@ -19,7 +19,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
@@ -27,17 +26,13 @@ import com.paranid5.crescendo.core.resources.R
 import com.paranid5.crescendo.core.resources.ui.theme.AppTheme.colors
 import com.paranid5.crescendo.core.resources.ui.theme.AppTheme.dimensions
 import com.paranid5.crescendo.core.resources.ui.theme.AppTheme.typography
-import com.paranid5.crescendo.feature.play.main.presentation.view_model.PlayState.PagerState
+import com.paranid5.crescendo.feature.play.main.view_model.PlayState.PagerState
 import com.paranid5.crescendo.ui.utils.clickableWithRipple
 import com.paranid5.crescendo.utils.extensions.pxToDp
 
 private val PagerActiveZoneHeight = 4.dp
 
 private val PagerTabPadding = 16.dp
-
-private inline val PagerShape
-    @Composable
-    get() = RoundedCornerShape(dimensions.corners.extraMedium)
 
 @Composable
 internal fun PrimaryPagerTabs(
@@ -53,7 +48,6 @@ internal fun PrimaryPagerTabs(
 
     Column(
         modifier
-            .clip(PagerShape)
             .background(colors.background.chips)
             .onGloballyPositioned { coords ->
                 pagerWidth = coords.size.width
@@ -118,7 +112,7 @@ private fun PrimaryPagerTabsContent(
 private fun PrimaryPagerTab(
     text: String,
     modifier: Modifier = Modifier,
-) = Box(Modifier.clip(PagerShape) then modifier) {
+) = Box(modifier) {
     Text(
         text = text,
         color = colors.text.primary,

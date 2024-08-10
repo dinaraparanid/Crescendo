@@ -3,6 +3,7 @@ package com.paranid5.crescendo.core.media.files
 import android.os.Environment
 import android.util.Log
 import com.arthenica.mobileffmpeg.FFmpeg
+import com.paranid5.crescendo.core.common.caching.Formats
 import com.paranid5.crescendo.core.common.caching.audioFileExt
 import com.paranid5.crescendo.core.common.trimming.TrimRange
 import kotlinx.coroutines.Deferred
@@ -28,7 +29,7 @@ suspend fun createVideoFileCatching(
  */
 
 private suspend inline fun MediaFile.VideoFile.toAudioFileImplAsync(
-    audioFormat: com.paranid5.crescendo.core.common.caching.Formats,
+    audioFormat: Formats,
     crossinline ffmpegCmd: (File) -> String
 ) = coroutineScope {
     async(Dispatchers.IO) {
@@ -66,10 +67,10 @@ private inline fun MediaFile.VideoFile.toAudioFile(
  */
 
 suspend fun MediaFile.VideoFile.toMP3Async(trimRange: TrimRange) =
-    toAudioFileImplAsync(audioFormat = com.paranid5.crescendo.core.common.caching.Formats.MP3) { newFile ->
+    toAudioFileImplAsync(audioFormat = Formats.MP3) { newFile ->
         "-y -i \"$absolutePath\" " +
-                "-ss ${trimRange.startPointMillis}ms " +
-                "-to ${trimRange.totalDurationMillis}ms " +
+                trimRange.ffmpegStartParam +
+                trimRange.ffmpegDurationParam +
                 "-vn -acodec libmp3lame " +
                 "-qscale:a 2 \"${newFile.absolutePath}\""
     }
@@ -80,10 +81,10 @@ suspend fun MediaFile.VideoFile.toMP3Async(trimRange: TrimRange) =
  */
 
 suspend fun MediaFile.VideoFile.toWAVAsync(trimRange: TrimRange) =
-    toAudioFileImplAsync(audioFormat = com.paranid5.crescendo.core.common.caching.Formats.WAV) { newFile ->
+    toAudioFileImplAsync(audioFormat = Formats.WAV) { newFile ->
         "-y -i \"$absolutePath\" " +
-                "-ss ${trimRange.startPointMillis}ms " +
-                "-to ${trimRange.totalDurationMillis}ms " +
+                trimRange.ffmpegStartParam +
+                trimRange.ffmpegDurationParam +
                 "-vn -acodec pcm_s16le " +
                 "-ar 44100 \"${newFile.absolutePath}\""
     }
@@ -94,10 +95,10 @@ suspend fun MediaFile.VideoFile.toWAVAsync(trimRange: TrimRange) =
  */
 
 suspend fun MediaFile.VideoFile.toAACAsync(trimRange: TrimRange) =
-    toAudioFileImplAsync(audioFormat = com.paranid5.crescendo.core.common.caching.Formats.AAC) { newFile ->
+    toAudioFileImplAsync(audioFormat = Formats.AAC) { newFile ->
         "-y -i \"$absolutePath\" " +
-                "-ss ${trimRange.startPointMillis}ms " +
-                "-to ${trimRange.totalDurationMillis}ms " +
+                trimRange.ffmpegStartParam +
+                trimRange.ffmpegDurationParam +
                 "-vn -c:a aac " +
                 "-b:a 256k \"${newFile.absolutePath}\""
     }
@@ -109,15 +110,24 @@ suspend fun MediaFile.VideoFile.toAACAsync(trimRange: TrimRange) =
  */
 
 suspend fun MediaFile.VideoFile.toAudioFileAsync(
-    audioFormat: com.paranid5.crescendo.core.common.caching.Formats,
-    trimRange: TrimRange
+    audioFormat: Formats,
+    trimRange: TrimRange,
 ): Deferred<MediaFile.AudioFile?> {
     Log.d(TAG, "Audio conversion to $audioFormat")
 
     return when (audioFormat) {
-        com.paranid5.crescendo.core.common.caching.Formats.MP3 -> toMP3Async(trimRange)
-        com.paranid5.crescendo.core.common.caching.Formats.WAV -> toWAVAsync(trimRange)
-        com.paranid5.crescendo.core.common.caching.Formats.AAC -> toAACAsync(trimRange)
-        com.paranid5.crescendo.core.common.caching.Formats.MP4 -> throw IllegalArgumentException("MP4 passed as an audio format")
+        Formats.MP3 -> toMP3Async(trimRange)
+        Formats.WAV -> toWAVAsync(trimRange)
+        Formats.AAC -> toAACAsync(trimRange)
+        Formats.MP4 -> throw IllegalArgumentException("MP4 passed as an audio format")
     }
 }
+
+private inline val TrimRange.ffmpegStartParam
+    get() = "-ss ${startPointMillis}ms "
+
+private inline val TrimRange.ffmpegDurationParam
+    get() = totalDurationMillis
+        .takeIf { it > 0 }
+        ?.let { "-to ${totalDurationMillis}ms " }
+        .orEmpty()

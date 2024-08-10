@@ -17,7 +17,6 @@
     <string name="ten_secs_forward">10 seconds forward</string>
     <string name="equalizer">Equalizer</string>
     <string name="change_repeat">Change repeat</string>
-    <string name="download_as_mp3">Download as MP3</string>
     <string name="geo_restricted">Sorry, this video is geo-restricted :(</string>
     <string name="something_went_wrong">Something went wrong</string>
     <string name="no_internet">Check your internet connection</string>
@@ -28,10 +27,8 @@
     <string name="cancel">Cancel</string>
     <string name="cancel_all">Cancel All</string>
     <string name="error">Error</string>
-    <string name="cache_properties">Cache Properties</string>
     <string name="filename">File Name</string>
     <string name="filename_placeholder">your file name</string>
-    <string name="start_caching">Start Caching</string>
     <string name="save_as">Save As</string>
     <string name="permission_required">Permission is required</string>
     <string name="external_storage_description">App needs access to storage in order to manage local and cached files</string>
@@ -119,4 +116,8 @@
     <string name="track_kebab_trim_track">Trim track</string>
     <string name="track_kebab_change_meta">Change metadata</string>
 
+    <!-- Cache Dialog -->
+    <string name="cache_dialog_title">Cache Properties</string>
+    <string name="cache_dialog_filename">File Name</string>
+    <string name="cache_dialog_accept_button_title">Start Caching</string>
 </resources>

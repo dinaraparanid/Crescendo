@@ -10,7 +10,7 @@ internal fun UpdateUiParamsEffect(
     screenAudioStatus: AudioStatus,
     coverAlpha: Float,
     onUiIntent: (PlayingUiIntent) -> Unit,
-) = LaunchedEffect(screenAudioStatus, coverAlpha) {
+) = LaunchedEffect(screenAudioStatus, coverAlpha, onUiIntent) {
     onUiIntent(
         PlayingUiIntent.UpdateState.UpdateUiParams(
             screenAudioStatus = screenAudioStatus,

@@ -32,7 +32,7 @@ internal fun DownloadButton(
     modifier: Modifier = Modifier,
 ) {
     val isCachePropertiesDialogShownState = remember { mutableStateOf(false) }
-    val isCachePropertiesDialogShown by isCachePropertiesDialogShownState
+    var isCachePropertiesDialogShown by isCachePropertiesDialogShownState
 
     Box(modifier) {
         val (areStoragePermissionsGranted, launchStoragePermissions) =
@@ -53,8 +53,8 @@ internal fun DownloadButton(
         if (isCachePropertiesDialogShown && areStoragePermissionsGranted)
             CacheDialog(
                 url = url,
-                isDialogShownState = isCachePropertiesDialogShownState,
                 modifier = Modifier.align(Alignment.Center),
+                hide = { isCachePropertiesDialogShown = false },
             )
     }
 }
@@ -66,7 +66,7 @@ private inline fun DownloadButtonImpl(
     areStoragePermissionsGranted: Boolean,
     crossinline launchStoragePermissions: () -> Unit,
     isCachePropertiesDialogShownState: MutableState<Boolean>,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     var isCachePropertiesDialogShown by isCachePropertiesDialogShownState
 
@@ -94,6 +94,6 @@ private fun DownloadIcon(paletteColor: Color, modifier: Modifier = Modifier) =
     Icon(
         modifier = modifier,
         imageVector = ImageVector.vectorResource(R.drawable.ic_save),
-        contentDescription = stringResource(R.string.download_as_mp3),
+        contentDescription = stringResource(R.string.cache_dialog_accept_button_title),
         tint = paletteColor,
     )
