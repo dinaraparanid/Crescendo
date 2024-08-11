@@ -24,14 +24,14 @@ internal fun BackgroundImage(audioStatus: AudioStatus, modifier: Modifier = Modi
 
     val coverModel = when (audioStatus) {
         AudioStatus.STREAMING -> videoCoverModel(
-            isPlaceholderRequired = true,
+            isPlaceholderRequired = false,
             size = ImageSize(config.screenWidthDp, config.screenHeightDp),
             isBlured = Build.VERSION.SDK_INT < Build.VERSION_CODES.S,
             bitmapSettings = Bitmap::increaseDarkness,
         )
 
         AudioStatus.PLAYING -> currentTrackCoverModel(
-            isPlaceholderRequired = true,
+            isPlaceholderRequired = false,
             size = ImageSize(config.screenWidthDp, config.screenHeightDp),
             isBlured = Build.VERSION.SDK_INT < Build.VERSION_CODES.S,
             bitmapSettings = Bitmap::increaseDarkness,

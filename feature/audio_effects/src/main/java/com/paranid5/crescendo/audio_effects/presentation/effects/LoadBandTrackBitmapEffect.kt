@@ -10,7 +10,7 @@ import androidx.compose.ui.platform.LocalContext
 import com.paranid5.crescendo.core.media.images.ImageSize
 import com.paranid5.crescendo.core.media.images.getBitmapFromResourceCatching
 import com.paranid5.crescendo.core.media.images.toBitmapDrawable
-import com.paranid5.crescendo.core.resources.R
+import com.paranid5.crescendo.core.resources.ui.theme.AppTheme.icons
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
@@ -21,13 +21,14 @@ internal fun LoadBandTrackBitmapEffect(
     coverModelState: MutableState<BitmapDrawable?>,
 ) {
     val context = LocalContext.current
+    val audioTrackImageRes = icons.audioTrackRes
     var coverModel by coverModelState
 
-    LaunchedEffect(width, height, context) {
+    LaunchedEffect(width, height, context, audioTrackImageRes) {
         coverModel = withContext(Dispatchers.IO) {
             getBitmapFromResourceCatching(
                 context = context,
-                res = R.drawable.audio_track_horizontal_night_transparent,
+                res = audioTrackImageRes,
                 size = ImageSize(width, height),
             )
                 .map { it.toBitmapDrawable(context) }

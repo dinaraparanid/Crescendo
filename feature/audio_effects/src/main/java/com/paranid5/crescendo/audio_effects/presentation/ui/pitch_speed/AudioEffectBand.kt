@@ -84,7 +84,10 @@ private fun AudioEffectSlider(
     Slider(
         value = effectVal,
         valueRange = 0.25F..2F,
-        colors = SliderDefaults.colors(activeTrackColor = colors.primary),
+        colors = SliderDefaults.colors(
+            activeTrackColor = colors.primary,
+            inactiveTrackColor = colors.utils.transparentUtility,
+        ),
         modifier = modifier.onGloballyPositioned {
             sliderWidth = it.size.width
             sliderHeight = it.size.height

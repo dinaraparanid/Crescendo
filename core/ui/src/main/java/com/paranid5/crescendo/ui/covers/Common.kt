@@ -20,7 +20,7 @@ fun coverModelWithPalette(
     )
 
     AudioStatus.PLAYING -> currentTrackCoverModelWithPalette(
-        isPlaceholderRequired = true,
+        isPlaceholderRequired = false,
         size = size,
     )
 }

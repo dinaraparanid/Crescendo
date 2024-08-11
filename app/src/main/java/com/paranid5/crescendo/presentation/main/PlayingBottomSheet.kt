@@ -28,6 +28,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
+import arrow.core.raise.nullable
 import com.paranid5.crescendo.core.common.AudioStatus
 import com.paranid5.crescendo.core.common.navigation.LocalNavigator
 import com.paranid5.crescendo.core.resources.R
@@ -58,16 +59,16 @@ private const val PushUpExpandedPadding = 32F
 internal fun PlayingBottomSheet(
     alpha: Float,
     modifier: Modifier = Modifier,
-) {
+) = nullable {
     val context = LocalContext.current
     val navigator = LocalNavigator.requireAppNavigator()
-    val curPlaylistSheetState = LocalCurrentPlaylistSheetState.current
-    val playingPagerState = LocalPlayingPagerState.current
+    val curPlaylistSheetState = LocalCurrentPlaylistSheetState.current.bind()
+    val playingPagerState = LocalPlayingPagerState.current.bind()
 
-    val playingSheetState = LocalPlayingSheetState.current
-    val sheetState = playingSheetState?.bottomSheetState
-    val targetValue = sheetState?.targetValue
-    val currentValue = sheetState?.currentValue
+    val playingSheetState = LocalPlayingSheetState.current.bind()
+    val sheetState = playingSheetState.bottomSheetState
+    val targetValue = sheetState.targetValue
+    val currentValue = sheetState.currentValue
     val isBarNotVisible = currentValue == BottomSheetValue.Expanded
             && targetValue == BottomSheetValue.Expanded
 
@@ -75,7 +76,7 @@ internal fun PlayingBottomSheet(
 
     fun onScreenEffect(result: PlayingScreenEffect) = when (result) {
         is PlayingScreenEffect.ShowAudioEffects -> {
-            coroutineScope.launch { playingSheetState?.bottomSheetState?.collapse() }
+            coroutineScope.launch { playingSheetState.bottomSheetState.collapse() }
             navigator.pushIfNotSame(AppScreen.Audio.AudioEffects)
         }
 
@@ -90,64 +91,62 @@ internal fun PlayingBottomSheet(
         is PlayingScreenEffect.ShowMetaEditor -> doNothing() // TODO: show meta editor
     }
 
-    curPlaylistSheetState?.let { curPlaylistScaffoldState ->
-        ModalBottomSheetLayout(
-            modifier = modifier,
-            sheetState = curPlaylistScaffoldState,
-            sheetContent = {
-                CurrentPlaylistBottomSheet(
-                    alpha = alpha,
-                    state = curPlaylistScaffoldState,
-                    modifier = Modifier.background(colors.background.gradient),
-                )
-            },
-            sheetBackgroundColor = Color.Transparent,
-            sheetShape = RoundedCornerShape(
-                topStart = dimensions.corners.extraMedium,
-                topEnd = dimensions.corners.extraMedium,
+    ModalBottomSheetLayout(
+        modifier = modifier,
+        sheetState = curPlaylistSheetState,
+        sheetContent = {
+            CurrentPlaylistBottomSheet(
+                alpha = alpha,
+                state = curPlaylistSheetState,
+                modifier = Modifier.background(colors.background.gradient),
             )
-        ) {
-            Box(Modifier.fillMaxWidth()) {
-                HorizontalPager(state = playingPagerState!!) { page ->
-                    when (page) {
-                        0 -> PlayingScreen(
-                            coverAlpha = 1 - alpha,
-                            screenAudioStatus = AudioStatus.PLAYING,
-                            modifier = modifier.fillMaxSize(),
-                            onScreenEffect = ::onScreenEffect,
-                        )
-
-                        else -> PlayingScreen(
-                            coverAlpha = 1 - alpha,
-                            screenAudioStatus = AudioStatus.STREAMING,
-                            modifier = modifier.fillMaxSize(),
-                            onScreenEffect = ::onScreenEffect,
-                        )
-                    }
-                }
-
-                if (isBarNotVisible.not())
-                    AppBar(
-                        Modifier
-                            .clip(
-                                RoundedCornerShape(
-                                    topStart = dimensions.corners.extraMedium,
-                                    topEnd = dimensions.corners.extraMedium,
-                                )
-                            )
-                            .fillMaxWidth()
-                            .heightIn(min = appBarHeight)
-                            .align(Alignment.TopCenter)
-                            .alpha(alpha),
+        },
+        sheetBackgroundColor = Color.Transparent,
+        sheetShape = RoundedCornerShape(
+            topStart = dimensions.corners.extraMedium,
+            topEnd = dimensions.corners.extraMedium,
+        )
+    ) {
+        Box(Modifier.fillMaxWidth()) {
+            HorizontalPager(state = playingPagerState) { page ->
+                when (page) {
+                    0 -> PlayingScreen(
+                        coverAlpha = 1 - alpha,
+                        screenAudioStatus = AudioStatus.PLAYING,
+                        modifier = modifier.fillMaxSize(),
+                        onScreenEffect = ::onScreenEffect,
                     )
 
-                PushUpButton(
-                    alpha = alpha,
-                    modifier = Modifier
-                        .align(Alignment.TopCenter)
-                        .padding(top = pushUpTopPadding),
-                )
+                    else -> PlayingScreen(
+                        coverAlpha = 1 - alpha,
+                        screenAudioStatus = AudioStatus.STREAMING,
+                        modifier = modifier.fillMaxSize(),
+                        onScreenEffect = ::onScreenEffect,
+                    )
+                }
             }
+
+            if (isBarNotVisible.not())
+                AppBar(
+                    Modifier
+                        .clip(
+                            RoundedCornerShape(
+                                topStart = dimensions.corners.extraMedium,
+                                topEnd = dimensions.corners.extraMedium,
+                            )
+                        )
+                        .fillMaxWidth()
+                        .heightIn(min = appBarHeight)
+                        .align(Alignment.TopCenter)
+                        .alpha(alpha),
+                )
+
+            PushUpButton(
+                alpha = alpha,
+                modifier = Modifier
+                    .align(Alignment.TopCenter)
+                    .padding(top = pushUpTopPadding),
+            )
         }
     }
 }

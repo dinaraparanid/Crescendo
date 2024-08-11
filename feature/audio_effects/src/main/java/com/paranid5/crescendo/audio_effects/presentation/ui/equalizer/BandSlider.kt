@@ -37,36 +37,37 @@ internal fun BandSlider(
     onUiIntent: (AudioEffectsUiIntent) -> Unit,
     modifier: Modifier = Modifier,
     thumbModifier: Modifier = Modifier,
-) {
-    Slider(
-        value = presentLvlsDbState[index],
-        valueRange = minDb..maxDb,
-        colors = SliderDefaults.colors(activeTrackColor = colors.primary),
-        modifier = modifier.sliderPositionPublisher(
-            sliderYPosState = sliderYPosState,
-            sliderWidthState = sliderWidthState,
-            sliderHeightState = sliderHeightState
-        ),
-        onValueChange = { level ->
-            presentLvlsDbState[index] = level
-            onUiIntent(
-                AudioEffectsUiIntent.UpdateData.UpdateEqBandLevels(
-                    level = level,
-                    index = index,
-                )
-            )
-        },
-        thumb = {
-            EqualizerThumb(
+) = Slider(
+    value = presentLvlsDbState[index],
+    valueRange = minDb..maxDb,
+    colors = SliderDefaults.colors(
+        activeTrackColor = colors.primary,
+        inactiveTrackColor = colors.utils.transparentUtility,
+    ),
+    modifier = modifier.sliderPositionPublisher(
+        sliderYPosState = sliderYPosState,
+        sliderWidthState = sliderWidthState,
+        sliderHeightState = sliderHeightState
+    ),
+    onValueChange = { level ->
+        presentLvlsDbState[index] = level
+        onUiIntent(
+            AudioEffectsUiIntent.UpdateData.UpdateEqBandLevels(
+                level = level,
                 index = index,
-                pointsState = pointsState,
-                sliderWidth = sliderWidthState.intValue,
-                sliderYPos = sliderYPosState.floatValue,
-                modifier = thumbModifier
             )
-        },
-    )
-}
+        )
+    },
+    thumb = {
+        EqualizerThumb(
+            index = index,
+            pointsState = pointsState,
+            sliderWidth = sliderWidthState.intValue,
+            sliderYPos = sliderYPosState.floatValue,
+            modifier = thumbModifier
+        )
+    },
+)
 
 @Composable
 private fun EqualizerThumb(
