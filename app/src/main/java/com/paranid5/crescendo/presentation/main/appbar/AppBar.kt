@@ -49,6 +49,6 @@ internal fun AppBar(modifier: Modifier = Modifier) =
             title = stringResource(R.string.appbar_preferences),
             icon = ImageVector.vectorResource(R.drawable.tab_preferences),
             modifier = itemModifier,
-            screen = AppScreen.Settings,
+            screen = AppScreen.Preferences,
         )
     }

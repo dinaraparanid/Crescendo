@@ -48,7 +48,7 @@ internal fun PrimaryPagerTabs(
 
     Column(
         modifier
-            .background(colors.background.chips)
+            .background(colors.background.highContrast)
             .onGloballyPositioned { coords ->
                 pagerWidth = coords.size.width
             },

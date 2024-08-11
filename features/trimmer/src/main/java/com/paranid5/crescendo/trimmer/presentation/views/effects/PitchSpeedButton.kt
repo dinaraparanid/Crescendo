@@ -47,7 +47,7 @@ private fun PitchSpeedIcon(modifier: Modifier = Modifier) =
     Icon(
         painter = painterResource(R.drawable.pitch_speed),
         contentDescription = labelMessage(),
-        tint = colors.primary,
+        tint = colors.text.primary,
         modifier = modifier.size(dimensions.padding.big),
     )
 
@@ -55,7 +55,7 @@ private fun PitchSpeedIcon(modifier: Modifier = Modifier) =
 private fun PitchSpeedLabel(modifier: Modifier) =
     Text(
         text = labelMessage(),
-        color = colors.primary,
+        color = colors.text.primary,
         style = typography.captionSm,
         modifier = modifier,
     )

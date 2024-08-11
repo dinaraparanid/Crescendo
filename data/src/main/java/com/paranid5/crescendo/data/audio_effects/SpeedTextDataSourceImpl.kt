@@ -7,7 +7,7 @@ import kotlinx.coroutines.flow.map
 internal class SpeedTextDataSourceImpl(
     private val audioEffectsDataStore: AudioEffectsDataStore,
 ) : SpeedTextDataSource {
-    override val speedTextState by lazy {
+    override val speedTextFlow by lazy {
         audioEffectsDataStore.speedFlow.map(Float::toString)
     }
 }

@@ -31,7 +31,7 @@ fun AppBarCardLabel(
                 shape = shape,
             )
             .clip(shape)
-            .background(colors.background.chips)
+            .background(colors.background.highContrast)
             .then(modifier)
     ) {
         Text(

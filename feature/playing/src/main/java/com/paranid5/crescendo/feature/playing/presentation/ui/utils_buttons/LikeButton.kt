@@ -56,7 +56,7 @@ private fun LikeIcon(
 private fun BorderIcon(tint: Color, modifier: Modifier = Modifier) = Icon(
     modifier = modifier.padding(dimensions.padding.minimum),
     imageVector = ImageVector.vectorResource(R.drawable.ic_like),
-    contentDescription = stringResource(R.string.favourites),
+    contentDescription = stringResource(R.string.play_favourites),
     tint = tint,
 )
 
@@ -64,6 +64,6 @@ private fun BorderIcon(tint: Color, modifier: Modifier = Modifier) = Icon(
 private fun FilledIcon(tint: Color, modifier: Modifier = Modifier) = Icon(
     modifier = modifier,
     imageVector = Icons.Filled.Favorite,
-    contentDescription = stringResource(R.string.favourites),
+    contentDescription = stringResource(R.string.play_favourites),
     tint = tint,
 )

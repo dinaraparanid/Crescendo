@@ -98,7 +98,7 @@ data class AppBackgroundColors(
     val primary: Color,
     val alternative: Color,
     val gradient: Brush,
-    val chips: Color,
+    val highContrast: Color,
     val card: Color,
     val searchBar: Color,
 ) {
@@ -114,7 +114,7 @@ data class AppBackgroundColors(
                 start = BackgroundGradientStart,
                 end = BackgroundGradientEnd,
             ),
-            chips = RussianViolet,
+            highContrast = RussianViolet,
             card = LightBlue,
             searchBar = Color.White,
         )
@@ -127,7 +127,7 @@ data class AppBackgroundColors(
                 start = BackgroundGradientStart,
                 end = BackgroundGradientEnd,
             ),
-            chips = Aquamarine,
+            highContrast = Aquamarine,
             card = AirSuperiorityBlue,
             searchBar = Aquamarine.copy(alpha = 0.75F),
         )

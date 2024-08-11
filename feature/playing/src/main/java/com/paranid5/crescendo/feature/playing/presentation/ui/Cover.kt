@@ -22,16 +22,20 @@ internal fun Cover(
     coverModel: ImageRequest,
     color: Color,
     modifier: Modifier = Modifier
-) = AsyncImage(
-    model = coverModel,
-    contentDescription = stringResource(R.string.video_cover),
-    contentScale = ContentScale.Crop,
-    alignment = Alignment.Center,
-    modifier = modifier
-        .simpleShadow(
-            elevation = CoverElevation,
-            color = color,
-            shape = RoundedCornerShape(dimensions.corners.minimum),
-        )
-        .clip(RoundedCornerShape(dimensions.corners.extraMedium)),
-)
+) {
+    val shape = RoundedCornerShape(dimensions.corners.extraMedium)
+
+    AsyncImage(
+        model = coverModel,
+        contentDescription = stringResource(R.string.video_cover),
+        contentScale = ContentScale.Crop,
+        alignment = Alignment.Center,
+        modifier = modifier
+            .clip(shape)
+            .simpleShadow(
+                elevation = CoverElevation,
+                color = color,
+                shape = shape,
+            ),
+    )
+}

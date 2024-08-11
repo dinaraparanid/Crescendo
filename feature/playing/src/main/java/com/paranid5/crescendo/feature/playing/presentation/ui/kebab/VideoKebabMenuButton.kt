@@ -6,7 +6,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.res.stringResource
 import com.paranid5.crescendo.core.resources.R
 
 @Composable
@@ -25,7 +24,7 @@ internal fun VideoKebabMenuButton(
 private fun KebabIcon(tint: Color, modifier: Modifier = Modifier) =
     Icon(
         painter = painterResource(R.drawable.ic_kebab_menu),
-        contentDescription = stringResource(R.string.settings),
+        contentDescription = null,
         tint = tint,
         modifier = modifier,
     )

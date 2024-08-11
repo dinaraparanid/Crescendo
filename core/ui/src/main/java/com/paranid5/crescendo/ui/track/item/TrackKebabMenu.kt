@@ -29,7 +29,7 @@ internal fun TrackKebabMenu(
     DropdownMenu(
         expanded = isPropertiesMenuShown,
         onDismissRequest = { isPropertiesMenuShown = false },
-        modifier = modifier.background(colors.background.chips),
+        modifier = modifier.background(colors.background.highContrast),
     ) {
         AddToCurrentPlaylistProperty(
             track = track,

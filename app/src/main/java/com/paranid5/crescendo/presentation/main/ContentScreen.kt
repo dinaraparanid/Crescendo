@@ -19,20 +19,17 @@ import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
-import com.paranid5.crescendo.about_app.AboutApp
 import com.paranid5.crescendo.audio_effects.presentation.AudioEffectsScreen
 import com.paranid5.crescendo.core.common.navigation.LocalNavigator
 import com.paranid5.crescendo.core.resources.R
 import com.paranid5.crescendo.core.resources.ui.theme.AppTheme.dimensions
-import com.paranid5.crescendo.favourites.FavouritesScreen
 import com.paranid5.crescendo.feature.play.main.presentation.PlayScreen
 import com.paranid5.crescendo.feature.play.main.view_model.PlayBackResult
+import com.paranid5.crescendo.feature.preferences.PreferencesScreen
 import com.paranid5.crescendo.fetch_stream.presentation.FetchStreamScreen
 import com.paranid5.crescendo.navigation.AppNavigator
 import com.paranid5.crescendo.navigation.AppScreen
 import com.paranid5.crescendo.navigation.requireAppNavigator
-import com.paranid5.crescendo.settings.SettingsScreen
-import com.paranid5.crescendo.track_collections.AlbumsScreen
 import com.paranid5.crescendo.trimmer.presentation.TrimmerScreen
 import com.paranid5.crescendo.ui.composition_locals.LocalCurrentPlaylistSheetState
 import com.paranid5.crescendo.ui.composition_locals.playing.LocalPlayingSheetState
@@ -72,8 +69,6 @@ private fun ContentScreenNavHost(
     startDestination = AppScreen.Play.title,
     modifier = modifier,
 ) {
-    // TODO: удалить левое
-
     composable(route = AppScreen.Play.title) {
         navigator.updateCurrentScreen(AppScreen.Play)
         PlayScreen(modifier = screenModifier) { result ->
@@ -84,11 +79,6 @@ private fun ContentScreenNavHost(
         }
     }
 
-    composable(route = AppScreen.TrackCollections.Albums.title) {
-        navigator.updateCurrentScreen(AppScreen.TrackCollections.Albums)
-        AlbumsScreen(modifier = screenModifier)
-    }
-
     composable(route = AppScreen.StreamFetching.title) {
         navigator.updateCurrentScreen(AppScreen.StreamFetching)
         FetchStreamScreen(modifier = screenModifier)
@@ -96,7 +86,7 @@ private fun ContentScreenNavHost(
 
     composable(route = AppScreen.Audio.AudioEffects.title) {
         navigator.updateCurrentScreen(AppScreen.Audio.AudioEffects)
-        AudioEffectsScreen(Modifier.screenPaddingDefault())
+        AudioEffectsScreen(modifier = Modifier.screenPaddingDefault())
     }
 
     composable(
@@ -115,19 +105,9 @@ private fun ContentScreenNavHost(
         )
     }
 
-    composable(route = AppScreen.AboutApp.title) {
-        navigator.updateCurrentScreen(AppScreen.AboutApp)
-        AboutApp(modifier = screenModifier)
-    }
-
-    composable(route = AppScreen.Favourites.title) {
-        navigator.updateCurrentScreen(AppScreen.Favourites)
-        FavouritesScreen(modifier = screenModifier)
-    }
-
-    composable(route = AppScreen.Settings.title) {
-        navigator.updateCurrentScreen(AppScreen.Settings)
-        SettingsScreen(modifier = screenModifier)
+    composable(route = AppScreen.Preferences.title) {
+        navigator.updateCurrentScreen(AppScreen.Preferences)
+        PreferencesScreen(modifier = screenModifier)
     }
 }
 

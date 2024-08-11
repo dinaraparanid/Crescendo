@@ -20,3 +20,8 @@ inline fun <T> buildImmutableList(
 fun <T> List<T>?.orNil() = this?.toImmutableList() ?: persistentListOf()
 
 fun <T> ImmutableList<T>?.orNil() = this ?: persistentListOf()
+
+operator fun <T> ImmutableList<T>.plus(elem: T) = buildImmutableList {
+    addAll(this@plus)
+    add(elem)
+}

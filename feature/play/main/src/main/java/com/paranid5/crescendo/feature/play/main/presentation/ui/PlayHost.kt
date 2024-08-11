@@ -9,10 +9,12 @@ import androidx.compose.ui.Modifier
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import com.paranid5.crescendo.core.common.navigation.LocalNavigator
+import com.paranid5.crescendo.feature.play.favourites.FavouritesScreen
 import com.paranid5.crescendo.feature.play.main.navigation.PlayScreen
 import com.paranid5.crescendo.feature.play.main.navigation.requirePlayNavigator
 import com.paranid5.crescendo.feature.play.main.view_model.PlayState
 import com.paranid5.crescendo.feature.play.main.view_model.PlayUiIntent
+import com.paranid5.crescendo.feature.play.playlists.PlaylistsScreen
 
 @Composable
 internal fun PlayHost(
@@ -40,16 +42,12 @@ internal fun PlayHost(
 
             composable(route = PlayScreen.Favourites.title) {
                 navigator.replaceIfNotSame(PlayScreen.Favourites)
-                Box(Modifier.fillMaxSize()) {
-                    Text("TODO: Favourites Screen", Modifier.align(Alignment.Center))
-                }
+                FavouritesScreen(modifier = Modifier.fillMaxSize())
             }
 
             composable(route = PlayScreen.Playlists.title) {
                 navigator.replaceIfNotSame(PlayScreen.Playlists)
-                Box(Modifier.fillMaxSize()) {
-                    Text("TODO: Playlists Screen", Modifier.align(Alignment.Center))
-                }
+                PlaylistsScreen(modifier = Modifier.fillMaxSize())
             }
 
             composable(route = PlayScreen.Recent.title) {

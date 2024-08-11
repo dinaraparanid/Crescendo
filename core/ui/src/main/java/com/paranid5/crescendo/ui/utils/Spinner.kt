@@ -1,8 +1,8 @@
 package com.paranid5.crescendo.ui.utils
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Text
@@ -14,6 +14,7 @@ import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import com.paranid5.crescendo.core.resources.ui.theme.AppTheme.colors
+import com.paranid5.crescendo.core.resources.ui.theme.AppTheme.dimensions
 import com.paranid5.crescendo.core.resources.ui.theme.AppTheme.typography
 import kotlinx.collections.immutable.ImmutableList
 
@@ -28,14 +29,16 @@ fun Spinner(
     selectedItemFactory: @Composable (Int, String, Modifier) -> Unit = { _, text, mod ->
         DefaultSelectedItem(text, mod)
     },
-    previewItemFactory: @Composable (Int, String, Modifier) -> Unit = selectedItemFactory,
+    previewItemFactory: @Composable (Int, String, Modifier) -> Unit = { _, text, mod ->
+        DefaultItem(text, mod.padding(vertical = dimensions.padding.small))
+    },
     dropdownItemFactory: @Composable (Int, String, Modifier) -> Unit = { _, text, mod ->
         DefaultItem(text, mod)
     },
 ) {
     var isExpanded by remember { mutableStateOf(false) }
 
-    Box(modifier.clickable { isExpanded = true }) {
+    Box(modifier.clickableWithRipple(bounded = true) { isExpanded = true }) {
         items.getOrNull(previewItemIndex)?.let {
             previewItemFactory(previewItemIndex, it, modifier)
         }
@@ -43,7 +46,7 @@ fun Spinner(
         DropdownMenu(
             expanded = isExpanded,
             onDismissRequest = { isExpanded = false },
-            modifier = dropdownModifier.background(colors.background.primary)
+            modifier = dropdownModifier.background(colors.background.highContrast)
         ) {
             items.forEachIndexed { index, element ->
                 DropdownMenuItem(
@@ -69,9 +72,9 @@ private fun DefaultSelectedItem(text: String, modifier: Modifier = Modifier) {
 
     Text(
         text = updText,
-        modifier = modifier,
-        color = colors.primary,
+        color = colors.selection.selected,
         style = typography.regular,
+        modifier = modifier,
     )
 }
 

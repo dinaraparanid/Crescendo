@@ -41,6 +41,8 @@ dependencies {
     implementation(project(":core:utils"))
     implementation(project(":core:ui"))
 
+    implementation(project(":feature:play:favourites"))
+    implementation(project(":feature:play:playlists"))
     implementation(project(":feature:play:tracks"))
 
     implementation(libs.androidx.core.ktx)

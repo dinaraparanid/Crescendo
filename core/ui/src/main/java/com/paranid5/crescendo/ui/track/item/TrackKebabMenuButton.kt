@@ -12,7 +12,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
 import com.paranid5.crescendo.core.common.tracks.Track
 import com.paranid5.crescendo.core.resources.R
@@ -73,6 +72,6 @@ private fun PropertiesIcon(tint: Color, modifier: Modifier = Modifier) =
     Icon(
         modifier = modifier,
         imageVector = ImageVector.vectorResource(R.drawable.ic_kebab_menu),
-        contentDescription = stringResource(R.string.settings),
+        contentDescription = null,
         tint = tint,
     )

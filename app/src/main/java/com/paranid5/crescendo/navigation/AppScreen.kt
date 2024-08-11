@@ -9,17 +9,6 @@ internal sealed class AppScreen(override val title: String) : Screen {
     @Parcelize
     data object Play : AppScreen("play")
 
-    sealed class TrackCollections(title: String) : AppScreen("track_collections/$title") {
-        @Parcelize
-        data object Albums : TrackCollections("albums")
-
-        @Parcelize
-        data object CustomPlaylists : TrackCollections("custom_playlists")
-    }
-
-    @Parcelize
-    data object Artists : AppScreen("artists")
-
     @Parcelize
     data object StreamFetching : AppScreen("stream_fetching")
 
@@ -38,11 +27,5 @@ internal sealed class AppScreen(override val title: String) : Screen {
     }
 
     @Parcelize
-    data object AboutApp : AppScreen("about_app")
-
-    @Parcelize
-    data object Favourites : AppScreen(title = "favourites")
-
-    @Parcelize
-    data object Settings : AppScreen(title = "settings")
+    data object Preferences : AppScreen(title = "preferences")
 }

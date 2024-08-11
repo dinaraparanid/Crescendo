@@ -1,5 +1,6 @@
 package com.paranid5.crescendo.feature.playing.presentation.ui
 
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
@@ -9,6 +10,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.layout.onGloballyPositioned
@@ -59,28 +61,33 @@ internal fun PlayingScreenPortrait(
                     .alpha(state.coverAlpha),
             )
 
-            Cover(
-                coverModel = coverModel,
-                color = palette.getBrightDominantOrPrimary(),
-                modifier = Modifier
-                    .alpha(state.coverAlpha)
-                    .aspectRatio(1F)
-                    .constrainAs(cover) {
-                        top.linkTo(parent.top, margin = appPadding.large)
-                        bottom.linkTo(audioWave.top, margin = appPadding.large)
-                        start.linkTo(parent.start, margin = appPadding.extraMedium)
-                        end.linkTo(parent.end, margin = appPadding.extraMedium)
-                        width = Dimension.fillToConstraints
-                        height = Dimension.fillToConstraints
-                    }
-                    .onGloballyPositioned { coordinates ->
-                        val width = coordinates.size.width
-                        val height = coordinates.size.height
+            Box(
+                Modifier.constrainAs(cover) {
+                    top.linkTo(parent.top, margin = appPadding.large)
+                    bottom.linkTo(audioWave.top, margin = appPadding.large)
+                    start.linkTo(parent.start, margin = appPadding.extraMedium)
+                    end.linkTo(parent.end, margin = appPadding.extraMedium)
+                    height = Dimension.fillToConstraints
+                    width = Dimension.fillToConstraints
+                }
+            ) {
+                Cover(
+                    coverModel = coverModel,
+                    color = palette.getBrightDominantOrPrimary(),
+                    modifier = Modifier
+                        .alpha(state.coverAlpha)
+                        .aspectRatio(1F)
+                        .fillMaxSize()
+                        .align(Alignment.Center)
+                        .onGloballyPositioned { coordinates ->
+                            val width = coordinates.size.width
+                            val height = coordinates.size.height
 
-                        if (width > 0 && height > 0)
-                            coverSize = ImageSize(width, height)
-                    },
-            )
+                            if (width > 0 && height > 0)
+                                coverSize = ImageSize(width, height)
+                        },
+                )
+            }
 
             AudioWaveform(
                 state = state,
