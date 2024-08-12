@@ -1,14 +1,12 @@
 package com.paranid5.crescendo.system.services.video_cache.files
 
 import android.util.Log
-import arrow.core.Either
 import com.paranid5.crescendo.core.common.caching.DownloadFilesStatus
 import com.paranid5.crescendo.core.common.caching.DownloadingStatus
 import com.paranid5.crescendo.core.media.caching.CachingResult
+import com.paranid5.crescendo.core.media.files.MediaFile
 import com.paranid5.crescendo.data.ktor_client.DownloadingProgress
-import com.paranid5.crescendo.data.ktor_client.UrlWithFile
 import com.paranid5.crescendo.data.ktor_client.downloadFile
-import com.paranid5.crescendo.data.ktor_client.downloadFiles
 import io.ktor.client.HttpClient
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -16,6 +14,7 @@ import kotlinx.coroutines.flow.update
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import java.io.File
+import java.util.concurrent.atomic.AtomicLong
 
 private const val TAG = "MediaFileDownloader"
 
@@ -38,69 +37,30 @@ internal class MediaFileDownloader : KoinComponent {
         _downloadStatusState.asStateFlow()
     }
 
-    suspend fun downloadAudioFile(
-        desiredFilename: String,
+    suspend fun downloadFile(
+        cacheFile: MediaFile,
         mediaUrl: String,
-        isAudio: Boolean
+        progress: AtomicLong,
     ): CachingResult.DownloadResult {
         _downloadStatusState.update { DownloadingStatus.Downloading }
 
-        val curVideoCacheFile = when (val storeFileRes =
-            initMediaFile(
-                desiredFilename = desiredFilename,
-                isAudio = isAudio
-            )
-        ) {
-            is Either.Left -> return storeFileRes.value
-            is Either.Right -> storeFileRes.value
-        }
-
         val status = ktorClient.downloadFile(
             fileUrl = mediaUrl,
-            storeFile = curVideoCacheFile,
+            storeFile = cacheFile,
+            progress = progress,
             totalProgressState = _videoDownloadProgressState,
             downloadingState = _downloadStatusState,
         )
 
         return when (status) {
-            DownloadFilesStatus.Success ->
-                CachingResult.DownloadResult.Success(listOf(curVideoCacheFile))
+            is DownloadFilesStatus.Success ->
+                CachingResult.DownloadResult.Success(cacheFile)
 
-            DownloadFilesStatus.Error ->
-                onError(curVideoCacheFile)
+            is DownloadFilesStatus.Error ->
+                onError()
 
-            DownloadFilesStatus.Canceled ->
-                onCancel(curVideoCacheFile)
-        }
-    }
-
-    suspend fun downloadAudioAndVideoFiles(
-        desiredFilename: String,
-        audioUrl: String,
-        videoUrl: String,
-    ): CachingResult.DownloadResult {
-        val mediaFilesInitResult = prepareMediaFilesForMP4Merging(desiredFilename)
-
-        val (audioFileStore, videoFileStore) = when (mediaFilesInitResult) {
-            is Either.Left -> return mediaFilesInitResult.value
-            is Either.Right -> mediaFilesInitResult.value
-        }
-
-        val downloadStatus = ktorClient.downloadFiles(
-            _downloadStatusState,
-            _videoDownloadProgressState,
-            UrlWithFile(audioUrl, audioFileStore), UrlWithFile(videoUrl, videoFileStore)
-        )
-
-        return when (downloadStatus) {
-            DownloadFilesStatus.Success ->
-                CachingResult.DownloadResult.Success(listOf(audioFileStore, videoFileStore))
-
-            DownloadFilesStatus.Canceled ->
-                onCancel(audioFileStore, videoFileStore)
-
-            DownloadFilesStatus.Error ->
-                onError(audioFileStore, videoFileStore)
+            is DownloadFilesStatus.Canceled ->
+                onCancel(cacheFile)
         }
     }
 
@@ -119,10 +79,8 @@ internal class MediaFileDownloader : KoinComponent {
         _downloadStatusState.update { it.afterReset }
 }
 
-private fun onError(vararg videoCacheFiles: File): CachingResult.DownloadResult.Error {
-    videoCacheFiles.forEach { Log.d(TAG, "File is deleted ${it.delete()}") }
-    return CachingResult.DownloadResult.Error
-}
+private fun onError(): CachingResult.DownloadResult.Error =
+    CachingResult.DownloadResult.Error
 
 private fun onCancel(vararg videoCacheFiles: File): CachingResult.Canceled {
     videoCacheFiles.forEach { Log.d(TAG, "File is deleted ${it.delete()}") }

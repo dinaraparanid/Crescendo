@@ -1,13 +1,9 @@
 package com.paranid5.crescendo.system.services.video_cache.cache
 
-import android.util.Log
 import com.paranid5.crescendo.core.common.caching.CachingStatus
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
-import java.io.File
-
-private const val TAG = "CacheManager"
 
 internal class CacheManager {
     private val _cachingStatusState by lazy {
@@ -30,9 +26,8 @@ internal class CacheManager {
     fun onConverted() =
         _cachingStatusState.update { CachingStatus.CONVERTED }
 
-    fun onCachingError(vararg videoCacheFiles: File) {
+    fun onCachingError() {
         _cachingStatusState.update { CachingStatus.ERR }
-        videoCacheFiles.forEach { Log.d(TAG, "File is deleted ${it.delete()}") }
     }
 
     fun prepareForNewVideo() =

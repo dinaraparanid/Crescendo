@@ -26,7 +26,7 @@ internal fun KtorClient() = HttpClient(OkHttp) {
         maxRetries = -1
 
         retryIf { _, response ->
-            !response.status.isSuccess()
+            response.status.isSuccess().not()
         }
     }
 
@@ -40,6 +40,6 @@ internal fun KtorClient() = HttpClient(OkHttp) {
 
     install(Logging) {
         logger = Logger.ANDROID
-        level = LogLevel.ALL
+        level = LogLevel.HEADERS
     }
 }

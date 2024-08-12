@@ -10,8 +10,8 @@ value class CachingResultRaise(private val raise: Raise<CachingResult>) :
     Raise<CachingResult> by raise {
     fun CachingResult.bind() =
         when (this) {
-            is CachingResult.Success -> listOf(file)
-            is CachingResult.DownloadResult.Success -> files
+            is CachingResult.Success -> file
+            is CachingResult.DownloadResult.Success -> file
             else -> raise.raise(this)
         }
 }

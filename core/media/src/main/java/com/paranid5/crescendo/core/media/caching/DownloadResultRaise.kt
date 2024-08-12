@@ -10,14 +10,14 @@ value class DownloadResultRaise(private val raise: Raise<CachingResult.DownloadR
     Raise<CachingResult.DownloadResult> by raise {
     fun CachingResult.DownloadResult.bind() =
         when (this) {
-            is CachingResult.DownloadResult.Success -> files
+            is CachingResult.DownloadResult.Success -> file
             else -> raise.raise(this)
         }
 }
 
 @OptIn(ExperimentalTypeInference::class)
 inline fun downloadResult(
-    @BuilderInference block: DownloadResultRaise.() -> List<MediaFile>
+    @BuilderInference block: DownloadResultRaise.() -> MediaFile,
 ): CachingResult.DownloadResult = recover(
     block = { CachingResult.DownloadResult.Success(block(DownloadResultRaise(this))) },
     recover = { it }

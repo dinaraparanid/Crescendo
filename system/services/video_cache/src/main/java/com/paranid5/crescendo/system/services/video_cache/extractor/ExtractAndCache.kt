@@ -12,12 +12,13 @@ import com.paranid5.crescendo.core.media.caching.isNotError
 import com.paranid5.crescendo.core.media.caching.onCanceled
 import com.paranid5.crescendo.core.media.convertToAudioFileAndSetTagsAsync
 import com.paranid5.crescendo.core.media.files.MediaFile
-import com.paranid5.crescendo.core.media.mergeToMP4AndSetTagsAsync
+import com.paranid5.crescendo.core.media.tags.setVideoTagsAsync
 import com.paranid5.crescendo.system.services.video_cache.VideoCacheService
 import com.paranid5.crescendo.system.services.video_cache.files.initMediaFile
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flow
+import java.util.concurrent.atomic.AtomicLong
 
 private const val RETRY_DELAY = 2000L
 
@@ -26,30 +27,37 @@ internal suspend fun VideoCacheService.extractMediaFilesAndStartCaching(
     desiredFilename: String,
     format: Formats,
     trimRange: TrimRange,
-): CachingResult {
+) = cachingResult {
+    val cacheFile = initMediaFile(
+        desiredFilename = desiredFilename,
+        isAudio = false,
+    ).bind()
+
+    val progress = AtomicLong()
+
     suspend fun impl() = either {
-        val (urls, metadata) = urlExtractor.extractUrlsWithMeta(
+        val (mediaUrl, metadata) = urlExtractor.extractUrlsWithMeta(
             context = this@extractMediaFilesAndStartCaching,
             ytUrl = ytUrl,
-            format = format
         ).bind()
 
         videoQueueManager.resetVideoMetadata(metadata)
 
         when (format) {
             Formats.MP4 -> cacheVideoFile(
-                desiredFilename = desiredFilename,
-                audioUrl = urls[0],
-                videoUrl = urls[1],
+                cacheFile = cacheFile,
+                mediaUrl = mediaUrl,
                 videoMetadata = metadata,
+                progress = progress,
             )
 
             else -> cacheAudioFile(
-                desiredFilename = desiredFilename,
-                audioUrl = urls[0],
+                cacheFile = cacheFile,
+                audioUrl = mediaUrl,
                 videoMetadata = metadata,
                 audioFormat = format,
                 trimRange = trimRange,
+                progress = progress,
             )
         }
     }
@@ -64,20 +72,21 @@ internal suspend fun VideoCacheService.extractMediaFilesAndStartCaching(
 }
 
 private suspend fun VideoCacheService.cacheAudioFile(
-    desiredFilename: String,
+    cacheFile: MediaFile,
     audioUrl: String,
     videoMetadata: VideoMetadata,
     audioFormat: Formats,
     trimRange: TrimRange,
-): CachingResult {
+    progress: AtomicLong,
+) = cachingResult {
     suspend fun impl() = cachingResult {
-        val result = mediaFileDownloader.downloadAudioFile(
-            desiredFilename = desiredFilename,
+        val result = mediaFileDownloader.downloadFile(
+            cacheFile = cacheFile,
             mediaUrl = audioUrl,
-            isAudio = true
+            progress = progress,
         ).bind()
 
-        val file = result.first() as MediaFile.VideoFile
+        val file = result as MediaFile.VideoFile
         cacheManager.onConversionStarted()
 
         val audioConversionResult =
@@ -97,61 +106,41 @@ private suspend fun VideoCacheService.cacheAudioFile(
         audioConversionResult
     }
 
-    return impl().onCanceled { videoQueueManager.decrementQueueLen() }
+    impl()
+        .onCanceled { videoQueueManager.decrementQueueLen() }
+        .bind()
 }
 
 private suspend fun VideoCacheService.cacheVideoFile(
-    desiredFilename: String,
-    audioUrl: String,
-    videoUrl: String,
+    cacheFile: MediaFile,
+    mediaUrl: String,
     videoMetadata: VideoMetadata,
-): CachingResult {
-    suspend fun merge(result: CachingResult.DownloadResult) =
-        cachingResult {
-            val (audioFileStore, videoFileStore) = result.bind()
+    progress: AtomicLong,
+) = cachingResult {
+    suspend fun impl() = cachingResult {
+        val result = mediaFileDownloader.downloadFile(
+            cacheFile = cacheFile,
+            mediaUrl = mediaUrl,
+            progress = progress,
+        ).bind()
 
-            val mergedMp4 = mergeToMp4(
-                desiredFilename = desiredFilename,
-                audioFileStore = audioFileStore,
-                videoFileStore = videoFileStore,
-                videoMetadata = videoMetadata
-            ).bind().first()
+        val videoFile = result as MediaFile.VideoFile
 
-            cacheManager.onConverted()
-            videoQueueManager.decrementQueueLen()
-            mergedMp4
-        }
+        setVideoTagsAsync(
+            context = this@cacheVideoFile,
+            videoFile = videoFile,
+            metadata = videoMetadata,
+        ).join()
 
-    val result = mediaFileDownloader.downloadAudioAndVideoFiles(
-        desiredFilename = desiredFilename,
-        audioUrl = audioUrl,
-        videoUrl = videoUrl
-    )
-
-    return merge(result).onCanceled { videoQueueManager.decrementQueueLen() }
-}
-
-private suspend inline fun VideoCacheService.mergeToMp4(
-    desiredFilename: String,
-    audioFileStore: MediaFile,
-    videoFileStore: MediaFile,
-    videoMetadata: VideoMetadata
-) = when (val storeFileRes =
-    initMediaFile(desiredFilename, isAudio = false)
-) {
-    is Either.Left -> {
-        cacheManager.onCachingError(audioFileStore, videoFileStore)
-        CachingResult.DownloadResult.FileCreationError
+        cacheManager.onConverted()
+        videoQueueManager.decrementQueueLen()
+        videoFile
     }
 
-    is Either.Right -> mergeToMP4AndSetTagsAsync(
-        context = this,
-        audioTrack = audioFileStore,
-        videoTrack = videoFileStore,
-        mp4StoreFile = storeFileRes.value,
-        videoMetadata = videoMetadata
-    ).await().also { cacheManager.onConverted() }
+    return impl().onCanceled { videoQueueManager.decrementQueueLen() }
 }
 
 private suspend inline fun Either<Throwable, CachingResult?>.isNotErrorOrDelay() =
-    isRight { it?.isNotError == true }.also { if (!it) delay(RETRY_DELAY) }
+    isRight { it?.isNotError == true }.also { isNotError ->
+        if (isNotError.not()) delay(RETRY_DELAY)
+    }

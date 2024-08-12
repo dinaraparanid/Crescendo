@@ -7,7 +7,7 @@ import kotlinx.parcelize.Parcelize
 sealed interface CachingResult : Parcelable {
     sealed interface DownloadResult : CachingResult {
         @Parcelize
-        data class Success(val files: List<MediaFile>) : DownloadResult
+        data class Success(val file: MediaFile) : DownloadResult
 
         @Parcelize
         data object Error : DownloadResult
@@ -41,7 +41,7 @@ inline val CachingResult.isError
     }
 
 inline val CachingResult.isNotError
-    get() = !isError
+    get() = isError.not()
 
 inline fun CachingResult.onCanceled(block: () -> Unit) =
     apply { if (this is CachingResult.Canceled) block() }

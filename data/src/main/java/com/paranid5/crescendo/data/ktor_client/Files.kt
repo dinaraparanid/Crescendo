@@ -6,6 +6,7 @@ import arrow.core.raise.nullable
 import com.paranid5.crescendo.core.common.caching.DownloadFilesStatus
 import com.paranid5.crescendo.core.common.caching.DownloadingStatus
 import com.paranid5.crescendo.core.common.caching.isCanceled
+import com.paranid5.crescendo.utils.identity
 import io.ktor.client.HttpClient
 import io.ktor.client.request.header
 import io.ktor.client.request.prepareGet
@@ -51,18 +52,17 @@ data class UrlWithFile(val fileUrl: String, val file: File)
 suspend fun HttpClient.downloadFile(
     fileUrl: String,
     storeFile: File,
+    progress: AtomicLong,
     downloadingState: MutableStateFlow<DownloadingStatus>,
     totalProgressState: MutableStateFlow<DownloadingProgress>? = null
 ): DownloadFilesStatus {
-    val progress = AtomicLong()
-
     val status = downloadFileResult(
         fileUrl = fileUrl,
         storeFile = storeFile,
         fileProgress = progress,
         downloadingState = downloadingState,
         totalProgressState = totalProgressState,
-        totalBytes = { it.totalBytes }
+        totalBytes = { it.totalBytes },
     )
 
     if (status is DownloadFilesStatus.Success)
@@ -86,7 +86,7 @@ private suspend fun downloadFileResult(
             return@catch DownloadFilesStatus.Canceled
 
         prepareFileGet(url = fileUrl, progress = fileProgress.get()).execute { response ->
-            if (!response.status.isSuccess())
+            if (response.status.isSuccess().not())
                 return@execute DownloadFilesStatus.Error
 
             response.downloadFileImpl(
@@ -94,14 +94,14 @@ private suspend fun downloadFileResult(
                 totalProgressState = totalProgressState,
                 storeFile = storeFile,
                 totalBytes = totalBytes(response),
-                fileProgress = fileProgress
+                fileProgress = fileProgress,
             )
         }
     }
 
     return impl().fold(
         ifLeft = { DownloadFilesStatus.Error },
-        ifRight = { it }
+        ifRight = ::identity,
     )
 }
 
@@ -136,7 +136,7 @@ private suspend inline fun HttpResponse.downloadFileImpl(
 ): DownloadFilesStatus {
     val channel = bodyAsChannel()
 
-    while (!channel.isClosedForRead && downloadingState.value == DownloadingStatus.Downloading) {
+    while (channel.isClosedForRead.not() && downloadingState.value == DownloadingStatus.Downloading) {
         val packet = withTimeoutOrNull(NEXT_PACKET_TIMEOUT) {
             channel.readRemaining(DEFAULT_BUFFER_SIZE.toLong())
         } ?: continue
