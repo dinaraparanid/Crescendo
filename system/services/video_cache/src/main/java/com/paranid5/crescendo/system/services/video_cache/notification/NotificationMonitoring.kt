@@ -26,7 +26,7 @@ internal suspend inline fun VideoCacheService.startNotificationMonitoring() =
                 cachingStatus,
                 meta,
                 queueLen,
-                System.currentTimeMillis()
+                System.currentTimeMillis(),
             )
         }.distinctUntilChanged { (_, _, _, _, _, prevTimestamp), (_, _, curCacheSt, _, _, curTimestamp) ->
             when {

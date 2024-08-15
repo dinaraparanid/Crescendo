@@ -20,7 +20,6 @@ import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 
 private const val TIMEOUT = 28000L
-private const val DEFAULT_AUDIO_TAG = 140
 
 internal class UrlExtractor : KoinComponent {
     private val ktorClient by inject<HttpClient>()
@@ -61,7 +60,7 @@ internal class UrlExtractor : KoinComponent {
 private fun extractWithYtDl(ytUrl: String) =
     YoutubeDL
         .getInstance()
-        .getInfo(YoutubeDLRequest(ytUrl).apply { addOption("-f", "best") })
+        .getInfo(YoutubeDLRequest(ytUrl))
         .url
 
 internal fun Result<VideoMeta>.getOrDefault() =

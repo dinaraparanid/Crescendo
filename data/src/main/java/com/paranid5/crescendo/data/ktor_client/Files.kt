@@ -18,6 +18,7 @@ import io.ktor.http.isSuccess
 import io.ktor.utils.io.cancel
 import io.ktor.utils.io.core.isNotEmpty
 import io.ktor.utils.io.core.readBytes
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -26,6 +27,7 @@ import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.flow.updateAndGet
+import kotlinx.coroutines.withContext
 import kotlinx.coroutines.withTimeoutOrNull
 import java.io.File
 import java.util.concurrent.atomic.AtomicLong
@@ -132,19 +134,19 @@ private suspend inline fun HttpResponse.downloadFileImpl(
     totalProgressState: MutableStateFlow<DownloadingProgress>?,
     storeFile: File,
     totalBytes: Long,
-    fileProgress: AtomicLong
+    fileProgress: AtomicLong,
 ): DownloadFilesStatus {
     val channel = bodyAsChannel()
 
     while (channel.isClosedForRead.not() && downloadingState.value == DownloadingStatus.Downloading) {
         val packet = withTimeoutOrNull(NEXT_PACKET_TIMEOUT) {
             channel.readRemaining(DEFAULT_BUFFER_SIZE.toLong())
-        } ?: continue
+        } ?: throw Exception("Packet timeout")
 
         while (packet.isNotEmpty && downloadingState.value == DownloadingStatus.Downloading) {
             val bytes = packet.readBytes()
             fileProgress.addAndGet(bytes.size.toLong())
-            storeFile.appendBytes(bytes)
+            withContext(Dispatchers.IO) { storeFile.appendBytes(bytes) }
 
             totalProgressState?.update { (progress, _) ->
                 DownloadingProgress(progress + bytes.size, totalBytes)
@@ -165,7 +167,7 @@ context(HttpClient)
 private suspend inline fun downloadFilesUntilError(
     downloadingState: MutableStateFlow<DownloadingStatus>,
     totalProgressState: MutableStateFlow<DownloadingProgress>?,
-    vararg files: UrlWithFile
+    vararg files: UrlWithFile,
 ): DownloadFilesStatus {
     downloadingState.update { DownloadingStatus.Downloading }
 
@@ -185,7 +187,7 @@ private suspend inline fun downloadFilesUntilError(
                 fileProgress = AtomicLong(),
                 downloadingState = downloadingState,
                 totalProgressState = totalProgressState,
-                totalBytes = { totalBytes }
+                totalBytes = { totalBytes },
             )
         }
         .firstOrNull { it !is DownloadFilesStatus.Success }

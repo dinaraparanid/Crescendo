@@ -60,7 +60,7 @@ internal class UrlExtractor : KoinComponent {
 private fun extractWithYtDl(ytUrl: String) =
     YoutubeDL
         .getInstance()
-        .getInfo(YoutubeDLRequest(ytUrl).apply { addOption("-f", "best") })
+        .getInfo(YoutubeDLRequest(ytUrl))
         .url
 
 internal fun Result<VideoMeta>.getOrDefault() =
