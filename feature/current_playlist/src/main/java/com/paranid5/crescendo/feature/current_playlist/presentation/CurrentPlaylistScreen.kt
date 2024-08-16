@@ -2,7 +2,9 @@ package com.paranid5.crescendo.feature.current_playlist.presentation
 
 import android.content.res.Configuration
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.NonRestartableComposable
@@ -38,26 +40,28 @@ fun CurrentPlaylistScreen(
     }
 
     Column(modifier) {
+        Spacer(Modifier.height(topPadding))
+
         CurrentPlaylistBar(
             state = state,
             modifier = Modifier.fillMaxWidth().padding(
-                top = topPadding,
-                bottom = dimensions.padding.small,
                 start = dimensions.padding.extraMedium,
                 end = dimensions.padding.extraMedium,
             ),
         )
 
+        Spacer(Modifier.height(dimensions.padding.extraBig))
+
         CurrentPlaylistTrackList(
             state = state,
             onUiIntent = onUiIntent,
             modifier = Modifier.fillMaxWidth().padding(
-                top = dimensions.padding.extraMedium,
                 start = dimensions.padding.extraMedium,
                 end = dimensions.padding.extraMedium,
-                bottom = dimensions.padding.small,
             ),
         )
+
+        Spacer(Modifier.height(dimensions.padding.extraBig))
     }
 }
 

@@ -14,7 +14,6 @@ import androidx.compose.material3.rememberSwipeToDismissBoxState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.unit.Dp
 import com.paranid5.crescendo.core.resources.ui.theme.AppTheme.dimensions
 import kotlinx.collections.immutable.ImmutableList
 
@@ -26,7 +25,6 @@ internal fun <T> DismissibleList(
     modifier: Modifier = Modifier,
     itemModifier: Modifier = Modifier,
     verticalArrangement: Arrangement.Vertical = Arrangement.spacedBy(dimensions.padding.extraMedium),
-    bottomPadding: Dp = dimensions.padding.extraMedium,
     key: ((index: Int, item: T) -> Any)? = null,
     itemContent: ListItemContent<T>,
 ) {
@@ -48,8 +46,6 @@ internal fun <T> DismissibleList(
             if (index != items.lastIndex)
                 Spacer(Modifier.height(itemSpace))
         }
-
-        item { Spacer(Modifier.height(bottomPadding)) }
     }
 }
 

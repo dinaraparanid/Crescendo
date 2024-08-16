@@ -5,9 +5,7 @@ import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.unit.Dp
 import com.paranid5.crescendo.core.common.tracks.Track
-import com.paranid5.crescendo.core.resources.ui.theme.AppTheme.dimensions
 import com.paranid5.crescendo.ui.drag.DraggableList
 import com.paranid5.crescendo.ui.drag.DraggableListItemContent
 import com.paranid5.crescendo.ui.track.ui_state.TrackUiState
@@ -21,7 +19,6 @@ internal fun DraggableTrackList(
     onTrackDragged: (draggedItems: ImmutableList<TrackUiState>, dragIndex: Int) -> Unit,
     modifier: Modifier = Modifier,
     trackItemModifier: Modifier = Modifier,
-    bottomPadding: Dp = dimensions.padding.extraMedium,
     trackItemContent: DraggableListItemContent<TrackUiState>,
 ) = DraggableList(
     items = tracks,
@@ -31,7 +28,6 @@ internal fun DraggableTrackList(
     itemContent = trackItemContent,
     modifier = modifier,
     itemModifier = trackItemModifier,
-    bottomPadding = bottomPadding,
     key = { index, track -> "${track.hashCode()}$index" },
 )
 
@@ -47,7 +43,6 @@ internal fun DraggableTrackList(
     showMetaEditor: () -> Unit,
     modifier: Modifier = Modifier,
     trackItemModifier: Modifier = Modifier,
-    bottomPadding: Dp = dimensions.padding.extraMedium,
 ) = DraggableTrackList(
     tracks = tracks,
     currentTrackIndex = currentTrackIndex,
@@ -55,7 +50,6 @@ internal fun DraggableTrackList(
     onTrackDragged = onTrackDragged,
     modifier = modifier,
     trackItemModifier = trackItemModifier,
-    bottomPadding = bottomPadding,
     trackItemContent = { trackList, trackInd, currentTrackDragIndex, trackModifier ->
         val isTrackCurrent by remember(trackInd, currentTrackDragIndex) {
             derivedStateOf { trackInd == currentTrackDragIndex }

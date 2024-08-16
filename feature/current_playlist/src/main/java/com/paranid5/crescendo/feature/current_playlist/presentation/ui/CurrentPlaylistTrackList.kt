@@ -4,7 +4,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Modifier
-import com.paranid5.crescendo.core.resources.ui.theme.AppTheme.dimensions
 import com.paranid5.crescendo.feature.current_playlist.view_model.CurrentPlaylistState
 import com.paranid5.crescendo.feature.current_playlist.view_model.CurrentPlaylistUiIntent
 
@@ -21,7 +20,6 @@ internal fun CurrentPlaylistTrackList(
         tracks = playlistState.playlist,
         currentTrackIndex = playlistState.currentTrackIndex,
         modifier = modifier,
-        bottomPadding = dimensions.padding.extraBig,
         onTrackDismissed = { index, _ ->
             when (index) {
                 currentTrackIndex -> false

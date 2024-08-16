@@ -42,9 +42,12 @@ internal fun PrimaryPagerTabs(
 ) {
     var pagerWidth by remember { mutableIntStateOf(1) }
 
-    val activeZoneWidth = maxOf(
-        (pagerWidth / PagesAmount).pxToDp() - PagerTabPadding * 2, 1.dp
-    )
+    val tabWidthPx = remember(pagerWidth) { pagerWidth / PagesAmount }
+    val tabWidth = tabWidthPx.pxToDp()
+
+    val activeZoneWidth = remember(tabWidth) {
+        maxOf(tabWidth - PagerTabPadding * 2, 1.dp)
+    }
 
     Column(
         modifier

@@ -13,7 +13,6 @@
     <string name="equalizer">Equalizer</string>
     <string name="change_repeat">Change repeat</string>
     <string name="geo_restricted">Sorry, this video is geo-restricted :(</string>
-    <string name="something_went_wrong">Something went wrong</string>
     <string name="no_internet">Check your internet connection</string>
     <string name="video_cached">Video were successfully cached!</string>
     <string name="video_canceled">Video was canceled</string>
@@ -120,4 +119,8 @@
     <string name="audio_effects_decibel">Db</string>
     <string name="audio_effects_hertz">Hz</string>
     <string name="audio_effects_equalizer_band">Equalizer band</string>
+
+    <!-- General -->
+    <string name="something_went_wrong">Something went wrong</string>
+    <string name="retry">Retry</string>
 </resources>
