@@ -119,6 +119,10 @@
     <string name="audio_effects_decibel">Db</string>
     <string name="audio_effects_hertz">Hz</string>
     <string name="audio_effects_equalizer_band">Equalizer band</string>
+    
+    <!-- Stream -->
+    <string name="stream_fetch_tab">Fetch</string>
+    <string name="stream_recent_tab">Recent</string>
 
     <!-- General -->
     <string name="something_went_wrong">Something went wrong</string>

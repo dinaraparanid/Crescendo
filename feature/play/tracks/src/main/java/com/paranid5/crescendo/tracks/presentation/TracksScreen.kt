@@ -10,7 +10,6 @@ import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.pullrefresh.pullRefresh
 import androidx.compose.material.pullrefresh.rememberPullRefreshState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -26,6 +25,7 @@ import com.paranid5.crescendo.tracks.view_model.TracksViewModel
 import com.paranid5.crescendo.tracks.view_model.TracksViewModelImpl
 import com.paranid5.crescendo.ui.foundation.AppRefreshIndicator
 import com.paranid5.crescendo.ui.foundation.UiState
+import com.paranid5.crescendo.utils.extensions.collectLatestAsState
 import org.koin.androidx.compose.koinViewModel
 
 @OptIn(ExperimentalMaterialApi::class)
@@ -36,7 +36,7 @@ fun TracksScreen(
     viewModel: TracksViewModel = koinViewModel<TracksViewModelImpl>(),
     onScreenEffect: (TracksScreenEffect) -> Unit,
 ) {
-    val state by viewModel.stateFlow.collectAsState()
+    val state by viewModel.stateFlow.collectLatestAsState()
     val onUiIntent = viewModel::onUiIntent
 
     val refreshState = rememberPullRefreshState(

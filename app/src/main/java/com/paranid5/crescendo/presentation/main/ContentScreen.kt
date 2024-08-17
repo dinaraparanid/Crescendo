@@ -26,7 +26,7 @@ import com.paranid5.crescendo.core.resources.ui.theme.AppTheme.dimensions
 import com.paranid5.crescendo.feature.play.main.presentation.PlayScreen
 import com.paranid5.crescendo.feature.play.main.view_model.PlayBackResult
 import com.paranid5.crescendo.feature.preferences.PreferencesScreen
-import com.paranid5.crescendo.fetch_stream.presentation.FetchStreamScreen
+import com.paranid5.crescendo.feature.stream.presentation.StreamScreen
 import com.paranid5.crescendo.navigation.AppNavigator
 import com.paranid5.crescendo.navigation.AppScreen
 import com.paranid5.crescendo.navigation.requireAppNavigator
@@ -81,7 +81,7 @@ private fun ContentScreenNavHost(
 
     composable(route = AppScreen.StreamFetching.title) {
         navigator.updateCurrentScreen(AppScreen.StreamFetching)
-        FetchStreamScreen(modifier = screenModifier)
+        StreamScreen(modifier = screenModifier)
     }
 
     composable(route = AppScreen.Audio.AudioEffects.title) {

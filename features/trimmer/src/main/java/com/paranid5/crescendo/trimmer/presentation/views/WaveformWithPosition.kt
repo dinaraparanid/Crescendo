@@ -8,7 +8,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
@@ -30,6 +29,7 @@ import com.paranid5.crescendo.trimmer.presentation.properties.compose.collectWav
 import com.paranid5.crescendo.trimmer.presentation.properties.playbackControllerOffsetFlow
 import com.paranid5.crescendo.trimmer.presentation.views.waveform.TrimWaveform
 import com.paranid5.crescendo.ui.utils.textWidth
+import com.paranid5.crescendo.utils.extensions.collectLatestAsState
 import org.koin.androidx.compose.koinViewModel
 
 @Composable
@@ -77,7 +77,7 @@ private fun animatePlaybackTextOffsetAsState(
 ): Int {
     val playbackControllerOffset by viewModel
         .playbackControllerOffsetFlow(spikeWidthRatio)
-        .collectAsState(initial = 0F)
+        .collectLatestAsState(initial = 0F)
 
     val waveformWidth by viewModel.collectWaveformWidthAsState(spikeWidthRatio)
     val playbackText by viewModel.collectPlaybackTextAsState()

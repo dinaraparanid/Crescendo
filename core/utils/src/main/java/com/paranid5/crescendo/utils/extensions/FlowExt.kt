@@ -14,17 +14,16 @@ import kotlin.coroutines.EmptyCoroutineContext
 @Composable
 fun <T : R, R> Flow<T>.collectLatestAsState(
     initial: R,
-    context: CoroutineContext = EmptyCoroutineContext
+    context: CoroutineContext = EmptyCoroutineContext,
 ): State<R> = produceState(initial, this, context) {
-    if (context == EmptyCoroutineContext) {
-        collectLatest { value = it }
-    } else withContext(context) {
-        collectLatest { value = it }
+    when (context) {
+        EmptyCoroutineContext -> collectLatest { value = it }
+        else -> withContext(context) { collectLatest { value = it } }
     }
 }
 
 @SuppressLint("StateFlowValueCalledInComposition")
 @Composable
 fun <T> StateFlow<T>.collectLatestAsState(
-    context: CoroutineContext = EmptyCoroutineContext
+    context: CoroutineContext = EmptyCoroutineContext,
 ): State<T> = collectLatestAsState(value, context)

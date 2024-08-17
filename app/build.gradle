@@ -65,8 +65,8 @@ dependencies {
     implementation project(':core:utils')
 
     implementation project(':data')
+    implementation project(':feature:stream:main')
 
-    implementation project(':features:fetch_stream')
     implementation project(':features:trimmer')
 
     implementation project(':feature:audio_effects')

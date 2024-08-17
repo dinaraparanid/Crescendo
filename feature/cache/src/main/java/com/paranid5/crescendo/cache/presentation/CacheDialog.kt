@@ -8,7 +8,6 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.NonRestartableComposable
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import com.paranid5.crescendo.cache.presentation.effect.UpdateUrlEffect
@@ -17,6 +16,7 @@ import com.paranid5.crescendo.cache.view_model.CacheViewModel
 import com.paranid5.crescendo.cache.view_model.CacheViewModelImpl
 import com.paranid5.crescendo.core.resources.ui.theme.AppTheme.colors
 import com.paranid5.crescendo.core.resources.ui.theme.AppTheme.dimensions
+import com.paranid5.crescendo.utils.extensions.collectLatestAsState
 import org.koin.androidx.compose.koinViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -28,7 +28,7 @@ fun CacheDialog(
     viewModel: CacheViewModel = koinViewModel<CacheViewModelImpl>(),
     hide: () -> Unit,
 ) {
-    val state by viewModel.stateFlow.collectAsState()
+    val state by viewModel.stateFlow.collectLatestAsState()
     val onUiIntent = viewModel::onUiIntent
 
     UpdateUrlEffect(url = url, onUiIntent = onUiIntent)
