@@ -8,7 +8,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.pullrefresh.pullRefresh
-import androidx.compose.material.pullrefresh.rememberPullRefreshState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -25,6 +24,7 @@ import com.paranid5.crescendo.tracks.view_model.TracksViewModel
 import com.paranid5.crescendo.tracks.view_model.TracksViewModelImpl
 import com.paranid5.crescendo.ui.foundation.AppRefreshIndicator
 import com.paranid5.crescendo.ui.foundation.UiState
+import com.paranid5.crescendo.ui.foundation.rememberPullRefreshWithDuration
 import com.paranid5.crescendo.utils.extensions.collectLatestAsState
 import org.koin.androidx.compose.koinViewModel
 
@@ -39,8 +39,8 @@ fun TracksScreen(
     val state by viewModel.stateFlow.collectLatestAsState()
     val onUiIntent = viewModel::onUiIntent
 
-    val refreshState = rememberPullRefreshState(
-        refreshing = state.shownTracksState is UiState.Refreshing,
+    val (refreshState, isRefreshing) = rememberPullRefreshWithDuration(
+        isRefreshing = state.shownTracksState is UiState.Refreshing,
         onRefresh = { onUiIntent(TracksUiIntent.Lifecycle.OnRefresh) },
     )
 
@@ -71,7 +71,7 @@ fun TracksScreen(
         }
 
         AppRefreshIndicator(
-            refreshing = state.shownTracksState is UiState.Refreshing,
+            refreshing = isRefreshing,
             refreshState = refreshState,
             modifier = Modifier.align(Alignment.TopCenter),
         )
