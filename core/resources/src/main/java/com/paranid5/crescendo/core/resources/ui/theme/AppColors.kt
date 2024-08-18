@@ -72,7 +72,7 @@ data class AppColors(
                 selection = AppSelectionColors.dark,
                 text = AppTextColors.dark,
                 button = AppButtonColors.dark,
-                icon = AppIconColors.default,
+                icon = AppIconColors.dark,
                 utils = AppUtilsColors.dark,
             )
 
@@ -86,7 +86,7 @@ data class AppColors(
                 selection = AppSelectionColors.light,
                 text = AppTextColors.light,
                 button = AppButtonColors.light,
-                icon = AppIconColors.default,
+                icon = AppIconColors.light,
                 utils = AppUtilsColors.light,
             )
         }
@@ -157,6 +157,8 @@ data class AppTextColors(
     val primary: Color,
     val onCard: Color,
     val onSearchBar: Color,
+    val onTextField: Color,
+    val onButton: Color,
     val tertiriary: Color,
 ) {
     companion object {
@@ -164,6 +166,8 @@ data class AppTextColors(
             primary = Color.White,
             onCard = DarkPurple,
             onSearchBar = DarkPurple,
+            onTextField = PaleCornflowerBlue,
+            onButton = PaleCornflowerBlue,
             tertiriary = TertiriaryDark,
         )
 
@@ -171,6 +175,8 @@ data class AppTextColors(
             primary = Color.Black,
             onCard = TiffanyBlue,
             onSearchBar = Color.Black,
+            onTextField = SlateGray,
+            onButton = SlateGray,
             tertiriary = TertiriaryLight,
         )
     }
@@ -183,12 +189,13 @@ data class AppButtonColors(
 ) {
     companion object {
         internal val dark = AppButtonColors(
-            primary = RoyalBlueGradient,
-            disabled = RussianViolet,
+            primary = RussianViolet,
+            disabled = RoyalBlue,
         )
+
         internal val light = AppButtonColors(
-            primary = Aquamarine,
-            disabled = TiffanyBlue,
+            primary = TiffanyBlue,
+            disabled = Pang,
         )
     }
 }
@@ -196,9 +203,18 @@ data class AppButtonColors(
 @Immutable
 data class AppIconColors(
     val onSearchBar: Color,
+    val selected: Color,
 ) {
     companion object {
-        internal val default = AppIconColors(onSearchBar = Color.Black)
+        internal val dark = AppIconColors(
+            onSearchBar = Color.Black,
+            selected = Emerald,
+        )
+
+        internal val light = AppIconColors(
+            onSearchBar = Color.Black,
+            selected = DarkSlateGray,
+        )
     }
 }
 

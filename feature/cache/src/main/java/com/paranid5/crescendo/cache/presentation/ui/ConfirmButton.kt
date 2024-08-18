@@ -1,6 +1,5 @@
 package com.paranid5.crescendo.cache.presentation.ui
 
-import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -12,6 +11,7 @@ import com.paranid5.crescendo.cache.view_model.CacheUiIntent
 import com.paranid5.crescendo.core.resources.R
 import com.paranid5.crescendo.core.resources.ui.theme.AppTheme.colors
 import com.paranid5.crescendo.core.resources.ui.theme.AppTheme.typography
+import com.paranid5.crescendo.ui.foundation.AppRippleButton
 
 @Composable
 internal fun ConfirmButton(
@@ -19,9 +19,9 @@ internal fun ConfirmButton(
     onUiIntent: (CacheUiIntent) -> Unit,
     modifier: Modifier = Modifier,
     hideDialog: () -> Unit,
-) = Button(
+) = AppRippleButton(
     modifier = modifier,
-    enabled = state.isCacheButtonClickable,
+    isEnabled = state.isCacheButtonClickable,
     colors = ButtonDefaults.buttonColors(
         containerColor = colors.button.primary,
         contentColor = colors.text.primary,

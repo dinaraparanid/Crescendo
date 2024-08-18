@@ -23,7 +23,7 @@ private const val SHIMMER_DURATION_MS = 1500
 @Composable
 fun Modifier.shimmerEffect(
     accentColor: Color = colors.background.alternative,
-    basicColor: Color = colors.background.primary,
+    basicColor: Color = colors.background.highContrast,
     widthOfShadowBrush: Float = WIDTH_OF_SHADOW_BRUSH,
     durationMillis: Int = SHIMMER_DURATION_MS,
 ): Modifier {
@@ -42,7 +42,7 @@ fun Modifier.shimmerEffect(
         label = "shimmer_animation"
     )
 
-    val shimmerColors = remember {
+    val shimmerColors = remember(basicColor) {
         persistentListOf(
             basicColor.copy(alpha = .6F),
             basicColor.copy(alpha = .4F),
@@ -54,13 +54,15 @@ fun Modifier.shimmerEffect(
         )
     }
 
-    return this.background(
-        brush = Brush.linearGradient(
-            colors = shimmerColors,
-            start = Offset(x = translateAnimation - widthOfShadowBrush, y = 0F),
-            end = Offset(x = translateAnimation, y = widthOfShadowBrush),
-        ),
-    )
+    return this
+        .background(color = accentColor)
+        .background(
+            brush = Brush.linearGradient(
+                colors = shimmerColors,
+                start = Offset(x = translateAnimation - widthOfShadowBrush, y = 0F),
+                end = Offset(x = translateAnimation, y = widthOfShadowBrush),
+            ),
+        )
 }
 
 inline fun Modifier.applyIf(

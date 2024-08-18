@@ -7,7 +7,6 @@
     <string name="unknown_streamer">Unknown channel</string>
     <string name="video_cover">Video cover</string>
     <string name="ten_secs_back">10 seconds back</string>
-    <string name="play">Play</string>
     <string name="pause">Pause</string>
     <string name="ten_secs_forward">10 seconds forward</string>
     <string name="equalizer">Equalizer</string>
@@ -41,7 +40,6 @@
     <string name="aac">Audio: AAC</string>
     <string name="mp4">Video: MP4</string>
     <string name="update_available">Update available</string>
-    <string name="download">Download</string>
     <string name="audio_recording_description">Audio visualizer requires recording in order to process input audio stream</string>
     <string name="pitch">Pitch</string>
     <string name="speed">Speed</string>
@@ -123,8 +121,24 @@
     <!-- Stream -->
     <string name="stream_fetch_tab">Fetch</string>
     <string name="stream_recent_tab">Recent</string>
+    <string name="stream_fetch_url_editor_title">Paste URL link here</string>
+    <string name="stream_fetch_url_editor_placeholder">Your URL</string>
+    <string name="stream_fetch_url_how_to_use_title">How To Use</string>
+    <string name="stream_fetch_url_how_to_use_step_1">Copy the URL link of the video</string>
+    <string name="stream_fetch_url_how_to_use_step_2">Paste the URL link and press “Continue” button</string>
+    <string name="stream_fetch_url_how_to_use_step_3">Wait until URL is successfully recognized and fetched</string>
+    <string name="stream_fetch_url_how_to_use_step_4">Start streaming by pressing on “Play” button</string>
+    <string name="stream_fetch_url_how_to_use_step_5">Download video in a desired audio / video format by pressing “Download” button</string>
+    <string name="stream_fetch_url_how_to_use_step_6">Control the downloading progress and the state of your fetch queue with notification</string>
+    <string name="stream_fetch_url_how_to_use_step_7">Wait until all videos are downloaded and converted</string>
+    <string name="stream_fetch_url_ready_to_stream">Ready to stream</string>
+    <string name="stream_recent_title">Last 50 Videos</string>
 
     <!-- General -->
     <string name="something_went_wrong">Something went wrong</string>
     <string name="retry">Retry</string>
+    <string name="continue_">Continue</string>
+    <string name="play">Play</string>
+    <string name="download">Download</string>
+    <string name="next">Next</string>
 </resources>

@@ -57,7 +57,7 @@ fun AudioEffectsScreen(
 
     when (state.uiState) {
         is UiState.Data, is UiState.Success, is UiState.Refreshing -> impl()
-        is UiState.Undefined, is UiState.Loading -> AppProgressIndicator(modifier = modifier)
+        is UiState.Initial, is UiState.Loading -> AppProgressIndicator(modifier = modifier)
         is UiState.Error -> doNothing
     }
 }

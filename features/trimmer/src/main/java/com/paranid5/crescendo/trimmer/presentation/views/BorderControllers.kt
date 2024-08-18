@@ -80,13 +80,12 @@ private fun BorderController(
     AppOutlinedTextField(
         value = millisStr,
         modifier = modifier,
-        onValueChange = {
-            millisStr = it.take(CORRECT_TIME_INPUT_LENGTH)
-            it.toTimeOrNull()?.let(setMillis)
-        },
         label = { BorderControllerLabel(label) },
         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Ascii),
-    )
+    ) {
+        millisStr = it.take(CORRECT_TIME_INPUT_LENGTH)
+        it.toTimeOrNull()?.let(setMillis)
+    }
 }
 
 @Composable

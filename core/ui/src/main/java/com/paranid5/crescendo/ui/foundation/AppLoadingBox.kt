@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Text
@@ -16,18 +17,21 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.Dp
 import com.paranid5.crescendo.core.resources.R
 import com.paranid5.crescendo.core.resources.ui.theme.AppTheme
+import com.paranid5.crescendo.core.resources.ui.theme.AppTheme.colors
 import com.paranid5.crescendo.ui.utils.applyIf
 import com.paranid5.crescendo.ui.utils.shimmerEffect
 
 @Composable
 fun AppLoadingBox(
     isLoading: Boolean,
+    minHeight: Dp,
     modifier: Modifier = Modifier,
     isError: Boolean = false,
     onErrorButtonClick: (() -> Unit)? = null,
-    errorBackgroundColor: Color = AppTheme.colors.background.highContrast,
+    errorBackgroundColor: Color = colors.background.highContrast,
     errorText: String = stringResource(R.string.something_went_wrong),
     errorButtonText: String = stringResource(R.string.retry),
     contentAlignment: Alignment = Alignment.Center,
@@ -36,7 +40,9 @@ fun AppLoadingBox(
 ) = Box(
     contentAlignment = contentAlignment,
     propagateMinConstraints = propagateMinConstraints,
-    modifier = modifier.applyIf(isLoading) { shimmerEffect() },
+    modifier = modifier
+        .heightIn(min = minHeight)
+        .applyIf(isLoading) { shimmerEffect() },
 ) {
     if (isLoading.not()) {
         when {

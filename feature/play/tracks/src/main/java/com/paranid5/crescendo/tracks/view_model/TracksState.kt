@@ -18,7 +18,7 @@ import kotlinx.parcelize.Parcelize
 @Immutable
 data class TracksState(
     val query: String = "",
-    @IgnoredOnParcel val allTracksState: UiState<ImmutableList<TrackUiState>> = UiState.Undefined,
+    @IgnoredOnParcel val allTracksState: UiState<ImmutableList<TrackUiState>> = UiState.Initial,
     @IgnoredOnParcel val trackOrder: TrackOrder = TrackOrder.default,
     @IgnoredOnParcel val currentTrack: TrackUiState? = null,
     @IgnoredOnParcel val screenEffect: TracksScreenEffect? = null,

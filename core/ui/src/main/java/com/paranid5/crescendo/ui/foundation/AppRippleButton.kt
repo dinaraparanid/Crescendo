@@ -30,7 +30,12 @@ fun AppRippleButton(
     shape: Shape = ButtonDefaults.shape,
     elevation: ButtonElevation? = ButtonDefaults.buttonElevation(),
     border: BorderStroke? = null,
-    colors: ButtonColors = ButtonDefaults.buttonColors(),
+    colors: ButtonColors = ButtonDefaults.buttonColors(
+        containerColor = AppTheme.colors.button.primary,
+        contentColor = AppTheme.colors.text.primary,
+        disabledContainerColor = AppTheme.colors.button.disabled,
+        disabledContentColor = AppTheme.colors.text.tertiriary,
+    ),
     contentPadding: PaddingValues = ButtonDefaults.ContentPadding,
     content: @Composable RowScope.() -> Unit,
 ) = Button(

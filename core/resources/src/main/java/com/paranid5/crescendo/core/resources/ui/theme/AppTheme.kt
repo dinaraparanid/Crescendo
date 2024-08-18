@@ -1,6 +1,7 @@
 package com.paranid5.crescendo.core.resources.ui.theme
 
 import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.foundation.text.selection.LocalTextSelectionColors
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
@@ -33,7 +34,8 @@ fun AppTheme(
             LocalColors provides appColors,
             LocalDimensions provides dimensions,
             LocalTypography provides typography,
-            LocalIcons provides appIcons
+            LocalIcons provides appIcons,
+            LocalTextSelectionColors provides AppTextSelectionColors,
         ) {
             MaterialTheme(
                 colorScheme = appColors.colorScheme,

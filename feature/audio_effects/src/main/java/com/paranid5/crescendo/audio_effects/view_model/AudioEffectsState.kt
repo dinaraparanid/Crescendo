@@ -27,7 +27,7 @@ data class AudioEffectsState(
         EqualizerBandsPreset.NIL -> 0
         null -> 0
     },
-    val uiState: UiState<Unit> = UiState.Undefined,
+    val uiState: UiState<Unit> = UiState.Initial,
 ) : Parcelable {
     @IgnoredOnParcel
     val isCustomPresetActive = equalizerUiState?.bandsPreset == EqualizerBandsPreset.CUSTOM

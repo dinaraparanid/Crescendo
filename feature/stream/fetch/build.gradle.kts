@@ -50,4 +50,7 @@ dependencies {
     implementation(libs.material)
 
     implementation(libs.koin.androidx.compose)
+
+    implementation(libs.coil.compose)
+    implementation(libs.compose.markdown)
 }

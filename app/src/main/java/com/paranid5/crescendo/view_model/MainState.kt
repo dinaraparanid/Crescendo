@@ -10,5 +10,5 @@ import kotlinx.parcelize.Parcelize
 @Immutable
 internal data class MainState(
     val isUpdateDialogShown: Boolean = false,
-    val releaseState: UiState<ReleaseUiState> = UiState.Undefined,
+    val releaseState: UiState<ReleaseUiState> = UiState.Initial,
 ) : Parcelable

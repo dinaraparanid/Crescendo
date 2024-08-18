@@ -1,11 +1,17 @@
 package com.paranid5.crescendo.feature.stream.fetch.presentation
 
-import androidx.compose.foundation.layout.Box
-import androidx.compose.material3.Text
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import com.paranid5.crescendo.core.resources.ui.theme.AppTheme.dimensions
+import com.paranid5.crescendo.feature.stream.fetch.presentation.ui.ContinueButton
+import com.paranid5.crescendo.feature.stream.fetch.presentation.ui.FetchCard
+import com.paranid5.crescendo.feature.stream.fetch.presentation.ui.HowToUseCard
+import com.paranid5.crescendo.feature.stream.fetch.view_model.FetchStreamUiIntent
 import com.paranid5.crescendo.feature.stream.fetch.view_model.FetchStreamViewModel
 import com.paranid5.crescendo.feature.stream.fetch.view_model.FetchStreamViewModelImpl
 import com.paranid5.crescendo.utils.extensions.collectLatestAsState
@@ -19,7 +25,26 @@ fun FetchStreamScreen(
     val state by viewModel.stateFlow.collectLatestAsState()
     val onUiIntent = viewModel::onUiIntent
 
-    Box(modifier) {
-        Text("TODO: Fetch Screen", Modifier.align(Alignment.Center))
+    Column(modifier) {
+        FetchCard(
+            state = state,
+            onUiIntent = onUiIntent,
+            modifier = Modifier.fillMaxWidth(),
+        )
+
+        Spacer(Modifier.height(dimensions.padding.extraMedium))
+
+        ContinueButton(
+            state = state,
+            modifier = Modifier.fillMaxWidth(),
+        ) {
+            onUiIntent(FetchStreamUiIntent.ContinueClick)
+        }
+
+        Spacer(Modifier.height(dimensions.padding.large))
+
+        HowToUseCard(modifier = Modifier.fillMaxWidth())
+
+        Spacer(Modifier.height(dimensions.padding.extraMedium))
     }
 }

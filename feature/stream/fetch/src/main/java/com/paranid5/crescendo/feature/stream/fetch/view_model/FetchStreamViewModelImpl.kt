@@ -4,6 +4,7 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import com.paranid5.crescendo.core.common.udf.StatePublisher
 import com.paranid5.crescendo.core.common.udf.state
+import com.paranid5.crescendo.utils.doNothing
 
 internal class FetchStreamViewModelImpl(
     private val savedStateHandle: SavedStateHandle,
@@ -20,5 +21,6 @@ internal class FetchStreamViewModelImpl(
 
     override fun onUiIntent(intent: FetchStreamUiIntent) = when (intent) {
         is FetchStreamUiIntent.UpdateUrl -> updateState { copy(url = intent.url) }
+        is FetchStreamUiIntent.ContinueClick -> doNothing() // TODO: fetch metadata
     }
 }
