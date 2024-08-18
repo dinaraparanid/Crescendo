@@ -9,12 +9,14 @@ import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.NonRestartableComposable
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.produceState
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.rememberUpdatedState
@@ -32,10 +34,12 @@ import com.paranid5.crescendo.core.resources.ui.theme.AppTheme.colors
 import com.paranid5.crescendo.core.resources.ui.theme.AppTheme.dimensions
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
-private const val ZERO_OFFSET = 0F
-private const val SCROLL_SPEED_UP = 2F
+private const val ZeroOffset = 0F
+private const val ScrollSpeedUp = 2F
+private const val DragEventTimeout = 500L
 
 typealias DraggableListItemContent<T> = @Composable (
     items: ImmutableList<T>,
@@ -153,13 +157,37 @@ private fun <T> Modifier.handleItemsMovement(
     var draggedItemIndex by draggedItemIndexState
 
     val coroutineScope = rememberCoroutineScope()
+    var itemOffset by remember { mutableStateOf(Offset.Zero) }
     var overscrollJob by remember { mutableStateOf<Job?>(null) }
+
+    val timer by produceDragEventTimer()
+
+    LaunchedEffect(position, itemOffset, timer) {
+        if (overscrollJob?.isActive == true)
+            return@LaunchedEffect
+
+        checkForOverscroll(
+            scrollingState = scrollingState,
+            offset = itemOffset,
+            dragItemPosition = position,
+        )
+            .takeIf { it != ZeroOffset }
+            ?.let { overScrollOffset ->
+                overscrollJob = coroutineScope.launch {
+                    scrollingState.animateScrollBy(
+                        value = overScrollOffset * ScrollSpeedUp,
+                        animationSpec = tween(easing = FastOutLinearInEasing),
+                    )
+                }
+            }
+    }
 
     return this then Modifier.pointerInput(Unit) {
         detectDragGesturesAfterLongPress(
             onDrag = { change, offset ->
                 change.consume()
 
+                itemOffset = offset
                 val itemSize = firstVisibleItem(scrollingState, offset)?.size ?: 0
                 val borderOffset = scrollingState.layoutInfo.viewportSize.height.toFloat()
 
@@ -167,25 +195,6 @@ private fun <T> Modifier.handleItemsMovement(
                     minimumValue = 0F,
                     maximumValue = borderOffset - itemSize,
                 )
-
-                if (overscrollJob?.isActive == true)
-                    return@detectDragGesturesAfterLongPress
-
-                checkForOverscroll(
-                    scrollingState = scrollingState,
-                    offset = offset,
-                    dragItemPosition = position,
-                )
-                    ?.takeIf { it != ZERO_OFFSET }
-                    ?.let { overScrollOffset ->
-                        overscrollJob = coroutineScope.launch {
-                            scrollingState.animateScrollBy(
-                                value = overScrollOffset * SCROLL_SPEED_UP,
-                                animationSpec = tween(easing = FastOutLinearInEasing),
-                            )
-                        }
-                    }
-                    ?: overscrollJob?.cancel()
             },
             onDragStart = { offset ->
                 isDragging = true
@@ -220,7 +229,7 @@ private inline fun <T> DraggableItemList(
         index,
         modifier
             .zIndex(offset?.let { 1F } ?: 0F)
-            .graphicsLayer { translationY = offset ?: ZERO_OFFSET }
+            .graphicsLayer { translationY = offset ?: ZeroOffset }
             .clip(RoundedCornerShape(dimensions.padding.extraMedium))
             .background(
                 offset
@@ -238,6 +247,14 @@ private fun rememberItemOffset(indexWithOffset: Pair<Int, Float>?, index: Int) =
         }
     }
 
+@Composable
+private fun produceDragEventTimer() = produceState(0L) {
+    while (true) {
+        delay(DragEventTimeout)
+        value = System.currentTimeMillis()
+    }
+}
+
 private fun itemIndexWithOffset(
     position: Float?,
     scrollingState: LazyListState,
@@ -249,7 +266,7 @@ private fun itemIndexWithOffset(
         .getOrNull(draggedItemIndex - scrollingState.firstVisibleItemIndex)
         ?: return null
 
-    val offset = (position ?: ZERO_OFFSET) - item.offset - item.size / 2F
+    val offset = (position ?: ZeroOffset) - item.offset - item.size / 2F
     return item.index to offset
 }
 
@@ -271,12 +288,12 @@ private fun checkForOverscroll(
     val endOffset = firstVisibleItem.offsetEnd + startOffset
 
     when {
-        startOffset > ZERO_OFFSET ->
+        startOffset > ZeroOffset ->
             (endOffset - scrollingState.layoutInfo.viewportEndOffset + itemSize)
-                .takeIf { diff -> diff > ZERO_OFFSET }
+                .takeIf { diff -> diff > ZeroOffset }
 
         else ->
             (startOffset - scrollingState.layoutInfo.viewportStartOffset - itemSize)
-                .takeIf { diff -> diff < ZERO_OFFSET }
+                .takeIf { diff -> diff < ZeroOffset }
     }
 }
