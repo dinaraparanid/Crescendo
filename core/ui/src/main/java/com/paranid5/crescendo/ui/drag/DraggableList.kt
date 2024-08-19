@@ -157,25 +157,42 @@ private fun <T> Modifier.handleItemsMovement(
 
     val coroutineScope = rememberCoroutineScope()
     var itemOffset by remember { mutableStateOf(Offset.Zero) }
+    var itemOffsetHandled by remember { mutableStateOf(false) }
     var overscrollJob by remember { mutableStateOf<Job?>(null) }
 
     val dragEventTrigger by produceDragEventTrigger()
 
     LaunchedEffect(isDragging, position, itemOffset, dragEventTrigger) {
-        if (isDragging.not() || overscrollJob?.isActive == true)
-            return@LaunchedEffect
+        val itemSize = firstVisibleItem(scrollingState, itemOffset)?.size ?: 0
+        val viewportHeight = scrollingState.layoutInfo.viewportSize.height.toFloat()
 
-        checkForOverscroll(
-            scrollingState = scrollingState,
-            offset = itemOffset,
-            dragItemPosition = position,
-        )?.let { overScrollOffset ->
-            overscrollJob = coroutineScope.launch {
-                scrollingState.animateScrollBy(
-                    value = overScrollOffset,
-                    animationSpec = tween(easing = FastOutLinearInEasing),
-                )
+        position = position?.plus(itemOffset.y)?.coerceIn(
+            minimumValue = ZeroOffset,
+            maximumValue = viewportHeight - itemSize,
+        )
+
+        if (isDragging && overscrollJob?.isActive != true) {
+            checkForOverscroll(
+                scrollingState = scrollingState,
+                offset = itemOffset,
+                dragItemPosition = position,
+            )?.let { overScrollOffset ->
+                overscrollJob = coroutineScope.launch {
+                    scrollingState.animateScrollBy(
+                        value = overScrollOffset,
+                        animationSpec = tween(easing = FastOutLinearInEasing),
+                    )
+                }
             }
+        }
+
+        itemOffsetHandled = true
+    }
+
+    LaunchedEffect(itemOffsetHandled) {
+        if (itemOffsetHandled) {
+            itemOffset = Offset.Zero
+            itemOffsetHandled = false
         }
     }
 
@@ -183,15 +200,7 @@ private fun <T> Modifier.handleItemsMovement(
         detectDragGesturesAfterLongPress(
             onDrag = { change, offset ->
                 change.consume()
-
                 itemOffset = offset
-                val itemSize = firstVisibleItem(scrollingState, offset)?.size ?: 0
-                val borderOffset = scrollingState.layoutInfo.viewportSize.height.toFloat()
-
-                position = position?.plus(offset.y)?.coerceIn(
-                    minimumValue = 0F,
-                    maximumValue = borderOffset - itemSize,
-                )
             },
             onDragStart = { offset ->
                 isDragging = true
