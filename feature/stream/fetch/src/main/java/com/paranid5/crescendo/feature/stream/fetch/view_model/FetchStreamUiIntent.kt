@@ -9,5 +9,8 @@ sealed interface FetchStreamUiIntent {
         data object NextClick : Buttons
     }
 
-    data object RefreshCover : FetchStreamUiIntent
+    sealed interface Retry : FetchStreamUiIntent {
+        data object RefreshCover : Retry
+        data object ClearMetaOnFailure : Retry
+    }
 }

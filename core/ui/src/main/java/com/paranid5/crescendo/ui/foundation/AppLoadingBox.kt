@@ -41,16 +41,16 @@ fun AppLoadingBox(
     errorText: String = stringResource(R.string.something_went_wrong),
     errorButtonText: String = stringResource(R.string.retry),
     contentAlignment: Alignment = Alignment.Center,
-    propagateMinConstraints: Boolean = false,
+    propagateMinConstraints: Boolean = true,
     content: (@Composable BoxScope.() -> Unit)? = null,
 ) = Box(
     contentAlignment = contentAlignment,
     propagateMinConstraints = propagateMinConstraints,
     modifier = modifier
-        .let {
+        .run {
             when (size) {
-                is LoadingBoxSize.FillMaxSize -> it.fillMaxSize()
-                is LoadingBoxSize.FixedHeight -> it.heightIn(min = size.minHeight)
+                is LoadingBoxSize.FillMaxSize -> fillMaxSize()
+                is LoadingBoxSize.FixedHeight -> heightIn(min = size.minHeight)
             }
         }
         .applyIf(isLoading) { shimmerEffect() },

@@ -32,6 +32,8 @@ internal fun FetchCard(
 
     AppLoadingBox(
         isLoading = state.videoMetadataUiState is UiState.Loading,
+        isError = state.videoMetadataUiState is UiState.Error,
+        onErrorButtonClick = { onUiIntent(FetchStreamUiIntent.Retry.ClearMetaOnFailure) },
         size = LoadingBoxSize.FixedHeight(FetchCardMinHeight),
         modifier = modifier
             .simpleShadow(

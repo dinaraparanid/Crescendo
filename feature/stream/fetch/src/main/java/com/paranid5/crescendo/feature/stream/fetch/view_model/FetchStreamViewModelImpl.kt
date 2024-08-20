@@ -37,21 +37,26 @@ internal class FetchStreamViewModelImpl(
 
     override fun onUiIntent(intent: FetchStreamUiIntent) = when (intent) {
         is FetchStreamUiIntent.UpdateUrl -> updateState { copy(url = intent.url) }
-        is FetchStreamUiIntent.RefreshCover -> refreshCover()
         is FetchStreamUiIntent.Buttons -> onButtonsUiIntent(intent = intent)
+        is FetchStreamUiIntent.Retry -> onRetryUiIntent(intent = intent)
     }
 
     private fun onButtonsUiIntent(intent: FetchStreamUiIntent.Buttons) = when (intent) {
         is FetchStreamUiIntent.Buttons.ContinueClick -> fetchMetadata()
-
-        is FetchStreamUiIntent.Buttons.NextClick -> updateState {
-            copy(
-                videoMetadataUiState = UiState.Initial,
-                coverUiState = UiState.Initial,
-            )
-        }
-
+        is FetchStreamUiIntent.Buttons.NextClick -> resetUiStates()
         is FetchStreamUiIntent.Buttons.StartStreaming -> startStreaming()
+    }
+
+    private fun onRetryUiIntent(intent: FetchStreamUiIntent.Retry) = when (intent) {
+        is FetchStreamUiIntent.Retry.ClearMetaOnFailure -> resetUiStates()
+        is FetchStreamUiIntent.Retry.RefreshCover -> refreshCover()
+    }
+
+    private fun resetUiStates() = updateState {
+        copy(
+            videoMetadataUiState = UiState.Initial,
+            coverUiState = UiState.Initial,
+        )
     }
 
     private fun fetchMetadata() = viewModelScope.sideEffect(Dispatchers.Default) {

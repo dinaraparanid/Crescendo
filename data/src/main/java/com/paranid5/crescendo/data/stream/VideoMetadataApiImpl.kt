@@ -2,10 +2,10 @@ package com.paranid5.crescendo.data.stream
 
 import android.content.Context
 import arrow.core.Either
-import com.paranid5.crescendo.core.common.metadata.VideoMetadata
+import arrow.core.flatMap
 import com.paranid5.crescendo.core.media.metadata.VideoMetadata.fromYtMeta
 import com.paranid5.crescendo.domain.stream.VideoMetadataApi
-import com.paranid5.yt_url_extractor_kt.VideoMeta
+import com.paranid5.crescendo.utils.extensions.toEither
 import com.paranid5.yt_url_extractor_kt.extractYtFilesWithMeta
 import io.ktor.client.HttpClient
 import kotlinx.coroutines.withTimeout
@@ -19,7 +19,7 @@ internal class VideoMetadataApiImpl(
     }
 
     override suspend fun getVideoMetadata(url: String) =
-        extractYtFilesWithMeta(url).map { it.videoMeta.getOrDefault() }
+        extractYtFilesWithMeta(url).flatMap { it.videoMeta.map(::fromYtMeta).toEither() }
 
     private suspend inline fun extractYtFilesWithMeta(url: String) =
         Either.catch {
@@ -30,6 +30,3 @@ internal class VideoMetadataApiImpl(
             }
         }
 }
-
-private fun Result<VideoMeta>.getOrDefault() =
-    fold(onSuccess = ::fromYtMeta, onFailure = { VideoMetadata() })

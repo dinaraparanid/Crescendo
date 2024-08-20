@@ -45,7 +45,7 @@ internal fun MetaContainer(
 
     AppClippedCover(
         coverUiState = coverUiState,
-        onRetry = { onUiIntent(FetchStreamUiIntent.RefreshCover) },
+        onRetry = { onUiIntent(FetchStreamUiIntent.Retry.RefreshCover) },
         modifier = Modifier
             .height(ImageHeight)
             .align(Alignment.CenterHorizontally)
