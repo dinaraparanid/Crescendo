@@ -28,7 +28,7 @@ internal fun FetchCard(
     val shape = RoundedCornerShape(AppTheme.dimensions.corners.small)
 
     AppLoadingBox(
-        isLoading = state.uiState is UiState.Loading,
+        isLoading = state.videoMetadataUiState is UiState.Loading,
         minHeight = FetchCardMinHeight,
         modifier = modifier
             .simpleShadow(

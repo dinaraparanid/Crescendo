@@ -4,6 +4,7 @@ import android.os.Parcelable
 import androidx.compose.runtime.Immutable
 import com.paranid5.crescendo.ui.foundation.UiState
 import com.paranid5.crescendo.ui.foundation.isOk
+import com.paranid5.crescendo.ui.metadata.VideoMetadataUiState
 import kotlinx.parcelize.IgnoredOnParcel
 import kotlinx.parcelize.Parcelize
 
@@ -11,7 +12,7 @@ import kotlinx.parcelize.Parcelize
 @Immutable
 data class FetchStreamState(
     val url: String = "",
-    val uiState: UiState<Unit> = UiState.Initial,
+    val videoMetadataUiState: UiState<VideoMetadataUiState> = UiState.Initial,
 ) : Parcelable {
     @IgnoredOnParcel
     val isCancelInputVisible = url.isNotEmpty()
@@ -20,8 +21,8 @@ data class FetchStreamState(
     val isContinueButtonEnabled = url.isNotBlank()
 
     @IgnoredOnParcel
-    val isError = uiState is UiState.Error
+    val isError = videoMetadataUiState is UiState.Error
 
     @IgnoredOnParcel
-    val isUrlMangerVisible = uiState.isOk
+    val isUrlMangerVisible = videoMetadataUiState.isOk
 }

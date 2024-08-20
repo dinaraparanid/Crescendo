@@ -1,4 +1,4 @@
-package com.paranid5.crescendo.data.ktor_client
+package com.paranid5.crescendo.data.ktor
 
 import io.ktor.client.HttpClient
 import io.ktor.client.engine.okhttp.OkHttp

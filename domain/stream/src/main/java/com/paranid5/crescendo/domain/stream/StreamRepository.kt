@@ -6,4 +6,5 @@ interface StreamRepository :
     DownloadingUrlSubscriber,
     DownloadingUrlPublisher,
     PlayingStreamUrlSubscriber,
-    PlayingStreamUrlPublisher
+    PlayingStreamUrlPublisher,
+    VideoMetadataApi

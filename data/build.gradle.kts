@@ -47,6 +47,7 @@ android {
 dependencies {
     api(project(":core:common"))
     api(project(":core:utils"))
+    api(project(":core:media"))
     api(project(":core:resources"))
 
     api(project(":domain:audio_effects"))
@@ -75,4 +76,6 @@ dependencies {
 
     implementation(libs.sqldelight.android.driver)
     implementation(libs.sqldelight.coroutines.extensions)
+
+    implementation(libs.yt.url.extractor.kt)
 }
