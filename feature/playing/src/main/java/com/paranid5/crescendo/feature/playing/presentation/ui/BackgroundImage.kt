@@ -10,7 +10,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.stringResource
 import coil.compose.AsyncImage
-import com.paranid5.crescendo.core.common.AudioStatus
+import com.paranid5.crescendo.core.common.PlaybackStatus
 import com.paranid5.crescendo.core.media.images.ImageSize
 import com.paranid5.crescendo.core.resources.R
 import com.paranid5.crescendo.core.resources.ui.theme.AppTheme.dimensions
@@ -19,18 +19,18 @@ import com.paranid5.crescendo.ui.covers.videoCoverModel
 import com.paranid5.crescendo.utils.extensions.increaseDarkness
 
 @Composable
-internal fun BackgroundImage(audioStatus: AudioStatus, modifier: Modifier = Modifier) {
+internal fun BackgroundImage(playbackStatus: PlaybackStatus, modifier: Modifier = Modifier) {
     val config = LocalConfiguration.current
 
-    val coverModel = when (audioStatus) {
-        AudioStatus.STREAMING -> videoCoverModel(
+    val coverModel = when (playbackStatus) {
+        PlaybackStatus.STREAMING -> videoCoverModel(
             isPlaceholderRequired = false,
             size = ImageSize(config.screenWidthDp, config.screenHeightDp),
             isBlured = Build.VERSION.SDK_INT < Build.VERSION_CODES.S,
             bitmapSettings = Bitmap::increaseDarkness,
         )
 
-        AudioStatus.PLAYING -> currentTrackCoverModel(
+        PlaybackStatus.PLAYING -> currentTrackCoverModel(
             isPlaceholderRequired = false,
             size = ImageSize(config.screenWidthDp, config.screenHeightDp),
             isBlured = Build.VERSION.SDK_INT < Build.VERSION_CODES.S,

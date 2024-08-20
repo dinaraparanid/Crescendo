@@ -86,7 +86,7 @@ private val featureModule = module {
         streamModule, playingModule,
         audioEffectsModule, trimmerModule,
         tracksModule, currentPlaylistModule,
-        cacheModule, playModule
+        cacheModule, playModule,
     )
 }
 

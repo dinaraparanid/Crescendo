@@ -8,7 +8,7 @@ import com.paranid5.crescendo.audio_effects.domain.updatedEQBandLevels
 import com.paranid5.crescendo.audio_effects.presentation.ui.entity.EqualizerUiState
 import com.paranid5.crescendo.audio_effects.view_model.AudioEffectsUiIntent.Lifecycle
 import com.paranid5.crescendo.audio_effects.view_model.AudioEffectsUiIntent.UpdateData
-import com.paranid5.crescendo.core.common.AudioStatus
+import com.paranid5.crescendo.core.common.PlaybackStatus
 import com.paranid5.crescendo.core.common.udf.StatePublisher
 import com.paranid5.crescendo.core.common.udf.state
 import com.paranid5.crescendo.domain.audio_effects.AudioEffectsRepository
@@ -84,7 +84,7 @@ internal class AudioEffectsViewModelImpl(
     private fun subscribeOnDataUpdates() {
         dataUpdatesJob = viewModelScope.launch(Dispatchers.Default) {
             combine(
-                playbackRepository.audioStatusFlow,
+                playbackRepository.playbackStatusFlow,
                 audioEffectsRepository.areAudioEffectsEnabledFlow,
                 audioEffectsRepository.bassStrengthFlow,
                 audioEffectsRepository.reverbPresetFlow,
@@ -93,7 +93,7 @@ internal class AudioEffectsViewModelImpl(
                 audioEffectsRepository.equalizerState,
             ) { params ->
                 AudioEffectsState(
-                    audioStatus = params[0] as AudioStatus?,
+                    playbackStatus = params[0] as PlaybackStatus?,
                     areAudioEffectsEnabled = params[1] as Boolean,
                     bassStrength = params[2] as Short,
                     reverbPreset = params[3] as Short,

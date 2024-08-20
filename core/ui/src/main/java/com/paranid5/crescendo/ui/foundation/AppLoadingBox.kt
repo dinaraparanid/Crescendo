@@ -24,10 +24,16 @@ import com.paranid5.crescendo.core.resources.ui.theme.AppTheme.colors
 import com.paranid5.crescendo.ui.utils.applyIf
 import com.paranid5.crescendo.ui.utils.shimmerEffect
 
+sealed interface LoadingBoxSize {
+    data object FillMaxSize : LoadingBoxSize
+
+    data class FixedHeight(val minHeight: Dp) : LoadingBoxSize
+}
+
 @Composable
 fun AppLoadingBox(
     isLoading: Boolean,
-    minHeight: Dp,
+    size: LoadingBoxSize,
     modifier: Modifier = Modifier,
     isError: Boolean = false,
     onErrorButtonClick: (() -> Unit)? = null,
@@ -41,7 +47,12 @@ fun AppLoadingBox(
     contentAlignment = contentAlignment,
     propagateMinConstraints = propagateMinConstraints,
     modifier = modifier
-        .heightIn(min = minHeight)
+        .let {
+            when (size) {
+                is LoadingBoxSize.FillMaxSize -> it.fillMaxSize()
+                is LoadingBoxSize.FixedHeight -> it.heightIn(min = size.minHeight)
+            }
+        }
         .applyIf(isLoading) { shimmerEffect() },
 ) {
     if (isLoading.not()) {
@@ -73,7 +84,7 @@ fun AppLoadingBoxError(
 ) {
     Text(
         text = errorText,
-        color = AppTheme.colors.text.primary,
+        color = colors.text.primary,
         style = AppTheme.typography.caption,
     )
 
@@ -82,16 +93,16 @@ fun AppLoadingBoxError(
 
         AppRippleButton(
             onClick = onErrorButtonClick,
-            rippleColor = AppTheme.colors.background.alternative,
+            rippleColor = colors.background.alternative,
             shape = RoundedCornerShape(AppTheme.dimensions.corners.small),
             colors = ButtonDefaults.buttonColors(
-                containerColor = AppTheme.colors.background.alternative,
-                disabledContainerColor = AppTheme.colors.background.alternative,
+                containerColor = colors.background.alternative,
+                disabledContainerColor = colors.background.alternative,
             )
         ) {
             Text(
                 text = errorButtonText,
-                color = AppTheme.colors.selection.selected,
+                color = colors.text.secondary,
                 style = AppTheme.typography.caption,
             )
         }

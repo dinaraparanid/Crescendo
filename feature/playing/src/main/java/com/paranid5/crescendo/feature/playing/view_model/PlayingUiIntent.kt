@@ -1,13 +1,13 @@
 package com.paranid5.crescendo.feature.playing.view_model
 
-import com.paranid5.crescendo.core.common.AudioStatus
+import com.paranid5.crescendo.core.common.PlaybackStatus
 import com.paranid5.crescendo.core.common.tracks.Track
 
 sealed interface PlayingUiIntent {
 
     sealed interface UpdateState : PlayingUiIntent {
         data class UpdateUiParams(
-            val screenAudioStatus: AudioStatus,
+            val screenPlaybackStatus: PlaybackStatus,
             val coverAlpha: Float,
         ) : UpdateState
 

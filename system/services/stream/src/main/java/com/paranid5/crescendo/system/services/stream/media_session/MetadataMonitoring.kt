@@ -4,7 +4,7 @@ import android.content.Context
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.repeatOnLifecycle
 import com.paranid5.crescendo.core.common.metadata.VideoMetadata
-import com.paranid5.crescendo.core.media.images.getVideoCoverBitmapAsync
+import com.paranid5.crescendo.core.media.images.getVideoCoverBitmapOrThumbnailAsync
 import com.paranid5.crescendo.system.services.stream.StreamService
 import com.paranid5.crescendo.utils.extensions.toAndroidMetadata
 import kotlinx.coroutines.flow.collectLatest
@@ -23,4 +23,4 @@ internal suspend fun StreamService.startMetadataMonitoring() =
     }
 
 private suspend inline fun VideoMetadata.toAndroidMetadata(context: Context) =
-    toAndroidMetadata(getVideoCoverBitmapAsync(context, this).await())
+    toAndroidMetadata(getVideoCoverBitmapOrThumbnailAsync(context = context, videoCovers = covers).await())

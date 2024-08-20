@@ -1,6 +1,6 @@
 package com.paranid5.crescendo.feature.playing.domain
 
-import com.paranid5.crescendo.core.common.AudioStatus
+import com.paranid5.crescendo.core.common.PlaybackStatus
 import com.paranid5.crescendo.domain.playback.PlaybackRepository
 import com.paranid5.crescendo.domain.playback.PlaybackRepository.Companion.UNDEFINED_AUDIO_SESSION_ID
 import com.paranid5.crescendo.system.services.stream.StreamServiceAccessor
@@ -16,17 +16,17 @@ internal class PlayingInteractor(
     private val trackServiceInteractor: TrackServiceInteractor,
     private val playbackRepository: PlaybackRepository,
 ) {
-    fun sendOnPrevButtonClickedBroadcast(audioStatus: AudioStatus) = audioStatus.fold(
+    fun sendOnPrevButtonClickedBroadcast(playbackStatus: PlaybackStatus) = playbackStatus.fold(
         ifStream = streamServiceAccessor::sendSeekTo10SecsBackBroadcast,
         ifTrack = trackServiceInteractor::sendSwitchToPrevTrackBroadcast,
     )
 
-    fun sendOnNextButtonClickedBroadcast(audioStatus: AudioStatus) = audioStatus.fold(
+    fun sendOnNextButtonClickedBroadcast(playbackStatus: PlaybackStatus) = playbackStatus.fold(
         ifStream = streamServiceAccessor::sendSeekTo10SecsForwardBroadcast,
         ifTrack = trackServiceInteractor::sendSwitchToNextTrackBroadcast,
     )
 
-    fun sendSeekToBroadcast(audioStatus: AudioStatus, position: Long) = audioStatus.fold(
+    fun sendSeekToBroadcast(playbackStatus: PlaybackStatus, position: Long) = playbackStatus.fold(
         ifStream = { streamServiceAccessor.sendSeekToBroadcast(position) },
         ifTrack = { trackServiceInteractor.sendSeekToBroadcast(position) },
     )
@@ -34,22 +34,22 @@ internal class PlayingInteractor(
     fun sendSeekToLiveStreamRealPosition() =
         streamServiceAccessor.sendSeekToBroadcast(position = 0)
 
-    fun sendPauseBroadcast(audioStatus: AudioStatus) = audioStatus.fold(
+    fun sendPauseBroadcast(playbackStatus: PlaybackStatus) = playbackStatus.fold(
         ifStream = streamServiceAccessor::sendPauseBroadcast,
         ifTrack = trackServiceInteractor::sendPauseBroadcast,
     )
 
-    fun startStreamingOrSendResumeBroadcast(audioStatus: AudioStatus) = audioStatus.fold(
+    fun startStreamingOrSendResumeBroadcast(playbackStatus: PlaybackStatus) = playbackStatus.fold(
         ifStream = streamServiceAccessor::startStreamingOrSendResumeBroadcast,
         ifTrack = trackServiceInteractor::startStreamingOrSendResumeBroadcast,
     )
 
-    fun sendChangeRepeatBroadcast(audioStatus: AudioStatus) = audioStatus.fold(
+    fun sendChangeRepeatBroadcast(playbackStatus: PlaybackStatus) = playbackStatus.fold(
         ifStream = streamServiceAccessor::sendChangeRepeatBroadcast,
         ifTrack = trackServiceInteractor::sendChangeRepeatBroadcast,
     )
 
-    suspend fun updateSeekToPosition(audioStatus: AudioStatus, position: Long) = audioStatus.fold(
+    suspend fun updateSeekToPosition(playbackStatus: PlaybackStatus, position: Long) = playbackStatus.fold(
         ifStream = { playbackRepository.updateStreamPlaybackPosition(position = position) },
         ifTrack = { playbackRepository.updateTracksPlaybackPosition(position = position) },
     )

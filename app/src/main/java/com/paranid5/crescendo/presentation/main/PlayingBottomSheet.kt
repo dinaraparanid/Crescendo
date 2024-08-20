@@ -29,7 +29,7 @@ import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import arrow.core.raise.nullable
-import com.paranid5.crescendo.core.common.AudioStatus
+import com.paranid5.crescendo.core.common.PlaybackStatus
 import com.paranid5.crescendo.core.common.navigation.LocalNavigator
 import com.paranid5.crescendo.core.resources.R
 import com.paranid5.crescendo.core.resources.ui.theme.AppTheme.colors
@@ -112,14 +112,14 @@ internal fun PlayingBottomSheet(
                 when (page) {
                     0 -> PlayingScreen(
                         coverAlpha = 1 - alpha,
-                        screenAudioStatus = AudioStatus.PLAYING,
+                        screenPlaybackStatus = PlaybackStatus.PLAYING,
                         modifier = modifier.fillMaxSize(),
                         onScreenEffect = ::onScreenEffect,
                     )
 
                     else -> PlayingScreen(
                         coverAlpha = 1 - alpha,
-                        screenAudioStatus = AudioStatus.STREAMING,
+                        screenPlaybackStatus = PlaybackStatus.STREAMING,
                         modifier = modifier.fillMaxSize(),
                         onScreenEffect = ::onScreenEffect,
                     )

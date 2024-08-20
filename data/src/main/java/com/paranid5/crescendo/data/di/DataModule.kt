@@ -1,6 +1,7 @@
 package com.paranid5.crescendo.data.di
 
 import com.paranid5.crescendo.data.audio_effects.di.audioEffectsModule
+import com.paranid5.crescendo.data.cover.di.coverRetrieverModule
 import com.paranid5.crescendo.data.current_playlist.di.currentPlaylistModule
 import com.paranid5.crescendo.data.datastore.di.dataStoreModule
 import com.paranid5.crescendo.data.github.di.gitHubModule
@@ -24,5 +25,6 @@ val dataModule = module {
         waveformModule,
         webModule,
         gitHubModule,
+        coverRetrieverModule,
     )
 }

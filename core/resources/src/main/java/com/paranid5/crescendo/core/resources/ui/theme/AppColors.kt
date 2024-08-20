@@ -155,29 +155,29 @@ data class AppSelectionColors(
 @Immutable
 data class AppTextColors(
     val primary: Color,
+    val secondary: Color,
+    val tertiriary: Color,
     val onCard: Color,
     val onSearchBar: Color,
     val onTextField: Color,
-    val onButton: Color,
-    val tertiriary: Color,
 ) {
     companion object {
         internal val dark = AppTextColors(
             primary = Color.White,
+            secondary = PaleCornflowerBlue,
+            tertiriary = TertiriaryDark,
             onCard = DarkPurple,
             onSearchBar = DarkPurple,
             onTextField = PaleCornflowerBlue,
-            onButton = PaleCornflowerBlue,
-            tertiriary = TertiriaryDark,
         )
 
         internal val light = AppTextColors(
             primary = Color.Black,
+            secondary = SlateGray,
+            tertiriary = TertiriaryLight,
             onCard = TiffanyBlue,
             onSearchBar = Color.Black,
             onTextField = SlateGray,
-            onButton = SlateGray,
-            tertiriary = TertiriaryLight,
         )
     }
 }

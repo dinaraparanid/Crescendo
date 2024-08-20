@@ -7,19 +7,32 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
 
-suspend inline fun getVideoCoverBitmapAsync(
+suspend inline fun getVideoCoverBitmapOrThumbnailAsync(
     context: Context,
-    videoMetadata: VideoMetadata,
+    videoCovers: List<String>,
     size: ImageSize? = null,
     crossinline bitmapSettings: (Bitmap) -> Unit = {}
 ) = coroutineScope {
     async(Dispatchers.IO) {
-        videoMetadata
-            .covers
+        videoCovers
             .map { getBitmapFromUrlCatching(context, it, size, bitmapSettings) }
             .firstOrNull { it.isRight() }
             ?.getOrNull()
             ?: getThumbnailBitmap(context)
+    }
+}
+
+suspend inline fun getVideoCoverBitmapAsync(
+    context: Context,
+    videoCovers: List<String>,
+    size: ImageSize? = null,
+    crossinline bitmapSettings: (Bitmap) -> Unit = {}
+) = coroutineScope {
+    async(Dispatchers.IO) {
+        videoCovers
+            .map { getBitmapFromUrlCatching(context, it, size, bitmapSettings) }
+            .firstOrNull { it.isRight() }
+            ?.getOrNull()
     }
 }
 

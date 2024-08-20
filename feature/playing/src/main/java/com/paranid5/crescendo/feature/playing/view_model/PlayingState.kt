@@ -3,7 +3,7 @@ package com.paranid5.crescendo.feature.playing.view_model
 import android.os.Parcelable
 import androidx.compose.runtime.Immutable
 import arrow.core.raise.nullable
-import com.paranid5.crescendo.core.common.AudioStatus
+import com.paranid5.crescendo.core.common.PlaybackStatus
 import com.paranid5.crescendo.ui.metadata.VideoMetadataUiState
 import com.paranid5.crescendo.ui.track.ui_state.TrackUiState
 import kotlinx.parcelize.IgnoredOnParcel
@@ -16,8 +16,8 @@ data class PlayingState(
     val isPlaying: Boolean = false,
     val isRepeating: Boolean = false,
     val isLiked: Boolean = false,
-    val actualAudioStatus: AudioStatus? = null,
-    val screenAudioStatus: AudioStatus? = null,
+    val actualPlaybackStatus: PlaybackStatus? = null,
+    val screenPlaybackStatus: PlaybackStatus? = null,
     val currentTrack: TrackUiState? = null,
     val currentMetadata: VideoMetadataUiState? = null,
     val playingStreamUrl: String = "",
@@ -34,25 +34,25 @@ data class PlayingState(
     private val trackDurationMillis = currentTrack?.durationMillis ?: 0
 
     @IgnoredOnParcel
-    val playbackPosition = when (actualAudioStatus) {
-        AudioStatus.STREAMING -> streamPlaybackPosition
-        AudioStatus.PLAYING -> trackPlaybackPosition
+    val playbackPosition = when (actualPlaybackStatus) {
+        PlaybackStatus.STREAMING -> streamPlaybackPosition
+        PlaybackStatus.PLAYING -> trackPlaybackPosition
         null -> 0
     }
 
     @IgnoredOnParcel
-    val durationMillis = when (actualAudioStatus) {
-        AudioStatus.STREAMING -> streamDurationMillis
-        AudioStatus.PLAYING -> trackDurationMillis
+    val durationMillis = when (actualPlaybackStatus) {
+        PlaybackStatus.STREAMING -> streamDurationMillis
+        PlaybackStatus.PLAYING -> trackDurationMillis
         null -> 0
     }
 
     @IgnoredOnParcel
     val isLiveStreaming =
-        screenAudioStatus == AudioStatus.STREAMING && currentMetadata?.isLiveStream == true
+        screenPlaybackStatus == PlaybackStatus.STREAMING && currentMetadata?.isLiveStream == true
 
     @IgnoredOnParcel
     val isScreenAudioStatusActual = nullable {
-        actualAudioStatus.bind() == screenAudioStatus.bind()
+        actualPlaybackStatus.bind() == screenPlaybackStatus.bind()
     } ?: false
 }

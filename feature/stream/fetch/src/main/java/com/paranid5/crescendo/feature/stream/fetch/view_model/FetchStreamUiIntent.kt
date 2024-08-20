@@ -2,5 +2,13 @@ package com.paranid5.crescendo.feature.stream.fetch.view_model
 
 sealed interface FetchStreamUiIntent {
     data class UpdateUrl(val url: String) : FetchStreamUiIntent
-    data object ContinueClick : FetchStreamUiIntent
+
+    sealed interface Buttons : FetchStreamUiIntent {
+        data object ContinueClick : Buttons
+        data object PlayClick : Buttons
+        data object DownloadClick : Buttons
+        data object NextClick : Buttons
+    }
+
+    data object RefreshCover : FetchStreamUiIntent
 }

@@ -58,6 +58,7 @@ dependencies {
     api(project(":domain:waveform"))
     api(project(":domain:web"))
     api(project(":domain:github"))
+    api(project(":domain:cover"))
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)

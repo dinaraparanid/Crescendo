@@ -43,7 +43,7 @@ internal fun PlayerNotificationManager(service: TrackService) =
         .setCustomActionReceiver(CustomActionsReceiver(service))
         .setFastForwardActionIconResourceId(R.drawable.ic_music_next)
         .setRewindActionIconResourceId(R.drawable.ic_music_previous)
-        .setPlayActionIconResourceId(R.drawable.ic_play)
+        .setPlayActionIconResourceId(R.drawable.ic_play_filled)
         .setPauseActionIconResourceId(R.drawable.ic_pause)
         .build()
         .apply {

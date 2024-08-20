@@ -4,7 +4,7 @@ import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.intPreferencesKey
 import androidx.datastore.preferences.core.longPreferencesKey
-import com.paranid5.crescendo.core.common.AudioStatus
+import com.paranid5.crescendo.core.common.PlaybackStatus
 import kotlinx.coroutines.flow.map
 
 internal class PlaybackDataStore(dataStoreProvider: DataStoreProvider) {
@@ -57,15 +57,15 @@ internal class PlaybackDataStore(dataStoreProvider: DataStoreProvider) {
         }
     }
 
-    val audioStatusFlow by lazy {
+    val playbackStatusFlow by lazy {
         dataStore.data
             .map { preferences -> preferences[AUDIO_STATUS] }
-            .map { audioStatusInd -> audioStatusInd?.let { AudioStatus.entries[it] } }
+            .map { audioStatusInd -> audioStatusInd?.let { PlaybackStatus.entries[it] } }
     }
 
-    suspend fun storeAudioStatus(audioStatus: AudioStatus) {
+    suspend fun storeAudioStatus(playbackStatus: PlaybackStatus) {
         dataStore.edit { preferences ->
-            preferences[AUDIO_STATUS] = audioStatus.ordinal
+            preferences[AUDIO_STATUS] = playbackStatus.ordinal
         }
     }
 }

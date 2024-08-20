@@ -6,7 +6,7 @@ import com.paranid5.crescendo.domain.playback.AudioStatusSubscriber
 internal class AudioStatusSubscriberImpl(
     playbackDataStore: PlaybackDataStore
 ) : AudioStatusSubscriber {
-    override val audioStatusFlow by lazy {
-        playbackDataStore.audioStatusFlow
+    override val playbackStatusFlow by lazy {
+        playbackDataStore.playbackStatusFlow
     }
 }

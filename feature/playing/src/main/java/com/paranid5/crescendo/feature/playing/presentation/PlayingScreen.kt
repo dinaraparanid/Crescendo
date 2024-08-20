@@ -6,7 +6,7 @@ import androidx.compose.runtime.NonRestartableComposable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalConfiguration
-import com.paranid5.crescendo.core.common.AudioStatus
+import com.paranid5.crescendo.core.common.PlaybackStatus
 import com.paranid5.crescendo.feature.playing.presentation.effect.LifecycleEffect
 import com.paranid5.crescendo.feature.playing.presentation.effect.ScreenEffect
 import com.paranid5.crescendo.feature.playing.presentation.effect.UpdateUiParamsEffect
@@ -22,7 +22,7 @@ import org.koin.androidx.compose.koinViewModel
 @NonRestartableComposable
 @Composable
 fun PlayingScreen(
-    screenAudioStatus: AudioStatus,
+    screenPlaybackStatus: PlaybackStatus,
     coverAlpha: Float,
     modifier: Modifier = Modifier,
     viewModel: PlayingViewModel = koinViewModel<PlayingViewModelImpl>(),
@@ -35,7 +35,7 @@ fun PlayingScreen(
     LifecycleEffect(onUiIntent = onUiIntent)
 
     UpdateUiParamsEffect(
-        screenAudioStatus = screenAudioStatus,
+        screenPlaybackStatus = screenPlaybackStatus,
         coverAlpha = coverAlpha,
         onUiIntent = onUiIntent,
     )

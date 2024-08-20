@@ -8,10 +8,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import com.paranid5.crescendo.core.resources.ui.theme.AppTheme.dimensions
-import com.paranid5.crescendo.feature.stream.fetch.presentation.ui.ContinueButton
+import com.paranid5.crescendo.feature.stream.fetch.presentation.ui.ButtonsContainer
 import com.paranid5.crescendo.feature.stream.fetch.presentation.ui.FetchCard
 import com.paranid5.crescendo.feature.stream.fetch.presentation.ui.HowToUseCard
-import com.paranid5.crescendo.feature.stream.fetch.view_model.FetchStreamUiIntent
 import com.paranid5.crescendo.feature.stream.fetch.view_model.FetchStreamViewModel
 import com.paranid5.crescendo.feature.stream.fetch.view_model.FetchStreamViewModelImpl
 import com.paranid5.crescendo.utils.extensions.collectLatestAsState
@@ -34,12 +33,11 @@ fun FetchStreamScreen(
 
         Spacer(Modifier.height(dimensions.padding.extraMedium))
 
-        ContinueButton(
+        ButtonsContainer(
             state = state,
+            onUiIntent = onUiIntent,
             modifier = Modifier.fillMaxWidth(),
-        ) {
-            onUiIntent(FetchStreamUiIntent.ContinueClick)
-        }
+        )
 
         Spacer(Modifier.height(dimensions.padding.large))
 

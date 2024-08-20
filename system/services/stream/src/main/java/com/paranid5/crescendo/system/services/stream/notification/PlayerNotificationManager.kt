@@ -12,7 +12,7 @@ import androidx.media3.common.util.NotificationUtil
 import androidx.media3.common.util.UnstableApi
 import androidx.media3.ui.PlayerNotificationManager
 import com.paranid5.crescendo.core.media.images.getThumbnailBitmap
-import com.paranid5.crescendo.core.media.images.getVideoCoverBitmapAsync
+import com.paranid5.crescendo.core.media.images.getVideoCoverBitmapOrThumbnailAsync
 import com.paranid5.crescendo.core.resources.R
 import com.paranid5.crescendo.system.common.intent.mainActivityIntent
 import com.paranid5.crescendo.system.services.stream.ACTION_DISMISS
@@ -42,7 +42,7 @@ internal fun PlayerNotificationManager(service: StreamService) =
         .setCustomActionReceiver(CustomActionsReceiver(service))
         .setFastForwardActionIconResourceId(R.drawable.ic_music_next)
         .setRewindActionIconResourceId(R.drawable.ic_music_previous)
-        .setPlayActionIconResourceId(R.drawable.ic_play)
+        .setPlayActionIconResourceId(R.drawable.ic_play_filled)
         .setPauseActionIconResourceId(R.drawable.ic_pause)
         .build()
         .apply {
@@ -141,7 +141,7 @@ private inline val StreamService.metadata
 
 private suspend inline fun NotificationManager.getVideoCoverBitmapAsync(context: Context) =
     currentMetadataState.value
-        ?.let { getVideoCoverBitmapAsync(context = context, videoMetadata = it) }
+        ?.let { getVideoCoverBitmapOrThumbnailAsync(context = context, videoCovers = it.covers) }
         ?: coroutineScope { async(Dispatchers.IO) { getThumbnailBitmap(context) } }
 
 private fun CustomActions(repeatMode: Int) = mutableListOf(

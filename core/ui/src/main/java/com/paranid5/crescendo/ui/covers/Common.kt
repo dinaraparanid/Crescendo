@@ -1,29 +1,49 @@
 package com.paranid5.crescendo.ui.covers
 
+import android.content.Context
 import android.graphics.drawable.BitmapDrawable
 import androidx.compose.runtime.Composable
 import androidx.palette.graphics.Palette
+import coil.request.CachePolicy
 import coil.request.ImageRequest
-import com.paranid5.crescendo.core.common.AudioStatus
+import coil.size.Precision
+import coil.size.Scale
+import com.paranid5.crescendo.core.common.PlaybackStatus
 import com.paranid5.crescendo.core.media.images.ImageSize
 import com.paranid5.crescendo.core.resources.R
 import com.paranid5.crescendo.utils.BlurTransformation
 
+private const val DefaultAnimationDuration = 400
+
 @Composable
-fun coverModelWithPalette(
-    audioStatus: AudioStatus,
+fun mediaCoverModelWithPalette(
+    playbackStatus: PlaybackStatus,
     size: ImageSize,
-): Pair<ImageRequest, Palette?> = when (audioStatus) {
-    AudioStatus.STREAMING -> videoCoverModelWithPalette(
+): Pair<ImageRequest, Palette?> = when (playbackStatus) {
+    PlaybackStatus.STREAMING -> videoCoverModelWithPalette(
         isPlaceholderRequired = false,
         size = size,
     )
 
-    AudioStatus.PLAYING -> currentTrackCoverModelWithPalette(
+    PlaybackStatus.PLAYING -> currentTrackCoverModelWithPalette(
         isPlaceholderRequired = false,
         size = size,
     )
 }
+
+fun coverModel(
+    data: Any?,
+    context: Context,
+    animationMillis: Int = DefaultAnimationDuration,
+): ImageRequest = ImageRequest.Builder(context)
+    .data(data)
+    .networkCachePolicy(CachePolicy.ENABLED)
+    .diskCachePolicy(CachePolicy.ENABLED)
+    .memoryCachePolicy(CachePolicy.ENABLED)
+    .precision(Precision.EXACT)
+    .scale(Scale.FILL)
+    .crossfade(animationMillis)
+    .build()
 
 internal fun ImageRequest.Builder.prevCoverPlaceholder(prevCoverModel: BitmapDrawable?) =
     when (prevCoverModel) {

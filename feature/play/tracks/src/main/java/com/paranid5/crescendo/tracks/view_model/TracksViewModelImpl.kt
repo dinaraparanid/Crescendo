@@ -3,7 +3,7 @@ package com.paranid5.crescendo.tracks.view_model
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.paranid5.crescendo.core.common.AudioStatus
+import com.paranid5.crescendo.core.common.PlaybackStatus
 import com.paranid5.crescendo.core.common.tracks.DefaultTrack
 import com.paranid5.crescendo.core.common.tracks.Track
 import com.paranid5.crescendo.core.common.tracks.sortedBy
@@ -109,7 +109,7 @@ internal class TracksViewModelImpl(
         val currentTrack = state.currentTrack
 
         viewModelScope.launch {
-            playbackRepository.updateAudioStatus(audioStatus = AudioStatus.PLAYING)
+            playbackRepository.updateAudioStatus(playbackStatus = PlaybackStatus.PLAYING)
             currentPlaylistRepository.updateCurrentPlaylist(playlist = nextPlaylist)
             tracksRepository.updateCurrentTrackIndex(index = nextTrackIndex)
 

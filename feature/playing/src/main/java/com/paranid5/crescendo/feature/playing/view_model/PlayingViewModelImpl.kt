@@ -4,7 +4,7 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import arrow.core.raise.nullable
-import com.paranid5.crescendo.core.common.AudioStatus
+import com.paranid5.crescendo.core.common.PlaybackStatus
 import com.paranid5.crescendo.core.common.metadata.VideoMetadata
 import com.paranid5.crescendo.core.common.tracks.DefaultTrack
 import com.paranid5.crescendo.core.common.tracks.Track
@@ -58,7 +58,7 @@ internal class PlayingViewModelImpl(
     private fun onUpdateStateUiIntent(intent: PlayingUiIntent.UpdateState) = when (intent) {
         is PlayingUiIntent.UpdateState.UpdateUiParams -> updateState {
             copy(
-                screenAudioStatus = intent.screenAudioStatus,
+                screenPlaybackStatus = intent.screenPlaybackStatus,
                 coverAlpha = intent.coverAlpha,
             )
         }
@@ -103,37 +103,37 @@ internal class PlayingViewModelImpl(
     }
 
     private fun onSeekTo(position: Long) = nullable {
-        val audioStatus = state.screenAudioStatus.bind()
+        val audioStatus = state.screenPlaybackStatus.bind()
 
         viewModelScope.launch {
-            interactor.updateSeekToPosition(audioStatus = audioStatus, position = position)
+            interactor.updateSeekToPosition(playbackStatus = audioStatus, position = position)
         }
 
-        interactor.sendSeekToBroadcast(audioStatus = audioStatus, position = position)
+        interactor.sendSeekToBroadcast(playbackStatus = audioStatus, position = position)
     }
 
     private fun onPrevButtonClick() = nullable {
-        val audioStatus = state.screenAudioStatus.bind()
-        viewModelScope.launch { playbackRepository.updateAudioStatus(audioStatus = audioStatus) }
-        interactor.sendOnPrevButtonClickedBroadcast(audioStatus = audioStatus)
+        val audioStatus = state.screenPlaybackStatus.bind()
+        viewModelScope.launch { playbackRepository.updateAudioStatus(playbackStatus = audioStatus) }
+        interactor.sendOnPrevButtonClickedBroadcast(playbackStatus = audioStatus)
     }
 
     private fun onPauseButtonClick() = nullable {
-        val audioStatus = state.screenAudioStatus.bind()
-        viewModelScope.launch { playbackRepository.updateAudioStatus(audioStatus = audioStatus) }
-        interactor.sendPauseBroadcast(audioStatus = audioStatus)
+        val audioStatus = state.screenPlaybackStatus.bind()
+        viewModelScope.launch { playbackRepository.updateAudioStatus(playbackStatus = audioStatus) }
+        interactor.sendPauseBroadcast(playbackStatus = audioStatus)
     }
 
     private fun onPlayButtonClick() = nullable {
-        val audioStatus = state.screenAudioStatus.bind()
-        viewModelScope.launch { playbackRepository.updateAudioStatus(audioStatus = audioStatus) }
-        interactor.startStreamingOrSendResumeBroadcast(audioStatus = audioStatus)
+        val audioStatus = state.screenPlaybackStatus.bind()
+        viewModelScope.launch { playbackRepository.updateAudioStatus(playbackStatus = audioStatus) }
+        interactor.startStreamingOrSendResumeBroadcast(playbackStatus = audioStatus)
     }
 
     private fun onNextButtonClick() = nullable {
-        val audioStatus = state.screenAudioStatus.bind()
-        viewModelScope.launch { playbackRepository.updateAudioStatus(audioStatus = audioStatus) }
-        interactor.sendOnNextButtonClickedBroadcast(audioStatus = audioStatus)
+        val audioStatus = state.screenPlaybackStatus.bind()
+        viewModelScope.launch { playbackRepository.updateAudioStatus(playbackStatus = audioStatus) }
+        interactor.sendOnNextButtonClickedBroadcast(playbackStatus = audioStatus)
     }
 
     private fun onAudioEffectsClick() = when {
@@ -147,8 +147,8 @@ internal class PlayingViewModelImpl(
     }
 
     private fun onRepeatClick() = nullable {
-        val audioStatus = state.screenAudioStatus.bind()
-        interactor.sendChangeRepeatBroadcast(audioStatus = audioStatus)
+        val audioStatus = state.screenPlaybackStatus.bind()
+        interactor.sendChangeRepeatBroadcast(playbackStatus = audioStatus)
     }
 
     private fun addToPlaylist(track: Track) {
@@ -162,7 +162,7 @@ internal class PlayingViewModelImpl(
             combine(
                 playbackRepository.audioSessionIdState,
                 playbackRepository.isPlayingState,
-                playbackRepository.audioStatusFlow,
+                playbackRepository.playbackStatusFlow,
                 playbackRepository.streamPlaybackPositionFlow,
                 playbackRepository.tracksPlaybackPositionFlow,
                 playbackRepository.isRepeatingFlow,
@@ -173,7 +173,7 @@ internal class PlayingViewModelImpl(
                 PlayingState(
                     audioSessionId = params[0] as Int,
                     isPlaying = params[1] as Boolean,
-                    actualAudioStatus = params[2] as AudioStatus?,
+                    actualPlaybackStatus = params[2] as PlaybackStatus?,
                     streamPlaybackPosition = params[3] as Long,
                     trackPlaybackPosition = params[4] as Long,
                     isRepeating = params[5] as Boolean,
@@ -188,7 +188,7 @@ internal class PlayingViewModelImpl(
                     copy(
                         audioSessionId = mediator.audioSessionId,
                         isPlaying = mediator.isPlaying,
-                        actualAudioStatus = mediator.actualAudioStatus,
+                        actualPlaybackStatus = mediator.actualPlaybackStatus,
                         streamPlaybackPosition = mediator.streamPlaybackPosition,
                         trackPlaybackPosition = mediator.trackPlaybackPosition,
                         isRepeating = mediator.isRepeating,

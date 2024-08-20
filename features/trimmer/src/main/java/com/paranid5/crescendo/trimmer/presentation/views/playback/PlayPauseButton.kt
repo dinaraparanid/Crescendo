@@ -60,7 +60,7 @@ private fun PauseIcon(modifier: Modifier = Modifier) =
 @Composable
 private fun PlayIcon(modifier: Modifier = Modifier) =
     Icon(
-        painter = painterResource(id = R.drawable.ic_play),
+        painter = painterResource(id = R.drawable.ic_play_filled),
         contentDescription = stringResource(id = R.string.play),
         tint = colors.background.primary,
         modifier = modifier,

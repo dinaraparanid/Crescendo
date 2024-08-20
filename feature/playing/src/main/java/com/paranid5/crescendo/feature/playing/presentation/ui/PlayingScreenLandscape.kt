@@ -20,7 +20,7 @@ import com.paranid5.crescendo.feature.playing.presentation.ui.composition_local.
 import com.paranid5.crescendo.feature.playing.presentation.ui.kebab.KebabMenuButton
 import com.paranid5.crescendo.feature.playing.view_model.PlayingState
 import com.paranid5.crescendo.feature.playing.view_model.PlayingUiIntent
-import com.paranid5.crescendo.ui.covers.coverModelWithPalette
+import com.paranid5.crescendo.ui.covers.mediaCoverModelWithPalette
 import com.paranid5.crescendo.utils.extensions.getBrightDominantOrPrimary
 
 @Composable
@@ -30,11 +30,11 @@ internal fun PlayingScreenLandscape(
     modifier: Modifier = Modifier,
 ) = nullable {
     val appPadding = dimensions.padding
-    val audioStatus = state.screenAudioStatus.bind()
+    val audioStatus = state.screenPlaybackStatus.bind()
     var coverSize by remember { mutableStateOf(ImageSize(1, 1)) }
 
-    val (coverModel, palette) = coverModelWithPalette(
-        audioStatus = audioStatus,
+    val (coverModel, palette) = mediaCoverModelWithPalette(
+        playbackStatus = audioStatus,
         size = coverSize,
     )
 
@@ -51,7 +51,7 @@ internal fun PlayingScreenLandscape(
             ) = createRefs()
 
             BackgroundImage(
-                audioStatus = audioStatus,
+                playbackStatus = audioStatus,
                 modifier = Modifier
                     .fillMaxSize()
                     .alpha(state.coverAlpha),

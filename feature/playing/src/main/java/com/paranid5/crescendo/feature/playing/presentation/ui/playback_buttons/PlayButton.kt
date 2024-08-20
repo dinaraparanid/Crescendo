@@ -35,7 +35,7 @@ internal fun PlayButton(
 private fun PlayIcon(tint: Color, modifier: Modifier = Modifier) =
     Icon(
         modifier = modifier,
-        imageVector = ImageVector.vectorResource(R.drawable.ic_play),
+        imageVector = ImageVector.vectorResource(R.drawable.ic_play_filled),
         contentDescription = stringResource(R.string.play),
         tint = tint,
     )

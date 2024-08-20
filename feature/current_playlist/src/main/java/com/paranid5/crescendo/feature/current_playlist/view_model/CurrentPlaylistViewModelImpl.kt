@@ -2,7 +2,7 @@ package com.paranid5.crescendo.feature.current_playlist.view_model
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.paranid5.crescendo.core.common.AudioStatus
+import com.paranid5.crescendo.core.common.PlaybackStatus
 import com.paranid5.crescendo.core.common.tracks.DefaultTrack
 import com.paranid5.crescendo.core.common.tracks.Track
 import com.paranid5.crescendo.core.common.udf.StatePublisher
@@ -171,7 +171,7 @@ internal class CurrentPlaylistViewModelImpl(
     private suspend fun startPlaylistPlayback(trackIndex: Int) {
         val (playlistState, _) = state
 
-        playbackRepository.updateAudioStatus(AudioStatus.PLAYING)
+        playbackRepository.updateAudioStatus(PlaybackStatus.PLAYING)
         currentPlaylistRepository.updateCurrentPlaylist(playlistState.playlist)
         tracksRepository.updateCurrentTrackIndex(trackIndex)
 

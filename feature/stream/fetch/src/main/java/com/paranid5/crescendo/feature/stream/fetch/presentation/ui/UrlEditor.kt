@@ -35,8 +35,9 @@ internal fun UrlEditor(
 ) = Column(modifier) {
     Spacer(Modifier.height(dimensions.padding.extraMedium))
 
-    UrlEditorTitle(
-        Modifier
+    FetchCardTitle(
+        title = stringResource(R.string.stream_fetch_url_editor_title),
+        modifier = Modifier
             .fillMaxWidth()
             .padding(horizontal = dimensions.padding.extraMedium),
     )
@@ -53,14 +54,6 @@ internal fun UrlEditor(
 
     Spacer(Modifier.height(dimensions.padding.extraMedium))
 }
-
-@Composable
-private fun UrlEditorTitle(modifier: Modifier = Modifier) = Text(
-    text = stringResource(R.string.stream_fetch_url_editor_title),
-    color = colors.text.primary,
-    style = typography.h.h3,
-    modifier = modifier,
-)
 
 @Composable
 private fun UrlEditorTextField(

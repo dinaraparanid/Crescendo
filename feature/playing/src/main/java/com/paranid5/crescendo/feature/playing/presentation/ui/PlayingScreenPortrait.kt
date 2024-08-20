@@ -23,7 +23,7 @@ import com.paranid5.crescendo.core.resources.ui.theme.AppTheme
 import com.paranid5.crescendo.feature.playing.presentation.ui.composition_local.LocalPalette
 import com.paranid5.crescendo.feature.playing.view_model.PlayingState
 import com.paranid5.crescendo.feature.playing.view_model.PlayingUiIntent
-import com.paranid5.crescendo.ui.covers.coverModelWithPalette
+import com.paranid5.crescendo.ui.covers.mediaCoverModelWithPalette
 import com.paranid5.crescendo.utils.extensions.getBrightDominantOrPrimary
 
 private val AudioWaveformHeight = 64.dp
@@ -35,11 +35,11 @@ internal fun PlayingScreenPortrait(
     modifier: Modifier = Modifier,
 ) = nullable {
     val appPadding = AppTheme.dimensions.padding
-    val audioStatus = state.screenAudioStatus.bind()
+    val audioStatus = state.screenPlaybackStatus.bind()
     var coverSize by remember { mutableStateOf(ImageSize(1, 1)) }
 
-    val (coverModel, palette) = coverModelWithPalette(
-        audioStatus = audioStatus,
+    val (coverModel, palette) = mediaCoverModelWithPalette(
+        playbackStatus = audioStatus,
         size = coverSize,
     )
 
@@ -55,7 +55,7 @@ internal fun PlayingScreenPortrait(
             ) = createRefs()
 
             BackgroundImage(
-                audioStatus = audioStatus,
+                playbackStatus = audioStatus,
                 modifier = Modifier
                     .fillMaxSize()
                     .alpha(state.coverAlpha),

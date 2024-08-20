@@ -6,7 +6,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import arrow.core.raise.nullable
-import com.paranid5.crescendo.core.common.AudioStatus
+import com.paranid5.crescendo.core.common.PlaybackStatus
 import com.paranid5.crescendo.feature.playing.view_model.PlayingState
 import com.paranid5.crescendo.feature.playing.view_model.PlayingUiIntent
 import com.paranid5.crescendo.ui.track.item.TrackKebabMenuButton
@@ -20,14 +20,14 @@ internal fun KebabMenuButton(
     onUiIntent: (PlayingUiIntent) -> Unit,
     modifier: Modifier = Modifier,
 ) = nullable {
-    when (state.screenAudioStatus.bind()) {
-        AudioStatus.STREAMING -> VideoKebabMenuButton(
+    when (state.screenPlaybackStatus.bind()) {
+        PlaybackStatus.STREAMING -> VideoKebabMenuButton(
             tint = tint,
             modifier = modifier,
             iconModifier = Modifier.size(IconSize),
         )
 
-        AudioStatus.PLAYING -> state.currentTrack?.let { currentTrack ->
+        PlaybackStatus.PLAYING -> state.currentTrack?.let { currentTrack ->
             TrackKebabMenuButton(
                 track = currentTrack,
                 tint = tint,

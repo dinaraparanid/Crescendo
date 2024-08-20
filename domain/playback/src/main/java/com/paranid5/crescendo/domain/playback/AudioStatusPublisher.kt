@@ -1,7 +1,7 @@
 package com.paranid5.crescendo.domain.playback
 
-import com.paranid5.crescendo.core.common.AudioStatus
+import com.paranid5.crescendo.core.common.PlaybackStatus
 
 interface AudioStatusPublisher {
-    suspend fun updateAudioStatus(audioStatus: AudioStatus)
+    suspend fun updateAudioStatus(playbackStatus: PlaybackStatus)
 }
