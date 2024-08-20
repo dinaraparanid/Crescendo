@@ -3,23 +3,27 @@ package com.paranid5.crescendo.feature.stream.fetch.view_model
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.paranid5.crescendo.core.common.PlaybackStatus
 import com.paranid5.crescendo.core.common.udf.StatePublisher
 import com.paranid5.crescendo.core.common.udf.state
 import com.paranid5.crescendo.domain.cover.CoverRetriever
+import com.paranid5.crescendo.domain.playback.PlaybackRepository
 import com.paranid5.crescendo.domain.stream.StreamRepository
+import com.paranid5.crescendo.system.services.stream.StreamServiceAccessor
 import com.paranid5.crescendo.ui.covers.ImageContainer
 import com.paranid5.crescendo.ui.foundation.UiState
 import com.paranid5.crescendo.ui.foundation.fold
 import com.paranid5.crescendo.ui.foundation.toUiState
 import com.paranid5.crescendo.ui.metadata.VideoMetadataUiState
-import com.paranid5.crescendo.utils.doNothing
 import com.paranid5.crescendo.utils.extensions.sideEffect
 import kotlinx.coroutines.Dispatchers
 
 internal class FetchStreamViewModelImpl(
     private val savedStateHandle: SavedStateHandle,
     private val streamRepository: StreamRepository,
+    private val playbackRepository: PlaybackRepository,
     private val coverRetriever: CoverRetriever,
+    private val streamServiceAccessor: StreamServiceAccessor,
 ) : FetchStreamViewModel, ViewModel(), StatePublisher<FetchStreamState> {
     companion object {
         private const val StateKey = "state"
@@ -40,8 +44,6 @@ internal class FetchStreamViewModelImpl(
     private fun onButtonsUiIntent(intent: FetchStreamUiIntent.Buttons) = when (intent) {
         is FetchStreamUiIntent.Buttons.ContinueClick -> fetchMetadata()
 
-        is FetchStreamUiIntent.Buttons.DownloadClick -> doNothing() // TODO: show dialog
-
         is FetchStreamUiIntent.Buttons.NextClick -> updateState {
             copy(
                 videoMetadataUiState = UiState.Initial,
@@ -49,7 +51,7 @@ internal class FetchStreamViewModelImpl(
             )
         }
 
-        is FetchStreamUiIntent.Buttons.PlayClick -> doNothing() // TODO: start playing
+        is FetchStreamUiIntent.Buttons.StartStreaming -> startStreaming()
     }
 
     private fun fetchMetadata() = viewModelScope.sideEffect(Dispatchers.Default) {
@@ -88,4 +90,10 @@ internal class FetchStreamViewModelImpl(
 
     private suspend fun fetchCover(coversPaths: List<String>) =
         ImageContainer.Bitmap(coverRetriever.getVideoCoverBitmap(videoCovers = coversPaths))
+
+    private fun startStreaming() = viewModelScope.sideEffect {
+        playbackRepository.updateAudioStatus(PlaybackStatus.STREAMING)
+        streamRepository.updatePlayingUrl(state.url)
+        streamServiceAccessor.startStreaming(state.url)
+    }
 }

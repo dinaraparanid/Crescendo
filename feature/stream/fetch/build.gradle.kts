@@ -44,6 +44,11 @@ dependencies {
 
     implementation(project(":domain:stream"))
     implementation(project(":domain:cover"))
+    implementation(project(":domain:playback"))
+
+    implementation(project(":feature:cache"))
+
+    implementation(project(":system:services:stream"))
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)

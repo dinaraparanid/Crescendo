@@ -33,7 +33,7 @@ internal fun ContinueButton(
         modifier = modifier,
         onClick = onClick,
         isEnabled = isEnabled,
-        contentPadding = PaddingValues(vertical = AppTheme.dimensions.padding.small),
+        contentPadding = PaddingValues(vertical = AppTheme.dimensions.padding.medium),
     ) {
         Text(
             text = stringResource(R.string.continue_),

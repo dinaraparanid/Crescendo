@@ -2,8 +2,8 @@ package com.paranid5.crescendo.feature.stream.fetch.presentation.ui
 
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -26,7 +26,7 @@ internal fun UrlManagerButton(
 ) = AppRippleButton(
     modifier = modifier,
     onClick = onClick,
-    contentPadding = PaddingValues(vertical = dimensions.padding.small),
+    contentPadding = PaddingValues(vertical = dimensions.padding.medium),
 ) {
     Icon(
         imageVector = icon,
@@ -35,7 +35,7 @@ internal fun UrlManagerButton(
         modifier = Modifier.size(IconSize)
     )
 
-    Spacer(Modifier.height(dimensions.padding.small))
+    Spacer(Modifier.width(dimensions.padding.small))
 
     Text(
         text = title,

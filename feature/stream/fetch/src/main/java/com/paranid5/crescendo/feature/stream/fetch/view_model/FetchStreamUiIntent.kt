@@ -5,8 +5,7 @@ sealed interface FetchStreamUiIntent {
 
     sealed interface Buttons : FetchStreamUiIntent {
         data object ContinueClick : Buttons
-        data object PlayClick : Buttons
-        data object DownloadClick : Buttons
+        data object StartStreaming : Buttons
         data object NextClick : Buttons
     }
 
