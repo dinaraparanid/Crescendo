@@ -25,6 +25,7 @@ import com.paranid5.crescendo.core.resources.ui.SlateGray
 import com.paranid5.crescendo.core.resources.ui.TertiriaryDark
 import com.paranid5.crescendo.core.resources.ui.TertiriaryLight
 import com.paranid5.crescendo.core.resources.ui.TiffanyBlue
+import com.paranid5.crescendo.core.resources.ui.TiffanyBlueLight
 import com.paranid5.crescendo.core.resources.ui.TransparentUtilityDark
 import com.paranid5.crescendo.core.resources.ui.TransparentUtilityLight
 
@@ -155,29 +156,35 @@ data class AppSelectionColors(
 @Immutable
 data class AppTextColors(
     val primary: Color,
-    val secondary: Color,
     val tertiriary: Color,
+    val onHighContrast: Color,
+    val onButton: Color,
     val onCard: Color,
     val onSearchBar: Color,
     val onTextField: Color,
+    val onBackgroundPrimary: Color,
 ) {
     companion object {
         internal val dark = AppTextColors(
             primary = Color.White,
-            secondary = PaleCornflowerBlue,
             tertiriary = TertiriaryDark,
+            onHighContrast = PaleCornflowerBlue,
+            onButton = PaleCornflowerBlue,
             onCard = DarkPurple,
             onSearchBar = DarkPurple,
             onTextField = PaleCornflowerBlue,
+            onBackgroundPrimary = Color.Black,
         )
 
         internal val light = AppTextColors(
             primary = Color.Black,
-            secondary = SlateGray,
             tertiriary = TertiriaryLight,
+            onHighContrast = SlateGray,
+            onButton = TiffanyBlue,
             onCard = TiffanyBlue,
             onSearchBar = Color.Black,
             onTextField = SlateGray,
+            onBackgroundPrimary = TiffanyBlue,
         )
     }
 }
@@ -186,16 +193,22 @@ data class AppTextColors(
 data class AppButtonColors(
     val primary: Color,
     val disabled: Color,
+    val onBackgroundPrimary: Color,
+    val onBackgroundPrimaryDisabled: Color,
 ) {
     companion object {
         internal val dark = AppButtonColors(
             primary = RussianViolet,
             disabled = RoyalBlue,
+            onBackgroundPrimary = LightBlue,
+            onBackgroundPrimaryDisabled = PaleCornflowerBlue,
         )
 
         internal val light = AppButtonColors(
-            primary = TiffanyBlue,
-            disabled = Pang,
+            primary = AirSuperiorityBlue,
+            disabled = TiffanyBlue,
+            onBackgroundPrimary = AirSuperiorityBlue,
+            onBackgroundPrimaryDisabled = TiffanyBlueLight,
         )
     }
 }

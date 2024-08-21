@@ -9,7 +9,6 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -26,7 +25,6 @@ import com.paranid5.crescendo.ui.utils.shimmerEffect
 
 sealed interface LoadingBoxSize {
     data object FillMaxSize : LoadingBoxSize
-
     data class FixedHeight(val minHeight: Dp) : LoadingBoxSize
 }
 
@@ -85,7 +83,7 @@ fun AppLoadingBoxError(
     Text(
         text = errorText,
         color = colors.text.primary,
-        style = AppTheme.typography.caption,
+        style = AppTheme.typography.body,
     )
 
     onErrorButtonClick?.let {
@@ -93,16 +91,15 @@ fun AppLoadingBoxError(
 
         AppRippleButton(
             onClick = onErrorButtonClick,
-            rippleColor = colors.background.alternative,
-            shape = RoundedCornerShape(AppTheme.dimensions.corners.small),
             colors = ButtonDefaults.buttonColors(
-                containerColor = colors.background.alternative,
-                disabledContainerColor = colors.background.alternative,
+                containerColor = colors.button.onBackgroundPrimary,
+                contentColor = colors.text.onBackgroundPrimary,
+                disabledContainerColor = colors.button.onBackgroundPrimaryDisabled,
+                disabledContentColor = colors.text.tertiriary,
             )
         ) {
             Text(
                 text = errorButtonText,
-                color = colors.text.secondary,
                 style = AppTheme.typography.caption,
             )
         }

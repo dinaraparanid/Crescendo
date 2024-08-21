@@ -32,7 +32,7 @@ fun AppRippleButton(
     border: BorderStroke? = null,
     colors: ButtonColors = ButtonDefaults.buttonColors(
         containerColor = AppTheme.colors.button.primary,
-        contentColor = AppTheme.colors.text.primary,
+        contentColor = AppTheme.colors.text.onButton,
         disabledContainerColor = AppTheme.colors.button.disabled,
         disabledContentColor = AppTheme.colors.text.tertiriary,
     ),

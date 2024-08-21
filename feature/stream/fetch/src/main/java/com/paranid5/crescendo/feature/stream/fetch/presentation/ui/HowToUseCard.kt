@@ -37,7 +37,7 @@ private fun Step(
     text: String,
     modifier: Modifier = Modifier,
 ) = MarkdownText(
-    color = colors.text.secondary,
+    color = colors.text.onHighContrast,
     style = typography.regular,
     modifier = modifier,
     markdown = "$number. $text",

@@ -11,7 +11,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.dp
 import com.paranid5.crescendo.core.resources.ui.theme.AppTheme
-import com.paranid5.crescendo.core.resources.ui.theme.AppTheme.colors
 import com.paranid5.crescendo.core.resources.ui.theme.AppTheme.dimensions
 import com.paranid5.crescendo.ui.foundation.AppRippleButton
 
@@ -30,7 +29,6 @@ internal fun UrlManagerButton(
 ) {
     Icon(
         imageVector = icon,
-        tint = colors.text.secondary,
         contentDescription = title,
         modifier = Modifier.size(IconSize)
     )
@@ -39,7 +37,6 @@ internal fun UrlManagerButton(
 
     Text(
         text = title,
-        color = colors.text.secondary,
         style = AppTheme.typography.regular,
     )
 }

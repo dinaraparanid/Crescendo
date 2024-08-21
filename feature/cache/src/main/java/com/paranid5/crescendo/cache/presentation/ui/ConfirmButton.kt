@@ -23,9 +23,9 @@ internal fun ConfirmButton(
     modifier = modifier,
     isEnabled = state.isCacheButtonClickable,
     colors = ButtonDefaults.buttonColors(
-        containerColor = colors.button.primary,
-        contentColor = colors.text.primary,
-        disabledContainerColor = colors.button.disabled,
+        containerColor = colors.button.onBackgroundPrimary,
+        contentColor = colors.text.onBackgroundPrimary,
+        disabledContainerColor = colors.button.onBackgroundPrimaryDisabled,
         disabledContentColor = colors.text.tertiriary,
     ),
     content = { ConfirmButtonLabel() },

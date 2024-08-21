@@ -72,7 +72,7 @@ private fun TitleWithDuration(
     Text(
         text = videoMeta.title,
         textAlign = TextAlign.Center,
-        color = colors.text.secondary,
+        color = colors.text.onHighContrast,
         style = typography.h.h3,
         modifier = Modifier
             .fillMaxWidth()
@@ -87,7 +87,7 @@ private fun TitleWithDuration(
             videoMeta.durationMillis.timeString,
         ),
         textAlign = TextAlign.Center,
-        color = colors.text.secondary,
+        color = colors.text.onHighContrast,
         style = typography.h.h3,
         modifier = Modifier
             .fillMaxWidth()

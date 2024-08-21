@@ -15,6 +15,6 @@ internal fun CacheDialogLabel(modifier: Modifier = Modifier) =
         text = stringResource(R.string.cache_dialog_title),
         modifier = modifier,
         color = colors.text.primary,
-        style = typography.h.h2,
+        style = typography.h.h3,
         fontWeight = FontWeight.Bold,
     )
