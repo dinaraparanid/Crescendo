@@ -17,6 +17,9 @@ inline fun <T> buildImmutableList(
     return persistentListOf<T>().mutate(builderAction)
 }
 
+fun <T> ImmutableList(size: Int, elem: T) =
+    buildImmutableList { repeat(size) { add(elem) } }
+
 fun <T> List<T>?.orNil() = this?.toImmutableList() ?: persistentListOf()
 
 fun <T> ImmutableList<T>?.orNil() = this ?: persistentListOf()
