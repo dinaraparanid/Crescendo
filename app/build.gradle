@@ -67,7 +67,7 @@ dependencies {
     implementation project(':data')
     implementation project(':feature:stream:main')
 
-    implementation project(':features:trimmer')
+    implementation project(':feature:trimmer')
 
     implementation project(':feature:audio_effects')
     implementation project(':feature:cache')

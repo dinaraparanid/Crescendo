@@ -43,8 +43,7 @@
             <option value="$PROJECT_DIR$/feature/stream" />
             <option value="$PROJECT_DIR$/feature/stream/fetch" />
             <option value="$PROJECT_DIR$/feature/stream/main" />
-            <option value="$PROJECT_DIR$/features" />
-            <option value="$PROJECT_DIR$/features/trimmer" />
+            <option value="$PROJECT_DIR$/feature/trimmer" />
             <option value="$PROJECT_DIR$/system" />
             <option value="$PROJECT_DIR$/system/common" />
             <option value="$PROJECT_DIR$/system/receivers" />

@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
@@ -96,13 +97,23 @@ private fun ContentScreenNavHost(
                 type = NavType.StringType
             }
         )
-    ) {
+    ) { backStackEntry ->
         navigator.updateCurrentScreen(AppScreen.Audio.Trimmer)
 
-        TrimmerScreen(
-            backStackEntry = it,
-            modifier = screenModifier,
-        )
+        val trackPath by remember(backStackEntry) {
+            derivedStateOf {
+                backStackEntry
+                    .arguments
+                    ?.getString(AppScreen.Audio.Trimmer.TrackPathKey)
+            }
+        }
+
+        trackPath?.let {
+            TrimmerScreen(
+                trackPath = it,
+                modifier = screenModifier,
+            )
+        }
     }
 
     composable(route = AppScreen.Preferences.title) {
