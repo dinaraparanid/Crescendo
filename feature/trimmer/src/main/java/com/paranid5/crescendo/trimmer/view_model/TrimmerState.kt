@@ -106,6 +106,9 @@ data class TrimmerState(
 
         @IgnoredOnParcel
         val canZoomOut = zoomLevel > InitialZoomLevel
+
+        @IgnoredOnParcel
+        val scrollRatio = zoomSteps + 1 - zoomLevel
     }
 
     @IgnoredOnParcel

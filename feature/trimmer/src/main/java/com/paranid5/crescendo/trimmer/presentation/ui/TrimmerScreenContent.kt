@@ -57,6 +57,7 @@ internal fun TrimmerScreenContent(
 
         FileSaveDialog(
             state = state,
+            onUiIntent = onUiIntent,
             isDialogShownState = isFileSaveDialogShownState,
             modifier = Modifier.align(Alignment.Center),
         )

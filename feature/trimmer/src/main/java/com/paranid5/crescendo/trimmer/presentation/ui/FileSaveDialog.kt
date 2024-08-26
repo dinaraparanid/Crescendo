@@ -22,6 +22,7 @@ import com.paranid5.crescendo.core.resources.ui.theme.AppTheme.colors
 import com.paranid5.crescendo.core.resources.ui.theme.AppTheme.dimensions
 import com.paranid5.crescendo.trimmer.presentation.ui.file_save_dialog.FileSaveDialogContent
 import com.paranid5.crescendo.trimmer.view_model.TrimmerState
+import com.paranid5.crescendo.trimmer.view_model.TrimmerUiIntent
 import com.paranid5.crescendo.ui.foundation.getOrNull
 import kotlinx.collections.immutable.persistentListOf
 import java.io.File
@@ -30,23 +31,14 @@ import java.io.File
 @Composable
 internal fun FileSaveDialog(
     state: TrimmerState,
+    onUiIntent: (TrimmerUiIntent) -> Unit,
     isDialogShownState: MutableState<Boolean>,
     modifier: Modifier = Modifier,
 ) {
+    // TODO: убрать все стейты на уровне компоуза ниже
+
     val track = remember(state.trackState.getOrNull()) {
         state.trackState.getOrNull()
-    }
-
-    val trimRange = remember(state.playbackPositions.trimRange) {
-        state.playbackPositions.trimRange
-    }
-
-    val fadeDurations = remember(state.playbackPositions.fadeDurations) {
-        state.playbackPositions.fadeDurations
-    }
-
-    val pitchAndSpeed = remember(state.playbackProperties.pitchAndSpeed) {
-        state.playbackProperties.pitchAndSpeed
     }
 
     var isDialogShown by isDialogShownState
@@ -74,20 +66,15 @@ internal fun FileSaveDialog(
                 shape = RoundedCornerShape(dimensions.corners.medium),
                 colors = CardDefaults.cardColors(containerColor = colors.background.primary),
             ) {
-                track?.let {
-                    FileSaveDialogContent(
-                        isDialogShownState = isDialogShownState,
-                        filenameState = filenameState,
-                        fileSaveOptions = fileSaveOptions,
-                        selectedSaveOptionIndexState = selectedSaveOptionIndexState,
-                        track = it,
-                        audioFormat = audioFormat,
-                        trimRange = trimRange,
-                        pitchAndSpeed = pitchAndSpeed,
-                        fadeDurations = fadeDurations,
-                        isSaveButtonClickable = isDialogSaveButtonClickable,
-                    )
-                }
+                FileSaveDialogContent(
+                    onUiIntent = onUiIntent,
+                    isDialogShownState = isDialogShownState,
+                    filenameState = filenameState,
+                    fileSaveOptions = fileSaveOptions,
+                    selectedSaveOptionIndexState = selectedSaveOptionIndexState,
+                    audioFormat = audioFormat,
+                    isSaveButtonClickable = isDialogSaveButtonClickable,
+                )
             }
         }
 }

@@ -5,6 +5,7 @@ import androidx.compose.foundation.gestures.detectHorizontalDragGestures
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -26,6 +27,7 @@ import com.paranid5.crescendo.trimmer.presentation.CONTROLLER_CIRCLE_CENTER
 import com.paranid5.crescendo.trimmer.presentation.CONTROLLER_CIRCLE_RADIUS
 import com.paranid5.crescendo.trimmer.presentation.CONTROLLER_RECT_OFFSET
 import com.paranid5.crescendo.trimmer.presentation.CONTROLLER_RECT_WIDTH
+import com.paranid5.crescendo.trimmer.presentation.WAVEFORM_SCROLL_SPEED_UP
 import com.paranid5.crescendo.trimmer.presentation.WAVEFORM_SPIKE_WIDTH_RATIO
 import com.paranid5.crescendo.trimmer.presentation.effects.waveform.RequestEndBorderFocusEffect
 import com.paranid5.crescendo.trimmer.view_model.TrimmerState
@@ -93,8 +95,8 @@ private fun Modifier.endBorderDragInput(
         state.playbackPositions.startPosInMillis
     }
 
-    val endMillis = remember(state.playbackPositions.endPosInMillis) {
-        state.playbackPositions.endPosInMillis
+    var endMillis by remember {
+        mutableLongStateOf(state.playbackPositions.endPosInMillis)
     }
 
     val durationInMillis = remember(state.trackDurationInMillis) {
@@ -111,13 +113,18 @@ private fun Modifier.endBorderDragInput(
                 onDragEnd = { isDragged = true },
             ) { change, dragAmount ->
                 change.consume()
-                onUiIntent(
-                    TrimmerUiIntent.Positions.UpdateEndPosition(
-                        (endMillis + (dragAmount * 200 / spikeWidthRatio))
-                            .toLong()
-                            .coerceIn(startMillis + 1..durationInMillis)
-                    )
-                )
+
+                val dragUpd = dragAmount *
+                        WAVEFORM_SCROLL_SPEED_UP *
+                        state.waveformProperties.scrollRatio /
+                        spikeWidthRatio
+
+                val newPosition = (endMillis + dragUpd)
+                    .toLong()
+                    .coerceIn(startMillis + 1..durationInMillis)
+
+                onUiIntent(TrimmerUiIntent.Positions.UpdateEndPosition(newPosition))
+                endMillis = newPosition
             }
         }
 }

@@ -85,7 +85,7 @@ private fun Modifier.playbackModifier(
             onUiIntent(
                 TrimmerUiIntent.Positions.SeekTo(
                     playbackPosition(
-                        offset = offset.y,
+                        offset = offset.x,
                         size = size.width,
                         durationMillis = durationMillis,
                     )

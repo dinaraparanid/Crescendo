@@ -2,6 +2,7 @@ package com.paranid5.crescendo.trimmer.presentation.ui.waveform
 
 import androidx.compose.foundation.Canvas
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.geometry.Offset
@@ -23,7 +24,8 @@ import com.paranid5.crescendo.trimmer.presentation.PLAYBACK_RECT_WIDTH
 
 @Composable
 internal fun PlaybackPosition(modifier: Modifier = Modifier) {
-    val playbackBrush = SolidColor(colors.background.alternative)
+    val color = colors.background.alternative
+    val playbackBrush = remember(color) { SolidColor(color) }
 
     Canvas(modifier.graphicsLayer(alpha = DEFAULT_GRAPHICS_LAYER_ALPHA)) {
         drawUpperTouchPad(playbackBrush)

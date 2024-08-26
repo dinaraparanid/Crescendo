@@ -38,6 +38,7 @@ internal const val PLAYBACK_CIRCLE_RADIUS = 12F
 internal const val PLAYBACK_CIRCLE_CENTER = 8F
 
 internal const val WAVEFORM_SPIKE_WIDTH_RATIO = 5
+internal const val WAVEFORM_SCROLL_SPEED_UP = 200
 
 internal const val WAVEFORM_PADDING =
     (CONTROLLER_CIRCLE_RADIUS +

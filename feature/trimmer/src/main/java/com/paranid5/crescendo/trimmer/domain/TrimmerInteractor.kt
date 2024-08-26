@@ -15,6 +15,8 @@ import com.paranid5.crescendo.core.media.tags.setAudioTags
 import com.paranid5.crescendo.core.resources.R
 import com.paranid5.crescendo.system.receivers.TrimmingStatusReceiver
 import com.paranid5.crescendo.utils.extensions.sendAppBroadcast
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import java.io.File
 
 internal suspend fun trimTrackAndSendBroadcast(
@@ -26,15 +28,17 @@ internal suspend fun trimTrackAndSendBroadcast(
     pitchAndSpeed: PitchAndSpeed,
     fadeDurations: FadeDurations,
 ) = context.sendTrimmingStatusBroadcast(
-    trimTrackResult(
-        context = context,
-        track = track,
-        outputFilename = outputFilename,
-        audioFormat = audioFormat,
-        trimRange = trimRange,
-        pitchAndSpeed = pitchAndSpeed,
-        fadeDurations = fadeDurations
-    )
+    withContext(Dispatchers.IO) {
+        trimTrackResult(
+            context = context,
+            track = track,
+            outputFilename = outputFilename,
+            audioFormat = audioFormat,
+            trimRange = trimRange,
+            pitchAndSpeed = pitchAndSpeed,
+            fadeDurations = fadeDurations
+        )
+    }
 )
 
 private suspend inline fun trimTrackResult(

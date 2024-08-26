@@ -1,5 +1,6 @@
 package com.paranid5.crescendo.trimmer.view_model
 
+import android.annotation.SuppressLint
 import android.content.Context
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
@@ -21,6 +22,7 @@ import com.paranid5.crescendo.trimmer.domain.player.PlayerStateChangedListener
 import com.paranid5.crescendo.trimmer.domain.player.seekTenSecsBack
 import com.paranid5.crescendo.trimmer.domain.player.seekTenSecsForward
 import com.paranid5.crescendo.trimmer.domain.player.stopAndReleaseCatching
+import com.paranid5.crescendo.trimmer.domain.trimTrackAndSendBroadcast
 import com.paranid5.crescendo.trimmer.view_model.TrimmerState.PlaybackPositions
 import com.paranid5.crescendo.trimmer.view_model.TrimmerState.PlaybackPositions.Companion.InitialPosition
 import com.paranid5.crescendo.trimmer.view_model.TrimmerState.PlaybackProperties
@@ -46,12 +48,14 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
+import kotlinx.coroutines.withContext
 import linc.com.amplituda.Amplituda
 import linc.com.amplituda.callback.AmplitudaErrorListener
 
 @UnstableApi
 internal class TrimmerViewModelImpl(
-    context: Context,
+    @SuppressLint("StaticFieldLeak")
+    private val appContext: Context,
     private val savedStateHandle: SavedStateHandle,
     private val tracksRepository: TracksRepository,
     private val waveformRepository: WaveformRepository,
@@ -67,7 +71,7 @@ internal class TrimmerViewModelImpl(
     private var audioEffectsJob: Job? = null
 
     private val amplituda by lazy {
-        Amplituda(context)
+        Amplituda(appContext)
     }
 
     private val trackPlayer by lazy {
@@ -76,7 +80,7 @@ internal class TrimmerViewModelImpl(
             .setUsage(C.USAGE_MEDIA)
             .build()
 
-        ExoPlayer.Builder(context)
+        ExoPlayer.Builder(appContext)
             .setAudioAttributes(audioAttributes, true)
             .setHandleAudioBecomingNoisy(true)
             .setWakeMode(C.WAKE_MODE_NETWORK)
@@ -97,7 +101,7 @@ internal class TrimmerViewModelImpl(
     private val mutex = Mutex()
 
     private suspend fun <R> withPlayer(func: Player.() -> R) =
-        mutex.withLock { func(trackPlayer) }
+        mutex.withLock { withContext(Dispatchers.Main) { func(trackPlayer) } }
 
     private val resetPlaybackPosCondVar by lazy { AsyncCondVar() }
 
@@ -130,6 +134,20 @@ internal class TrimmerViewModelImpl(
             copy(focusEvent = intent.focusEvent)
         }
 
+        is TrimmerUiIntent.TrimTrack -> viewModelScope.sideEffect(Dispatchers.IO) {
+            state.trackState.getOrNull()?.let {
+                trimTrackAndSendBroadcast(
+                    context = appContext,
+                    track = it,
+                    outputFilename = intent.outputFilename,
+                    audioFormat = intent.audioFormat,
+                    trimRange = state.playbackPositions.trimRange,
+                    pitchAndSpeed = state.playbackProperties.pitchAndSpeed,
+                    fadeDurations = state.playbackPositions.fadeDurations,
+                )
+            }
+        }
+
         is TrimmerUiIntent.Lifecycle -> onLifecycleUiIntent(intent = intent)
 
         is TrimmerUiIntent.Waveform -> onWaveformUiIntent(intent = intent)
@@ -140,13 +158,12 @@ internal class TrimmerViewModelImpl(
     }
 
     private fun onLifecycleUiIntent(intent: TrimmerUiIntent.Lifecycle) = when (intent) {
-        is TrimmerUiIntent.Lifecycle.OnStart -> subscribeOnDataUpdates()
-
-        is TrimmerUiIntent.Lifecycle.OnStop -> {
-            unsubscribeFromDataUpdates()
-            releasePlayerTasks()
-            releasePlayer()
+        is TrimmerUiIntent.Lifecycle.OnStart -> {
+            subscribeOnDataUpdates()
+            launchPlayerTasks()
         }
+
+        is TrimmerUiIntent.Lifecycle.OnStop -> cleanUp()
     }
 
     private fun onWaveformUiIntent(intent: TrimmerUiIntent.Waveform) = when (intent) {
@@ -283,9 +300,7 @@ internal class TrimmerViewModelImpl(
         copy(zoomSteps = zoomSteps)
     }
 
-    private fun Player.onPlaybackLaunched() = viewModelScope.sideEffect(Dispatchers.Default) {
-        launchPlayerTasks()
-
+    private fun Player.onPlaybackLaunched() = viewModelScope.sideEffect(Dispatchers.Main) {
         while (isPlaying) {
             updatePlaybackPositions { copy(playbackPosInMillis = currentPosition) }
             delay(PlaybackUpdateCooldown)
@@ -302,7 +317,6 @@ internal class TrimmerViewModelImpl(
     private fun onCompletion() = viewModelScope.sideEffect(Dispatchers.Default) {
         updatePlaybackProperties { copy(isPlaying = false) }
         resetPlaybackPosition()
-        releasePlayerTasks()
     }
 
     private suspend fun resetPlaybackPosition() {
@@ -435,9 +449,16 @@ internal class TrimmerViewModelImpl(
         }
     }
 
+    private fun cleanUp() {
+        unsubscribeFromDataUpdates()
+        releasePlayerTasks()
+        releasePlayer()
+    }
+
     override fun onCleared() {
         super.onCleared()
         clearAmplitudes()
+        cleanUp()
     }
 
     private fun clearAmplitudes() = viewModelScope.sideEffect(Dispatchers.IO) {

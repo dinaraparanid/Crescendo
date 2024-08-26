@@ -1,6 +1,7 @@
 package com.paranid5.crescendo.trimmer.view_model
 
 import androidx.compose.ui.focus.FocusState
+import com.paranid5.crescendo.core.common.caching.Formats
 import com.paranid5.crescendo.trimmer.domain.entities.ShownEffects
 
 sealed interface TrimmerUiIntent {
@@ -10,6 +11,9 @@ sealed interface TrimmerUiIntent {
     data class UpdateFocusEvent(val focusEvent: FocusState) : TrimmerUiIntent
 
     data class ShowEffect(val shownEffects: ShownEffects) : TrimmerUiIntent
+
+    // TODO: получать из стейта
+    data class TrimTrack(val outputFilename: String, val audioFormat: Formats) : TrimmerUiIntent
 
     sealed interface Lifecycle : TrimmerUiIntent {
         data object OnStart : Lifecycle

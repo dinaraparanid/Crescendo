@@ -34,7 +34,7 @@ internal fun PitchSpeedButton(
         modifier.clickableWithRipple(bounded = true) {
             onUiIntent(TrimmerUiIntent.ShowEffect(ShownEffects.PITCH_SPEED))
             coroutineScope.launch { effectsScaffoldState?.show() }
-        }
+        },
     ) {
         PitchSpeedIcon(Modifier.align(Alignment.CenterHorizontally))
         PitchSpeedLabel(Modifier.align(Alignment.CenterHorizontally))
@@ -46,7 +46,7 @@ private fun PitchSpeedIcon(modifier: Modifier = Modifier) =
     Icon(
         painter = painterResource(R.drawable.pitch_speed),
         contentDescription = labelMessage(),
-        tint = colors.text.primary,
+        tint = colors.primary,
         modifier = modifier.size(dimensions.padding.big),
     )
 
@@ -54,7 +54,7 @@ private fun PitchSpeedIcon(modifier: Modifier = Modifier) =
 private fun PitchSpeedLabel(modifier: Modifier) =
     Text(
         text = labelMessage(),
-        color = colors.text.primary,
+        color = colors.primary,
         style = typography.captionSm,
         modifier = modifier,
     )

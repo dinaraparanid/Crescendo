@@ -11,9 +11,6 @@ import com.paranid5.crescendo.core.common.trimming.FadeDurations
 import com.paranid5.crescendo.core.common.trimming.PitchAndSpeed
 import com.paranid5.crescendo.core.common.trimming.TrimRange
 import com.paranid5.crescendo.core.common.trimming.totalDurationSecs
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.coroutineScope
-import kotlinx.coroutines.withContext
 
 private const val TAG = "AudioFiles"
 
@@ -48,25 +45,23 @@ suspend fun MediaFile.AudioFile.trimmedCatching(
     }
 }
 
-private suspend inline fun trim(
+private fun trim(
     inputPath: String,
     outputPath: String,
     trimRange: TrimRange,
     pitchAndSpeed: PitchAndSpeed,
-    fadeDurations: FadeDurations
-) = coroutineScope {
-    withContext(Dispatchers.IO) {
-        val command = ffmpegTrimCommand(
-            inputPath = inputPath,
-            outputPath = outputPath,
-            trimRange = trimRange,
-            pitchAndSpeed = pitchAndSpeed,
-            fadeDurations = fadeDurations
-        )
+    fadeDurations: FadeDurations,
+) {
+    val command = ffmpegTrimCommand(
+        inputPath = inputPath,
+        outputPath = outputPath,
+        trimRange = trimRange,
+        pitchAndSpeed = pitchAndSpeed,
+        fadeDurations = fadeDurations
+    )
 
-        Log.d(TAG, command)
-        Log.d(TAG, "FFmpeg status: ${FFmpeg.execute(command)}")
-    }
+    Log.d(TAG, command)
+    Log.d(TAG, "FFmpeg status: ${FFmpeg.execute(command)}")
 }
 
 private fun ffmpegTrimCommand(
