@@ -5,6 +5,7 @@ import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
 import android.graphics.Bitmap
+import android.media.session.MediaSession
 import androidx.annotation.OptIn
 import androidx.core.app.NotificationCompat
 import androidx.media3.common.Player
@@ -56,7 +57,7 @@ internal fun PlayerNotificationManager(service: TrackService) =
 
             setPriority(NotificationCompat.PRIORITY_HIGH)
             setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
-            setMediaSessionToken(service.mediaSessionManager.sessionToken)
+            setMediaSessionToken(service.mediaSessionManager.sessionToken.token as MediaSession.Token)
         }
 
 @OptIn(UnstableApi::class)
@@ -91,12 +92,12 @@ private fun MediaDescriptionProvider(service: TrackService) =
                 service,
                 0,
                 service.mainActivityIntent,
-                PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+                PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE,
             )
 
         override fun getCurrentLargeIcon(
             player: Player,
-            callback: PlayerNotificationManager.BitmapCallback
+            callback: PlayerNotificationManager.BitmapCallback,
         ): Bitmap? {
             service.serviceScope.launch(Dispatchers.IO) {
                 callback.onBitmap(
@@ -116,11 +117,11 @@ private fun CustomActionsReceiver(service: TrackService) =
     object : PlayerNotificationManager.CustomActionReceiver {
         override fun createCustomActions(
             context: Context,
-            instanceId: Int
+            instanceId: Int,
         ) = mutableMapOf(
             ACTION_REPEAT to RepeatActionCompat(service),
             ACTION_UNREPEAT to UnrepeatActionCompat(service),
-            ACTION_DISMISS to DismissNotificationActionCompat(service)
+            ACTION_DISMISS to DismissNotificationActionCompat(service),
         )
 
         override fun getCustomActions(player: Player) =

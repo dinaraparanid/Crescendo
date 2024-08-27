@@ -40,7 +40,7 @@ internal fun AudioEffectsButton(
 private fun EqualizerIcon(tint: Color, modifier: Modifier = Modifier) =
     Icon(
         modifier = modifier,
-        imageVector = ImageVector.vectorResource(R.drawable.equalizer),
+        imageVector = ImageVector.vectorResource(R.drawable.ic_equalizer),
         contentDescription = stringResource(R.string.equalizer),
         tint = tint,
     )

@@ -6,7 +6,8 @@ import android.support.v4.media.session.MediaSessionCompat
 import android.support.v4.media.session.PlaybackStateCompat
 
 class MediaSessionManager {
-    private lateinit var mediaSession: MediaSessionCompat
+    lateinit var mediaSession: MediaSessionCompat
+        private set
 
     val sessionToken: MediaSessionCompat.Token
         get() = mediaSession.sessionToken

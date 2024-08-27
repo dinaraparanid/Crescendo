@@ -10,23 +10,23 @@ import com.paranid5.crescendo.system.services.track.Actions
 
 internal fun RepeatActionCompat(context: Context) =
     NotificationCompat.Action.Builder(
-        IconCompat.createWithResource(context, R.drawable.repeat),
+        IconCompat.createWithResource(context, R.drawable.ic_repeat),
         context.resources.getString(R.string.change_repeat),
-        Actions.Repeat.playbackIntent(context)
+        Actions.Repeat.playbackIntent(context),
     ).build()
 
 internal fun UnrepeatActionCompat(context: Context) =
     NotificationCompat.Action.Builder(
-        IconCompat.createWithResource(context, R.drawable.no_repeat),
+        IconCompat.createWithResource(context, R.drawable.ic_no_repeat),
         context.resources.getString(R.string.change_repeat),
-        Actions.Unrepeat.playbackIntent(context)
+        Actions.Unrepeat.playbackIntent(context),
     ).build()
 
 internal fun DismissNotificationActionCompat(context: Context) =
     NotificationCompat.Action.Builder(
-        IconCompat.createWithResource(context, R.drawable.cross),
+        IconCompat.createWithResource(context, R.drawable.ic_cancel),
         context.resources.getString(R.string.cancel),
-        Actions.Dismiss.playbackIntent(context)
+        Actions.Dismiss.playbackIntent(context),
     ).build()
 
 private fun Actions.playbackIntent(context: Context) =
@@ -34,5 +34,5 @@ private fun Actions.playbackIntent(context: Context) =
         context,
         requestCode,
         Intent(playbackAction),
-        PendingIntent.FLAG_IMMUTABLE
+        PendingIntent.FLAG_IMMUTABLE,
     )

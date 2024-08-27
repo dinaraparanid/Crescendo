@@ -1,8 +1,6 @@
 package com.paranid5.crescendo.system.services.track.playback
 
 import androidx.annotation.OptIn
-import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.repeatOnLifecycle
 import androidx.media3.common.AudioAttributes
 import androidx.media3.common.C
 import androidx.media3.common.util.UnstableApi
@@ -14,16 +12,17 @@ import com.paranid5.crescendo.domain.playback.PlaybackRepository.Companion.UNDEF
 import com.paranid5.crescendo.domain.playback.RepeatingPublisher
 import com.paranid5.crescendo.domain.playback.RepeatingSubscriber
 import com.paranid5.crescendo.system.services.track.TrackService
+import com.paranid5.crescendo.utils.extensions.sideEffect
 import com.paranid5.crescendo.utils.extensions.toMediaItem
 import com.paranid5.crescendo.utils.extensions.toMediaItemList
 import com.paranid5.system.services.common.playback.AudioEffectsController
 import com.paranid5.system.services.common.playback.AudioEffectsControllerImpl
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.update
-import kotlinx.coroutines.launch
 
 internal class PlayerControllerImpl(
     service: TrackService,
@@ -46,10 +45,7 @@ internal class PlayerControllerImpl(
                 addListener(PlayerStateChangedListener(service))
                 playbackRepository.updateAudioSessionId(audioSessionId)
                 initAudioEffects(audioSessionId)
-
-                service.serviceScope.launch {
-                    startRepeatMonitoring(service.lifecycle)
-                }
+                startRepeatMonitoring(service.serviceScope)
             }
     }
 
@@ -176,8 +172,8 @@ internal class PlayerControllerImpl(
         currentPosition
     )
 
-    private suspend inline fun startRepeatMonitoring(lifecycle: Lifecycle): Unit =
-        lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
+    private fun startRepeatMonitoring(scope: CoroutineScope): Unit =
+        scope.sideEffect {
             isRepeatingFlow
                 .distinctUntilChanged()
                 .collectLatest { player.repeatMode = repeatMode(it) }

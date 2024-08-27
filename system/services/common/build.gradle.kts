@@ -46,6 +46,7 @@ dependencies {
     implementation(libs.androidx.appcompat)
     implementation(libs.androidx.lifecycle.extensions)
     implementation(libs.androidx.media)
+    implementation(libs.androidx.media3.session)
 
     implementation(libs.koin.androidx.compose)
 }

@@ -18,8 +18,9 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.unit.dp
 import com.paranid5.crescendo.core.resources.R
 import com.paranid5.crescendo.core.resources.ui.theme.AppTheme.colors
@@ -90,7 +91,7 @@ fun <T> AppSearchBar(
 @Composable
 private fun SearchIcon(modifier: Modifier = Modifier) =
     Icon(
-        painter = painterResource(R.drawable.search),
+        imageVector = ImageVector.vectorResource(R.drawable.ic_search),
         contentDescription = null,
         tint = colors.primary,
         modifier = modifier,
@@ -103,7 +104,7 @@ private inline fun CancelSearchIcon(
     modifier: Modifier = Modifier,
     crossinline setQuery: (String?) -> Unit
 ) = Icon(
-    painter = painterResource(R.drawable.cross),
+    imageVector = ImageVector.vectorResource(R.drawable.ic_cancel),
     contentDescription = null,
     tint = colors.primary,
     modifier = modifier.clickable {

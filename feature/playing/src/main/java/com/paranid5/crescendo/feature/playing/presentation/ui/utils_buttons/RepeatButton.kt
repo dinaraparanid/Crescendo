@@ -49,8 +49,8 @@ private fun RepeatIcon(
 ) {
     val icon = remember(isRepeating) {
         when {
-            isRepeating -> R.drawable.repeat
-            else -> R.drawable.no_repeat
+            isRepeating -> R.drawable.ic_repeat
+            else -> R.drawable.ic_no_repeat
         }
     }
 

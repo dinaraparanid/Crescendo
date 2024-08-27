@@ -7,8 +7,9 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.res.vectorResource
 import com.paranid5.crescendo.core.resources.R
 import com.paranid5.crescendo.core.resources.ui.theme.AppTheme.dimensions
 import com.paranid5.crescendo.trimmer.view_model.TrimmerState
@@ -52,7 +53,7 @@ private fun PitchController(
     EffectController(
         modifier = modifier,
         label = pitchLabel(pitch),
-        iconPainter = painterResource(R.drawable.pitch),
+        icon = ImageVector.vectorResource(R.drawable.ic_pitch),
         valueState = pitch,
         minValue = MinPitch,
         maxValue = MaxPitch,
@@ -78,7 +79,7 @@ private fun SpeedController(
     EffectController(
         modifier = modifier,
         label = speedLabel(speed),
-        iconPainter = painterResource(R.drawable.speed),
+        icon = ImageVector.vectorResource(R.drawable.ic_speed),
         valueState = speed,
         minValue = MinSpeed,
         maxValue = MaxSpeed,

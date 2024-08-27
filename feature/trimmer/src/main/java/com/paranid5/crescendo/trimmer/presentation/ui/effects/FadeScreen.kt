@@ -9,8 +9,9 @@ import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.res.vectorResource
 import com.paranid5.crescendo.core.resources.R
 import com.paranid5.crescendo.core.resources.ui.theme.AppTheme.dimensions
 import com.paranid5.crescendo.trimmer.view_model.TrimmerState
@@ -60,7 +61,7 @@ private fun FadeInController(
     EffectController(
         modifier = modifier,
         label = fadeInLabel(fadeInSecs),
-        iconPainter = painterResource(R.drawable.fade_in),
+        icon = ImageVector.vectorResource(R.drawable.ic_fade_in),
         valueState = fadeInSecs.toFloat(),
         minValue = MinFade.toFloat(),
         maxValue = maxFade.toFloat(),
@@ -96,7 +97,7 @@ private fun FadeOutController(
     EffectController(
         modifier = modifier,
         label = fadeOutLabel(fadeOutSecs),
-        iconPainter = painterResource(R.drawable.fade_out),
+        icon = ImageVector.vectorResource(R.drawable.ic_fade_out),
         valueState = fadeOutSecs.toFloat(),
         minValue = MinFade.toFloat(),
         maxValue = maxFade.toFloat(),

@@ -81,13 +81,13 @@ private fun RepeatAction(context: Context, isRepeating: Boolean) = when {
     isRepeating -> PlaybackStateCompat.CustomAction.Builder(
         ACTION_REPEAT,
         context.getString(R.string.change_repeat),
-        R.drawable.repeat
+        R.drawable.ic_repeat,
     )
 
     else -> PlaybackStateCompat.CustomAction.Builder(
         ACTION_UNREPEAT,
         context.getString(R.string.change_repeat),
-        R.drawable.no_repeat
+        R.drawable.ic_no_repeat,
     )
 }.build()
 
@@ -95,5 +95,5 @@ private fun CancelAction(context: Context) =
     PlaybackStateCompat.CustomAction.Builder(
         ACTION_DISMISS,
         context.getString(R.string.cancel),
-        R.drawable.cross
+        R.drawable.ic_cancel
     ).build()

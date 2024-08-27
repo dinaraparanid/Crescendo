@@ -17,7 +17,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.painter.Painter
+import androidx.compose.ui.graphics.vector.ImageVector
 import com.paranid5.crescendo.core.resources.ui.theme.AppTheme.colors
 import com.paranid5.crescendo.core.resources.ui.theme.AppTheme.dimensions
 import com.paranid5.crescendo.core.resources.ui.theme.AppTheme.typography
@@ -25,7 +25,7 @@ import com.paranid5.crescendo.core.resources.ui.theme.AppTheme.typography
 @Composable
 internal fun EffectController(
     label: String,
-    iconPainter: Painter,
+    icon: ImageVector,
     valueState: Float,
     minValue: Float,
     maxValue: Float,
@@ -38,7 +38,7 @@ internal fun EffectController(
     Spacer(Modifier.height(dimensions.padding.extraSmall))
 
     EffectIconSlider(
-        iconPainter = iconPainter,
+        icon = icon,
         initialValue = valueState,
         minValue = minValue,
         maxValue = maxValue,
@@ -63,7 +63,7 @@ private fun EffectLabel(
 
 @Composable
 private inline fun EffectIconSlider(
-    iconPainter: Painter,
+    icon: ImageVector,
     initialValue: Float,
     minValue: Float,
     maxValue: Float,
@@ -73,7 +73,7 @@ private inline fun EffectIconSlider(
     contentDescription: String? = null,
 ) = Row(modifier) {
     EffectIcon(
-        iconPainter = iconPainter,
+        icon = icon,
         contentDescription = contentDescription,
         modifier = Modifier.align(Alignment.CenterVertically),
     )
@@ -94,11 +94,11 @@ private inline fun EffectIconSlider(
 
 @Composable
 private fun EffectIcon(
-    iconPainter: Painter,
+    icon: ImageVector,
     modifier: Modifier = Modifier,
     contentDescription: String? = null,
 ) = Icon(
-    painter = iconPainter,
+    imageVector = icon,
     contentDescription = contentDescription,
     tint = colors.primary,
     modifier = modifier,

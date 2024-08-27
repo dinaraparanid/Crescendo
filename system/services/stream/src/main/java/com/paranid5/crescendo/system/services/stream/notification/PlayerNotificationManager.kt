@@ -5,6 +5,7 @@ import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
 import android.graphics.Bitmap
+import android.media.session.MediaSession
 import androidx.annotation.OptIn
 import androidx.core.app.NotificationCompat
 import androidx.media3.common.Player
@@ -55,7 +56,7 @@ internal fun PlayerNotificationManager(service: StreamService) =
 
             setPriority(NotificationCompat.PRIORITY_HIGH)
             setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
-            setMediaSessionToken(service.mediaSessionManager.sessionToken)
+            setMediaSessionToken(service.mediaSessionManager.sessionToken.token as MediaSession.Token)
         }
 
 @OptIn(UnstableApi::class)
