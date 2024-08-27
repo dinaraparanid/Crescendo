@@ -2,11 +2,9 @@ package com.paranid5.crescendo.trimmer.presentation.ui
 
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -19,9 +17,9 @@ import com.paranid5.crescendo.ui.foundation.AppRippleButton
 @Composable
 internal fun FileSaveButton(
     state: TrimmerState,
-    isFileSaveDialogShownState: MutableState<Boolean>,
     modifier: Modifier = Modifier,
     textModifier: Modifier = Modifier,
+    onClick: () -> Unit,
 ) {
     val trimRange = remember(state.playbackPositions.trimRange) {
         state.playbackPositions.trimRange
@@ -31,8 +29,6 @@ internal fun FileSaveButton(
         state.trackDurationInMillis
     }
 
-    var isFileSaveDialogShown by isFileSaveDialogShownState
-
     val isClickable by remember(trimRange, trackDurationMillis) {
         derivedStateOf { trimRange.totalDurationMillis in 1..trackDurationMillis }
     }
@@ -40,7 +36,7 @@ internal fun FileSaveButton(
     AppRippleButton(
         modifier = modifier,
         isEnabled = isClickable,
-        onClick = { isFileSaveDialogShown = true },
+        onClick = onClick,
         content = { FileSaveButtonLabel(textModifier) },
     )
 }

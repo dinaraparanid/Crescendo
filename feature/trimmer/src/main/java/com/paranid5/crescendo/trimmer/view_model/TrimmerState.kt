@@ -3,6 +3,7 @@ package com.paranid5.crescendo.trimmer.view_model
 import android.os.Parcelable
 import androidx.compose.runtime.Immutable
 import androidx.compose.ui.focus.FocusState
+import com.paranid5.crescendo.core.common.caching.Formats
 import com.paranid5.crescendo.core.common.trimming.FadeDurations
 import com.paranid5.crescendo.core.common.trimming.PitchAndSpeed
 import com.paranid5.crescendo.core.common.trimming.TrimRange
@@ -29,6 +30,7 @@ data class TrimmerState(
     val playbackPositions: PlaybackPositions = PlaybackPositions(),
     val playbackProperties: PlaybackProperties = PlaybackProperties(),
     val waveformProperties: WaveformZoomProperties = WaveformZoomProperties(),
+    val fileSaveDialogProperties: FileSaveDialogProperties = FileSaveDialogProperties(),
     @IgnoredOnParcel val focusEvent: FocusState? = null,
 ) : Parcelable {
 
@@ -109,6 +111,20 @@ data class TrimmerState(
 
         @IgnoredOnParcel
         val scrollRatio = zoomSteps + 1 - zoomLevel
+    }
+
+    @Parcelize
+    @Immutable
+    data class FileSaveDialogProperties(
+        val isDialogVisible: Boolean = false,
+        val filename: String = "",
+        val selectedSaveOptionIndex: Int = 0,
+    ) : Parcelable {
+        @IgnoredOnParcel
+        val audioFormat = Formats.entries[selectedSaveOptionIndex]
+
+        @IgnoredOnParcel
+        val isSaveButtonClickable = filename.isNotBlank()
     }
 
     @IgnoredOnParcel

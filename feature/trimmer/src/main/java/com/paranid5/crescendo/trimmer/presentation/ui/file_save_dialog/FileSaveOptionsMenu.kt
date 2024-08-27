@@ -22,11 +22,11 @@ import kotlinx.collections.immutable.ImmutableList
 @Composable
 internal fun FileSaveOptionsMenu(
     fileSaveOptions: ImmutableList<String>,
-    selectedSaveOptionIndexState: MutableState<Int>,
+    selectedSaveOptionIndex: Int,
     modifier: Modifier = Modifier,
+    onItemClick: (index: Int) -> Unit,
 ) {
     val isDropdownShownState = remember { mutableStateOf(false) }
-    val selectedSaveOptionIndex by selectedSaveOptionIndexState
 
     Box(modifier) {
         OptionLabel(
@@ -38,8 +38,8 @@ internal fun FileSaveOptionsMenu(
 
         FileOptionsMenu(
             fileSaveOptions = fileSaveOptions,
-            selectedSaveOptionIndexState = selectedSaveOptionIndexState,
             isDropdownShownState = isDropdownShownState,
+            onItemClick = onItemClick,
         )
     }
 }
@@ -67,9 +67,9 @@ private fun OptionLabel(
 @Composable
 private fun FileOptionsMenu(
     fileSaveOptions: ImmutableList<String>,
-    selectedSaveOptionIndexState: MutableState<Int>,
     isDropdownShownState: MutableState<Boolean>,
     modifier: Modifier = Modifier,
+    onItemClick: (index: Int) -> Unit,
 ) {
     var isDropdownShown by isDropdownShownState
 
@@ -82,7 +82,7 @@ private fun FileOptionsMenu(
             FileOption(
                 option = option,
                 index = index,
-                selectedSaveOptionIndexState = selectedSaveOptionIndexState,
+                onItemClick = onItemClick,
             )
         }
     }
@@ -92,20 +92,16 @@ private fun FileOptionsMenu(
 private fun FileOption(
     option: String,
     index: Int,
-    selectedSaveOptionIndexState: MutableState<Int>,
     modifier: Modifier = Modifier,
-) {
-    var selectedSaveOptionIndex by selectedSaveOptionIndexState
-
-    DropdownMenuItem(
-        modifier = modifier,
-        text = {
-            Text(
-                text = option,
-                color = colors.text.primary,
-                style = typography.regular,
-            )
-        },
-        onClick = { selectedSaveOptionIndex = index },
-    )
-}
+    onItemClick: (index: Int) -> Unit,
+) = DropdownMenuItem(
+    modifier = modifier,
+    text = {
+        Text(
+            text = option,
+            color = colors.text.primary,
+            style = typography.regular,
+        )
+    },
+    onClick = { onItemClick(index) },
+)

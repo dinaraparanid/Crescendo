@@ -23,6 +23,7 @@ import com.paranid5.crescendo.trimmer.domain.player.seekTenSecsBack
 import com.paranid5.crescendo.trimmer.domain.player.seekTenSecsForward
 import com.paranid5.crescendo.trimmer.domain.player.stopAndReleaseCatching
 import com.paranid5.crescendo.trimmer.domain.trimTrackAndSendBroadcast
+import com.paranid5.crescendo.trimmer.view_model.TrimmerState.FileSaveDialogProperties
 import com.paranid5.crescendo.trimmer.view_model.TrimmerState.PlaybackPositions
 import com.paranid5.crescendo.trimmer.view_model.TrimmerState.PlaybackPositions.Companion.InitialPosition
 import com.paranid5.crescendo.trimmer.view_model.TrimmerState.PlaybackProperties
@@ -51,6 +52,7 @@ import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
 import linc.com.amplituda.Amplituda
 import linc.com.amplituda.callback.AmplitudaErrorListener
+import java.io.File
 
 @UnstableApi
 internal class TrimmerViewModelImpl(
@@ -120,6 +122,9 @@ internal class TrimmerViewModelImpl(
     private fun updatePlaybackProperties(func: PlaybackProperties.() -> PlaybackProperties) =
         updateState { copy(playbackProperties = func(playbackProperties)) }
 
+    private fun updateFileSaveDialogProperties(func: FileSaveDialogProperties.() -> FileSaveDialogProperties) =
+        updateState { copy(fileSaveDialogProperties = func(fileSaveDialogProperties)) }
+
     override fun onUiIntent(intent: TrimmerUiIntent) = when (intent) {
         is TrimmerUiIntent.LoadTrack -> {
             loadTrack(trackPath = intent.trackPath)
@@ -139,8 +144,8 @@ internal class TrimmerViewModelImpl(
                 trimTrackAndSendBroadcast(
                     context = appContext,
                     track = it,
-                    outputFilename = intent.outputFilename,
-                    audioFormat = intent.audioFormat,
+                    outputFilename = state.fileSaveDialogProperties.filename,
+                    audioFormat = state.fileSaveDialogProperties.audioFormat,
                     trimRange = state.playbackPositions.trimRange,
                     pitchAndSpeed = state.playbackProperties.pitchAndSpeed,
                     fadeDurations = state.playbackPositions.fadeDurations,
@@ -155,6 +160,8 @@ internal class TrimmerViewModelImpl(
         is TrimmerUiIntent.Player -> onPlayerUiIntent(intent = intent)
 
         is TrimmerUiIntent.Positions -> onPositionUiIntent(intent = intent)
+
+        is TrimmerUiIntent.FileSave -> onFileSaveUiIntent(intent = intent)
     }
 
     private fun onLifecycleUiIntent(intent: TrimmerUiIntent.Lifecycle) = when (intent) {
@@ -215,8 +222,25 @@ internal class TrimmerViewModelImpl(
         }
     }
 
+    private fun onFileSaveUiIntent(intent: TrimmerUiIntent.FileSave) = when (intent) {
+        is TrimmerUiIntent.FileSave.SelectSaveOption -> updateFileSaveDialogProperties {
+            copy(selectedSaveOptionIndex = intent.saveOptionIndex)
+        }
+
+        is TrimmerUiIntent.FileSave.UpdateDialogVisibility -> updateFileSaveDialogProperties {
+            copy(isDialogVisible = intent.isVisible)
+        }
+
+        is TrimmerUiIntent.FileSave.UpdateFilename -> updateFilename(filename = intent.filename)
+    }
+
+    private fun updateFilename(filename: String) = updateFileSaveDialogProperties {
+        copy(filename = filename)
+    }
+
     private fun loadTrack(trackPath: String) = viewModelScope.sideEffect(Dispatchers.Default) {
         updateState { copy(trackState = UiState.Loading) }
+        updateFilename(filename = initialFilename(trackPath = trackPath))
 
         val trackUiState = tracksRepository
             .getTrackFromMediaStore(trackPath = trackPath)
@@ -240,6 +264,9 @@ internal class TrimmerViewModelImpl(
             )
         }
     }
+
+    private fun initialFilename(trackPath: String) =
+        trackPath.let(::File).nameWithoutExtension
 
     private fun loadTrackAmplitudes(trackPath: String) =
         viewModelScope.sideEffect(Dispatchers.Default) {

@@ -8,10 +8,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
-import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -37,10 +35,6 @@ internal fun TrimmerScreenContent(
     onUiIntent: (TrimmerUiIntent) -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    val isFileSaveDialogShownState = remember {
-        mutableStateOf(false)
-    }
-
     val screenWidthPxState = remember {
         mutableIntStateOf(1)
     }
@@ -52,13 +46,11 @@ internal fun TrimmerScreenContent(
             state = state,
             onUiIntent = onUiIntent,
             screenWidthPx = screenWidthPx,
-            isFileSaveDialogShownState = isFileSaveDialogShownState,
         )
 
         FileSaveDialog(
-            state = state,
+            state = state.fileSaveDialogProperties,
             onUiIntent = onUiIntent,
-            isDialogShownState = isFileSaveDialogShownState,
             modifier = Modifier.align(Alignment.Center),
         )
     }
@@ -70,7 +62,6 @@ private fun TrimmerScreenContentOriented(
     state: TrimmerState,
     onUiIntent: (TrimmerUiIntent) -> Unit,
     screenWidthPx: Int,
-    isFileSaveDialogShownState: MutableState<Boolean>,
 ) {
     val config = LocalConfiguration.current
 
@@ -93,7 +84,6 @@ private fun TrimmerScreenContentOriented(
                 state = state,
                 onUiIntent = onUiIntent,
                 screenWidthPx = screenWidthPx,
-                isFileSaveDialogShownState = isFileSaveDialogShownState,
                 modifier = Modifier.fillMaxSize(),
             )
 
@@ -101,7 +91,6 @@ private fun TrimmerScreenContentOriented(
                 state = state,
                 onUiIntent = onUiIntent,
                 screenWidthPx = screenWidthPx,
-                isFileSaveDialogShownState = isFileSaveDialogShownState,
                 modifier = Modifier.fillMaxSize(),
             )
         }
@@ -113,7 +102,6 @@ private fun TrimmerScreenContentPortrait(
     state: TrimmerState,
     onUiIntent: (TrimmerUiIntent) -> Unit,
     screenWidthPx: Int,
-    isFileSaveDialogShownState: MutableState<Boolean>,
     modifier: Modifier = Modifier,
 ) = ConstraintLayout(modifier) {
     val (
@@ -197,7 +185,6 @@ private fun TrimmerScreenContentPortrait(
 
     FileSaveButton(
         state = state,
-        isFileSaveDialogShownState = isFileSaveDialogShownState,
         textModifier = Modifier.padding(vertical = appPadding.extraSmall),
         modifier = Modifier.constrainAs(saveButton) {
             top.linkTo(controllers.bottom, margin = appPadding.large)
@@ -205,7 +192,9 @@ private fun TrimmerScreenContentPortrait(
             end.linkTo(parent.end, margin = appPadding.extraMedium)
             width = Dimension.matchParent
         },
-    )
+    ) {
+        onUiIntent(TrimmerUiIntent.FileSave.UpdateDialogVisibility(isVisible = true))
+    }
 }
 
 @Composable
@@ -213,7 +202,6 @@ private fun TrimmerScreenContentLandscape(
     state: TrimmerState,
     onUiIntent: (TrimmerUiIntent) -> Unit,
     screenWidthPx: Int,
-    isFileSaveDialogShownState: MutableState<Boolean>,
     modifier: Modifier = Modifier
 ) = ConstraintLayout(modifier) {
     val (
@@ -298,12 +286,13 @@ private fun TrimmerScreenContentLandscape(
 
     FileSaveButton(
         state = state,
-        isFileSaveDialogShownState = isFileSaveDialogShownState,
         modifier = Modifier.constrainAs(saveButton) {
             bottom.linkTo(parent.bottom, margin = appPadding.extraSmall)
             start.linkTo(controllers.end, margin = appPadding.extraMedium)
             end.linkTo(parent.end, margin = appPadding.small)
             width = Dimension.fillToConstraints
         },
-    )
+    ) {
+        onUiIntent(TrimmerUiIntent.FileSave.UpdateDialogVisibility(isVisible = true))
+    }
 }
