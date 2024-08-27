@@ -10,7 +10,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import com.paranid5.crescendo.core.resources.R
-import com.paranid5.crescendo.core.resources.ui.theme.AppTheme.colors
 import com.paranid5.crescendo.core.resources.ui.theme.AppTheme.dimensions
 import com.paranid5.crescendo.core.resources.ui.theme.AppTheme.typography
 import com.paranid5.crescendo.ui.foundation.AppOutlinedTextField
@@ -33,7 +32,6 @@ internal fun FilenameInput(filenameState: MutableState<String>, modifier: Modifi
 private fun FilenameLabel(modifier: Modifier = Modifier) =
     Text(
         text = stringResource(R.string.filename),
-        color = colors.primary,
         style = typography.caption,
         modifier = modifier,
     )

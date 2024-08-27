@@ -1,8 +1,8 @@
 package com.paranid5.crescendo.utils.extensions
 
-val Long.timeString: String
+val Number.timeFormat: String
     get() {
-        var self = this
+        var self = this.toLong()
 
         val hours = self / 3600000
         self -= hours * 3600000
@@ -17,9 +17,9 @@ val Long.timeString: String
                 seconds.toTimeValue(minLength = 2)
     }
 
-val Long.timeStringMs: String
+val Number.timeFormatMs: String
     get() {
-        var self = this
+        var self = this.toLong()
 
         val hours = self / 3600000
         self -= hours * 3600000

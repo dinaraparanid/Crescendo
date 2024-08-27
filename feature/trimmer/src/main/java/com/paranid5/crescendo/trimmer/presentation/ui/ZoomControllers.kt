@@ -13,9 +13,9 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.painter.Painter
-import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.unit.dp
 import com.paranid5.crescendo.core.resources.R
 import com.paranid5.crescendo.core.resources.ui.theme.AppTheme.colors
@@ -27,6 +27,7 @@ import com.paranid5.crescendo.trimmer.view_model.TrimmerState
 import com.paranid5.crescendo.trimmer.view_model.TrimmerUiIntent
 
 private val ZoomButtonSize = 32.dp
+private val ZoomIconSize = 16.dp
 
 @Composable
 internal fun ZoomControllers(
@@ -48,7 +49,7 @@ internal fun ZoomControllers(
         onUiIntent = onUiIntent,
         modifier = modifier
             .clip(RoundedCornerShape(dimensions.corners.extraMedium))
-            .background(colors.background.alternative),
+            .background(colors.background.highContrast),
     )
 }
 
@@ -93,7 +94,7 @@ private fun ZoomInButton(
     ZoomButton(
         modifier = modifier,
         enabled = canZoomIn,
-        iconPainter = painterResource(R.drawable.zoom_in),
+        imageVector = ImageVector.vectorResource(R.drawable.ic_zoom_in),
         contentDescription = stringResource(R.string.zoom_in),
     ) {
         onUiIntent(TrimmerUiIntent.Waveform.ZoomIn)
@@ -113,7 +114,7 @@ private fun ZoomOutButton(
     ZoomButton(
         modifier = modifier,
         enabled = canZoomOut,
-        iconPainter = painterResource(R.drawable.zoom_out),
+        imageVector = ImageVector.vectorResource(R.drawable.ic_zoom_out),
         contentDescription = stringResource(R.string.zoom_out),
     ) {
         onUiIntent(TrimmerUiIntent.Waveform.ZoomOut)
@@ -122,7 +123,7 @@ private fun ZoomOutButton(
 
 @Composable
 private fun ZoomButton(
-    iconPainter: Painter,
+    imageVector: ImageVector,
     enabled: Boolean,
     contentDescription: String,
     modifier: Modifier = Modifier,
@@ -133,10 +134,10 @@ private fun ZoomButton(
     modifier = modifier.size(ZoomButtonSize),
 ) {
     Icon(
-        painter = iconPainter,
+        imageVector = imageVector,
         contentDescription = contentDescription,
-        tint = colors.primary,
-        modifier = Modifier.size(dimensions.padding.extraMedium),
+        tint = colors.text.onHighContrast,
+        modifier = Modifier.size(ZoomIconSize),
     )
 }
 
@@ -151,7 +152,7 @@ private fun ZoomRatioLabel(
 
     Text(
         text = "${1 shl zoom}X",
-        color = colors.primary,
+        color = colors.text.onHighContrast,
         style = typography.caption,
         modifier = modifier,
     )

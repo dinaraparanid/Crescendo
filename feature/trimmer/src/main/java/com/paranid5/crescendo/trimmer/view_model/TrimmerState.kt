@@ -14,7 +14,7 @@ import com.paranid5.crescendo.ui.foundation.UiState
 import com.paranid5.crescendo.ui.foundation.fold
 import com.paranid5.crescendo.ui.track.ui_state.TrackUiState
 import com.paranid5.crescendo.utils.extensions.safeDiv
-import com.paranid5.crescendo.utils.extensions.timeString
+import com.paranid5.crescendo.utils.extensions.timeFormat
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.parcelize.IgnoredOnParcel
@@ -63,7 +63,7 @@ data class TrimmerState(
         )
 
         @IgnoredOnParcel
-        val playbackText = playbackPosInMillis.timeString
+        val playbackText = playbackPosInMillis.timeFormat
     }
 
     @Parcelize

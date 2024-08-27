@@ -60,9 +60,12 @@ internal fun FileSaveDialog(
     }
 
     if (isDialogShown)
-        BasicAlertDialog(onDismissRequest = { isDialogShown = false }) {
+        BasicAlertDialog(
+            modifier = modifier,
+            onDismissRequest = { isDialogShown = false },
+        ) {
             Card(
-                modifier = modifier.fillMaxWidth(),
+                modifier = Modifier.fillMaxWidth(),
                 shape = RoundedCornerShape(dimensions.corners.medium),
                 colors = CardDefaults.cardColors(containerColor = colors.background.primary),
             ) {

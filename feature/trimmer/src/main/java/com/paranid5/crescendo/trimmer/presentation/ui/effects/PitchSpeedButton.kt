@@ -1,7 +1,10 @@
 package com.paranid5.crescendo.trimmer.presentation.ui.effects
 
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
@@ -9,6 +12,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import com.paranid5.crescendo.core.resources.R
@@ -31,13 +35,18 @@ internal fun PitchSpeedButton(
     val coroutineScope = rememberCoroutineScope()
 
     Column(
-        modifier.clickableWithRipple(bounded = true) {
-            onUiIntent(TrimmerUiIntent.ShowEffect(ShownEffects.PITCH_SPEED))
-            coroutineScope.launch { effectsScaffoldState?.show() }
-        },
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.spacedBy(dimensions.padding.extraSmall),
+        modifier = modifier
+            .clip(RoundedCornerShape(dimensions.corners.extraSmall))
+            .clickableWithRipple(bounded = true) {
+                onUiIntent(TrimmerUiIntent.ShowEffect(ShownEffects.PITCH_SPEED))
+                coroutineScope.launch { effectsScaffoldState?.show() }
+            },
     ) {
-        PitchSpeedIcon(Modifier.align(Alignment.CenterHorizontally))
-        PitchSpeedLabel(Modifier.align(Alignment.CenterHorizontally))
+        val commonModifier = Modifier.padding(horizontal = dimensions.padding.extraSmall)
+        PitchSpeedIcon(commonModifier.padding(top = dimensions.padding.extraSmall))
+        PitchSpeedLabel(commonModifier.padding(bottom = dimensions.padding.extraSmall))
     }
 }
 
@@ -46,7 +55,7 @@ private fun PitchSpeedIcon(modifier: Modifier = Modifier) =
     Icon(
         painter = painterResource(R.drawable.pitch_speed),
         contentDescription = labelMessage(),
-        tint = colors.primary,
+        tint = colors.text.onHighContrast,
         modifier = modifier.size(dimensions.padding.big),
     )
 
@@ -54,7 +63,7 @@ private fun PitchSpeedIcon(modifier: Modifier = Modifier) =
 private fun PitchSpeedLabel(modifier: Modifier) =
     Text(
         text = labelMessage(),
-        color = colors.primary,
+        color = colors.text.onHighContrast,
         style = typography.captionSm,
         modifier = modifier,
     )

@@ -20,7 +20,7 @@ import com.paranid5.crescendo.core.resources.ui.theme.AppTheme.colors
 import com.paranid5.crescendo.core.resources.ui.theme.AppTheme.dimensions
 import com.paranid5.crescendo.core.resources.ui.theme.AppTheme.typography
 import com.paranid5.crescendo.feature.playing.view_model.PlayingState
-import com.paranid5.crescendo.utils.extensions.timeString
+import com.paranid5.crescendo.utils.extensions.timeFormat
 
 @Composable
 internal fun PlaybackSliderWithTimeContainer(
@@ -53,7 +53,7 @@ internal fun PlaybackSliderWithTimeContainer(
 @Composable
 internal fun TimeText(time: Long, color: Color, modifier: Modifier = Modifier) =
     Text(
-        text = time.timeString,
+        text = time.timeFormat,
         color = color,
         modifier = modifier,
         style = typography.body,

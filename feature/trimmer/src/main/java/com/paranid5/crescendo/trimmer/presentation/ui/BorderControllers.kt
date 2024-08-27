@@ -13,12 +13,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
 import com.paranid5.crescendo.core.resources.R
-import com.paranid5.crescendo.core.resources.ui.theme.AppTheme.colors
 import com.paranid5.crescendo.core.resources.ui.theme.AppTheme.typography
 import com.paranid5.crescendo.trimmer.view_model.TrimmerState
 import com.paranid5.crescendo.trimmer.view_model.TrimmerUiIntent
 import com.paranid5.crescendo.ui.foundation.AppOutlinedTextField
-import com.paranid5.crescendo.utils.extensions.timeStringMs
+import com.paranid5.crescendo.utils.extensions.timeFormatMs
 import com.paranid5.crescendo.utils.extensions.toTimeOrNull
 
 /** hh:mm:ss.xxx */
@@ -92,10 +91,10 @@ private fun BorderController(
     label: String,
     millis: Long,
     setMillis: (Long) -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     var millisStr by remember(millis) {
-        mutableStateOf(millis.timeStringMs)
+        mutableStateOf(millis.timeFormatMs)
     }
 
     AppOutlinedTextField(
@@ -113,7 +112,6 @@ private fun BorderController(
 private fun BorderControllerLabel(text: String, modifier: Modifier = Modifier) =
     Text(
         text = text,
-        color = colors.primary,
         style = typography.caption,
         modifier = modifier,
     )

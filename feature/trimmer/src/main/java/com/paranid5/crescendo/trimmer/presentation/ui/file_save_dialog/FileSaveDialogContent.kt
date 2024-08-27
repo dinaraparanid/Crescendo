@@ -24,15 +24,19 @@ internal fun FileSaveDialogContent(
     isDialogShownState: MutableState<Boolean>,
     filenameState: MutableState<String>,
     selectedSaveOptionIndexState: MutableState<Int>,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     val outputFilename by filenameState
 
     Column(modifier) {
-        Title(Modifier.align(Alignment.CenterHorizontally))
-        Spacer(Modifier.height(dimensions.padding.medium))
+        Spacer(Modifier.height(dimensions.padding.extraMedium))
+
+        FileSaveDialogLabel(Modifier.align(Alignment.CenterHorizontally))
+
+        Spacer(Modifier.height(dimensions.padding.extraBig))
 
         FilenameInput(filenameState = filenameState)
+
         Spacer(Modifier.height(dimensions.padding.medium))
 
         FileSaveOptionsMenu(
@@ -43,7 +47,7 @@ internal fun FileSaveDialogContent(
                 .padding(horizontal = dimensions.padding.medium),
         )
 
-        Spacer(Modifier.height(dimensions.padding.medium))
+        Spacer(Modifier.height(dimensions.padding.extraBig))
 
         ConfirmButton(
             onUiIntent = onUiIntent,
@@ -55,5 +59,7 @@ internal fun FileSaveDialogContent(
                 .padding(vertical = dimensions.padding.medium)
                 .align(Alignment.CenterHorizontally),
         )
+
+        Spacer(Modifier.height(dimensions.padding.medium))
     }
 }

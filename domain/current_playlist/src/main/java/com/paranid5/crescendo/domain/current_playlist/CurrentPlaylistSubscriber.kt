@@ -1,7 +1,7 @@
 package com.paranid5.crescendo.domain.current_playlist
 
 import com.paranid5.crescendo.core.common.tracks.Track
-import com.paranid5.crescendo.utils.extensions.timeString
+import com.paranid5.crescendo.utils.extensions.timeFormat
 import com.paranid5.crescendo.utils.extensions.totalDurationMillis
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
@@ -17,4 +17,4 @@ inline val CurrentPlaylistSubscriber.currentPlaylistDurationMillisFlow
     get() = currentPlaylistFlow.map { it.totalDurationMillis }
 
 inline val CurrentPlaylistSubscriber.currentPlaylistDurationFormattedFlow
-    get() = currentPlaylistDurationMillisFlow.map { it.timeString }
+    get() = currentPlaylistDurationMillisFlow.map { it.timeFormat }

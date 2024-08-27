@@ -34,11 +34,11 @@ fun CacheDialog(
     UpdateUrlEffect(url = url, onUiIntent = onUiIntent)
 
     BasicAlertDialog(
+        modifier = modifier,
         onDismissRequest = hide,
-        modifier = modifier
     ) {
         Card(
-            modifier = modifier.fillMaxWidth(),
+            modifier = Modifier.fillMaxWidth(),
             shape = RoundedCornerShape(dimensions.corners.extraMedium),
             colors = CardDefaults.cardColors(containerColor = colors.background.primary),
         ) {

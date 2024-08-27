@@ -21,7 +21,7 @@ import com.paranid5.crescendo.ui.covers.AppClippedCover
 import com.paranid5.crescendo.ui.covers.ImageContainer
 import com.paranid5.crescendo.ui.foundation.UiState
 import com.paranid5.crescendo.ui.metadata.VideoMetadataUiState
-import com.paranid5.crescendo.utils.extensions.timeString
+import com.paranid5.crescendo.utils.extensions.timeFormat
 
 private val ImageHeight = 164.dp
 
@@ -84,7 +84,7 @@ private fun TitleWithDuration(
     Text(
         text = stringResource(
             R.string.stream_fetch_url_meta_duration,
-            videoMeta.durationMillis.timeString,
+            videoMeta.durationMillis.timeFormat,
         ),
         textAlign = TextAlign.Center,
         color = colors.text.onHighContrast,

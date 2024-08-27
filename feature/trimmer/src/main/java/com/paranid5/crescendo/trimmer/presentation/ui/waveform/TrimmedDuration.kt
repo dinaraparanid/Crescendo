@@ -10,7 +10,7 @@ import androidx.compose.ui.text.font.FontWeight
 import com.paranid5.crescendo.core.resources.ui.theme.AppTheme.colors
 import com.paranid5.crescendo.core.resources.ui.theme.AppTheme.typography
 import com.paranid5.crescendo.trimmer.view_model.TrimmerState
-import com.paranid5.crescendo.utils.extensions.timeString
+import com.paranid5.crescendo.utils.extensions.timeFormat
 
 @Composable
 internal fun TrimmedDuration(
@@ -26,14 +26,14 @@ internal fun TrimmedDuration(
     }
 
     val trimmedDuration by remember(duration, speed) {
-        derivedStateOf { (duration / speed).toLong().timeString }
+        derivedStateOf { (duration / speed).timeFormat }
     }
 
     Text(
         text = trimmedDuration,
         style = typography.body,
         fontWeight = FontWeight.Bold,
-        color = colors.primary,
+        color = colors.text.onHighContrast,
         modifier = modifier,
     )
 }
