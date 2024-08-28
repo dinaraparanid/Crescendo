@@ -68,8 +68,13 @@ internal class PlayerControllerImpl(
     private inline val currentPosition
         get() = currentPositionState.value
 
-    override fun updateCurrentPosition() =
-        _currentPositionState.update { player.currentPosition }
+    override fun fetchPositionFromPlayer() =
+        updateCurrentPosition(position = player.currentPosition)
+
+    override fun resetPosition() = updateCurrentPosition(position = 0)
+
+    private fun updateCurrentPosition(position: Long) =
+        _currentPositionState.update { position }
 
     override suspend fun updateAndStoreRepeating(isRepeating: Boolean) {
         repeatMode = repeatMode(isRepeating)
@@ -104,7 +109,7 @@ internal class PlayerControllerImpl(
     }
 
     override fun resetAudioSessionIdIfNotPlaying() {
-        if (!isPlaying) resetAudioSessionId()
+        if (isPlaying.not()) resetAudioSessionId()
     }
 
     @OptIn(UnstableApi::class)

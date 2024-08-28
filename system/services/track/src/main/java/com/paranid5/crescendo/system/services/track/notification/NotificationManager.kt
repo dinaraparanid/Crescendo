@@ -18,9 +18,9 @@ internal class NotificationManager(
 ) : CurrentTrackSubscriber by tracksRepository {
     internal val currentTrackState by lazy {
         currentTrackFlow.stateIn(
-            service.serviceScope,
-            SharingStarted.WhileSubscribed(),
-            null
+            scope = service.serviceScope,
+            started = SharingStarted.Eagerly,
+            initialValue = null,
         )
     }
 

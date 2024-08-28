@@ -33,10 +33,11 @@ internal suspend fun TrackService.startPlaybackStatesMonitoring() =
                     isPlaying = isPlaying,
                     isRepeating = isRepeating,
                     currentPlaybackPosition = position,
-                    speed = speed
+                    speed = speed,
                 )
             }
             .collectLatest {
+                // TODO: здесь хуйня
                 mediaSessionManager.updatePlaybackState(it)
                 notificationManager.updateNotification()
             }
@@ -58,7 +59,7 @@ private fun PlaybackState(
         },
         currentPlaybackPosition,
         speed,
-        SystemClock.elapsedRealtime()
+        SystemClock.elapsedRealtime(),
     )
     .build()
 

@@ -18,6 +18,7 @@ import com.paranid5.crescendo.feature.playing.domain.PlayingInteractor
 import com.paranid5.crescendo.system.services.track.TrackServiceInteractor
 import com.paranid5.crescendo.ui.metadata.VideoMetadataUiState
 import com.paranid5.crescendo.ui.track.ui_state.TrackUiState
+import com.paranid5.crescendo.utils.doNothing
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.collectLatest
@@ -114,7 +115,16 @@ internal class PlayingViewModelImpl(
 
     private fun onPrevButtonClick() = nullable {
         val audioStatus = state.screenPlaybackStatus.bind()
-        viewModelScope.launch { playbackRepository.updateAudioStatus(playbackStatus = audioStatus) }
+
+        viewModelScope.launch {
+            playbackRepository.updateAudioStatus(playbackStatus = audioStatus)
+
+            audioStatus.fold(
+                ifStream = doNothing,
+                ifTrack = { resetTrackPlaybackPosition() },
+            )
+        }
+
         interactor.sendOnPrevButtonClickedBroadcast(playbackStatus = audioStatus)
     }
 
@@ -132,9 +142,21 @@ internal class PlayingViewModelImpl(
 
     private fun onNextButtonClick() = nullable {
         val audioStatus = state.screenPlaybackStatus.bind()
-        viewModelScope.launch { playbackRepository.updateAudioStatus(playbackStatus = audioStatus) }
+
+        viewModelScope.launch {
+            playbackRepository.updateAudioStatus(playbackStatus = audioStatus)
+
+            audioStatus.fold(
+                ifStream = doNothing,
+                ifTrack = { resetTrackPlaybackPosition() },
+            )
+        }
+
         interactor.sendOnNextButtonClickedBroadcast(playbackStatus = audioStatus)
     }
+
+    private suspend inline fun resetTrackPlaybackPosition() =
+        playbackRepository.updateTracksPlaybackPosition(0)
 
     private fun onAudioEffectsClick() = when {
         interactor.isAllowedToShowAudioEffects -> updateState {

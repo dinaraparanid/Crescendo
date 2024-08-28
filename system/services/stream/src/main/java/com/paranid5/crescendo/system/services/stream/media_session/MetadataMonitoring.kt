@@ -22,5 +22,6 @@ internal suspend fun StreamService.startMetadataMonitoring() =
             }
     }
 
-private suspend inline fun VideoMetadata.toAndroidMetadata(context: Context) =
-    toAndroidMetadata(getVideoCoverBitmapOrThumbnailAsync(context = context, videoCovers = covers).await())
+private suspend inline fun VideoMetadata.toAndroidMetadata(context: Context) = toAndroidMetadata(
+    getVideoCoverBitmapOrThumbnailAsync(context = context, videoCovers = covers).await()
+)

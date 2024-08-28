@@ -37,6 +37,7 @@ internal suspend fun StreamService.startPlaybackStatesMonitoring() =
                 )
             }
             .collectLatest {
+                // TODO: здесь хуйня
                 mediaSessionManager.updatePlaybackState(it)
                 notificationManager.updateNotification()
             }

@@ -123,12 +123,14 @@ private suspend inline fun TrackService.onSeekToPreviousTrack(playlistSize: Int)
     playerProvider.resetAudioSessionIdIfNotPlaying()
     val newCurTrackInd = playerProvider.seekToPreviousTrackViaPlayer(playlistSize)
     playerProvider.updateCurrentTrackIndex(newCurTrackInd)
+    playerProvider.resetPosition()
 }
 
 private suspend inline fun TrackService.onSeekToNextTrack() {
     playerProvider.resetAudioSessionIdIfNotPlaying()
     val newCurTrackInd = playerProvider.seekToNextTrackViaPlayer()
     playerProvider.updateCurrentTrackIndex(newCurTrackInd)
+    playerProvider.resetPosition()
 }
 
 private fun TrackService.onAddTrackToPlaylist(track: Track) =

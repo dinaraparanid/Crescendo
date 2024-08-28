@@ -17,7 +17,10 @@ interface PlayerController :
     val isPlayingState: StateFlow<Boolean>
 
     val currentPositionState: StateFlow<Long>
-    fun updateCurrentPosition()
+
+    fun fetchPositionFromPlayer()
+
+    fun resetPosition()
 
     suspend fun updateAndStoreRepeating(isRepeating: Boolean)
 

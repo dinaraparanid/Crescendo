@@ -2,16 +2,34 @@ package com.paranid5.crescendo.system.services.video_cache.notification
 
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.repeatOnLifecycle
-import arrow.core.Tuple6
 import com.paranid5.crescendo.core.common.caching.CachingStatus
+import com.paranid5.crescendo.core.common.caching.DownloadingStatus
+import com.paranid5.crescendo.core.common.metadata.VideoMetadata
+import com.paranid5.crescendo.data.ktor.DownloadingProgress
 import com.paranid5.crescendo.system.services.video_cache.VideoCacheService
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.mapNotNull
+import kotlinx.coroutines.flow.runningFold
 
-private const val TOO_FREQUENT_UPDATES = 1000
+private const val DELAY_BETWEEN_EVENTS = 1000L
 
-internal suspend inline fun VideoCacheService.startNotificationMonitoring() =
+private data class NotificationData(
+    val downloadStatus: DownloadingStatus,
+    val downloadProgress: DownloadingProgress,
+    val cachingStatus: CachingStatus,
+    val meta: VideoMetadata,
+    val queueLen: Int,
+    val timestamp: Long = System.currentTimeMillis(),
+)
+
+private data class NotificationHistory(
+    val previous: NotificationData? = null,
+    val current: NotificationData? = null,
+)
+
+internal suspend fun VideoCacheService.startNotificationMonitoring() =
     lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
         combine(
             mediaFileDownloader.downloadStatusState,
@@ -20,20 +38,24 @@ internal suspend inline fun VideoCacheService.startNotificationMonitoring() =
             videoQueueManager.currentVideoMetadataState,
             videoQueueManager.videoQueueLenState,
         ) { downloadStatus, downloadProgress, cachingStatus, meta, queueLen ->
-            Tuple6(
-                downloadStatus,
-                downloadProgress,
-                cachingStatus,
-                meta,
-                queueLen,
-                System.currentTimeMillis(),
+            NotificationData(
+                downloadStatus = downloadStatus,
+                downloadProgress = downloadProgress,
+                cachingStatus = cachingStatus,
+                meta = meta,
+                queueLen = queueLen,
             )
-        }.distinctUntilChanged { (_, _, _, _, _, prevTimestamp), (_, _, curCacheSt, _, _, curTimestamp) ->
-            when {
-                curCacheSt != CachingStatus.NONE -> false
-                else -> curTimestamp - prevTimestamp < TOO_FREQUENT_UPDATES
-            }
-        }.collectLatest { (downloadSt, progress, cacheSt, meta, qLen) ->
+        }.runningFold(initial = NotificationHistory()) { acc, data ->
+            NotificationHistory(previous = acc.current, current = data)
+        }.mapNotNull { (prev, cur) ->
+            val prevTime = prev?.timestamp ?: 0
+            val currentTime = cur?.timestamp ?: 0
+
+            if (currentTime - prevTime < DELAY_BETWEEN_EVENTS)
+                delay(DELAY_BETWEEN_EVENTS)
+
+            cur
+        }.collectLatest { (downloadSt, progress, cacheSt, meta, qLen, _) ->
             notificationManager.showNotification(
                 service = this@startNotificationMonitoring,
                 downloadStatus = downloadSt,

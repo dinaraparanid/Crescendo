@@ -56,7 +56,7 @@ class VideoCacheService : SuspendService(), PlaybackForegroundService, KoinCompo
 
         launchMonitoringTasks()
 
-        val videoData = intent!!.videoCacheDataArg
+        val videoData = requireNotNull(intent?.videoCacheDataArg)
         cacheNewVideoAsync(videoData)
 
         return START_REDELIVER_INTENT
@@ -76,28 +76,31 @@ private fun VideoCacheService.launchMonitoringTasks() {
 
 internal inline val Intent.videoCacheDataArg
     get() = VideoCacheData(
-        url = getStringExtra(VideoCacheServiceBroadcasts.URL_ARG)!!,
-        desiredFilename = getStringExtra(VideoCacheServiceBroadcasts.FILENAME_ARG)!!,
+        url = requireNotNull(getStringExtra(VideoCacheServiceBroadcasts.URL_ARG)),
+        desiredFilename = requireNotNull(getStringExtra(VideoCacheServiceBroadcasts.FILENAME_ARG)),
         format = formatArg,
-        trimRange = trimRangeArg.toEntity()
+        trimRange = trimRangeArg.toEntity(),
     )
 
 @Suppress("DEPRECATION")
 private inline val Intent.formatArg
     get() = when {
-        Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU ->
-            getSerializableExtra(VideoCacheServiceBroadcasts.FORMAT_ARG, Formats::class.java)!!
+        Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU -> requireNotNull(
+            getSerializableExtra(VideoCacheServiceBroadcasts.FORMAT_ARG, Formats::class.java)
+        )
 
         else -> getSerializableExtra(VideoCacheServiceBroadcasts.FORMAT_ARG) as Formats
     }
 
 @Suppress("DEPRECATION")
 private inline val Intent.trimRangeArg
-    get() = when {
-        Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU -> getParcelableExtra(
-            VideoCacheServiceBroadcasts.TRIM_RANGE_ARG,
-            TrimRangeModel::class.java
-        )!!
+    get() = requireNotNull(
+        when {
+            Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU -> getParcelableExtra(
+                VideoCacheServiceBroadcasts.TRIM_RANGE_ARG,
+                TrimRangeModel::class.java,
+            )
 
-        else -> getParcelableExtra(VideoCacheServiceBroadcasts.TRIM_RANGE_ARG)!!
-    }
+            else -> getParcelableExtra(VideoCacheServiceBroadcasts.TRIM_RANGE_ARG)
+        }
+    )

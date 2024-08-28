@@ -5,7 +5,6 @@ import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
 import android.graphics.Bitmap
-import android.media.session.MediaSession
 import androidx.annotation.OptIn
 import androidx.core.app.NotificationCompat
 import androidx.media3.common.Player
@@ -40,7 +39,7 @@ internal fun PlayerNotificationManager(service: TrackService) =
         .setChannelDescriptionResourceId(R.string.app_name)
         .setChannelImportance(NotificationUtil.IMPORTANCE_HIGH)
         .setNotificationListener(NotificationListener(service))
-        .setMediaDescriptionAdapter(MediaDescriptionProvider(service))
+        .setMediaDescriptionAdapter(MediaDescriptionAdapter(service))
         .setCustomActionReceiver(CustomActionsReceiver(service))
         .setFastForwardActionIconResourceId(R.drawable.ic_music_next)
         .setRewindActionIconResourceId(R.drawable.ic_music_previous)
@@ -57,7 +56,7 @@ internal fun PlayerNotificationManager(service: TrackService) =
 
             setPriority(NotificationCompat.PRIORITY_HIGH)
             setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
-            setMediaSessionToken(service.mediaSessionManager.sessionToken.token as MediaSession.Token)
+            setMediaSessionToken(service.mediaSessionManager.sessionToken)
         }
 
 @OptIn(UnstableApi::class)
@@ -71,7 +70,7 @@ private fun NotificationListener(service: TrackService) =
         override fun onNotificationPosted(
             notificationId: Int,
             notification: Notification,
-            ongoing: Boolean
+            ongoing: Boolean,
         ) {
             super.onNotificationPosted(notificationId, notification, ongoing)
             service.startMediaForeground(notificationId, notification)
@@ -79,7 +78,7 @@ private fun NotificationListener(service: TrackService) =
     }
 
 @OptIn(UnstableApi::class)
-private fun MediaDescriptionProvider(service: TrackService) =
+private fun MediaDescriptionAdapter(service: TrackService) =
     object : PlayerNotificationManager.MediaDescriptionAdapter {
         override fun getCurrentContentTitle(player: Player) =
             service.trackTitle ?: service.getString(R.string.unknown_track)
