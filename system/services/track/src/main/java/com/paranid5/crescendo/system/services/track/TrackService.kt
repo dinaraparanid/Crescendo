@@ -99,8 +99,8 @@ class TrackService : SuspendService(), PlaybackForegroundService, KoinComponent,
         super.onStartCommand(intent, flags, startId)
         connect(startId)
 
-        when (intent!!.startType) {
-            TrackServiceStart.RESUME -> startResumingAsync()
+        when (intent?.startType) {
+            TrackServiceStart.RESUME, null -> startResumingAsync()
             TrackServiceStart.NEW_TRACK -> playPlaylistAsync()
         }
 

@@ -39,7 +39,7 @@ internal suspend fun TrackService.startPlaybackStatesMonitoring() =
             .collectLatest {
                 // TODO: здесь хуйня
                 mediaSessionManager.updatePlaybackState(it)
-                notificationManager.updateNotification()
+                notificationManager.invalidateNotification()
             }
     }
 

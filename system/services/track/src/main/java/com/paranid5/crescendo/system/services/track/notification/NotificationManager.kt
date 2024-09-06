@@ -34,7 +34,7 @@ internal class NotificationManager(
         playerNotificationManager.setPlayer(player)
 
     @OptIn(UnstableApi::class)
-    fun updateNotification() = playerNotificationManager.invalidate()
+    fun invalidateNotification() = playerNotificationManager.invalidate()
 
     @OptIn(UnstableApi::class)
     fun releasePlayer() = playerNotificationManager.setPlayer(null)

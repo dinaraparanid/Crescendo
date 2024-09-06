@@ -13,6 +13,6 @@ internal suspend inline fun TrackService.startNotificationMonitoring() =
             .currentTrackFlow
             .distinctUntilChanged()
             .collectLatest {
-                serviceScope.launch { notificationManager.updateNotification() }
+                serviceScope.launch { notificationManager.invalidateNotification() }
             }
     }

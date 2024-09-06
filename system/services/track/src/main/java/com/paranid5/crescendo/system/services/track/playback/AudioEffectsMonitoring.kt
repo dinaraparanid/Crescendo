@@ -27,7 +27,7 @@ internal suspend fun TrackService.startPlaybackEffectsMonitoring() =
                 speed = speed
             )
 
-            notificationManager.updateNotification()
+            notificationManager.invalidateNotification()
         }
     }
 
