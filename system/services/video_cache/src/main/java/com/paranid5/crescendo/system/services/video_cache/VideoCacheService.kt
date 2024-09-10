@@ -59,7 +59,7 @@ class VideoCacheService : SuspendService(), PlaybackForegroundService, KoinCompo
         val videoData = requireNotNull(intent?.videoCacheDataArg)
         cacheNewVideoAsync(videoData)
 
-        return START_REDELIVER_INTENT
+        return START_NOT_STICKY
     }
 
     override fun onDestroy() {
