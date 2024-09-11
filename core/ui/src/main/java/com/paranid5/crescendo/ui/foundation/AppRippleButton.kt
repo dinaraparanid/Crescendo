@@ -5,12 +5,12 @@ import androidx.compose.foundation.indication
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.RowScope
-import androidx.compose.material.ripple.rememberRipple
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonColors
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ButtonElevation
 import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.ripple
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
@@ -52,7 +52,7 @@ fun AppRippleButton(
         .clip(shape)
         .indication(
             interactionSource = interactionSource,
-            indication = rememberRipple(
+            indication = ripple(
                 bounded = rippleBounded,
                 color = rippleColor,
             )
@@ -85,7 +85,7 @@ fun AppOutlinedRippleButton(
         .clip(shape)
         .indication(
             interactionSource = interactionSource,
-            indication = rememberRipple(
+            indication = ripple(
                 bounded = rippleBounded,
                 color = rippleColor,
             )
