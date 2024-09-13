@@ -1,7 +1,5 @@
 package com.paranid5.crescendo.system.services.track.playback
 
-import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.repeatOnLifecycle
 import arrow.core.Tuple4
 import com.paranid5.crescendo.core.common.tracks.Track
 import com.paranid5.crescendo.core.resources.R
@@ -10,9 +8,10 @@ import com.paranid5.crescendo.system.services.track.showErrNotificationAndSendBr
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.launch
 
 internal suspend fun TrackService.startPlaybackEventLoop() =
-    lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
+    serviceScope.launch {
         playerProvider.playbackEventFlow
             .combine(ArgsFlow(this@startPlaybackEventLoop)) { event, (trackInd, position, playlist) ->
                 Tuple4(event, trackInd, position, playlist)

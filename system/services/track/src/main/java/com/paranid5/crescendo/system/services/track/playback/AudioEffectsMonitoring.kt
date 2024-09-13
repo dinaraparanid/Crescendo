@@ -1,17 +1,16 @@
 package com.paranid5.crescendo.system.services.track.playback
 
 import android.os.Build
-import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.repeatOnLifecycle
 import androidx.media3.common.PlaybackParameters
 import com.paranid5.crescendo.system.services.track.TrackService
 import com.paranid5.system.services.common.playback.AudioEffectsController
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.launch
 
 internal suspend fun TrackService.startPlaybackEffectsMonitoring() =
-    lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
+    serviceScope.launch {
         combine(
             playerProvider.areAudioEffectsEnabledFlow,
             playerProvider.pitchFlow,
@@ -26,13 +25,11 @@ internal suspend fun TrackService.startPlaybackEffectsMonitoring() =
                 pitch = pitch,
                 speed = speed
             )
-
-            notificationManager.invalidateNotification()
         }
     }
 
 internal suspend fun TrackService.startEqMonitoring() =
-    lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
+    serviceScope.launch {
         combine(
             playerProvider.equalizerBandsFlow,
             playerProvider.equalizerPresetFlow,

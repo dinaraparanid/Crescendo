@@ -62,8 +62,14 @@
         <service
                 android:name=".system.services.stream.StreamService"
                 android:foregroundServiceType="mediaPlayback" />
-        <service android:name=".system.services.track.TrackService"
-                android:foregroundServiceType="mediaPlayback" />
+        <service
+            android:name=".system.services.track.TrackService"
+            android:foregroundServiceType="mediaPlayback"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="androidx.media3.session.MediaSessionService"/>
+            </intent-filter>
+        </service>
         <service
             android:name=".system.services.video_cache.VideoCacheService"
             android:foregroundServiceType="mediaPlayback" />

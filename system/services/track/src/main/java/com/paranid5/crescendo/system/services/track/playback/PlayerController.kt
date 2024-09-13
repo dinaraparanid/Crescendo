@@ -12,6 +12,7 @@ interface PlayerController :
     RepeatingSubscriber,
     RepeatingPublisher {
     val player: Player
+    //val mediaController: MediaController
 
     var isPlaying: Boolean
     val isPlayingState: StateFlow<Boolean>

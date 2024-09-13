@@ -1,30 +1,20 @@
 package com.paranid5.system.services.common.media_session
 
 import android.content.Context
-import android.media.session.MediaSession
-import android.support.v4.media.MediaMetadataCompat
-import android.support.v4.media.session.MediaSessionCompat
-import android.support.v4.media.session.PlaybackStateCompat
+import androidx.media3.common.Player
+import androidx.media3.session.MediaSession
 
 class MediaSessionManager {
-    lateinit var mediaSession: MediaSessionCompat
+    lateinit var mediaSession: MediaSession
         private set
-
-    val sessionToken: MediaSession.Token
-        get() = mediaSession.sessionToken.token as MediaSession.Token
 
     fun initMediaSession(
         context: Context,
-        mediaSessionCallback: MediaSessionCompat.Callback,
+        player: Player,
+        callback: MediaSession.Callback? = null,
     ) {
-        mediaSession = MediaSession(context, mediaSessionCallback)
+        mediaSession = MediaSession(context = context, player = player, callback = callback)
     }
-
-    fun updatePlaybackState(state: PlaybackStateCompat) =
-        mediaSession.setPlaybackState(state)
-
-    fun updateMetadata(metadata: MediaMetadataCompat) =
-        mediaSession.setMetadata(metadata)
 
     fun releaseMediaSession() = mediaSession.release()
 }

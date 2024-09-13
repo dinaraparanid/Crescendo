@@ -49,6 +49,16 @@ internal class PlayerControllerImpl(
             }
     }
 
+//    private val sessionToken by lazy {
+//        SessionToken(service, ComponentName(service, TrackService::class.java))
+//    }
+//
+//    override val mediaController by lazy {
+//        MediaController.Builder(service, sessionToken)
+//            .buildAsync()
+//            .get()
+//    }
+
     override var isPlaying
         get() = playbackRepository.isPlayingState.value
         set(value) = playbackRepository.updatePlaying(isPlaying = value)
@@ -186,6 +196,8 @@ internal class PlayerControllerImpl(
 
     override fun releasePlayerWithEffects() {
         releaseAudioEffects()
+        player.stop()
+        player.release()
         player.stop()
         player.release()
         playbackRepository.updateAudioSessionId(UNDEFINED_AUDIO_SESSION_ID)

@@ -2,13 +2,12 @@ package com.paranid5.crescendo.system.services.track
 
 import android.content.Intent
 import android.os.Build
+import androidx.media3.common.Player
+import androidx.media3.session.MediaSession
 import com.paranid5.crescendo.core.common.tracks.Track
 import com.paranid5.crescendo.system.common.broadcast.TrackServiceBroadcasts
 import com.paranid5.crescendo.system.services.track.media_session.MediaSessionCallback
-import com.paranid5.crescendo.system.services.track.media_session.startMetadataMonitoring
-import com.paranid5.crescendo.system.services.track.media_session.startPlaybackStatesMonitoring
 import com.paranid5.crescendo.system.services.track.notification.NotificationManager
-import com.paranid5.crescendo.system.services.track.notification.startNotificationMonitoring
 import com.paranid5.crescendo.system.services.track.playback.PlayerProvider
 import com.paranid5.crescendo.system.services.track.playback.playPlaylistAsync
 import com.paranid5.crescendo.system.services.track.playback.startBassMonitoring
@@ -30,8 +29,8 @@ import com.paranid5.crescendo.system.services.track.receivers.SwitchPlaylistRece
 import com.paranid5.crescendo.system.services.track.receivers.registerReceivers
 import com.paranid5.crescendo.system.services.track.receivers.unregisterReceivers
 import com.paranid5.system.services.common.ConnectionManager
+import com.paranid5.system.services.common.MediaSuspendService
 import com.paranid5.system.services.common.PlaybackForegroundService
-import com.paranid5.system.services.common.SuspendService
 import com.paranid5.system.services.common.connect
 import com.paranid5.system.services.common.disconnect
 import com.paranid5.system.services.common.media_session.MediaSessionManager
@@ -52,7 +51,7 @@ internal const val ACTION_REPEAT = "repeat"
 internal const val ACTION_UNREPEAT = "unrepeat"
 internal const val ACTION_DISMISS = "dismiss"
 
-class TrackService : SuspendService(), PlaybackForegroundService, KoinComponent,
+class TrackService : MediaSuspendService(), PlaybackForegroundService, KoinComponent,
     ConnectionManager by ConnectionManagerImpl() {
     internal val mediaSessionManager by inject<MediaSessionManager>()
     internal val playerProvider by inject<PlayerProvider> { parametersOf(this) }
@@ -87,7 +86,8 @@ class TrackService : SuspendService(), PlaybackForegroundService, KoinComponent,
 
         mediaSessionManager.initMediaSession(
             context = this,
-            mediaSessionCallback = MediaSessionCallback(this),
+            player = playerProvider.player,
+            callback = MediaSessionCallback(service = this),
         )
 
         notificationManager.initNotificationManager(playerProvider.player)
@@ -107,6 +107,21 @@ class TrackService : SuspendService(), PlaybackForegroundService, KoinComponent,
         return START_STICKY
     }
 
+    override fun onGetSession(controllerInfo: MediaSession.ControllerInfo) =
+        mediaSessionManager.mediaSession
+
+    override fun onTaskRemoved(rootIntent: Intent?) {
+        val player = playerProvider.player
+
+        if (
+            player.playWhenReady.not() ||
+            player.mediaItemCount == 0 ||
+            player.playbackState == Player.STATE_ENDED
+        ) {
+            stopSelf()
+        }
+    }
+
     override fun onDestroy() {
         super.onDestroy()
         disconnect()
@@ -123,9 +138,6 @@ class TrackService : SuspendService(), PlaybackForegroundService, KoinComponent,
 
 private fun TrackService.launchMonitoringTasks() {
     serviceScope.launch { startPlaybackEventLoop() }
-    serviceScope.launch { startNotificationMonitoring() }
-    serviceScope.launch { startPlaybackStatesMonitoring() }
-    serviceScope.launch { startMetadataMonitoring() }
     serviceScope.launch { startPlaybackEffectsMonitoring() }
     serviceScope.launch { startEqMonitoring() }
     serviceScope.launch { startBassMonitoring() }

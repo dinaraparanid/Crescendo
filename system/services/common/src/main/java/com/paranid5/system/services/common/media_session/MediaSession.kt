@@ -1,22 +1,14 @@
 package com.paranid5.system.services.common.media_session
 
 import android.content.Context
-import android.os.Build
-import android.support.v4.media.session.MediaSessionCompat
+import androidx.media3.common.Player
+import androidx.media3.session.MediaSession
 
-private const val TAG = "MediaSession"
-
-fun MediaSession(
+internal fun MediaSession(
     context: Context,
-    mediaSessionCallback: MediaSessionCompat.Callback,
-) = MediaSessionCompat(context, TAG).apply {
-    isActive = true
-
-    @Suppress("DEPRECATION")
-    if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) setFlags(
-        MediaSessionCompat.FLAG_HANDLES_TRANSPORT_CONTROLS
-                or MediaSessionCompat.FLAG_HANDLES_MEDIA_BUTTONS
-    )
-
-    setCallback(mediaSessionCallback)
-}
+    player: Player,
+    callback: MediaSession.Callback?,
+) = MediaSession
+    .Builder(context, player)
+    .run { callback?.let(this::setCallback) ?: this }
+    .build()

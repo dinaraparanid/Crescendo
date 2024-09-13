@@ -55,7 +55,7 @@ internal fun PlayerNotificationManager(service: StreamService) =
 
             setPriority(NotificationCompat.PRIORITY_HIGH)
             setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
-            setMediaSessionToken(service.mediaSessionManager.sessionToken)
+            setMediaSessionToken(service.mediaSessionManager.mediaSession.platformToken)
         }
 
 @OptIn(UnstableApi::class)

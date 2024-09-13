@@ -4,8 +4,6 @@ import android.content.Intent
 import com.paranid5.crescendo.system.common.broadcast.StreamServiceBroadcasts.POSITION_ARG
 import com.paranid5.crescendo.system.common.broadcast.StreamServiceBroadcasts.URL_ARG
 import com.paranid5.crescendo.system.services.stream.extractor.UrlExtractor
-import com.paranid5.crescendo.system.services.stream.media_session.MediaSessionCallback
-import com.paranid5.crescendo.system.services.stream.media_session.startMetadataMonitoring
 import com.paranid5.crescendo.system.services.stream.media_session.startPlaybackStatesMonitoring
 import com.paranid5.crescendo.system.services.stream.notification.NotificationManager
 import com.paranid5.crescendo.system.services.stream.notification.startNotificationMonitoring
@@ -87,7 +85,7 @@ class StreamService : SuspendService(), PlaybackForegroundService, KoinComponent
 
         mediaSessionManager.initMediaSession(
             context = this,
-            mediaSessionCallback = MediaSessionCallback(this),
+            player = playerProvider.player,
         )
 
         notificationManager.initNotificationManager(playerProvider.player)
@@ -123,7 +121,7 @@ private fun StreamService.launchMonitoringTasks() {
     serviceScope.launch { startPlaybackEventLoop() }
     serviceScope.launch { startNotificationMonitoring() }
     serviceScope.launch { startPlaybackStatesMonitoring() }
-    serviceScope.launch { startMetadataMonitoring() }
+    //serviceScope.launch { startMetadataMonitoring() }
     serviceScope.launch { startPlaybackEffectsMonitoring() }
     serviceScope.launch { startEqMonitoring() }
     serviceScope.launch { startBassMonitoring() }

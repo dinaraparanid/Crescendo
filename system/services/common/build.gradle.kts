@@ -42,11 +42,11 @@ dependencies {
 
     api(project(":system:common"))
 
-    implementation(libs.androidx.core.ktx)
-    implementation(libs.androidx.appcompat)
-    implementation(libs.androidx.lifecycle.extensions)
-    implementation(libs.androidx.media)
-    implementation(libs.androidx.media3.session)
+    api(libs.androidx.core.ktx)
+    api(libs.androidx.appcompat)
+    api(libs.androidx.lifecycle.extensions)
+    api(libs.androidx.media)
+    api(libs.androidx.media3.session)
 
-    implementation(libs.koin.androidx.compose)
+    api(libs.koin.androidx.compose)
 }
