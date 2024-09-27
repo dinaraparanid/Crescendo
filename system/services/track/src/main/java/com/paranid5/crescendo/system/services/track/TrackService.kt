@@ -6,9 +6,12 @@ import androidx.media3.common.Player
 import androidx.media3.session.MediaSession
 import com.paranid5.crescendo.core.common.tracks.Track
 import com.paranid5.crescendo.system.common.broadcast.TrackServiceBroadcasts
+import com.paranid5.crescendo.system.services.track.media_session.CancelAction
 import com.paranid5.crescendo.system.services.track.media_session.MediaSessionCallback
+import com.paranid5.crescendo.system.services.track.media_session.RepeatAction
 import com.paranid5.crescendo.system.services.track.notification.NotificationManager
 import com.paranid5.crescendo.system.services.track.playback.PlayerProvider
+import com.paranid5.crescendo.system.services.track.playback.isRepeating
 import com.paranid5.crescendo.system.services.track.playback.playPlaylistAsync
 import com.paranid5.crescendo.system.services.track.playback.startBassMonitoring
 import com.paranid5.crescendo.system.services.track.playback.startEqMonitoring
@@ -51,6 +54,8 @@ internal const val ACTION_REPEAT = "repeat"
 internal const val ACTION_UNREPEAT = "unrepeat"
 internal const val ACTION_DISMISS = "dismiss"
 
+private const val MEDIA_SESSION_ID = "track_media_session_id"
+
 class TrackService : MediaSuspendService(), PlaybackForegroundService, KoinComponent,
     ConnectionManager by ConnectionManagerImpl() {
     internal val mediaSessionManager by inject<MediaSessionManager>()
@@ -87,7 +92,15 @@ class TrackService : MediaSuspendService(), PlaybackForegroundService, KoinCompo
         mediaSessionManager.initMediaSession(
             context = this,
             player = playerProvider.player,
+            mediaSessionId = MEDIA_SESSION_ID,
             callback = MediaSessionCallback(service = this),
+            initialActions = listOf(
+                RepeatAction(
+                    context = this,
+                    isRepeating = playerProvider.isRepeating,
+                ),
+                CancelAction(context = this),
+            ),
         )
 
         notificationManager.initNotificationManager(playerProvider.player)
@@ -107,9 +120,6 @@ class TrackService : MediaSuspendService(), PlaybackForegroundService, KoinCompo
         return START_STICKY
     }
 
-    override fun onGetSession(controllerInfo: MediaSession.ControllerInfo) =
-        mediaSessionManager.mediaSession
-
     override fun onTaskRemoved(rootIntent: Intent?) {
         val player = playerProvider.player
 
@@ -121,6 +131,9 @@ class TrackService : MediaSuspendService(), PlaybackForegroundService, KoinCompo
             stopSelf()
         }
     }
+
+    override fun onGetSession(controllerInfo: MediaSession.ControllerInfo) =
+        mediaSessionManager.mediaSession
 
     override fun onDestroy() {
         super.onDestroy()

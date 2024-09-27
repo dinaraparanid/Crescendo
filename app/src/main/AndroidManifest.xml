@@ -60,14 +60,21 @@
                 android:theme="@style/Theme.MediaStreamer">
         </activity>
         <service
-                android:name=".system.services.stream.StreamService"
-                android:foregroundServiceType="mediaPlayback" />
+            android:name=".system.services.stream.StreamService"
+            android:foregroundServiceType="mediaPlayback"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="androidx.media3.session.MediaSessionService"/>
+                <action android:name="android.intent.action.MEDIA_BUTTON" />
+            </intent-filter>
+        </service>
         <service
             android:name=".system.services.track.TrackService"
             android:foregroundServiceType="mediaPlayback"
             android:exported="false">
             <intent-filter>
                 <action android:name="androidx.media3.session.MediaSessionService"/>
+                <action android:name="android.intent.action.MEDIA_BUTTON" />
             </intent-filter>
         </service>
         <service

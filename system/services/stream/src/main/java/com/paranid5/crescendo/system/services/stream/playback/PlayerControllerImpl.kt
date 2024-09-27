@@ -1,8 +1,6 @@
 package com.paranid5.crescendo.system.services.stream.playback
 
 import androidx.annotation.OptIn
-import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.repeatOnLifecycle
 import androidx.media3.common.AudioAttributes
 import androidx.media3.common.C
 import androidx.media3.common.MediaItem
@@ -14,6 +12,7 @@ import com.paranid5.crescendo.domain.playback.PlaybackRepository.Companion.UNDEF
 import com.paranid5.crescendo.domain.playback.RepeatingPublisher
 import com.paranid5.crescendo.domain.playback.RepeatingSubscriber
 import com.paranid5.crescendo.system.services.stream.StreamService
+import com.paranid5.crescendo.utils.extensions.sideEffect
 import com.paranid5.system.services.common.playback.AudioEffectsController
 import com.paranid5.system.services.common.playback.AudioEffectsControllerImpl
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -21,7 +20,6 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.update
-import kotlinx.coroutines.launch
 
 private const val TEN_SECS_AS_MILLIS = 10_000
 
@@ -39,17 +37,15 @@ internal class PlayerControllerImpl(
         ExoPlayer.Builder(service)
             .setAudioAttributes(newAudioAttributes, true)
             .setHandleAudioBecomingNoisy(true)
-            .setWakeMode(C.WAKE_MODE_NETWORK)
             .setPauseAtEndOfMediaItems(false)
+            .setWakeMode(C.WAKE_MODE_NETWORK)
+            .setPriority(C.PRIORITY_MAX)
             .build()
             .apply {
                 addListener(PlayerStateChangedListener(service))
                 playbackRepository.updateAudioSessionId(audioSessionId)
                 initAudioEffects(audioSessionId)
-
-                service.serviceScope.launch {
-                    startRepeatMonitoring(service.lifecycle)
-                }
+                service.serviceScope.sideEffect { startRepeatMonitoring() }
             }
     }
 
@@ -72,8 +68,13 @@ internal class PlayerControllerImpl(
     private inline val currentPosition
         get() = currentPositionState.value
 
-    override fun updateCurrentPosition() =
-        _currentPositionState.update { player.currentPosition }
+    override fun fetchPositionFromPlayer() =
+        updateCurrentPosition(position = player.currentPosition)
+
+    override fun resetPosition() = updateCurrentPosition(position = 0)
+
+    private fun updateCurrentPosition(position: Long) =
+        _currentPositionState.update { position }
 
     override suspend fun setAndStoreRepeating(isRepeating: Boolean) {
         repeatMode = repeatMode(isRepeating)
@@ -99,7 +100,7 @@ internal class PlayerControllerImpl(
     }
 
     override fun resetAudioSessionIdIfNotPlaying() {
-        if (!isPlaying) resetAudioSessionId()
+        if (isPlaying.not()) resetAudioSessionId()
     }
 
     @OptIn(UnstableApi::class)
@@ -119,12 +120,10 @@ internal class PlayerControllerImpl(
         minOf(currentPosition + TEN_SECS_AS_MILLIS, videoDurationMillis)
     )
 
-    private suspend inline fun startRepeatMonitoring(lifecycle: Lifecycle): Unit =
-        lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
-            isRepeatingFlow
-                .distinctUntilChanged()
-                .collectLatest { player.repeatMode = repeatMode(it) }
-        }
+    private suspend inline fun startRepeatMonitoring(): Unit =
+        isRepeatingFlow
+            .distinctUntilChanged()
+            .collectLatest { player.repeatMode = repeatMode(it) }
 
     override fun releasePlayerWithEffects() {
         releaseAudioEffects()
@@ -137,6 +136,6 @@ internal class PlayerControllerImpl(
 @OptIn(UnstableApi::class)
 private inline val newAudioAttributes
     get() = AudioAttributes.Builder()
-        .setContentType(C.AUDIO_CONTENT_TYPE_MOVIE)
+        .setContentType(C.AUDIO_CONTENT_TYPE_MUSIC)
         .setUsage(C.USAGE_MEDIA)
         .build()

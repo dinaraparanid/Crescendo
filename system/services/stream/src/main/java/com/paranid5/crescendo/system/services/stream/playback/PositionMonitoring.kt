@@ -17,7 +17,7 @@ internal fun StreamService.startPlaybackPositionMonitoringAsync() =
 internal fun StreamService.startPlaybackPositionMonitoring() {
     playbackPosMonitorTask = serviceScope.launch {
         while (playerProvider.isPlaying) {
-            playerProvider.updateCurrentPosition()
+            playerProvider.fetchPositionFromPlayer()
             delay(PLAYBACK_UPDATE_COOLDOWN)
         }
     }

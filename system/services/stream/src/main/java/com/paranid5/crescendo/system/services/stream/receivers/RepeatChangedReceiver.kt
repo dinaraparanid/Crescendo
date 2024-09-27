@@ -14,7 +14,7 @@ internal fun RepeatChangedReceiver(service: StreamService) =
 
             service.serviceScope.launch {
                 playerProvider.setAndStoreRepeating(!playerProvider.isRepeating)
-                service.notificationManager.updateNotification()
+                service.notificationManager.invalidateNotification()
             }
         }
     }

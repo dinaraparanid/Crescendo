@@ -7,38 +7,33 @@ import com.paranid5.system.services.common.playback.AudioEffectsController
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
-import kotlinx.coroutines.launch
 
 internal suspend fun TrackService.startPlaybackEffectsMonitoring() =
-    serviceScope.launch {
-        combine(
-            playerProvider.areAudioEffectsEnabledFlow,
-            playerProvider.pitchFlow,
-            playerProvider.speedFlow,
-        ) { enabled, pitch, speed ->
-            Triple(enabled, pitch, speed)
-        }.distinctUntilChanged().collectLatest { (enabled, pitch, speed) ->
-            resetPlaybackEffects(
-                audioEffectsController = playerProvider,
-                playerProvider = playerProvider,
-                isEnabled = enabled,
-                pitch = pitch,
-                speed = speed
-            )
-        }
+    combine(
+        playerProvider.areAudioEffectsEnabledFlow,
+        playerProvider.pitchFlow,
+        playerProvider.speedFlow,
+    ) { enabled, pitch, speed ->
+        Triple(enabled, pitch, speed)
+    }.distinctUntilChanged().collectLatest { (enabled, pitch, speed) ->
+        resetPlaybackEffects(
+            audioEffectsController = playerProvider,
+            playerProvider = playerProvider,
+            isEnabled = enabled,
+            pitch = pitch,
+            speed = speed
+        )
     }
 
 internal suspend fun TrackService.startEqMonitoring() =
-    serviceScope.launch {
-        combine(
-            playerProvider.equalizerBandsFlow,
-            playerProvider.equalizerPresetFlow,
-            playerProvider.equalizerParamFlow,
-        ) { param, bands, preset ->
-            Triple(param, bands, preset)
-        }.distinctUntilChanged().collectLatest { (bands, preset, param) ->
-            playerProvider.setEqParameter(bands, preset, param)
-        }
+    combine(
+        playerProvider.equalizerBandsFlow,
+        playerProvider.equalizerPresetFlow,
+        playerProvider.equalizerParamFlow,
+    ) { param, bands, preset ->
+        Triple(param, bands, preset)
+    }.distinctUntilChanged().collectLatest { (bands, preset, param) ->
+        playerProvider.setEqParameter(bands, preset, param)
     }
 
 internal suspend fun TrackService.startBassMonitoring() =

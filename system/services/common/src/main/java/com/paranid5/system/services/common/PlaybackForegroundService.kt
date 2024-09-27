@@ -15,4 +15,3 @@ fun <S> S.startMediaForeground(id: Int, notification: Notification)
 
     else -> startForeground(id, notification)
 }
-

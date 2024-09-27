@@ -33,7 +33,7 @@ internal fun PlayerNotificationManager(service: TrackService) =
     PlayerNotificationManager.Builder(
         service,
         TRACKS_NOTIFICATION_ID,
-        TRACKS_CHANNEL_ID
+        TRACKS_CHANNEL_ID,
     )
         .setChannelNameResourceId(R.string.app_name)
         .setChannelDescriptionResourceId(R.string.app_name)

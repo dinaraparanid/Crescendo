@@ -1,9 +1,17 @@
 package com.paranid5.crescendo.system.services.track.media_session
 
+import android.content.Intent
+import android.content.Intent.EXTRA_KEY_EVENT
 import android.os.Bundle
+import android.view.KeyEvent
+import android.view.KeyEvent.KEYCODE_MEDIA_NEXT
+import android.view.KeyEvent.KEYCODE_MEDIA_PAUSE
+import android.view.KeyEvent.KEYCODE_MEDIA_PLAY
+import android.view.KeyEvent.KEYCODE_MEDIA_PREVIOUS
 import androidx.annotation.OptIn
 import androidx.media3.common.util.UnstableApi
 import androidx.media3.session.MediaSession
+import androidx.media3.session.MediaSession.ConnectionResult
 import androidx.media3.session.MediaSession.ConnectionResult.AcceptedResultBuilder
 import androidx.media3.session.SessionCommand
 import androidx.media3.session.SessionResult
@@ -11,6 +19,11 @@ import com.google.common.util.concurrent.Futures
 import com.google.common.util.concurrent.ListenableFuture
 import com.paranid5.crescendo.system.services.track.TrackService
 import com.paranid5.crescendo.system.services.track.playback.isRepeating
+import com.paranid5.crescendo.system.services.track.playback.pauseAsync
+import com.paranid5.crescendo.system.services.track.playback.resumeAsync
+import com.paranid5.crescendo.system.services.track.playback.seekToNextTrackAsync
+import com.paranid5.crescendo.system.services.track.playback.seekToPrevTrackAsync
+import com.paranid5.crescendo.utils.extensions.getParcelableCompat
 import com.paranid5.crescendo.utils.extensions.sendAppBroadcast
 
 internal fun MediaSessionCallback(service: TrackService) =
@@ -18,35 +31,29 @@ internal fun MediaSessionCallback(service: TrackService) =
         @OptIn(UnstableApi::class)
         override fun onConnect(
             session: MediaSession,
-            controller: MediaSession.ControllerInfo
-        ): MediaSession.ConnectionResult {
-            val connectionResult = super.onConnect(session, controller)
-
-            val sessionCommands =
-                MediaSession.ConnectionResult.DEFAULT_SESSION_COMMANDS
-                    .buildUpon()
-                    .addSessionCommands(
-                        listOfNotNull(
-                            RepeatAction(
-                                context = service,
-                                isRepeating = true,
-                            ).sessionCommand,
-                            RepeatAction(
-                                context = service,
-                                isRepeating = false,
-                            ).sessionCommand,
-                            CancelAction(context = service).sessionCommand,
-                        )
-                    )
+            controller: MediaSession.ControllerInfo,
+        ): ConnectionResult = AcceptedResultBuilder(session)
+            .setAvailablePlayerCommands(ConnectionResult.DEFAULT_PLAYER_COMMANDS)
+            .setAvailableSessionCommands(
+                ConnectionResult.DEFAULT_SESSION_COMMANDS.buildUpon()
+                    .add(RepeatSessionCommand)
+                    .add(UnrepeatSessionCommand)
+                    .add(CancelSessionCommand)
                     .build()
+            )
+            .build()
 
-            val playerCommands = MediaSession.ConnectionResult.DEFAULT_PLAYER_COMMANDS
-                .buildUpon()
-                .build()
+        override fun onPostConnect(
+            session: MediaSession,
+            controller: MediaSession.ControllerInfo,
+        ) {
+            super.onPostConnect(session, controller)
 
-            return AcceptedResultBuilder(session)
+            service
+                .mediaSessionManager
+                .mediaSession
                 .setCustomLayout(
-                    listOfNotNull(
+                    listOf(
                         RepeatAction(
                             context = service,
                             isRepeating = service.playerProvider.isRepeating,
@@ -54,22 +61,25 @@ internal fun MediaSessionCallback(service: TrackService) =
                         CancelAction(context = service),
                     )
                 )
-                .setAvailableSessionCommands(sessionCommands)
-                .setAvailablePlayerCommands(playerCommands)
-                .build()
         }
 
-        override fun onPostConnect(session: MediaSession, controller: MediaSession.ControllerInfo) {
-            super.onPostConnect(session, controller)
-            session.setCustomLayout(
-                listOf(
-                    RepeatAction(
-                        context = service,
-                        isRepeating = service.playerProvider.isRepeating,
-                    ),
-                    CancelAction(context = service),
-                )
-            )
+        @OptIn(UnstableApi::class)
+        override fun onMediaButtonEvent(
+            session: MediaSession,
+            controllerInfo: MediaSession.ControllerInfo,
+            intent: Intent
+        ): Boolean {
+            val key = intent.extras
+                ?.getParcelableCompat(EXTRA_KEY_EVENT, KeyEvent::class.java)
+                ?: return false
+
+            return when (key.keyCode) {
+                KEYCODE_MEDIA_PLAY -> service.resumeAsync().let { true }
+                KEYCODE_MEDIA_PAUSE -> service.pauseAsync().let { true }
+                KEYCODE_MEDIA_NEXT -> service.seekToNextTrackAsync().let { true }
+                KEYCODE_MEDIA_PREVIOUS -> service.seekToPrevTrackAsync().let { true }
+                else -> false
+            }
         }
 
         override fun onCustomCommand(

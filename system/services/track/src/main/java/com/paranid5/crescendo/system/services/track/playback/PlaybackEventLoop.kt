@@ -8,19 +8,16 @@ import com.paranid5.crescendo.system.services.track.showErrNotificationAndSendBr
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
-import kotlinx.coroutines.launch
 
 internal suspend fun TrackService.startPlaybackEventLoop() =
-    serviceScope.launch {
-        playerProvider.playbackEventFlow
-            .combine(ArgsFlow(this@startPlaybackEventLoop)) { event, (trackInd, position, playlist) ->
-                Tuple4(event, trackInd, position, playlist)
-            }
-            .distinctUntilChanged { (e1, _, _, _), (e2, _, _, _) -> e1 == e2 }
-            .collectLatest { (event, trackInd, position, playlist) ->
-                onEvent(event, trackInd, position, playlist)
-            }
-    }
+    playerProvider.playbackEventFlow
+        .combine(ArgsFlow(this@startPlaybackEventLoop)) { event, (trackInd, position, playlist) ->
+            Tuple4(event, trackInd, position, playlist)
+        }
+        .distinctUntilChanged { (e1, _, _, _), (e2, _, _, _) -> e1 == e2 }
+        .collectLatest { (event, trackInd, position, playlist) ->
+            onEvent(event, trackInd, position, playlist)
+        }
 
 private fun ArgsFlow(service: TrackService) =
     combine(

@@ -1,7 +1,5 @@
 package com.paranid5.crescendo.system.services.stream.playback
 
-import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.repeatOnLifecycle
 import arrow.core.Tuple4
 import com.paranid5.crescendo.system.services.stream.StreamService
 import com.paranid5.crescendo.system.services.stream.extractor.extractMediaFilesAndStartPlaying
@@ -10,16 +8,14 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
 
 internal suspend fun StreamService.startPlaybackEventLoop() =
-    lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
-        playerProvider.playbackEventFlow
-            .combine(ArgsFlow(this@startPlaybackEventLoop)) { event, (url, position, metadata) ->
-                Tuple4(event, url, position, metadata)
-            }
-            .distinctUntilChanged { (e1, _, _, _), (e2, _, _, _) -> e1 == e2 }
-            .collectLatest { (event, ytUrl, position, duration) ->
-                onEvent(event, ytUrl, position, duration)
-            }
-    }
+    playerProvider.playbackEventFlow
+        .combine(ArgsFlow(this@startPlaybackEventLoop)) { event, (url, position, metadata) ->
+            Tuple4(event, url, position, metadata)
+        }
+        .distinctUntilChanged { (e1, _, _, _), (e2, _, _, _) -> e1 == e2 }
+        .collectLatest { (event, ytUrl, position, duration) ->
+            onEvent(event, ytUrl, position, duration)
+        }
 
 private fun ArgsFlow(service: StreamService) =
     combine(

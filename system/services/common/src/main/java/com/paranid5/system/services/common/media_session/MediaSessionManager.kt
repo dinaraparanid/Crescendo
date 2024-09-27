@@ -2,6 +2,7 @@ package com.paranid5.system.services.common.media_session
 
 import android.content.Context
 import androidx.media3.common.Player
+import androidx.media3.session.CommandButton
 import androidx.media3.session.MediaSession
 
 class MediaSessionManager {
@@ -11,9 +12,17 @@ class MediaSessionManager {
     fun initMediaSession(
         context: Context,
         player: Player,
-        callback: MediaSession.Callback? = null,
+        mediaSessionId: String,
+        callback: MediaSession.Callback,
+        initialActions: List<CommandButton> = listOf(),
     ) {
-        mediaSession = MediaSession(context = context, player = player, callback = callback)
+        mediaSession = MediaSession(
+            context = context,
+            player = player,
+            mediaSessionId = mediaSessionId,
+            callback = callback,
+            initialActions = initialActions
+        )
     }
 
     fun releaseMediaSession() = mediaSession.release()
