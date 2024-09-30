@@ -82,8 +82,8 @@ data class TrimmerState(
             internal const val InitialSpeed = 1F
             internal const val MinPitch = 0.5F
             internal const val MinSpeed = 0.5F
-            internal const val MaxPitch = 0.5F
-            internal const val MaxSpeed = 0.5F
+            internal const val MaxPitch = 2F
+            internal const val MaxSpeed = 2F
         }
 
         @IgnoredOnParcel

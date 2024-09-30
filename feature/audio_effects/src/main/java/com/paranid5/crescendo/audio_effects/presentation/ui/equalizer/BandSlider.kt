@@ -20,6 +20,7 @@ import androidx.compose.ui.unit.dp
 import com.paranid5.crescendo.audio_effects.view_model.AudioEffectsUiIntent
 import com.paranid5.crescendo.core.resources.R
 import com.paranid5.crescendo.core.resources.ui.theme.AppTheme.colors
+import com.paranid5.crescendo.core.resources.ui.theme.AppTheme.dimensions
 
 private val EqualizerThumbHeight = 20.dp
 
@@ -40,10 +41,6 @@ internal fun BandSlider(
 ) = Slider(
     value = presentLvlsDbState[index],
     valueRange = minDb..maxDb,
-    colors = SliderDefaults.colors(
-        activeTrackColor = colors.primary,
-        inactiveTrackColor = colors.utils.transparentUtility,
-    ),
     modifier = modifier.sliderPositionPublisher(
         sliderYPosState = sliderYPosState,
         sliderWidthState = sliderWidthState,
@@ -67,6 +64,18 @@ internal fun BandSlider(
             modifier = thumbModifier
         )
     },
+    track = { state ->
+        SliderDefaults.Track(
+            sliderState = state,
+            drawStopIndicator = null,
+            modifier = Modifier.height(dimensions.lines.audioEffectsSlider),
+            thumbTrackGapSize = dimensions.padding.zero,
+            colors = SliderDefaults.colors(
+                activeTrackColor = colors.primary,
+                inactiveTrackColor = colors.utils.transparentUtility,
+            ),
+        )
+    }
 )
 
 @Composable

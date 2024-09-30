@@ -12,6 +12,7 @@ data class AppDimensions(
     val separators: Separators,
     val elevation: Elevation,
     val borders: Borders,
+    val lines: Lines,
 ) {
     companion object {
         val default
@@ -43,6 +44,7 @@ data class AppDimensions(
                     minimum = 2.dp,
                     extraSmall = 4.dp,
                 ),
+                lines = Lines(audioEffectsSlider = 4.dp),
             )
     }
 
@@ -82,6 +84,9 @@ data class AppDimensions(
         val minimum: Dp,
         val extraSmall: Dp,
     )
+
+    @Immutable
+    data class Lines(val audioEffectsSlider: Dp)
 }
 
 internal val LocalDimensions = staticCompositionLocalOf { AppDimensions.default }

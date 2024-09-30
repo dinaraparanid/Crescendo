@@ -87,7 +87,7 @@ private fun ProgressBar(
 
     Canvas(modifier) {
         drawFullBarArc(
-            color = colors.utils.disabled,
+            color = colors.utils.transparentUtility,
             arcStartAngle = arcStartAngle,
             angleRangeDistance = angleRangeDistance,
         )

@@ -1,6 +1,5 @@
 package com.paranid5.crescendo.feature.play.main.presentation.ui.pager
 
-import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.Text
@@ -23,7 +22,6 @@ import com.paranid5.crescendo.utils.doNothing
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
 
-@OptIn(ExperimentalFoundationApi::class)
 @Composable
 internal fun PrimaryPager(
     state: PlayState,

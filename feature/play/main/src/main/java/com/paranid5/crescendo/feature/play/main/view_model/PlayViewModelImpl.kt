@@ -26,6 +26,10 @@ internal class PlayViewModelImpl(
                 else -> updateState { copy(searchQuery = "") }
             }
 
+            is PlayUiIntent.ShowTrimmer -> updateState {
+                copy(backResult = PlayBackResult.ShowTrimmer(trackUri = intent.trackUri))
+            }
+
             is PlayUiIntent.UpdatePagerState ->
                 updateState { copy(pagerState = intent.pagerState) }
 

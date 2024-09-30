@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.width
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Slider
 import androidx.compose.material3.SliderDefaults
@@ -104,6 +105,7 @@ private fun EffectIcon(
     modifier = modifier,
 )
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private inline fun EffectSlider(
     initialValue: Float,
@@ -120,14 +122,21 @@ private inline fun EffectSlider(
         valueRange = minValue..maxValue,
         steps = steps,
         modifier = modifier,
-        colors = SliderDefaults.colors(
-            thumbColor = colors.primary,
-            activeTrackColor = colors.primary,
-            inactiveTrackColor = colors.utils.transparentUtility,
-        ),
+        colors = SliderDefaults.colors(thumbColor = colors.primary),
         onValueChange = {
             curPosition = it
             setEffect(it)
+        },
+        track = { state ->
+            SliderDefaults.Track(
+                sliderState = state,
+                drawStopIndicator = null,
+                thumbTrackGapSize = dimensions.padding.zero,
+                colors = SliderDefaults.colors(
+                    activeTrackColor = colors.primary,
+                    inactiveTrackColor = colors.utils.transparentUtility,
+                ),
+            )
         }
     )
 }
