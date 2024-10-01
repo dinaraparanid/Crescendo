@@ -3,7 +3,6 @@ package com.paranid5.crescendo.presentation.main
 import android.content.res.Configuration
 import android.widget.Toast
 import androidx.compose.animation.core.animateDpAsState
-import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
@@ -19,12 +18,12 @@ import androidx.compose.material.ModalBottomSheetState
 import androidx.compose.material.ModalBottomSheetValue
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
@@ -54,7 +53,6 @@ private const val ContentExpandedPadding = 24F
 private const val PushUpCollapsedPadding = 12F
 private const val PushUpExpandedPadding = 32F
 
-@OptIn(ExperimentalMaterialApi::class, ExperimentalFoundationApi::class)
 @Composable
 internal fun PlayingBottomSheet(
     alpha: Float,
@@ -101,29 +99,24 @@ internal fun PlayingBottomSheet(
                 modifier = Modifier.background(colors.background.gradient),
             )
         },
-        sheetBackgroundColor = Color.Transparent,
+        sheetBackgroundColor = colors.background.primary,
         sheetShape = RoundedCornerShape(
             topStart = dimensions.corners.extraMedium,
             topEnd = dimensions.corners.extraMedium,
-        )
+        ),
     ) {
         Box(Modifier.fillMaxWidth()) {
             HorizontalPager(state = playingPagerState) { page ->
-                when (page) {
-                    0 -> PlayingScreen(
-                        coverAlpha = 1 - alpha,
-                        screenPlaybackStatus = PlaybackStatus.PLAYING,
-                        modifier = modifier.fillMaxSize(),
-                        onScreenEffect = ::onScreenEffect,
-                    )
-
-                    else -> PlayingScreen(
-                        coverAlpha = 1 - alpha,
-                        screenPlaybackStatus = PlaybackStatus.STREAMING,
-                        modifier = modifier.fillMaxSize(),
-                        onScreenEffect = ::onScreenEffect,
-                    )
+                val screenPlaybackStatus = remember(page) {
+                    PlaybackStatus.entries[page]
                 }
+
+                PlayingScreen(
+                    coverAlpha = 1 - alpha,
+                    screenPlaybackStatus = screenPlaybackStatus,
+                    modifier = modifier.fillMaxSize(),
+                    onScreenEffect = ::onScreenEffect,
+                )
             }
 
             if (isBarNotVisible.not())
@@ -151,7 +144,6 @@ internal fun PlayingBottomSheet(
     }
 }
 
-@OptIn(ExperimentalMaterialApi::class)
 @Composable
 private fun CurrentPlaylistBottomSheet(
     alpha: Float,

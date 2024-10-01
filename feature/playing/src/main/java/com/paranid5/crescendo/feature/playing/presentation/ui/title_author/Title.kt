@@ -1,6 +1,5 @@
 package com.paranid5.crescendo.feature.playing.presentation.ui.title_author
 
-import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.basicMarquee
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -10,20 +9,20 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.platform.LocalContext
 import com.paranid5.crescendo.core.common.PlaybackStatus
 import com.paranid5.crescendo.core.resources.R
 import com.paranid5.crescendo.core.resources.ui.theme.AppTheme.typography
 import com.paranid5.crescendo.feature.playing.view_model.PlayingState
 
-@OptIn(ExperimentalFoundationApi::class)
 @Composable
 internal fun Title(
+    screenPlaybackStatus: PlaybackStatus,
     textColor: Color,
     state: PlayingState,
     modifier: Modifier = Modifier,
 ) {
-    val title by rememberTitle(state)
+    val title by rememberTitle(screenPlaybackStatus = screenPlaybackStatus, state = state)
 
     Text(
         text = title,
@@ -35,20 +34,23 @@ internal fun Title(
 }
 
 @Composable
-private fun rememberTitle(state: PlayingState): State<String> {
-    val audioStatus = state.screenPlaybackStatus
+private fun rememberTitle(
+    state: PlayingState,
+    screenPlaybackStatus: PlaybackStatus,
+): State<String> {
+    val context = LocalContext.current
+
     val currentMetadata = state.currentMetadata
     val currentTrack = state.currentTrack
 
-    val unknownStream = stringResource(R.string.stream_no_name)
-    val unknownTrack = stringResource(R.string.unknown_track)
+    return remember(context, screenPlaybackStatus, currentMetadata?.title, currentTrack?.title) {
+        val unknownStream = context.getString(R.string.stream_no_name)
+        val unknownTrack = context.getString(R.string.unknown_track)
 
-    return remember(audioStatus, currentMetadata?.title, currentTrack?.title) {
         derivedStateOf {
-            when (audioStatus) {
+            when (screenPlaybackStatus) {
                 PlaybackStatus.STREAMING -> currentMetadata?.title ?: unknownStream
                 PlaybackStatus.PLAYING -> currentTrack?.title ?: unknownTrack
-                else -> ""
             }
         }
     }

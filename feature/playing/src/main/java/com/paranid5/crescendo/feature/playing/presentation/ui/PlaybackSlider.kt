@@ -102,7 +102,7 @@ private fun PlaybackSliderImpl(
         modifier = modifier,
         value = currentPosition.toFloat(),
         valueRange = 0F..state.durationMillis.toFloat(),
-        enabled = state.isScreenAudioStatusActual,
+        enabled = state.isVisibleAudioStatusActual,
         colors = SliderDefaults.colors(
             thumbColor = color,
             activeTrackColor = color,

@@ -10,12 +10,13 @@ import com.paranid5.crescendo.utils.extensions.getBrightDominantOrPrimary
 
 @Composable
 internal fun PlaylistOrDownloadButton(
+    screenPlaybackStatus: PlaybackStatus,
     state: PlayingState,
     modifier: Modifier = Modifier,
 ) = nullable {
     val tint = LocalPalette.current.getBrightDominantOrPrimary()
 
-    when (state.screenPlaybackStatus.bind()) {
+    when (screenPlaybackStatus) {
         PlaybackStatus.STREAMING -> DownloadButton(
             tint = tint,
             url = state.playingStreamUrl,

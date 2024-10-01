@@ -19,7 +19,7 @@ internal fun AudioWaveform(
     state: PlayingState,
     modifier: Modifier = Modifier,
 ) {
-    val isWaveformEnabled = state.isScreenAudioStatusActual
+    val isWaveformEnabled = state.isVisibleAudioStatusActual
     val audioSessionId = state.audioSessionId
     val isPlaying = state.isPlaying
 

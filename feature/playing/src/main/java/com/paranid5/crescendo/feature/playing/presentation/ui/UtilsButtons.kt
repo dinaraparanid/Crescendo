@@ -3,6 +3,7 @@ package com.paranid5.crescendo.feature.playing.presentation.ui
 import androidx.compose.foundation.layout.Row
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import com.paranid5.crescendo.core.common.PlaybackStatus
 import com.paranid5.crescendo.feature.playing.presentation.ui.composition_local.LocalPalette
 import com.paranid5.crescendo.feature.playing.presentation.ui.utils_buttons.AudioEffectsButton
 import com.paranid5.crescendo.feature.playing.presentation.ui.utils_buttons.LikeButton
@@ -14,6 +15,7 @@ import com.paranid5.crescendo.utils.extensions.getBrightDominantOrPrimary
 
 @Composable
 internal fun UtilsButtons(
+    screenPlaybackStatus: PlaybackStatus,
     state: PlayingState,
     onUiIntent: (PlayingUiIntent) -> Unit,
     modifier: Modifier = Modifier,
@@ -30,7 +32,7 @@ internal fun UtilsButtons(
     RepeatButton(
         isRepeating = state.isRepeating,
         tint = tint,
-        enabled = state.isScreenAudioStatusActual,
+        enabled = state.isVisibleAudioStatusActual,
         modifier = Modifier.weight(1F),
     ) {
         onUiIntent(PlayingUiIntent.Playback.RepeatClick)
@@ -45,6 +47,7 @@ internal fun UtilsButtons(
     }
 
     PlaylistOrDownloadButton(
+        screenPlaybackStatus = screenPlaybackStatus,
         state = state,
         modifier = Modifier.weight(1F),
     )

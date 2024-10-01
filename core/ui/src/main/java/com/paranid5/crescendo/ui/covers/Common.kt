@@ -2,7 +2,6 @@ package com.paranid5.crescendo.ui.covers
 
 import android.content.Context
 import android.graphics.drawable.BitmapDrawable
-import androidx.compose.runtime.Composable
 import androidx.palette.graphics.Palette
 import coil.request.CachePolicy
 import coil.request.ImageRequest
@@ -15,18 +14,24 @@ import com.paranid5.crescendo.utils.BlurTransformation
 
 private const val DefaultAnimationDuration = 400
 
-@Composable
-fun mediaCoverModelWithPalette(
+suspend fun mediaCoverModelWithPalette(
+    context: Context,
+    videoCovers: List<String>,
+    trackPath: String?,
     playbackStatus: PlaybackStatus,
     size: ImageSize,
 ): Pair<ImageRequest, Palette?> = when (playbackStatus) {
     PlaybackStatus.STREAMING -> videoCoverModelWithPalette(
-        isPlaceholderRequired = false,
+        context = context,
+        videoCovers = videoCovers,
+        isPlaceholderRequired = true,
         size = size,
     )
 
-    PlaybackStatus.PLAYING -> currentTrackCoverModelWithPalette(
-        isPlaceholderRequired = false,
+    PlaybackStatus.PLAYING -> trackCoverModelWithPalette(
+        context = context,
+        trackPath = trackPath,
+        isPlaceholderRequired = true,
         size = size,
     )
 }
@@ -63,39 +68,22 @@ internal fun ImageRequest.Builder.prevCoverFallback(prevCoverModel: BitmapDrawab
         else -> fallback(prevCoverModel)
     }
 
-internal fun ImageRequest.Builder.prevCoverPlaceholderOrDefault(
-    usePrevCoverAsPlaceholder: Boolean,
-    prevCoverModel: BitmapDrawable?,
-) = when {
-    usePrevCoverAsPlaceholder -> prevCoverPlaceholder(prevCoverModel)
-    else -> placeholder(R.drawable.cover_thumbnail)
-}
+internal fun ImageRequest.Builder.defaultPlaceholder() =
+    placeholder(R.drawable.cover_thumbnail)
 
-internal fun ImageRequest.Builder.prevCoverErrorOrDefault(
-    usePrevCoverAsPlaceholder: Boolean,
-    prevCoverModel: BitmapDrawable?,
-) = when {
-    usePrevCoverAsPlaceholder -> prevCoverError(prevCoverModel)
-    else -> error(R.drawable.cover_thumbnail)
-}
+internal fun ImageRequest.Builder.defaultError() =
+    error(R.drawable.cover_thumbnail)
 
-internal fun ImageRequest.Builder.prevCoverFallbackOrDefault(
-    usePrevCoverAsPlaceholder: Boolean,
-    prevCoverModel: BitmapDrawable?,
-) = when {
-    usePrevCoverAsPlaceholder -> prevCoverFallback(prevCoverModel)
-    else -> fallback(R.drawable.cover_thumbnail)
-}
+internal fun ImageRequest.Builder.defaultFallback() =
+    fallback(R.drawable.cover_thumbnail)
 
 internal fun ImageRequest.Builder.applyTransformations(
     isPlaceholderRequired: Boolean,
     size: ImageSize?,
     isBlured: Boolean,
-    usePrevCoverAsPlaceholder: Boolean,
-    prevCoverModel: BitmapDrawable?
 ) = apply {
     if (isPlaceholderRequired)
-        prevCoverPlaceholderOrDefault(usePrevCoverAsPlaceholder, prevCoverModel)
+        defaultPlaceholder()
 
     if (isBlured)
         transformations(BlurTransformation())

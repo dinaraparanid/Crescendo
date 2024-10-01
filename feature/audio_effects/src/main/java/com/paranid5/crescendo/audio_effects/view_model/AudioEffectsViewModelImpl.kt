@@ -119,7 +119,7 @@ internal class AudioEffectsViewModelImpl(
         viewModelScope.launch {
             audioEffectsRepository.run {
                 when (presetIndex) {
-                    state.currentPresetIndex -> updateEqualizerParam(EqualizerBandsPreset.CUSTOM)
+                    state.customPresetIndex -> updateEqualizerParam(EqualizerBandsPreset.CUSTOM)
 
                     else -> {
                         updateEqualizerParam(EqualizerBandsPreset.BUILT_IN)

@@ -15,12 +15,13 @@ private val IconSize = 24.dp
 
 @Composable
 internal fun KebabMenuButton(
+    screenPlaybackStatus: PlaybackStatus,
     tint: Color,
     state: PlayingState,
     onUiIntent: (PlayingUiIntent) -> Unit,
     modifier: Modifier = Modifier,
 ) = nullable {
-    when (state.screenPlaybackStatus.bind()) {
+    when (screenPlaybackStatus) {
         PlaybackStatus.STREAMING -> VideoKebabMenuButton(
             tint = tint,
             modifier = modifier,

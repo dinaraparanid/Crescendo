@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import com.paranid5.crescendo.core.common.PlaybackStatus
 import com.paranid5.crescendo.core.resources.ui.theme.AppTheme.dimensions
 import com.paranid5.crescendo.feature.playing.presentation.ui.composition_local.LocalPalette
 import com.paranid5.crescendo.feature.playing.presentation.ui.kebab.KebabMenuButton
@@ -16,12 +17,14 @@ import com.paranid5.crescendo.utils.extensions.getBrightDominantOrPrimary
 
 @Composable
 internal fun TitleAndPropertiesButton(
+    screenPlaybackStatus: PlaybackStatus,
     state: PlayingState,
     onUiIntent: (PlayingUiIntent) -> Unit,
     modifier: Modifier = Modifier,
     textAlignment: Alignment.Horizontal = Alignment.Start,
 ) = Row(modifier) {
     TitleAndAuthor(
+        screenPlaybackStatus = screenPlaybackStatus,
         state = state,
         textAlignment = textAlignment,
         modifier = Modifier.weight(1F),
@@ -30,6 +33,7 @@ internal fun TitleAndPropertiesButton(
     Spacer(Modifier.width(dimensions.padding.small))
 
     KebabMenuButton(
+        screenPlaybackStatus = screenPlaybackStatus,
         tint = LocalPalette.current.getBrightDominantOrPrimary(),
         state = state,
         onUiIntent = onUiIntent,

@@ -2,6 +2,7 @@ package com.paranid5.crescendo.feature.playing.presentation
 
 import android.content.res.Configuration
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.NonRestartableComposable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
@@ -12,6 +13,7 @@ import com.paranid5.crescendo.feature.playing.presentation.effect.ScreenEffect
 import com.paranid5.crescendo.feature.playing.presentation.effect.UpdateUiParamsEffect
 import com.paranid5.crescendo.feature.playing.presentation.ui.PlayingScreenLandscape
 import com.paranid5.crescendo.feature.playing.presentation.ui.PlayingScreenPortrait
+import com.paranid5.crescendo.feature.playing.presentation.ui.composition_local.LocalCoverAlpha
 import com.paranid5.crescendo.feature.playing.view_model.PlayingScreenEffect
 import com.paranid5.crescendo.feature.playing.view_model.PlayingUiIntent
 import com.paranid5.crescendo.feature.playing.view_model.PlayingViewModel
@@ -36,7 +38,6 @@ fun PlayingScreen(
 
     UpdateUiParamsEffect(
         screenPlaybackStatus = screenPlaybackStatus,
-        coverAlpha = coverAlpha,
         onUiIntent = onUiIntent,
     )
 
@@ -44,17 +45,21 @@ fun PlayingScreen(
         onUiIntent(PlayingUiIntent.ScreenEffect.ClearScreenEffect)
     }
 
-    when (config.orientation) {
-        Configuration.ORIENTATION_LANDSCAPE -> PlayingScreenLandscape(
-            state = state,
-            onUiIntent = onUiIntent,
-            modifier = modifier,
-        )
+    CompositionLocalProvider(LocalCoverAlpha provides coverAlpha) {
+        when (config.orientation) {
+            Configuration.ORIENTATION_LANDSCAPE -> PlayingScreenLandscape(
+                screenPlaybackStatus = screenPlaybackStatus,
+                state = state,
+                onUiIntent = onUiIntent,
+                modifier = modifier,
+            )
 
-        else -> PlayingScreenPortrait(
-            state = state,
-            onUiIntent = onUiIntent,
-            modifier = modifier,
-        )
+            else -> PlayingScreenPortrait(
+                screenPlaybackStatus = screenPlaybackStatus,
+                state = state,
+                onUiIntent = onUiIntent,
+                modifier = modifier,
+            )
+        }
     }
 }

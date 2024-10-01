@@ -4,12 +4,14 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import com.paranid5.crescendo.core.common.PlaybackStatus
 import com.paranid5.crescendo.core.resources.ui.theme.AppTheme.dimensions
 import com.paranid5.crescendo.feature.playing.presentation.ui.title_author.TitleAndAuthor
 import com.paranid5.crescendo.feature.playing.view_model.PlayingState
 
 @Composable
 internal fun PlaybackSliderWithLabels(
+    screenPlaybackStatus: PlaybackStatus,
     state: PlayingState,
     modifier: Modifier = Modifier,
     seekTo: (position: Long) -> Unit,
@@ -21,6 +23,7 @@ internal fun PlaybackSliderWithLabels(
     if (state.isLiveStreaming.not()) TimeText(time = curPosition, color = color)
 
     TitleAndAuthor(
+        screenPlaybackStatus = screenPlaybackStatus,
         state = state,
         textAlignment = Alignment.CenterHorizontally,
         modifier = Modifier

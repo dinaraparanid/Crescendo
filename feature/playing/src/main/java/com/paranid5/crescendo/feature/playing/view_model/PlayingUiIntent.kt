@@ -6,14 +6,9 @@ import com.paranid5.crescendo.core.common.tracks.Track
 sealed interface PlayingUiIntent {
 
     sealed interface UpdateState : PlayingUiIntent {
-        data class UpdateUiParams(
-            val screenPlaybackStatus: PlaybackStatus,
-            val coverAlpha: Float,
-        ) : UpdateState
-
-        data object LikeClick : UpdateState
-
+        data class UpdateUiParams(val visiblePlaybackStatus: PlaybackStatus) : UpdateState
         data class AddTrackToPlaylist(val track: Track) : UpdateState
+        data object LikeClick : UpdateState
     }
 
     sealed interface Lifecycle : PlayingUiIntent {

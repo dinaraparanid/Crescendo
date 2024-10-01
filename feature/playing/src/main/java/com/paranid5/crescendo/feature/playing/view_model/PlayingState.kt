@@ -17,13 +17,12 @@ data class PlayingState(
     val isRepeating: Boolean = false,
     val isLiked: Boolean = false,
     val actualPlaybackStatus: PlaybackStatus? = null,
-    val screenPlaybackStatus: PlaybackStatus? = null,
+    val visiblePlaybackStatus: PlaybackStatus? = null,
     val currentTrack: TrackUiState? = null,
     val currentMetadata: VideoMetadataUiState? = null,
     val playingStreamUrl: String = "",
     val streamPlaybackPosition: Long = 0,
     val trackPlaybackPosition: Long = 0,
-    val coverAlpha: Float = 0F,
     @IgnoredOnParcel val screenEffect: PlayingScreenEffect? = null,
 ) : Parcelable {
 
@@ -49,10 +48,10 @@ data class PlayingState(
 
     @IgnoredOnParcel
     val isLiveStreaming =
-        screenPlaybackStatus == PlaybackStatus.STREAMING && currentMetadata?.isLiveStream == true
+        visiblePlaybackStatus == PlaybackStatus.STREAMING && currentMetadata?.isLiveStream == true
 
     @IgnoredOnParcel
-    val isScreenAudioStatusActual = nullable {
-        actualPlaybackStatus.bind() == screenPlaybackStatus.bind()
+    val isVisibleAudioStatusActual = nullable {
+        actualPlaybackStatus.bind() == visiblePlaybackStatus.bind()
     } ?: false
 }

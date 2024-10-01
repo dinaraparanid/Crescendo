@@ -58,10 +58,7 @@ internal class PlayingViewModelImpl(
 
     private fun onUpdateStateUiIntent(intent: PlayingUiIntent.UpdateState) = when (intent) {
         is PlayingUiIntent.UpdateState.UpdateUiParams -> updateState {
-            copy(
-                screenPlaybackStatus = intent.screenPlaybackStatus,
-                coverAlpha = intent.coverAlpha,
-            )
+            copy(visiblePlaybackStatus = intent.visiblePlaybackStatus)
         }
 
         is PlayingUiIntent.UpdateState.LikeClick -> updateState {
@@ -104,7 +101,7 @@ internal class PlayingViewModelImpl(
     }
 
     private fun onSeekTo(position: Long) = nullable {
-        val audioStatus = state.screenPlaybackStatus.bind()
+        val audioStatus = state.visiblePlaybackStatus.bind()
 
         viewModelScope.launch {
             interactor.updateSeekToPosition(playbackStatus = audioStatus, position = position)
@@ -114,7 +111,7 @@ internal class PlayingViewModelImpl(
     }
 
     private fun onPrevButtonClick() = nullable {
-        val audioStatus = state.screenPlaybackStatus.bind()
+        val audioStatus = state.visiblePlaybackStatus.bind()
 
         viewModelScope.launch {
             playbackRepository.updateAudioStatus(playbackStatus = audioStatus)
@@ -129,19 +126,19 @@ internal class PlayingViewModelImpl(
     }
 
     private fun onPauseButtonClick() = nullable {
-        val audioStatus = state.screenPlaybackStatus.bind()
+        val audioStatus = state.visiblePlaybackStatus.bind()
         viewModelScope.launch { playbackRepository.updateAudioStatus(playbackStatus = audioStatus) }
         interactor.sendPauseBroadcast(playbackStatus = audioStatus)
     }
 
     private fun onPlayButtonClick() = nullable {
-        val audioStatus = state.screenPlaybackStatus.bind()
+        val audioStatus = state.visiblePlaybackStatus.bind()
         viewModelScope.launch { playbackRepository.updateAudioStatus(playbackStatus = audioStatus) }
         interactor.startStreamingOrSendResumeBroadcast(playbackStatus = audioStatus)
     }
 
     private fun onNextButtonClick() = nullable {
-        val audioStatus = state.screenPlaybackStatus.bind()
+        val audioStatus = state.visiblePlaybackStatus.bind()
 
         viewModelScope.launch {
             playbackRepository.updateAudioStatus(playbackStatus = audioStatus)
@@ -169,7 +166,7 @@ internal class PlayingViewModelImpl(
     }
 
     private fun onRepeatClick() = nullable {
-        val audioStatus = state.screenPlaybackStatus.bind()
+        val audioStatus = state.visiblePlaybackStatus.bind()
         interactor.sendChangeRepeatBroadcast(playbackStatus = audioStatus)
     }
 

@@ -6,12 +6,9 @@ import androidx.media3.common.Player
 import androidx.media3.session.MediaSession
 import com.paranid5.crescendo.core.common.tracks.Track
 import com.paranid5.crescendo.system.common.broadcast.TrackServiceBroadcasts
-import com.paranid5.crescendo.system.services.track.media_session.CancelAction
 import com.paranid5.crescendo.system.services.track.media_session.MediaSessionCallback
-import com.paranid5.crescendo.system.services.track.media_session.RepeatAction
 import com.paranid5.crescendo.system.services.track.notification.NotificationManager
 import com.paranid5.crescendo.system.services.track.playback.PlayerProvider
-import com.paranid5.crescendo.system.services.track.playback.isRepeating
 import com.paranid5.crescendo.system.services.track.playback.playPlaylistAsync
 import com.paranid5.crescendo.system.services.track.playback.startBassMonitoring
 import com.paranid5.crescendo.system.services.track.playback.startEqMonitoring

@@ -8,13 +8,11 @@ import com.paranid5.crescendo.feature.playing.view_model.PlayingUiIntent
 @Composable
 internal fun UpdateUiParamsEffect(
     screenPlaybackStatus: PlaybackStatus,
-    coverAlpha: Float,
     onUiIntent: (PlayingUiIntent) -> Unit,
-) = LaunchedEffect(screenPlaybackStatus, coverAlpha, onUiIntent) {
+) = LaunchedEffect(screenPlaybackStatus, onUiIntent) {
     onUiIntent(
         PlayingUiIntent.UpdateState.UpdateUiParams(
-            screenPlaybackStatus = screenPlaybackStatus,
-            coverAlpha = coverAlpha,
+            visiblePlaybackStatus = screenPlaybackStatus,
         )
     )
 }

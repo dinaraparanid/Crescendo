@@ -38,6 +38,6 @@ private fun TrimLabel(modifier: Modifier = Modifier) =
     Text(
         text = stringResource(R.string.trim),
         style = typography.regular,
-        fontWeight = FontWeight.Bold,
+        fontWeight = FontWeight.W700,
         modifier = modifier,
     )

@@ -1,6 +1,5 @@
 package com.paranid5.crescendo.ui.pager
 
-import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
@@ -28,7 +27,6 @@ import kotlinx.coroutines.launch
 
 private val PagerElevation = 4.dp
 
-@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun AppPager(
     pagerUiStates: ImmutableList<PagerUiState>,

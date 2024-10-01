@@ -14,10 +14,10 @@ import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.core.content.ContextCompat
-import com.paranid5.crescendo.utils.extensions.openAppSettings
 import com.paranid5.crescendo.ui.permissions.PermissionDialog
 import com.paranid5.crescendo.ui.permissions.description_providers.PermissionDescriptionProvider
 import com.paranid5.crescendo.utils.extensions.getActivity
+import com.paranid5.crescendo.utils.extensions.openAppSettings
 import java.util.Queue
 
 @Composable
@@ -54,7 +54,7 @@ fun permissionsRequestLauncher(
                 },
                 onGrantedClicked = {
                     permissionResultLauncher.launch(arrayOf(permission))
-                    notGrantedPermissions.removeFirst()
+                    notGrantedPermissions.removeFirstOrNull()
                 },
                 onGoToAppSettingsClicked = context::openAppSettings,
             )

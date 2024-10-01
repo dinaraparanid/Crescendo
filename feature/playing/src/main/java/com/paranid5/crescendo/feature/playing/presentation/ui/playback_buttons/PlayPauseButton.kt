@@ -36,7 +36,7 @@ internal fun PlayPauseButton(
 
 @Composable
 private fun rememberIsPlaying(state: PlayingState): State<Boolean> {
-    val isScreenAudioStatusActual = state.isScreenAudioStatusActual
+    val isScreenAudioStatusActual = state.isVisibleAudioStatusActual
     val isPlaying = state.isPlaying
 
     return remember(isPlaying, isScreenAudioStatusActual) {

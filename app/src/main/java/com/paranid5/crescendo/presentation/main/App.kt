@@ -1,6 +1,5 @@
 package com.paranid5.crescendo.presentation.main
 
-import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.calculateEndPadding
@@ -8,10 +7,10 @@ import androidx.compose.foundation.layout.calculateStartPadding
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.pager.rememberPagerState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.BottomSheetScaffold
 import androidx.compose.material.BottomSheetScaffoldState
 import androidx.compose.material.BottomSheetValue
-import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.ModalBottomSheetValue
 import androidx.compose.material.rememberBottomSheetScaffoldState
 import androidx.compose.material.rememberModalBottomSheetState
@@ -26,6 +25,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalLayoutDirection
 import com.paranid5.crescendo.core.resources.ui.theme.AppTheme.colors
+import com.paranid5.crescendo.core.resources.ui.theme.AppTheme.dimensions
 import com.paranid5.crescendo.presentation.UpdateCheckerDialog
 import com.paranid5.crescendo.ui.appbar.appBarHeight
 import com.paranid5.crescendo.ui.composition_locals.LocalCurrentPlaylistSheetState
@@ -68,7 +68,6 @@ internal fun App(
     }
 }
 
-@OptIn(ExperimentalMaterialApi::class, ExperimentalFoundationApi::class)
 @Composable
 private fun ScreenScaffold(modifier: Modifier = Modifier) {
     val playingScaffoldState = rememberBottomSheetScaffoldState()
@@ -91,8 +90,12 @@ private fun ScreenScaffold(modifier: Modifier = Modifier) {
             scaffoldState = playingScaffoldState,
             sheetPeekHeight = appBarHeight,
             backgroundColor = Color.Transparent,
-            sheetBackgroundColor = Color.Transparent,
+            sheetBackgroundColor = colors.background.highContrast,
             sheetContent = { PlayingBottomSheet(alpha) },
+            sheetShape = RoundedCornerShape(
+                topStart = dimensions.corners.extraMedium,
+                topEnd = dimensions.corners.extraMedium,
+            ),
             content = { padding ->
                 val layoutDirection = LocalLayoutDirection.current
 
@@ -109,17 +112,25 @@ private fun ScreenScaffold(modifier: Modifier = Modifier) {
     }
 }
 
-@OptIn(ExperimentalMaterialApi::class)
 private fun bottomSheetPushAlpha(state: BottomSheetScaffoldState): Float {
     val sheetState = state.bottomSheetState
-    val progress = sheetState.progress
     val targetValue = sheetState.targetValue
     val currentValue = sheetState.currentValue
+
+    val upToDownProgress = sheetState.progress(
+        from = BottomSheetValue.Expanded,
+        to = BottomSheetValue.Collapsed,
+    )
+
+    val downToUpProgress = sheetState.progress(
+        from = BottomSheetValue.Collapsed,
+        to = BottomSheetValue.Expanded,
+    )
 
     return when {
         currentValue == BottomSheetValue.Collapsed && targetValue == BottomSheetValue.Collapsed -> 1F
         currentValue == BottomSheetValue.Expanded && targetValue == BottomSheetValue.Expanded -> 0F
-        currentValue == BottomSheetValue.Expanded && targetValue == BottomSheetValue.Collapsed -> progress
-        else -> 1 - progress
+        currentValue == BottomSheetValue.Expanded && targetValue == BottomSheetValue.Collapsed -> upToDownProgress
+        else -> 1 - downToUpProgress
     }
 }

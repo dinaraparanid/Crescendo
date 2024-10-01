@@ -16,5 +16,5 @@ internal fun FileSaveDialogLabel(modifier: Modifier = Modifier) =
         modifier = modifier,
         color = colors.text.primary,
         style = typography.h.h3,
-        fontWeight = FontWeight.Bold,
+        fontWeight = FontWeight.W700,
     )
