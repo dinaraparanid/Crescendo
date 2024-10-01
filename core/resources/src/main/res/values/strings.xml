@@ -70,7 +70,6 @@
     <string name="end_time">End time</string>
     <string name="save">Save</string>
     <string name="trim">Trim</string>
-    <string name="file_trimmed">File is successfully trimmed!</string>
     <string name="fade">Fade</string>
     <string name="fade_in">Fade In</string>
     <string name="fade_out">Fade Out</string>
@@ -134,6 +133,9 @@
     <string name="stream_fetch_url_meta_title">Ready to stream</string>
     <string name="stream_fetch_url_meta_duration" formatted="false">Duration: %s</string>
     <string name="stream_recent_title">Last 50 Videos</string>
+
+    <!-- Trimmer -->
+    <string name="trimmer_done">File is successfully trimmed!</string>
 
     <!-- General -->
     <string name="something_went_wrong">Something went wrong</string>

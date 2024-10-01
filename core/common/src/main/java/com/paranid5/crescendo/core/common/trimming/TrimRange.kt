@@ -1,5 +1,8 @@
 package com.paranid5.crescendo.core.common.trimming
 
+import kotlinx.serialization.Serializable
+
+@Serializable
 data class TrimRange(val startPointMillis: Long, val totalDurationMillis: Long) {
     constructor() : this(0, 0)
 }

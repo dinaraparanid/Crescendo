@@ -6,12 +6,13 @@ import kotlinx.coroutines.flow.map
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 
-internal class WaveformDataStore(dataStoreProvider: DataStoreProvider) {
+internal class WaveformDataStore(
+    dataStoreProvider: DataStoreProvider,
+    private val json: Json,
+) {
     private companion object {
         private val AMPLITUDES = stringPreferencesKey("amplitudes")
     }
-
-    private val json by lazy { Json { ignoreUnknownKeys = true } }
 
     private val dataStore by lazy { dataStoreProvider.dataStore }
 

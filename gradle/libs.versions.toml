@@ -1,6 +1,7 @@
 [versions]
 activityCompose = "1.9.2"
 amplituda = "2.2.2"
+workManger = "2.9.1"
 sqlDelight = "2.0.2"
 appcompat = "1.7.0"
 arrowFxCoroutines = "1.2.4"
@@ -28,13 +29,10 @@ navigationCompose = "2.8.1"
 paletteKtx = "1.0.0"
 ui = "1.7.2"
 ytUrlExtractorKt = "9a8db37d0c"
-foundationAndroid = "1.7.1"
+foundationAndroid = "1.7.2"
 ytdl = "0.15.0"
 agp = "8.4.2"
 kotlin = "2.0.20"
-junit = "4.13.2"
-junitVersion = "1.2.1"
-espressoCore = "3.6.1"
 
 [libraries]
 amplituda = { module = "com.github.lincollincol:amplituda", version.ref = "amplituda" }
@@ -62,6 +60,7 @@ androidx-palette-ktx = { module = "androidx.palette:palette-ktx", version.ref = 
 androidx-ui = { module = "androidx.compose.ui:ui", version.ref = "ui" }
 androidx-ui-tooling-preview = { module = "androidx.compose.ui:ui-tooling-preview", version.ref = "ui" }
 androidx-foundation-android = { group = "androidx.compose.foundation", name = "foundation-android", version.ref = "foundationAndroid" }
+androidx-work-work-runtime-ktx = { module = "androidx.work:work-runtime-ktx", version.ref = "workManger" }
 
 arrow-fx-coroutines = { module = "io.arrow-kt:arrow-fx-coroutines", version.ref = "arrowFxCoroutines" }
 
@@ -100,10 +99,6 @@ yt-url-extractor-kt = { module = "com.github.dinaraparanid:yt-url-extractor-kt",
 ytdl-lib = { group = "com.github.yausername.youtubedl-android", name = "library", version.ref = "ytdl" }
 ytdl-ffmpeg = { group = "com.github.yausername.youtubedl-android", name = "ffmpeg", version.ref = "ytdl" }
 ytdl-aria = { group = "com.github.yausername.youtubedl-android", name = "aria2c", version.ref = "ytdl" }
-
-junit = { group = "junit", name = "junit", version.ref = "junit" }
-androidx-junit = { group = "androidx.test.ext", name = "junit", version.ref = "junitVersion" }
-androidx-espresso-core = { group = "androidx.test.espresso", name = "espresso-core", version.ref = "espressoCore" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

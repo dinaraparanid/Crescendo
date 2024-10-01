@@ -11,7 +11,10 @@ import kotlinx.coroutines.flow.map
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 
-internal class AudioEffectsDataStore(dataStoreProvider: DataStoreProvider) {
+internal class AudioEffectsDataStore(
+    dataStoreProvider: DataStoreProvider,
+    private val json: Json,
+) {
     private companion object {
         private val AUDIO_EFFECTS_ENABLED = booleanPreferencesKey("audio_effects_enabled")
         private val PITCH_VALUE = floatPreferencesKey("pitch_value")
@@ -31,8 +34,6 @@ internal class AudioEffectsDataStore(dataStoreProvider: DataStoreProvider) {
         private const val INITIAL_REVERB_PRESET: Short = 0
         private const val INITIAL_AUDIO_EFFECTS_ENABLED = false
     }
-
-    private val json by lazy { Json { ignoreUnknownKeys = true } }
 
     private val dataStore by lazy { dataStoreProvider.dataStore }
 

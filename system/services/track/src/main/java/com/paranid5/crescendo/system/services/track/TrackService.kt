@@ -94,13 +94,6 @@ class TrackService : MediaSuspendService(), PlaybackForegroundService, KoinCompo
             player = playerProvider.player,
             mediaSessionId = MEDIA_SESSION_ID,
             callback = MediaSessionCallback(service = this),
-            initialActions = listOf(
-                RepeatAction(
-                    context = this,
-                    isRepeating = playerProvider.isRepeating,
-                ),
-                CancelAction(context = this),
-            ),
         )
 
         notificationManager.initNotificationManager(playerProvider.player)

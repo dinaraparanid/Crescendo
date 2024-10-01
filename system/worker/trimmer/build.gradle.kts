@@ -1,12 +1,11 @@
 plugins {
     alias(libs.plugins.android.library)
     alias(libs.plugins.kotlin.android)
-    alias(libs.plugins.compose.compiler)
-    id("kotlin-parcelize")
+    alias(libs.plugins.kotlinx.serialization)
 }
 
 android {
-    namespace = "com.paranid5.crescendo.feature.trimmer"
+    namespace = "com.paranid5.crescendo.system.worker.trimmer"
     compileSdk = 34
 
     defaultConfig {
@@ -37,29 +36,14 @@ android {
 dependencies {
     implementation(project(":core:common"))
     implementation(project(":core:media"))
-    implementation(project(":core:ui"))
-    implementation(project(":core:utils"))
     implementation(project(":core:resources"))
 
-    implementation(project(":domain:tracks"))
-    implementation(project(":domain:waveform"))
-
-    implementation(project(":system:worker:trimmer"))
+    implementation(project(":system:receivers"))
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)
-    implementation(libs.androidx.ui)
-    implementation(libs.androidx.constraintlayout.compose)
-    implementation(libs.androidx.navigation.compose)
-    implementation(libs.androidx.media3.common)
-    implementation(libs.androidx.media3.exoplayer)
-    implementation(libs.androidx.material)
-    implementation(libs.androidx.material3)
-    implementation(libs.material)
+    api(libs.androidx.work.work.runtime.ktx)
 
-    implementation(libs.kotlinx.collections.immutable)
+    implementation(libs.kotlinx.serialization.json)
     implementation(libs.koin.androidx.compose)
-    implementation(libs.arrow.fx.coroutines)
-
-    implementation(libs.amplituda)
 }

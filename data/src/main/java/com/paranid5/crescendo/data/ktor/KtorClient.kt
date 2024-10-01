@@ -17,7 +17,7 @@ import kotlinx.serialization.json.Json
 private const val USER_AGENT =
     "Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/97.0.4692.98 Safari/537.36"
 
-internal fun KtorClient() = HttpClient(OkHttp) {
+internal fun KtorClient(json: Json) = HttpClient(OkHttp) {
     install(UserAgent) {
         agent = USER_AGENT
     }
@@ -35,7 +35,7 @@ internal fun KtorClient() = HttpClient(OkHttp) {
     }
 
     install(ContentNegotiation) {
-        json(Json { ignoreUnknownKeys = true })
+        json(json = json)
     }
 
     install(Logging) {

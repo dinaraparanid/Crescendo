@@ -2,6 +2,7 @@ package com.paranid5.crescendo.trimmer.view_model
 
 import android.annotation.SuppressLint
 import android.content.Context
+import androidx.annotation.OptIn
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -11,18 +12,23 @@ import androidx.media3.common.PlaybackParameters
 import androidx.media3.common.Player
 import androidx.media3.common.util.UnstableApi
 import androidx.media3.exoplayer.ExoPlayer
+import androidx.work.OneTimeWorkRequestBuilder
+import androidx.work.WorkManager
+import androidx.work.workDataOf
 import arrow.core.Either
 import arrow.core.Tuple4
+import com.paranid5.crescendo.core.common.tracks.DefaultTrack
 import com.paranid5.crescendo.core.common.tracks.Track
 import com.paranid5.crescendo.core.common.udf.StatePublisher
 import com.paranid5.crescendo.core.common.udf.state
 import com.paranid5.crescendo.domain.tracks.TracksRepository
 import com.paranid5.crescendo.domain.waveform.WaveformRepository
+import com.paranid5.crescendo.system.worker.trimmer.TrimmerWorkRequest
+import com.paranid5.crescendo.system.worker.trimmer.TrimmerWorker
 import com.paranid5.crescendo.trimmer.domain.player.PlayerStateChangedListener
 import com.paranid5.crescendo.trimmer.domain.player.seekTenSecsBack
 import com.paranid5.crescendo.trimmer.domain.player.seekTenSecsForward
 import com.paranid5.crescendo.trimmer.domain.player.stopAndReleaseCatching
-import com.paranid5.crescendo.trimmer.domain.trimTrackAndSendBroadcast
 import com.paranid5.crescendo.trimmer.view_model.TrimmerState.FileSaveDialogProperties
 import com.paranid5.crescendo.trimmer.view_model.TrimmerState.PlaybackPositions
 import com.paranid5.crescendo.trimmer.view_model.TrimmerState.PlaybackPositions.Companion.InitialPosition
@@ -50,17 +56,20 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
+import kotlinx.serialization.encodeToString
+import kotlinx.serialization.json.Json
 import linc.com.amplituda.Amplituda
 import linc.com.amplituda.callback.AmplitudaErrorListener
 import java.io.File
 
-@UnstableApi
+@OptIn(UnstableApi::class)
 internal class TrimmerViewModelImpl(
     @SuppressLint("StaticFieldLeak")
     private val appContext: Context,
     private val savedStateHandle: SavedStateHandle,
     private val tracksRepository: TracksRepository,
     private val waveformRepository: WaveformRepository,
+    private val json: Json,
 ) : ViewModel(), TrimmerViewModel, StatePublisher<TrimmerState> {
     companion object {
         private const val StateKey = "state"
@@ -139,19 +148,7 @@ internal class TrimmerViewModelImpl(
             copy(focusEvent = intent.focusEvent)
         }
 
-        is TrimmerUiIntent.TrimTrack -> viewModelScope.sideEffect(Dispatchers.IO) {
-            state.trackState.getOrNull()?.let {
-                trimTrackAndSendBroadcast(
-                    context = appContext,
-                    track = it,
-                    outputFilename = state.fileSaveDialogProperties.filename,
-                    audioFormat = state.fileSaveDialogProperties.audioFormat,
-                    trimRange = state.playbackPositions.trimRange,
-                    pitchAndSpeed = state.playbackProperties.pitchAndSpeed,
-                    fadeDurations = state.playbackPositions.fadeDurations,
-                )
-            }
-        }
+        is TrimmerUiIntent.TrimTrack -> sendTrimRequest()
 
         is TrimmerUiIntent.Lifecycle -> onLifecycleUiIntent(intent = intent)
 
@@ -232,6 +229,31 @@ internal class TrimmerViewModelImpl(
         }
 
         is TrimmerUiIntent.FileSave.UpdateFilename -> updateFilename(filename = intent.filename)
+    }
+
+    private fun sendTrimRequest() = viewModelScope.sideEffect(Dispatchers.IO) {
+        state.trackState.getOrNull()?.let { track ->
+            WorkManager
+                .getInstance(appContext)
+                .enqueue(
+                    OneTimeWorkRequestBuilder<TrimmerWorker>()
+                        .setInputData(
+                            workDataOf(
+                                TrimmerWorker.REQUEST_KEY to json.encodeToString(
+                                    TrimmerWorkRequest(
+                                        track = DefaultTrack(track),
+                                        outputFilename = state.fileSaveDialogProperties.filename,
+                                        audioFormat = state.fileSaveDialogProperties.audioFormat,
+                                        trimRange = state.playbackPositions.trimRange,
+                                        pitchAndSpeed = state.playbackProperties.pitchAndSpeed,
+                                        fadeDurations = state.playbackPositions.fadeDurations,
+                                    )
+                                )
+                            )
+                        )
+                        .build()
+                )
+        }
     }
 
     private fun updateFilename(filename: String) = updateFileSaveDialogProperties {

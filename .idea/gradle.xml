@@ -53,6 +53,8 @@
             <option value="$PROJECT_DIR$/system/services/stream" />
             <option value="$PROJECT_DIR$/system/services/track" />
             <option value="$PROJECT_DIR$/system/services/video_cache" />
+            <option value="$PROJECT_DIR$/system/worker" />
+            <option value="$PROJECT_DIR$/system/worker/trimmer" />
           </set>
         </option>
         <option name="resolveExternalAnnotations" value="false" />

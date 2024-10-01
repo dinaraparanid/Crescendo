@@ -7,7 +7,10 @@ import kotlinx.coroutines.flow.map
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 
-internal class StreamDataStore(dataStoreProvider: DataStoreProvider) {
+internal class StreamDataStore(
+    dataStoreProvider: DataStoreProvider,
+    private val json: Json,
+) {
     private companion object {
         private val STREAM_URL = stringPreferencesKey("current_url")
         private val DOWNLOADING_URL = stringPreferencesKey("download_url")
@@ -15,8 +18,6 @@ internal class StreamDataStore(dataStoreProvider: DataStoreProvider) {
 
         private const val UNDEFINED_STREAM_URL = ""
     }
-
-    private val json by lazy { Json { ignoreUnknownKeys = true } }
 
     private val dataStore by lazy { dataStoreProvider.dataStore }
 

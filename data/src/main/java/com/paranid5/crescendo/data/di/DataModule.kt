@@ -11,6 +11,7 @@ import com.paranid5.crescendo.data.stream.di.streamModule
 import com.paranid5.crescendo.data.tracks.di.tracksModule
 import com.paranid5.crescendo.data.waveform.di.waveformModule
 import com.paranid5.crescendo.data.web.di.webModule
+import kotlinx.serialization.json.Json
 import org.koin.dsl.module
 
 val dataModule = module {
@@ -27,4 +28,6 @@ val dataModule = module {
         gitHubModule,
         coverRetrieverModule,
     )
+
+    single { Json { ignoreUnknownKeys = true } }
 }
