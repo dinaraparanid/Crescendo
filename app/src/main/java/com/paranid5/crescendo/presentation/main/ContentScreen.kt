@@ -5,7 +5,6 @@ import android.content.res.Configuration
 import android.widget.Toast
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
@@ -24,6 +23,7 @@ import com.paranid5.crescendo.audio_effects.presentation.AudioEffectsScreen
 import com.paranid5.crescendo.core.common.navigation.LocalNavigator
 import com.paranid5.crescendo.core.resources.R
 import com.paranid5.crescendo.core.resources.ui.theme.AppTheme.dimensions
+import com.paranid5.crescendo.feature.meta_editor.presentation.MetaEditorScreen
 import com.paranid5.crescendo.feature.play.main.presentation.PlayScreen
 import com.paranid5.crescendo.feature.play.main.view_model.PlayBackResult
 import com.paranid5.crescendo.feature.preferences.PreferencesScreen
@@ -76,6 +76,9 @@ private fun ContentScreenNavHost(
             when (result) {
                 is PlayBackResult.ShowTrimmer ->
                     navigator.pushIfNotSame(AppScreen.Audio.Trimmer(result.trackUri))
+
+                is PlayBackResult.ShowMetaEditor ->
+                    navigator.pushIfNotSame(AppScreen.Audio.MetaEditor(result.trackUri))
             }
         }
     }
@@ -116,13 +119,38 @@ private fun ContentScreenNavHost(
         }
     }
 
+    composable(
+        route = AppScreen.Audio.MetaEditor.title,
+        arguments = persistentListOf(
+            navArgument(AppScreen.Audio.MetaEditor.TrackPathKey) {
+                type = NavType.StringType
+            }
+        )
+    ) { backStackEntry ->
+        navigator.updateCurrentScreen(AppScreen.Audio.MetaEditor)
+
+        val trackPath by remember(backStackEntry) {
+            derivedStateOf {
+                backStackEntry
+                    .arguments
+                    ?.getString(AppScreen.Audio.MetaEditor.TrackPathKey)
+            }
+        }
+
+        trackPath?.let {
+            MetaEditorScreen(
+                trackPath = it,
+                modifier = screenModifier,
+            )
+        }
+    }
+
     composable(route = AppScreen.Preferences.title) {
         navigator.updateCurrentScreen(AppScreen.Preferences)
         PreferencesScreen(modifier = screenModifier)
     }
 }
 
-@OptIn(ExperimentalMaterialApi::class)
 @Composable
 private fun BackHandler() {
     val context = LocalContext.current

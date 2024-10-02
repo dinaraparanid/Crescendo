@@ -95,8 +95,8 @@ internal class PlayingViewModelImpl(
             copy(screenEffect = PlayingScreenEffect.ShowTrimmer(trackUri = intent.trackUri))
         }
 
-        PlayingUiIntent.ScreenEffect.ShowMetaEditor -> updateState {
-            copy(screenEffect = PlayingScreenEffect.ShowMetaEditor)
+        is PlayingUiIntent.ScreenEffect.ShowMetaEditor -> updateState {
+            copy(screenEffect = PlayingScreenEffect.ShowMetaEditor(trackUri = intent.trackUri))
         }
     }
 

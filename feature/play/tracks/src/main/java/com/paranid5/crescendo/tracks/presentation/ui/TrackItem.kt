@@ -87,7 +87,7 @@ internal fun TrackItem(
                     onUiIntent(TracksUiIntent.ScreenEffect.ShowTrimmer(trackUri = it))
                 },
                 showMetaEditor = {
-                    onUiIntent(TracksUiIntent.ScreenEffect.ShowMetaEditor)
+                    onUiIntent(TracksUiIntent.ScreenEffect.ShowMetaEditor(trackUri = it))
                 }
             )
         }

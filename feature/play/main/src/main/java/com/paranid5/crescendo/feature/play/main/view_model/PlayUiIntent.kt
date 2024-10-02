@@ -11,5 +11,7 @@ interface PlayUiIntent {
 
     data class ShowTrimmer(val trackUri: String) : PlayUiIntent
 
+    data class ShowMetaEditor(val trackUri: String) : PlayUiIntent
+
     data object ClearBackResult : PlayUiIntent
 }

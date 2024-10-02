@@ -8,5 +8,5 @@ sealed interface PlayingScreenEffect {
 
     data class ShowTrimmer(val trackUri: String) : PlayingScreenEffect
 
-    data object ShowMetaEditor : PlayingScreenEffect
+    data class ShowMetaEditor(val trackUri: String) : PlayingScreenEffect
 }

@@ -30,6 +30,10 @@ internal class PlayViewModelImpl(
                 copy(backResult = PlayBackResult.ShowTrimmer(trackUri = intent.trackUri))
             }
 
+            is PlayUiIntent.ShowMetaEditor -> updateState {
+                copy(backResult = PlayBackResult.ShowMetaEditor(trackUri = intent.trackUri))
+            }
+
             is PlayUiIntent.UpdatePagerState ->
                 updateState { copy(pagerState = intent.pagerState) }
 

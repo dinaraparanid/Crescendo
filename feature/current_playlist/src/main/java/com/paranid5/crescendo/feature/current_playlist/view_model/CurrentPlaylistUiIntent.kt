@@ -24,7 +24,7 @@ interface CurrentPlaylistUiIntent {
 
     sealed interface Screen : CurrentPlaylistUiIntent {
         data class ShowTrimmer(val trackUri: String) : Screen
-        data object ShowMetaEditor : Screen
+        data class ShowMetaEditor(val trackUri: String) : Screen
         data object ClearScreenEffect : Screen
     }
 }

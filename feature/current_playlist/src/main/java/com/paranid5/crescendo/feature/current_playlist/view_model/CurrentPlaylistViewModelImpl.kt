@@ -108,7 +108,7 @@ internal class CurrentPlaylistViewModelImpl(
         }
 
         is CurrentPlaylistUiIntent.Screen.ShowMetaEditor -> updateState {
-            copy(screenEffect = CurrentPlaylistScreenEffect.ShowMetaEditor)
+            copy(screenEffect = CurrentPlaylistScreenEffect.ShowMetaEditor(trackUri = intent.trackUri))
         }
 
         is CurrentPlaylistUiIntent.Screen.ShowTrimmer -> updateState {

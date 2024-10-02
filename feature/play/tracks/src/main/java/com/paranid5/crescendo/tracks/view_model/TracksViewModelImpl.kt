@@ -83,7 +83,7 @@ internal class TracksViewModelImpl(
         }
 
         is TracksUiIntent.ScreenEffect.ShowMetaEditor -> updateState {
-            copy(screenEffect = TracksScreenEffect.ShowMetaEditor)
+            copy(screenEffect = TracksScreenEffect.ShowMetaEditor(trackUri = intent.trackUri))
         }
 
         is TracksUiIntent.ScreenEffect.ShowTrimmer -> updateState {

@@ -24,6 +24,15 @@ internal sealed class AppScreen(override val title: String) : Screen {
                 const val TrackPathKey = "trackPath"
             }
         }
+
+        @Parcelize
+        data class MetaEditor(val trackPath: String) : Audio("meta/$trackPath") {
+            @Parcelize
+            companion object : Audio("meta/{trackPath}") {
+                @IgnoredOnParcel
+                const val TrackPathKey = "trackPath"
+            }
+        }
     }
 
     @Parcelize

@@ -1,6 +1,6 @@
 package com.paranid5.crescendo.ui.track.item.properties
 
-import androidx.compose.material.ExperimentalMaterialApi
+import android.net.Uri
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.rememberCoroutineScope
@@ -12,11 +12,11 @@ import com.paranid5.crescendo.core.resources.R
 import com.paranid5.crescendo.ui.composition_locals.playing.LocalPlayingSheetState
 import kotlinx.coroutines.launch
 
-@OptIn(ExperimentalMaterialApi::class)
 @Composable
 internal fun ChangeTrackMetaProperty(
+    trackPath: String,
     modifier: Modifier = Modifier,
-    showMetaEditor: () -> Unit,
+    showMetaEditor: (trackUri: String) -> Unit,
 ) {
     val playingSheetState = LocalPlayingSheetState.current
     val coroutineScope = rememberCoroutineScope()
@@ -26,7 +26,7 @@ internal fun ChangeTrackMetaProperty(
         leadingIcon = { PropertyIcon(ImageVector.vectorResource(R.drawable.ic_edit)) },
         text = { PropertyText(stringResource(R.string.track_kebab_change_meta)) },
         onClick = {
-            showMetaEditor()
+            showMetaEditor(Uri.encode(trackPath))
             coroutineScope.launch { playingSheetState?.bottomSheetState?.collapse() }
         },
     )

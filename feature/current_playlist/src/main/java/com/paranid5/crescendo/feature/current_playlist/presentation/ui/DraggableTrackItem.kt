@@ -37,7 +37,7 @@ internal fun DraggableTrackItem(
     isCurrent: Boolean,
     addToPlaylist: (track: Track) -> Unit,
     showTrimmer: (trackUri: String) -> Unit,
-    showMetaEditor: () -> Unit,
+    showMetaEditor: (trackUri: String) -> Unit,
     modifier: Modifier = Modifier,
     onClick: () -> Unit
 ) {
@@ -64,7 +64,7 @@ private fun CurrentPlaylistTrackItemContent(
     isCurrent: Boolean,
     addToPlaylist: (track: Track) -> Unit,
     showTrimmer: (trackUri: String) -> Unit,
-    showMetaEditor: () -> Unit,
+    showMetaEditor: (trackUri: String) -> Unit,
     modifier: Modifier = Modifier,
     onClick: () -> Unit,
 ) {

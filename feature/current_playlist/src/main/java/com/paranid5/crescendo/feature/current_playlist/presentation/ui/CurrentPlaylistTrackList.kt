@@ -47,7 +47,7 @@ internal fun CurrentPlaylistTrackList(
             onUiIntent(CurrentPlaylistUiIntent.Screen.ShowTrimmer(trackUri = it))
         },
         showMetaEditor = {
-            onUiIntent(CurrentPlaylistUiIntent.Screen.ShowMetaEditor)
+            onUiIntent(CurrentPlaylistUiIntent.Screen.ShowMetaEditor(trackUri = it))
         },
     )
 }

@@ -10,6 +10,7 @@ import com.paranid5.crescendo.core.impl.di.VIDEO_CACHE_SERVICE_CONNECTION
 import com.paranid5.crescendo.core.resources.R
 import com.paranid5.crescendo.data.di.dataModule
 import com.paranid5.crescendo.feature.current_playlist.di.currentPlaylistModule
+import com.paranid5.crescendo.feature.meta_editor.di.metaEditorModule
 import com.paranid5.crescendo.feature.play.main.di.playModule
 import com.paranid5.crescendo.feature.playing.di.playingModule
 import com.paranid5.crescendo.feature.stream.di.streamModule
@@ -26,7 +27,7 @@ import com.paranid5.crescendo.view_model.MainViewModelImpl
 import com.paranid5.system.services.common.di.commonServiceModule
 import kotlinx.coroutines.flow.MutableStateFlow
 import org.koin.android.ext.koin.androidContext
-import org.koin.androidx.viewmodel.dsl.viewModelOf
+import org.koin.core.module.dsl.viewModelOf
 import org.koin.core.qualifier.named
 import org.koin.core.scope.Scope
 import org.koin.dsl.module
@@ -86,7 +87,7 @@ private val featureModule = module {
         streamModule, playingModule,
         audioEffectsModule, trimmerModule,
         tracksModule, currentPlaylistModule,
-        cacheModule, playModule,
+        cacheModule, playModule, metaEditorModule,
     )
 }
 

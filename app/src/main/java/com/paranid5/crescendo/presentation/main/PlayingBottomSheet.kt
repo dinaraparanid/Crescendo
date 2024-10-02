@@ -45,7 +45,6 @@ import com.paranid5.crescendo.ui.composition_locals.LocalCurrentPlaylistSheetSta
 import com.paranid5.crescendo.ui.composition_locals.playing.LocalPlayingPagerState
 import com.paranid5.crescendo.ui.composition_locals.playing.LocalPlayingSheetState
 import com.paranid5.crescendo.ui.utils.PushUpButton
-import com.paranid5.crescendo.utils.doNothing
 import kotlinx.coroutines.launch
 
 private const val ContentCollapsedPadding = 8F
@@ -81,12 +80,13 @@ internal fun PlayingBottomSheet(
         is PlayingScreenEffect.ShowTrimmer ->
             navigator.pushIfNotSame(AppScreen.Audio.Trimmer(result.trackUri))
 
+        is PlayingScreenEffect.ShowMetaEditor ->
+            navigator.pushIfNotSame(AppScreen.Audio.MetaEditor(result.trackUri))
+
         is PlayingScreenEffect.ShowAudioEffectsNotAllowed ->
             Toast
                 .makeText(context, R.string.audio_effects_init_error, Toast.LENGTH_LONG)
                 .show()
-
-        is PlayingScreenEffect.ShowMetaEditor -> doNothing() // TODO: show meta editor
     }
 
     ModalBottomSheetLayout(
@@ -172,7 +172,7 @@ private fun CurrentPlaylistBottomSheet(
                     navigator.pushIfNotSame(AppScreen.Audio.Trimmer(result.trackUri))
 
                 is CurrentPlaylistScreenEffect.ShowMetaEditor ->
-                    doNothing // TODO: show meta editor
+                    navigator.pushIfNotSame(AppScreen.Audio.MetaEditor(result.trackUri))
             }
         }
     }

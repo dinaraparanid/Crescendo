@@ -40,7 +40,7 @@ internal fun DraggableTrackList(
     onTrackClick: (index: Int) -> Unit,
     addToPlaylist: (track: Track) -> Unit,
     showTrimmer: (trackUri: String) -> Unit,
-    showMetaEditor: () -> Unit,
+    showMetaEditor: (trackUri: String) -> Unit,
     modifier: Modifier = Modifier,
     trackItemModifier: Modifier = Modifier,
 ) = DraggableTrackList(

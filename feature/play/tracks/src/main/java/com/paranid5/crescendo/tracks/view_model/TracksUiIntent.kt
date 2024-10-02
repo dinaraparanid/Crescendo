@@ -27,7 +27,7 @@ sealed interface TracksUiIntent {
 
     sealed interface ScreenEffect : TracksUiIntent {
         data class ShowTrimmer(val trackUri: String) : ScreenEffect
-        data object ShowMetaEditor : ScreenEffect
+        data class ShowMetaEditor(val trackUri: String) : ScreenEffect
         data object ClearBackResult : ScreenEffect
     }
 }

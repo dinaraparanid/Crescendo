@@ -1,7 +1,6 @@
 package com.paranid5.crescendo.ui.track.item.properties
 
 import android.net.Uri
-import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.rememberCoroutineScope
@@ -13,7 +12,6 @@ import com.paranid5.crescendo.core.resources.R
 import com.paranid5.crescendo.ui.composition_locals.playing.LocalPlayingSheetState
 import kotlinx.coroutines.launch
 
-@OptIn(ExperimentalMaterialApi::class)
 @Composable
 internal fun TrimTrackProperty(
     trackPath: String,

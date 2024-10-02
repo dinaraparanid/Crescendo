@@ -20,7 +20,7 @@ internal fun TrackKebabMenu(
     isPropertiesMenuShownState: MutableState<Boolean>,
     addToPlaylist: (track: Track) -> Unit,
     showTrimmer: (trackUri: String) -> Unit,
-    showMetaEditor: () -> Unit,
+    showMetaEditor: (trackUri: String) -> Unit,
     modifier: Modifier = Modifier,
     itemModifier: Modifier = Modifier,
 ) {
@@ -38,6 +38,7 @@ internal fun TrackKebabMenu(
         )
 
         ChangeTrackMetaProperty(
+            trackPath = track.path,
             modifier = itemModifier,
             showMetaEditor = showMetaEditor,
         )

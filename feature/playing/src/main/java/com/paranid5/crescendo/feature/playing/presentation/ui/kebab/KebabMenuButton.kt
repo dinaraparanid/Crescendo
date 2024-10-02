@@ -41,7 +41,7 @@ internal fun KebabMenuButton(
                     onUiIntent(PlayingUiIntent.ScreenEffect.ShowTrimmer(trackUri = it))
                 },
                 showMetaEditor = {
-                    onUiIntent(PlayingUiIntent.ScreenEffect.ShowMetaEditor)
+                    onUiIntent(PlayingUiIntent.ScreenEffect.ShowMetaEditor(trackUri = it))
                 }
             )
         }

@@ -49,7 +49,8 @@ internal fun PrimaryPager(
                     is TracksScreenEffect.ShowTrimmer ->
                         onUiIntent(PlayUiIntent.ShowTrimmer(result.trackUri))
 
-                    TracksScreenEffect.ShowMetaEditor -> doNothing // TODO: show meta editor
+                    is TracksScreenEffect.ShowMetaEditor ->
+                        onUiIntent(PlayUiIntent.ShowMetaEditor(result.trackUri))
                 }
             }
 

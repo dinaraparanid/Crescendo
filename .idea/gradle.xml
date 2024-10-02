@@ -33,6 +33,7 @@
             <option value="$PROJECT_DIR$/feature/audio_effects" />
             <option value="$PROJECT_DIR$/feature/cache" />
             <option value="$PROJECT_DIR$/feature/current_playlist" />
+            <option value="$PROJECT_DIR$/feature/meta_editor" />
             <option value="$PROJECT_DIR$/feature/play" />
             <option value="$PROJECT_DIR$/feature/play/favourites" />
             <option value="$PROJECT_DIR$/feature/play/main" />

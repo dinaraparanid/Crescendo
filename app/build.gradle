@@ -65,18 +65,18 @@ dependencies {
     implementation project(':core:utils')
 
     implementation project(':data')
-    implementation project(':feature:stream:main')
-
-    implementation project(':feature:trimmer')
 
     implementation project(':feature:audio_effects')
     implementation project(':feature:cache')
     implementation project(':feature:current_playlist')
-    implementation project(':feature:splash')
-    implementation project(':feature:playing')
+    implementation project(':feature:meta_editor')
     implementation project(':feature:play:main')
     implementation project(':feature:play:tracks')
+    implementation project(':feature:playing')
     implementation project(':feature:preferences')
+    implementation project(':feature:splash')
+    implementation project(':feature:stream:main')
+    implementation project(':feature:trimmer')
 
     implementation project(':system:common')
     implementation project(':system:receivers')
