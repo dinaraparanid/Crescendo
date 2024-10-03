@@ -53,7 +53,7 @@ internal fun PlayingScreenLandscape(
         state.currentTrack?.path
     }
 
-    LaunchedEffect(context, screenPlaybackStatus, videoCovers, coverSize) {
+    LaunchedEffect(context, trackPath, screenPlaybackStatus, videoCovers, coverSize) {
         val (model, plt) = mediaCoverModelWithPalette(
             context = context,
             playbackStatus = screenPlaybackStatus,
