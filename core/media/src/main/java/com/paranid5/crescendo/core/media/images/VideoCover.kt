@@ -17,7 +17,6 @@ suspend inline fun getVideoCoverBitmapOrThumbnailAsync(
             .map { getBitmapFromUrlCatching(context, it, size, bitmapSettings) }
             .firstOrNull { it.isRight() }
             ?.getOrNull()
-            ?: getThumbnailBitmap(context)
     }
 }
 
@@ -47,7 +46,6 @@ suspend inline fun getVideoCoverAsync(
             .firstOrNull { it.isRight() }
             ?.map { it.toBitmapDrawable(context) }
             ?.getOrNull()
-            ?: getThumbnailBitmapDrawable(context)
     }
 }
 
@@ -61,10 +59,8 @@ suspend inline fun getVideoCoverWithPaletteAsync(
         videoCovers
             .map { getBitmapFromUrlWithPaletteCatching(context, it, size, bitmapSettings) }
             .firstOrNull { it.isRight() }
-            ?.map { (palette, bitmap) ->
-                palette to bitmap.toBitmapDrawable(context)
-            }
+            ?.map { (palette, bitmap) -> palette to bitmap.toBitmapDrawable(context) }
             ?.getOrNull()
-            ?: getThumbnailBitmapDrawableWithPalette(context)
+            .let { it?.first to it?.second }
     }
 }

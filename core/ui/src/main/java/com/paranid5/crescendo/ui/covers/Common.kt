@@ -2,7 +2,6 @@ package com.paranid5.crescendo.ui.covers
 
 import android.content.Context
 import android.graphics.drawable.BitmapDrawable
-import androidx.palette.graphics.Palette
 import coil.request.CachePolicy
 import coil.request.ImageRequest
 import coil.size.Precision
@@ -20,18 +19,16 @@ suspend fun mediaCoverModelWithPalette(
     trackPath: String?,
     playbackStatus: PlaybackStatus,
     size: ImageSize,
-): Pair<ImageRequest, Palette?> = when (playbackStatus) {
+) = when (playbackStatus) {
     PlaybackStatus.STREAMING -> videoCoverModelWithPalette(
         context = context,
         videoCovers = videoCovers,
-        isPlaceholderRequired = true,
         size = size,
     )
 
     PlaybackStatus.PLAYING -> trackCoverModelWithPalette(
         context = context,
         trackPath = trackPath,
-        isPlaceholderRequired = true,
         size = size,
     )
 }

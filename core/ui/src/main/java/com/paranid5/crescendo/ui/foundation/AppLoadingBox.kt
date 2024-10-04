@@ -1,5 +1,6 @@
 package com.paranid5.crescendo.ui.foundation
 
+import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -45,6 +46,7 @@ fun AppLoadingBox(
     contentAlignment = contentAlignment,
     propagateMinConstraints = propagateMinConstraints,
     modifier = modifier
+        .animateContentSize()
         .run {
             when (size) {
                 is LoadingBoxSize.FillMaxSize -> fillMaxSize()

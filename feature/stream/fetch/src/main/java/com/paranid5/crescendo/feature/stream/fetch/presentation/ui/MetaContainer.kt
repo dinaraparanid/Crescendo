@@ -1,10 +1,12 @@
 package com.paranid5.crescendo.feature.stream.fetch.presentation.ui
 
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -43,13 +45,21 @@ internal fun MetaContainer(
 
     Spacer(Modifier.height(dimensions.padding.extraMedium))
 
+    val coverShape = RoundedCornerShape(dimensions.corners.small)
+
     AppClippedCover(
         coverUiState = coverUiState,
+        coverShape = coverShape,
         onRetry = { onUiIntent(FetchStreamUiIntent.Retry.RefreshCover) },
         modifier = Modifier
             .height(ImageHeight)
             .align(Alignment.CenterHorizontally)
             .padding(horizontal = dimensions.padding.extraMedium),
+        coverModifier = Modifier.border(
+            width = dimensions.borders.minimum,
+            color = colors.button.primary,
+            shape = coverShape,
+        )
     )
 
     Spacer(Modifier.height(dimensions.padding.extraMedium))

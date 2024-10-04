@@ -19,39 +19,39 @@ suspend fun videoCoverModel(
     isBlured: Boolean = false,
     animationMillis: Int = 400,
     bitmapSettings: (Bitmap) -> Unit = {}
-) = ImageRequest.Builder(context)
-    .data(
-        getVideoCoverAsync(
-            context = context,
-            videoCovers = videoCovers,
+) = getVideoCoverAsync(
+    context = context,
+    videoCovers = videoCovers,
+    size = size,
+    bitmapSettings = bitmapSettings,
+).await()?.let { model ->
+    ImageRequest.Builder(context)
+        .data(model)
+        .applyTransformations(
+            isPlaceholderRequired = isPlaceholderRequired,
             size = size,
-            bitmapSettings = bitmapSettings,
-        ).await()
-    )
-    .applyTransformations(
-        isPlaceholderRequired = isPlaceholderRequired,
-        size = size,
-        isBlured = isBlured,
-    )
-    .defaultError()
-    .defaultFallback()
-    .networkCachePolicy(CachePolicy.ENABLED)
-    .diskCachePolicy(CachePolicy.ENABLED)
-    .memoryCachePolicy(CachePolicy.ENABLED)
-    .precision(Precision.EXACT)
-    .scale(Scale.FILL)
-    .crossfade(animationMillis)
-    .build()
+            isBlured = isBlured,
+        )
+        .defaultError()
+        .defaultFallback()
+        .networkCachePolicy(CachePolicy.ENABLED)
+        .diskCachePolicy(CachePolicy.ENABLED)
+        .memoryCachePolicy(CachePolicy.ENABLED)
+        .precision(Precision.EXACT)
+        .scale(Scale.FILL)
+        .crossfade(animationMillis)
+        .build()
+}
 
 suspend fun videoCoverModelWithPalette(
     context: Context,
     videoCovers: List<String>,
-    isPlaceholderRequired: Boolean,
+    isPlaceholderRequired: Boolean = false,
     size: ImageSize? = null,
     isBlured: Boolean = false,
     animationMillis: Int = 400,
     bitmapSettings: (Bitmap) -> Unit = {}
-): Pair<ImageRequest, Palette?> {
+): Pair<ImageRequest?, Palette?> {
     val (palette, coverModel) = getVideoCoverWithPaletteAsync(
         context = context,
         videoCovers = videoCovers,
@@ -59,20 +59,22 @@ suspend fun videoCoverModelWithPalette(
         bitmapSettings = bitmapSettings,
     ).await()
 
-    return ImageRequest.Builder(context)
-        .data(coverModel)
-        .defaultError()
-        .defaultFallback()
-        .applyTransformations(
-            isPlaceholderRequired = isPlaceholderRequired,
-            size = size,
-            isBlured = isBlured,
-        )
-        .networkCachePolicy(CachePolicy.ENABLED)
-        .diskCachePolicy(CachePolicy.ENABLED)
-        .memoryCachePolicy(CachePolicy.ENABLED)
-        .precision(Precision.EXACT)
-        .scale(Scale.FILL)
-        .crossfade(animationMillis)
-        .build() to palette
+    return coverModel?.let {
+        ImageRequest.Builder(context)
+            .data(coverModel)
+            .defaultError()
+            .defaultFallback()
+            .applyTransformations(
+                isPlaceholderRequired = isPlaceholderRequired,
+                size = size,
+                isBlured = isBlured,
+            )
+            .networkCachePolicy(CachePolicy.ENABLED)
+            .diskCachePolicy(CachePolicy.ENABLED)
+            .memoryCachePolicy(CachePolicy.ENABLED)
+            .precision(Precision.EXACT)
+            .scale(Scale.FILL)
+            .crossfade(animationMillis)
+            .build()
+    } to palette
 }

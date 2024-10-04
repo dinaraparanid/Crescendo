@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -53,6 +54,10 @@ internal fun PlayingScreenLandscape(
         state.currentTrack?.path
     }
 
+    val isLiveStreaming by remember(screenPlaybackStatus, state.isLiveStreaming) {
+        derivedStateOf { screenPlaybackStatus == PlaybackStatus.STREAMING && state.isLiveStreaming }
+    }
+
     LaunchedEffect(context, trackPath, screenPlaybackStatus, videoCovers, coverSize) {
         val (model, plt) = mediaCoverModelWithPalette(
             context = context,
@@ -62,7 +67,7 @@ internal fun PlayingScreenLandscape(
             size = coverSize,
         )
 
-        coverModel = model
+        if (model != null) coverModel = model
         palette = plt
     }
 
@@ -101,28 +106,25 @@ internal fun PlayingScreenLandscape(
                 },
             )
 
-            coverModel?.let { model ->
-                Cover(
-                    coverModel = model,
-                    color = palette.getBrightDominantOrPrimary(),
-                    modifier = Modifier
-                        .alpha(coverAlpha)
-                        .aspectRatio(1F)
-                        .constrainAs(cover) {
-                            centerHorizontallyTo(parent)
-                            top.linkTo(parent.top, margin = appPadding.small)
-                            bottom.linkTo(slider.top, margin = appPadding.minimum)
-                            height = Dimension.fillToConstraints
-                        }
-                        .onGloballyPositioned { coordinates ->
-                            val width = coordinates.size.width
-                            val height = coordinates.size.height
+            Cover(
+                coverModel = coverModel,
+                modifier = Modifier
+                    .alpha(coverAlpha)
+                    .aspectRatio(1F)
+                    .constrainAs(cover) {
+                        centerHorizontallyTo(parent)
+                        top.linkTo(parent.top, margin = appPadding.small)
+                        bottom.linkTo(slider.top, margin = appPadding.minimum)
+                        height = Dimension.fillToConstraints
+                    }
+                    .onGloballyPositioned { coordinates ->
+                        val width = coordinates.size.width
+                        val height = coordinates.size.height
 
-                            if (width > 0 && height > 0)
-                                coverSize = ImageSize(width, height)
-                        },
-                )
-            }
+                        if (width > 0 && height > 0)
+                            coverSize = ImageSize(width, height)
+                    },
+            )
 
             KebabMenuButton(
                 screenPlaybackStatus = screenPlaybackStatus,
@@ -135,7 +137,7 @@ internal fun PlayingScreenLandscape(
                 },
             )
 
-            if (state.isLiveStreaming)
+            if (isLiveStreaming)
                 LiveSeeker(
                     color = palette.getBrightDominantOrPrimary(),
                     modifier = Modifier.constrainAs(liveSeeker) {
@@ -147,6 +149,7 @@ internal fun PlayingScreenLandscape(
                 }
 
             PlaybackSliderWithLabels(
+                isLiveStreaming = isLiveStreaming,
                 screenPlaybackStatus = screenPlaybackStatus,
                 state = state,
                 modifier = Modifier.constrainAs(slider) {

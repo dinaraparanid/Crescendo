@@ -15,6 +15,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import com.paranid5.crescendo.core.common.PlaybackStatus
 import com.paranid5.crescendo.core.resources.R
 import com.paranid5.crescendo.core.resources.ui.theme.AppTheme.colors
 import com.paranid5.crescendo.core.resources.ui.theme.AppTheme.dimensions
@@ -24,6 +25,7 @@ import com.paranid5.crescendo.utils.extensions.timeFormat
 
 @Composable
 internal fun PlaybackSliderWithTimeContainer(
+    screenPlaybackStatus: PlaybackStatus,
     state: PlayingState,
     seekTo: (position: Long) -> Unit,
     modifier: Modifier = Modifier,
@@ -34,13 +36,14 @@ internal fun PlaybackSliderWithTimeContainer(
     modifier = modifier
 ) { curPosition, videoLength, color ->
     when {
-        state.isLiveStreaming -> Box(Modifier.fillMaxWidth()) {
-            LiveSeeker(
-                color = color,
-                modifier = Modifier.align(Alignment.Center),
-                onClick = onLiveSeekerClick,
-            )
-        }
+        screenPlaybackStatus == PlaybackStatus.STREAMING && state.isLiveStreaming ->
+            Box(Modifier.fillMaxWidth()) {
+                LiveSeeker(
+                    color = color,
+                    modifier = Modifier.align(Alignment.Center),
+                    onClick = onLiveSeekerClick,
+                )
+            }
 
         else -> {
             TimeText(curPosition, color)

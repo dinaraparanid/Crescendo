@@ -17,50 +17,15 @@ suspend fun trackCoverModel(
     isPlaceholderRequired: Boolean,
     size: ImageSize? = null,
     isBlured: Boolean = false,
-    animationMillis: Int = 400,
     bitmapSettings: (Bitmap) -> Unit = {},
-) = ImageRequest.Builder(context)
-    .data(
-        getTrackCoverAsync(
-            context = context,
-            path = trackPath,
-            size = size,
-            bitmapSettings = bitmapSettings,
-        ).await()
-    )
-    .defaultError()
-    .defaultFallback()
-    .applyTransformations(
-        isPlaceholderRequired = isPlaceholderRequired,
-        size = size,
-        isBlured = isBlured,
-    )
-    .networkCachePolicy(CachePolicy.ENABLED)
-    .diskCachePolicy(CachePolicy.ENABLED)
-    .memoryCachePolicy(CachePolicy.ENABLED)
-    .precision(Precision.EXACT)
-    .scale(Scale.FILL)
-    .crossfade(animationMillis)
-    .build()
-
-suspend fun trackCoverModelWithPalette(
-    context: Context,
-    trackPath: String?,
-    isPlaceholderRequired: Boolean,
-    size: ImageSize? = null,
-    isBlured: Boolean = false,
-    animationMillis: Int = 400,
-    bitmapSettings: (Bitmap) -> Unit = {}
-): Pair<ImageRequest, Palette?> {
-    val (palette, coverModel) = getTrackCoverWithPaletteAsync(
-        context = context,
-        path = trackPath,
-        size = size,
-        bitmapSettings = bitmapSettings,
-    ).await()
-
-    return ImageRequest.Builder(context)
-        .data(coverModel)
+) = getTrackCoverAsync(
+    context = context,
+    path = trackPath,
+    size = size,
+    bitmapSettings = bitmapSettings,
+).await()?.let { model ->
+    ImageRequest.Builder(context)
+        .data(model)
         .defaultError()
         .defaultFallback()
         .applyTransformations(
@@ -73,6 +38,39 @@ suspend fun trackCoverModelWithPalette(
         .memoryCachePolicy(CachePolicy.ENABLED)
         .precision(Precision.EXACT)
         .scale(Scale.FILL)
-        .crossfade(animationMillis)
-        .build() to palette
+        .build()
+}
+
+suspend fun trackCoverModelWithPalette(
+    context: Context,
+    trackPath: String?,
+    isPlaceholderRequired: Boolean = false,
+    size: ImageSize? = null,
+    isBlured: Boolean = false,
+    bitmapSettings: (Bitmap) -> Unit = {}
+): Pair<ImageRequest?, Palette?> {
+    val (palette, coverModel) = getTrackCoverWithPaletteAsync(
+        context = context,
+        path = trackPath,
+        size = size,
+        bitmapSettings = bitmapSettings,
+    ).await()
+
+    return coverModel?.let {
+        ImageRequest.Builder(context)
+            .data(coverModel)
+            .defaultError()
+            .defaultFallback()
+            .applyTransformations(
+                isPlaceholderRequired = isPlaceholderRequired,
+                size = size,
+                isBlured = isBlured,
+            )
+            .networkCachePolicy(CachePolicy.ENABLED)
+            .diskCachePolicy(CachePolicy.ENABLED)
+            .memoryCachePolicy(CachePolicy.ENABLED)
+            .precision(Precision.EXACT)
+            .scale(Scale.FILL)
+            .build()
+    } to palette
 }

@@ -10,9 +10,7 @@ internal fun PlayerStateChangedListener(service: TrackService) =
     object : Player.Listener {
         override fun onMediaItemTransition(mediaItem: MediaItem?, reason: Int) {
             super.onMediaItemTransition(mediaItem, reason)
-
-            if (reason == Player.MEDIA_ITEM_TRANSITION_REASON_AUTO)
-                service.updateCurrentTrackIndexAsync()
+            service.updateCurrentTrackIndexAsync()
         }
 
         override fun onPlaybackStateChanged(playbackState: Int) {

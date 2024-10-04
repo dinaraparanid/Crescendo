@@ -23,8 +23,6 @@ import com.paranid5.crescendo.utils.extensions.sendAppBroadcast
 import com.paranid5.system.services.common.notification.detachNotification
 import com.paranid5.system.services.common.startMediaForeground
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.async
-import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
 
 @OptIn(UnstableApi::class)
@@ -101,8 +99,7 @@ private fun MediaDescriptionProvider(service: StreamService) =
                 callback.onBitmap(
                     service
                         .notificationManager
-                        .getVideoCoverBitmapAsync(service)
-                        .await()
+                        .getVideoCoverBitmap(service)
                 )
             }
 
@@ -139,10 +136,11 @@ private inline val StreamService.videoAuthor
 private inline val StreamService.metadata
     get() = notificationManager.currentMetadataState.value
 
-private suspend inline fun NotificationManager.getVideoCoverBitmapAsync(context: Context) =
+private suspend inline fun NotificationManager.getVideoCoverBitmap(context: Context) =
     currentMetadataState.value
         ?.let { getVideoCoverBitmapOrThumbnailAsync(context = context, videoCovers = it.covers) }
-        ?: coroutineScope { async(Dispatchers.IO) { getThumbnailBitmap(context) } }
+        ?.await()
+        ?: getThumbnailBitmap(context)
 
 private fun CustomActions(repeatMode: Int) = mutableListOf(
     when (repeatMode) {

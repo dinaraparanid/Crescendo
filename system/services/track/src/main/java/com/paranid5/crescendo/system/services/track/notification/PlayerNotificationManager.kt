@@ -24,8 +24,6 @@ import com.paranid5.crescendo.utils.extensions.sendAppBroadcast
 import com.paranid5.system.services.common.notification.detachNotification
 import com.paranid5.system.services.common.startMediaForeground
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.async
-import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
 
 @OptIn(UnstableApi::class)
@@ -102,8 +100,7 @@ private fun MediaDescriptionAdapter(service: TrackService) =
                 callback.onBitmap(
                     service
                         .notificationManager
-                        .getTrackCoverBitmapAsync(service)
-                        .await()
+                        .getTrackCoverBitmap(service)
                 )
             }
 
@@ -140,10 +137,11 @@ private inline val TrackService.trackArtistAlbum
 private inline val TrackService.track
     get() = notificationManager.currentTrackState.value
 
-private suspend inline fun NotificationManager.getTrackCoverBitmapAsync(context: Context) =
+private suspend inline fun NotificationManager.getTrackCoverBitmap(context: Context) =
     currentTrackState.value
         ?.let { getTrackCoverBitmapAsync(context = context, path = it.path) }
-        ?: coroutineScope { async(Dispatchers.IO) { getThumbnailBitmap(context) } }
+        ?.await()
+        ?: getThumbnailBitmap(context)
 
 private fun CustomActions(repeatMode: Int) = mutableListOf(
     when (repeatMode) {

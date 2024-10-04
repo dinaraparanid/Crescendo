@@ -2,6 +2,7 @@ package com.paranid5.crescendo.feature.playing.presentation.ui
 
 import android.graphics.Bitmap
 import android.os.Build
+import androidx.compose.animation.Crossfade
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -39,7 +40,7 @@ internal fun BackgroundImage(
     var coverModel by remember { mutableStateOf<ImageRequest?>(null) }
 
     LaunchedEffect(context, config, playbackStatus, videoCovers, trackPath) {
-        coverModel = when (playbackStatus) {
+        val model = when (playbackStatus) {
             PlaybackStatus.STREAMING -> videoCoverModel(
                 context = context,
                 videoCovers = videoCovers,
@@ -58,13 +59,17 @@ internal fun BackgroundImage(
                 bitmapSettings = Bitmap::increaseDarkness,
             )
         }
+
+        if (model != null) coverModel = model
     }
 
-    AsyncImage(
-        model = coverModel,
-        modifier = modifier.blur(radius = dimensions.corners.small),
-        contentDescription = stringResource(R.string.video_cover),
-        contentScale = ContentScale.FillBounds,
-        alignment = Alignment.Center,
-    )
+    Crossfade(coverModel, label = "BackgroundImage") { model ->
+        AsyncImage(
+            model = model,
+            modifier = modifier.blur(radius = dimensions.corners.small),
+            contentDescription = stringResource(R.string.video_cover),
+            contentScale = ContentScale.FillBounds,
+            alignment = Alignment.Center,
+        )
+    }
 }

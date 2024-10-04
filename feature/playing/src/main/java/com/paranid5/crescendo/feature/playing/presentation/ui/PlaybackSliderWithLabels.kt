@@ -11,6 +11,7 @@ import com.paranid5.crescendo.feature.playing.view_model.PlayingState
 
 @Composable
 internal fun PlaybackSliderWithLabels(
+    isLiveStreaming: Boolean,
     screenPlaybackStatus: PlaybackStatus,
     state: PlayingState,
     modifier: Modifier = Modifier,
@@ -20,7 +21,7 @@ internal fun PlaybackSliderWithLabels(
     seekTo = seekTo,
     modifier = modifier,
 ) { curPosition, videoLength, color ->
-    if (state.isLiveStreaming.not()) TimeText(time = curPosition, color = color)
+    if (isLiveStreaming.not()) TimeText(time = curPosition, color = color)
 
     TitleAndAuthor(
         screenPlaybackStatus = screenPlaybackStatus,
@@ -31,5 +32,5 @@ internal fun PlaybackSliderWithLabels(
             .weight(1F),
     )
 
-    if (state.isLiveStreaming.not()) TimeText(time = videoLength, color = color)
+    if (isLiveStreaming.not()) TimeText(time = videoLength, color = color)
 }

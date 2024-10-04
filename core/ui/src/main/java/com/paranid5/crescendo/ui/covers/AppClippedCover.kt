@@ -1,7 +1,6 @@
 package com.paranid5.crescendo.ui.covers
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
@@ -28,6 +27,7 @@ import com.paranid5.crescendo.ui.foundation.getOrNull
 fun AppClippedCover(
     coverUiState: UiState<ImageContainer>,
     modifier: Modifier = Modifier,
+    coverModifier: Modifier = Modifier,
     coverShape: Shape = RoundedCornerShape(dimensions.corners.small),
     contentScale: ContentScale = ContentScale.FillHeight,
     errorBackgroundColor: Color = colors.background.highContrast,
@@ -51,13 +51,9 @@ fun AppClippedCover(
             contentDescription = null,
             alignment = Alignment.Center,
             contentScale = contentScale,
-            modifier = modifier
+            modifier = Modifier
                 .clip(coverShape)
-                .border(
-                    width = dimensions.borders.minimum,
-                    color = colors.button.primary,
-                    shape = coverShape,
-                ),
+                .then(coverModifier),
             loading = {
                 AppLoadingBox(
                     isLoading = true,

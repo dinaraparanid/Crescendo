@@ -68,7 +68,7 @@ internal fun PlayingScreenPortrait(
             size = coverSize,
         )
 
-        coverModel = model
+        if (model != null) coverModel = model
         palette = plt
     }
 
@@ -105,7 +105,6 @@ internal fun PlayingScreenPortrait(
                 coverModel?.let { model ->
                     Cover(
                         coverModel = model,
-                        color = palette.getBrightDominantOrPrimary(),
                         modifier = Modifier
                             .alpha(coverAlpha)
                             .aspectRatio(1F)
@@ -136,6 +135,7 @@ internal fun PlayingScreenPortrait(
             )
 
             PlaybackSliderWithTimeContainer(
+                screenPlaybackStatus = screenPlaybackStatus,
                 state = state,
                 seekTo = { onUiIntent(PlayingUiIntent.Playback.SeekTo(position = it)) },
                 onLiveSeekerClick = { onUiIntent(PlayingUiIntent.Playback.SeekToLiveStreamRealPosition) },
