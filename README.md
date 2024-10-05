@@ -130,7 +130,7 @@ Crescendo provides multiple features to move your music experience to a new leve
 6. App customization and settings
 
 ## **System Requirements**
-**Android 5.0** or higher
+**Android 7.0** or higher
 
 Stable internet connection to play audio from YouTube and cache video is required
 

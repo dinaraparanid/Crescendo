@@ -19,19 +19,19 @@ kotlinxSerializationJson = "1.7.3"
 ktorClientCore = "2.3.12"
 lifecycleExtensions = "2.2.0"
 lifecycleRuntimeKtx = "2.8.6"
-material = "1.7.2"
+material = "1.7.3"
 material3 = "1.3.0"
 materialVersion = "1.12.0"
 media = "1.7.0"
 media3Exoplayer = "1.4.1"
-mobileFfmpegFull = "4.4.LTS"
-navigationCompose = "2.8.1"
+mobileFfmpegFull = "4.4"
+navigationCompose = "2.8.2"
 paletteKtx = "1.0.0"
-ui = "1.7.2"
+ui = "1.7.3"
 ytUrlExtractorKt = "9a8db37d0c"
-foundationAndroid = "1.7.2"
-ytdl = "0.15.0"
-agp = "8.4.2"
+foundationAndroid = "1.7.3"
+ytdl = "0.17.0"
+agp = "8.7.0"
 kotlin = "2.0.20"
 
 [libraries]
@@ -96,9 +96,9 @@ sqldelight-android-driver = { module = "app.cash.sqldelight:android-driver", ver
 sqldelight-coroutines-extensions = { module = "app.cash.sqldelight:coroutines-extensions", version.ref = "sqlDelight" }
 
 yt-url-extractor-kt = { module = "com.github.dinaraparanid:yt-url-extractor-kt", version.ref = "ytUrlExtractorKt" }
-ytdl-lib = { group = "com.github.yausername.youtubedl-android", name = "library", version.ref = "ytdl" }
-ytdl-ffmpeg = { group = "com.github.yausername.youtubedl-android", name = "ffmpeg", version.ref = "ytdl" }
-ytdl-aria = { group = "com.github.yausername.youtubedl-android", name = "aria2c", version.ref = "ytdl" }
+ytdl-lib = { group = "io.github.junkfood02.youtubedl-android", name = "library", version.ref = "ytdl" }
+ytdl-ffmpeg = { group = "io.github.junkfood02.youtubedl-android", name = "ffmpeg", version.ref = "ytdl" }
+ytdl-aria = { group = "io.github.junkfood02.youtubedl-android", name = "aria2c", version.ref = "ytdl" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
