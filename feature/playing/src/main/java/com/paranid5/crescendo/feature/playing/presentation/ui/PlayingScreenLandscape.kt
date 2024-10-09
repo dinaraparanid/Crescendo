@@ -1,5 +1,6 @@
 package com.paranid5.crescendo.feature.playing.presentation.ui
 
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
@@ -10,6 +11,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.layout.onGloballyPositioned
@@ -106,25 +108,32 @@ internal fun PlayingScreenLandscape(
                 },
             )
 
-            Cover(
-                coverModel = coverModel,
-                modifier = Modifier
-                    .alpha(coverAlpha)
-                    .aspectRatio(1F)
-                    .constrainAs(cover) {
-                        centerHorizontallyTo(parent)
-                        top.linkTo(parent.top, margin = appPadding.small)
-                        bottom.linkTo(slider.top, margin = appPadding.minimum)
-                        height = Dimension.fillToConstraints
-                    }
-                    .onGloballyPositioned { coordinates ->
-                        val width = coordinates.size.width
-                        val height = coordinates.size.height
+            Box(
+                Modifier.constrainAs(cover) {
+                    centerHorizontallyTo(parent)
+                    top.linkTo(parent.top, margin = appPadding.small)
+                    bottom.linkTo(slider.top, margin = appPadding.minimum)
+                    height = Dimension.fillToConstraints
+                }
+            ) {
+                coverModel?.let { model ->
+                    Cover(
+                        coverModel = model,
+                        modifier = Modifier
+                            .alpha(coverAlpha)
+                            .aspectRatio(1F)
+                            .fillMaxSize()
+                            .align(Alignment.Center)
+                            .onGloballyPositioned { coordinates ->
+                                val width = coordinates.size.width
+                                val height = coordinates.size.height
 
-                        if (width > 0 && height > 0)
-                            coverSize = ImageSize(width, height)
-                    },
-            )
+                                if (width > 0 && height > 0)
+                                    coverSize = ImageSize(width, height)
+                            },
+                    )
+                }
+            }
 
             KebabMenuButton(
                 screenPlaybackStatus = screenPlaybackStatus,

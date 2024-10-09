@@ -67,12 +67,14 @@ internal fun MediaSessionCallback(service: TrackService) =
         override fun onMediaButtonEvent(
             session: MediaSession,
             controllerInfo: MediaSession.ControllerInfo,
-            intent: Intent
+            intent: Intent,
         ): Boolean {
             val key = intent.extras
                 ?.getParcelableCompat(EXTRA_KEY_EVENT, KeyEvent::class.java)
                 ?: return false
 
+            // TODO: рандомно приходит KEYCODE_MEDIA_NEXT
+            // для bluetooth наушников, когда они начинают садиться
             return when (key.keyCode) {
                 KEYCODE_MEDIA_PLAY -> service.resumeAsync().let { true }
                 KEYCODE_MEDIA_PAUSE -> service.pauseAsync().let { true }

@@ -16,8 +16,7 @@ import io.ktor.http.HttpHeaders
 import io.ktor.http.contentLength
 import io.ktor.http.isSuccess
 import io.ktor.utils.io.cancel
-import io.ktor.utils.io.core.isNotEmpty
-import io.ktor.utils.io.core.readBytes
+import io.ktor.utils.io.readRemaining
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -29,6 +28,7 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.flow.updateAndGet
 import kotlinx.coroutines.withContext
 import kotlinx.coroutines.withTimeoutOrNull
+import kotlinx.io.readByteArray
 import java.io.File
 import java.util.concurrent.atomic.AtomicLong
 
@@ -143,8 +143,11 @@ private suspend inline fun HttpResponse.downloadFileImpl(
             channel.readRemaining(DEFAULT_BUFFER_SIZE.toLong())
         } ?: throw Exception("Packet timeout")
 
-        while (packet.isNotEmpty && downloadingState.value == DownloadingStatus.Downloading) {
-            val bytes = packet.readBytes()
+        while (
+            packet.exhausted().not() &&
+            downloadingState.value == DownloadingStatus.Downloading
+        ) {
+            val bytes = packet.readByteArray()
             fileProgress.addAndGet(bytes.size.toLong())
             withContext(Dispatchers.IO) { storeFile.appendBytes(bytes) }
 

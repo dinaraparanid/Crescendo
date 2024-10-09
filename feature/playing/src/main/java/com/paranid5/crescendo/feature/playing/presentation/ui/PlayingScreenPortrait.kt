@@ -94,7 +94,7 @@ internal fun PlayingScreenPortrait(
 
             Box(
                 Modifier.constrainAs(cover) {
-                    top.linkTo(parent.top, margin = appPadding.large)
+                    top.linkTo(parent.top, margin = appPadding.extraLarge)
                     bottom.linkTo(audioWave.top, margin = appPadding.large)
                     start.linkTo(parent.start, margin = appPadding.extraMedium)
                     end.linkTo(parent.end, margin = appPadding.extraMedium)
