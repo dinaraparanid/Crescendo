@@ -1,3 +1,8 @@
 package com.paranid5.crescendo.feature.meta_editor.view_model
 
-interface MetaEditorViewModel
+import com.paranid5.crescendo.core.common.udf.StateSource
+import com.paranid5.crescendo.core.common.udf.UiIntentHandler
+
+interface MetaEditorViewModel :
+    StateSource<MetaEditorState>,
+    UiIntentHandler<MetaEditorUiIntent>

@@ -46,19 +46,20 @@ android {
 
 dependencies {
     api(project(":core:common"))
-    api(project(":core:utils"))
     api(project(":core:media"))
     api(project(":core:resources"))
+    api(project(":core:utils"))
 
     api(project(":domain:audio_effects"))
+    api(project(":domain:cover"))
+    api(project(":domain:current_playlist"))
+    api(project(":domain:genius"))
+    api(project(":domain:github"))
     api(project(":domain:playback"))
     api(project(":domain:stream"))
     api(project(":domain:tracks"))
-    api(project(":domain:current_playlist"))
     api(project(":domain:waveform"))
     api(project(":domain:web"))
-    api(project(":domain:github"))
-    api(project(":domain:cover"))
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)

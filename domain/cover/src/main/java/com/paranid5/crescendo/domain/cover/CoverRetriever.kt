@@ -4,4 +4,5 @@ import android.graphics.Bitmap
 
 interface CoverRetriever {
     suspend fun getVideoCoverBitmap(videoCovers: List<String>): Bitmap?
+    suspend fun getTrackCoverBitmap(trackPath: String): Bitmap?
 }

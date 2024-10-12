@@ -1,7 +1,7 @@
 package com.paranid5.crescendo.presentation.entity
 
 import android.os.Parcelable
-import com.paranid5.crescendo.domain.github.dto.Release
+import com.paranid5.crescendo.domain.github.model.Release
 import kotlinx.parcelize.Parcelize
 
 @Parcelize

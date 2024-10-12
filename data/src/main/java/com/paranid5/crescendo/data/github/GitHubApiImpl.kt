@@ -1,8 +1,9 @@
 package com.paranid5.crescendo.data.github
 
 import arrow.core.Either
+import com.paranid5.crescendo.data.github.dto.ReleaseResponse
+import com.paranid5.crescendo.data.github.dto.toModel
 import com.paranid5.crescendo.domain.github.GitHubApi
-import com.paranid5.crescendo.domain.github.dto.Release
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
 import io.ktor.client.request.get
@@ -23,8 +24,9 @@ internal class GitHubApiImpl(
     private suspend inline fun getLatestRelease() = Either.catch {
         withContext(Dispatchers.IO) {
             ktorClient.get(urlBuilder.buildAppLatestReleaseUrl())
-                .body<List<Release>>()
+                .body<List<ReleaseResponse>>()
                 .first()
+                .toModel()
         }
     }
 }

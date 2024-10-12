@@ -24,7 +24,7 @@ internal class FetchStreamViewModelImpl(
     private val playbackRepository: PlaybackRepository,
     private val coverRetriever: CoverRetriever,
     private val streamServiceAccessor: StreamServiceAccessor,
-) : FetchStreamViewModel, ViewModel(), StatePublisher<FetchStreamState> {
+) : ViewModel(), FetchStreamViewModel, StatePublisher<FetchStreamState> {
     companion object {
         private const val StateKey = "state"
     }
