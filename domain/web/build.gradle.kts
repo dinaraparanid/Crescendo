@@ -5,7 +5,7 @@ plugins {
 
 android {
     namespace = "com.paranid5.crescendo.domain.web"
-    compileSdk = 34
+    compileSdk = 35
 
     defaultConfig {
         minSdk = 24

@@ -8,7 +8,7 @@ plugins {
 
 android {
     namespace = "com.paranid5.core.common"
-    compileSdk = 34
+    compileSdk = 35
 
     defaultConfig {
         minSdk = 24

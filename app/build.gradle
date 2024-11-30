@@ -8,12 +8,12 @@ plugins {
 
 android {
     namespace 'com.paranid5.crescendo'
-    compileSdk 34
+    compileSdk 35
 
     defaultConfig {
         applicationId 'com.paranid5.crescendo'
         minSdk 24
-        targetSdk 34
+        targetSdk 35
         versionCode 1
         versionName '0.4.0.0'
 

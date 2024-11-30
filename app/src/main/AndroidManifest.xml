@@ -34,7 +34,7 @@
             android:usesCleartextTraffic="true"
             android:requestLegacyExternalStorage="true"
             android:extractNativeLibs="true"
-            tools:targetApi="33">
+            tools:targetApi="35">
         <activity
                 android:name=".feature.splash.SplashActivity"
                 android:exported="true"

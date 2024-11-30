@@ -17,7 +17,7 @@ sqldelight {
 
 android {
     namespace = "com.paranid5.domain"
-    compileSdk = 34
+    compileSdk = 35
 
     defaultConfig {
         minSdk = 24

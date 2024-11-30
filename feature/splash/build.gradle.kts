@@ -6,7 +6,7 @@ plugins {
 
 android {
     namespace = "com.paranid5.crescendo.feature.splash"
-    compileSdk = 34
+    compileSdk = 35
 
     defaultConfig {
         minSdk = 24

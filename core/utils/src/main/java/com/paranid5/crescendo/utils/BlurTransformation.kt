@@ -38,7 +38,7 @@ private suspend inline fun Bitmap.blur(sampling: Float, radius: Int) =
         val width = (sentBitmap.width * sampling).roundToInt()
         val height = (sentBitmap.height * sampling).roundToInt()
         sentBitmap = Bitmap.createScaledBitmap(sentBitmap, width, height, false)
-        val bitmap = sentBitmap.copy(sentBitmap.config, true)
+        val bitmap = sentBitmap.copy(sentBitmap.config!!, true)
         if (radius < 1)
             return@withContext null
         val w = bitmap.width

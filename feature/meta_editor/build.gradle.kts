@@ -7,7 +7,7 @@ plugins {
 
 android {
     namespace = "com.paranid5.crescendo.feature.meta_editor"
-    compileSdk = 34
+    compileSdk = 35
 
     defaultConfig {
         minSdk = 24

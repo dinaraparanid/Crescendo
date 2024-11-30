@@ -7,7 +7,7 @@ plugins {
 
 android {
     namespace = "com.paranid5.crescendo.feature.play.tracks"
-    compileSdk = 34
+    compileSdk = 35
 
     defaultConfig {
         minSdk = 24
