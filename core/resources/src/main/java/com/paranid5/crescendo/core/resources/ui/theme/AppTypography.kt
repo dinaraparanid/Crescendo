@@ -20,6 +20,7 @@ data class AppTypography(
         val h1: TextStyle,
         val h2: TextStyle,
         val h3: TextStyle,
+        val h4: TextStyle,
     )
 
     companion object {
@@ -41,6 +42,13 @@ data class AppTypography(
                         letterSpacing = 0.sp,
                     ),
                     h3 = TextStyle(
+                        fontStyle = FontStyle.Normal,
+                        fontWeight = FontWeight.Normal,
+                        fontSize = 20.sp,
+                        lineHeight = 22.sp,
+                        letterSpacing = 0.sp,
+                    ),
+                    h4 = TextStyle(
                         fontStyle = FontStyle.Normal,
                         fontWeight = FontWeight.Normal,
                         fontSize = 18.sp,

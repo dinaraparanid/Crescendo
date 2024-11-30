@@ -15,6 +15,6 @@ internal fun FileSaveDialogLabel(modifier: Modifier = Modifier) =
         text = stringResource(R.string.save_as),
         modifier = modifier,
         color = colors.text.primary,
-        style = typography.h.h3,
+        style = typography.h.h4,
         fontWeight = FontWeight.W700,
     )

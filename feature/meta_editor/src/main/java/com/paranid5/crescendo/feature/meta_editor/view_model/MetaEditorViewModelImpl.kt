@@ -30,8 +30,15 @@ internal class MetaEditorViewModelImpl(
     }
 
     override fun onUiIntent(intent: MetaEditorUiIntent) = when (intent) {
+        is MetaEditorUiIntent.General -> onGeneralUiIntent(intent)
         is MetaEditorUiIntent.Lifecycle -> onLifecycleUiIntent(intent)
         is MetaEditorUiIntent.Meta -> onMetaUiIntent(intent)
+    }
+
+    private fun onGeneralUiIntent(intent: MetaEditorUiIntent.General) = when (intent) {
+        is MetaEditorUiIntent.General.Apply -> doNothing() // TODO: update meta and exit
+        is MetaEditorUiIntent.General.Back -> doNothing() // TODO: exit
+        is MetaEditorUiIntent.General.KebabClick -> doNothing() // TODO: show kebab menu
     }
 
     private fun onLifecycleUiIntent(intent: MetaEditorUiIntent.Lifecycle) = when (intent) {

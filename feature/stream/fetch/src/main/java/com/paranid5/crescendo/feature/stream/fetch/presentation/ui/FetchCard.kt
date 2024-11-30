@@ -73,6 +73,6 @@ internal fun FetchCardTitle(
 ) = Text(
     text = title,
     color = colors.text.primary,
-    style = AppTheme.typography.h.h3,
+    style = AppTheme.typography.h.h4,
     modifier = modifier,
 )

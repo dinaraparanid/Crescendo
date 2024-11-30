@@ -108,7 +108,7 @@ private fun Placeholder(modifier: Modifier = Modifier) =
         text = stringResource(R.string.play_search_bar_placeholder),
         modifier = modifier,
         color = colors.text.tertiriary,
-        style = typography.h.h3,
+        style = typography.h.h4,
         overflow = TextOverflow.Ellipsis,
         maxLines = 1,
     )

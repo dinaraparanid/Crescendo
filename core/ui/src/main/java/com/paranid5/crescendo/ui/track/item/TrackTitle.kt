@@ -14,5 +14,5 @@ fun TrackTitle(
     modifier = modifier,
     text = trackTitle,
     textColor = textColor,
-    style = typography.h.h3,
+    style = typography.h.h4,
 )

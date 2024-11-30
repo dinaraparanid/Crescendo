@@ -32,7 +32,7 @@ internal fun Author(
         text = author,
         maxLines = 1,
         color = textColor,
-        style = typography.h.h3,
+        style = typography.h.h4,
         modifier = modifier.basicMarquee(iterations = Int.MAX_VALUE),
     )
 }

@@ -71,7 +71,7 @@ fun AppExpandableCard(
                 Text(
                     text = title,
                     color = colors.text.primary,
-                    style = typography.h.h3,
+                    style = typography.h.h4,
                     overflow = TextOverflow.Ellipsis,
                     modifier = Modifier.weight(1F)
                 )

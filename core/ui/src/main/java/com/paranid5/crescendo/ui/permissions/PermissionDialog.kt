@@ -82,7 +82,7 @@ private fun Title(modifier: Modifier = Modifier) =
         modifier = modifier,
         text = stringResource(R.string.permission_required),
         color = colors.text.primary,
-        style = typography.h.h3,
+        style = typography.h.h4,
         maxLines = 1,
         fontWeight = FontWeight.W700,
     )

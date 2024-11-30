@@ -107,7 +107,7 @@ private fun PlayScreenCard(
 
         Text(
             text = title,
-            style = typography.h.h3,
+            style = typography.h.h4,
             color = colors.text.onCard,
         )
     }

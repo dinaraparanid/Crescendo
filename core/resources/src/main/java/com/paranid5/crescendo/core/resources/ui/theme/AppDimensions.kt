@@ -13,6 +13,7 @@ data class AppDimensions(
     val elevation: Elevation,
     val borders: Borders,
     val lines: Lines,
+    val iconSize: IconSize,
 ) {
     companion object {
         val default
@@ -45,6 +46,18 @@ data class AppDimensions(
                     extraSmall = 4.dp,
                 ),
                 lines = Lines(audioEffectsSlider = 4.dp),
+                iconSize = IconSize(
+                    minimum = 4.dp,
+                    extraSmall = 8.dp,
+                    small = 12.dp,
+                    medium = 16.dp,
+                    extraMedium = 20.dp,
+                    big = 24.dp,
+                    extraBig = 32.dp,
+                    large = 48.dp,
+                    extraLarge = 64.dp,
+                    enormous = 128.dp,
+                )
             )
     }
 
@@ -87,6 +100,20 @@ data class AppDimensions(
 
     @Immutable
     data class Lines(val audioEffectsSlider: Dp)
+
+    @Immutable
+    data class IconSize(
+        val minimum: Dp,
+        val extraSmall: Dp,
+        val small: Dp,
+        val medium: Dp,
+        val extraMedium: Dp,
+        val big: Dp,
+        val extraBig: Dp,
+        val large: Dp,
+        val extraLarge: Dp,
+        val enormous: Dp,
+    )
 }
 
 internal val LocalDimensions = staticCompositionLocalOf { AppDimensions.default }

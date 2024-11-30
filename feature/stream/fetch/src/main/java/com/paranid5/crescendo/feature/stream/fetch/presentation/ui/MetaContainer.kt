@@ -83,7 +83,7 @@ private fun TitleWithDuration(
         text = videoMeta.title,
         textAlign = TextAlign.Center,
         color = colors.text.onHighContrast,
-        style = typography.h.h3,
+        style = typography.h.h4,
         modifier = Modifier
             .fillMaxWidth()
             .padding(horizontal = dimensions.padding.extraMedium),
@@ -98,7 +98,7 @@ private fun TitleWithDuration(
         ),
         textAlign = TextAlign.Center,
         color = colors.text.onHighContrast,
-        style = typography.h.h3,
+        style = typography.h.h4,
         modifier = Modifier
             .fillMaxWidth()
             .padding(horizontal = dimensions.padding.extraMedium),
