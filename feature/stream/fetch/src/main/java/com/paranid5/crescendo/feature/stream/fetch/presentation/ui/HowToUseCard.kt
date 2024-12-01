@@ -12,6 +12,7 @@ import com.paranid5.crescendo.core.resources.ui.theme.AppTheme.colors
 import com.paranid5.crescendo.core.resources.ui.theme.AppTheme.dimensions
 import com.paranid5.crescendo.core.resources.ui.theme.AppTheme.typography
 import com.paranid5.crescendo.ui.foundation.AppExpandableCard
+import com.paranid5.crescendo.ui.foundation.AppExpandableCardStyle
 import dev.jeziellago.compose.markdowntext.MarkdownText
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
@@ -23,6 +24,9 @@ internal fun HowToUseCard(modifier: Modifier = Modifier) {
     AppExpandableCard(
         modifier = modifier,
         title = stringResource(R.string.stream_fetch_url_how_to_use_title),
+        style = AppExpandableCardStyle.create(
+            prefixHorizontalPadding = dimensions.padding.extraMedium,
+        ),
     ) {
         steps.forEachIndexed { index, text ->
             Step(number = index + 1, text = text, modifier = Modifier.fillMaxWidth())

@@ -35,6 +35,7 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 internal class CurrentPlaylistViewModelImpl(
+
     private val currentPlaylistRepository: CurrentPlaylistRepository,
     private val playbackRepository: PlaybackRepository,
     private val tracksRepository: TracksRepository,

@@ -9,5 +9,5 @@ internal fun LoadMetaEffect(
     trackPath: String,
     onUiIntent: (MetaEditorUiIntent) -> Unit,
 ) = LaunchedEffect(Unit) {
-    onUiIntent(MetaEditorUiIntent.Lifecycle.OnCreate(trackPath = trackPath))
+    onUiIntent(MetaEditorUiIntent.Lifecycle.Create(trackPath = trackPath))
 }

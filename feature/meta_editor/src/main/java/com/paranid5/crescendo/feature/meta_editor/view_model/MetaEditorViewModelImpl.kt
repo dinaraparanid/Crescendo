@@ -42,8 +42,8 @@ internal class MetaEditorViewModelImpl(
     }
 
     private fun onLifecycleUiIntent(intent: MetaEditorUiIntent.Lifecycle) = when (intent) {
-        is MetaEditorUiIntent.Lifecycle.OnCreate -> onCreate(trackPath = intent.trackPath)
-        is MetaEditorUiIntent.Lifecycle.OnRefresh -> doNothing() // TODO: fetch all data from network
+        is MetaEditorUiIntent.Lifecycle.Create -> onCreate(trackPath = intent.trackPath)
+        is MetaEditorUiIntent.Lifecycle.Refresh -> doNothing() // TODO: fetch all data from network
     }
 
     private fun onMetaUiIntent(intent: MetaEditorUiIntent.Meta) = when (intent) {

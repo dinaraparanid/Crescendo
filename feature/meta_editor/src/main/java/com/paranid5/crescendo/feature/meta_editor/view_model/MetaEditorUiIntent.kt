@@ -1,5 +1,7 @@
 package com.paranid5.crescendo.feature.meta_editor.view_model
 
+import com.paranid5.crescendo.ui.covers.ImageContainer
+
 sealed interface MetaEditorUiIntent {
     sealed interface General : MetaEditorUiIntent {
         data object Back : General
@@ -8,8 +10,8 @@ sealed interface MetaEditorUiIntent {
     }
 
     sealed interface Lifecycle : MetaEditorUiIntent {
-        data class OnCreate(val trackPath: String) : Lifecycle
-        data object OnRefresh : Lifecycle
+        data class Create(val trackPath: String) : Lifecycle
+        data object Refresh : Lifecycle
     }
 
     sealed interface Meta : MetaEditorUiIntent {
@@ -17,5 +19,6 @@ sealed interface MetaEditorUiIntent {
         data class UpdateArtist(val artist: String) : Meta
         data class UpdateAlbum(val album: String) : Meta
         data class UpdateNumberInAlbum(val numberInAlbum: Int) : Meta
+        data class SimilarCoverClicked(val cover: ImageContainer) : Meta
     }
 }

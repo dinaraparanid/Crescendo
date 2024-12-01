@@ -137,6 +137,11 @@
     <!-- Trimmer -->
     <string name="trimmer_done">File is successfully trimmed!</string>
 
+    <!-- Meta Editor -->
+    <string name="meta_editor_cover_picker_title">Cover</string>
+    <string name="meta_editor_meta_fields_title">Metadata</string>
+    <string name="meta_editor_meta_fields_path">Path</string>
+
     <!-- General -->
     <string name="something_went_wrong">Something went wrong</string>
     <string name="retry">Retry</string>

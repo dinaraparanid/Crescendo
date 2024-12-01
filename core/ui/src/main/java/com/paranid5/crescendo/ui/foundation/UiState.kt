@@ -77,5 +77,11 @@ inline val <T> UiState<T>.isInitialOrLoading
 inline val <T> UiState<T>.isLoadingOrRefreshing
     get() = this is UiState.Initial || this is UiState.Refreshing
 
+inline val <T> UiState<T>.isEvaluating
+    get() = isInitialOrLoading || this is UiState.Refreshing
+
 inline val <T> UiState<T>.isOk
     get() = this is UiState.Success || this is UiState.Data
+
+inline val <T> UiState<T>.isError
+    get() = this is UiState.Error

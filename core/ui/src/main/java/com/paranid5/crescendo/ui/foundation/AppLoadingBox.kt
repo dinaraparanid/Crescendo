@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.heightIn
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.Immutable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -24,8 +25,12 @@ import com.paranid5.crescendo.core.resources.ui.theme.AppTheme.colors
 import com.paranid5.crescendo.ui.utils.applyIf
 import com.paranid5.crescendo.ui.utils.shimmerEffect
 
+@Immutable
 sealed interface LoadingBoxSize {
+    @Immutable
     data object FillMaxSize : LoadingBoxSize
+
+    @Immutable
     data class FixedHeight(val minHeight: Dp) : LoadingBoxSize
 }
 
