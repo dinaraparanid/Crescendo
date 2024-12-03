@@ -15,6 +15,7 @@ import androidx.compose.ui.draw.clip
 import com.paranid5.crescendo.core.resources.ui.theme.AppTheme.colors
 import com.paranid5.crescendo.core.resources.ui.theme.AppTheme.dimensions
 import com.paranid5.crescendo.feature.meta_editor.presentation.effect.LoadMetaEffect
+import com.paranid5.crescendo.feature.meta_editor.presentation.ui.CoverWithToolbar
 import com.paranid5.crescendo.feature.meta_editor.presentation.ui.CoversPicker
 import com.paranid5.crescendo.feature.meta_editor.presentation.ui.EditorFields
 import com.paranid5.crescendo.feature.meta_editor.presentation.ui.Header
@@ -27,6 +28,7 @@ import org.koin.androidx.compose.koinViewModel
 fun MetaEditorScreen(
     trackPath: String,
     modifier: Modifier = Modifier,
+    safeDrawingModifier: Modifier = Modifier,
     viewModel: MetaEditorViewModel = koinViewModel<MetaEditorViewModelImpl>(),
 ) {
     val state by viewModel.stateFlow.collectLatestAsStateWithLifecycle()
@@ -40,6 +42,13 @@ fun MetaEditorScreen(
             .padding(horizontal = dimensions.padding.medium)
             .clip(RoundedCornerShape(dimensions.corners.small))
             .background(colors.background.highContrast)
+
+        CoverWithToolbar(
+            state = state,
+            onUiIntent = onUiIntent,
+            modifier = Modifier.fillMaxWidth(),
+            toolbarModifier = safeDrawingModifier.fillMaxWidth(),
+        )
 
         ContentSpacer()
 

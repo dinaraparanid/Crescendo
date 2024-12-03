@@ -149,4 +149,6 @@
     <string name="play">Play</string>
     <string name="download">Download</string>
     <string name="next">Next</string>
+    <string name="back">Back</string>
+    <string name="apply">Apply</string>
 </resources>

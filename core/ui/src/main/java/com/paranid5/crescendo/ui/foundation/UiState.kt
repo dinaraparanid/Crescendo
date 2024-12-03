@@ -71,6 +71,21 @@ fun <D> D?.toUiStateIfNotNull() =
 
 fun Throwable.toUiState() = UiState.Error(this::class.qualifiedName)
 
+inline val <T> UiState<T>.isInitial
+    get() = this is UiState.Initial
+
+inline val <T> UiState<T>.isLoading
+    get() = this is UiState.Loading
+
+inline val <T> UiState<T>.isRefreshing
+    get() = this is UiState.Refreshing
+
+inline val <T> UiState<T>.isError
+    get() = this is UiState.Error
+
+inline val <T> UiState<T>.isSuccess
+    get() = this is UiState.Success
+
 inline val <T> UiState<T>.isInitialOrLoading
     get() = this is UiState.Initial || this is UiState.Loading
 
@@ -82,6 +97,3 @@ inline val <T> UiState<T>.isEvaluating
 
 inline val <T> UiState<T>.isOk
     get() = this is UiState.Success || this is UiState.Data
-
-inline val <T> UiState<T>.isError
-    get() = this is UiState.Error

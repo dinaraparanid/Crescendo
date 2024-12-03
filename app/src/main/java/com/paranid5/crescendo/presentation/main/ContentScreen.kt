@@ -140,7 +140,8 @@ private fun ContentScreenNavHost(
         trackPath?.let {
             MetaEditorScreen(
                 trackPath = it,
-                modifier = screenModifier,
+                modifier = Modifier.fillMaxSize(),
+                safeDrawingModifier = Modifier.screenPaddingDefault(),
             )
         }
     }

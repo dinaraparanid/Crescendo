@@ -14,40 +14,51 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.vectorResource
+import androidx.compose.ui.unit.dp
 import com.paranid5.crescendo.core.resources.R
 import com.paranid5.crescendo.core.resources.ui.theme.AppTheme.colors
 import com.paranid5.crescendo.core.resources.ui.theme.AppTheme.dimensions
 import com.paranid5.crescendo.core.resources.ui.theme.AppTheme.typography
 import com.paranid5.crescendo.feature.meta_editor.view_model.MetaEditorState
 import com.paranid5.crescendo.feature.meta_editor.view_model.MetaEditorUiIntent
+import com.paranid5.crescendo.ui.foundation.AppLoadingBox
+import com.paranid5.crescendo.ui.foundation.LoadingBoxSize
+import com.paranid5.crescendo.ui.foundation.isInitialOrLoading
 import com.paranid5.crescendo.ui.utils.clickableWithRipple
+
+private val BlockMinHeight = 83.dp
 
 @Composable
 internal fun Header(
     state: MetaEditorState,
     onUiIntent: (MetaEditorUiIntent) -> Unit,
     modifier: Modifier = Modifier,
-) = Row(
-    modifier = modifier,
-    verticalAlignment = Alignment.CenterVertically,
+) = AppLoadingBox(
+    isLoading = state.trackPathUiState.isInitialOrLoading,
+    size = LoadingBoxSize.FixedHeight(BlockMinHeight),
 ) {
-    Spacer(Modifier.width(dimensions.padding.medium))
+    Row(
+        modifier = modifier,
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        Spacer(Modifier.width(dimensions.padding.medium))
 
-    TitleWithArtist(
-        title = state.title,
-        artist = state.artist,
-        modifier = Modifier
-            .padding(vertical = dimensions.padding.extraMedium)
-            .weight(1F),
-    )
+        TitleWithArtist(
+            title = state.title,
+            artist = state.artist,
+            modifier = Modifier
+                .padding(vertical = dimensions.padding.extraMedium)
+                .weight(1F),
+        )
 
-    Spacer(Modifier.width(dimensions.padding.small))
+        Spacer(Modifier.width(dimensions.padding.small))
 
-    KebabButton(modifier = Modifier.size(dimensions.iconSize.big)) {
-        onUiIntent(MetaEditorUiIntent.General.KebabClick)
+        KebabButton(modifier = Modifier.size(dimensions.iconSize.big)) {
+            onUiIntent(MetaEditorUiIntent.General.KebabClick)
+        }
+
+        Spacer(Modifier.width(dimensions.padding.medium))
     }
-
-    Spacer(Modifier.width(dimensions.padding.medium))
 }
 
 @Composable
@@ -76,5 +87,6 @@ private fun KebabButton(modifier: Modifier = Modifier, onClick: () -> Unit) =
     Icon(
         imageVector = ImageVector.vectorResource(R.drawable.ic_kebab_menu),
         contentDescription = null,
+        tint = colors.icon.primary,
         modifier = modifier.clickableWithRipple(onClick = onClick),
     )

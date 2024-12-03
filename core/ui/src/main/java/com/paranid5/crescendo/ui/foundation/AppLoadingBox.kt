@@ -52,13 +52,12 @@ fun AppLoadingBox(
     propagateMinConstraints = propagateMinConstraints,
     modifier = modifier
         .animateContentSize()
-        .run {
+        .applyIf(isLoading) {
             when (size) {
                 is LoadingBoxSize.FillMaxSize -> fillMaxSize()
                 is LoadingBoxSize.FixedHeight -> heightIn(min = size.minHeight)
-            }
-        }
-        .applyIf(isLoading) { shimmerEffect() },
+            }.shimmerEffect()
+        },
 ) {
     if (isLoading.not()) {
         when {
