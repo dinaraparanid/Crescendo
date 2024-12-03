@@ -58,6 +58,10 @@ internal class MetaEditorViewModelImpl(
 
         is MetaEditorUiIntent.Meta.UpdateTitle ->
             updateState { copy(title = intent.title) }
+
+        is MetaEditorUiIntent.Meta.SimilarCoverClicked -> {
+            // TODO: change cover
+        }
     }
 
     private fun onCreate(trackPath: String) {

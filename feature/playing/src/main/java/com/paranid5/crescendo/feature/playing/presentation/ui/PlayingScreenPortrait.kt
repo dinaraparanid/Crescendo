@@ -108,8 +108,8 @@ internal fun PlayingScreenPortrait(
                         modifier = Modifier
                             .alpha(coverAlpha)
                             .aspectRatio(1F)
-                            .fillMaxSize()
                             .align(Alignment.Center)
+                            .fillMaxSize()
                             .onGloballyPositioned { coordinates ->
                                 val width = coordinates.size.width
                                 val height = coordinates.size.height

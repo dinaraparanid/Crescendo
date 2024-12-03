@@ -1,6 +1,7 @@
 package com.paranid5.crescendo.feature.playing.presentation.ui
 
 import androidx.compose.animation.Crossfade
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -16,17 +17,23 @@ import com.paranid5.crescendo.core.resources.ui.theme.AppTheme.dimensions
 @Composable
 internal fun Cover(
     coverModel: ImageRequest?,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     val shape = RoundedCornerShape(dimensions.corners.extraMedium)
 
-    Crossfade(coverModel, label = "Cover") { model ->
+    Crossfade(
+        targetState = coverModel,
+        label = "Cover",
+        modifier = modifier,
+    ) { model ->
         AsyncImage(
             model = model,
             contentDescription = stringResource(R.string.video_cover),
             contentScale = ContentScale.Crop,
             alignment = Alignment.Center,
-            modifier = modifier.clip(shape),
+            modifier = modifier
+                .fillMaxSize()
+                .clip(shape),
         )
     }
 }

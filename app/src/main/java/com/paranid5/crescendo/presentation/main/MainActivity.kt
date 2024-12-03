@@ -1,5 +1,6 @@
 package com.paranid5.crescendo.presentation.main
 
+import android.os.Build
 import android.os.Bundle
 import android.view.WindowManager
 import androidx.activity.ComponentActivity
@@ -48,5 +49,10 @@ private fun MainActivity.setNavigationBarColorToTransparent() = window.run {
         WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS
     )
 
-    navigationBarColor = getColorCompat(android.R.color.transparent)
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+        isNavigationBarContrastEnforced = false
+    } else {
+        @Suppress("DEPRECATION")
+        navigationBarColor = getColorCompat(android.R.color.transparent)
+    }
 }
