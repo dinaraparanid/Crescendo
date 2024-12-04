@@ -6,16 +6,20 @@ import androidx.lifecycle.viewModelScope
 import com.paranid5.crescendo.core.common.udf.StatePublisher
 import com.paranid5.crescendo.core.common.udf.state
 import com.paranid5.crescendo.domain.cover.CoverRetriever
+import com.paranid5.crescendo.domain.genius.GeniusApi
 import com.paranid5.crescendo.domain.tracks.TracksRepository
+import com.paranid5.crescendo.feature.meta_editor.data.toTrackUiState
 import com.paranid5.crescendo.ui.covers.ImageContainer
 import com.paranid5.crescendo.ui.foundation.UiState
 import com.paranid5.crescendo.ui.foundation.toUiState
+import com.paranid5.crescendo.ui.foundation.toUiStateError
 import com.paranid5.crescendo.ui.foundation.toUiStateIfNotNull
 import com.paranid5.crescendo.utils.doNothing
 import com.paranid5.crescendo.utils.extensions.sideEffect
 
 internal class MetaEditorViewModelImpl(
     private val savedStateHandle: SavedStateHandle,
+    private val geniusApi: GeniusApi,
     private val tracksRepository: TracksRepository,
     private val coverRetriever: CoverRetriever,
 ) : ViewModel(), MetaEditorViewModel, StatePublisher<MetaEditorState> {
@@ -42,7 +46,10 @@ internal class MetaEditorViewModelImpl(
     }
 
     private fun onLifecycleUiIntent(intent: MetaEditorUiIntent.Lifecycle) = when (intent) {
-        is MetaEditorUiIntent.Lifecycle.Create -> onCreate(trackPath = intent.trackPath)
+        is MetaEditorUiIntent.Lifecycle.Create -> viewModelScope.sideEffect {
+            onCreate(trackPath = intent.trackPath)
+        }
+
         is MetaEditorUiIntent.Lifecycle.Refresh -> doNothing() // TODO: fetch all data from network
     }
 
@@ -64,7 +71,7 @@ internal class MetaEditorViewModelImpl(
         }
     }
 
-    private fun onCreate(trackPath: String) {
+    private suspend fun onCreate(trackPath: String) {
         updateState {
             copy(
                 trackPathUiState = trackPath.toUiState(),
@@ -73,14 +80,14 @@ internal class MetaEditorViewModelImpl(
         }
 
         viewModelScope.sideEffect { fetchTrackCover() }
-        viewModelScope.sideEffect { fetchTrackMeta() }
 
-        // TODO: Fetch data from network
+        fetchTrackMeta()
+        loadSimilarTracks(isInitialLoading = true)
     }
 
     private suspend fun fetchTrackCover() {
         val coverUiState = coverRetriever
-            .getTrackCoverBitmap(trackPath = state.requireTrackPath())
+            .retrieveCoverBitmap(path = state.requireTrackPath())
             ?.let(ImageContainer::Bitmap)
             .toUiStateIfNotNull()
 
@@ -100,5 +107,48 @@ internal class MetaEditorViewModelImpl(
                     )
                 }
             }
+    }
+
+    private suspend fun loadSimilarTracks(isInitialLoading: Boolean) {
+        updateState {
+            copy(
+                similarTracksUiState = when {
+                    isInitialLoading -> UiState.Loading
+                    else -> UiState.Refreshing.flattened(similarTracksUiState)
+                },
+                similarCoversUiState = when {
+                    isInitialLoading -> UiState.Loading
+                    else -> UiState.Refreshing.flattened(similarCoversUiState)
+                },
+            )
+        }
+
+        val (tracksUiState, coversUiState) = geniusApi
+            .findSimilarTracks(titleInput = state.title, artistInput = state.artist)
+            .fold(
+                ifLeft = {
+                    it.printStackTrace()
+                    it.toUiStateError() to it.toUiStateError()
+                },
+                ifRight = { models ->
+                    val tracksUiState = models
+                        .map { it.toTrackUiState(numberInAlbum = 0) } // TODO: запрос номера альбома
+                        .toUiState()
+
+                    val coversUiState = models
+                        .map {
+                            coverRetriever
+                                .downloadCoverBitmap(*it.covers.toTypedArray())
+                                .let(ImageContainer::Bitmap)
+                        }
+                        .toUiState()
+
+                    tracksUiState to coversUiState
+                },
+            )
+
+        updateState {
+            copy(similarTracksUiState = tracksUiState, similarCoversUiState = coversUiState)
+        }
     }
 }

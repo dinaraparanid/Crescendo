@@ -94,7 +94,7 @@ internal class FetchStreamViewModelImpl(
     }
 
     private suspend fun fetchCover(coversPaths: List<String>) =
-        ImageContainer.Bitmap(coverRetriever.getVideoCoverBitmap(videoCovers = coversPaths))
+        ImageContainer.Bitmap(coverRetriever.downloadCoverBitmap(urls = coversPaths.toTypedArray()))
 
     private fun startStreaming() = viewModelScope.sideEffect {
         playbackRepository.updateAudioStatus(PlaybackStatus.STREAMING)

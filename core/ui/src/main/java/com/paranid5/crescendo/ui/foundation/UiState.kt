@@ -16,7 +16,14 @@ sealed interface UiState<out T> : Parcelable {
     data object Loading : UiState<Nothing>
 
     @Parcelize
-    data class Refreshing<out T>(val innerState: UiState<T>) : UiState<T>
+    data class Refreshing<out T>(val innerState: UiState<T>) : UiState<T> {
+        companion object {
+            fun <T> flattened(innerState: UiState<T>) = when (innerState) {
+                is UiState.Refreshing -> innerState
+                else -> UiState.Refreshing(innerState)
+            }
+        }
+    }
 
     @Parcelize
     data class Error(val errorMessage: String? = null) : UiState<Nothing>
@@ -66,10 +73,9 @@ inline fun <T, R> UiState<T>.fold(ifPresent: (T) -> R, ifEmpty: () -> R): R =
 
 fun <D> D.toUiState() = UiState.Data(this)
 
-fun <D> D?.toUiStateIfNotNull() =
-    this?.toUiState() ?: UiState.Error()
+fun <D> D?.toUiStateIfNotNull() = this?.toUiState() ?: UiState.Error()
 
-fun Throwable.toUiState() = UiState.Error(this::class.qualifiedName)
+fun Throwable.toUiStateError() = UiState.Error(this::class.qualifiedName)
 
 inline val <T> UiState<T>.isInitial
     get() = this is UiState.Initial

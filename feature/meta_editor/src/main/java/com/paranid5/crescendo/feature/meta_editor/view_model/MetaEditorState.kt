@@ -5,7 +5,7 @@ import androidx.compose.runtime.Immutable
 import com.paranid5.crescendo.ui.covers.ImageContainer
 import com.paranid5.crescendo.ui.foundation.UiState
 import com.paranid5.crescendo.ui.foundation.getOrNull
-import kotlinx.collections.immutable.ImmutableList
+import com.paranid5.crescendo.ui.track.ui_state.TrackUiState
 import kotlinx.parcelize.IgnoredOnParcel
 import kotlinx.parcelize.Parcelize
 
@@ -18,9 +18,8 @@ data class MetaEditorState(
     val artist: String = "",
     val album: String = "",
     val numberInAlbum: Int = UndefinedNumberInAlbum,
-
-    @IgnoredOnParcel
-    val similarCoversUiState: UiState<ImmutableList<ImageContainer>> = UiState.Initial,
+    val similarTracksUiState: UiState<List<TrackUiState>> = UiState.Initial,
+    val similarCoversUiState: UiState<List<ImageContainer>> = UiState.Initial,
 ) : Parcelable {
     companion object {
         const val UndefinedNumberInAlbum = -1

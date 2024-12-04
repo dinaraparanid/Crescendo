@@ -5,6 +5,9 @@ import android.graphics.Bitmap
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.flow.asFlow
+import kotlinx.coroutines.flow.firstOrNull
+import kotlinx.coroutines.flow.map
 
 suspend inline fun getVideoCoverBitmapOrThumbnailAsync(
     context: Context,
@@ -14,20 +17,22 @@ suspend inline fun getVideoCoverBitmapOrThumbnailAsync(
 ) = coroutineScope {
     async(Dispatchers.IO) {
         videoCovers
+            .asFlow()
             .map { getBitmapFromUrlCatching(context, it, size, bitmapSettings) }
             .firstOrNull { it.isRight() }
             ?.getOrNull()
     }
 }
 
-suspend inline fun getVideoCoverBitmapAsync(
+suspend inline fun downloadCoverBitmapAsync(
     context: Context,
-    videoCovers: List<String>,
     size: ImageSize? = null,
+    vararg urls: String,
     crossinline bitmapSettings: (Bitmap) -> Unit = {}
 ) = coroutineScope {
     async(Dispatchers.IO) {
-        videoCovers
+        urls
+            .asFlow()
             .map { getBitmapFromUrlCatching(context, it, size, bitmapSettings) }
             .firstOrNull { it.isRight() }
             ?.getOrNull()
@@ -42,6 +47,7 @@ suspend inline fun getVideoCoverAsync(
 ) = coroutineScope {
     async(Dispatchers.IO) {
         videoCovers
+            .asFlow()
             .map { getBitmapFromUrlCatching(context, it, size, bitmapSettings) }
             .firstOrNull { it.isRight() }
             ?.map { it.toBitmapDrawable(context) }
@@ -57,6 +63,7 @@ suspend inline fun getVideoCoverWithPaletteAsync(
 ) = coroutineScope {
     async(Dispatchers.IO) {
         videoCovers
+            .asFlow()
             .map { getBitmapFromUrlWithPaletteCatching(context, it, size, bitmapSettings) }
             .firstOrNull { it.isRight() }
             ?.map { (palette, bitmap) -> palette to bitmap.toBitmapDrawable(context) }

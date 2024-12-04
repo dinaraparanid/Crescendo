@@ -3,6 +3,6 @@ package com.paranid5.crescendo.domain.cover
 import android.graphics.Bitmap
 
 interface CoverRetriever {
-    suspend fun getVideoCoverBitmap(videoCovers: List<String>): Bitmap?
-    suspend fun getTrackCoverBitmap(trackPath: String): Bitmap?
+    suspend fun downloadCoverBitmap(vararg urls: String): Bitmap?
+    suspend fun retrieveCoverBitmap(path: String): Bitmap?
 }

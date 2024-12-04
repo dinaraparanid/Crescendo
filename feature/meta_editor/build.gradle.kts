@@ -41,6 +41,7 @@ dependencies {
     implementation(project(":core:utils"))
 
     implementation(project(":domain:cover"))
+    implementation(project(":domain:genius"))
     implementation(project(":domain:tracks"))
 
     implementation(libs.androidx.core.ktx)
