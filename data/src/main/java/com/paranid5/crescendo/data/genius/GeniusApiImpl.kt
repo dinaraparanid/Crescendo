@@ -13,6 +13,7 @@ import io.ktor.client.HttpClient
 import io.ktor.client.call.body
 import io.ktor.client.request.bearerAuth
 import io.ktor.client.request.get
+import io.ktor.client.request.parameter
 import io.ktor.client.request.url
 
 internal class GeniusApiImpl(
@@ -26,6 +27,7 @@ internal class GeniusApiImpl(
         ktorClient
             .get {
                 url(urlBuilder.buildSearchUrl())
+                parameter("q", "$artistInput - $titleInput")
                 bearerAuth(GeniusApiToken)
             }
             .body<GeniusResponse<SearchResponse>>()
@@ -45,6 +47,7 @@ internal class GeniusApiImpl(
             }
             .body<GeniusResponse<GeniusTrackResponse>>()
             .response
+            .data
             .toModel()
     }
 }

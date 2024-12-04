@@ -9,9 +9,7 @@ internal data class SearchResponse(@SerialName("hits") val hits: List<SearchHitR
 }
 
 @Serializable
-@JvmInline
-internal value class SearchHitResponse(@SerialName("result") val result: SongIdResponse)
+internal data class SearchHitResponse(@SerialName("result") val result: SongIdResponse)
 
 @Serializable
-@JvmInline
-internal value class SongIdResponse(@SerialName("id") val id: Long)
+internal data class SongIdResponse(@SerialName("id") val id: Long)

@@ -6,6 +6,11 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 internal data class GeniusTrackResponse(
+    @SerialName("song") val data: GeniusTrackDataResponse,
+)
+
+@Serializable
+internal data class GeniusTrackDataResponse(
     @SerialName("id") val id: Long,
     @SerialName("title") val title: String,
     @SerialName("artist_names") val artists: String,
@@ -21,7 +26,7 @@ internal data class AlbumResponse(
     @SerialName("cover_art_url") val cover: String?,
 )
 
-internal fun GeniusTrackResponse.toModel() = GeniusTrack(
+internal fun GeniusTrackDataResponse.toModel() = GeniusTrack(
     id = id,
     title = title,
     artists = artists,

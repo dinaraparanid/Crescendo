@@ -126,10 +126,7 @@ internal class MetaEditorViewModelImpl(
         val (tracksUiState, coversUiState) = geniusApi
             .findSimilarTracks(titleInput = state.title, artistInput = state.artist)
             .fold(
-                ifLeft = {
-                    it.printStackTrace()
-                    it.toUiStateError() to it.toUiStateError()
-                },
+                ifLeft = { it.toUiStateError() to it.toUiStateError() },
                 ifRight = { models ->
                     val tracksUiState = models
                         .map { it.toTrackUiState(numberInAlbum = 0) } // TODO: запрос номера альбома
