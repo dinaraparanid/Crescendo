@@ -2,6 +2,7 @@ package com.paranid5.crescendo.tracks.presentation
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -16,7 +17,7 @@ import com.paranid5.crescendo.core.resources.ui.theme.AppTheme.dimensions
 import com.paranid5.crescendo.tracks.presentation.effect.LifecycleEffect
 import com.paranid5.crescendo.tracks.presentation.effect.QueryUpdatesEffect
 import com.paranid5.crescendo.tracks.presentation.effect.ScreenEffect
-import com.paranid5.crescendo.tracks.presentation.ui.DefaultTrackList
+import com.paranid5.crescendo.tracks.presentation.ui.TrackListNode
 import com.paranid5.crescendo.tracks.presentation.ui.TracksBar
 import com.paranid5.crescendo.tracks.view_model.TracksScreenEffect
 import com.paranid5.crescendo.tracks.view_model.TracksUiIntent
@@ -62,11 +63,11 @@ fun TracksScreen(
 
             Spacer(Modifier.height(dimensions.padding.extraMedium))
 
-            DefaultTrackList(
+            TrackListNode(
                 state = state,
                 onUiIntent = onUiIntent,
-                bottomPadding = dimensions.padding.small,
                 modifier = Modifier.fillMaxSize(1F),
+                contentPadding = PaddingValues(bottom = dimensions.padding.small),
             )
         }
 

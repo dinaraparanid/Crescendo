@@ -40,7 +40,8 @@ internal fun TrackItem(
 
     Box(modifier) {
         Row(
-            Modifier
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = Modifier
                 .fillMaxWidth()
                 .clip(RoundedCornerShape(dimensions.padding.extraMedium))
                 .background(backgroundColor)
@@ -59,7 +60,6 @@ internal fun TrackItem(
                         bottom = dimensions.padding.medium,
                     )
                     .size(TrackCoverSize)
-                    .align(Alignment.CenterVertically)
                     .clip(RoundedCornerShape(dimensions.padding.small)),
             )
 
@@ -70,8 +70,7 @@ internal fun TrackItem(
                 textColor = contentColor,
                 modifier = Modifier
                     .weight(1F)
-                    .padding(start = dimensions.padding.small)
-                    .align(Alignment.CenterVertically),
+                    .padding(start = dimensions.padding.small),
             )
 
             Spacer(Modifier.width(dimensions.padding.medium))
@@ -79,7 +78,6 @@ internal fun TrackItem(
             TrackKebabMenuButton(
                 track = track,
                 tint = contentColor,
-                modifier = Modifier.align(Alignment.CenterVertically),
                 addToPlaylist = {
                     onUiIntent(TracksUiIntent.Tracks.AddTrackToPlaylist(track = it))
                 },

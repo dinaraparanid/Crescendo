@@ -30,7 +30,7 @@ private val BlockMinHeight = 148.dp
 private val ImageSize = 80.dp
 
 @Composable
-internal fun CoversPicker(
+internal fun CoverPicker(
     state: MetaEditorState,
     onUiIntent: (MetaEditorUiIntent) -> Unit,
     modifier: Modifier = Modifier,
@@ -52,7 +52,7 @@ internal fun CoversPicker(
         horizontalArrangement = Arrangement.spacedBy(dimensions.padding.medium),
         contentPadding = PaddingValues(horizontal = dimensions.padding.medium),
     ) {
-        items(covers) { cover ->
+        items(covers, key = { it.hashCode() }) { cover ->
             AppClippedCover(
                 coverUiState = cover.toUiState(),
                 modifier = Modifier

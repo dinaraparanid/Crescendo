@@ -5,7 +5,6 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -16,6 +15,7 @@ import androidx.compose.ui.Modifier
 import com.paranid5.crescendo.core.resources.ui.theme.AppTheme.colors
 import com.paranid5.crescendo.core.resources.ui.theme.AppTheme.dimensions
 import com.paranid5.crescendo.core.resources.ui.theme.AppTheme.typography
+import com.paranid5.crescendo.ui.foundation.AppText
 import kotlinx.collections.immutable.ImmutableList
 
 @Composable
@@ -70,11 +70,12 @@ fun Spinner(
 private fun DefaultSelectedItem(text: String, modifier: Modifier = Modifier) {
     val updText by rememberUpdatedState(text)
 
-    Text(
+    AppText(
         text = updText,
-        color = colors.selection.selected,
-        style = typography.regular,
         modifier = modifier,
+        style = typography.regular.copy(
+            color = colors.selection.selected,
+        ),
     )
 }
 
@@ -82,10 +83,11 @@ private fun DefaultSelectedItem(text: String, modifier: Modifier = Modifier) {
 private fun DefaultItem(text: String, modifier: Modifier = Modifier) {
     val updText by rememberUpdatedState(text)
 
-    Text(
+    AppText(
         text = updText,
         modifier = modifier,
-        color = colors.text.primary,
-        style = typography.regular,
+        style = typography.regular.copy(
+            color = colors.text.primary,
+        ),
     )
 }

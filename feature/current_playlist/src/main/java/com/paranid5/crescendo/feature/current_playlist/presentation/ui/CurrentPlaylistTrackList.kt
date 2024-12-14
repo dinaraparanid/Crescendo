@@ -1,9 +1,11 @@
 package com.paranid5.crescendo.feature.current_playlist.presentation.ui
 
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Modifier
+import com.paranid5.crescendo.core.resources.ui.theme.AppTheme.dimensions
 import com.paranid5.crescendo.feature.current_playlist.view_model.CurrentPlaylistState
 import com.paranid5.crescendo.feature.current_playlist.view_model.CurrentPlaylistUiIntent
 
@@ -19,6 +21,10 @@ internal fun CurrentPlaylistTrackList(
     DraggableTrackList(
         tracks = playlistState.playlist,
         currentTrackIndex = playlistState.currentTrackIndex,
+        contentPadding = PaddingValues(
+            top = dimensions.padding.extraBig,
+            bottom = dimensions.padding.extraLarge,
+        ),
         modifier = modifier,
         onTrackDismissed = { index, _ ->
             when (index) {

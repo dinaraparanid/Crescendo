@@ -8,12 +8,13 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.material3.Icon
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.vectorResource
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.paranid5.crescendo.core.resources.R
 import com.paranid5.crescendo.core.resources.ui.theme.AppTheme.colors
@@ -22,11 +23,14 @@ import com.paranid5.crescendo.core.resources.ui.theme.AppTheme.typography
 import com.paranid5.crescendo.feature.meta_editor.view_model.MetaEditorState
 import com.paranid5.crescendo.feature.meta_editor.view_model.MetaEditorUiIntent
 import com.paranid5.crescendo.ui.foundation.AppLoadingBox
+import com.paranid5.crescendo.ui.foundation.AppText
 import com.paranid5.crescendo.ui.foundation.LoadingBoxSize
 import com.paranid5.crescendo.ui.foundation.isInitialOrLoading
 import com.paranid5.crescendo.ui.utils.clickableWithRipple
 
 private val BlockMinHeight = 83.dp
+private const val TitleMaxLines = 2
+private const val ArtistMaxLines = 1
 
 @Composable
 internal fun Header(
@@ -67,18 +71,26 @@ private fun TitleWithArtist(
     artist: String,
     modifier: Modifier = Modifier,
 ) = Column(modifier) {
-    Text(
+    AppText(
         text = title,
-        style = typography.h.h3,
-        color = colors.text.primary,
+        maxLines = TitleMaxLines,
+        overflow = TextOverflow.Ellipsis,
+        style = typography.h.h3.copy(
+            color = colors.text.primary,
+            fontWeight = FontWeight.W700,
+        ),
     )
 
     Spacer(Modifier.height(dimensions.padding.small))
 
-    Text(
+    AppText(
         text = artist,
-        style = typography.body,
-        color = colors.text.primary,
+        maxLines = ArtistMaxLines,
+        overflow = TextOverflow.Ellipsis,
+        style = typography.body.copy(
+            color = colors.text.primary,
+            fontWeight = FontWeight.W700,
+        ),
     )
 }
 

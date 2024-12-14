@@ -11,7 +11,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
@@ -20,8 +19,12 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.onGloballyPositioned
+import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import com.paranid5.crescendo.core.resources.ui.theme.AppTheme
+import com.paranid5.crescendo.core.resources.ui.theme.AppTheme.colors
+import com.paranid5.crescendo.core.resources.ui.theme.AppTheme.typography
+import com.paranid5.crescendo.ui.foundation.AppText
 import com.paranid5.crescendo.ui.utils.clickableWithRipple
 import com.paranid5.crescendo.utils.extensions.pxToDp
 import kotlinx.collections.immutable.ImmutableList
@@ -49,10 +52,8 @@ internal fun AppPagerTabs(
 
     Column(
         modifier
-            .background(AppTheme.colors.background.highContrast)
-            .onGloballyPositioned { coords ->
-                pagerWidth = coords.size.width
-            },
+            .background(colors.background.highContrast)
+            .onGloballyPositioned { coords -> pagerWidth = coords.size.width },
     ) {
         Spacer(Modifier.height(AppTheme.dimensions.padding.small))
 
@@ -104,10 +105,9 @@ private fun AppPagerTab(
     text: String,
     modifier: Modifier = Modifier,
 ) = Box(modifier) {
-    Text(
+    AppText(
         text = text,
-        color = AppTheme.colors.text.primary,
-        style = AppTheme.typography.body,
+        style = typography.body.copy(color = colors.text.primary),
         modifier = Modifier.align(Alignment.Center),
     )
 }
@@ -115,7 +115,7 @@ private fun AppPagerTab(
 @Composable
 private fun AppPagerActiveZone(modifier: Modifier = Modifier) = Spacer(
     modifier = modifier.background(
-        color = AppTheme.colors.selection.selected,
+        color = colors.selection.selected,
         shape = RoundedCornerShape(AppTheme.dimensions.corners.extraSmall),
     )
 )
@@ -128,5 +128,5 @@ private fun Modifier.activePagerTab(
 ): Modifier {
     val xOffset = (activePage * pagerWidthPx / pagesAmount).pxToDp() + PagerTabPadding
     val xOffsetAnim by animateDpAsState(targetValue = xOffset, label = "")
-    return this.offset(x = xOffsetAnim, y = 0.dp)
+    return this.offset { IntOffset(x = xOffsetAnim.toPx().toInt(), y = 0) }
 }

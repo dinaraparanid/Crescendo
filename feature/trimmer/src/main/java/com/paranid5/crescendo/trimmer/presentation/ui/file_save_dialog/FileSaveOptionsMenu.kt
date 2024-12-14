@@ -4,7 +4,6 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.derivedStateOf
@@ -16,6 +15,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import com.paranid5.crescendo.core.resources.ui.theme.AppTheme.colors
 import com.paranid5.crescendo.core.resources.ui.theme.AppTheme.typography
+import com.paranid5.crescendo.ui.foundation.AppText
 import com.paranid5.crescendo.ui.utils.clickableWithRipple
 import kotlinx.collections.immutable.ImmutableList
 
@@ -57,10 +57,12 @@ private fun OptionLabel(
         derivedStateOf { fileSaveOptions[selectedSaveOptionIndex] }
     }
 
-    Text(
+    AppText(
         text = label,
-        color = colors.text.primary,
         modifier = modifier.clickableWithRipple { isDropdownShown = true },
+        style = typography.regular.copy(
+            color = colors.text.primary,
+        ),
     )
 }
 
@@ -97,10 +99,11 @@ private fun FileOption(
 ) = DropdownMenuItem(
     modifier = modifier,
     text = {
-        Text(
+        AppText(
             text = option,
-            color = colors.text.primary,
-            style = typography.regular,
+            style = typography.regular.copy(
+                color = colors.text.primary,
+            ),
         )
     },
     onClick = { onItemClick(index) },

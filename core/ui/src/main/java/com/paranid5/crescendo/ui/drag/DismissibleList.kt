@@ -1,13 +1,13 @@
 package com.paranid5.crescendo.ui.drag
 
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.itemsIndexed
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.SwipeToDismissBox
 import androidx.compose.material3.SwipeToDismissBoxValue
 import androidx.compose.material3.rememberSwipeToDismissBoxState
@@ -25,6 +25,7 @@ internal fun <T> DismissibleList(
     modifier: Modifier = Modifier,
     itemModifier: Modifier = Modifier,
     verticalArrangement: Arrangement.Vertical = Arrangement.spacedBy(dimensions.padding.extraMedium),
+    contentPadding: PaddingValues = PaddingValues(),
     key: ((index: Int, item: T) -> Any)? = null,
     itemContent: ListItemContent<T>,
 ) {
@@ -32,6 +33,7 @@ internal fun <T> DismissibleList(
 
     LazyColumn(
         state = scrollingState,
+        contentPadding = contentPadding,
         modifier = modifier,
     ) {
         itemsIndexed(items, key) { index, _ ->
@@ -49,7 +51,6 @@ internal fun <T> DismissibleList(
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun <T> DismissibleItem(
     items: ImmutableList<T>,
@@ -75,7 +76,6 @@ private fun <T> DismissibleItem(
     )
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private inline fun <T> rememberDismissState(
     index: Int,

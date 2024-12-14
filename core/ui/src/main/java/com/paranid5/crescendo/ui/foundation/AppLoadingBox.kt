@@ -11,7 +11,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Immutable
 import androidx.compose.ui.Alignment
@@ -86,10 +85,9 @@ fun AppLoadingBoxError(
     verticalArrangement = Arrangement.Center,
     horizontalAlignment = Alignment.CenterHorizontally
 ) {
-    Text(
+    AppText(
         text = errorText,
-        color = colors.text.primary,
-        style = AppTheme.typography.body,
+        style = AppTheme.typography.body.copy(color = colors.text.primary),
     )
 
     onErrorButtonClick?.let {
@@ -104,7 +102,7 @@ fun AppLoadingBoxError(
                 disabledContentColor = colors.text.tertiriary,
             )
         ) {
-            Text(
+            AppText(
                 text = errorButtonText,
                 style = AppTheme.typography.caption,
             )

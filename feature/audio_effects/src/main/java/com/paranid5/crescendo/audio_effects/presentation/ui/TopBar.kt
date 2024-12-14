@@ -3,7 +3,6 @@ package com.paranid5.crescendo.audio_effects.presentation.ui
 import androidx.compose.foundation.layout.Box
 import androidx.compose.material3.Switch
 import androidx.compose.material3.SwitchDefaults
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -14,6 +13,7 @@ import com.paranid5.crescendo.audio_effects.view_model.AudioEffectsUiIntent
 import com.paranid5.crescendo.core.resources.R
 import com.paranid5.crescendo.core.resources.ui.theme.AppTheme.colors
 import com.paranid5.crescendo.core.resources.ui.theme.AppTheme.typography
+import com.paranid5.crescendo.ui.foundation.AppText
 
 private const val TrackDecreasedBrightnessRatio = 0.5F
 private const val BorderDecreasedBrightnessRatio = 0.25F
@@ -35,11 +35,13 @@ internal fun TopBar(
 
 @Composable
 private fun AudioEffectsLabel(modifier: Modifier = Modifier) =
-    Text(
-        text = stringResource(R.string.audio_effects_title),
-        color = colors.text.primary,
-        style = typography.h.h2.copy(shadow = Shadow(color = colors.primary)),
+    AppText(
         modifier = modifier,
+        text = stringResource(R.string.audio_effects_title),
+        style = typography.h.h2.copy(
+            color = colors.text.primary,
+            shadow = Shadow(color = colors.primary),
+        ),
     )
 
 @Composable

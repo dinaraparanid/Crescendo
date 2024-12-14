@@ -13,6 +13,7 @@ data object AppTheme {
     val dimensions @Composable get() = LocalDimensions.current
     val typography @Composable get() = LocalTypography.current
     val icons @Composable get() = LocalIcons.current
+    val fontFamily = NunitoSansFontFamily
 }
 
 @Composable

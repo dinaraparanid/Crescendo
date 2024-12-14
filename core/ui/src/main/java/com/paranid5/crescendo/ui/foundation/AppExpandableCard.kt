@@ -14,7 +14,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Icon
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.getValue
@@ -27,6 +26,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.vectorResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
@@ -96,11 +96,14 @@ fun AppExpandableCard(
                     Spacer(Modifier.width(style.prefixHorizontalPadding))
                 }
 
-                Text(
+                AppText(
                     text = title,
-                    color = colors.text.primary,
-                    style = typography.h.h4,
                     overflow = TextOverflow.Ellipsis,
+                    maxLines = 1,
+                    style = typography.h.h4.copy(
+                        color = colors.text.primary,
+                        fontWeight = FontWeight.W700,
+                    ),
                     modifier = Modifier.weight(1F)
                 )
 

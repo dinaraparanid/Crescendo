@@ -3,7 +3,6 @@ package com.paranid5.crescendo.feature.stream.fetch.presentation.ui
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -14,6 +13,7 @@ import com.paranid5.crescendo.core.resources.ui.theme.AppTheme.typography
 import com.paranid5.crescendo.feature.stream.fetch.view_model.FetchStreamState
 import com.paranid5.crescendo.feature.stream.fetch.view_model.FetchStreamUiIntent
 import com.paranid5.crescendo.ui.foundation.AppLoadingBox
+import com.paranid5.crescendo.ui.foundation.AppText
 import com.paranid5.crescendo.ui.foundation.LoadingBoxSize
 import com.paranid5.crescendo.ui.foundation.getOrNull
 import com.paranid5.crescendo.ui.foundation.isError
@@ -67,9 +67,8 @@ internal fun FetchCard(
 internal fun FetchCardTitle(
     title: String,
     modifier: Modifier = Modifier,
-) = Text(
+) = AppText(
     text = title,
-    color = colors.text.primary,
-    style = typography.h.h4,
+    style = typography.h.h4.copy(color = colors.text.primary),
     modifier = modifier,
 )

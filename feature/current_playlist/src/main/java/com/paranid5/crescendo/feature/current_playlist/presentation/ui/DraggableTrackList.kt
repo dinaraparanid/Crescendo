@@ -1,5 +1,6 @@
 package com.paranid5.crescendo.feature.current_playlist.presentation.ui
 
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
@@ -19,6 +20,7 @@ internal fun DraggableTrackList(
     onTrackDragged: (draggedItems: ImmutableList<TrackUiState>, dragIndex: Int) -> Unit,
     modifier: Modifier = Modifier,
     trackItemModifier: Modifier = Modifier,
+    contentPadding: PaddingValues = PaddingValues(),
     trackItemContent: DraggableListItemContent<TrackUiState>,
 ) = DraggableList(
     items = tracks,
@@ -28,6 +30,7 @@ internal fun DraggableTrackList(
     itemContent = trackItemContent,
     modifier = modifier,
     itemModifier = trackItemModifier,
+    contentPadding = contentPadding,
     key = { index, track -> "${track.hashCode()}$index" },
 )
 
@@ -43,6 +46,7 @@ internal fun DraggableTrackList(
     showMetaEditor: (trackUri: String) -> Unit,
     modifier: Modifier = Modifier,
     trackItemModifier: Modifier = Modifier,
+    contentPadding: PaddingValues = PaddingValues(),
 ) = DraggableTrackList(
     tracks = tracks,
     currentTrackIndex = currentTrackIndex,
@@ -50,6 +54,7 @@ internal fun DraggableTrackList(
     onTrackDragged = onTrackDragged,
     modifier = modifier,
     trackItemModifier = trackItemModifier,
+    contentPadding = contentPadding,
     trackItemContent = { trackList, trackInd, currentTrackDragIndex, trackModifier ->
         val isTrackCurrent by remember(trackInd, currentTrackDragIndex) {
             derivedStateOf { trackInd == currentTrackDragIndex }

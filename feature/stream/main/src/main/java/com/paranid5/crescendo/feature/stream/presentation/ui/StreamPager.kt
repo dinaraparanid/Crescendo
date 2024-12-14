@@ -16,7 +16,7 @@ import com.paranid5.crescendo.feature.stream.fetch.presentation.FetchStreamScree
 import com.paranid5.crescendo.feature.stream.view_model.StreamState
 import com.paranid5.crescendo.feature.stream.view_model.StreamState.PagerState
 import com.paranid5.crescendo.feature.stream.view_model.StreamUiIntent
-import com.paranid5.crescendo.ui.pager.AppPager
+import com.paranid5.crescendo.ui.pager.AppHorizontalPager
 import com.paranid5.crescendo.ui.pager.PagerUiState
 import com.paranid5.crescendo.utils.doNothing
 import kotlinx.collections.immutable.ImmutableList
@@ -31,7 +31,7 @@ internal fun StreamPager(
 ) {
     val activePageIndex by rememberActivePageIndex(state = state)
 
-    AppPager(
+    AppHorizontalPager(
         pagerUiStates = rememberStreamPagerUiStates(),
         activePage = activePageIndex,
         modifier = modifier,

@@ -15,10 +15,11 @@ import androidx.compose.ui.draw.clip
 import com.paranid5.crescendo.core.resources.ui.theme.AppTheme.colors
 import com.paranid5.crescendo.core.resources.ui.theme.AppTheme.dimensions
 import com.paranid5.crescendo.feature.meta_editor.presentation.effect.LoadMetaEffect
+import com.paranid5.crescendo.feature.meta_editor.presentation.ui.CoverPicker
 import com.paranid5.crescendo.feature.meta_editor.presentation.ui.CoverWithToolbar
-import com.paranid5.crescendo.feature.meta_editor.presentation.ui.CoversPicker
 import com.paranid5.crescendo.feature.meta_editor.presentation.ui.EditorFields
 import com.paranid5.crescendo.feature.meta_editor.presentation.ui.Header
+import com.paranid5.crescendo.feature.meta_editor.presentation.ui.SimilarTracksPicker
 import com.paranid5.crescendo.feature.meta_editor.view_model.MetaEditorViewModel
 import com.paranid5.crescendo.feature.meta_editor.view_model.MetaEditorViewModelImpl
 import com.paranid5.crescendo.utils.extensions.collectLatestAsStateWithLifecycle
@@ -56,11 +57,15 @@ fun MetaEditorScreen(
 
         ContentSpacer()
 
-        CoversPicker(state = state, onUiIntent = onUiIntent, modifier = blockModifier)
+        CoverPicker(state = state, onUiIntent = onUiIntent, modifier = blockModifier)
 
         ContentSpacer()
 
         EditorFields(state = state, onUiIntent = onUiIntent, modifier = blockModifier)
+
+        ContentSpacer()
+
+        SimilarTracksPicker(state = state, onUiIntent = onUiIntent, modifier = blockModifier)
 
         ContentSpacer()
     }

@@ -10,7 +10,6 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Slider
 import androidx.compose.material3.SliderDefaults
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
@@ -22,6 +21,7 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import com.paranid5.crescendo.core.resources.ui.theme.AppTheme.colors
 import com.paranid5.crescendo.core.resources.ui.theme.AppTheme.dimensions
 import com.paranid5.crescendo.core.resources.ui.theme.AppTheme.typography
+import com.paranid5.crescendo.ui.foundation.AppText
 
 @Composable
 internal fun EffectController(
@@ -55,11 +55,12 @@ internal fun EffectController(
 private fun EffectLabel(
     text: String,
     modifier: Modifier = Modifier,
-) = Text(
+) = AppText(
     text = text,
     modifier = modifier,
-    color = colors.text.primary,
-    style = typography.caption,
+    style = typography.caption.copy(
+        color = colors.text.primary,
+    ),
 )
 
 @Composable

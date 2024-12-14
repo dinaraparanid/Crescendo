@@ -10,7 +10,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.Icon
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
@@ -22,6 +21,7 @@ import com.paranid5.crescendo.core.resources.ui.theme.AppTheme.typography
 import com.paranid5.crescendo.feature.stream.fetch.view_model.FetchStreamState
 import com.paranid5.crescendo.feature.stream.fetch.view_model.FetchStreamUiIntent
 import com.paranid5.crescendo.ui.foundation.AppOutlinedTextField
+import com.paranid5.crescendo.ui.foundation.AppText
 import com.paranid5.crescendo.ui.utils.clickableWithRipple
 import com.paranid5.crescendo.utils.takeIfTrueOrNull
 
@@ -76,7 +76,7 @@ private fun UrlEditorTextField(
 
 @Composable
 private fun Placeholder(modifier: Modifier = Modifier) =
-    Text(
+    AppText(
         text = stringResource(R.string.stream_fetch_url_editor_placeholder),
         style = typography.caption,
         modifier = modifier,
@@ -97,9 +97,8 @@ private fun CancelIcon(
 
 @Composable
 private fun ErrorLabel(modifier: Modifier = Modifier) =
-    Text(
+    AppText(
         text = stringResource(R.string.stream_fetch_url_editor_placeholder),
-        color = colors.error,
-        style = typography.captionSm,
+        style = typography.captionSm.copy(color = colors.error),
         modifier = modifier,
     )

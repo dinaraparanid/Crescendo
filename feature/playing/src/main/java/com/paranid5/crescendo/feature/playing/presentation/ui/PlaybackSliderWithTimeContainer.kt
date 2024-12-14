@@ -6,7 +6,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -21,6 +20,7 @@ import com.paranid5.crescendo.core.resources.ui.theme.AppTheme.colors
 import com.paranid5.crescendo.core.resources.ui.theme.AppTheme.dimensions
 import com.paranid5.crescendo.core.resources.ui.theme.AppTheme.typography
 import com.paranid5.crescendo.feature.playing.view_model.PlayingState
+import com.paranid5.crescendo.ui.foundation.AppText
 import com.paranid5.crescendo.utils.extensions.timeFormat
 
 @Composable
@@ -55,11 +55,12 @@ internal fun PlaybackSliderWithTimeContainer(
 
 @Composable
 internal fun TimeText(time: Long, color: Color, modifier: Modifier = Modifier) =
-    Text(
+    AppText(
         text = time.timeFormat,
-        color = color,
         modifier = modifier,
-        style = typography.body,
+        style = typography.body.copy(
+            color = color,
+        ),
     )
 
 @Composable
@@ -77,11 +78,13 @@ internal fun LiveSeeker(
 
 @Composable
 private fun LiveLabel(modifier: Modifier = Modifier) =
-    Text(
+    AppText(
         text = stringResource(R.string.live),
-        color = colors.primary,
-        fontWeight = FontWeight.Bold,
-        fontStyle = FontStyle.Italic,
-        textAlign = TextAlign.Center,
         modifier = modifier,
+        style = typography.regular.copy(
+            color = colors.primary,
+            fontWeight = FontWeight.W700,
+            fontStyle = FontStyle.Italic,
+            textAlign = TextAlign.Center,
+        ),
     )

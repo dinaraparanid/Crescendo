@@ -7,7 +7,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -25,6 +24,7 @@ import com.paranid5.crescendo.trimmer.presentation.WAVEFORM_SPIKE_WIDTH_RATIO
 import com.paranid5.crescendo.trimmer.presentation.effects.waveform.InitZoomStepsEffect
 import com.paranid5.crescendo.trimmer.view_model.TrimmerState
 import com.paranid5.crescendo.trimmer.view_model.TrimmerUiIntent
+import com.paranid5.crescendo.ui.foundation.AppText
 
 private val ZoomButtonSize = 32.dp
 private val ZoomIconSize = 16.dp
@@ -150,10 +150,11 @@ private fun ZoomRatioLabel(
         state.waveformProperties.zoomLevel
     }
 
-    Text(
+    AppText(
         text = "${1 shl zoom}X",
-        color = colors.text.onHighContrast,
-        style = typography.caption,
+        style = typography.caption.copy(
+            color = colors.text.onHighContrast,
+        ),
         modifier = modifier,
     )
 }

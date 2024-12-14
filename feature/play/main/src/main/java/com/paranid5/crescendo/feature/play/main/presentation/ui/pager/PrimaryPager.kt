@@ -16,7 +16,7 @@ import com.paranid5.crescendo.feature.play.main.view_model.PlayState.PagerState
 import com.paranid5.crescendo.feature.play.main.view_model.PlayUiIntent
 import com.paranid5.crescendo.tracks.presentation.TracksScreen
 import com.paranid5.crescendo.tracks.view_model.TracksScreenEffect
-import com.paranid5.crescendo.ui.pager.AppPager
+import com.paranid5.crescendo.ui.pager.AppHorizontalPager
 import com.paranid5.crescendo.ui.pager.PagerUiState
 import com.paranid5.crescendo.utils.doNothing
 import kotlinx.collections.immutable.ImmutableList
@@ -30,7 +30,7 @@ internal fun PrimaryPager(
 ) {
     val activePageIndex by rememberActivePageIndex(state = state)
 
-    AppPager(
+    AppHorizontalPager(
         pagerUiStates = rememberPrimaryPagerUiStates(),
         activePage = activePageIndex,
         modifier = modifier,

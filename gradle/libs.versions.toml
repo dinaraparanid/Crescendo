@@ -31,7 +31,7 @@ ui = "1.7.5"
 ytUrlExtractorKt = "9a8db37d0c"
 foundationAndroid = "1.7.5"
 ytdl = "0.17.2"
-agp = "8.7.2"
+agp = "8.7.3"
 kotlin = "2.1.0"
 
 [libraries]

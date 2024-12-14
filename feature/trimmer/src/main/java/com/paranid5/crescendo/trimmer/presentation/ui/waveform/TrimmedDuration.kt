@@ -1,6 +1,5 @@
 package com.paranid5.crescendo.trimmer.presentation.ui.waveform
 
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
@@ -10,6 +9,7 @@ import androidx.compose.ui.text.font.FontWeight
 import com.paranid5.crescendo.core.resources.ui.theme.AppTheme.colors
 import com.paranid5.crescendo.core.resources.ui.theme.AppTheme.typography
 import com.paranid5.crescendo.trimmer.view_model.TrimmerState
+import com.paranid5.crescendo.ui.foundation.AppText
 import com.paranid5.crescendo.utils.extensions.timeFormat
 
 @Composable
@@ -29,11 +29,12 @@ internal fun TrimmedDuration(
         derivedStateOf { (duration / speed).timeFormat }
     }
 
-    Text(
+    AppText(
         text = trimmedDuration,
-        style = typography.body,
-        fontWeight = FontWeight.Bold,
-        color = colors.text.onHighContrast,
         modifier = modifier,
+        style = typography.body.copy(
+            fontWeight = FontWeight.W700,
+            color = colors.text.onHighContrast,
+        ),
     )
 }

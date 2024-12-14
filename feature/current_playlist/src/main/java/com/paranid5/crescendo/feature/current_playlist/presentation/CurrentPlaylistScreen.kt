@@ -50,8 +50,6 @@ fun CurrentPlaylistScreen(
             ),
         )
 
-        Spacer(Modifier.height(dimensions.padding.extraBig))
-
         CurrentPlaylistTrackList(
             state = state,
             onUiIntent = onUiIntent,
@@ -60,8 +58,6 @@ fun CurrentPlaylistScreen(
                 end = dimensions.padding.extraMedium,
             ),
         )
-
-        Spacer(Modifier.height(dimensions.padding.extraBig))
     }
 }
 

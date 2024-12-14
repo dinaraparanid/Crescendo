@@ -5,6 +5,7 @@ import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.animateScrollBy
 import androidx.compose.foundation.gestures.detectDragGesturesAfterLongPress
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -57,6 +58,7 @@ fun <T> DraggableList(
     modifier: Modifier = Modifier,
     itemModifier: Modifier = Modifier,
     scrollingState: LazyListState = rememberLazyListState(),
+    contentPadding: PaddingValues = PaddingValues(),
     key: ((index: Int, item: T) -> Any)? = null,
     itemContent: DraggableListItemContent<T>,
 ) {
@@ -99,6 +101,7 @@ fun <T> DraggableList(
     DismissibleList(
         items = draggableItems,
         scrollingState = scrollingState,
+        contentPadding = contentPadding,
         onDismissed = onDismissed,
         modifier = modifier.handleItemsMovement(
             items = draggableItems,

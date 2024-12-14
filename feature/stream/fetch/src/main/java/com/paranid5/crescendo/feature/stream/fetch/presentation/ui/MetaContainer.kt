@@ -7,7 +7,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -21,6 +20,7 @@ import com.paranid5.crescendo.core.resources.ui.theme.AppTheme.typography
 import com.paranid5.crescendo.feature.stream.fetch.view_model.FetchStreamUiIntent
 import com.paranid5.crescendo.ui.covers.AppClippedCover
 import com.paranid5.crescendo.ui.covers.ImageContainer
+import com.paranid5.crescendo.ui.foundation.AppText
 import com.paranid5.crescendo.ui.foundation.UiState
 import com.paranid5.crescendo.ui.metadata.VideoMetadataUiState
 import com.paranid5.crescendo.utils.extensions.timeFormat
@@ -79,11 +79,12 @@ private fun TitleWithDuration(
     videoMeta: VideoMetadataUiState,
     modifier: Modifier = Modifier,
 ) = Column(modifier = modifier) {
-    Text(
+    AppText(
         text = videoMeta.title,
-        textAlign = TextAlign.Center,
-        color = colors.text.onHighContrast,
-        style = typography.h.h4,
+        style = typography.h.h4.copy(
+            textAlign = TextAlign.Center,
+            color = colors.text.onHighContrast,
+        ),
         modifier = Modifier
             .fillMaxWidth()
             .padding(horizontal = dimensions.padding.extraMedium),
@@ -91,14 +92,15 @@ private fun TitleWithDuration(
 
     Spacer(Modifier.height(dimensions.padding.small))
 
-    Text(
+    AppText(
         text = stringResource(
             R.string.stream_fetch_url_meta_duration,
             videoMeta.durationMillis.timeFormat,
         ),
-        textAlign = TextAlign.Center,
-        color = colors.text.onHighContrast,
-        style = typography.h.h4,
+        style = typography.h.h4.copy(
+            textAlign = TextAlign.Center,
+            color = colors.text.onHighContrast,
+        ),
         modifier = Modifier
             .fillMaxWidth()
             .padding(horizontal = dimensions.padding.extraMedium),

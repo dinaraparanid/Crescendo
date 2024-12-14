@@ -6,7 +6,6 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
@@ -26,6 +25,7 @@ import com.paranid5.crescendo.trimmer.presentation.composition_locals.LocalTrimm
 import com.paranid5.crescendo.trimmer.presentation.ui.waveform.TrimWaveform
 import com.paranid5.crescendo.trimmer.view_model.TrimmerState
 import com.paranid5.crescendo.trimmer.view_model.TrimmerUiIntent
+import com.paranid5.crescendo.ui.foundation.AppText
 import com.paranid5.crescendo.ui.utils.textWidth
 
 @Composable
@@ -74,10 +74,11 @@ private fun PlaybackPositionText(
         derivedStateOf { state.playbackProperties.playbackAlpha }
     }
 
-    Text(
+    AppText(
         text = playbackText,
-        color = colors.text.primary,
-        style = typography.captionSm,
+        style = typography.captionSm.copy(
+            color = colors.text.primary,
+        ),
         modifier = modifier.alpha(playbackAlpha),
     )
 }

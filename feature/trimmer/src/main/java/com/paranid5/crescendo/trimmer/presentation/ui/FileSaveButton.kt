@@ -1,6 +1,5 @@
 package com.paranid5.crescendo.trimmer.presentation.ui
 
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
@@ -13,6 +12,7 @@ import com.paranid5.crescendo.core.resources.ui.theme.AppTheme.colors
 import com.paranid5.crescendo.core.resources.ui.theme.AppTheme.typography
 import com.paranid5.crescendo.trimmer.view_model.TrimmerState
 import com.paranid5.crescendo.ui.foundation.AppRippleButton
+import com.paranid5.crescendo.ui.foundation.AppText
 
 @Composable
 internal fun FileSaveButton(
@@ -43,10 +43,11 @@ internal fun FileSaveButton(
 
 @Composable
 private fun FileSaveButtonLabel(modifier: Modifier = Modifier) =
-    Text(
+    AppText(
         text = stringResource(R.string.save),
-        color = colors.text.primary,
-        style = typography.body,
-        fontWeight = FontWeight.Bold,
         modifier = modifier,
+        style = typography.body.copy(
+            color = colors.text.primary,
+            fontWeight = FontWeight.W700,
+        ),
     )

@@ -2,10 +2,12 @@ package com.paranid5.crescendo.feature.meta_editor.presentation.ui
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.zIndex
+import com.paranid5.crescendo.core.resources.ui.theme.AppTheme.dimensions
 import com.paranid5.crescendo.feature.meta_editor.view_model.MetaEditorState
 import com.paranid5.crescendo.feature.meta_editor.view_model.MetaEditorUiIntent
 
@@ -24,7 +26,8 @@ internal fun CoverWithToolbar(
         onUiIntent = onUiIntent,
         modifier = toolbarModifier
             .fillMaxWidth()
-            .zIndex(1F),
+            .zIndex(1F)
+            .padding(horizontal = dimensions.padding.extraMedium),
     )
 
     CurrentCover(

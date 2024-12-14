@@ -11,7 +11,6 @@ import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.remember
@@ -24,6 +23,7 @@ import com.paranid5.crescendo.core.resources.ui.theme.AppTheme.colors
 import com.paranid5.crescendo.core.resources.ui.theme.AppTheme.dimensions
 import com.paranid5.crescendo.core.resources.ui.theme.AppTheme.typography
 import com.paranid5.crescendo.ui.foundation.AppRippleButton
+import com.paranid5.crescendo.ui.foundation.AppText
 import com.paranid5.crescendo.ui.permissions.description_providers.PermissionDescriptionProvider
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -78,23 +78,25 @@ internal inline fun PermissionDialog(
 
 @Composable
 private fun Title(modifier: Modifier = Modifier) =
-    Text(
+    AppText(
         modifier = modifier,
         text = stringResource(R.string.permission_required),
-        color = colors.text.primary,
-        style = typography.h.h4,
+        style = typography.h.h4.copy(
+            color = colors.text.primary,
+            fontWeight = FontWeight.W700,
+        ),
         maxLines = 1,
-        fontWeight = FontWeight.W700,
     )
 
 @Composable
 private fun Description(
     descriptionProvider: PermissionDescriptionProvider,
     modifier: Modifier = Modifier,
-) = Text(
+) = AppText(
     text = descriptionProvider.description,
-    style = typography.body,
-    color = colors.text.primary,
+    style = typography.body.copy(
+        color = colors.text.primary,
+    ),
     modifier = modifier,
 )
 
@@ -122,10 +124,11 @@ private inline fun GrantPermissionButton(
             disabledContentColor = colors.text.tertiriary,
         ),
     ) {
-        Text(
+        AppText(
             text = stringResource(textRes),
-            style = typography.regular,
-            fontWeight = FontWeight.W700,
+            style = typography.regular.copy(
+                fontWeight = FontWeight.W700,
+            ),
         )
     }
 }

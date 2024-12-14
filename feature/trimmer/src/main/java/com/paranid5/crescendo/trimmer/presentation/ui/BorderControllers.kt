@@ -3,7 +3,6 @@ package com.paranid5.crescendo.trimmer.presentation.ui
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -17,6 +16,7 @@ import com.paranid5.crescendo.core.resources.ui.theme.AppTheme.typography
 import com.paranid5.crescendo.trimmer.view_model.TrimmerState
 import com.paranid5.crescendo.trimmer.view_model.TrimmerUiIntent
 import com.paranid5.crescendo.ui.foundation.AppOutlinedTextField
+import com.paranid5.crescendo.ui.foundation.AppText
 import com.paranid5.crescendo.utils.extensions.timeFormatMs
 import com.paranid5.crescendo.utils.extensions.toTimeOrNull
 
@@ -110,7 +110,7 @@ private fun BorderController(
 
 @Composable
 private fun BorderControllerLabel(text: String, modifier: Modifier = Modifier) =
-    Text(
+    AppText(
         text = text,
         style = typography.caption,
         modifier = modifier,

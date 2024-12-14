@@ -5,12 +5,12 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.width
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.CheckboxDefaults
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import com.paranid5.crescendo.core.resources.ui.theme.AppTheme.colors
 import com.paranid5.crescendo.core.resources.ui.theme.AppTheme.dimensions
 import com.paranid5.crescendo.core.resources.ui.theme.AppTheme.typography
+import com.paranid5.crescendo.ui.foundation.AppText
 
 @Composable
 internal fun OrderItem(item: String, modifier: Modifier = Modifier) =
@@ -31,9 +31,8 @@ private fun OrderItemCheckbox(modifier: Modifier = Modifier) =
 
 @Composable
 private fun OrderItemLabel(item: String, modifier: Modifier = Modifier) =
-    Text(
+    AppText(
         text = item,
-        color = colors.text.primary,
-        style = typography.regular,
+        style = typography.regular.copy(color = colors.text.primary),
         modifier = modifier,
     )

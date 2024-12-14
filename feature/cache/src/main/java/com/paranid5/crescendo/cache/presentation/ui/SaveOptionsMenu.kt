@@ -5,7 +5,6 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.MenuDefaults
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -19,6 +18,7 @@ import com.paranid5.crescendo.cache.view_model.CacheUiIntent
 import com.paranid5.crescendo.core.resources.R
 import com.paranid5.crescendo.core.resources.ui.theme.AppTheme.colors
 import com.paranid5.crescendo.core.resources.ui.theme.AppTheme.typography
+import com.paranid5.crescendo.ui.foundation.AppText
 import com.paranid5.crescendo.ui.utils.clickableWithRipple
 import kotlinx.collections.immutable.persistentListOf
 
@@ -51,11 +51,12 @@ private fun OptionLabel(
     selectedSaveOptionIndex: Int,
     modifier: Modifier = Modifier,
     onClick: () -> Unit,
-) = Text(
+) = AppText(
     text = fileSaveOptions[selectedSaveOptionIndex],
-    color = colors.text.primary,
-    style = typography.regular,
     modifier = modifier.clickableWithRipple(onClick = onClick),
+    style = typography.regular.copy(
+        color = colors.text.primary,
+    ),
 )
 
 @Composable
@@ -91,11 +92,12 @@ private fun OptionMenuItem(
 private fun OptionMenuItemLabel(
     item: String,
     modifier: Modifier = Modifier,
-) = Text(
+) = AppText(
     text = item,
-    color = colors.text.primary,
-    style = typography.regular,
     modifier = modifier,
+    style = typography.regular.copy(
+        color = colors.text.primary,
+    ),
 )
 
 private inline val fileSaveOptions

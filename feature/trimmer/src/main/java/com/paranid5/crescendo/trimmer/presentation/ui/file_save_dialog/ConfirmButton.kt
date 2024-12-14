@@ -1,7 +1,6 @@
 package com.paranid5.crescendo.trimmer.presentation.ui.file_save_dialog
 
 import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
@@ -11,6 +10,7 @@ import com.paranid5.crescendo.core.resources.ui.theme.AppTheme.colors
 import com.paranid5.crescendo.core.resources.ui.theme.AppTheme.typography
 import com.paranid5.crescendo.trimmer.view_model.TrimmerUiIntent
 import com.paranid5.crescendo.ui.foundation.AppRippleButton
+import com.paranid5.crescendo.ui.foundation.AppText
 
 @Composable
 internal fun ConfirmButton(
@@ -35,9 +35,10 @@ internal fun ConfirmButton(
 
 @Composable
 private fun TrimLabel(modifier: Modifier = Modifier) =
-    Text(
+    AppText(
         text = stringResource(R.string.trim),
-        style = typography.regular,
-        fontWeight = FontWeight.W700,
         modifier = modifier,
+        style = typography.regular.copy(
+            fontWeight = FontWeight.W700,
+        ),
     )

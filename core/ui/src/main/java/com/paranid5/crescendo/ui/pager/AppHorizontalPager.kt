@@ -28,7 +28,7 @@ import kotlinx.coroutines.launch
 private val PagerElevation = 4.dp
 
 @Composable
-fun AppPager(
+fun AppHorizontalPager(
     pagerUiStates: ImmutableList<PagerUiState>,
     activePage: Int,
     modifier: Modifier = Modifier,

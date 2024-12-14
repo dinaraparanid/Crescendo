@@ -11,7 +11,6 @@ import androidx.compose.material3.BasicAlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -23,6 +22,7 @@ import com.paranid5.crescendo.core.resources.ui.theme.AppTheme.colors
 import com.paranid5.crescendo.core.resources.ui.theme.AppTheme.dimensions
 import com.paranid5.crescendo.core.resources.ui.theme.AppTheme.typography
 import com.paranid5.crescendo.presentation.entity.ReleaseUiState
+import com.paranid5.crescendo.ui.foundation.AppText
 import com.paranid5.crescendo.ui.foundation.getOrNull
 import com.paranid5.crescendo.utils.extensions.simpleShadow
 import com.paranid5.crescendo.view_model.MainState
@@ -117,9 +117,8 @@ private fun DownloadButton(
 )
 
 @Composable
-private fun DownloadLabel(modifier: Modifier = Modifier) = Text(
+private fun DownloadLabel(modifier: Modifier = Modifier) = AppText(
     text = stringResource(R.string.download),
-    color = colors.primary,
-    style = typography.regular,
+    style = typography.regular.copy(color = colors.primary),
     modifier = modifier,
 )

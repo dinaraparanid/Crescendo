@@ -1,11 +1,10 @@
 package com.paranid5.crescendo.ui.track.item
 
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.style.TextOverflow
+import com.paranid5.crescendo.ui.foundation.AppText
 
 @Composable
 internal fun TrackTextLabel(
@@ -13,11 +12,9 @@ internal fun TrackTextLabel(
     textColor: Color,
     style: TextStyle,
     modifier: Modifier = Modifier
-) = Text(
+) = AppText(
     modifier = modifier,
     text = text,
-    color = textColor,
-    style = style,
+    style = style.copy(color = textColor),
     maxLines = 1,
-    overflow = TextOverflow.Ellipsis
 )

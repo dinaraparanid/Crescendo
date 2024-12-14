@@ -8,7 +8,7 @@ import com.paranid5.crescendo.core.common.udf.state
 import com.paranid5.crescendo.domain.cover.CoverRetriever
 import com.paranid5.crescendo.domain.genius.GeniusApi
 import com.paranid5.crescendo.domain.tracks.TracksRepository
-import com.paranid5.crescendo.feature.meta_editor.data.toTrackUiState
+import com.paranid5.crescendo.feature.meta_editor.presentation.ui.model.SimilarTrackUiState
 import com.paranid5.crescendo.ui.covers.ImageContainer
 import com.paranid5.crescendo.ui.foundation.UiState
 import com.paranid5.crescendo.ui.foundation.toUiState
@@ -66,9 +66,18 @@ internal class MetaEditorViewModelImpl(
         is MetaEditorUiIntent.Meta.UpdateTitle ->
             updateState { copy(title = intent.title) }
 
-        is MetaEditorUiIntent.Meta.SimilarCoverClicked -> {
-            // TODO: change cover
-        }
+        is MetaEditorUiIntent.Meta.SimilarCoverClicked ->
+            updateState { copy(coverUiState = intent.cover.toUiState()) }
+
+        is MetaEditorUiIntent.Meta.SimilarTrackClicked ->
+            updateState {
+                copy(
+                    title = intent.track.title,
+                    artist = intent.track.artists,
+                    album = intent.track.album.orEmpty(),
+                    coverUiState = intent.track.primaryCover,
+                )
+            }
     }
 
     private suspend fun onCreate(trackPath: String) {
@@ -128,16 +137,22 @@ internal class MetaEditorViewModelImpl(
             .fold(
                 ifLeft = { it.toUiStateError() to it.toUiStateError() },
                 ifRight = { models ->
-                    val tracksUiState = models
-                        .map { it.toTrackUiState(numberInAlbum = 0) } // TODO: запрос номера альбома
+                    val tracksWithCovers = models.map { track ->
+                        track to track.covers.map {
+                            ImageContainer.Bitmap(coverRetriever.downloadCoverBitmap(it))
+                        }
+                    }
+
+                    val tracksUiState = tracksWithCovers
+                        .map { (track, covers) ->
+                            // TODO: запрос номера альбома
+                            SimilarTrackUiState.fromDTO(track = track, covers = covers)
+                        }
                         .toUiState()
 
-                    val coversUiState = models
-                        .map {
-                            coverRetriever
-                                .downloadCoverBitmap(*it.covers.toTypedArray())
-                                .let(ImageContainer::Bitmap)
-                        }
+                    val coversUiState = tracksWithCovers
+                        .flatMap { it.second }
+                        .distinct()
                         .toUiState()
 
                     tracksUiState to coversUiState

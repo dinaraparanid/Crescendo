@@ -18,6 +18,7 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.VisualTransformation
 import com.paranid5.crescendo.core.resources.ui.theme.AppTextSelectionColors
 import com.paranid5.crescendo.core.resources.ui.theme.AppTheme.colors
+import com.paranid5.crescendo.core.resources.ui.theme.AppTheme.fontFamily
 import com.paranid5.crescendo.core.resources.ui.theme.AppTheme.typography
 
 @Composable
@@ -40,7 +41,7 @@ fun AppOutlinedTextField(
         singleLine = true,
         onValueChange = onValueChange,
         modifier = modifier,
-        textStyle = style.copy(color = color),
+        textStyle = style.copy(color = color, fontFamily = fontFamily),
         cursorBrush = SolidColor(colors.selection.selected),
         keyboardOptions = keyboardOptions,
         decorationBox = @Composable { innerTextField ->

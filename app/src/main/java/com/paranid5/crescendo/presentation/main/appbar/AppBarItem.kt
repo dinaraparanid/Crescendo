@@ -3,9 +3,7 @@ package com.paranid5.crescendo.presentation.main.appbar
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material3.Icon
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.State
 import androidx.compose.runtime.derivedStateOf
@@ -22,10 +20,10 @@ import com.paranid5.crescendo.navigation.AppScreen
 import com.paranid5.crescendo.navigation.requireAppNavigator
 import com.paranid5.crescendo.ui.composition_locals.LocalCurrentPlaylistSheetState
 import com.paranid5.crescendo.ui.composition_locals.playing.LocalPlayingSheetState
+import com.paranid5.crescendo.ui.foundation.AppText
 import com.paranid5.crescendo.ui.utils.clickableWithRipple
 import com.paranid5.crescendo.utils.extensions.collectLatestAsState
 
-@OptIn(ExperimentalMaterialApi::class)
 @Composable
 internal fun AppBarItem(
     title: String,
@@ -70,10 +68,9 @@ internal fun AppBarItem(
 
             Spacer(Modifier.weight(1F))
 
-            Text(
+            AppText(
                 text = title,
-                style = typography.regular,
-                color = itemColor,
+                style = typography.regular.copy(color = itemColor),
                 modifier = Modifier.align(Alignment.CenterHorizontally),
             )
         }

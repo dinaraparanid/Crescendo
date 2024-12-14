@@ -2,7 +2,6 @@ package com.paranid5.crescendo.audio_effects.presentation.ui.bass_reverb
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.width
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -10,6 +9,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.paranid5.crescendo.core.resources.ui.theme.AppTheme.colors
 import com.paranid5.crescendo.core.resources.ui.theme.AppTheme.typography
+import com.paranid5.crescendo.ui.foundation.AppText
 
 private val AudioControllerWidth = 100.dp
 internal const val ControllerMinAngle = -135F
@@ -35,12 +35,13 @@ internal fun AudioControllerWithLabel(
             .width(AudioControllerWidth),
     )
 
-    Text(
+    AppText(
         text = contentDescription,
-        color = colors.text.primary,
-        style = typography.captionSm,
         maxLines = 1,
-        textAlign = TextAlign.Center,
         modifier = Modifier.align(Alignment.CenterHorizontally),
+        style = typography.captionSm.copy(
+            color = colors.text.primary,
+            textAlign = TextAlign.Center,
+        ),
     )
 }

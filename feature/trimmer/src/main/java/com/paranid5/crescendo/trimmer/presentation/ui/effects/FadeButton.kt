@@ -4,9 +4,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material3.Icon
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
@@ -23,12 +21,12 @@ import com.paranid5.crescendo.core.resources.ui.theme.AppTheme.typography
 import com.paranid5.crescendo.trimmer.domain.entities.ShownEffects
 import com.paranid5.crescendo.trimmer.presentation.composition_locals.LocalTrimmerEffectSheetState
 import com.paranid5.crescendo.trimmer.view_model.TrimmerUiIntent
+import com.paranid5.crescendo.ui.foundation.AppText
 import com.paranid5.crescendo.ui.utils.clickableWithRipple
 import kotlinx.coroutines.launch
 
 private val FadeIconSize = 20.dp
 
-@OptIn(ExperimentalMaterialApi::class)
 @Composable
 internal fun FadeButton(
     onUiIntent: (TrimmerUiIntent) -> Unit,
@@ -63,9 +61,10 @@ private fun FadeIcon(modifier: Modifier = Modifier) =
 
 @Composable
 private fun EffectLabel(modifier: Modifier = Modifier) =
-    Text(
+    AppText(
         text = stringResource(R.string.fade),
-        color = colors.text.onHighContrast,
-        style = typography.captionSm,
         modifier = modifier,
+        style = typography.captionSm.copy(
+            color = colors.text.onHighContrast,
+        ),
     )

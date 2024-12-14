@@ -2,30 +2,34 @@ package com.paranid5.crescendo.feature.meta_editor.view_model
 
 import android.os.Parcelable
 import androidx.compose.runtime.Immutable
+import com.paranid5.crescendo.feature.meta_editor.presentation.ui.model.SimilarTrackUiState
 import com.paranid5.crescendo.ui.covers.ImageContainer
 import com.paranid5.crescendo.ui.foundation.UiState
 import com.paranid5.crescendo.ui.foundation.getOrNull
-import com.paranid5.crescendo.ui.track.ui_state.TrackUiState
+import com.paranid5.crescendo.utils.extensions.orNil
 import kotlinx.parcelize.IgnoredOnParcel
 import kotlinx.parcelize.Parcelize
 
 @Parcelize
 @Immutable
-data class MetaEditorState(
-    val trackPathUiState: UiState<String> = UiState.Initial,
-    val coverUiState: UiState<ImageContainer> = UiState.Initial,
-    val title: String = "",
-    val artist: String = "",
-    val album: String = "",
-    val numberInAlbum: Int = UndefinedNumberInAlbum,
-    val similarTracksUiState: UiState<List<TrackUiState>> = UiState.Initial,
-    val similarCoversUiState: UiState<List<ImageContainer>> = UiState.Initial,
+data class MetaEditorState internal constructor(
+    internal val trackPathUiState: UiState<String> = UiState.Initial,
+    internal val coverUiState: UiState<ImageContainer> = UiState.Initial,
+    internal val title: String = "",
+    internal val artist: String = "",
+    internal val album: String = "",
+    internal val numberInAlbum: Int = UndefinedNumberInAlbum,
+    internal val similarTracksUiState: UiState<List<SimilarTrackUiState>> = UiState.Initial,
+    internal val similarCoversUiState: UiState<List<ImageContainer>> = UiState.Initial,
 ) : Parcelable {
-    companion object {
+    internal companion object {
         const val UndefinedNumberInAlbum = -1
     }
 
     @IgnoredOnParcel
-    val trackPath = trackPathUiState.getOrNull()
-    fun requireTrackPath() = requireNotNull(trackPath)
+    internal val trackPath = trackPathUiState.getOrNull()
+    internal fun requireTrackPath() = requireNotNull(trackPath)
+
+    @IgnoredOnParcel
+    internal val similarTracks = similarTracksUiState.getOrNull().orNil()
 }

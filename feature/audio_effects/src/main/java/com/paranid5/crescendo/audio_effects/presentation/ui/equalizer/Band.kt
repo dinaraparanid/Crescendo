@@ -4,7 +4,6 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
@@ -22,6 +21,7 @@ import com.paranid5.crescendo.core.resources.ui.theme.AppTheme.colors
 import com.paranid5.crescendo.core.resources.ui.theme.AppTheme.dimensions
 import com.paranid5.crescendo.core.resources.ui.theme.AppTheme.typography
 import com.paranid5.crescendo.domain.audio_effects.entity.EqualizerData.Companion.MILLIBELS_IN_DECIBEL
+import com.paranid5.crescendo.ui.foundation.AppText
 import java.util.Locale
 
 @Composable
@@ -69,16 +69,17 @@ private fun BandDbLabel(
 ) {
     val realLvlDb = presentLvlsDbState[index]
 
-    Text(
+    AppText(
         text = String.format(
             Locale.getDefault(),
             "%.2f %s",
             realLvlDb,
             stringResource(R.string.audio_effects_decibel),
         ),
-        textAlign = TextAlign.Center,
-        color = colors.text.primary,
-        style = typography.captionSm,
+        style = typography.captionSm.copy(
+            textAlign = TextAlign.Center,
+            color = colors.text.primary,
+        ),
         maxLines = 1,
         modifier = modifier,
     )
@@ -101,12 +102,13 @@ private fun BandHzLabel(
         }
     }
 
-    Text(
-        text = "$bandHz ${stringResource(R.string.audio_effects_hertz)}",
-        textAlign = TextAlign.Center,
-        color = colors.text.primary,
-        style = typography.captionSm,
-        maxLines = 1,
+    AppText(
         modifier = modifier,
+        text = "$bandHz ${stringResource(R.string.audio_effects_hertz)}",
+        maxLines = 1,
+        style = typography.captionSm.copy(
+            textAlign = TextAlign.Center,
+            color = colors.text.primary,
+        ),
     )
 }

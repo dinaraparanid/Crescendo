@@ -1,7 +1,6 @@
 package com.paranid5.crescendo.cache.presentation.ui
 
 import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
@@ -12,6 +11,7 @@ import com.paranid5.crescendo.core.resources.R
 import com.paranid5.crescendo.core.resources.ui.theme.AppTheme.colors
 import com.paranid5.crescendo.core.resources.ui.theme.AppTheme.typography
 import com.paranid5.crescendo.ui.foundation.AppRippleButton
+import com.paranid5.crescendo.ui.foundation.AppText
 
 @Composable
 internal fun ConfirmButton(
@@ -37,9 +37,10 @@ internal fun ConfirmButton(
 
 @Composable
 private fun ConfirmButtonLabel(modifier: Modifier = Modifier) =
-    Text(
+    AppText(
         text = stringResource(R.string.cache_dialog_accept_button_title),
-        style = typography.regular,
-        fontWeight = FontWeight.Bold,
         modifier = modifier,
+        style = typography.regular.copy(
+            fontWeight = FontWeight.Bold,
+        ),
     )

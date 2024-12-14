@@ -7,7 +7,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -25,6 +24,7 @@ import com.paranid5.crescendo.core.resources.ui.theme.AppTheme.typography
 import com.paranid5.crescendo.feature.meta_editor.view_model.MetaEditorState
 import com.paranid5.crescendo.feature.meta_editor.view_model.MetaEditorUiIntent
 import com.paranid5.crescendo.ui.foundation.AppOutlinedTextField
+import com.paranid5.crescendo.ui.foundation.AppText
 import com.paranid5.crescendo.ui.foundation.LoadingBoxSize
 import com.paranid5.crescendo.ui.foundation.isInitialOrLoading
 
@@ -95,7 +95,7 @@ internal fun EditorFields(
 }
 
 @Composable
-private fun InputHint(text: String, modifier: Modifier = Modifier) = Text(
+private fun InputHint(text: String, modifier: Modifier = Modifier) = AppText(
     text = text,
     style = typography.caption,
     modifier = modifier,
@@ -104,7 +104,7 @@ private fun InputHint(text: String, modifier: Modifier = Modifier) = Text(
 @Composable
 private fun PathLabel(path: String, modifier: Modifier = Modifier) =
     Column(modifier.fillMaxWidth()) {
-        Text(
+        AppText(
             text = stringResource(R.string.meta_editor_meta_fields_path),
             style = typography.h.h3.copy(
                 color = colors.text.primary,
@@ -114,7 +114,7 @@ private fun PathLabel(path: String, modifier: Modifier = Modifier) =
 
         Spacer(Modifier.height(dimensions.padding.small))
 
-        Text(
+        AppText(
             text = path,
             style = typography.regular.copy(
                 color = colors.text.onHighContrast,

@@ -5,7 +5,6 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.material3.Icon
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -13,6 +12,7 @@ import androidx.compose.ui.unit.dp
 import com.paranid5.crescendo.core.resources.ui.theme.AppTheme
 import com.paranid5.crescendo.core.resources.ui.theme.AppTheme.dimensions
 import com.paranid5.crescendo.ui.foundation.AppRippleButton
+import com.paranid5.crescendo.ui.foundation.AppText
 
 private val IconSize = 18.dp
 
@@ -35,7 +35,7 @@ internal fun UrlManagerButton(
 
     Spacer(Modifier.width(dimensions.padding.small))
 
-    Text(
+    AppText(
         text = title,
         style = AppTheme.typography.regular,
     )

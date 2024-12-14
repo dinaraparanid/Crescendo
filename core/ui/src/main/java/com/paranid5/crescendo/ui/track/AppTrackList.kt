@@ -1,41 +1,39 @@
 package com.paranid5.crescendo.ui.track
 
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.unit.Dp
 import com.paranid5.crescendo.core.resources.ui.theme.AppTheme.dimensions
-import com.paranid5.crescendo.ui.track.ui_state.TrackUiState
 import kotlinx.collections.immutable.ImmutableList
 
-typealias TrackItemContent = @Composable (
-    tracks: ImmutableList<TrackUiState>,
+typealias TrackItemContent <T> = @Composable (
+    tracks: ImmutableList<T>,
     trackInd: Int,
     modifier: Modifier
 ) -> Unit
 
 @Composable
-fun TrackList(
-    tracks: ImmutableList<TrackUiState>,
+fun <T> AppTrackList(
+    tracks: ImmutableList<T>,
+    key: (index: Int, item: T) -> Any,
     modifier: Modifier = Modifier,
     trackItemModifier: Modifier = Modifier,
-    bottomPadding: Dp = dimensions.padding.extraMedium,
-    trackItemContent: TrackItemContent,
+    contentPadding: PaddingValues = PaddingValues(),
+    verticalArrangement: Arrangement.Vertical = Arrangement.spacedBy(dimensions.padding.medium),
+    itemContent: TrackItemContent<T>,
 ) = LazyColumn(
-    verticalArrangement = Arrangement.spacedBy(dimensions.padding.medium),
+    verticalArrangement = verticalArrangement,
+    contentPadding = contentPadding,
     modifier = modifier,
 ) {
     itemsIndexed(
         items = tracks,
-        key = { ind, track -> "${track.hashCode()}$ind" }
+        key = key,
     ) { ind, _ ->
-        trackItemContent(tracks, ind, trackItemModifier.fillMaxWidth())
+        itemContent(tracks, ind, trackItemModifier.fillMaxWidth())
     }
-
-    item { Spacer(Modifier.height(bottomPadding)) }
 }

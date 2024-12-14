@@ -11,7 +11,6 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Icon
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -27,6 +26,7 @@ import com.paranid5.crescendo.core.resources.ui.theme.AppTheme.dimensions
 import com.paranid5.crescendo.core.resources.ui.theme.AppTheme.typography
 import com.paranid5.crescendo.feature.play.main.navigation.PlayScreen
 import com.paranid5.crescendo.feature.play.main.navigation.requirePlayNavigator
+import com.paranid5.crescendo.ui.foundation.AppText
 import com.paranid5.crescendo.ui.utils.clickableWithRipple
 import com.paranid5.crescendo.utils.extensions.simpleShadow
 
@@ -105,10 +105,11 @@ private fun PlayScreenCard(
 
         Spacer(Modifier.width(dimensions.padding.extraSmall))
 
-        Text(
+        AppText(
             text = title,
-            style = typography.h.h4,
-            color = colors.text.onCard,
+            style = typography.h.h4.copy(
+                color = colors.text.onCard,
+            ),
         )
     }
 }

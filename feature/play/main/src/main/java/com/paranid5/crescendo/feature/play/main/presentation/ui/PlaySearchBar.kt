@@ -11,7 +11,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.Icon
-import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
@@ -20,7 +19,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.paranid5.crescendo.core.resources.R
 import com.paranid5.crescendo.core.resources.ui.theme.AppTextSelectionColors
@@ -30,6 +28,7 @@ import com.paranid5.crescendo.core.resources.ui.theme.AppTheme.typography
 import com.paranid5.crescendo.feature.play.main.presentation.effect.SearchBarFocusEffect
 import com.paranid5.crescendo.feature.play.main.view_model.PlayState
 import com.paranid5.crescendo.feature.play.main.view_model.PlayUiIntent
+import com.paranid5.crescendo.ui.foundation.AppText
 import com.paranid5.crescendo.ui.utils.clickableWithRipple
 
 private val IconSize = 24.dp
@@ -104,13 +103,13 @@ private fun SearchIcon(modifier: Modifier = Modifier) =
 
 @Composable
 private fun Placeholder(modifier: Modifier = Modifier) =
-    Text(
+    AppText(
         text = stringResource(R.string.play_search_bar_placeholder),
         modifier = modifier,
-        color = colors.text.tertiriary,
-        style = typography.h.h4,
-        overflow = TextOverflow.Ellipsis,
         maxLines = 1,
+        style = typography.h.h4.copy(
+            color = colors.text.tertiriary,
+        ),
     )
 
 @Composable

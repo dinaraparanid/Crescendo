@@ -1,7 +1,6 @@
 package com.paranid5.crescendo.feature.playing.presentation.ui.title_author
 
 import androidx.compose.foundation.basicMarquee
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.State
 import androidx.compose.runtime.derivedStateOf
@@ -14,6 +13,7 @@ import com.paranid5.crescendo.core.common.PlaybackStatus
 import com.paranid5.crescendo.core.resources.R
 import com.paranid5.crescendo.core.resources.ui.theme.AppTheme.typography
 import com.paranid5.crescendo.feature.playing.view_model.PlayingState
+import com.paranid5.crescendo.ui.foundation.AppText
 import com.paranid5.crescendo.utils.extensions.artistAlbum
 
 @Composable
@@ -28,12 +28,13 @@ internal fun Author(
         state = state,
     )
 
-    Text(
+    AppText(
         text = author,
         maxLines = 1,
-        color = textColor,
-        style = typography.h.h4,
         modifier = modifier.basicMarquee(iterations = Int.MAX_VALUE),
+        style = typography.h.h4.copy(
+            color = textColor,
+        ),
     )
 }
 
