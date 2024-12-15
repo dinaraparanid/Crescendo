@@ -4,8 +4,8 @@ import android.os.Parcelable
 import androidx.compose.runtime.Immutable
 import arrow.core.raise.nullable
 import com.paranid5.crescendo.core.common.PlaybackStatus
-import com.paranid5.crescendo.ui.metadata.VideoMetadataUiState
 import com.paranid5.crescendo.ui.track.ui_state.TrackUiState
+import com.paranid5.feature.metadata.VideoMetadataUiState
 import kotlinx.parcelize.IgnoredOnParcel
 import kotlinx.parcelize.Parcelize
 

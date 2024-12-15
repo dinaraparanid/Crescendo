@@ -138,7 +138,12 @@ private inline val StreamService.metadata
 
 private suspend inline fun NotificationManager.getVideoCoverBitmap(context: Context) =
     currentMetadataState.value
-        ?.let { getVideoCoverBitmapOrThumbnailAsync(context = context, videoCovers = it.covers) }
+        ?.let { metadata ->
+            getVideoCoverBitmapOrThumbnailAsync(
+                context = context,
+                videoCovers = metadata.covers.map { it.value.value },
+            )
+        }
         ?.await()
         ?: getThumbnailBitmap(context)
 

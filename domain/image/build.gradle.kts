@@ -1,6 +1,7 @@
 plugins {
     alias(libs.plugins.android.library)
     alias(libs.plugins.kotlin.android)
+    alias(libs.plugins.kotlinx.serialization)
     id("kotlin-parcelize")
 }
 
@@ -34,9 +35,9 @@ android {
 }
 
 dependencies {
-    api(project(":core:media"))
-
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)
     implementation(libs.androidx.palette.ktx)
+
+    implementation(libs.kotlinx.serialization.json)
 }

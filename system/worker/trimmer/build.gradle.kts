@@ -38,6 +38,8 @@ dependencies {
     implementation(project(":core:media"))
     implementation(project(":core:resources"))
 
+    implementation(project(":domain:metadata"))
+
     implementation(project(":system:receivers"))
 
     implementation(libs.androidx.core.ktx)

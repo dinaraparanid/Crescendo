@@ -39,6 +39,7 @@ dependencies {
     implementation(project(":core:utils"))
     implementation(project(":core:resources"))
 
+    implementation(project(":domain:metadata"))
     implementation(project(":domain:playback"))
     implementation(project(":domain:stream"))
 

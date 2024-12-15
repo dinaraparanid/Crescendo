@@ -5,20 +5,20 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import arrow.core.raise.nullable
 import com.paranid5.crescendo.core.common.PlaybackStatus
-import com.paranid5.crescendo.core.common.metadata.VideoMetadata
 import com.paranid5.crescendo.core.common.tracks.DefaultTrack
 import com.paranid5.crescendo.core.common.tracks.Track
 import com.paranid5.crescendo.core.common.udf.StatePublisher
 import com.paranid5.crescendo.core.common.udf.state
 import com.paranid5.crescendo.domain.current_playlist.CurrentPlaylistRepository
+import com.paranid5.crescendo.domain.metadata.model.VideoMetadata
 import com.paranid5.crescendo.domain.playback.PlaybackRepository
 import com.paranid5.crescendo.domain.stream.StreamRepository
 import com.paranid5.crescendo.domain.tracks.TracksRepository
 import com.paranid5.crescendo.feature.playing.domain.PlayingInteractor
 import com.paranid5.crescendo.system.services.track.TrackServiceInteractor
-import com.paranid5.crescendo.ui.metadata.VideoMetadataUiState
 import com.paranid5.crescendo.ui.track.ui_state.TrackUiState
 import com.paranid5.crescendo.utils.doNothing
+import com.paranid5.feature.metadata.VideoMetadataUiState
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.collectLatest
@@ -199,7 +199,7 @@ internal class PlayingViewModelImpl(
                     currentTrack = (params[6] as Track?)
                         ?.let(TrackUiState.Companion::fromDTO),
                     currentMetadata = (params[7] as VideoMetadata?)
-                        ?.let(VideoMetadataUiState.Companion::fromDTO),
+                        ?.let(com.paranid5.feature.metadata.VideoMetadataUiState.Companion::fromDTO),
                     playingStreamUrl = params[8] as String,
                 )
             }.distinctUntilChanged().collectLatest { mediator ->

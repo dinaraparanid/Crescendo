@@ -1,8 +1,9 @@
-package com.paranid5.crescendo.ui.metadata
+package com.paranid5.feature.metadata
 
 import android.os.Parcelable
 import androidx.compose.runtime.Immutable
-import com.paranid5.crescendo.core.common.metadata.VideoMetadata
+import com.paranid5.crescendo.domain.image.model.Image
+import com.paranid5.crescendo.domain.metadata.model.VideoMetadata
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.toImmutableList
 import kotlinx.parcelize.Parcelize
@@ -12,7 +13,7 @@ import kotlinx.parcelize.Parcelize
 data class VideoMetadataUiState(
     val title: String,
     val author: String,
-    val coversPaths: ImmutableList<String>,
+    val coversUrls: ImmutableList<Image.Url>,
     val durationMillis: Long,
     val isLiveStream: Boolean,
 ) : Parcelable {
@@ -20,7 +21,7 @@ data class VideoMetadataUiState(
         fun fromDTO(metadata: VideoMetadata) = VideoMetadataUiState(
             title = metadata.title.orEmpty(),
             author = metadata.author.orEmpty(),
-            coversPaths = metadata.covers.toImmutableList(),
+            coversUrls = metadata.covers.toImmutableList(),
             durationMillis = metadata.durationMillis,
             isLiveStream = metadata.isLiveStream,
         )

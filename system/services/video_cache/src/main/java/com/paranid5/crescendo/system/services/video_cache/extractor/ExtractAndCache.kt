@@ -4,7 +4,6 @@ import arrow.core.Either
 import arrow.core.raise.either
 import arrow.core.raise.ensureNotNull
 import com.paranid5.crescendo.core.common.caching.Formats
-import com.paranid5.crescendo.core.common.metadata.VideoMetadata
 import com.paranid5.crescendo.core.common.trimming.TrimRange
 import com.paranid5.crescendo.core.media.caching.CachingResult
 import com.paranid5.crescendo.core.media.caching.cachingResult
@@ -13,6 +12,7 @@ import com.paranid5.crescendo.core.media.caching.onCanceled
 import com.paranid5.crescendo.core.media.convertToAudioFileAndSetTagsAsync
 import com.paranid5.crescendo.core.media.files.MediaFile
 import com.paranid5.crescendo.core.media.tags.setVideoTagsAsync
+import com.paranid5.crescendo.domain.metadata.model.VideoMetadata
 import com.paranid5.crescendo.system.services.video_cache.VideoCacheService
 import com.paranid5.crescendo.system.services.video_cache.files.initMediaFile
 import kotlinx.coroutines.delay

@@ -5,9 +5,9 @@ import android.content.Context
 import android.net.Uri
 import android.os.Build
 import android.provider.MediaStore
-import com.paranid5.crescendo.core.common.metadata.AudioMetadata
-import com.paranid5.crescendo.core.common.metadata.Metadata
-import com.paranid5.crescendo.core.common.metadata.VideoMetadata
+import com.paranid5.crescendo.domain.metadata.model.AudioMetadata
+import com.paranid5.crescendo.domain.metadata.model.Metadata
+import com.paranid5.crescendo.domain.metadata.model.VideoMetadata
 
 fun Context.insertMediaFileToMediaStore(
     externalContentUri: Uri,

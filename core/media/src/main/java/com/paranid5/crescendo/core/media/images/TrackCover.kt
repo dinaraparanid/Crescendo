@@ -6,6 +6,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
 
+@Deprecated("Will be removed")
 suspend fun getTrackCoverBitmapAsync(
     context: Context,
     path: String?,
@@ -17,6 +18,7 @@ suspend fun getTrackCoverBitmapAsync(
     }
 }
 
+@Deprecated("Will be removed")
 suspend fun getTrackCoverAsync(
     context: Context,
     path: String?,
@@ -30,6 +32,7 @@ suspend fun getTrackCoverAsync(
     }
 }
 
+@Deprecated("Will be removed")
 suspend fun getTrackCoverWithPaletteAsync(
     context: Context,
     path: String?,

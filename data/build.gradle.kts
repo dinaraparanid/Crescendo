@@ -55,6 +55,7 @@ dependencies {
     api(project(":domain:genius"))
     api(project(":domain:github"))
     api(project(":domain:image"))
+    api(project(":domain:metadata"))
     api(project(":domain:playback"))
     api(project(":domain:stream"))
     api(project(":domain:tracks"))

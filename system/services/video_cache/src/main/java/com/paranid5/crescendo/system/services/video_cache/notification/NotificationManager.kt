@@ -9,8 +9,8 @@ import android.os.Build
 import androidx.annotation.RequiresApi
 import com.paranid5.crescendo.core.common.caching.CachingStatus
 import com.paranid5.crescendo.core.common.caching.DownloadingStatus
-import com.paranid5.crescendo.core.common.metadata.VideoMetadata
 import com.paranid5.crescendo.core.resources.R
+import com.paranid5.crescendo.domain.metadata.model.VideoMetadata
 import com.paranid5.crescendo.system.services.video_cache.VideoCacheService
 import com.paranid5.system.services.common.startMediaForeground
 

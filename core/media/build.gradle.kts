@@ -39,6 +39,7 @@ dependencies {
     api(project(":core:utils"))
 
     api(project(":domain:audio_effects"))
+    implementation(project(":domain:metadata"))
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)

@@ -9,6 +9,7 @@ import kotlinx.coroutines.flow.asFlow
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.map
 
+@Deprecated("Will be removed")
 suspend fun getVideoCoverBitmapOrThumbnailAsync(
     context: Context,
     videoCovers: List<String>,
@@ -24,6 +25,7 @@ suspend fun getVideoCoverBitmapOrThumbnailAsync(
     }
 }
 
+@Deprecated("Will be removed")
 suspend fun downloadCoverBitmapAsync(
     context: Context,
     size: ImageSize? = null,
@@ -39,6 +41,7 @@ suspend fun downloadCoverBitmapAsync(
     }
 }
 
+@Deprecated("Will be removed")
 suspend fun getVideoCoverAsync(
     context: Context,
     videoCovers: List<String>,
@@ -55,6 +58,7 @@ suspend fun getVideoCoverAsync(
     }
 }
 
+@Deprecated("Will be removed")
 suspend fun getVideoCoverWithPaletteAsync(
     context: Context,
     videoCovers: List<String>,

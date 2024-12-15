@@ -2,7 +2,7 @@ package com.paranid5.crescendo.data.datastore
 
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.stringPreferencesKey
-import com.paranid5.crescendo.core.common.metadata.VideoMetadata
+import com.paranid5.crescendo.domain.metadata.model.VideoMetadata
 import kotlinx.coroutines.flow.map
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
@@ -54,5 +54,4 @@ internal class StreamDataStore(
     }
 }
 
-private fun Json.decodeVideoMetadata(metadata: String) =
-    decodeFromString<VideoMetadata>(metadata)
+private fun Json.decodeVideoMetadata(metadata: String) = decodeFromString<VideoMetadata>(metadata)

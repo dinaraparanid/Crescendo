@@ -5,11 +5,11 @@ import android.content.Intent
 import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
 import arrow.core.Either
-import com.paranid5.crescendo.core.common.metadata.AudioMetadata
 import com.paranid5.crescendo.core.media.files.MediaFile
 import com.paranid5.crescendo.core.media.files.trimmedCatching
 import com.paranid5.crescendo.core.media.tags.setAudioTags
 import com.paranid5.crescendo.core.resources.R
+import com.paranid5.crescendo.domain.metadata.MetadataExtractor
 import com.paranid5.crescendo.system.receivers.TrimmingStatusReceiver
 import com.paranid5.crescendo.utils.extensions.sendAppBroadcast
 import kotlinx.coroutines.Dispatchers
@@ -28,6 +28,7 @@ class TrimmerWorker(
     }
 
     private val json by inject<Json>()
+    private val metadataExtractor by inject<MetadataExtractor>()
 
     override suspend fun doWork(): Result = Either.catch {
         trimTrackAndSendBroadcast(
@@ -63,7 +64,7 @@ class TrimmerWorker(
             setAudioTags(
                 context = context,
                 audioFile = file,
-                metadata = AudioMetadata.extract(request.track),
+                metadata = metadataExtractor.extractAudioMetadata(request.track),
                 audioFormat = request.audioFormat,
             )
         }

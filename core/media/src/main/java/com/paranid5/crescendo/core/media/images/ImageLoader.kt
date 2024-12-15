@@ -10,11 +10,14 @@ import kotlinx.parcelize.Parcelize
 
 @Parcelize
 @Immutable
+@Deprecated("Will be removed")
 data class ImageSize(@Px val width: Int, @Px val height: Int) : Parcelable
 
+@Deprecated("Will be removed")
 fun ImageLoaderBuilder(context: Context) =
     context.imageLoader.newBuilder()
 
+@Deprecated("Will be removed")
 fun Any.getCoilModelBuilder(context: Context) =
     ImageRequest.Builder(context)
         .data(this)

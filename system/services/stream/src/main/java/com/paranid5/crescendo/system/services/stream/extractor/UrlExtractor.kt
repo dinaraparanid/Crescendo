@@ -4,8 +4,8 @@ import android.content.Context
 import arrow.core.Either
 import arrow.core.raise.either
 import arrow.core.raise.ensure
-import com.paranid5.crescendo.core.common.metadata.VideoMetadata
-import com.paranid5.crescendo.core.media.metadata.VideoMetadata.fromYtMeta
+import com.paranid5.crescendo.domain.metadata.MetadataExtractor
+import com.paranid5.crescendo.domain.metadata.model.VideoMetadata
 import com.paranid5.yt_url_extractor_kt.VideoMeta
 import com.paranid5.yt_url_extractor_kt.YtFilesNotFoundException
 import com.paranid5.yt_url_extractor_kt.YtRequestTimeoutException
@@ -23,6 +23,7 @@ private const val TIMEOUT = 28000L
 
 internal class UrlExtractor : KoinComponent {
     private val ktorClient by inject<HttpClient>()
+    private val metadataExtractor by inject<MetadataExtractor>()
 
     suspend fun extractAudioUrlWithMeta(
         context: Context,
@@ -55,13 +56,13 @@ internal class UrlExtractor : KoinComponent {
                     .getOrThrow()
             }
         }
+
+    private fun extractWithYtDl(ytUrl: String) =
+        YoutubeDL
+            .getInstance()
+            .getInfo(YoutubeDLRequest(ytUrl))
+            .url
+
+    private fun Result<VideoMeta>.getOrDefault() =
+        getOrNull()?.let(metadataExtractor::extractVideoMetadata) ?: VideoMetadata()
 }
-
-private fun extractWithYtDl(ytUrl: String) =
-    YoutubeDL
-        .getInstance()
-        .getInfo(YoutubeDLRequest(ytUrl))
-        .url
-
-internal fun Result<VideoMeta>.getOrDefault() =
-    getOrNull()?.let(::fromYtMeta) ?: VideoMetadata()

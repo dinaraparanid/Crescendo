@@ -7,7 +7,7 @@ import com.paranid5.crescendo.core.common.PlaybackStatus
 import com.paranid5.crescendo.core.common.udf.StatePublisher
 import com.paranid5.crescendo.core.common.udf.state
 import com.paranid5.crescendo.domain.image.ImageRetriever
-import com.paranid5.crescendo.domain.image.model.ImageUrl
+import com.paranid5.crescendo.domain.image.model.Image
 import com.paranid5.crescendo.domain.playback.PlaybackRepository
 import com.paranid5.crescendo.domain.stream.StreamRepository
 import com.paranid5.crescendo.system.services.stream.StreamServiceAccessor
@@ -15,8 +15,8 @@ import com.paranid5.crescendo.ui.covers.ImageContainer
 import com.paranid5.crescendo.ui.foundation.UiState
 import com.paranid5.crescendo.ui.foundation.fold
 import com.paranid5.crescendo.ui.foundation.toUiState
-import com.paranid5.crescendo.ui.metadata.VideoMetadataUiState
 import com.paranid5.crescendo.utils.extensions.sideEffect
+import com.paranid5.feature.metadata.VideoMetadataUiState
 import kotlinx.coroutines.Dispatchers
 
 internal class FetchStreamViewModelImpl(
@@ -87,15 +87,16 @@ internal class FetchStreamViewModelImpl(
 
     private fun refreshCover() = viewModelScope.sideEffect(Dispatchers.Default) {
         val coverUiState = state.videoMetadataUiState.fold(
-            ifPresent = { fetchCover(it.coversPaths).toUiState() },
+            ifPresent = { fetchCover(it.coversUrls).toUiState() },
             ifEmpty = { UiState.Error() },
         )
 
         updateState { copy(coverUiState = coverUiState) }
     }
 
-    private suspend fun fetchCover(coversPaths: List<String>) = // TODO: хуйня
-        ImageContainer.Bitmap(imageRetriever.downloadBitmap(url = ImageUrl(coversPaths.first())))
+    @Deprecated("Will be removed")
+    private suspend fun fetchCover(coversUrls: List<Image.Url>) =
+        ImageContainer.Bitmap(imageRetriever.downloadBitmap(url = coversUrls.first().value))
 
     private fun startStreaming() = viewModelScope.sideEffect {
         playbackRepository.updateAudioStatus(PlaybackStatus.STREAMING)

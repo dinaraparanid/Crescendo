@@ -22,14 +22,14 @@ import com.paranid5.crescendo.ui.covers.AppClippedCover
 import com.paranid5.crescendo.ui.covers.ImageContainer
 import com.paranid5.crescendo.ui.foundation.AppText
 import com.paranid5.crescendo.ui.foundation.UiState
-import com.paranid5.crescendo.ui.metadata.VideoMetadataUiState
 import com.paranid5.crescendo.utils.extensions.timeFormat
+import com.paranid5.feature.metadata.VideoMetadataUiState
 
 private val ImageHeight = 164.dp
 
 @Composable
 internal fun MetaContainer(
-    videoMeta: VideoMetadataUiState,
+    videoMeta: com.paranid5.feature.metadata.VideoMetadataUiState,
     coverUiState: UiState<ImageContainer>,
     onUiIntent: (FetchStreamUiIntent) -> Unit,
     modifier: Modifier = Modifier,
@@ -76,7 +76,7 @@ internal fun MetaContainer(
 
 @Composable
 private fun TitleWithDuration(
-    videoMeta: VideoMetadataUiState,
+    videoMeta: com.paranid5.feature.metadata.VideoMetadataUiState,
     modifier: Modifier = Modifier,
 ) = Column(modifier = modifier) {
     AppText(

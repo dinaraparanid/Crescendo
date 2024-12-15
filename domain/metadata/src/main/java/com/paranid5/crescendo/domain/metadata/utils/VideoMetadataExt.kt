@@ -1,8 +1,8 @@
-package com.paranid5.crescendo.utils.extensions
+package com.paranid5.crescendo.domain.metadata.utils
 
 import android.graphics.Bitmap
 import android.support.v4.media.MediaMetadataCompat
-import com.paranid5.crescendo.core.common.metadata.VideoMetadata
+import com.paranid5.crescendo.domain.metadata.model.VideoMetadata
 
 fun VideoMetadata.toAndroidMetadata(cover: Bitmap? = null): MediaMetadataCompat =
     MediaMetadataCompat.Builder()

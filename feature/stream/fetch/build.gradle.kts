@@ -47,6 +47,7 @@ dependencies {
     implementation(project(":domain:stream"))
 
     implementation(project(":feature:cache"))
+    implementation(project(":feature:metadata"))
 
     implementation(project(":system:services:stream"))
 

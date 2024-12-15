@@ -8,12 +8,12 @@ import android.provider.MediaStore
 import arrow.core.Either
 import com.paranid5.crescendo.core.common.caching.Formats
 import com.paranid5.crescendo.core.media.files.MediaFile
-import com.paranid5.crescendo.core.media.media_scanner.sendScanFile
-import com.paranid5.crescendo.core.common.metadata.AudioMetadata
-import com.paranid5.crescendo.core.common.metadata.Metadata
-import com.paranid5.crescendo.core.common.metadata.VideoMetadata
 import com.paranid5.crescendo.core.media.images.getImageBinaryDataFromPathCatching
 import com.paranid5.crescendo.core.media.images.getImageBinaryDataFromUrlCatching
+import com.paranid5.crescendo.core.media.media_scanner.sendScanFile
+import com.paranid5.crescendo.domain.metadata.model.AudioMetadata
+import com.paranid5.crescendo.domain.metadata.model.Metadata
+import com.paranid5.crescendo.domain.metadata.model.VideoMetadata
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import org.jaudiotagger.audio.AudioFileIO
@@ -25,7 +25,7 @@ suspend fun setAudioTags(
     context: Context,
     audioFile: MediaFile.AudioFile,
     metadata: Metadata,
-    audioFormat: Formats
+    audioFormat: Formats,
 ) {
     val externalContentUri = when {
         Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q ->
@@ -64,7 +64,7 @@ suspend fun setAudioTags(
 private inline fun <M : Metadata> setBaseAudioTagsToFile(
     file: MediaFile.AudioFile,
     metadata: M,
-    setSpecificTags: (tag: Tag) -> Unit
+    setSpecificTags: (tag: Tag) -> Unit,
 ) = AudioFileIO.read(file).run {
     tagOrCreateAndSetDefault.run {
         setField(FieldKey.TITLE, metadata.title)
@@ -77,12 +77,12 @@ private inline fun <M : Metadata> setBaseAudioTagsToFile(
 private fun setAudioTagsToFile(
     context: Context,
     file: MediaFile.AudioFile,
-    metadata: VideoMetadata
+    metadata: VideoMetadata,
 ) = setBaseAudioTagsToFile(file, metadata) { tag ->
     metadata
         .covers
         .asSequence()
-        .map { getImageBinaryDataFromUrlCatching(context, it) }
+        .map { getImageBinaryDataFromUrlCatching(context, it.value.value) }
         .firstOrNull { it.isRight() }
         ?.getOrNull()
         ?.let { ArtworkFactory.getNew().apply { binaryData = it } }
@@ -92,14 +92,14 @@ private fun setAudioTagsToFile(
 private fun setAudioTagsToFile(
     context: Context,
     file: MediaFile.AudioFile,
-    metadata: AudioMetadata
+    metadata: AudioMetadata,
 ) = setBaseAudioTagsToFile(file, metadata) { tag ->
     tag.setField(FieldKey.ALBUM, metadata.album)
 
     metadata
         .covers
         .asSequence()
-        .map { getImageBinaryDataFromPathCatching(context, it) }
+        .map { getImageBinaryDataFromPathCatching(context, it.value.value) }
         .firstOrNull { it.isRight() }
         ?.getOrNull()
         ?.let { ArtworkFactory.getNew().apply { binaryData = it } }
@@ -109,7 +109,7 @@ private fun setAudioTagsToFile(
 private fun setAudioTagsToFileCatching(
     context: Context,
     file: MediaFile.AudioFile,
-    metadata: Metadata
+    metadata: Metadata,
 ) = Either.catch {
     when (metadata) {
         is AudioMetadata -> setAudioTagsToFile(context, file, metadata)

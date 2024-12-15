@@ -8,7 +8,7 @@ import android.provider.MediaStore
 import arrow.core.Either
 import com.paranid5.crescendo.core.media.files.MediaFile
 import com.paranid5.crescendo.core.media.media_scanner.sendScanFile
-import com.paranid5.crescendo.core.common.metadata.VideoMetadata
+import com.paranid5.crescendo.domain.metadata.model.VideoMetadata
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
@@ -31,7 +31,7 @@ private fun setVideoTagsToFileCatching(file: MediaFile.VideoFile, metadata: Vide
 suspend fun setVideoTagsAsync(
     context: Context,
     videoFile: MediaFile.VideoFile,
-    metadata: VideoMetadata
+    metadata: VideoMetadata,
 ) = coroutineScope {
     val externalContentUri = when {
         Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q ->

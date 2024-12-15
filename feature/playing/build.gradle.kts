@@ -42,12 +42,14 @@ dependencies {
     implementation(project(":core:media"))
     implementation(project(":core:resources"))
 
-    implementation(project(":domain:playback"))
     implementation(project(":domain:current_playlist"))
-    implementation(project(":domain:tracks"))
+    implementation(project(":domain:metadata"))
+    implementation(project(":domain:playback"))
     implementation(project(":domain:stream"))
+    implementation(project(":domain:tracks"))
 
     implementation(project(":feature:cache"))
+    implementation(project(":feature:metadata"))
 
     implementation(project(":system:services:stream"))
     implementation(project(":system:services:track"))

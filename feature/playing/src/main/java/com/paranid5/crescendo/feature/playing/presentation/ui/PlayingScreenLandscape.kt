@@ -31,6 +31,7 @@ import com.paranid5.crescendo.feature.playing.view_model.PlayingState
 import com.paranid5.crescendo.feature.playing.view_model.PlayingUiIntent
 import com.paranid5.crescendo.ui.covers.mediaCoverModelWithPalette
 import com.paranid5.crescendo.utils.extensions.getBrightDominantOrPrimary
+import com.paranid5.crescendo.utils.extensions.mapToImmutableList
 import com.paranid5.crescendo.utils.extensions.orNil
 
 @Composable
@@ -49,7 +50,7 @@ internal fun PlayingScreenLandscape(
     var palette by remember { mutableStateOf<Palette?>(null) }
 
     val videoCovers = remember(state.currentMetadata) {
-        state.currentMetadata?.coversPaths.orNil()
+        state.currentMetadata?.coversUrls?.mapToImmutableList { it.value.value }.orNil()
     }
 
     val trackPath = remember(state.currentTrack) {

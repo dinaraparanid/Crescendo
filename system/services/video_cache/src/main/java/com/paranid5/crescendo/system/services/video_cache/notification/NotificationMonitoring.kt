@@ -4,8 +4,8 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.repeatOnLifecycle
 import com.paranid5.crescendo.core.common.caching.CachingStatus
 import com.paranid5.crescendo.core.common.caching.DownloadingStatus
-import com.paranid5.crescendo.core.common.metadata.VideoMetadata
 import com.paranid5.crescendo.data.ktor.DownloadingProgress
+import com.paranid5.crescendo.domain.metadata.model.VideoMetadata
 import com.paranid5.crescendo.system.services.video_cache.VideoCacheService
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.collectLatest
