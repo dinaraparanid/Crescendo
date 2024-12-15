@@ -6,7 +6,8 @@ import androidx.lifecycle.viewModelScope
 import com.paranid5.crescendo.core.common.PlaybackStatus
 import com.paranid5.crescendo.core.common.udf.StatePublisher
 import com.paranid5.crescendo.core.common.udf.state
-import com.paranid5.crescendo.domain.cover.CoverRetriever
+import com.paranid5.crescendo.domain.image.ImageRetriever
+import com.paranid5.crescendo.domain.image.model.ImageUrl
 import com.paranid5.crescendo.domain.playback.PlaybackRepository
 import com.paranid5.crescendo.domain.stream.StreamRepository
 import com.paranid5.crescendo.system.services.stream.StreamServiceAccessor
@@ -22,7 +23,7 @@ internal class FetchStreamViewModelImpl(
     private val savedStateHandle: SavedStateHandle,
     private val streamRepository: StreamRepository,
     private val playbackRepository: PlaybackRepository,
-    private val coverRetriever: CoverRetriever,
+    private val imageRetriever: ImageRetriever,
     private val streamServiceAccessor: StreamServiceAccessor,
 ) : ViewModel(), FetchStreamViewModel, StatePublisher<FetchStreamState> {
     companion object {
@@ -93,8 +94,8 @@ internal class FetchStreamViewModelImpl(
         updateState { copy(coverUiState = coverUiState) }
     }
 
-    private suspend fun fetchCover(coversPaths: List<String>) =
-        ImageContainer.Bitmap(coverRetriever.downloadCoverBitmap(urls = coversPaths.toTypedArray()))
+    private suspend fun fetchCover(coversPaths: List<String>) = // TODO: хуйня
+        ImageContainer.Bitmap(imageRetriever.downloadBitmap(url = ImageUrl(coversPaths.first())))
 
     private fun startStreaming() = viewModelScope.sideEffect {
         playbackRepository.updateAudioStatus(PlaybackStatus.STREAMING)

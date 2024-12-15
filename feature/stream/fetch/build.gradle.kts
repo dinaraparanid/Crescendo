@@ -42,9 +42,9 @@ dependencies {
     implementation(project(":core:resources"))
     implementation(project(":core:media"))
 
-    implementation(project(":domain:stream"))
-    implementation(project(":domain:cover"))
+    implementation(project(":domain:image"))
     implementation(project(":domain:playback"))
+    implementation(project(":domain:stream"))
 
     implementation(project(":feature:cache"))
 

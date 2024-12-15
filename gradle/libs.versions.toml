@@ -33,6 +33,9 @@ foundationAndroid = "1.7.6"
 ytdl = "0.17.2"
 agp = "8.7.3"
 kotlin = "2.1.0"
+junit = "4.13.2"
+junitVersion = "1.2.1"
+espressoCore = "3.6.1"
 
 [libraries]
 amplituda = { module = "com.github.lincollincol:amplituda", version.ref = "amplituda" }
@@ -100,6 +103,9 @@ yt-url-extractor-kt = { module = "com.github.dinaraparanid:yt-url-extractor-kt",
 ytdl-lib = { group = "io.github.junkfood02.youtubedl-android", name = "library", version.ref = "ytdl" }
 ytdl-ffmpeg = { group = "io.github.junkfood02.youtubedl-android", name = "ffmpeg", version.ref = "ytdl" }
 ytdl-aria = { group = "io.github.junkfood02.youtubedl-android", name = "aria2c", version.ref = "ytdl" }
+junit = { group = "junit", name = "junit", version.ref = "junit" }
+androidx-junit = { group = "androidx.test.ext", name = "junit", version.ref = "junitVersion" }
+androidx-espresso-core = { group = "androidx.test.espresso", name = "espresso-core", version.ref = "espressoCore" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

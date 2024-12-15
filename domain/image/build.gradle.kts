@@ -1,12 +1,11 @@
 plugins {
     alias(libs.plugins.android.library)
     alias(libs.plugins.kotlin.android)
-    alias(libs.plugins.compose.compiler)
     id("kotlin-parcelize")
 }
 
 android {
-    namespace = "com.paranid5.crescendo.feature.meta_editor"
+    namespace = "com.paranid5.crescendo.domain.image"
     compileSdk = 35
 
     defaultConfig {
@@ -35,22 +34,9 @@ android {
 }
 
 dependencies {
-    implementation(project(":core:common"))
-    implementation(project(":core:resources"))
-    implementation(project(":core:ui"))
-    implementation(project(":core:utils"))
+    api(project(":core:media"))
 
-    implementation(project(":domain:genius"))
-    implementation(project(":domain:image"))
-    implementation(project(":domain:tracks"))
-
-    implementation(libs.androidx.appcompat)
     implementation(libs.androidx.core.ktx)
-    implementation(libs.androidx.foundation.android)
-    implementation(libs.androidx.material3)
-    implementation(libs.androidx.navigation.compose)
-    implementation(libs.material)
-
-    implementation(libs.kotlinx.collections.immutable)
-    implementation(libs.koin.androidx.compose)
+    implementation(libs.androidx.appcompat)
+    implementation(libs.androidx.palette.ktx)
 }

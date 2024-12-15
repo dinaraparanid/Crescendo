@@ -1,9 +1,9 @@
-package com.paranid5.crescendo.core.media.images
+package com.paranid5.crescendo.domain.image.utils
 
 import android.graphics.drawable.Drawable
 import androidx.core.graphics.drawable.toBitmap
+import com.paranid5.crescendo.domain.image.model.ImageSize
 
-@Deprecated("Will be removed")
 fun Drawable.toResizedBitmap(size: ImageSize? = null) =
     when (size) {
         null -> toBitmap()

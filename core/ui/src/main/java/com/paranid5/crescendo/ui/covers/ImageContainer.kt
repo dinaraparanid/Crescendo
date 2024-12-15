@@ -46,7 +46,7 @@ sealed interface ImageContainer : Parcelable {
     ) : ImageContainer
 }
 
-inline val ImageContainer.data: Any?
+val ImageContainer.data: Any?
     get() = when (this) {
         is ImageContainer.Bytes -> value
         is ImageContainer.Uri -> value

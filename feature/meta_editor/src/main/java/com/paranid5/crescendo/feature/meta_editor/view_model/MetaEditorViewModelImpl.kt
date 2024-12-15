@@ -5,8 +5,10 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.paranid5.crescendo.core.common.udf.StatePublisher
 import com.paranid5.crescendo.core.common.udf.state
-import com.paranid5.crescendo.domain.cover.CoverRetriever
 import com.paranid5.crescendo.domain.genius.GeniusApi
+import com.paranid5.crescendo.domain.image.ImageRetriever
+import com.paranid5.crescendo.domain.image.model.ImagePath
+import com.paranid5.crescendo.domain.image.model.ImageUrl
 import com.paranid5.crescendo.domain.tracks.TracksRepository
 import com.paranid5.crescendo.feature.meta_editor.presentation.ui.model.SimilarTrackUiState
 import com.paranid5.crescendo.ui.covers.ImageContainer
@@ -23,7 +25,7 @@ internal class MetaEditorViewModelImpl(
     private val savedStateHandle: SavedStateHandle,
     private val geniusApi: GeniusApi,
     private val tracksRepository: TracksRepository,
-    private val coverRetriever: CoverRetriever,
+    private val imageRetriever: ImageRetriever,
 ) : ViewModel(), MetaEditorViewModel, StatePublisher<MetaEditorState> {
     companion object {
         private const val StateKey = "state"
@@ -100,8 +102,8 @@ internal class MetaEditorViewModelImpl(
     }
 
     private suspend fun fetchTrackCover() {
-        val coverUiState = coverRetriever
-            .retrieveCoverBitmap(path = state.requireTrackPath())
+        val coverUiState = imageRetriever
+            .retrieveBitmapFromMedia(ImagePath(state.requireTrackPath()))
             ?.let(ImageContainer::Bitmap)
             .toUiStateIfNotNull()
 
@@ -144,7 +146,7 @@ internal class MetaEditorViewModelImpl(
                 ifRight = { models ->
                     val tracksWithCovers = models.map { track ->
                         track to track.covers.map {
-                            ImageContainer.Bitmap(coverRetriever.downloadCoverBitmap(it))
+                            ImageContainer.Bitmap(imageRetriever.downloadBitmap(ImageUrl(it)))
                         }
                     }
 

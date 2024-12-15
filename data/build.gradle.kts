@@ -51,10 +51,10 @@ dependencies {
     api(project(":core:utils"))
 
     api(project(":domain:audio_effects"))
-    api(project(":domain:cover"))
     api(project(":domain:current_playlist"))
     api(project(":domain:genius"))
     api(project(":domain:github"))
+    api(project(":domain:image"))
     api(project(":domain:playback"))
     api(project(":domain:stream"))
     api(project(":domain:tracks"))
@@ -79,5 +79,7 @@ dependencies {
     implementation(libs.sqldelight.android.driver)
     implementation(libs.sqldelight.coroutines.extensions)
 
+    implementation(libs.coil.compose)
+    implementation(libs.jaudiotagger)
     implementation(libs.yt.url.extractor.kt)
 }
