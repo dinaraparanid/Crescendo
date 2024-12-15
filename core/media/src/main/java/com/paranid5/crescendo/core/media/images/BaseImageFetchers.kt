@@ -11,7 +11,7 @@ import com.paranid5.crescendo.utils.extensions.toBitmap
 import org.jaudiotagger.audio.AudioFileIO
 import java.io.File
 
-fun Any.getCoilModel(context: Context, size: ImageSize? = null) =
+internal fun Any.getCoilModel(context: Context, size: ImageSize? = null) =
     when (size) {
         null -> getCoilModelBuilder(context).build()
 
@@ -20,7 +20,7 @@ fun Any.getCoilModel(context: Context, size: ImageSize? = null) =
             .build()
     }
 
-suspend inline fun getBitmapFromModel(
+internal suspend fun getBitmapFromModel(
     context: Context,
     model: Any,
     size: ImageSize? = null,
@@ -32,7 +32,7 @@ suspend inline fun getBitmapFromModel(
     .toResizedBitmap(size)
     .also(bitmapSettings)
 
-inline fun getBitmapFromModelBlocking(
+internal fun getBitmapFromModelBlocking(
     context: Context,
     model: Any,
     size: ImageSize? = null,
@@ -44,21 +44,21 @@ inline fun getBitmapFromModelBlocking(
     .toResizedBitmap(size)
     .also(bitmapSettings)
 
-suspend inline fun getBitmapFromResource(
+internal suspend fun getBitmapFromResource(
     context: Context,
     @DrawableRes res: Int,
     size: ImageSize? = null,
     bitmapSettings: (Bitmap) -> Unit = {}
 ) = getBitmapFromModel(context, res, size, bitmapSettings)
 
-inline fun getBitmapFromResourceBlocking(
+internal fun getBitmapFromResourceBlocking(
     context: Context,
     @DrawableRes res: Int,
     size: ImageSize? = null,
     bitmapSettings: (Bitmap) -> Unit = {}
 ) = getBitmapFromModelBlocking(context, res, size, bitmapSettings)
 
-suspend inline fun getBitmapFromResourceCatching(
+internal suspend fun getBitmapFromResourceCatching(
     context: Context,
     @DrawableRes res: Int,
     size: ImageSize? = null,
@@ -67,7 +67,7 @@ suspend inline fun getBitmapFromResourceCatching(
     getBitmapFromResource(context, res, size, bitmapSettings)
 }
 
-inline fun getBitmapFromResourceBlockingCatching(
+internal fun getBitmapFromResourceBlockingCatching(
     context: Context,
     @DrawableRes res: Int,
     size: ImageSize? = null,
@@ -76,35 +76,35 @@ inline fun getBitmapFromResourceBlockingCatching(
     getBitmapFromResourceBlocking(context, res, size, bitmapSettings)
 }
 
-suspend inline fun getBitmapFromUrl(
+internal suspend fun getBitmapFromUrl(
     context: Context,
     url: String,
     size: ImageSize? = null,
     bitmapSettings: (Bitmap) -> Unit = {}
 ) = getBitmapFromModel(context, url, size, bitmapSettings)
 
-inline fun getBitmapFromUrlBlocking(
+internal fun getBitmapFromUrlBlocking(
     context: Context,
     url: String,
     size: ImageSize? = null,
     bitmapSettings: (Bitmap) -> Unit = {}
 ) = getBitmapFromModelBlocking(context, url, size, bitmapSettings)
 
-suspend inline fun getBitmapFromUrlWithPalette(
+internal suspend fun getBitmapFromUrlWithPalette(
     context: Context,
     url: String,
     size: ImageSize? = null,
     bitmapSettings: (Bitmap) -> Unit = {}
 ) = getBitmapFromUrl(context, url, size, bitmapSettings).withPalette
 
-inline fun getBitmapFromUrlWithPaletteBlocking(
+internal fun getBitmapFromUrlWithPaletteBlocking(
     context: Context,
     url: String,
     size: ImageSize? = null,
     bitmapSettings: (Bitmap) -> Unit = {}
 ) = getBitmapFromUrlBlocking(context, url, size, bitmapSettings).withPalette
 
-suspend inline fun getBitmapFromUrlCatching(
+internal suspend fun getBitmapFromUrlCatching(
     context: Context,
     url: String,
     size: ImageSize? = null,
@@ -113,7 +113,7 @@ suspend inline fun getBitmapFromUrlCatching(
     getBitmapFromUrl(context, url, size, bitmapSettings)
 }
 
-inline fun getBitmapFromUrlBlockingCatching(
+internal fun getBitmapFromUrlBlockingCatching(
     context: Context,
     url: String,
     size: ImageSize? = null,
@@ -122,7 +122,7 @@ inline fun getBitmapFromUrlBlockingCatching(
     getBitmapFromUrlBlocking(context, url, size, bitmapSettings)
 }
 
-suspend inline fun getBitmapFromUrlWithPaletteCatching(
+internal suspend fun getBitmapFromUrlWithPaletteCatching(
     context: Context,
     url: String,
     size: ImageSize? = null,
@@ -131,7 +131,7 @@ suspend inline fun getBitmapFromUrlWithPaletteCatching(
     getBitmapFromUrlWithPalette(context, url, size, bitmapSettings)
 }
 
-inline fun getBitmapFromUrlWithPaletteBlockingCatching(
+internal fun getBitmapFromUrlWithPaletteBlockingCatching(
     context: Context,
     url: String,
     size: ImageSize? = null,
@@ -161,7 +161,7 @@ internal fun getCoverDataByPath(path: String?): ByteArray? {
     }
 }
 
-suspend fun getBitmapFromPath(
+internal suspend fun getBitmapFromPath(
     context: Context,
     path: String?,
     size: ImageSize? = null,
@@ -171,7 +171,7 @@ suspend fun getBitmapFromPath(
     ?.let { getBitmapFromModel(context, it, size, bitmapSettings) }
     ?: getThumbnailBitmap(context)
 
-fun getBitmapFromPathBlocking(
+internal fun getBitmapFromPathBlocking(
     context: Context,
     path: String?,
     size: ImageSize? = null,
@@ -181,21 +181,21 @@ fun getBitmapFromPathBlocking(
     ?.let { getBitmapFromModelBlocking(context, it, size, bitmapSettings) }
     ?: getThumbnailBitmapBlocking(context)
 
-suspend fun getBitmapFromPathWithPalette(
+internal suspend fun getBitmapFromPathWithPalette(
     context: Context,
     path: String?,
     size: ImageSize? = null,
     bitmapSettings: (Bitmap) -> Unit = {}
 ) = getBitmapFromPath(context, path, size, bitmapSettings).withPalette
 
-fun getBitmapFromPathWithPaletteBlocking(
+internal fun getBitmapFromPathWithPaletteBlocking(
     context: Context,
     path: String?,
     size: ImageSize? = null,
     bitmapSettings: (Bitmap) -> Unit = {}
 ) = getBitmapFromPathBlocking(context, path, size, bitmapSettings).withPalette
 
-suspend fun getBitmapFromPathCatching(
+internal suspend fun getBitmapFromPathCatching(
     context: Context,
     path: String?,
     size: ImageSize? = null,
@@ -204,7 +204,7 @@ suspend fun getBitmapFromPathCatching(
     getBitmapFromPath(context, path, size, bitmapSettings)
 }
 
-fun getBitmapFromPathBlockingCatching(
+internal fun getBitmapFromPathBlockingCatching(
     context: Context,
     path: String?,
     size: ImageSize? = null,
@@ -213,7 +213,7 @@ fun getBitmapFromPathBlockingCatching(
     getBitmapFromPathBlocking(context, path, size, bitmapSettings)
 }
 
-suspend fun getBitmapFromPathWithPaletteCatching(
+internal suspend fun getBitmapFromPathWithPaletteCatching(
     context: Context,
     path: String?,
     size: ImageSize? = null,
@@ -222,7 +222,7 @@ suspend fun getBitmapFromPathWithPaletteCatching(
     getBitmapFromPathWithPalette(context, path, size, bitmapSettings)
 }
 
-fun getBitmapFromPathWithPaletteBlockingCatching(
+internal fun getBitmapFromPathWithPaletteBlockingCatching(
     context: Context,
     path: String?,
     size: ImageSize? = null,

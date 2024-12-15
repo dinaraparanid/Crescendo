@@ -58,7 +58,7 @@ dependencies {
     implementation(libs.kotlinx.collections.immutable)
     implementation(libs.koin.androidx.compose)
     implementation(libs.ktor.client.core)
-    implementation(libs.arrow.fx.coroutines)
+    implementation(libs.bundles.arrow)
 
     implementation(libs.yt.url.extractor.kt)
     implementation(libs.ytdl.lib)

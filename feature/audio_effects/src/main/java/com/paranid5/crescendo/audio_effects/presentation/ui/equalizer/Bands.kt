@@ -1,8 +1,8 @@
 package com.paranid5.crescendo.audio_effects.presentation.ui.equalizer
 
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.remember
@@ -23,20 +23,19 @@ internal fun Bands(
 ) {
     val presentLvlsDbState = rememberPresentLvlsDbState(state)
 
-    Row(modifier) {
-        Spacer(Modifier.width(dimensions.padding.medium))
-
-        repeat(state.bandsAmount) {
+    Row(
+        modifier = modifier.padding(horizontal = dimensions.padding.medium),
+        horizontalArrangement = Arrangement.spacedBy(dimensions.padding.medium),
+    ) {
+        repeat(state.bandsAmount) { index ->
             Band(
-                index = it,
+                index = index,
                 presentLvlsDbState = presentLvlsDbState,
                 pointsState = pointsState,
                 state = state,
                 onUiIntent = onUiIntent,
                 modifier = Modifier.weight(1F),
             )
-
-            Spacer(Modifier.width(dimensions.padding.medium))
         }
     }
 }

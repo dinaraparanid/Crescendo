@@ -1,7 +1,11 @@
 package com.paranid5.crescendo.audio_effects.presentation.ui.equalizer
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
@@ -19,13 +23,13 @@ import androidx.compose.ui.layout.Measurable
 import androidx.compose.ui.layout.layout
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.Constraints
-import coil.compose.AsyncImage
-import coil.request.ImageRequest
-import com.paranid5.crescendo.audio_effects.presentation.ui.getBandTrackModel
+import com.paranid5.crescendo.audio_effects.presentation.ui.SliderHeight
+import com.paranid5.crescendo.audio_effects.presentation.ui.rememberBandTrackPainter
 import com.paranid5.crescendo.audio_effects.view_model.AudioEffectsState
 import com.paranid5.crescendo.audio_effects.view_model.AudioEffectsUiIntent
 import com.paranid5.crescendo.core.resources.R
 import com.paranid5.crescendo.domain.audio_effects.entity.EqualizerData.Companion.MILLIBELS_IN_DECIBEL
+import com.paranid5.crescendo.utils.extensions.pxToDp
 
 @Composable
 internal fun BandController(
@@ -51,13 +55,12 @@ internal fun BandController(
     }
 
     val sliderYPosState = remember { mutableFloatStateOf(0F) }
-    val sliderWidthState = remember { mutableIntStateOf(1) }
-    val sliderHeightState = remember { mutableIntStateOf(1) }
 
-    val bandTrackModel = getBandTrackModel(
-        width = sliderWidthState.intValue,
-        height = sliderHeightState.intValue,
-    )
+    val sliderWidthState = remember { mutableIntStateOf(1) }
+    val sliderWidth by sliderWidthState
+
+    val sliderHeightState = remember { mutableIntStateOf(1) }
+    val sliderHeight by sliderHeightState
 
     Box(modifier.controllerModifier()) {
         BandSlider(
@@ -71,25 +74,35 @@ internal fun BandController(
             sliderHeightState = sliderHeightState,
             onUiIntent = onUiIntent,
             modifier = Modifier.align(Alignment.Center),
-            thumbModifier = Modifier.align(Alignment.Center),
+            thumbModifier = Modifier
+                .align(Alignment.Center)
+                .height(SliderHeight),
         )
 
         EqualizerTrack(
-            bandTrackModel = bandTrackModel,
-            modifier = Modifier.fillMaxSize(),
+            sliderWidth = sliderWidth,
+            sliderHeight = sliderHeight,
+            modifier = Modifier
+                .align(Alignment.Center)
+                .widthIn(max = sliderWidth.pxToDp())
+                .heightIn(max = sliderHeight.pxToDp())
+                .fillMaxSize(),
         )
     }
 }
 
 @Composable
-private fun EqualizerTrack(bandTrackModel: ImageRequest, modifier: Modifier = Modifier) =
-    AsyncImage(
-        model = bandTrackModel,
-        contentDescription = stringResource(R.string.audio_effects_equalizer_band),
-        contentScale = ContentScale.Fit,
-        alignment = Alignment.Center,
-        modifier = modifier,
-    )
+private fun EqualizerTrack(
+    sliderWidth: Int,
+    sliderHeight: Int,
+    modifier: Modifier = Modifier,
+) = Image(
+    painter = rememberBandTrackPainter(width = sliderWidth, height = sliderHeight),
+    contentDescription = stringResource(R.string.audio_effects_equalizer_band),
+    contentScale = ContentScale.FillBounds,
+    alignment = Alignment.Center,
+    modifier = modifier,
+)
 
 private fun Modifier.controllerModifier() =
     this

@@ -60,5 +60,5 @@ dependencies {
     implementation(libs.kotlinx.collections.immutable)
     implementation(libs.koin.androidx.compose)
     implementation(libs.coil.compose)
-    implementation(libs.arrow.fx.coroutines)
+    implementation(libs.bundles.arrow)
 }

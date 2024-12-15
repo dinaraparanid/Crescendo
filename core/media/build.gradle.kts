@@ -49,7 +49,7 @@ dependencies {
 
     implementation(libs.kotlinx.collections.immutable)
 
-    implementation(libs.arrow.fx.coroutines)
+    implementation(libs.bundles.arrow)
 
     implementation(libs.mobile.ffmpeg.full)
     implementation(libs.jaudiotagger)

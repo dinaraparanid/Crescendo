@@ -12,7 +12,6 @@ data object AppTheme {
     val colors @Composable get() = LocalColors.current
     val dimensions @Composable get() = LocalDimensions.current
     val typography @Composable get() = LocalTypography.current
-    val icons @Composable get() = LocalIcons.current
     val fontFamily = NunitoSansFontFamily
 }
 
@@ -28,14 +27,12 @@ fun AppTheme(
     }
 
     val appColors = remember(theme) { AppColors.create(theme) }
-    val appIcons = remember(theme) { AppIcons.create(theme) }
 
     KoinContext {
         CompositionLocalProvider(
             LocalColors provides appColors,
             LocalDimensions provides dimensions,
             LocalTypography provides typography,
-            LocalIcons provides appIcons,
             LocalTextSelectionColors provides AppTextSelectionColors,
         ) {
             MaterialTheme(

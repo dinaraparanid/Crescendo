@@ -10,6 +10,7 @@ import androidx.compose.ui.res.stringResource
 import com.paranid5.crescendo.core.resources.R
 import com.paranid5.crescendo.core.resources.ui.theme.AppTheme.colors
 import com.paranid5.crescendo.core.resources.ui.theme.AppTheme.dimensions
+import com.paranid5.crescendo.core.resources.ui.theme.AppTheme.fontFamily
 import com.paranid5.crescendo.core.resources.ui.theme.AppTheme.typography
 import com.paranid5.crescendo.ui.foundation.AppExpandableCard
 import com.paranid5.crescendo.ui.foundation.AppExpandableCardStyle
@@ -41,10 +42,12 @@ private fun Step(
     text: String,
     modifier: Modifier = Modifier,
 ) = MarkdownText(
-    color = colors.text.onHighContrast,
-    style = typography.regular,
     modifier = modifier,
     markdown = "$number. $text",
+    style = typography.regular.copy(
+        fontFamily = fontFamily,
+        color = colors.text.onHighContrast,
+    ),
 )
 
 @Composable

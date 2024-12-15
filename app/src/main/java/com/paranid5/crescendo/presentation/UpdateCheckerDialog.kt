@@ -20,6 +20,7 @@ import androidx.compose.ui.unit.dp
 import com.paranid5.crescendo.core.resources.R
 import com.paranid5.crescendo.core.resources.ui.theme.AppTheme.colors
 import com.paranid5.crescendo.core.resources.ui.theme.AppTheme.dimensions
+import com.paranid5.crescendo.core.resources.ui.theme.AppTheme.fontFamily
 import com.paranid5.crescendo.core.resources.ui.theme.AppTheme.typography
 import com.paranid5.crescendo.presentation.entity.ReleaseUiState
 import com.paranid5.crescendo.ui.foundation.AppText
@@ -87,10 +88,12 @@ private fun VersionLabel(
     modifier: Modifier = Modifier,
 ) = MarkdownText(
     markdown = "# ${stringResource(R.string.update_available)}: $versionName",
-    color = colors.primary,
-    style = typography.captionSm,
     maxLines = 1,
     modifier = modifier.simpleShadow(elevation = TitleShadow),
+    style = typography.captionSm.copy(
+        fontFamily = fontFamily,
+        color = colors.primary,
+    ),
 )
 
 @Composable
@@ -99,9 +102,11 @@ private fun VersionContent(
     modifier: Modifier = Modifier,
 ) = MarkdownText(
     markdown = versionBody,
-    color = colors.primary,
-    style = typography.caption,
     modifier = modifier,
+    style = typography.caption.copy(
+        fontFamily = fontFamily,
+        color = colors.primary,
+    ),
 )
 
 @Composable

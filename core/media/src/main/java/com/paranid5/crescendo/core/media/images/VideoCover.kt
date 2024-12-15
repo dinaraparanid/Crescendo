@@ -9,11 +9,11 @@ import kotlinx.coroutines.flow.asFlow
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.map
 
-suspend inline fun getVideoCoverBitmapOrThumbnailAsync(
+suspend fun getVideoCoverBitmapOrThumbnailAsync(
     context: Context,
     videoCovers: List<String>,
     size: ImageSize? = null,
-    crossinline bitmapSettings: (Bitmap) -> Unit = {}
+    bitmapSettings: (Bitmap) -> Unit = {}
 ) = coroutineScope {
     async(Dispatchers.IO) {
         videoCovers
@@ -24,11 +24,11 @@ suspend inline fun getVideoCoverBitmapOrThumbnailAsync(
     }
 }
 
-suspend inline fun downloadCoverBitmapAsync(
+suspend fun downloadCoverBitmapAsync(
     context: Context,
     size: ImageSize? = null,
     vararg urls: String,
-    crossinline bitmapSettings: (Bitmap) -> Unit = {}
+    bitmapSettings: (Bitmap) -> Unit = {}
 ) = coroutineScope {
     async(Dispatchers.IO) {
         urls
@@ -39,11 +39,11 @@ suspend inline fun downloadCoverBitmapAsync(
     }
 }
 
-suspend inline fun getVideoCoverAsync(
+suspend fun getVideoCoverAsync(
     context: Context,
     videoCovers: List<String>,
     size: ImageSize? = null,
-    crossinline bitmapSettings: (Bitmap) -> Unit = {}
+    bitmapSettings: (Bitmap) -> Unit = {}
 ) = coroutineScope {
     async(Dispatchers.IO) {
         videoCovers
@@ -55,11 +55,11 @@ suspend inline fun getVideoCoverAsync(
     }
 }
 
-suspend inline fun getVideoCoverWithPaletteAsync(
+suspend fun getVideoCoverWithPaletteAsync(
     context: Context,
     videoCovers: List<String>,
     size: ImageSize? = null,
-    crossinline bitmapSettings: (Bitmap) -> Unit = {}
+    bitmapSettings: (Bitmap) -> Unit = {}
 ) = coroutineScope {
     async(Dispatchers.IO) {
         videoCovers

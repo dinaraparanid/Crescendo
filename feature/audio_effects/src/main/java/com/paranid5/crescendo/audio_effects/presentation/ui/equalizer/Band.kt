@@ -1,9 +1,7 @@
 package com.paranid5.crescendo.audio_effects.presentation.ui.equalizer
 
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
@@ -32,14 +30,15 @@ internal fun Band(
     state: AudioEffectsState,
     onUiIntent: (AudioEffectsUiIntent) -> Unit,
     modifier: Modifier = Modifier,
-) = Column(modifier) {
+) = Column(
+    modifier = modifier,
+    horizontalAlignment = Alignment.CenterHorizontally,
+    verticalArrangement = Arrangement.spacedBy(dimensions.padding.medium),
+) {
     BandDbLabel(
         index = index,
         presentLvlsDbState = presentLvlsDbState,
-        modifier = Modifier.align(Alignment.CenterHorizontally),
     )
-
-    Spacer(Modifier.height(dimensions.padding.medium))
 
     BandController(
         index = index,
@@ -47,17 +46,12 @@ internal fun Band(
         pointsState = pointsState,
         state = state,
         onUiIntent = onUiIntent,
-        modifier = Modifier
-            .fillMaxWidth()
-            .weight(1F),
+        modifier = Modifier.weight(1F),
     )
-
-    Spacer(Modifier.height(dimensions.padding.medium))
 
     BandHzLabel(
         index = index,
         state = state,
-        modifier = Modifier.align(Alignment.CenterHorizontally),
     )
 }
 

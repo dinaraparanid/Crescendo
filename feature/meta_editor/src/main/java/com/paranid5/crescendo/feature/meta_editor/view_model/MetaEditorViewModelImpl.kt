@@ -16,6 +16,8 @@ import com.paranid5.crescendo.ui.foundation.toUiStateError
 import com.paranid5.crescendo.ui.foundation.toUiStateIfNotNull
 import com.paranid5.crescendo.utils.doNothing
 import com.paranid5.crescendo.utils.extensions.sideEffect
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.asSharedFlow
 
 internal class MetaEditorViewModelImpl(
     private val savedStateHandle: SavedStateHandle,
@@ -28,6 +30,9 @@ internal class MetaEditorViewModelImpl(
     }
 
     override val stateFlow = savedStateHandle.getStateFlow(StateKey, MetaEditorState())
+
+    private val _effectFlow = MutableSharedFlow<MetaEditorUiEffect>()
+    override val effectFlow = _effectFlow.asSharedFlow()
 
     override fun updateState(func: MetaEditorState.() -> MetaEditorState) {
         savedStateHandle[StateKey] = func(state)
