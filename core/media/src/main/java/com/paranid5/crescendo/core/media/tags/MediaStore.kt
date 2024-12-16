@@ -9,6 +9,7 @@ import com.paranid5.crescendo.domain.metadata.model.AudioMetadata
 import com.paranid5.crescendo.domain.metadata.model.Metadata
 import com.paranid5.crescendo.domain.metadata.model.VideoMetadata
 
+@Deprecated("Will be removed")
 fun Context.insertMediaFileToMediaStore(
     externalContentUri: Uri,
     absoluteFilePath: String,

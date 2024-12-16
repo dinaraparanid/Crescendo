@@ -11,7 +11,6 @@ import com.paranid5.crescendo.core.media.caching.isNotError
 import com.paranid5.crescendo.core.media.caching.onCanceled
 import com.paranid5.crescendo.core.media.convertToAudioFileAndSetTagsAsync
 import com.paranid5.crescendo.core.media.files.MediaFile
-import com.paranid5.crescendo.core.media.tags.setVideoTagsAsync
 import com.paranid5.crescendo.domain.metadata.model.VideoMetadata
 import com.paranid5.crescendo.system.services.video_cache.VideoCacheService
 import com.paranid5.crescendo.system.services.video_cache.files.initMediaFile
@@ -126,11 +125,10 @@ private suspend fun VideoCacheService.cacheVideoFile(
 
         val videoFile = result as MediaFile.VideoFile
 
-        setVideoTagsAsync(
-            context = this@cacheVideoFile,
+        tagsRepository.setVideoTags(
             videoFile = videoFile,
             metadata = videoMetadata,
-        ).join()
+        )
 
         cacheManager.onConverted()
         videoQueueManager.decrementQueueLen()

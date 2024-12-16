@@ -21,6 +21,7 @@ import org.jaudiotagger.tag.FieldKey
 import org.jaudiotagger.tag.Tag
 import org.jaudiotagger.tag.images.ArtworkFactory
 
+@Deprecated("Will be removed")
 suspend fun setAudioTags(
     context: Context,
     audioFile: MediaFile.AudioFile,
@@ -43,12 +44,12 @@ suspend fun setAudioTags(
         else -> throw IllegalArgumentException("Video format for audio file")
     }
 
-    val absoluteFilePath = audioFile.absolutePath
+    val absoluteFilePath = audioFile.path
 
     withContext(Dispatchers.IO) {
         context.insertMediaFileToMediaStore(
             externalContentUri,
-            absoluteFilePath,
+            absoluteFilePath.value,
             mediaDirectory,
             metadata,
             mimeType
@@ -61,6 +62,7 @@ suspend fun setAudioTags(
     }
 }
 
+@Deprecated("Will be removed")
 private inline fun <M : Metadata> setBaseAudioTagsToFile(
     file: MediaFile.AudioFile,
     metadata: M,
@@ -117,6 +119,7 @@ private fun setAudioTagsToFileCatching(
     }
 }
 
+@Deprecated("Will be removed")
 internal fun ContentValues(
     absoluteFilePath: String,
     relativeFilePath: String,

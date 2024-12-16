@@ -1,11 +1,10 @@
 plugins {
     alias(libs.plugins.android.library)
     alias(libs.plugins.kotlin.android)
-    alias(libs.plugins.kotlinx.serialization)
 }
 
 android {
-    namespace = "com.paranid5.crescendo.system.worker.trimmer"
+    namespace = "com.paranid5.crescendo.domain.tags"
     compileSdk = 35
 
     defaultConfig {
@@ -34,19 +33,13 @@ android {
 }
 
 dependencies {
-    implementation(project(":core:common"))
-    implementation(project(":core:media"))
-    implementation(project(":core:resources"))
-
-    implementation(project(":domain:metadata"))
-    implementation(project(":domain:tags"))
-
-    implementation(project(":system:receivers"))
+    implementation(project(":core:media")) // TODO: убрать (files)
+    api(project(":domain:metadata"))
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)
-    api(libs.androidx.work.work.runtime.ktx)
 
-    implementation(libs.kotlinx.serialization.json)
-    implementation(libs.koin.androidx.compose)
+    implementation(libs.bundles.arrow)
+
+    implementation(libs.jaudiotagger)
 }

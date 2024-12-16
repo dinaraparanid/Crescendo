@@ -4,6 +4,8 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.util.Log
+import com.paranid5.crescendo.core.common.uri.Path
+import com.paranid5.crescendo.utils.extensions.getParcelableCompat
 
 class MediaScannerReceiver : BroadcastReceiver() {
     companion object {
@@ -21,4 +23,4 @@ class MediaScannerReceiver : BroadcastReceiver() {
 }
 
 private inline val Intent.nextFilePathArg
-    get() = getStringExtra(MediaScannerReceiver.FILE_PATH_ARG)!!
+    get() = getParcelableCompat(MediaScannerReceiver.FILE_PATH_ARG, Path::class.java)!!

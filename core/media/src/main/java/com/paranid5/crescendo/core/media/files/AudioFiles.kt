@@ -6,7 +6,8 @@ import arrow.core.Either
 import arrow.core.flatMap
 import com.arthenica.mobileffmpeg.FFmpeg
 import com.paranid5.crescendo.core.common.caching.Formats
-import com.paranid5.crescendo.core.common.caching.audioFileExt
+import com.paranid5.crescendo.core.common.caching.fileExtension
+import com.paranid5.crescendo.core.common.media.MediaFileExtension
 import com.paranid5.crescendo.core.common.trimming.FadeDurations
 import com.paranid5.crescendo.core.common.trimming.PitchAndSpeed
 import com.paranid5.crescendo.core.common.trimming.TrimRange
@@ -14,13 +15,15 @@ import com.paranid5.crescendo.core.common.trimming.totalDurationSecs
 
 private const val TAG = "AudioFiles"
 
+@Deprecated("Will be removed")
 suspend fun createAudioFileCatching(
     mediaDirectory: MediaDirectory,
     filename: String,
-    ext: String
+    ext: MediaFileExtension,
 ) = createFileCatching(mediaDirectory, filename, ext)
     .map { MediaFile.AudioFile(it) }
 
+@Deprecated("Will be removed")
 suspend fun MediaFile.AudioFile.trimmedCatching(
     outputFilename: String,
     audioFormat: Formats,
@@ -30,7 +33,7 @@ suspend fun MediaFile.AudioFile.trimmedCatching(
 ) = createAudioFileCatching(
     mediaDirectory = MediaDirectory(Environment.DIRECTORY_MUSIC),
     filename = outputFilename,
-    ext = audioFormat.audioFileExt
+    ext = audioFormat.fileExtension
 ).flatMap { outputFile ->
     Either.catch {
         trim(

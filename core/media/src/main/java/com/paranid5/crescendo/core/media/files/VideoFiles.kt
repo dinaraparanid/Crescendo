@@ -4,7 +4,8 @@ import android.os.Environment
 import android.util.Log
 import com.arthenica.mobileffmpeg.FFmpeg
 import com.paranid5.crescendo.core.common.caching.Formats
-import com.paranid5.crescendo.core.common.caching.audioFileExt
+import com.paranid5.crescendo.core.common.caching.fileExtension
+import com.paranid5.crescendo.core.common.media.MediaFileExtension
 import com.paranid5.crescendo.core.common.trimming.TrimRange
 import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.Dispatchers
@@ -14,9 +15,10 @@ import java.io.File
 
 private const val TAG = "VideoFiles"
 
+@Deprecated("Will be removed")
 suspend fun createVideoFileCatching(
     filename: String,
-    ext: String,
+    ext: MediaFileExtension,
     mediaDirectory: MediaDirectory = MediaDirectory(Environment.DIRECTORY_MOVIES)
 ) = createFileCatching(mediaDirectory, filename, ext)
     .map { MediaFile.VideoFile(it) }
@@ -33,7 +35,7 @@ private suspend inline fun MediaFile.VideoFile.toAudioFileImplAsync(
     crossinline ffmpegCmd: (File) -> String
 ) = coroutineScope {
     async(Dispatchers.IO) {
-        val ext = audioFormat.audioFileExt
+        val ext = audioFormat.fileExtension
 
         val newFile = createFileCatching(
             mediaDirectory = MediaDirectory(Environment.DIRECTORY_MUSIC),
@@ -66,6 +68,7 @@ private inline fun MediaFile.VideoFile.toAudioFile(
  * @return .mp3 file if conversion was successful, otherwise null
  */
 
+@Deprecated("Will be removed")
 suspend fun MediaFile.VideoFile.toMP3Async(trimRange: TrimRange) =
     toAudioFileImplAsync(audioFormat = Formats.MP3) { newFile ->
         "-y -i \"$absolutePath\" " +
@@ -80,6 +83,7 @@ suspend fun MediaFile.VideoFile.toMP3Async(trimRange: TrimRange) =
  * @return .wav file if conversion was successful, otherwise null
  */
 
+@Deprecated("Will be removed")
 suspend fun MediaFile.VideoFile.toWAVAsync(trimRange: TrimRange) =
     toAudioFileImplAsync(audioFormat = Formats.WAV) { newFile ->
         "-y -i \"$absolutePath\" " +
@@ -94,6 +98,7 @@ suspend fun MediaFile.VideoFile.toWAVAsync(trimRange: TrimRange) =
  * @return .aac file if conversion was successful, otherwise null
  */
 
+@Deprecated("Will be removed")
 suspend fun MediaFile.VideoFile.toAACAsync(trimRange: TrimRange) =
     toAudioFileImplAsync(audioFormat = Formats.AAC) { newFile ->
         "-y -i \"$absolutePath\" " +
@@ -109,6 +114,7 @@ suspend fun MediaFile.VideoFile.toAACAsync(trimRange: TrimRange) =
  * @return file if conversion was successful, otherwise null
  */
 
+@Deprecated("Will be removed")
 suspend fun MediaFile.VideoFile.toAudioFileAsync(
     audioFormat: Formats,
     trimRange: TrimRange,

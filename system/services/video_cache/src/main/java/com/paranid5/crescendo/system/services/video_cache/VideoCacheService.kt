@@ -6,6 +6,7 @@ import com.paranid5.crescendo.core.common.caching.Formats
 import com.paranid5.crescendo.core.common.caching.VideoCacheData
 import com.paranid5.crescendo.core.impl.trimmer.TrimRangeModel
 import com.paranid5.crescendo.core.impl.trimmer.toEntity
+import com.paranid5.crescendo.domain.tags.TagsRepository
 import com.paranid5.crescendo.system.common.broadcast.VideoCacheServiceBroadcasts
 import com.paranid5.crescendo.system.services.video_cache.cache.CacheManager
 import com.paranid5.crescendo.system.services.video_cache.cache.cacheNewVideoAsync
@@ -27,16 +28,17 @@ import com.paranid5.system.services.common.connect
 import com.paranid5.system.services.common.disconnect
 import kotlinx.coroutines.launch
 import org.koin.android.ext.android.inject
-import org.koin.core.component.KoinComponent
 import org.koin.core.parameter.parametersOf
 
-class VideoCacheService : SuspendService(), PlaybackForegroundService, KoinComponent,
+class VideoCacheService : SuspendService(),
+    PlaybackForegroundService,
     ConnectionManager by ConnectionManagerImpl() {
     internal val videoQueueManager by inject<VideoQueueManager>()
     internal val notificationManager by inject<NotificationManager> { parametersOf(this) }
     internal val cacheManager by inject<CacheManager>()
     internal val urlExtractor by inject<UrlExtractor>()
     internal val mediaFileDownloader by inject<MediaFileDownloader>()
+    internal val tagsRepository by inject<TagsRepository>()
 
     internal val cacheNextVideoReceiver = CacheNextVideoReceiver(this)
     internal val cancelCurrentVideoReceiver = CancelCurrentVideoReceiver(this)

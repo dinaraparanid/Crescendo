@@ -7,9 +7,9 @@ import androidx.work.WorkerParameters
 import arrow.core.Either
 import com.paranid5.crescendo.core.media.files.MediaFile
 import com.paranid5.crescendo.core.media.files.trimmedCatching
-import com.paranid5.crescendo.core.media.tags.setAudioTags
 import com.paranid5.crescendo.core.resources.R
 import com.paranid5.crescendo.domain.metadata.MetadataExtractor
+import com.paranid5.crescendo.domain.tags.TagsRepository
 import com.paranid5.crescendo.system.receivers.TrimmingStatusReceiver
 import com.paranid5.crescendo.utils.extensions.sendAppBroadcast
 import kotlinx.coroutines.Dispatchers
@@ -29,6 +29,7 @@ class TrimmerWorker(
 
     private val json by inject<Json>()
     private val metadataExtractor by inject<MetadataExtractor>()
+    private val tagsRepository by inject<TagsRepository>()
 
     override suspend fun doWork(): Result = Either.catch {
         trimTrackAndSendBroadcast(
@@ -46,11 +47,10 @@ class TrimmerWorker(
         context: Context,
         request: TrimmerWorkRequest,
     ) = context.sendTrimmingStatusBroadcast(
-        withContext(Dispatchers.IO) { trimTrackResult(context = context, request = request) }
+        withContext(Dispatchers.IO) { trimTrackResult(request = request) }
     )
 
     private suspend inline fun trimTrackResult(
-        context: Context,
         request: TrimmerWorkRequest,
     ) = MediaFile.AudioFile(File(request.track.path))
         .trimmedCatching(
@@ -61,8 +61,7 @@ class TrimmerWorker(
             fadeDurations = request.fadeDurations,
         )
         .onRight { file ->
-            setAudioTags(
-                context = context,
+            tagsRepository.setAudioTags(
                 audioFile = file,
                 metadata = metadataExtractor.extractAudioMetadata(request.track),
                 audioFormat = request.audioFormat,

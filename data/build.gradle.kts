@@ -58,6 +58,7 @@ dependencies {
     api(project(":domain:metadata"))
     api(project(":domain:playback"))
     api(project(":domain:stream"))
+    api(project(":domain:tags"))
     api(project(":domain:tracks"))
     api(project(":domain:waveform"))
     api(project(":domain:web"))

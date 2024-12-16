@@ -28,6 +28,7 @@ private fun setVideoTagsToFile(file: MediaFile.VideoFile, metadata: VideoMetadat
 private fun setVideoTagsToFileCatching(file: MediaFile.VideoFile, metadata: VideoMetadata) =
     Either.catch { setVideoTagsToFile(file, metadata) }
 
+@Deprecated("Will be removed")
 suspend fun setVideoTagsAsync(
     context: Context,
     videoFile: MediaFile.VideoFile,
@@ -42,12 +43,12 @@ suspend fun setVideoTagsAsync(
 
     val mediaDirectory = Environment.DIRECTORY_MOVIES
     val mimeType = "video/${videoFile.extension}"
-    val absoluteFilePath = videoFile.absolutePath
+    val absoluteFilePath = videoFile.path
 
     launch(Dispatchers.IO) {
         context.insertMediaFileToMediaStore(
             externalContentUri,
-            absoluteFilePath,
+            absoluteFilePath.value,
             mediaDirectory,
             metadata,
             mimeType
@@ -58,6 +59,7 @@ suspend fun setVideoTagsAsync(
     }
 }
 
+@Deprecated("Will be removed")
 internal fun ContentValues(
     absoluteFilePath: String,
     relativeFilePath: String,

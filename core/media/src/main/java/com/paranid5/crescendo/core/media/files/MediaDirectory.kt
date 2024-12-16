@@ -3,6 +3,7 @@ package com.paranid5.crescendo.core.media.files
 import android.os.Build
 import android.os.Environment
 
+@Deprecated("Will be removed")
 @JvmInline
 value class MediaDirectory(val value: String) : CharSequence {
     override val length
@@ -16,6 +17,7 @@ value class MediaDirectory(val value: String) : CharSequence {
 
 /** @return absolute path of the media directory */
 
+@Deprecated("Will be removed")
 fun getFullMediaDirectory(mediaDirectory: String) = MediaDirectory(
     Environment
         .getExternalStoragePublicDirectory(mediaDirectory)
@@ -24,6 +26,7 @@ fun getFullMediaDirectory(mediaDirectory: String) = MediaDirectory(
 
 /** @return absolute path of the media directory */
 
+@Deprecated("Will be removed")
 fun getFullMediaDirectory(mediaDirectory: MediaDirectory) =
     getFullMediaDirectory(mediaDirectory.value)
 
@@ -32,6 +35,7 @@ fun getFullMediaDirectory(mediaDirectory: MediaDirectory) =
  * for older models it is either [Environment.DIRECTORY_MUSIC] or [Environment.DIRECTORY_MOVIES]
  */
 
+@Deprecated("Will be removed")
 fun getInitialVideoDirectory(isAudio: Boolean) = MediaDirectory(
     when {
         Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q -> Environment.DIRECTORY_MOVIES
