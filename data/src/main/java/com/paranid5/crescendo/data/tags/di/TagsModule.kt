@@ -6,6 +6,6 @@ import org.koin.core.module.dsl.singleOf
 import org.koin.dsl.bind
 import org.koin.dsl.module
 
-val tagsModule = module {
+internal val tagsModule = module {
     singleOf(::TagsRepositoryImpl) bind TagsRepository::class
 }

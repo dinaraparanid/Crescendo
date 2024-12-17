@@ -137,9 +137,9 @@ internal object AudioTags {
 
         when {
             Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q ->
-                put(MediaStore.MediaColumns.RELATIVE_PATH, relativeFilePath.value)
+                put(MediaStore.MediaColumns.RELATIVE_PATH, relativeFilePath.toString())
 
-            else -> put(MediaStore.MediaColumns.DATA, absoluteFilePath.value)
+            else -> put(MediaStore.MediaColumns.DATA, absoluteFilePath.toString())
         }
     }
 }

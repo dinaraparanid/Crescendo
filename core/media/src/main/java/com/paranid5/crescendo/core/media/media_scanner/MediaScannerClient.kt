@@ -11,6 +11,6 @@ class MediaScannerClient(context: Context, private val filePath: Path) :
     private val connection = MediaScannerConnection(context.applicationContext, this)
     fun scan() = connection.connect()
 
-    override fun onMediaScannerConnected() = connection.scanFile(filePath.value, null)
+    override fun onMediaScannerConnected() = connection.scanFile(filePath.toString(), null)
     override fun onScanCompleted(path: String?, uri: Uri?) = connection.disconnect()
 }

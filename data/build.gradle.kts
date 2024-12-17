@@ -52,6 +52,7 @@ dependencies {
 
     api(project(":domain:audio_effects"))
     api(project(":domain:current_playlist"))
+    api(project(":domain:files"))
     api(project(":domain:genius"))
     api(project(":domain:github"))
     api(project(":domain:image"))
@@ -84,4 +85,5 @@ dependencies {
     implementation(libs.coil.compose)
     implementation(libs.jaudiotagger)
     implementation(libs.yt.url.extractor.kt)
+    implementation(libs.mobile.ffmpeg.full)
 }

@@ -49,7 +49,7 @@ suspend fun setAudioTags(
     withContext(Dispatchers.IO) {
         context.insertMediaFileToMediaStore(
             externalContentUri,
-            absoluteFilePath.value,
+            absoluteFilePath.toString(),
             mediaDirectory,
             metadata,
             mimeType

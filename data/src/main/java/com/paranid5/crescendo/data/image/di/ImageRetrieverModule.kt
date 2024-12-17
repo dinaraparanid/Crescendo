@@ -6,6 +6,6 @@ import org.koin.core.module.dsl.singleOf
 import org.koin.dsl.bind
 import org.koin.dsl.module
 
-val imageRetrieverModule = module {
+internal val imageRetrieverModule = module {
     singleOf(::ImageRetrieverImpl) bind ImageRetriever::class
 }

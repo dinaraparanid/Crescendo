@@ -9,4 +9,6 @@ import kotlinx.serialization.Serializable
 @Parcelize
 @Immutable
 @JvmInline
-value class Path(val value: String) : Parcelable
+value class Path(private val value: String) : Parcelable {
+    override fun toString(): String = value
+}

@@ -48,7 +48,7 @@ suspend fun setVideoTagsAsync(
     launch(Dispatchers.IO) {
         context.insertMediaFileToMediaStore(
             externalContentUri,
-            absoluteFilePath.value,
+            absoluteFilePath.toString(),
             mediaDirectory,
             metadata,
             mimeType

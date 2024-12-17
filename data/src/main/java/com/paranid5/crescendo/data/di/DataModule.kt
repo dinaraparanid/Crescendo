@@ -3,6 +3,7 @@ package com.paranid5.crescendo.data.di
 import com.paranid5.crescendo.data.audio_effects.di.audioEffectsModule
 import com.paranid5.crescendo.data.current_playlist.di.currentPlaylistModule
 import com.paranid5.crescendo.data.datastore.di.dataStoreModule
+import com.paranid5.crescendo.data.files.di.mediaFilesModule
 import com.paranid5.crescendo.data.genius.di.geniusModule
 import com.paranid5.crescendo.data.github.di.gitHubModule
 import com.paranid5.crescendo.data.image.di.imageRetrieverModule
@@ -26,6 +27,7 @@ val dataModule = module {
         gitHubModule,
         imageRetrieverModule,
         ktorModule,
+        mediaFilesModule,
         metadataModule,
         playbackModule,
         streamModule,
