@@ -3,7 +3,8 @@ package com.paranid5.crescendo.data.files
 import android.os.Environment
 import arrow.core.Either
 import arrow.core.raise.nullable
-import com.arthenica.mobileffmpeg.FFmpeg
+import com.arthenica.ffmpegkit.FFmpegKit
+import com.arthenica.ffmpegkit.SessionState
 import com.paranid5.crescendo.core.common.trimming.TrimRange
 import com.paranid5.crescendo.data.files.Files.createFileCatching
 import com.paranid5.crescendo.domain.files.model.Filename
@@ -15,8 +16,6 @@ import com.paranid5.crescendo.domain.files.model.fileExtension
 import java.io.File
 
 internal object VideoFiles {
-    private const val FFMPEG_SUCCESS = 0
-
     suspend fun createVideoFileCatching(
         filename: Filename,
         ext: MediaFileExtension,
@@ -53,8 +52,8 @@ internal object VideoFiles {
     private inline fun MediaFile.VideoFile.toAudioFile(
         newFile: File,
         crossinline ffmpegCmd: (File) -> String,
-    ): MediaFile.AudioFile? = when (FFmpeg.execute(ffmpegCmd(newFile))) {
-        FFMPEG_SUCCESS -> {
+    ): MediaFile.AudioFile? = when (FFmpegKit.execute(ffmpegCmd(newFile)).state) {
+        SessionState.COMPLETED -> {
             delete()
             MediaFile.AudioFile(newFile)
         }

@@ -2,7 +2,8 @@ package com.paranid5.crescendo.core.media.files
 
 import android.os.Environment
 import android.util.Log
-import com.arthenica.mobileffmpeg.FFmpeg
+import com.arthenica.ffmpegkit.FFmpegKit
+import com.arthenica.ffmpegkit.SessionState
 import com.paranid5.crescendo.core.common.caching.Formats
 import com.paranid5.crescendo.core.common.caching.fileExtension
 import com.paranid5.crescendo.core.common.media.MediaFileExtension
@@ -51,8 +52,8 @@ private suspend inline fun MediaFile.VideoFile.toAudioFileImplAsync(
 private inline fun MediaFile.VideoFile.toAudioFile(
     newFile: File,
     crossinline ffmpegCmd: (File) -> String
-) = when (FFmpeg.execute(ffmpegCmd(newFile))) {
-    0 -> {
+) = when (FFmpegKit.execute(ffmpegCmd(newFile)).state) {
+    SessionState.FAILED -> {
         delete()
         MediaFile.AudioFile(newFile)
     }

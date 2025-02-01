@@ -4,7 +4,7 @@ import android.os.Environment
 import android.util.Log
 import arrow.core.Either
 import arrow.core.flatMap
-import com.arthenica.mobileffmpeg.FFmpeg
+import com.arthenica.ffmpegkit.FFmpegKit
 import com.paranid5.crescendo.core.common.caching.Formats
 import com.paranid5.crescendo.core.common.caching.fileExtension
 import com.paranid5.crescendo.core.common.media.MediaFileExtension
@@ -64,7 +64,7 @@ private fun trim(
     )
 
     Log.d(TAG, command)
-    Log.d(TAG, "FFmpeg status: ${FFmpeg.execute(command)}")
+    Log.d(TAG, "FFmpeg status: ${FFmpegKit.execute(command)}")
 }
 
 private fun ffmpegTrimCommand(

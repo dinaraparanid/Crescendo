@@ -32,6 +32,7 @@ internal fun PlayerStateChangedListener(service: TrackService) =
 
         override fun onPlayerError(error: PlaybackException) {
             super.onPlayerError(error)
+            error.printStackTrace()
             service.playerProvider.isStoppedWithError = true
             service.showErrNotificationAndSendBroadcast(error)
         }

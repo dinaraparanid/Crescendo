@@ -1,6 +1,5 @@
 package com.paranid5.crescendo.system.services.track.playback
 
-import android.os.Build
 import androidx.media3.common.PlaybackParameters
 import com.paranid5.crescendo.system.services.track.TrackService
 import com.paranid5.system.services.common.playback.AudioEffectsController
@@ -67,8 +66,7 @@ private fun resetPlaybackEffects(
             audioEffectsController.bassBoost.enabled = isEnabled
 
             // TODO: figure out what happened with reverb
-            if (Build.VERSION.SDK_INT != Build.VERSION_CODES.UPSIDE_DOWN_CAKE)
-                audioEffectsController.reverb.enabled = isEnabled
+            // audioEffectsController.reverb.enabled = isEnabled
         } catch (ignored: IllegalStateException) {
             // not initialized
         }
