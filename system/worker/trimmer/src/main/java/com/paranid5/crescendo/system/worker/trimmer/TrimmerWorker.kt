@@ -83,7 +83,7 @@ class TrimmerWorker(
             is Either.Right -> getString(R.string.trimmer_done)
 
             is Either.Left -> "${getString(R.string.error)}: " +
-                    (trimmingResult.value.message
+                    (trimmingResult.value.message.also { trimmingResult.value.printStackTrace() }
                         ?: getString(R.string.unknown_error))
         }
 }

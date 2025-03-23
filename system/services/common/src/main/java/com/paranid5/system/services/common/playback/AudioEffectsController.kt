@@ -44,7 +44,8 @@ class AudioEffectsControllerImpl(
     override fun initAudioEffects(audioSessionId: Int) {
         equalizer = Equalizer(0, audioSessionId)
         bassBoost = BassBoost(0, audioSessionId)
-        reverb = PresetReverb(0, audioSessionId)
+        reverb = PresetReverb(0, audioSessionId) // Это не правильно, оставил, чтобы не искажал звук
+        // reverb = PresetReverb(0, 0) <- правильно https://stackoverflow.com/questions/61775727/using-android-presetreverb-on-audiotrack
     }
 
     override fun setEqParameter(
@@ -56,11 +57,14 @@ class AudioEffectsControllerImpl(
         updateEqData(bandLevels, preset, currentParameter)
     }
 
-    override fun setBassStrength(bassStrength: Short) =
-        bassBoost.setStrength(bassStrength)
+    override fun setBassStrength(bassStrength: Short) {
+        kotlin.runCatching { bassBoost.setStrength(bassStrength) }
+    }
 
     override fun setReverbPreset(reverbPreset: Short) {
-        reverb.preset = reverbPreset
+        kotlin.runCatching { reverb.preset = reverbPreset }.onFailure {
+            it.printStackTrace()
+        }
     }
 
     private fun updateEqData(

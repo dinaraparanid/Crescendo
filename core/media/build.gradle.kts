@@ -52,7 +52,6 @@ dependencies {
 
     implementation(libs.bundles.arrow)
 
-    implementation(libs.mobile.ffmpeg.full)
     implementation(libs.jaudiotagger)
 
     implementation(libs.yt.url.extractor.kt)

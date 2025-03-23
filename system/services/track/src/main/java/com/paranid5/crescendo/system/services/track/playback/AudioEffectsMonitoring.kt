@@ -39,13 +39,13 @@ internal suspend fun TrackService.startBassMonitoring() =
     playerProvider
         .bassStrengthFlow
         .distinctUntilChanged()
-        .collectLatest { playerProvider.setBassStrength(it) }
+        .collectLatest { playerProvider.setBassStrength(bassStrength = it) }
 
 internal suspend fun TrackService.startReverbMonitoring() =
     playerProvider
         .reverbPresetFlow
         .distinctUntilChanged()
-        .collectLatest { playerProvider.setReverbPreset(it) }
+        .collectLatest { playerProvider.setReverbPreset(reverbPreset = it) }
 
 private fun resetPlaybackEffects(
     audioEffectsController: AudioEffectsController,
@@ -59,16 +59,10 @@ private fun resetPlaybackEffects(
         else -> PlaybackParameters(1F, 1F)
     }
 
-    // For some reason, it requires multiple tries to enable...
-    repeat(3) {
-        try {
-            audioEffectsController.equalizer.enabled = isEnabled
-            audioEffectsController.bassBoost.enabled = isEnabled
-
-            // TODO: figure out what happened with reverb
-            // audioEffectsController.reverb.enabled = isEnabled
-        } catch (ignored: IllegalStateException) {
-            // not initialized
-        }
-    }
+    runCatching {
+        audioEffectsController.equalizer.enabled = isEnabled
+        audioEffectsController.bassBoost.enabled = isEnabled
+        // звук искажается
+        // audioEffectsController.reverb.enabled = isEnabled
+    }.onFailure { it.printStackTrace() }
 }

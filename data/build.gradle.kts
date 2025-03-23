@@ -85,5 +85,4 @@ dependencies {
     implementation(libs.coil.compose)
     implementation(libs.jaudiotagger)
     implementation(libs.yt.url.extractor.kt)
-    implementation(libs.mobile.ffmpeg.full)
 }

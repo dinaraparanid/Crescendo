@@ -2,6 +2,7 @@ package com.paranid5.crescendo.system.services.track.playback
 
 import androidx.annotation.OptIn
 import androidx.media3.common.AudioAttributes
+import androidx.media3.common.AuxEffectInfo
 import androidx.media3.common.C
 import androidx.media3.common.util.UnstableApi
 import androidx.media3.exoplayer.ExoPlayer
@@ -40,11 +41,13 @@ internal class PlayerControllerImpl(
             .setPauseAtEndOfMediaItems(false)
             .setWakeMode(C.WAKE_MODE_LOCAL)
             .setPriority(C.PRIORITY_MAX)
+            //.setSkipSilenceEnabled(true) // smooth transition
             .build()
             .apply {
                 addListener(PlayerStateChangedListener(service))
                 playbackRepository.updateAudioSessionId(audioSessionId)
                 initAudioEffects(audioSessionId)
+                setAuxEffectInfo(AuxEffectInfo(reverb.id, 1F))
                 service.serviceScope.sideEffect { startRepeatMonitoring() }
             }
     }

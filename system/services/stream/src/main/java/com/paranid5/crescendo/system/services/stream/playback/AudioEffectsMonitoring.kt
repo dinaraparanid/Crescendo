@@ -1,6 +1,5 @@
 package com.paranid5.crescendo.system.services.stream.playback
 
-import android.os.Build
 import androidx.media3.common.PlaybackParameters
 import com.paranid5.crescendo.system.services.stream.StreamService
 import com.paranid5.system.services.common.playback.AudioEffectsController
@@ -62,17 +61,12 @@ private fun resetPlaybackEffects(
         else -> PlaybackParameters(1F, 1F)
     }
 
-    // For some reason, it requires multiple tries to enable...
-    repeat(3) {
-        try {
-            audioEffectsController.equalizer.enabled = isEnabled
-            audioEffectsController.bassBoost.enabled = isEnabled
+    runCatching {
+        audioEffectsController.equalizer.enabled = isEnabled
+        audioEffectsController.bassBoost.enabled = isEnabled
 
-            // TODO: figure out what happened with reverb
-            if (Build.VERSION.SDK_INT != Build.VERSION_CODES.UPSIDE_DOWN_CAKE)
-                audioEffectsController.reverb.enabled = isEnabled
-        } catch (ignored: IllegalStateException) {
-            // not initialized
-        }
+        // TODO: figure out what happened with reverb
+        // if (Build.VERSION.SDK_INT != Build.VERSION_CODES.UPSIDE_DOWN_CAKE)
+        // audioEffectsController.reverb.enabled = isEnabled
     }
 }

@@ -1,6 +1,7 @@
 package com.paranid5.crescendo.system.services.track.playback
 
 import androidx.media3.common.Player
+import androidx.media3.exoplayer.ExoPlayer
 import com.paranid5.crescendo.core.common.tracks.Track
 import com.paranid5.crescendo.domain.playback.RepeatingPublisher
 import com.paranid5.crescendo.domain.playback.RepeatingSubscriber
@@ -11,7 +12,7 @@ interface PlayerController :
     AudioEffectsController,
     RepeatingSubscriber,
     RepeatingPublisher {
-    val player: Player
+    val player: ExoPlayer
 
     var isPlaying: Boolean
     val isPlayingState: StateFlow<Boolean>
