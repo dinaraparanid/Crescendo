@@ -64,9 +64,6 @@ private fun resetPlaybackEffects(
     runCatching {
         audioEffectsController.equalizer.enabled = isEnabled
         audioEffectsController.bassBoost.enabled = isEnabled
-
-        // TODO: figure out what happened with reverb
-        // if (Build.VERSION.SDK_INT != Build.VERSION_CODES.UPSIDE_DOWN_CAKE)
-        // audioEffectsController.reverb.enabled = isEnabled
+        audioEffectsController.reverb.enabled = isEnabled
     }
 }

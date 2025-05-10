@@ -62,7 +62,6 @@ private fun resetPlaybackEffects(
     runCatching {
         audioEffectsController.equalizer.enabled = isEnabled
         audioEffectsController.bassBoost.enabled = isEnabled
-        // звук искажается
-        // audioEffectsController.reverb.enabled = isEnabled
+        audioEffectsController.reverb.enabled = isEnabled
     }.onFailure { it.printStackTrace() }
 }

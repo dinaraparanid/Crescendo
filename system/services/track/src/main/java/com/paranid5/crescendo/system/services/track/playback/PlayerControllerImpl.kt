@@ -41,7 +41,6 @@ internal class PlayerControllerImpl(
             .setPauseAtEndOfMediaItems(false)
             .setWakeMode(C.WAKE_MODE_LOCAL)
             .setPriority(C.PRIORITY_MAX)
-            //.setSkipSilenceEnabled(true) // smooth transition
             .build()
             .apply {
                 addListener(PlayerStateChangedListener(service))

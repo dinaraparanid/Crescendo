@@ -9,9 +9,12 @@ object FFmpeg {
         System.loadLibrary("avutil")
         System.loadLibrary("swresample")
         System.loadLibrary("swscale")
+        System.loadLibrary("native-lib")
     }
 
-    private external fun executeImpl(rawCommand: String): Int
+    private external fun execute(args: Array<String>): Int
 
-    fun execute(command: String): Int = executeImpl("ffmpeg $command")
+    fun execute(command: String): Int = execute(
+        arrayOf("ffmpeg", *command.split(' ').toTypedArray())
+    )
 }

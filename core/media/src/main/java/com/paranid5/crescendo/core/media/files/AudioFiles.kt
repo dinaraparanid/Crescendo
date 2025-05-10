@@ -63,7 +63,7 @@ private fun trim(
     )
 
     Log.d(TAG, command)
-    Log.d(TAG, "FFmpeg status: ${Runtime.getRuntime().exec("ffmpeg $command").waitFor()}")
+    Log.d(TAG, "FFmpeg status: ${FFmpeg.execute(command)}")
 }
 
 private fun ffmpegTrimCommand(

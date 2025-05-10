@@ -13,10 +13,10 @@ android {
     defaultConfig {
         applicationId 'com.paranid5.crescendo'
         minSdk 24
-        ndkVersion "28.0.13004108"
         targetSdk 35
         versionCode 1
         versionName '0.4.0.0'
+        ndkVersion "29.0.13113456"
 
         testInstrumentationRunner 'androidx.test.runner.AndroidJUnitRunner'
 
@@ -62,6 +62,12 @@ android {
         }
         jniLibs {
             useLegacyPackaging true
+        }
+    }
+    externalNativeBuild {
+        cmake {
+            path "src/main/cpp/CMakeLists.txt"
+            version "3.31.6"
         }
     }
 }
@@ -144,7 +150,6 @@ dependencies {
     implementation libs.ytdl.lib
 
     implementation files('libs/jave-1.0.2.jar')
-    implementation fileTree(dir: "libs", include: ["lib*.so"])
 }
 
 tasks.configureEach {
