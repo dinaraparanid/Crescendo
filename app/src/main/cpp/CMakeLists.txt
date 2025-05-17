@@ -17,16 +17,6 @@ include(ExternalProject)
 
 set(FFMPEG_LIBS avutil swresample avcodec avformat swscale avfilter avdevice)
 set(FFMPEG_CONFIGURE_EXTRAS --enable-jni --enable-mediacodec)
-IF (${LIB_X264_ENABLED})
-    include(libx264.cmake)
-
-    set(FFMPEG_DEPENDS libx264_target)
-    set(FFMPEG_EXTRA_LD_FLAGS "-L${CMAKE_LIBRARY_OUTPUT_DIRECTORY}")
-    set(FFMPEG_EXTRA_C_FLAGS "-I${CMAKE_LIBRARY_OUTPUT_DIRECTORY}/include")
-
-    list(APPEND FFMPEG_CONFIGURE_EXTRAS --enable-gpl --enable-libx264 --enable-nonfree)
-    list(APPEND FFMPEG_LIBS postproc x264)
-ENDIF()
 
 include(ffmpeg.cmake)
 

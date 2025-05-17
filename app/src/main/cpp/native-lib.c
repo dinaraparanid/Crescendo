@@ -6,7 +6,6 @@
 #include <unistd.h>
 #include <pthread.h>
 #include <android/log.h>
-#include <jni.h>
 
 static int pfd[2];
 static pthread_t thr;
@@ -23,7 +22,7 @@ static void* thread_func(void* in) {
     return 0;
 }
 
-jint JNI_OnLoad(JavaVM* vm, void* reserved){
+jint JNI_OnLoad(JavaVM* vm, void* reserved) {
     av_jni_set_java_vm(vm, NULL);
 
     setvbuf(stdout, 0, _IOLBF, 0);
@@ -43,6 +42,7 @@ jint JNI_OnLoad(JavaVM* vm, void* reserved){
 }
 
 int main(int argc, char **argv);
+
 JNIEXPORT jint JNICALL Java_com_paranid5_crescendo_core_media_files_FFmpeg_execute(
     JNIEnv* env,
     jobject thiz,
@@ -64,8 +64,7 @@ JNIEXPORT jint JNICALL Java_com_paranid5_crescendo_core_media_files_FFmpeg_execu
         }
     }
 
-    jint retcode = 0;
-    retcode = main(argc, argv);
+    const int retcode = main(argc, argv);
 
     for (i = 0; i < argc; ++i) {
         (*env)->ReleaseStringUTFChars(env, strr[i], argv[i]);
@@ -74,5 +73,5 @@ JNIEXPORT jint JNICALL Java_com_paranid5_crescendo_core_media_files_FFmpeg_execu
     free(argv);
     free(strr);
 
-    return retcode;
+    return (jint) retcode;
 }

@@ -2,6 +2,7 @@ package com.paranid5.crescendo.core.media.files
 
 object FFmpeg {
     init {
+        System.loadLibrary("mp3lame")
         System.loadLibrary("avcodec")
         System.loadLibrary("avdevice")
         System.loadLibrary("avfilter")

@@ -51,6 +51,7 @@ android {
     }
     buildFeatures {
         compose true
+        prefab true
     }
     composeOptions {
         kotlinCompilerExtensionVersion '1.5.7'

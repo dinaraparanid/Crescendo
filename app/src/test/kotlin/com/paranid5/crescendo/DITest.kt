@@ -4,10 +4,13 @@ import androidx.lifecycle.SavedStateHandle
 import com.paranid5.crescendo.di.appModule
 import io.ktor.client.HttpClientConfig
 import io.ktor.client.engine.HttpClientEngine
+import org.koin.core.annotation.KoinExperimentalAPI
 import org.koin.test.verify.verify
 import kotlin.test.Test
 
 class DITest {
+
+    @OptIn(KoinExperimentalAPI::class)
     @Test
     fun koinGraphTest() {
         appModule.verify(

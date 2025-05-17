@@ -63,7 +63,9 @@ private fun trim(
     )
 
     Log.d(TAG, command)
-    Log.d(TAG, "FFmpeg status: ${FFmpeg.execute(command)}")
+    val status = FFmpeg.execute(command)
+    Log.d(TAG, "FFmpeg status: $status")
+    require(status == 0)
 }
 
 private fun ffmpegTrimCommand(
@@ -73,11 +75,11 @@ private fun ffmpegTrimCommand(
     pitchAndSpeed: PitchAndSpeed,
     fadeDurations: FadeDurations
 ) = "-y -ss ${trimRange.startPointMillis}ms " +
-        "-i \"$inputPath\" " +
+        "-i $inputPath " +
         "-t ${trimRange.totalDurationMillis}ms " +
         "-af asetrate=44100*${pitchAndSpeed.pitch}," +
         "aresample=44100," +
         "atempo=${pitchAndSpeed.speed}/${pitchAndSpeed.pitch}," +
         "afade=in:0:d=${fadeDurations.fadeInSecs}," +
         "afade=out:st=${trimRange.totalDurationSecs - fadeDurations.fadeOutSecs}:d=${fadeDurations.fadeOutSecs} " +
-        "\"$outputPath\""
+        outputPath

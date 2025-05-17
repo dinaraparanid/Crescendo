@@ -31,14 +31,12 @@ class TrimmerWorker(
     private val metadataExtractor by inject<MetadataExtractor>()
     private val tagsRepository by inject<TagsRepository>()
 
-    override suspend fun doWork(): Result = Either.catch {
-        trimTrackAndSendBroadcast(
-            context = applicationContext,
-            request = json.decodeFromString<TrimmerWorkRequest>(
-                requireNotNull(inputData.getString(REQUEST_KEY))
-            ),
-        )
-    }.fold(
+    override suspend fun doWork(): Result = trimTrackAndSendBroadcast(
+        context = applicationContext,
+        request = json.decodeFromString<TrimmerWorkRequest>(
+            requireNotNull(inputData.getString(REQUEST_KEY))
+        ),
+    ).fold(
         ifLeft = { Result.failure() },
         ifRight = { Result.success() },
     )
@@ -46,9 +44,11 @@ class TrimmerWorker(
     private suspend inline fun trimTrackAndSendBroadcast(
         context: Context,
         request: TrimmerWorkRequest,
-    ) = context.sendTrimmingStatusBroadcast(
-        withContext(Dispatchers.IO) { trimTrackResult(request = request) }
-    )
+    ): Either<Throwable, MediaFile.AudioFile> {
+        val res = withContext(Dispatchers.IO) { trimTrackResult(request = request) }
+        context.sendTrimmingStatusBroadcast(trimmingResult = res)
+        return res
+    }
 
     private suspend inline fun trimTrackResult(
         request: TrimmerWorkRequest,
