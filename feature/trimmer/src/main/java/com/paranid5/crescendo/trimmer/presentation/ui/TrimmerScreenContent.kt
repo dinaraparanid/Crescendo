@@ -188,7 +188,7 @@ private fun TrimmerScreenContentPortrait(
             top.linkTo(controllers.bottom, margin = appPadding.large)
             start.linkTo(parent.start, margin = appPadding.extraMedium)
             end.linkTo(parent.end, margin = appPadding.extraMedium)
-            width = Dimension.matchParent
+            width = Dimension.fillToConstraints
         },
     ) {
         onUiIntent(TrimmerUiIntent.FileSave.UpdateDialogVisibility(isVisible = true))

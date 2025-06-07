@@ -2,7 +2,6 @@ package com.paranid5.crescendo.trimmer.presentation
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.ModalBottomSheetLayout
 import androidx.compose.material.ModalBottomSheetValue
 import androidx.compose.material.rememberModalBottomSheetState
@@ -18,7 +17,6 @@ import com.paranid5.crescendo.trimmer.presentation.ui.TrimmerScreenContent
 import com.paranid5.crescendo.trimmer.view_model.TrimmerState
 import com.paranid5.crescendo.trimmer.view_model.TrimmerUiIntent
 
-@OptIn(ExperimentalMaterialApi::class)
 @Composable
 internal fun TrimmerScreenImpl(
     state: TrimmerState,

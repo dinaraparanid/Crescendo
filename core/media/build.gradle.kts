@@ -55,4 +55,8 @@ dependencies {
     implementation(libs.jaudiotagger)
 
     implementation(libs.yt.url.extractor.kt)
+
+    implementation(libs.smart.exception.java)
+
+    implementation(files("../../app/libs/jave-1.0.2.jar", "../../app/libs/ffmpeg-kit-full-gpl-6.0-2.LTS.aar"))
 }

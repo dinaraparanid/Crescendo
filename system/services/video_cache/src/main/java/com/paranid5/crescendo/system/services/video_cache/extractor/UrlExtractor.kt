@@ -6,6 +6,7 @@ import arrow.core.raise.either
 import arrow.core.raise.ensure
 import com.paranid5.crescendo.domain.metadata.MetadataExtractor
 import com.paranid5.crescendo.domain.metadata.model.VideoMetadata
+import com.paranid5.crescendo.utils.extensions.catchNonCancellation
 import com.paranid5.yt_url_extractor_kt.VideoMeta
 import com.paranid5.yt_url_extractor_kt.YtFilesNotFoundException
 import com.paranid5.yt_url_extractor_kt.YtRequestTimeoutException
@@ -16,15 +17,13 @@ import io.ktor.client.HttpClient
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import kotlinx.coroutines.withTimeout
-import org.koin.core.component.KoinComponent
-import org.koin.core.component.inject
 
 private const val TIMEOUT = 28000L
 
-internal class UrlExtractor : KoinComponent {
-    private val ktorClient by inject<HttpClient>()
-    private val metaExtractor by inject<MetadataExtractor>()
-
+internal class UrlExtractor(
+    private val ktorClient: HttpClient,
+    private val metaExtractor: MetadataExtractor,
+) {
     suspend fun extractUrlsWithMeta(
         context: Context,
         ytUrl: String,
@@ -49,7 +48,7 @@ internal class UrlExtractor : KoinComponent {
     }
 
     private suspend inline fun extractYtFilesWithMeta(context: Context, ytUrl: String) =
-        Either.catch {
+        Either.catchNonCancellation {
             withTimeout(TIMEOUT) {
                 ktorClient
                     .extractYtFilesWithMeta(context, ytUrl)
@@ -60,7 +59,7 @@ internal class UrlExtractor : KoinComponent {
     private fun extractWithYtDl(ytUrl: String) =
         YoutubeDL
             .getInstance()
-            .getInfo(YoutubeDLRequest(ytUrl))
+            .getInfo(YoutubeDLRequest(ytUrl).addOption("-f", "best"))
             .url
 
     private fun Result<VideoMeta>.getOrDefault() =
