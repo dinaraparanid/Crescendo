@@ -6,15 +6,16 @@ import android.os.Build
 import android.os.Environment
 import android.provider.MediaStore
 import arrow.core.Either
-import com.paranid5.crescendo.core.common.caching.Formats
-import com.paranid5.crescendo.core.common.caching.mimeType
-import com.paranid5.crescendo.core.common.media.MimeType
 import com.paranid5.crescendo.core.common.uri.Path
-import com.paranid5.crescendo.core.media.files.MediaFile
 import com.paranid5.crescendo.core.media.images.getImageBinaryDataFromPathCatching
 import com.paranid5.crescendo.core.media.images.getImageBinaryDataFromUrlCatching
 import com.paranid5.crescendo.core.media.media_scanner.sendScanFile
 import com.paranid5.crescendo.data.tags.MediaStore.insertMediaFileToMediaStore
+import com.paranid5.crescendo.domain.files.entity.Formats
+import com.paranid5.crescendo.domain.files.entity.MediaFile
+import com.paranid5.crescendo.domain.files.entity.MimeType
+import com.paranid5.crescendo.domain.files.entity.mimeType
+import com.paranid5.crescendo.domain.image.model.Image
 import com.paranid5.crescendo.domain.metadata.model.AudioMetadata
 import com.paranid5.crescendo.domain.metadata.model.Metadata
 import com.paranid5.crescendo.domain.metadata.model.VideoMetadata
@@ -80,7 +81,7 @@ internal object AudioTags {
         metadata
             .covers
             .asSequence()
-            .map { getImageBinaryDataFromUrlCatching(context, it.value.value) }
+            .map { getImageBinaryDataCatching(context = context, image = it) }
             .firstOrNull { it.isRight() }
             ?.getOrNull()
             ?.let { ArtworkFactory.getNew().apply { binaryData = it } }
@@ -97,12 +98,19 @@ internal object AudioTags {
         metadata
             .covers
             .asSequence()
-            .map { getImageBinaryDataFromPathCatching(context, it.value.value) }
+            .map { getImageBinaryDataCatching(context = context, image = it) }
             .firstOrNull { it.isRight() }
             ?.getOrNull()
             ?.let { ArtworkFactory.getNew().apply { binaryData = it } }
             ?.let(tag::setField)
     }
+
+    private fun getImageBinaryDataCatching(context: Context, image: Image) =
+        when (image) {
+            is Image.Path -> getImageBinaryDataFromPathCatching(context, image.value.value)
+            is Image.Url -> getImageBinaryDataFromUrlCatching(context, image.value.value)
+            is Image.Resource -> Either.Left(Exception("Resource files are not supported"))
+        }
 
     private fun setAudioTagsToFileCatching(
         context: Context,

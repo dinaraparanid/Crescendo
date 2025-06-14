@@ -13,7 +13,7 @@ import kotlinx.parcelize.Parcelize
 data class VideoMetadataUiState(
     val title: String,
     val author: String,
-    val coversUrls: ImmutableList<Image.Url>,
+    val coversUrls: ImmutableList<Image>,
     val durationMillis: Long,
     val isLiveStream: Boolean,
 ) : Parcelable {

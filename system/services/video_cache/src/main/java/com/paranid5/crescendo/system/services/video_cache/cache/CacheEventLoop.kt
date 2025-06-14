@@ -2,9 +2,9 @@ package com.paranid5.crescendo.system.services.video_cache.cache
 
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.repeatOnLifecycle
+import com.paranid5.crescendo.caching.entity.VideoCacheData
 import com.paranid5.crescendo.core.common.caching.CachingStatus
 import com.paranid5.crescendo.core.common.caching.DownloadingStatus
-import com.paranid5.crescendo.core.common.caching.VideoCacheData
 import com.paranid5.crescendo.system.services.video_cache.VideoCacheService
 import com.paranid5.crescendo.system.services.video_cache.extractor.extractMediaFilesAndStartCaching
 import kotlinx.coroutines.flow.distinctUntilChanged

@@ -3,7 +3,7 @@ package com.paranid5.crescendo.data.files
 import android.os.Build
 import android.os.Environment
 import com.paranid5.crescendo.core.common.uri.Path
-import com.paranid5.crescendo.domain.files.model.MediaDirectory
+import com.paranid5.crescendo.domain.files.entity.MediaDirectory
 
 internal object MediaDirectoryPath {
     fun getFullMediaDirectoryPath(mediaDirectory: String): Path =

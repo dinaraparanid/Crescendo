@@ -1,8 +1,8 @@
 package com.paranid5.crescendo.data.tags
 
 import android.content.Context
-import com.paranid5.crescendo.core.common.caching.Formats
-import com.paranid5.crescendo.core.media.files.MediaFile
+import com.paranid5.crescendo.domain.files.entity.Formats
+import com.paranid5.crescendo.domain.files.entity.MediaFile
 import com.paranid5.crescendo.domain.metadata.model.AudioMetadata
 import com.paranid5.crescendo.domain.metadata.model.VideoMetadata
 import com.paranid5.crescendo.domain.tags.TagsRepository

@@ -3,11 +3,11 @@ package com.paranid5.crescendo.domain.files
 import android.os.Environment
 import arrow.core.Either
 import com.paranid5.crescendo.core.common.trimming.TrimRange
-import com.paranid5.crescendo.domain.files.model.Filename
-import com.paranid5.crescendo.domain.files.model.Formats
-import com.paranid5.crescendo.domain.files.model.MediaDirectory
-import com.paranid5.crescendo.domain.files.model.MediaFile
-import com.paranid5.crescendo.domain.files.model.MediaFileExtension
+import com.paranid5.crescendo.domain.files.entity.Filename
+import com.paranid5.crescendo.domain.files.entity.Formats
+import com.paranid5.crescendo.domain.files.entity.MediaDirectory
+import com.paranid5.crescendo.domain.files.entity.MediaFile
+import com.paranid5.crescendo.domain.files.entity.MediaFileExtension
 
 interface MediaFilesRepository {
     suspend fun createAudioFile(
@@ -16,7 +16,7 @@ interface MediaFilesRepository {
         mediaDirectory: MediaDirectory = MediaDirectory(Environment.DIRECTORY_MUSIC),
     ): Either<Throwable, MediaFile.AudioFile>
 
-    suspend fun createVideoFileCatching(
+    suspend fun createVideoFile(
         filename: Filename,
         ext: MediaFileExtension,
         mediaDirectory: MediaDirectory = MediaDirectory(Environment.DIRECTORY_MOVIES),
@@ -27,4 +27,6 @@ interface MediaFilesRepository {
         audioFormat: Formats,
         trimRange: TrimRange,
     ): MediaFile.AudioFile?
+
+    fun getInitialVideoDirectory(isAudio: Boolean): MediaDirectory
 }

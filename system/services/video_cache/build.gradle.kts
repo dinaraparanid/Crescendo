@@ -35,9 +35,12 @@ android {
 dependencies {
     implementation(project(":core:common"))
     implementation(project(":core:impl"))
-    implementation(project(":core:media"))
+    implementation(project(":core:media")) // TODO: убрать
     implementation(project(":core:utils"))
     implementation(project(":core:resources"))
+
+    api(project(":domain:caching"))
+    api(project(":domain:files"))
 
     implementation(project(":data")) // TODO: убрать
 

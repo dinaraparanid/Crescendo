@@ -3,10 +3,10 @@ package com.paranid5.crescendo.trimmer.view_model
 import android.os.Parcelable
 import androidx.compose.runtime.Immutable
 import androidx.compose.ui.focus.FocusState
-import com.paranid5.crescendo.core.common.caching.Formats
 import com.paranid5.crescendo.core.common.trimming.FadeDurations
 import com.paranid5.crescendo.core.common.trimming.PitchAndSpeed
 import com.paranid5.crescendo.core.common.trimming.TrimRange
+import com.paranid5.crescendo.domain.files.entity.Formats
 import com.paranid5.crescendo.trimmer.domain.entities.ShownEffects
 import com.paranid5.crescendo.trimmer.presentation.CONTROLLER_CIRCLE_CENTER
 import com.paranid5.crescendo.trimmer.presentation.CONTROLLER_CIRCLE_RADIUS

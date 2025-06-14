@@ -1,4 +1,4 @@
-package com.paranid5.crescendo.domain.files.model
+package com.paranid5.crescendo.domain.files.entity
 
 import com.paranid5.crescendo.core.common.uri.Path
 import java.io.File

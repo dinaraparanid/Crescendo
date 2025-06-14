@@ -5,9 +5,8 @@ import android.content.Intent
 import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
 import arrow.core.Either
-import com.paranid5.crescendo.core.media.files.MediaFile
-import com.paranid5.crescendo.core.media.files.trimmedCatching
 import com.paranid5.crescendo.core.resources.R
+import com.paranid5.crescendo.domain.files.entity.MediaFile
 import com.paranid5.crescendo.domain.metadata.MetadataExtractor
 import com.paranid5.crescendo.domain.tags.TagsRepository
 import com.paranid5.crescendo.system.receivers.TrimmingStatusReceiver
@@ -30,6 +29,7 @@ class TrimmerWorker(
     private val json by inject<Json>()
     private val metadataExtractor by inject<MetadataExtractor>()
     private val tagsRepository by inject<TagsRepository>()
+    private val trimAudioFileUseCase by inject<TrimAudioFileUseCase>()
 
     override suspend fun doWork(): Result = trimTrackAndSendBroadcast(
         context = applicationContext,
@@ -50,17 +50,15 @@ class TrimmerWorker(
         return res
     }
 
-    private suspend inline fun trimTrackResult(
-        request: TrimmerWorkRequest,
-    ) = MediaFile.AudioFile(File(request.track.path))
-        .trimmedCatching(
+    private suspend inline fun trimTrackResult(request: TrimmerWorkRequest) =
+        trimAudioFileUseCase(
+            file = MediaFile.AudioFile(File(request.track.path)),
             outputFilename = request.outputFilename,
             audioFormat = request.audioFormat,
             trimRange = request.trimRange,
             pitchAndSpeed = request.pitchAndSpeed,
             fadeDurations = request.fadeDurations,
-        )
-        .onRight { file ->
+        ).onRight { file ->
             tagsRepository.setAudioTags(
                 audioFile = file,
                 metadata = metadataExtractor.extractAudioMetadata(request.track),
@@ -68,15 +66,16 @@ class TrimmerWorker(
             )
         }
 
-    private fun Context.sendTrimmingStatusBroadcast(trimmingResult: Either<Throwable, MediaFile.AudioFile>) =
-        sendAppBroadcast(
-            Intent(applicationContext, TrimmingStatusReceiver::class.java)
-                .setAction(TrimmingStatusReceiver.Broadcast_TRIMMING_COMPLETED)
-                .putExtra(
-                    TrimmingStatusReceiver.TRIMMING_STATUS_ARG,
-                    trimmingStatusMessage(trimmingResult),
-                )
-        )
+    private fun Context.sendTrimmingStatusBroadcast(
+        trimmingResult: Either<Throwable, MediaFile.AudioFile>,
+    ) = sendAppBroadcast(
+        Intent(applicationContext, TrimmingStatusReceiver::class.java)
+            .setAction(TrimmingStatusReceiver.Broadcast_TRIMMING_COMPLETED)
+            .putExtra(
+                TrimmingStatusReceiver.TRIMMING_STATUS_ARG,
+                trimmingStatusMessage(trimmingResult),
+            )
+    )
 
     private fun Context.trimmingStatusMessage(trimmingResult: Either<Throwable, MediaFile.AudioFile>) =
         when (trimmingResult) {

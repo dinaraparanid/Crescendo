@@ -3,10 +3,10 @@ package com.paranid5.crescendo.system.services.video_cache
 import android.content.Context
 import android.content.Intent
 import android.os.Build
-import com.paranid5.crescendo.core.common.caching.Formats
 import com.paranid5.crescendo.core.common.trimming.TrimRange
 import com.paranid5.crescendo.core.impl.di.VIDEO_CACHE_SERVICE_CONNECTION
 import com.paranid5.crescendo.core.impl.trimmer.TrimRangeModel
+import com.paranid5.crescendo.domain.files.entity.Formats
 import com.paranid5.crescendo.system.common.broadcast.VideoCacheServiceBroadcasts
 import com.paranid5.system.services.common.ServiceAccessor
 import com.paranid5.system.services.common.ServiceAccessorImpl
@@ -15,8 +15,10 @@ import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import org.koin.core.qualifier.named
 
-class VideoCacheServiceAccessor(context: Context) : KoinComponent,
+class VideoCacheServiceAccessor(context: Context) :
+    KoinComponent,
     ServiceAccessor by ServiceAccessorImpl(context) {
+
     private val isVideoCacheServiceConnectedState by inject<MutableStateFlow<Boolean>>(
         named(VIDEO_CACHE_SERVICE_CONNECTION)
     )

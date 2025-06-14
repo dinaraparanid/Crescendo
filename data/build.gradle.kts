@@ -46,7 +46,7 @@ android {
 
 dependencies {
     api(project(":core:common"))
-    api(project(":core:media"))
+    api(project(":core:media")) // TODO убрать
     api(project(":core:resources"))
     api(project(":core:utils"))
 

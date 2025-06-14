@@ -2,16 +2,18 @@ package com.paranid5.crescendo.system.services.video_cache
 
 import android.content.Intent
 import android.os.Build
-import com.paranid5.crescendo.core.common.caching.Formats
-import com.paranid5.crescendo.core.common.caching.VideoCacheData
+import com.paranid5.crescendo.caching.entity.VideoCacheData
 import com.paranid5.crescendo.core.impl.trimmer.TrimRangeModel
 import com.paranid5.crescendo.core.impl.trimmer.toEntity
+import com.paranid5.crescendo.domain.files.entity.Formats
+import com.paranid5.crescendo.domain.tags.ConvertToAudioFileAndSetTagsUseCase
 import com.paranid5.crescendo.domain.tags.TagsRepository
 import com.paranid5.crescendo.system.common.broadcast.VideoCacheServiceBroadcasts
 import com.paranid5.crescendo.system.services.video_cache.cache.CacheManager
 import com.paranid5.crescendo.system.services.video_cache.cache.cacheNewVideoAsync
 import com.paranid5.crescendo.system.services.video_cache.cache.startCacheEventLoop
 import com.paranid5.crescendo.system.services.video_cache.extractor.UrlExtractor
+import com.paranid5.crescendo.system.services.video_cache.files.InitMediaFileUseCase
 import com.paranid5.crescendo.system.services.video_cache.files.MediaFileDownloader
 import com.paranid5.crescendo.system.services.video_cache.files.VideoQueueManager
 import com.paranid5.crescendo.system.services.video_cache.notification.NotificationManager
@@ -21,6 +23,7 @@ import com.paranid5.crescendo.system.services.video_cache.receivers.CancelAllRec
 import com.paranid5.crescendo.system.services.video_cache.receivers.CancelCurrentVideoReceiver
 import com.paranid5.crescendo.system.services.video_cache.receivers.registerReceivers
 import com.paranid5.crescendo.system.services.video_cache.receivers.unregisterReceivers
+import com.paranid5.crescendo.utils.extensions.notNull
 import com.paranid5.system.services.common.ConnectionManager
 import com.paranid5.system.services.common.PlaybackForegroundService
 import com.paranid5.system.services.common.SuspendService
@@ -39,6 +42,8 @@ class VideoCacheService : SuspendService(),
     internal val urlExtractor by inject<UrlExtractor>()
     internal val mediaFileDownloader by inject<MediaFileDownloader>()
     internal val tagsRepository by inject<TagsRepository>()
+    internal val initMediaFileUseCase by inject<InitMediaFileUseCase>()
+    internal val convertToAudioFileAndSetTagsUseCase by inject<ConvertToAudioFileAndSetTagsUseCase>()
 
     internal val cacheNextVideoReceiver = CacheNextVideoReceiver(this)
     internal val cancelCurrentVideoReceiver = CancelCurrentVideoReceiver(this)
@@ -69,40 +74,39 @@ class VideoCacheService : SuspendService(),
         disconnect()
         unregisterReceivers()
     }
-}
 
-private fun VideoCacheService.launchMonitoringTasks() {
-    serviceScope.launch { startCacheEventLoop() }
-    serviceScope.launch { startNotificationMonitoring() }
+    private fun launchMonitoringTasks() {
+        serviceScope.launch { startCacheEventLoop() }
+        serviceScope.launch { startNotificationMonitoring() }
+    }
 }
 
 internal inline val Intent.videoCacheDataArg
     get() = VideoCacheData(
-        url = requireNotNull(getStringExtra(VideoCacheServiceBroadcasts.URL_ARG)),
-        desiredFilename = requireNotNull(getStringExtra(VideoCacheServiceBroadcasts.FILENAME_ARG)),
+        url = getStringExtra(VideoCacheServiceBroadcasts.URL_ARG).notNull,
+        desiredFilename = getStringExtra(VideoCacheServiceBroadcasts.FILENAME_ARG).notNull,
         format = formatArg,
         trimRange = trimRangeArg.toEntity(),
     )
 
 @Suppress("DEPRECATION")
-private inline val Intent.formatArg
+internal inline val Intent.formatArg
     get() = when {
-        Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU -> requireNotNull(
-            getSerializableExtra(VideoCacheServiceBroadcasts.FORMAT_ARG, Formats::class.java)
+        Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU -> getSerializableExtra(
+            VideoCacheServiceBroadcasts.FORMAT_ARG,
+            Formats::class.java
         )
 
         else -> getSerializableExtra(VideoCacheServiceBroadcasts.FORMAT_ARG) as Formats
-    }
+    }.notNull
 
 @Suppress("DEPRECATION")
-private inline val Intent.trimRangeArg
-    get() = requireNotNull(
-        when {
-            Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU -> getParcelableExtra(
-                VideoCacheServiceBroadcasts.TRIM_RANGE_ARG,
-                TrimRangeModel::class.java,
-            )
+internal inline val Intent.trimRangeArg
+    get() = when {
+        Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU -> getParcelableExtra(
+            VideoCacheServiceBroadcasts.TRIM_RANGE_ARG,
+            TrimRangeModel::class.java,
+        )
 
-            else -> getParcelableExtra(VideoCacheServiceBroadcasts.TRIM_RANGE_ARG)
-        }
-    )
+        else -> getParcelableExtra(VideoCacheServiceBroadcasts.TRIM_RANGE_ARG)
+    }.notNull

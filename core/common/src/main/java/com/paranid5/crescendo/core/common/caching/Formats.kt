@@ -3,8 +3,10 @@ package com.paranid5.crescendo.core.common.caching
 import com.paranid5.crescendo.core.common.media.MediaFileExtension
 import com.paranid5.crescendo.core.common.media.MimeType
 
+@Deprecated("Will be removed")
 enum class Formats { MP3, WAV, AAC, MP4 }
 
+@Deprecated("Will be removed")
 val Formats.fileExtension
     get() = MediaFileExtension(
         when (this) {
@@ -15,6 +17,7 @@ val Formats.fileExtension
         }
     )
 
+@Deprecated("Will be removed")
 val Formats.mimeType
     get() = MimeType(
         when (this) {

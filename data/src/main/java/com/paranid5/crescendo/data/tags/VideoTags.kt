@@ -6,13 +6,13 @@ import android.os.Build
 import android.os.Environment
 import android.provider.MediaStore
 import arrow.core.Either
-import com.paranid5.crescendo.core.common.caching.Formats
-import com.paranid5.crescendo.core.common.caching.mimeType
-import com.paranid5.crescendo.core.common.media.MimeType
 import com.paranid5.crescendo.core.common.uri.Path
-import com.paranid5.crescendo.core.media.files.MediaFile
 import com.paranid5.crescendo.core.media.media_scanner.sendScanFile
 import com.paranid5.crescendo.data.tags.MediaStore.insertMediaFileToMediaStore
+import com.paranid5.crescendo.domain.files.entity.Formats
+import com.paranid5.crescendo.domain.files.entity.MediaFile
+import com.paranid5.crescendo.domain.files.entity.MimeType
+import com.paranid5.crescendo.domain.files.entity.mimeType
 import com.paranid5.crescendo.domain.metadata.model.VideoMetadata
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.coroutineScope
@@ -22,6 +22,7 @@ import org.jaudiotagger.tag.mp4.Mp4FieldKey
 import org.jaudiotagger.tag.mp4.Mp4Tag
 
 internal object VideoTags {
+
     suspend fun setVideoTags(
         context: Context,
         videoFile: MediaFile.VideoFile,

@@ -2,8 +2,8 @@ package com.paranid5.crescendo.cache.view_model
 
 import android.os.Parcelable
 import androidx.compose.runtime.Immutable
-import com.paranid5.crescendo.core.common.caching.Formats
 import com.paranid5.crescendo.core.common.trimming.TrimRange
+import com.paranid5.crescendo.domain.files.entity.Formats
 import kotlinx.parcelize.IgnoredOnParcel
 import kotlinx.parcelize.Parcelize
 

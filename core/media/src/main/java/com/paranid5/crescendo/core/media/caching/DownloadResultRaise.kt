@@ -5,6 +5,7 @@ import arrow.core.raise.recover
 import com.paranid5.crescendo.core.media.files.MediaFile
 import kotlin.experimental.ExperimentalTypeInference
 
+@Deprecated("Will be removed")
 @JvmInline
 value class DownloadResultRaise(private val raise: Raise<CachingResult.DownloadResult>) :
     Raise<CachingResult.DownloadResult> by raise {
@@ -15,6 +16,7 @@ value class DownloadResultRaise(private val raise: Raise<CachingResult.DownloadR
         }
 }
 
+@Deprecated("Will be removed")
 @OptIn(ExperimentalTypeInference::class)
 inline fun downloadResult(
     @BuilderInference block: DownloadResultRaise.() -> MediaFile,

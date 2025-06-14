@@ -17,6 +17,7 @@ import com.paranid5.crescendo.feature.stream.di.streamModule
 import com.paranid5.crescendo.system.services.stream.di.streamServiceModule
 import com.paranid5.crescendo.system.services.track.di.trackServiceModule
 import com.paranid5.crescendo.system.services.video_cache.di.videoCacheServiceModule
+import com.paranid5.crescendo.system.worker.trimmer.di.trimmerWorkerModule
 import com.paranid5.crescendo.tracks.di.tracksModule
 import com.paranid5.crescendo.trimmer.di.trimmerModule
 import com.paranid5.crescendo.ui.permissions.description_providers.AudioRecordingDescriptionProvider
@@ -79,7 +80,7 @@ private val permissionsModule = module {
 }
 
 private val systemModule = module {
-    includes(servicesModule, permissionsModule)
+    includes(servicesModule, permissionsModule, trimmerWorkerModule)
 }
 
 private val featureModule = module {

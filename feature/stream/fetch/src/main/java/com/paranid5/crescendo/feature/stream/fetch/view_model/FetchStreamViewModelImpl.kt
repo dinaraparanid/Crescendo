@@ -79,7 +79,7 @@ internal class FetchStreamViewModelImpl(
 
         val coverUiState = metaRes.fold(
             ifLeft = { UiState.Error(it.message) },
-            ifRight = { fetchCover(it.covers).toUiState() },
+            ifRight = { fetchCover(it.covers.map { it as Image.Url }).toUiState() },
         )
 
         updateState { copy(coverUiState = coverUiState) }
@@ -87,7 +87,7 @@ internal class FetchStreamViewModelImpl(
 
     private fun refreshCover() = viewModelScope.sideEffect(Dispatchers.Default) {
         val coverUiState = state.videoMetadataUiState.fold(
-            ifPresent = { fetchCover(it.coversUrls).toUiState() },
+            ifPresent = { fetchCover(it.coversUrls.map { it as Image.Url }).toUiState() },
             ifEmpty = { UiState.Error() },
         )
 

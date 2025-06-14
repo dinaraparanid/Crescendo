@@ -1,8 +1,8 @@
 package com.paranid5.crescendo.system.services.video_cache.cache
 
 import android.content.Intent
-import com.paranid5.crescendo.core.media.caching.CachingResult
-import com.paranid5.crescendo.core.media.caching.VideoCacheResponse
+import com.paranid5.crescendo.caching.entity.CachingResult
+import com.paranid5.crescendo.caching.entity.VideoCacheResponse
 import com.paranid5.crescendo.system.receivers.CacheStatusReceiver
 import com.paranid5.crescendo.system.services.video_cache.VideoCacheService
 import com.paranid5.crescendo.utils.extensions.sendAppBroadcast

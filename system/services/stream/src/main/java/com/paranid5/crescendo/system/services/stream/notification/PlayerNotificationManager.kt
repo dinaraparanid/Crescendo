@@ -14,6 +14,7 @@ import androidx.media3.ui.PlayerNotificationManager
 import com.paranid5.crescendo.core.media.images.getThumbnailBitmap
 import com.paranid5.crescendo.core.media.images.getVideoCoverBitmapOrThumbnailAsync
 import com.paranid5.crescendo.core.resources.R
+import com.paranid5.crescendo.domain.image.model.Image
 import com.paranid5.crescendo.system.common.intent.mainActivityIntent
 import com.paranid5.crescendo.system.services.stream.ACTION_DISMISS
 import com.paranid5.crescendo.system.services.stream.ACTION_REPEAT
@@ -141,7 +142,7 @@ private suspend inline fun NotificationManager.getVideoCoverBitmap(context: Cont
         ?.let { metadata ->
             getVideoCoverBitmapOrThumbnailAsync(
                 context = context,
-                videoCovers = metadata.covers.map { it.value.value },
+                videoCovers = metadata.covers.map { (it as Image.Url).value.value },
             )
         }
         ?.await()

@@ -33,7 +33,7 @@ android {
 }
 
 dependencies {
-    implementation(project(":core:media")) // TODO: убрать (files)
+    api(project(":domain:files"))
     api(project(":domain:metadata"))
 
     implementation(libs.androidx.core.ktx)

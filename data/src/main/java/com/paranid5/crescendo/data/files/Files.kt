@@ -4,9 +4,9 @@ import android.os.Environment
 import arrow.core.Either
 import com.paranid5.crescendo.core.common.uri.Path
 import com.paranid5.crescendo.data.files.MediaDirectoryPath.getFullMediaDirectoryPath
-import com.paranid5.crescendo.domain.files.model.Filename
-import com.paranid5.crescendo.domain.files.model.MediaDirectory
-import com.paranid5.crescendo.domain.files.model.MediaFileExtension
+import com.paranid5.crescendo.domain.files.entity.Filename
+import com.paranid5.crescendo.domain.files.entity.MediaDirectory
+import com.paranid5.crescendo.domain.files.entity.MediaFileExtension
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.io.File

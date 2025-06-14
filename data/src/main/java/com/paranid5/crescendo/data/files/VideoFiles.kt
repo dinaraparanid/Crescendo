@@ -6,12 +6,12 @@ import arrow.core.raise.nullable
 import com.paranid5.crescendo.core.common.trimming.TrimRange
 import com.paranid5.crescendo.core.media.files.FFmpeg
 import com.paranid5.crescendo.data.files.Files.createFileCatching
-import com.paranid5.crescendo.domain.files.model.Filename
-import com.paranid5.crescendo.domain.files.model.Formats
-import com.paranid5.crescendo.domain.files.model.MediaDirectory
-import com.paranid5.crescendo.domain.files.model.MediaFile
-import com.paranid5.crescendo.domain.files.model.MediaFileExtension
-import com.paranid5.crescendo.domain.files.model.fileExtension
+import com.paranid5.crescendo.domain.files.entity.Filename
+import com.paranid5.crescendo.domain.files.entity.Formats
+import com.paranid5.crescendo.domain.files.entity.MediaDirectory
+import com.paranid5.crescendo.domain.files.entity.MediaFile
+import com.paranid5.crescendo.domain.files.entity.MediaFileExtension
+import com.paranid5.crescendo.domain.files.entity.fileExtension
 import java.io.File
 
 internal object VideoFiles {

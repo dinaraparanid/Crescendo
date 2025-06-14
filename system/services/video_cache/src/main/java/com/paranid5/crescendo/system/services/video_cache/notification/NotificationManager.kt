@@ -139,12 +139,6 @@ internal class NotificationManager(service: VideoCacheService) {
             CanceledNotificationBuilder(context).build()
         )
 
-    private fun showDownloadErrorNotification(context: Context, code: Int, description: String) =
-        manager.notify(
-            VIDEO_CACHE_NOTIFICATION_ID,
-            DownloadErrorNotificationBuilder(context, code, description).build()
-        )
-
     private fun showConnectionLostNotification(context: Context) =
         manager.notify(
             VIDEO_CACHE_NOTIFICATION_ID,

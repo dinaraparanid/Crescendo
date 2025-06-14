@@ -3,20 +3,21 @@ package com.paranid5.crescendo.system.services.video_cache.extractor
 import arrow.core.Either
 import arrow.core.raise.either
 import arrow.core.raise.ensureNotNull
-import com.paranid5.crescendo.core.common.caching.Formats
+import com.paranid5.crescendo.caching.entity.CachingResult
+import com.paranid5.crescendo.caching.entity.cachingResult
+import com.paranid5.crescendo.caching.entity.isError
+import com.paranid5.crescendo.caching.entity.onCanceled
 import com.paranid5.crescendo.core.common.trimming.TrimRange
-import com.paranid5.crescendo.core.media.caching.CachingResult
-import com.paranid5.crescendo.core.media.caching.cachingResult
-import com.paranid5.crescendo.core.media.caching.isNotError
-import com.paranid5.crescendo.core.media.caching.onCanceled
-import com.paranid5.crescendo.core.media.convertToAudioFileAndSetTagsAsync
-import com.paranid5.crescendo.core.media.files.MediaFile
+import com.paranid5.crescendo.domain.files.entity.Formats
+import com.paranid5.crescendo.domain.files.entity.MediaFile
 import com.paranid5.crescendo.domain.metadata.model.VideoMetadata
 import com.paranid5.crescendo.system.services.video_cache.VideoCacheService
-import com.paranid5.crescendo.system.services.video_cache.files.initMediaFile
+import com.paranid5.crescendo.utils.extensions.notNull
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.onEach
 import java.util.concurrent.atomic.AtomicLong
 
 private const val RETRY_DELAY = 2000L
@@ -27,7 +28,7 @@ internal suspend fun VideoCacheService.extractMediaFilesAndStartCaching(
     format: Formats,
     trimRange: TrimRange,
 ) = cachingResult {
-    val cacheFile = initMediaFile(
+    val cacheFile = initMediaFileUseCase(
         desiredFilename = desiredFilename,
         isAudio = false,
     ).bind()
@@ -66,8 +67,10 @@ internal suspend fun VideoCacheService.extractMediaFilesAndStartCaching(
     }
 
     return implFlow()
-        .first { it.isNotErrorOrDelay() }
-        .getOrNull()!!
+        .onEach { if (it.isNotError.not()) delay(RETRY_DELAY) }
+        .first { it.isNotError }
+        .getOrNull()
+        .notNull
 }
 
 private suspend fun VideoCacheService.cacheAudioFile(
@@ -88,13 +91,12 @@ private suspend fun VideoCacheService.cacheAudioFile(
         val file = result as MediaFile.VideoFile
         cacheManager.onConversionStarted()
 
-        val audioConversionResult =
-            file.convertToAudioFileAndSetTagsAsync(
-                context = this@cacheAudioFile,
-                videoMetadata = videoMetadata,
-                audioFormat = audioFormat,
-                trimRange = trimRange,
-            ).await()
+        val audioConversionResult = convertToAudioFileAndSetTagsUseCase(
+            videoFile = file,
+            videoMetadata = videoMetadata,
+            audioFormat = audioFormat,
+            trimRange = trimRange,
+        )
 
         ensureNotNull(audioConversionResult) {
             CachingResult.ConversionError
@@ -138,7 +140,5 @@ private suspend fun VideoCacheService.cacheVideoFile(
     return impl().onCanceled { videoQueueManager.decrementQueueLen() }
 }
 
-private suspend inline fun Either<Throwable, CachingResult?>.isNotErrorOrDelay() =
-    isRight { it?.isNotError == true }.also { isNotError ->
-        if (isNotError.not()) delay(RETRY_DELAY)
-    }
+private inline val Either<Throwable, CachingResult?>.isNotError
+    get() = isRight { it?.isError?.not() == true }

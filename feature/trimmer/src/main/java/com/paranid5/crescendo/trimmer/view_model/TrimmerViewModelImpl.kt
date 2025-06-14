@@ -21,6 +21,7 @@ import com.paranid5.crescendo.core.common.tracks.DefaultTrack
 import com.paranid5.crescendo.core.common.tracks.Track
 import com.paranid5.crescendo.core.common.udf.StatePublisher
 import com.paranid5.crescendo.core.common.udf.state
+import com.paranid5.crescendo.domain.files.entity.Filename
 import com.paranid5.crescendo.domain.tracks.TracksRepository
 import com.paranid5.crescendo.domain.waveform.WaveformRepository
 import com.paranid5.crescendo.system.worker.trimmer.TrimmerWorkRequest
@@ -242,7 +243,7 @@ internal class TrimmerViewModelImpl(
                                 TrimmerWorker.REQUEST_KEY to json.encodeToString(
                                     TrimmerWorkRequest(
                                         track = DefaultTrack(track),
-                                        outputFilename = state.fileSaveDialogProperties.filename,
+                                        outputFilename = Filename(state.fileSaveDialogProperties.filename),
                                         audioFormat = state.fileSaveDialogProperties.audioFormat,
                                         trimRange = state.playbackPositions.trimRange,
                                         pitchAndSpeed = state.playbackProperties.pitchAndSpeed,

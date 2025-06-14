@@ -26,6 +26,7 @@ import coil.request.ImageRequest
 import com.paranid5.crescendo.core.common.PlaybackStatus
 import com.paranid5.crescendo.core.media.images.ImageSize
 import com.paranid5.crescendo.core.resources.ui.theme.AppTheme.dimensions
+import com.paranid5.crescendo.domain.image.model.Image
 import com.paranid5.crescendo.feature.playing.presentation.ui.composition_local.LocalCoverAlpha
 import com.paranid5.crescendo.feature.playing.presentation.ui.composition_local.LocalPalette
 import com.paranid5.crescendo.feature.playing.view_model.PlayingState
@@ -53,7 +54,7 @@ internal fun PlayingScreenPortrait(
     var palette by remember { mutableStateOf<Palette?>(null) }
 
     val videoCovers = remember(state.currentMetadata) {
-        state.currentMetadata?.coversUrls?.mapToImmutableList { it.value.value }.orNil()
+        state.currentMetadata?.coversUrls?.mapToImmutableList { (it as Image.Url).value.value }.orNil()
     }
 
     val trackPath = remember(state.currentTrack) {

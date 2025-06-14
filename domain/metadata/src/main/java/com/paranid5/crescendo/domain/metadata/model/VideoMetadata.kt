@@ -7,7 +7,7 @@ import kotlinx.serialization.Serializable
 data class VideoMetadata(
     override val title: String? = null,
     override val author: String? = null,
-    override val covers: List<Image.Url> = listOf(),
+    override val covers: List<Image> = listOf(),
     override val durationMillis: Long = 0,
     val isLiveStream: Boolean = false,
 ) : Metadata

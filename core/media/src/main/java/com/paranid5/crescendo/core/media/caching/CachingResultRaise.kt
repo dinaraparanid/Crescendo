@@ -5,6 +5,7 @@ import arrow.core.raise.recover
 import com.paranid5.crescendo.core.media.files.MediaFile
 import kotlin.experimental.ExperimentalTypeInference
 
+@Deprecated("Will be removed")
 @JvmInline
 value class CachingResultRaise(private val raise: Raise<CachingResult>) :
     Raise<CachingResult> by raise {
@@ -16,6 +17,7 @@ value class CachingResultRaise(private val raise: Raise<CachingResult>) :
         }
 }
 
+@Deprecated("Will be removed")
 @OptIn(ExperimentalTypeInference::class)
 inline fun cachingResult(
     @BuilderInference block: CachingResultRaise.() -> MediaFile

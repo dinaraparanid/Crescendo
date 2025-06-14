@@ -5,8 +5,8 @@ import android.content.Context
 import android.net.Uri
 import android.os.Build
 import android.provider.MediaStore
-import com.paranid5.crescendo.core.common.media.MimeType
 import com.paranid5.crescendo.core.common.uri.Path
+import com.paranid5.crescendo.domain.files.entity.MimeType
 import com.paranid5.crescendo.domain.metadata.model.AudioMetadata
 import com.paranid5.crescendo.domain.metadata.model.Metadata
 import com.paranid5.crescendo.domain.metadata.model.VideoMetadata

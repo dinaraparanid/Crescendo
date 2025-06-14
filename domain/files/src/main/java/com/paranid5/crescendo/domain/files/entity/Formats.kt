@@ -1,4 +1,4 @@
-package com.paranid5.crescendo.domain.files.model
+package com.paranid5.crescendo.domain.files.entity
 
 enum class Formats { MP3, WAV, AAC, MP4 }
 

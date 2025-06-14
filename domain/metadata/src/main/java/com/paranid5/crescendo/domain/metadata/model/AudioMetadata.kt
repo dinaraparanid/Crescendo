@@ -7,7 +7,7 @@ import kotlinx.serialization.Serializable
 data class AudioMetadata(
     override val title: String? = null,
     override val author: String? = null,
-    @JvmField val album: String? = null,
-    override val covers: List<Image.Path> = listOf(),
+    val album: String? = null,
+    override val covers: List<Image> = listOf(),
     override val durationMillis: Long = 0,
 ) : Metadata

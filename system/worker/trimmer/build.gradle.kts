@@ -38,8 +38,9 @@ dependencies {
     implementation(project(":core:media"))
     implementation(project(":core:resources"))
 
-    implementation(project(":domain:metadata"))
-    implementation(project(":domain:tags"))
+    api(project(":domain:files"))
+    api(project(":domain:metadata"))
+    api(project(":domain:tags"))
 
     implementation(project(":system:receivers"))
 

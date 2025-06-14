@@ -98,8 +98,6 @@ sqldelight-coroutines-extensions = { module = "app.cash.sqldelight:coroutines-ex
 
 yt-url-extractor-kt = { module = "com.github.dinaraparanid:yt-url-extractor-kt", version.ref = "ytUrlExtractorKt" }
 ytdl-lib = { group = "io.github.junkfood02.youtubedl-android", name = "library", version.ref = "ytdl" }
-ytdl-ffmpeg = { group = "io.github.junkfood02.youtubedl-android", name = "ffmpeg", version.ref = "ytdl" }
-ytdl-aria = { group = "io.github.junkfood02.youtubedl-android", name = "aria2c", version.ref = "ytdl" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
@@ -111,5 +109,4 @@ compose-compiler = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "
 sqlDelight = { id = "app.cash.sqldelight", version.ref = "sqlDelight" }
 
 [bundles]
-ytdl = ["ytdl-lib", "ytdl-ffmpeg", "ytdl-aria"]
 arrow = ["arrow-fx-coroutines", "arrow-functions"]
