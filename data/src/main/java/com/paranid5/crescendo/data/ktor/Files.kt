@@ -6,6 +6,7 @@ import arrow.core.raise.nullable
 import com.paranid5.crescendo.core.common.caching.DownloadFilesStatus
 import com.paranid5.crescendo.core.common.caching.DownloadingStatus
 import com.paranid5.crescendo.core.common.caching.isCanceled
+import com.paranid5.crescendo.utils.extensions.catchNonCancellation
 import com.paranid5.crescendo.utils.identity
 import io.ktor.client.HttpClient
 import io.ktor.client.request.header
@@ -83,9 +84,9 @@ private suspend fun downloadFileResult(
     totalProgressState: MutableStateFlow<DownloadingProgress>?,
     totalBytes: (response: HttpResponse) -> Long
 ): DownloadFilesStatus {
-    suspend fun impl() = Either.catch {
+    suspend fun impl() = Either.catchNonCancellation {
         if (downloadingState.value.isCanceled)
-            return@catch DownloadFilesStatus.Canceled
+            return@catchNonCancellation DownloadFilesStatus.Canceled
 
         prepareFileGet(url = fileUrl, progress = fileProgress.get()).execute { response ->
             if (response.status.isSuccess().not())

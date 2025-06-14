@@ -7,6 +7,7 @@ import arrow.core.raise.ensure
 import com.paranid5.crescendo.domain.metadata.MetadataExtractor
 import com.paranid5.crescendo.domain.metadata.model.VideoMetadata
 import com.paranid5.crescendo.utils.extensions.catchNonCancellation
+import com.paranid5.crescendo.utils.extensions.runCatchingNonCancellation
 import com.paranid5.yt_url_extractor_kt.VideoMeta
 import com.paranid5.yt_url_extractor_kt.YtFilesNotFoundException
 import com.paranid5.yt_url_extractor_kt.YtRequestTimeoutException
@@ -38,7 +39,7 @@ internal class UrlExtractor(
             LiveStreamingNotAllowedException()
         }
 
-        val mediaUrl = withContext(Dispatchers.IO) { extractWithYtDl(ytUrl) }
+        val mediaUrl = withContext(Dispatchers.IO) { extractWithYtDl(ytUrl) }.bind()
 
         ensure(mediaUrl != null) {
             YtFilesNotFoundException()
@@ -56,11 +57,15 @@ internal class UrlExtractor(
             }
         }
 
-    private fun extractWithYtDl(ytUrl: String) =
+    private fun extractWithYtDl(ytUrl: String) = Either.catchNonCancellation {
         YoutubeDL
             .getInstance()
-            .getInfo(YoutubeDLRequest(ytUrl).addOption("-f", "best"))
+            .getInfo(
+                YoutubeDLRequest(ytUrl)
+                    .addOption("-f", "bestaudio")
+            )
             .url
+    }
 
     private fun Result<VideoMeta>.getOrDefault() =
         getOrNull()?.let(metaExtractor::extractVideoMetadata) ?: VideoMetadata()

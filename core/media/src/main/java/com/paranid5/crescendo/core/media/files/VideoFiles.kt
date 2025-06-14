@@ -49,7 +49,7 @@ private suspend inline fun MediaFile.VideoFile.toAudioFileImplAsync(
 
 private inline fun MediaFile.VideoFile.toAudioFile(
     newFile: File,
-    crossinline ffmpegCmd: (File) -> String
+    crossinline ffmpegCmd: (File) -> String,
 ) = when (FFmpeg.execute(ffmpegCmd(newFile))) {
     0 -> {
         delete()

@@ -6,6 +6,8 @@ import arrow.core.raise.either
 import arrow.core.raise.ensure
 import com.paranid5.crescendo.domain.metadata.MetadataExtractor
 import com.paranid5.crescendo.domain.metadata.model.VideoMetadata
+import com.paranid5.crescendo.utils.extensions.catchNonCancellation
+import com.paranid5.crescendo.utils.extensions.runCatchingNonCancellation
 import com.paranid5.yt_url_extractor_kt.VideoMeta
 import com.paranid5.yt_url_extractor_kt.YtFilesNotFoundException
 import com.paranid5.yt_url_extractor_kt.YtRequestTimeoutException
@@ -38,7 +40,7 @@ internal class UrlExtractor : KoinComponent {
 
         val audioUrl = when (videoMeta.isLiveStream) {
             true -> liveStreamManifests?.hlsManifestUrl
-            else -> withContext(Dispatchers.IO) { extractWithYtDl(ytUrl) }
+            else -> withContext(Dispatchers.IO) { extractWithYtDl(ytUrl) }.bind()
         }
 
         ensure(audioUrl != null) {
@@ -57,11 +59,12 @@ internal class UrlExtractor : KoinComponent {
             }
         }
 
-    private fun extractWithYtDl(ytUrl: String) =
+    private fun extractWithYtDl(ytUrl: String) = Either.catchNonCancellation {
         YoutubeDL
             .getInstance()
-            .getInfo(YoutubeDLRequest(ytUrl))
-            .url
+            .execute(YoutubeDLRequest(ytUrl).addOption("--get-url"))
+            .out
+    }
 
     private fun Result<VideoMeta>.getOrDefault() =
         getOrNull()?.let(metadataExtractor::extractVideoMetadata) ?: VideoMetadata()

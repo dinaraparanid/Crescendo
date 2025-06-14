@@ -29,6 +29,8 @@ inline fun <R> runCatchingNonCancellation(
 ) = try {
     Result.success(block())
 } catch (e: Throwable) {
+    e.printStackTrace()
+
     when (e) {
         is InterruptedException, is CancellationException -> throw e
         else -> Result.failure(e)
