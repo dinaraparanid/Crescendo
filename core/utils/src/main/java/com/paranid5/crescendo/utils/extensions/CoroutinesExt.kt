@@ -1,6 +1,7 @@
 package com.paranid5.crescendo.utils.extensions
 
 import android.util.Log
+import com.paranid5.core.common.BuildConfig
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineExceptionHandler
@@ -26,10 +27,10 @@ fun CoroutineScope.launchInScope(
 inline fun <R> runCatchingNonCancellation(
     finallyBlock: () -> Unit = {},
     block: () -> R,
-) = try {
+): Result<R> = try {
     Result.success(block())
 } catch (e: Throwable) {
-    e.printStackTrace()
+    if (BuildConfig.DEBUG) e.printStackTrace()
 
     when (e) {
         is InterruptedException, is CancellationException -> throw e

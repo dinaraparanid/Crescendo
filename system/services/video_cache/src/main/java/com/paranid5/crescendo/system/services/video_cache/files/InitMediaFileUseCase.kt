@@ -3,7 +3,8 @@ package com.paranid5.crescendo.system.services.video_cache.files
 import com.paranid5.crescendo.caching.entity.CachingResult
 import com.paranid5.crescendo.domain.files.MediaFilesRepository
 import com.paranid5.crescendo.domain.files.entity.Filename
-import com.paranid5.crescendo.domain.files.entity.MediaFileExtension
+import com.paranid5.crescendo.domain.files.entity.Formats
+import com.paranid5.crescendo.domain.files.entity.fileExtension
 
 internal class InitMediaFileUseCase(
     private val repository: MediaFilesRepository,
@@ -15,7 +16,9 @@ internal class InitMediaFileUseCase(
         .createVideoFile(
             mediaDirectory = repository.getInitialVideoDirectory(isAudio),
             filename = Filename(desiredFilename.replace(Regex("\\W+"), "_")),
-            ext = MediaFileExtension("mp4"),
+            ext = Formats.MP4.fileExtension,
         )
-        .mapLeft { CachingResult.DownloadResult.FileCreationError }
+        .mapLeft {
+            CachingResult.DownloadResult.FileCreationError
+        }
 }

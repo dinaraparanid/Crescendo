@@ -19,6 +19,7 @@ import com.paranid5.crescendo.domain.image.model.Image
 import com.paranid5.crescendo.domain.metadata.model.AudioMetadata
 import com.paranid5.crescendo.domain.metadata.model.Metadata
 import com.paranid5.crescendo.domain.metadata.model.VideoMetadata
+import com.paranid5.crescendo.utils.extensions.catchNonCancellation
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import org.jaudiotagger.audio.AudioFileIO
@@ -93,7 +94,7 @@ internal object AudioTags {
         file: MediaFile.AudioFile,
         metadata: AudioMetadata,
     ) = setBaseAudioTagsToFile(file, metadata) { tag ->
-        tag.setField(FieldKey.ALBUM, metadata.album)
+        tag.setField(FieldKey.ALBUM, metadata.album.orEmpty())
 
         metadata
             .covers
@@ -116,7 +117,7 @@ internal object AudioTags {
         context: Context,
         file: MediaFile.AudioFile,
         metadata: Metadata,
-    ) = Either.catch {
+    ) = Either.catchNonCancellation {
         when (metadata) {
             is AudioMetadata -> setAudioTagsToFile(context, file, metadata)
             is VideoMetadata -> setAudioTagsToFile(context, file, metadata)

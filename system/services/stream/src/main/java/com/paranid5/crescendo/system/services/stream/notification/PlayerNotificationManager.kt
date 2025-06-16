@@ -142,7 +142,7 @@ private suspend inline fun NotificationManager.getVideoCoverBitmap(context: Cont
         ?.let { metadata ->
             getVideoCoverBitmapOrThumbnailAsync(
                 context = context,
-                videoCovers = metadata.covers.map { (it as Image.Url).value.value },
+                videoCovers = metadata.covers.mapNotNull { (it as? Image.Url?)?.value?.value },
             )
         }
         ?.await()

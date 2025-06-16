@@ -63,7 +63,7 @@ internal fun MediaSessionCallback(service: StreamService) =
             intent: Intent
         ): Boolean {
             val key = intent.extras
-                ?.getParcelableCompat(EXTRA_KEY_EVENT, KeyEvent::class.java)
+                ?.getParcelableCompat(EXTRA_KEY_EVENT, KeyEvent::class)
                 ?: return false
 
             return when (key.keyCode) {

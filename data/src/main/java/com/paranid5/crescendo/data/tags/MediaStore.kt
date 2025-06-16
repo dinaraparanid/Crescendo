@@ -12,6 +12,7 @@ import com.paranid5.crescendo.domain.metadata.model.Metadata
 import com.paranid5.crescendo.domain.metadata.model.VideoMetadata
 
 internal object MediaStore {
+
     fun Context.insertMediaFileToMediaStore(
         externalContentUri: Uri,
         absoluteFilePath: Path,

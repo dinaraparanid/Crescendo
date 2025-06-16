@@ -79,7 +79,7 @@ internal class FetchStreamViewModelImpl(
 
         val coverUiState = metaRes.fold(
             ifLeft = { UiState.Error(it.message) },
-            ifRight = { fetchCover(it.covers.map { it as Image.Url }).toUiState() },
+            ifRight = { fetchCover(it.covers.mapNotNull { it as? Image.Url? }).toUiState() },
         )
 
         updateState { copy(coverUiState = coverUiState) }

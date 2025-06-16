@@ -70,7 +70,7 @@ internal fun MediaSessionCallback(service: TrackService) =
             intent: Intent,
         ): Boolean {
             val key = intent.extras
-                ?.getParcelableCompat(EXTRA_KEY_EVENT, KeyEvent::class.java)
+                ?.getParcelableCompat(EXTRA_KEY_EVENT, KeyEvent::class)
                 ?: return false
 
             // TODO: рандомно приходит KEYCODE_MEDIA_NEXT

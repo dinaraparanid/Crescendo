@@ -36,6 +36,9 @@ dependencies {
     implementation(project(":core:impl"))
     implementation(project(":core:media"))
     implementation(project(":core:resources"))
+
+    implementation(project(":domain:caching"))
+
     implementation(project(":system:common"))
 
     implementation(libs.androidx.core.ktx)

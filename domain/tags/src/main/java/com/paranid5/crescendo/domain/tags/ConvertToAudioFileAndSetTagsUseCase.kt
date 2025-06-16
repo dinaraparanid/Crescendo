@@ -19,7 +19,7 @@ class ConvertToAudioFileAndSetTagsUseCase(
         videoMetadata: VideoMetadata,
         audioFormat: Formats,
         trimRange: TrimRange,
-    ) = withContext(Dispatchers.IO) {
+    ): MediaFile.AudioFile? = withContext(Dispatchers.IO) {
         val audioFile = mediaFilesRepository.convertVideoFileToAudio(
             file = videoFile,
             audioFormat = audioFormat,

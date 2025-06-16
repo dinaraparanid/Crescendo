@@ -15,6 +15,7 @@ import com.paranid5.crescendo.domain.files.entity.fileExtension
 import java.io.File
 
 internal object VideoFiles {
+
     suspend fun createVideoFileCatching(
         filename: Filename,
         ext: MediaFileExtension,

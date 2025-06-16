@@ -36,6 +36,7 @@ import org.koin.core.parameter.parametersOf
 class VideoCacheService : SuspendService(),
     PlaybackForegroundService,
     ConnectionManager by ConnectionManagerImpl() {
+
     internal val videoQueueManager by inject<VideoQueueManager>()
     internal val notificationManager by inject<NotificationManager> { parametersOf(this) }
     internal val cacheManager by inject<CacheManager>()
