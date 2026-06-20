@@ -17,6 +17,8 @@ import androidx.work.WorkManager
 import androidx.work.workDataOf
 import arrow.core.Either
 import arrow.core.Tuple4
+import com.linc.amplituda.Amplituda
+import com.linc.amplituda.callback.AmplitudaErrorListener
 import com.paranid5.crescendo.core.common.tracks.DefaultTrack
 import com.paranid5.crescendo.core.common.tracks.Track
 import com.paranid5.crescendo.core.common.udf.StatePublisher
@@ -57,10 +59,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
-import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
-import linc.com.amplituda.Amplituda
-import linc.com.amplituda.callback.AmplitudaErrorListener
 import java.io.File
 
 @OptIn(UnstableApi::class)
@@ -278,11 +277,10 @@ internal class TrimmerViewModelImpl(
             copy(
                 trackState = trackUiState,
                 playbackPositions = PlaybackPositions(
-                    startPosInMillis = 0L,
                     endPosInMillis = trackUiState.fold(
                         ifPresent = TrackUiState::durationMillis,
                         ifEmpty = { 0L },
-                    )
+                    ),
                 ),
             )
         }

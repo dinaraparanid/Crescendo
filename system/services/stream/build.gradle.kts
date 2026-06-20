@@ -1,11 +1,10 @@
 plugins {
     alias(libs.plugins.android.library)
-    alias(libs.plugins.kotlin.android)
 }
 
 android {
     namespace = "com.paranid5.crescendo.system.services.stream"
-    compileSdk = 35
+    compileSdk = 37
 
     defaultConfig {
         minSdk = 24
@@ -27,25 +26,22 @@ android {
         sourceCompatibility = JavaVersion.VERSION_17
         targetCompatibility = JavaVersion.VERSION_17
     }
-    kotlinOptions {
-        jvmTarget = "17"
-    }
 }
 
 dependencies {
-    implementation(project(":core:common"))
-    implementation(project(":core:impl"))
-    implementation(project(":core:media"))
-    implementation(project(":core:utils"))
-    implementation(project(":core:resources"))
+    implementation(projects.core.common)
+    implementation(projects.core.impl)
+    implementation(projects.core.media)
+    implementation(projects.core.utils)
+    implementation(projects.core.resources)
 
-    implementation(project(":domain:metadata"))
-    implementation(project(":domain:playback"))
-    implementation(project(":domain:stream"))
+    implementation(projects.domain.metadata)
+    implementation(projects.domain.playback)
+    implementation(projects.domain.stream)
 
-    implementation(project(":system:common"))
-    implementation(project(":system:receivers"))
-    api(project(":system:services:common"))
+    implementation(projects.system.common)
+    implementation(projects.system.receivers)
+    api(projects.system.services.common)
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)

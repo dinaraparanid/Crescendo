@@ -1,12 +1,11 @@
 plugins {
     alias(libs.plugins.android.library)
-    alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlinx.serialization)
 }
 
 android {
     namespace = "com.paranid5.crescendo.system.worker.trimmer"
-    compileSdk = 35
+    compileSdk = 37
 
     defaultConfig {
         minSdk = 24
@@ -28,21 +27,18 @@ android {
         sourceCompatibility = JavaVersion.VERSION_17
         targetCompatibility = JavaVersion.VERSION_17
     }
-    kotlinOptions {
-        jvmTarget = "17"
-    }
 }
 
 dependencies {
-    implementation(project(":core:common"))
-    implementation(project(":core:media"))
-    implementation(project(":core:resources"))
+    implementation(projects.core.common)
+    implementation(projects.core.media)
+    implementation(projects.core.resources)
 
-    api(project(":domain:files"))
-    api(project(":domain:metadata"))
-    api(project(":domain:tags"))
+    api(projects.domain.files)
+    api(projects.domain.metadata)
+    api(projects.domain.tags)
 
-    implementation(project(":system:receivers"))
+    implementation(projects.system.receivers)
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)

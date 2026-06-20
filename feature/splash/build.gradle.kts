@@ -1,12 +1,11 @@
 plugins {
     alias(libs.plugins.android.library)
-    alias(libs.plugins.kotlin.android)
     alias(libs.plugins.compose.compiler)
 }
 
 android {
     namespace = "com.paranid5.crescendo.feature.splash"
-    compileSdk = 35
+    compileSdk = 37
 
     defaultConfig {
         minSdk = 24
@@ -28,15 +27,12 @@ android {
         sourceCompatibility = JavaVersion.VERSION_17
         targetCompatibility = JavaVersion.VERSION_17
     }
-    kotlinOptions {
-        jvmTarget = "17"
-    }
 }
 
 dependencies {
-    implementation(project(":core:resources"))
-    implementation(project(":core:ui"))
-    implementation(project(":system:common"))
+    implementation(projects.core.resources)
+    implementation(projects.core.ui)
+    implementation(projects.system.common)
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.activity.compose)

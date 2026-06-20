@@ -1,13 +1,12 @@
 plugins {
     alias(libs.plugins.android.library)
-    alias(libs.plugins.kotlin.android)
     alias(libs.plugins.compose.compiler)
     id("kotlin-parcelize")
 }
 
 android {
     namespace = "com.paranid5.crescendo.feature.meta_editor"
-    compileSdk = 35
+    compileSdk = 37
 
     defaultConfig {
         minSdk = 24
@@ -29,20 +28,17 @@ android {
         sourceCompatibility = JavaVersion.VERSION_17
         targetCompatibility = JavaVersion.VERSION_17
     }
-    kotlinOptions {
-        jvmTarget = "17"
-    }
 }
 
 dependencies {
-    implementation(project(":core:common"))
-    implementation(project(":core:resources"))
-    implementation(project(":core:ui"))
-    implementation(project(":core:utils"))
+    implementation(projects.core.common)
+    implementation(projects.core.resources)
+    implementation(projects.core.ui)
+    implementation(projects.core.utils)
 
-    implementation(project(":domain:genius"))
-    implementation(project(":domain:image"))
-    implementation(project(":domain:tracks"))
+    implementation(projects.domain.genius)
+    implementation(projects.domain.image)
+    implementation(projects.domain.tracks)
 
     implementation(libs.androidx.appcompat)
     implementation(libs.androidx.core.ktx)

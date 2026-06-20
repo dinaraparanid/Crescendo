@@ -1,6 +1,5 @@
 package com.paranid5.crescendo.data.ktor
 
-import android.util.Log
 import arrow.core.Either
 import arrow.core.raise.nullable
 import com.paranid5.crescendo.core.common.caching.DownloadFilesStatus
@@ -30,6 +29,7 @@ import kotlinx.coroutines.flow.updateAndGet
 import kotlinx.coroutines.withContext
 import kotlinx.coroutines.withTimeoutOrNull
 import kotlinx.io.readByteArray
+import timber.log.Timber
 import java.io.File
 import java.util.concurrent.atomic.AtomicLong
 
@@ -71,11 +71,11 @@ suspend fun HttpClient.downloadFile(
     if (status is DownloadFilesStatus.Success)
         downloadingState.updatedToFinished()
 
-    Log.d(TAG, "Done, status: $status")
+    Timber.tag(TAG).d("Done, status: $status")
     return status
 }
 
-context(HttpClient)
+context(client: HttpClient)
 private suspend fun downloadFileResult(
     fileUrl: String,
     storeFile: File,
@@ -167,7 +167,7 @@ private suspend inline fun HttpResponse.downloadFileImpl(
     }
 }
 
-context(HttpClient)
+context(client: HttpClient)
 private suspend inline fun downloadFilesUntilError(
     downloadingState: MutableStateFlow<DownloadingStatus>,
     totalProgressState: MutableStateFlow<DownloadingProgress>?,
@@ -198,17 +198,17 @@ private suspend inline fun downloadFilesUntilError(
         ?: DownloadFilesStatus.Success
 }
 
-context(HttpClient)
+context(client: HttpClient)
 private suspend inline fun prepareFileGet(
     url: String,
     progress: Long,
-) = prepareGet(url) {
+) = client.prepareGet(url) {
     header(HttpHeaders.Range, "bytes=$progress-")
 }
 
-context(HttpClient)
+context(client: HttpClient)
 private suspend inline fun contentLength(url: String) =
-    prepareGet(url).execute { if (it.status.isSuccess()) it.contentLength() else null }
+    client.prepareGet(url).execute { if (it.status.isSuccess()) it.contentLength() else null }
 
 private inline val HttpResponse.totalBytes
     get() = headers[HttpHeaders.ContentRange]

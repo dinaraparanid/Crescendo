@@ -1,11 +1,10 @@
 plugins {
-    id("com.android.library")
-    id("org.jetbrains.kotlin.android")
+    alias(libs.plugins.android.library)
 }
 
 android {
     namespace = "com.paranid5.receiver"
-    compileSdk = 35
+    compileSdk = 37
 
     defaultConfig {
         minSdk = 24
@@ -27,19 +26,16 @@ android {
         sourceCompatibility = JavaVersion.VERSION_17
         targetCompatibility = JavaVersion.VERSION_17
     }
-    kotlinOptions {
-        jvmTarget = "17"
-    }
 }
 
 dependencies {
-    implementation(project(":core:impl"))
-    implementation(project(":core:media"))
-    implementation(project(":core:resources"))
+    implementation(projects.core.impl)
+    implementation(projects.core.media)
+    implementation(projects.core.resources)
 
-    implementation(project(":domain:caching"))
+    implementation(projects.domain.caching)
 
-    implementation(project(":system:common"))
+    implementation(projects.system.common)
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)

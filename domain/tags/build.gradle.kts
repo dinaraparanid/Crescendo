@@ -1,11 +1,10 @@
 plugins {
     alias(libs.plugins.android.library)
-    alias(libs.plugins.kotlin.android)
 }
 
 android {
     namespace = "com.paranid5.crescendo.domain.tags"
-    compileSdk = 35
+    compileSdk = 37
 
     defaultConfig {
         minSdk = 24
@@ -27,14 +26,11 @@ android {
         sourceCompatibility = JavaVersion.VERSION_17
         targetCompatibility = JavaVersion.VERSION_17
     }
-    kotlinOptions {
-        jvmTarget = "17"
-    }
 }
 
 dependencies {
-    api(project(":domain:files"))
-    api(project(":domain:metadata"))
+    api(projects.domain.files)
+    api(projects.domain.metadata)
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)

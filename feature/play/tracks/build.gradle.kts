@@ -1,13 +1,12 @@
 plugins {
     alias(libs.plugins.android.library)
-    alias(libs.plugins.kotlin.android)
     alias(libs.plugins.compose.compiler)
     id("kotlin-parcelize")
 }
 
 android {
     namespace = "com.paranid5.crescendo.feature.play.tracks"
-    compileSdk = 35
+    compileSdk = 37
 
     defaultConfig {
         minSdk = 24
@@ -29,24 +28,21 @@ android {
         sourceCompatibility = JavaVersion.VERSION_17
         targetCompatibility = JavaVersion.VERSION_17
     }
-    kotlinOptions {
-        jvmTarget = "17"
-    }
 }
 
 dependencies {
-    implementation(project(":core:common"))
-    implementation(project(":core:impl"))
-    implementation(project(":core:media"))
-    implementation(project(":core:ui"))
-    implementation(project(":core:utils"))
-    implementation(project(":core:resources"))
+    implementation(projects.core.common)
+    implementation(projects.core.impl)
+    implementation(projects.core.media)
+    implementation(projects.core.ui)
+    implementation(projects.core.utils)
+    implementation(projects.core.resources)
 
-    implementation(project(":domain:current_playlist"))
-    implementation(project(":domain:playback"))
-    implementation(project(":domain:tracks"))
+    implementation(projects.domain.currentPlaylist)
+    implementation(projects.domain.playback)
+    implementation(projects.domain.tracks)
 
-    implementation(project(":system:services:track"))
+    implementation(projects.system.services.track)
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)

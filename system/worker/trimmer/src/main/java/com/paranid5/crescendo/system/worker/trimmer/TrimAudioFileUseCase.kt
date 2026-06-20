@@ -1,7 +1,6 @@
 package com.paranid5.crescendo.system.worker.trimmer
 
 import android.os.Environment
-import android.util.Log
 import arrow.core.Either
 import arrow.core.flatMap
 import com.paranid5.crescendo.core.common.trimming.FadeDurations
@@ -15,6 +14,7 @@ import com.paranid5.crescendo.domain.files.entity.Formats
 import com.paranid5.crescendo.domain.files.entity.MediaDirectory
 import com.paranid5.crescendo.domain.files.entity.MediaFile
 import com.paranid5.crescendo.domain.files.entity.fileExtension
+import timber.log.Timber
 
 private const val TAG = "TrimAudioFileUseCase"
 
@@ -62,9 +62,9 @@ internal class TrimAudioFileUseCase(
             fadeDurations = fadeDurations
         )
 
-        if (BuildConfig.DEBUG) Log.d(TAG, command)
+        Timber.tag(TAG).d(command)
         val status = FFmpeg.execute(command)
-        if (BuildConfig.DEBUG) Log.d(TAG, "FFmpeg status: $status")
+        Timber.tag(TAG).d("FFmpeg trim status: $status")
         require(status == 0)
     }
 

@@ -1,0 +1,78 @@
+pluginManagement {
+    repositories {
+        gradlePluginPortal()
+        google()
+        mavenCentral()
+    }
+}
+
+plugins {
+    id("org.gradle.toolchains.foojay-resolver-convention") version "1.0.0"
+}
+
+dependencyResolutionManagement {
+    repositories {
+        google()
+        mavenCentral()
+        maven { url = uri("https://jitpack.io") }
+    }
+}
+
+enableFeaturePreview("TYPESAFE_PROJECT_ACCESSORS")
+
+rootProject.name = "Crescendo"
+
+include(":app")
+
+// Core
+include(":core:common")
+include(":core:impl")
+include(":core:media")
+include(":core:resources")
+include(":core:ui")
+include(":core:utils")
+
+// Data
+include(":data")
+
+// Domain
+include(":domain:audio_effects")
+include(":domain:caching")
+include(":domain:current_playlist")
+include(":domain:files")
+include(":domain:genius")
+include(":domain:github")
+include(":domain:image")
+include(":domain:metadata")
+include(":domain:playback")
+include(":domain:stream")
+include(":domain:tags")
+include(":domain:tracks")
+include(":domain:waveform")
+include(":domain:web")
+
+// Feature
+include(":feature:audio_effects")
+include(":feature:cache")
+include(":feature:current_playlist")
+include(":feature:meta_editor")
+include(":feature:metadata")
+include(":feature:play:favourites")
+include(":feature:play:main")
+include(":feature:play:playlists")
+include(":feature:play:tracks")
+include(":feature:playing")
+include(":feature:preferences")
+include(":feature:splash")
+include(":feature:stream:fetch")
+include(":feature:stream:main")
+include(":feature:trimmer")
+
+// System
+include(":system:common")
+include(":system:receivers")
+include(":system:services:common")
+include(":system:services:stream")
+include(":system:services:track")
+include(":system:services:video_cache")
+include(":system:worker:trimmer")

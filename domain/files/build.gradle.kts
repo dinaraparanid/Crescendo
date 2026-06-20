@@ -1,13 +1,12 @@
 plugins {
     alias(libs.plugins.android.library)
-    alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlinx.serialization)
     id("kotlin-parcelize")
 }
 
 android {
     namespace = "com.paranid5.crescendo.domain.files"
-    compileSdk = 35
+    compileSdk = 37
 
     defaultConfig {
         minSdk = 24
@@ -29,13 +28,10 @@ android {
         sourceCompatibility = JavaVersion.VERSION_17
         targetCompatibility = JavaVersion.VERSION_17
     }
-    kotlinOptions {
-        jvmTarget = "17"
-    }
 }
 
 dependencies {
-    api(project(":core:common")) // Path
+    api(projects.core.common) // Path
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)

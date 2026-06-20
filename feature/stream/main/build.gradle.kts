@@ -1,13 +1,12 @@
 plugins {
     alias(libs.plugins.android.library)
-    alias(libs.plugins.kotlin.android)
     alias(libs.plugins.compose.compiler)
     id("kotlin-parcelize")
 }
 
 android {
     namespace = "com.paranid5.crescendo.feature.stream.main"
-    compileSdk = 35
+    compileSdk = 37
 
     defaultConfig {
         minSdk = 24
@@ -29,25 +28,22 @@ android {
         sourceCompatibility = JavaVersion.VERSION_17
         targetCompatibility = JavaVersion.VERSION_17
     }
-    kotlinOptions {
-        jvmTarget = "17"
-    }
 }
 
 dependencies {
-    implementation(project(":core:common"))
-    implementation(project(":core:impl"))
-    implementation(project(":core:ui"))
-    implementation(project(":core:utils"))
-    implementation(project(":core:resources"))
+    implementation(projects.core.common)
+    implementation(projects.core.impl)
+    implementation(projects.core.ui)
+    implementation(projects.core.utils)
+    implementation(projects.core.resources)
 
-    implementation(project(":domain:stream"))
-    implementation(project(":domain:playback"))
+    implementation(projects.domain.stream)
+    implementation(projects.domain.playback)
 
-    implementation(project(":feature:cache"))
-    implementation(project(":feature:stream:fetch"))
+    implementation(projects.feature.cache)
+    implementation(projects.feature.stream.fetch)
 
-    implementation(project(":system:services:stream"))
+    implementation(projects.system.services.stream)
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)

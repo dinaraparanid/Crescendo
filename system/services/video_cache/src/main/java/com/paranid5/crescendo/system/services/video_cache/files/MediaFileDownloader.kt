@@ -1,7 +1,5 @@
 package com.paranid5.crescendo.system.services.video_cache.files
 
-import android.util.Log
-import com.paranid5.core.common.BuildConfig
 import com.paranid5.crescendo.caching.entity.CachingResult
 import com.paranid5.crescendo.core.common.caching.DownloadFilesStatus
 import com.paranid5.crescendo.core.common.caching.DownloadingStatus
@@ -16,8 +14,6 @@ import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import java.io.File
 import java.util.concurrent.atomic.AtomicLong
-
-private const val TAG = "MediaFileDownloader"
 
 internal class MediaFileDownloader : KoinComponent {
     private val ktorClient by inject<HttpClient>()
@@ -84,13 +80,7 @@ internal class MediaFileDownloader : KoinComponent {
     }
 
     private fun onCancel(videoCacheFile: File): CachingResult.Canceled {
-        val isFileDeleted = videoCacheFile.delete()
-
-        if (BuildConfig.DEBUG) {
-            Log.d(TAG, "File is deleted: $isFileDeleted")
-            Log.d(TAG, "Downloading was canceled")
-        }
-
+        videoCacheFile.delete()
         return CachingResult.Canceled
     }
 }

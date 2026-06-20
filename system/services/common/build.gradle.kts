@@ -1,11 +1,10 @@
 plugins {
     alias(libs.plugins.android.library)
-    alias(libs.plugins.kotlin.android)
 }
 
 android {
     namespace = "com.paranid5.system.services.common"
-    compileSdk = 35
+    compileSdk = 37
 
     defaultConfig {
         minSdk = 24
@@ -27,20 +26,17 @@ android {
         sourceCompatibility = JavaVersion.VERSION_17
         targetCompatibility = JavaVersion.VERSION_17
     }
-    kotlinOptions {
-        jvmTarget = "17"
-    }
 }
 
 dependencies {
-    api(project(":core:common"))
-    api(project(":core:impl"))
-    api(project(":core:media"))
-    api(project(":core:resources"))
+    api(projects.core.common)
+    api(projects.core.impl)
+    api(projects.core.media)
+    api(projects.core.resources)
 
-    api(project(":domain:audio_effects"))
+    api(projects.domain.audioEffects)
 
-    api(project(":system:common"))
+    api(projects.system.common)
 
     api(libs.androidx.core.ktx)
     api(libs.androidx.appcompat)
