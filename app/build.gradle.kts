@@ -4,8 +4,13 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlinx.serialization)
     alias(libs.plugins.compose.compiler)
+    alias(libs.plugins.kotlinter)
     id("kotlin-parcelize")
 }
+
+// kotlinter {
+//    ktlintVersion = "1.8.0"
+// }
 
 kotlin {
     compilerOptions {
@@ -95,7 +100,7 @@ kotlin {
                 "libs/jave-1.0.2.jar",
                 "libs/ffmpeg-kit-full-gpl-6.0-2.LTS.aar",
                 "libs/audiovisualizer-0.9.2.aar",
-            )
+            ),
         )
     }
 }
@@ -129,7 +134,7 @@ android {
             isDebuggable = false
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
-                "proguard-rules.pro"
+                "proguard-rules.pro",
             )
             signingConfig = signingConfigs.getByName("debug")
         }

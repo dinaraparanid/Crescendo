@@ -37,10 +37,10 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
-private const val ZeroOffset = 0F
-private const val UpSpeedUp = 2F
-private const val DownSpeedUp = 3F
-private const val DragEventTimeout = 500L
+private const val ZERO_OFFSET = 0F
+private const val UP_SPEED_UP = 2F
+private const val DOWN_SPEED_UP = 3F
+private const val DRAG_EVENT_TIMEOUT = 500L
 
 typealias DraggableListItemContent<T> = @Composable (
     items: ImmutableList<T>,
@@ -122,7 +122,7 @@ fun <T> DraggableList(
                 itemView = { itemList2, index2, itemMod2 ->
                     itemContent(itemList2, index2, currentItemIndexAfterDrag, itemMod2)
                 },
-                modifier = draggableItemModifier then itemModifier
+                modifier = draggableItemModifier then itemModifier,
             )
         },
     )
@@ -132,11 +132,11 @@ fun <T> DraggableList(
 private fun rememberItemIndexWithOffset(
     position: Float?,
     scrollingState: LazyListState,
-    draggedItemIndex: Int?
+    draggedItemIndex: Int?,
 ) = remember(draggedItemIndex, position) {
     derivedStateOf {
         draggedItemIndex?.let(
-            ::itemIndexWithOffset.curried()(position)(scrollingState)
+            ::itemIndexWithOffset.curried()(position)(scrollingState),
         )
     }
 }
@@ -170,7 +170,7 @@ private fun <T> Modifier.handleItemsMovement(
         val viewportHeight = scrollingState.layoutInfo.viewportSize.height.toFloat()
 
         position = position?.plus(itemOffset.y)?.coerceIn(
-            minimumValue = ZeroOffset,
+            minimumValue = ZERO_OFFSET,
             maximumValue = viewportHeight - itemSize,
         )
 
@@ -238,12 +238,12 @@ private inline fun <T> DraggableItemList(
         index,
         modifier
             .zIndex(offset?.let { 1F } ?: 0F)
-            .graphicsLayer { translationY = offset ?: ZeroOffset }
+            .graphicsLayer { translationY = offset ?: ZERO_OFFSET }
             .clip(RoundedCornerShape(dimensions.padding.extraMedium))
             .background(
                 offset
                     ?.let { colors.background.highContrast.copy(alpha = 0.5F) }
-                    ?: Color.Transparent
+                    ?: Color.Transparent,
             ),
     )
 }
@@ -259,7 +259,7 @@ private fun rememberItemOffset(indexWithOffset: Pair<Int, Float>?, index: Int) =
 @Composable
 private fun produceDragEventTrigger() = produceState(0L) {
     while (true) {
-        delay(DragEventTimeout)
+        delay(DRAG_EVENT_TIMEOUT)
         value = System.currentTimeMillis()
     }
 }
@@ -275,22 +275,21 @@ private fun itemIndexWithOffset(
         .getOrNull(draggedItemIndex - scrollingState.firstVisibleItemIndex)
         .bind()
 
-    val offset = (position ?: ZeroOffset) - item.offset - item.size / 2F
+    val offset = (position ?: ZERO_OFFSET) - item.offset - item.size / 2F
     item.index to offset
 }
 
-private fun firstVisibleItem(scrollingState: LazyListState, offset: Offset) =
-    scrollingState
-        .layoutInfo
-        .visibleItemsInfo
-        .firstOrNull { offset.y.toInt() in it.offset..it.offset + it.size }
+private fun firstVisibleItem(scrollingState: LazyListState, offset: Offset) = scrollingState
+    .layoutInfo
+    .visibleItemsInfo
+    .firstOrNull { offset.y.toInt() in it.offset..it.offset + it.size }
 
 private fun checkForOverscroll(
     scrollingState: LazyListState,
     offset: Offset,
     dragItemPosition: Float?,
-    upSpeedUp: Float = UpSpeedUp,
-    downSpeedUp: Float = DownSpeedUp,
+    upSpeedUp: Float = UP_SPEED_UP,
+    downSpeedUp: Float = DOWN_SPEED_UP,
 ): Float? = nullable {
     val firstVisibleItem = firstVisibleItem(scrollingState, offset).bind()
     val itemSize = firstVisibleItem.size
@@ -299,14 +298,14 @@ private fun checkForOverscroll(
     val endOffset = firstVisibleItem.offsetEnd + startOffset
 
     when {
-        startOffset > ZeroOffset ->
+        startOffset > ZERO_OFFSET ->
             (endOffset - scrollingState.layoutInfo.viewportEndOffset + itemSize)
-                .takeIf { diff -> diff > ZeroOffset }
+                .takeIf { diff -> diff > ZERO_OFFSET }
                 ?.let { it * downSpeedUp }
 
         else ->
             (startOffset - scrollingState.layoutInfo.viewportStartOffset - itemSize)
-                .takeIf { diff -> diff < ZeroOffset }
+                .takeIf { diff -> diff < ZERO_OFFSET }
                 ?.let { it * upSpeedUp }
     }
 }

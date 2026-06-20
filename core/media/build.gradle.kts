@@ -1,5 +1,6 @@
 plugins {
     alias(libs.plugins.android.library)
+    alias(libs.plugins.kotlinter)
     id("kotlin-parcelize")
 }
 
@@ -19,7 +20,7 @@ android {
             isMinifyEnabled = false
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
-                "proguard-rules.pro"
+                "proguard-rules.pro",
             )
         }
     }
@@ -59,6 +60,6 @@ dependencies {
             "../../app/libs/jave-1.0.2.jar",
             "../../app/libs/ffmpeg-kit-full-gpl-6.0-2.LTS.aar",
             "../../app/libs/audiovisualizer-0.9.2.aar",
-        )
+        ),
     )
 }
