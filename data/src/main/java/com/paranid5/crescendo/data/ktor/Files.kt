@@ -1,6 +1,5 @@
 package com.paranid5.crescendo.data.ktor
 
-import android.util.Log
 import arrow.core.Either
 import arrow.core.raise.nullable
 import com.paranid5.crescendo.core.common.caching.DownloadFilesStatus
@@ -30,6 +29,7 @@ import kotlinx.coroutines.flow.updateAndGet
 import kotlinx.coroutines.withContext
 import kotlinx.coroutines.withTimeoutOrNull
 import kotlinx.io.readByteArray
+import timber.log.Timber
 import java.io.File
 import java.util.concurrent.atomic.AtomicLong
 
@@ -71,7 +71,7 @@ suspend fun HttpClient.downloadFile(
     if (status is DownloadFilesStatus.Success)
         downloadingState.updatedToFinished()
 
-    Log.d(TAG, "Done, status: $status")
+    Timber.tag(TAG).d("Done, status: $status")
     return status
 }
 

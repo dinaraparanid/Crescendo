@@ -88,6 +88,8 @@ kotlin {
         implementation(libs.yt.url.extractor.kt)
         implementation(libs.ytdl.lib)
 
+        implementation(libs.timber)
+
         implementation(
             files(
                 "libs/jave-1.0.2.jar",

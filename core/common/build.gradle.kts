@@ -37,4 +37,5 @@ dependencies {
     api(libs.kotlinx.collections.immutable)
     api(libs.kotlinx.serialization.json)
     api(libs.arrow.fx.coroutines)
+    api(libs.timber)
 }

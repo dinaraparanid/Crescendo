@@ -12,6 +12,7 @@ import kotlinx.coroutines.withContext
 import org.koin.android.ext.koin.androidContext
 import org.koin.android.ext.koin.androidLogger
 import org.koin.core.context.startKoin
+import timber.log.Timber
 
 class MainApplication : Application() {
     private val applicationScope = CoroutineScope(SupervisorJob() + Dispatchers.Main)
@@ -19,6 +20,7 @@ class MainApplication : Application() {
     override fun onCreate() {
         super.onCreate()
         initKoin()
+        Timber.plant(Timber.DebugTree())
         applicationScope.launchInScope(Dispatchers.IO) { initYtDl() }
     }
 

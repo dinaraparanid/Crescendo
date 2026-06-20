@@ -1,6 +1,6 @@
 [versions]
 activityCompose = "1.13.0"
-amplituda = "2.2.2"
+amplituda = "2.3.1"
 smartExceptionJava = "0.2.1"
 workManger = "2.11.2"
 sqlDelight = "2.3.2"
@@ -33,6 +33,7 @@ foundationAndroid = "1.11.3"
 ytdl = "0.18.1"
 agp = "9.2.1"
 kotlin = "2.4.0"
+timber = "5.0.1"
 
 [libraries]
 androidx-activity-compose = { module = "androidx.activity:activity-compose", version.ref = "activityCompose" }
@@ -98,6 +99,8 @@ sqldelight-coroutines-extensions = { module = "app.cash.sqldelight:coroutines-ex
 
 yt-url-extractor-kt = { module = "com.github.dinaraparanid:yt-url-extractor-kt", version.ref = "ytUrlExtractorKt" }
 ytdl-lib = { group = "io.github.junkfood02.youtubedl-android", name = "library", version.ref = "ytdl" }
+
+timber = { module = "com.jakewharton.timber:timber", version.ref = "timber" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
