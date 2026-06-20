@@ -75,7 +75,7 @@ suspend fun HttpClient.downloadFile(
     return status
 }
 
-context(HttpClient)
+context(client: HttpClient)
 private suspend fun downloadFileResult(
     fileUrl: String,
     storeFile: File,
@@ -167,7 +167,7 @@ private suspend inline fun HttpResponse.downloadFileImpl(
     }
 }
 
-context(HttpClient)
+context(client: HttpClient)
 private suspend inline fun downloadFilesUntilError(
     downloadingState: MutableStateFlow<DownloadingStatus>,
     totalProgressState: MutableStateFlow<DownloadingProgress>?,
@@ -198,17 +198,17 @@ private suspend inline fun downloadFilesUntilError(
         ?: DownloadFilesStatus.Success
 }
 
-context(HttpClient)
+context(client: HttpClient)
 private suspend inline fun prepareFileGet(
     url: String,
     progress: Long,
-) = prepareGet(url) {
+) = client.prepareGet(url) {
     header(HttpHeaders.Range, "bytes=$progress-")
 }
 
-context(HttpClient)
+context(client: HttpClient)
 private suspend inline fun contentLength(url: String) =
-    prepareGet(url).execute { if (it.status.isSuccess()) it.contentLength() else null }
+    client.prepareGet(url).execute { if (it.status.isSuccess()) it.contentLength() else null }
 
 private inline val HttpResponse.totalBytes
     get() = headers[HttpHeaders.ContentRange]

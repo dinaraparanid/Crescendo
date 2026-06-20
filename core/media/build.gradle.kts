@@ -1,12 +1,11 @@
 plugins {
-    id("com.android.library")
-    id("org.jetbrains.kotlin.android")
+    alias(libs.plugins.android.library)
     id("kotlin-parcelize")
 }
 
 android {
     namespace = "com.paranid5.crescendo.core.media"
-    compileSdk = 35
+    compileSdk = 37
 
     defaultConfig {
         minSdk = 24
@@ -27,9 +26,6 @@ android {
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_17
         targetCompatibility = JavaVersion.VERSION_17
-    }
-    kotlinOptions {
-        jvmTarget = "17"
     }
 }
 
@@ -58,5 +54,11 @@ dependencies {
 
     implementation(libs.smart.exception.java)
 
-    implementation(files("../../app/libs/jave-1.0.2.jar", "../../app/libs/ffmpeg-kit-full-gpl-6.0-2.LTS.aar"))
+    implementation(
+        files(
+            "../../app/libs/jave-1.0.2.jar",
+            "../../app/libs/ffmpeg-kit-full-gpl-6.0-2.LTS.aar",
+            "../../app/libs/audiovisualizer-0.9.2.aar",
+        )
+    )
 }

@@ -1,13 +1,12 @@
 plugins {
     alias(libs.plugins.android.library)
-    alias(libs.plugins.kotlin.android)
     alias(libs.plugins.compose.compiler)
     id("kotlin-parcelize")
 }
 
 android {
     namespace = "com.paranid5.crescendo.feature.playing"
-    compileSdk = 35
+    compileSdk = 37
 
     defaultConfig {
         minSdk = 24
@@ -28,9 +27,6 @@ android {
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_17
         targetCompatibility = JavaVersion.VERSION_17
-    }
-    kotlinOptions {
-        jvmTarget = "17"
     }
 }
 
@@ -60,13 +56,11 @@ dependencies {
     implementation(libs.androidx.foundation.android)
     implementation(libs.androidx.palette.ktx)
     implementation(libs.androidx.constraintlayout.compose)
-    implementation(libs.androidx.material)
-    implementation(libs.androidx.material3)
-    implementation(libs.material)
+    implementation(libs.bundles.material)
 
     implementation(libs.kotlinx.collections.immutable)
     implementation(libs.koin.androidx.compose)
     implementation(libs.coil.compose)
 
-    implementation(libs.audiovisualizer)
+    implementation(files("../../app/libs/audiovisualizer-0.9.2.aar"))
 }

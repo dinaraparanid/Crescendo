@@ -62,9 +62,7 @@ internal class TrimAudioFileUseCase(
             fadeDurations = fadeDurations
         )
 
-        if (BuildConfig.DEBUG) Log.d(TAG, command)
         val status = FFmpeg.execute(command)
-        if (BuildConfig.DEBUG) Log.d(TAG, "FFmpeg status: $status")
         require(status == 0)
     }
 

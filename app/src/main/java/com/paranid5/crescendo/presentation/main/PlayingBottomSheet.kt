@@ -185,7 +185,11 @@ private fun animateContentTopPaddingAsState(sheetState: ModalBottomSheetState) =
         Configuration.ORIENTATION_LANDSCAPE -> dimensions.padding.extraBig
 
         else -> {
-            val progress = sheetState.progress
+            val progress = sheetState.progress(
+                from = ModalBottomSheetValue.Hidden,
+                to = ModalBottomSheetValue.Expanded,
+            )
+
             val targetValue = sheetState.targetValue
             val currentValue = sheetState.currentValue
 
