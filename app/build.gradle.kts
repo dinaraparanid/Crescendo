@@ -178,3 +178,7 @@ tasks.configureEach {
         dependsOn("testDebugUnitTest")
     }
 }
+
+tasks.check {
+    dependsOn("installKotlinterPrePushHook")
+}
