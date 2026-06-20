@@ -4,6 +4,12 @@ buildscript {
         mavenCentral()
         maven { url = uri("https://jitpack.io") }
     }
+
+    dependencies {
+        classpath(libs.ktlint.compose) {
+            exclude(group = "org.jetbrains.kotlin", module = "kotlin-compiler-embeddable")
+        }
+    }
 }
 
 plugins {
@@ -12,6 +18,7 @@ plugins {
     alias(libs.plugins.kotlin.jvm) apply false
     alias(libs.plugins.sqlDelight) apply false
     alias(libs.plugins.compose.compiler) apply false
+    alias(libs.plugins.kotlinter) apply false
 }
 
 allprojects {

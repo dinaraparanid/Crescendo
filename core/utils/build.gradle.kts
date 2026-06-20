@@ -3,6 +3,7 @@ plugins {
     alias(libs.plugins.kotlinx.serialization)
     alias(libs.plugins.sqlDelight)
     alias(libs.plugins.compose.compiler)
+    alias(libs.plugins.kotlinter)
     id("kotlin-parcelize")
 }
 
@@ -23,7 +24,7 @@ android {
             isJniDebuggable = false
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
-                "proguard-rules.pro"
+                "proguard-rules.pro",
             )
         }
     }

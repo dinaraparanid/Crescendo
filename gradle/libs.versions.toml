@@ -34,6 +34,8 @@ ytdl = "0.18.1"
 agp = "9.2.1"
 kotlin = "2.4.0"
 timber = "5.0.1"
+kotlinter = "5.5.0"
+ktlintCompose = "0.6.2"
 
 [libraries]
 androidx-activity-compose = { module = "androidx.activity:activity-compose", version.ref = "activityCompose" }
@@ -101,6 +103,7 @@ yt-url-extractor-kt = { module = "com.github.dinaraparanid:yt-url-extractor-kt",
 ytdl-lib = { group = "io.github.junkfood02.youtubedl-android", name = "library", version.ref = "ytdl" }
 
 timber = { module = "com.jakewharton.timber:timber", version.ref = "timber" }
+ktlint-compose = { module = "io.nlopez.compose.rules:ktlint", version.ref = "ktlintCompose" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
@@ -109,6 +112,7 @@ kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
 kotlinx-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
 compose-compiler = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
 sqlDelight = { id = "app.cash.sqldelight", version.ref = "sqlDelight" }
+kotlinter = { id = "org.jmailen.kotlinter", version.ref = "kotlinter" }
 
 [bundles]
 arrow = ["arrow-fx-coroutines", "arrow-functions"]
