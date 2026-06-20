@@ -29,8 +29,8 @@ android {
 }
 
 dependencies {
-    api(project(":core:common"))
-    api(project(":core:utils"))
+    api(projects.core.common)
+    api(projects.core.utils)
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)

@@ -30,15 +30,15 @@ android {
 }
 
 dependencies {
-    implementation(project(":core:common"))
-    implementation(project(":core:media"))
-    implementation(project(":core:resources"))
+    implementation(projects.core.common)
+    implementation(projects.core.media)
+    implementation(projects.core.resources)
 
-    api(project(":domain:files"))
-    api(project(":domain:metadata"))
-    api(project(":domain:tags"))
+    api(projects.domain.files)
+    api(projects.domain.metadata)
+    api(projects.domain.tags)
 
-    implementation(project(":system:receivers"))
+    implementation(projects.system.receivers)
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)

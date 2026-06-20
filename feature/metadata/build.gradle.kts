@@ -31,7 +31,7 @@ android {
 }
 
 dependencies {
-    api(project(":domain:metadata"))
+    api(projects.domain.metadata)
 
     implementation(libs.androidx.appcompat)
     implementation(libs.androidx.core.ktx)

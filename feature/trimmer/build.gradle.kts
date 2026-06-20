@@ -31,16 +31,16 @@ android {
 }
 
 dependencies {
-    implementation(project(":core:common"))
-    implementation(project(":core:media"))
-    implementation(project(":core:ui"))
-    implementation(project(":core:utils"))
-    implementation(project(":core:resources"))
+    implementation(projects.core.common)
+    implementation(projects.core.media)
+    implementation(projects.core.ui)
+    implementation(projects.core.utils)
+    implementation(projects.core.resources)
 
-    implementation(project(":domain:tracks"))
-    implementation(project(":domain:waveform"))
+    implementation(projects.domain.tracks)
+    implementation(projects.domain.waveform)
 
-    implementation(project(":system:worker:trimmer"))
+    implementation(projects.system.worker.trimmer)
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)

@@ -31,7 +31,7 @@ android {
 }
 
 dependencies {
-    api(project(":core:common")) // Path
+    api(projects.core.common) // Path
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)

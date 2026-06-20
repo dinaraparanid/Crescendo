@@ -31,14 +31,14 @@ android {
 }
 
 dependencies {
-    implementation(project(":core:common"))
-    implementation(project(":core:resources"))
-    implementation(project(":core:ui"))
-    implementation(project(":core:utils"))
+    implementation(projects.core.common)
+    implementation(projects.core.resources)
+    implementation(projects.core.ui)
+    implementation(projects.core.utils)
 
-    implementation(project(":domain:genius"))
-    implementation(project(":domain:image"))
-    implementation(project(":domain:tracks"))
+    implementation(projects.domain.genius)
+    implementation(projects.domain.image)
+    implementation(projects.domain.tracks)
 
     implementation(libs.androidx.appcompat)
     implementation(libs.androidx.core.ktx)

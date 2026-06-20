@@ -30,12 +30,12 @@ android {
 }
 
 dependencies {
-    api(project(":core:common"))
-    api(project(":core:resources"))
-    api(project(":core:utils"))
+    api(projects.core.common)
+    api(projects.core.resources)
+    api(projects.core.utils)
 
-    api(project(":domain:audio_effects"))
-    implementation(project(":domain:metadata"))
+    api(projects.domain.audioEffects)
+    implementation(projects.domain.metadata)
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)

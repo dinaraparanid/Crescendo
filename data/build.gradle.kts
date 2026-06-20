@@ -46,24 +46,24 @@ android {
 }
 
 dependencies {
-    api(project(":core:common"))
-    api(project(":core:media")) // TODO убрать
-    api(project(":core:resources"))
-    api(project(":core:utils"))
+    api(projects.core.common)
+    api(projects.core.media) // TODO убрать
+    api(projects.core.resources)
+    api(projects.core.utils)
 
-    api(project(":domain:audio_effects"))
-    api(project(":domain:current_playlist"))
-    api(project(":domain:files"))
-    api(project(":domain:genius"))
-    api(project(":domain:github"))
-    api(project(":domain:image"))
-    api(project(":domain:metadata"))
-    api(project(":domain:playback"))
-    api(project(":domain:stream"))
-    api(project(":domain:tags"))
-    api(project(":domain:tracks"))
-    api(project(":domain:waveform"))
-    api(project(":domain:web"))
+    api(projects.domain.audioEffects)
+    api(projects.domain.currentPlaylist)
+    api(projects.domain.files)
+    api(projects.domain.genius)
+    api(projects.domain.github)
+    api(projects.domain.image)
+    api(projects.domain.metadata)
+    api(projects.domain.playback)
+    api(projects.domain.stream)
+    api(projects.domain.tags)
+    api(projects.domain.tracks)
+    api(projects.domain.waveform)
+    api(projects.domain.web)
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)

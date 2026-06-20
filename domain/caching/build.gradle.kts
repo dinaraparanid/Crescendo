@@ -30,8 +30,8 @@ android {
 }
 
 dependencies {
-    api(project(":core:resources"))
-    api(project(":domain:files"))
+    api(projects.core.resources)
+    api(projects.domain.files)
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)

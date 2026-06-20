@@ -31,25 +31,25 @@ android {
 }
 
 dependencies {
-    implementation(project(":core:common"))
-    implementation(project(":core:impl"))
-    implementation(project(":core:ui"))
-    implementation(project(":core:utils"))
-    implementation(project(":core:media"))
-    implementation(project(":core:resources"))
+    implementation(projects.core.common)
+    implementation(projects.core.impl)
+    implementation(projects.core.ui)
+    implementation(projects.core.utils)
+    implementation(projects.core.media)
+    implementation(projects.core.resources)
 
-    implementation(project(":domain:current_playlist"))
-    implementation(project(":domain:metadata"))
-    implementation(project(":domain:playback"))
-    implementation(project(":domain:stream"))
-    implementation(project(":domain:tracks"))
+    implementation(projects.domain.currentPlaylist)
+    implementation(projects.domain.metadata)
+    implementation(projects.domain.playback)
+    implementation(projects.domain.stream)
+    implementation(projects.domain.tracks)
 
-    implementation(project(":feature:cache"))
-    implementation(project(":feature:metadata"))
+    implementation(projects.feature.cache)
+    implementation(projects.feature.metadata)
 
-    implementation(project(":system:services:stream"))
-    implementation(project(":system:services:track"))
-    implementation(project(":system:services:video_cache"))
+    implementation(projects.system.services.stream)
+    implementation(projects.system.services.track)
+    implementation(projects.system.services.videoCache)
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)

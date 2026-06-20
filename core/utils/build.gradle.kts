@@ -6,14 +6,6 @@ plugins {
     id("kotlin-parcelize")
 }
 
-sqldelight {
-    databases {
-        create("Database") {
-            packageName.set("com.example")
-        }
-    }
-}
-
 android {
     namespace = "com.paranid5.domain"
     compileSdk = 37

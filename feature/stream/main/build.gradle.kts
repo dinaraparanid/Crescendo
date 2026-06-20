@@ -31,19 +31,19 @@ android {
 }
 
 dependencies {
-    implementation(project(":core:common"))
-    implementation(project(":core:impl"))
-    implementation(project(":core:ui"))
-    implementation(project(":core:utils"))
-    implementation(project(":core:resources"))
+    implementation(projects.core.common)
+    implementation(projects.core.impl)
+    implementation(projects.core.ui)
+    implementation(projects.core.utils)
+    implementation(projects.core.resources)
 
-    implementation(project(":domain:stream"))
-    implementation(project(":domain:playback"))
+    implementation(projects.domain.stream)
+    implementation(projects.domain.playback)
 
-    implementation(project(":feature:cache"))
-    implementation(project(":feature:stream:fetch"))
+    implementation(projects.feature.cache)
+    implementation(projects.feature.stream.fetch)
 
-    implementation(project(":system:services:stream"))
+    implementation(projects.system.services.stream)
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)

@@ -29,13 +29,13 @@ android {
 }
 
 dependencies {
-    implementation(project(":core:impl"))
-    implementation(project(":core:media"))
-    implementation(project(":core:resources"))
+    implementation(projects.core.impl)
+    implementation(projects.core.media)
+    implementation(projects.core.resources)
 
-    implementation(project(":domain:caching"))
+    implementation(projects.domain.caching)
 
-    implementation(project(":system:common"))
+    implementation(projects.system.common)
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)

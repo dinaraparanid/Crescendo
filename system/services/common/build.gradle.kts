@@ -29,14 +29,14 @@ android {
 }
 
 dependencies {
-    api(project(":core:common"))
-    api(project(":core:impl"))
-    api(project(":core:media"))
-    api(project(":core:resources"))
+    api(projects.core.common)
+    api(projects.core.impl)
+    api(projects.core.media)
+    api(projects.core.resources)
 
-    api(project(":domain:audio_effects"))
+    api(projects.domain.audioEffects)
 
-    api(project(":system:common"))
+    api(projects.system.common)
 
     api(libs.androidx.core.ktx)
     api(libs.androidx.appcompat)

@@ -29,20 +29,20 @@ android {
 }
 
 dependencies {
-    implementation(project(":core:common"))
-    implementation(project(":core:impl"))
-    implementation(project(":core:media")) // TODO: убрать
-    implementation(project(":core:utils"))
-    implementation(project(":core:resources"))
+    implementation(projects.core.common)
+    implementation(projects.core.impl)
+    implementation(projects.core.media) // TODO: убрать
+    implementation(projects.core.utils)
+    implementation(projects.core.resources)
 
-    api(project(":domain:caching"))
-    api(project(":domain:files"))
+    api(projects.domain.caching)
+    api(projects.domain.files)
 
-    implementation(project(":data")) // TODO: убрать
+    implementation(projects.data) // TODO: убрать
 
-    implementation(project(":system:common"))
-    implementation(project(":system:receivers"))
-    api(project(":system:services:common"))
+    implementation(projects.system.common)
+    implementation(projects.system.receivers)
+    api(projects.system.services.common)
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)

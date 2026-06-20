@@ -31,15 +31,15 @@ android {
 }
 
 dependencies {
-    implementation(project(":core:common"))
-    implementation(project(":core:impl"))
-    implementation(project(":core:resources"))
-    implementation(project(":core:utils"))
-    implementation(project(":core:ui"))
+    implementation(projects.core.common)
+    implementation(projects.core.impl)
+    implementation(projects.core.resources)
+    implementation(projects.core.utils)
+    implementation(projects.core.ui)
 
-    implementation(project(":feature:play:favourites"))
-    implementation(project(":feature:play:playlists"))
-    implementation(project(":feature:play:tracks"))
+    implementation(projects.feature.play.favourites)
+    implementation(projects.feature.play.playlists)
+    implementation(projects.feature.play.tracks)
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)

@@ -31,14 +31,14 @@ android {
 }
 
 dependencies {
-    implementation(project(":core:common"))
-    implementation(project(":core:resources"))
-    implementation(project(":core:ui"))
-    implementation(project(":core:utils"))
+    implementation(projects.core.common)
+    implementation(projects.core.resources)
+    implementation(projects.core.ui)
+    implementation(projects.core.utils)
 
-    implementation(project(":domain:stream"))
+    implementation(projects.domain.stream)
 
-    implementation(project(":system:services:video_cache"))
+    implementation(projects.system.services.videoCache)
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)

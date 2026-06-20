@@ -31,8 +31,8 @@ android {
 }
 
 dependencies {
-    api(project(":core:common")) // Track
-    api(project(":domain:image"))
+    api(projects.core.common) // Track
+    api(projects.domain.image)
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)
