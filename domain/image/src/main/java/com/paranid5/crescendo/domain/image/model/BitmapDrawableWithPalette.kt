@@ -7,10 +7,12 @@ import com.paranid5.crescendo.domain.image.utils.toBitmapDrawable
 
 data class BitmapDrawableWithPalette(val drawable: BitmapDrawable, val palette: Palette) {
     companion object {
-        fun fromBitmapWithPalette(context: Context, bitmapWithPalette: BitmapWithPalette) =
-            BitmapDrawableWithPalette(
-                drawable = bitmapWithPalette.bitmap.toBitmapDrawable(context),
-                palette = bitmapWithPalette.palette,
-            )
+        fun fromBitmapWithPalette(
+            context: Context,
+            bitmapWithPalette: BitmapWithPalette,
+        ): BitmapDrawableWithPalette = BitmapDrawableWithPalette(
+            drawable = bitmapWithPalette.bitmap.toBitmapDrawable(context),
+            palette = bitmapWithPalette.palette,
+        )
     }
 }

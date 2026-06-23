@@ -1,3 +1,4 @@
+//noinspection UsingMaterialAndMaterial3Libraries
 package com.paranid5.crescendo.presentation.main
 
 import android.content.res.Configuration
@@ -225,7 +226,11 @@ private fun animatePushUpTopPaddingAsState(sheetState: ModalBottomSheetState) = 
         Configuration.ORIENTATION_LANDSCAPE -> dimensions.padding.medium
 
         else -> {
-            val progress = sheetState.progress
+            val progress = sheetState.progress(
+                from = ModalBottomSheetValue.Hidden,
+                to = ModalBottomSheetValue.Expanded,
+            )
+
             val targetValue = sheetState.targetValue
             val currentValue = sheetState.currentValue
 

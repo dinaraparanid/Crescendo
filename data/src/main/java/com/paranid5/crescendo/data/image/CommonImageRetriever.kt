@@ -10,7 +10,7 @@ import com.paranid5.crescendo.domain.image.utils.toResizedBitmap
 
 internal object CommonImageRetriever {
     fun ImageLoaderBuilder(context: Context) = context.imageLoader.newBuilder()
-    
+
     fun Any.getCoilModelBuilder(context: Context) =
         ImageRequest.Builder(context)
             .data(this)

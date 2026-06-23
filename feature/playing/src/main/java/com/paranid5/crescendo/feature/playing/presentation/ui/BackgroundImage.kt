@@ -13,8 +13,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.blur
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalWindowInfo
 import androidx.compose.ui.res.stringResource
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
@@ -22,6 +22,8 @@ import com.paranid5.crescendo.core.common.PlaybackStatus
 import com.paranid5.crescendo.core.media.images.ImageSize
 import com.paranid5.crescendo.core.resources.R
 import com.paranid5.crescendo.core.resources.ui.theme.AppTheme.dimensions
+import com.paranid5.crescendo.domain.image.model.ImagePath
+import com.paranid5.crescendo.domain.image.model.ImageUrl
 import com.paranid5.crescendo.ui.covers.trackCoverModel
 import com.paranid5.crescendo.ui.covers.videoCoverModel
 import com.paranid5.crescendo.utils.extensions.increaseDarkness
@@ -30,31 +32,31 @@ import kotlinx.collections.immutable.ImmutableList
 @Composable
 internal fun BackgroundImage(
     playbackStatus: PlaybackStatus,
-    videoCovers: ImmutableList<String>,
-    trackPath: String?,
+    videoCovers: ImmutableList<ImageUrl>,
+    trackPath: ImagePath?,
     modifier: Modifier = Modifier,
 ) {
     val context = LocalContext.current
-    val config = LocalConfiguration.current
+    val window = LocalWindowInfo.current
 
     var coverModel by remember { mutableStateOf<ImageRequest?>(null) }
 
-    LaunchedEffect(context, config, playbackStatus, videoCovers, trackPath) {
+    LaunchedEffect(context, window, playbackStatus, videoCovers, trackPath) {
         val model = when (playbackStatus) {
             PlaybackStatus.STREAMING -> videoCoverModel(
                 context = context,
-                videoCovers = videoCovers,
+                videoCovers = videoCovers.map { it.value },
                 isPlaceholderRequired = false,
-                size = ImageSize(config.screenWidthDp, config.screenHeightDp),
+                size = ImageSize(window.containerSize.width, window.containerSize.height),
                 isBlured = Build.VERSION.SDK_INT < Build.VERSION_CODES.S,
                 bitmapSettings = Bitmap::increaseDarkness,
             )
 
             PlaybackStatus.PLAYING -> trackCoverModel(
                 context = context,
-                trackPath = trackPath,
+                trackPath = trackPath?.value,
                 isPlaceholderRequired = false,
-                size = ImageSize(config.screenWidthDp, config.screenHeightDp),
+                size = ImageSize(window.containerSize.width, window.containerSize.height),
                 isBlured = Build.VERSION.SDK_INT < Build.VERSION_CODES.S,
                 bitmapSettings = Bitmap::increaseDarkness,
             )

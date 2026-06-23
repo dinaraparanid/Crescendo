@@ -10,6 +10,10 @@ import com.paranid5.crescendo.core.common.tracks.Track
 import com.paranid5.crescendo.core.common.udf.StatePublisher
 import com.paranid5.crescendo.core.common.udf.state
 import com.paranid5.crescendo.domain.current_playlist.CurrentPlaylistRepository
+import com.paranid5.crescendo.domain.image.ImageRetriever
+import com.paranid5.crescendo.domain.image.model.BitmapDrawableWithPalette
+import com.paranid5.crescendo.domain.image.model.ImagePath
+import com.paranid5.crescendo.domain.image.model.ImageUrl
 import com.paranid5.crescendo.domain.metadata.model.VideoMetadata
 import com.paranid5.crescendo.domain.playback.PlaybackRepository
 import com.paranid5.crescendo.domain.stream.StreamRepository
@@ -18,13 +22,15 @@ import com.paranid5.crescendo.feature.playing.domain.PlayingInteractor
 import com.paranid5.crescendo.system.services.track.TrackServiceInteractor
 import com.paranid5.crescendo.ui.track.ui_state.TrackUiState
 import com.paranid5.crescendo.utils.doNothing
+import com.paranid5.crescendo.utils.extensions.launchInScope
 import com.paranid5.feature.metadata.VideoMetadataUiState
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
-import kotlinx.coroutines.launch
 
 internal class PlayingViewModelImpl(
     private val savedStateHandle: SavedStateHandle,
@@ -34,18 +40,33 @@ internal class PlayingViewModelImpl(
     private val currentPlaylistRepository: CurrentPlaylistRepository,
     private val interactor: PlayingInteractor,
     private val trackServiceInteractor: TrackServiceInteractor,
+    private val imageRetriever: ImageRetriever,
 ) : ViewModel(), PlayingViewModel, StatePublisher<PlayingState> {
     companion object {
-        private const val StateKey = "state"
+        private const val STATE_KEY = "state"
     }
 
     private var subscribeDataUpdatesJob: Job? = null
 
-    override val stateFlow = savedStateHandle.getStateFlow(StateKey, PlayingState())
+    override val stateFlow = savedStateHandle.getStateFlow(STATE_KEY, PlayingState())
 
     override fun updateState(func: PlayingState.() -> PlayingState) {
-        savedStateHandle[StateKey] = func(state)
+        savedStateHandle[STATE_KEY] = func(state)
     }
+
+    private val _effectFlow = MutableSharedFlow<PlayingScreenEffect>()
+
+    override val effectFlow = _effectFlow.asSharedFlow()
+
+    override suspend fun retrieveBitmapDrawableFromMediaWithPalette(
+        path: ImagePath,
+    ): BitmapDrawableWithPalette? = imageRetriever
+        .retrieveBitmapDrawableFromMediaWithPalette(path = path)
+
+    override suspend fun downloadBitmapDrawableWithPalette(
+        url: ImageUrl,
+    ): BitmapDrawableWithPalette? = imageRetriever
+        .downloadBitmapDrawableWithPalette(url = url)
 
     override fun onUiIntent(intent: PlayingUiIntent) {
         when (intent) {
@@ -85,25 +106,20 @@ internal class PlayingViewModelImpl(
     }
 
     private fun onScreenEventUiIntent(intent: PlayingUiIntent.ScreenEffect) = when (intent) {
-        is PlayingUiIntent.ScreenEffect.ClearScreenEffect -> updateState {
-            copy(screenEffect = null)
-        }
+        is PlayingUiIntent.ScreenEffect.ShowAudioEffects ->
+            onAudioEffectsClick()
 
-        is PlayingUiIntent.ScreenEffect.ShowAudioEffects -> onAudioEffectsClick()
+        is PlayingUiIntent.ScreenEffect.ShowTrimmer ->
+            onShowTrimmerClick(trackUri = intent.trackUri)
 
-        is PlayingUiIntent.ScreenEffect.ShowTrimmer -> updateState {
-            copy(screenEffect = PlayingScreenEffect.ShowTrimmer(trackUri = intent.trackUri))
-        }
-
-        is PlayingUiIntent.ScreenEffect.ShowMetaEditor -> updateState {
-            copy(screenEffect = PlayingScreenEffect.ShowMetaEditor(trackUri = intent.trackUri))
-        }
+        is PlayingUiIntent.ScreenEffect.ShowMetaEditor ->
+            onShowMetaEditorClick(trackUri = intent.trackUri)
     }
 
     private fun onSeekTo(position: Long) = nullable {
         val audioStatus = state.visiblePlaybackStatus.bind()
 
-        viewModelScope.launch {
+        viewModelScope.launchInScope {
             interactor.updateSeekToPosition(playbackStatus = audioStatus, position = position)
         }
 
@@ -113,7 +129,7 @@ internal class PlayingViewModelImpl(
     private fun onPrevButtonClick() = nullable {
         val audioStatus = state.visiblePlaybackStatus.bind()
 
-        viewModelScope.launch {
+        viewModelScope.launchInScope {
             playbackRepository.updateAudioStatus(playbackStatus = audioStatus)
 
             audioStatus.fold(
@@ -127,20 +143,28 @@ internal class PlayingViewModelImpl(
 
     private fun onPauseButtonClick() = nullable {
         val audioStatus = state.visiblePlaybackStatus.bind()
-        viewModelScope.launch { playbackRepository.updateAudioStatus(playbackStatus = audioStatus) }
+
+        viewModelScope.launchInScope {
+            playbackRepository.updateAudioStatus(playbackStatus = audioStatus)
+        }
+
         interactor.sendPauseBroadcast(playbackStatus = audioStatus)
     }
 
     private fun onPlayButtonClick() = nullable {
         val audioStatus = state.visiblePlaybackStatus.bind()
-        viewModelScope.launch { playbackRepository.updateAudioStatus(playbackStatus = audioStatus) }
+
+        viewModelScope.launchInScope {
+            playbackRepository.updateAudioStatus(playbackStatus = audioStatus)
+        }
+
         interactor.startStreamingOrSendResumeBroadcast(playbackStatus = audioStatus)
     }
 
     private fun onNextButtonClick() = nullable {
         val audioStatus = state.visiblePlaybackStatus.bind()
 
-        viewModelScope.launch {
+        viewModelScope.launchInScope {
             playbackRepository.updateAudioStatus(playbackStatus = audioStatus)
 
             audioStatus.fold(
@@ -156,12 +180,24 @@ internal class PlayingViewModelImpl(
         playbackRepository.updateTracksPlaybackPosition(0)
 
     private fun onAudioEffectsClick() = when {
-        interactor.isAllowedToShowAudioEffects -> updateState {
-            copy(screenEffect = PlayingScreenEffect.ShowAudioEffects)
+        interactor.isAllowedToShowAudioEffects -> viewModelScope.launchInScope(Dispatchers.Main) {
+            _effectFlow.emit(PlayingScreenEffect.ShowAudioEffects)
         }
 
-        else -> updateState {
-            copy(screenEffect = PlayingScreenEffect.ShowAudioEffectsNotAllowed)
+        else -> viewModelScope.launchInScope(Dispatchers.Main) {
+            _effectFlow.emit(PlayingScreenEffect.ShowAudioEffectsNotAllowed)
+        }
+    }
+
+    private fun onShowTrimmerClick(trackUri: String) {
+        viewModelScope.launchInScope(Dispatchers.Main) {
+            _effectFlow.emit(PlayingScreenEffect.ShowTrimmer(trackUri = trackUri))
+        }
+    }
+
+    private fun onShowMetaEditorClick(trackUri: String) {
+        viewModelScope.launchInScope(Dispatchers.Main) {
+            _effectFlow.emit(PlayingScreenEffect.ShowMetaEditor(trackUri = trackUri))
         }
     }
 
@@ -173,11 +209,11 @@ internal class PlayingViewModelImpl(
     private fun addToPlaylist(track: Track) {
         val defaultTrack = DefaultTrack(track)
         trackServiceInteractor.addToPlaylist(defaultTrack)
-        viewModelScope.launch { currentPlaylistRepository.addTrackToPlaylist(defaultTrack) }
+        viewModelScope.launchInScope { currentPlaylistRepository.addTrackToPlaylist(defaultTrack) }
     }
 
     private fun subscribeOnDataUpdates() {
-        subscribeDataUpdatesJob = viewModelScope.launch(Dispatchers.Default) {
+        subscribeDataUpdatesJob = viewModelScope.launchInScope(Dispatchers.Default) {
             combine(
                 playbackRepository.audioSessionIdState,
                 playbackRepository.isPlayingState,
@@ -199,7 +235,7 @@ internal class PlayingViewModelImpl(
                     currentTrack = (params[6] as Track?)
                         ?.let(TrackUiState.Companion::fromDTO),
                     currentMetadata = (params[7] as VideoMetadata?)
-                        ?.let(com.paranid5.feature.metadata.VideoMetadataUiState.Companion::fromDTO),
+                        ?.let(VideoMetadataUiState.Companion::fromDTO),
                     playingStreamUrl = params[8] as String,
                 )
             }.distinctUntilChanged().collectLatest { mediator ->

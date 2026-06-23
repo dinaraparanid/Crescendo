@@ -11,6 +11,7 @@ import com.paranid5.crescendo.core.media.images.ImageSize
 import com.paranid5.crescendo.core.media.images.getVideoCoverAsync
 import com.paranid5.crescendo.core.media.images.getVideoCoverWithPaletteAsync
 
+@Deprecated("Will be removed")
 suspend fun videoCoverModel(
     context: Context,
     videoCovers: List<String>,
@@ -43,6 +44,7 @@ suspend fun videoCoverModel(
         .build()
 }
 
+@Deprecated("Will be removed")
 suspend fun videoCoverModelWithPalette(
     context: Context,
     videoCovers: List<String>,

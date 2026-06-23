@@ -1,7 +1,6 @@
 package com.paranid5.crescendo.ui.covers
 
 import android.content.Context
-import android.graphics.drawable.BitmapDrawable
 import coil.request.CachePolicy
 import coil.request.ImageRequest
 import coil.size.Precision
@@ -13,6 +12,7 @@ import com.paranid5.crescendo.utils.BlurTransformation
 
 private const val DefaultAnimationDuration = 400
 
+@Deprecated("Will be removed")
 suspend fun mediaCoverModelWithPalette(
     context: Context,
     videoCovers: List<String>,
@@ -33,6 +33,7 @@ suspend fun mediaCoverModelWithPalette(
     )
 }
 
+@Deprecated("Will be removed")
 fun coverModel(
     data: Any?,
     context: Context,
@@ -46,24 +47,6 @@ fun coverModel(
     .scale(Scale.FILL)
     .crossfade(animationMillis)
     .build()
-
-internal fun ImageRequest.Builder.prevCoverPlaceholder(prevCoverModel: BitmapDrawable?) =
-    when (prevCoverModel) {
-        null -> placeholder(R.drawable.cover_thumbnail)
-        else -> placeholder(prevCoverModel)
-    }
-
-internal fun ImageRequest.Builder.prevCoverError(prevCoverModel: BitmapDrawable?) =
-    when (prevCoverModel) {
-        null -> error(R.drawable.cover_thumbnail)
-        else -> error(prevCoverModel)
-    }
-
-internal fun ImageRequest.Builder.prevCoverFallback(prevCoverModel: BitmapDrawable?) =
-    when (prevCoverModel) {
-        null -> fallback(R.drawable.cover_thumbnail)
-        else -> fallback(prevCoverModel)
-    }
 
 internal fun ImageRequest.Builder.defaultPlaceholder() =
     placeholder(R.drawable.cover_thumbnail)

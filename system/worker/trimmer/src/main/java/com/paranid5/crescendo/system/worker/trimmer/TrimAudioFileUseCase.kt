@@ -81,6 +81,7 @@ internal class TrimAudioFileUseCase(
             "aresample=44100," +
             "atempo=${pitchAndSpeed.speed}/${pitchAndSpeed.pitch}," +
             "afade=in:0:d=${fadeDurations.fadeInSecs}," +
-            "afade=out:st=${trimRange.totalDurationSecs - fadeDurations.fadeOutSecs}:d=${fadeDurations.fadeOutSecs} " +
+            "afade=out:st=${trimRange.totalDurationSecs - fadeDurations.fadeOutSecs}" +
+            ":d=${fadeDurations.fadeOutSecs} " +
             "\"$outputPath\""
 }

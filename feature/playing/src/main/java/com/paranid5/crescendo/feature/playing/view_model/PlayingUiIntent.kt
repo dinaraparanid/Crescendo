@@ -30,6 +30,5 @@ sealed interface PlayingUiIntent {
         data class ShowTrimmer(val trackUri: String) : ScreenEffect
         data class ShowMetaEditor(val trackUri: String) : ScreenEffect
         data object ShowAudioEffects : ScreenEffect
-        data object ClearScreenEffect : ScreenEffect
     }
 }

@@ -32,6 +32,7 @@ import kotlinx.io.readByteArray
 import timber.log.Timber
 import java.io.File
 import java.util.concurrent.atomic.AtomicLong
+import kotlin.time.Duration.Companion.milliseconds
 
 private const val TAG = "KtorClient"
 
@@ -139,8 +140,10 @@ private suspend inline fun HttpResponse.downloadFileImpl(
 ): DownloadFilesStatus {
     val channel = bodyAsChannel()
 
-    while (channel.isClosedForRead.not() && downloadingState.value == DownloadingStatus.Downloading) {
-        val packet = withTimeoutOrNull(NEXT_PACKET_TIMEOUT) {
+    while (channel.isClosedForRead.not() &&
+        downloadingState.value == DownloadingStatus.Downloading
+    ) {
+        val packet = withTimeoutOrNull(NEXT_PACKET_TIMEOUT.milliseconds) {
             channel.readRemaining(DEFAULT_BUFFER_SIZE.toLong())
         } ?: throw Exception("Packet timeout")
 
@@ -161,8 +164,11 @@ private suspend inline fun HttpResponse.downloadFileImpl(
     channel.cancel()
 
     return when (downloadingState.finishedValue) {
-        DownloadingStatus.CanceledAll, DownloadingStatus.CanceledCurrent -> DownloadFilesStatus.Canceled
-        DownloadingStatus.Downloaded -> DownloadFilesStatus.Success
+        is DownloadingStatus.CanceledAll, is DownloadingStatus.CanceledCurrent ->
+            DownloadFilesStatus.Canceled
+
+        is DownloadingStatus.Downloaded -> DownloadFilesStatus.Success
+
         else -> DownloadFilesStatus.Error
     }
 }

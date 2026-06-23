@@ -44,38 +44,6 @@ internal fun getBitmapFromModelBlocking(
     .toResizedBitmap(size)
     .also(bitmapSettings)
 
-internal suspend fun getBitmapFromResource(
-    context: Context,
-    @DrawableRes res: Int,
-    size: ImageSize? = null,
-    bitmapSettings: (Bitmap) -> Unit = {}
-) = getBitmapFromModel(context, res, size, bitmapSettings)
-
-internal fun getBitmapFromResourceBlocking(
-    context: Context,
-    @DrawableRes res: Int,
-    size: ImageSize? = null,
-    bitmapSettings: (Bitmap) -> Unit = {}
-) = getBitmapFromModelBlocking(context, res, size, bitmapSettings)
-
-internal suspend fun getBitmapFromResourceCatching(
-    context: Context,
-    @DrawableRes res: Int,
-    size: ImageSize? = null,
-    bitmapSettings: (Bitmap) -> Unit = {}
-) = Either.catch {
-    getBitmapFromResource(context, res, size, bitmapSettings)
-}
-
-internal fun getBitmapFromResourceBlockingCatching(
-    context: Context,
-    @DrawableRes res: Int,
-    size: ImageSize? = null,
-    bitmapSettings: (Bitmap) -> Unit = {}
-) = Either.catch {
-    getBitmapFromResourceBlocking(context, res, size, bitmapSettings)
-}
-
 internal suspend fun getBitmapFromUrl(
     context: Context,
     url: String,
@@ -96,13 +64,6 @@ internal suspend fun getBitmapFromUrlWithPalette(
     size: ImageSize? = null,
     bitmapSettings: (Bitmap) -> Unit = {}
 ) = getBitmapFromUrl(context, url, size, bitmapSettings).withPalette
-
-internal fun getBitmapFromUrlWithPaletteBlocking(
-    context: Context,
-    url: String,
-    size: ImageSize? = null,
-    bitmapSettings: (Bitmap) -> Unit = {}
-) = getBitmapFromUrlBlocking(context, url, size, bitmapSettings).withPalette
 
 internal suspend fun getBitmapFromUrlCatching(
     context: Context,
@@ -129,15 +90,6 @@ internal suspend fun getBitmapFromUrlWithPaletteCatching(
     bitmapSettings: (Bitmap) -> Unit = {}
 ) = Either.catch {
     getBitmapFromUrlWithPalette(context, url, size, bitmapSettings)
-}
-
-internal fun getBitmapFromUrlWithPaletteBlockingCatching(
-    context: Context,
-    url: String,
-    size: ImageSize? = null,
-    bitmapSettings: (Bitmap) -> Unit = {}
-) = Either.catch {
-    getBitmapFromUrlWithPaletteBlocking(context, url, size, bitmapSettings)
 }
 
 internal fun getCoverDataByPath(path: String?): ByteArray? {
@@ -188,13 +140,6 @@ internal suspend fun getBitmapFromPathWithPalette(
     bitmapSettings: (Bitmap) -> Unit = {}
 ) = getBitmapFromPath(context, path, size, bitmapSettings).withPalette
 
-internal fun getBitmapFromPathWithPaletteBlocking(
-    context: Context,
-    path: String?,
-    size: ImageSize? = null,
-    bitmapSettings: (Bitmap) -> Unit = {}
-) = getBitmapFromPathBlocking(context, path, size, bitmapSettings).withPalette
-
 internal suspend fun getBitmapFromPathCatching(
     context: Context,
     path: String?,
@@ -220,13 +165,4 @@ internal suspend fun getBitmapFromPathWithPaletteCatching(
     bitmapSettings: (Bitmap) -> Unit = {}
 ) = Either.catch {
     getBitmapFromPathWithPalette(context, path, size, bitmapSettings)
-}
-
-internal fun getBitmapFromPathWithPaletteBlockingCatching(
-    context: Context,
-    path: String?,
-    size: ImageSize? = null,
-    bitmapSettings: (Bitmap) -> Unit = {}
-) = Either.catch {
-    getBitmapFromPathWithPaletteBlocking(context, path, size, bitmapSettings)
 }

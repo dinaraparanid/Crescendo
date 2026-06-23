@@ -42,16 +42,16 @@ internal class ImageRetrieverImpl(private val context: Context) : ImageRetriever
         BinaryDataRetriever.getImageBinaryDataFromPathCatching(context, path).getOrNull()
 
     override suspend fun resourceBitmap(resource: ImageResource): Bitmap? =
-        com.paranid5.crescendo.data.image.ResourceRetriever.getBitmapFromResourceCatching(context, resource).getOrNull()
+        ResourceRetriever.getBitmapFromResourceCatching(context, resource).getOrNull()
 
     override suspend fun resourceBitmapWithPalette(resource: ImageResource): BitmapWithPalette? =
-        com.paranid5.crescendo.data.image.ResourceRetriever.getBitmapFromResourceWithPaletteCatching(context, resource).getOrNull()
+        ResourceRetriever.getBitmapFromResourceWithPaletteCatching(context, resource).getOrNull()
 
     override suspend fun resourceBitmapDrawable(resource: ImageResource): BitmapDrawable? =
-        com.paranid5.crescendo.data.image.ResourceRetriever.getBitmapDrawableFromResourceCatching(context, resource).getOrNull()
+        ResourceRetriever.getBitmapDrawableFromResourceCatching(context, resource).getOrNull()
 
     override suspend fun resourceBitmapDrawableWithPalette(resource: ImageResource): BitmapDrawableWithPalette? =
-        com.paranid5.crescendo.data.image.ResourceRetriever.getBitmapDrawableFromResourceWithPaletteCatching(context, resource).getOrNull()
+        ResourceRetriever.getBitmapDrawableFromResourceWithPaletteCatching(context, resource).getOrNull()
 
     override suspend fun resourceImageData(resource: ImageResource): ByteArray? =
         BinaryDataRetriever.getImageBinaryDataFromResourceCatching(context, resource).getOrNull()

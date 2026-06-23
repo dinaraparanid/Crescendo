@@ -28,7 +28,7 @@ internal class GeniusApiImpl(
             .get {
                 url(urlBuilder.buildSearchUrl())
                 parameter("q", "$artistInput - $titleInput")
-                bearerAuth(GeniusApiToken)
+                bearerAuth(GENIUS_API_TOKEN)
             }
             .body<GeniusResponse<SearchResponse>>()
             .response
@@ -43,7 +43,7 @@ internal class GeniusApiImpl(
         ktorClient
             .get {
                 url(urlBuilder.buildSongsUrl(geniusTrackId))
-                bearerAuth(GeniusApiToken)
+                bearerAuth(GENIUS_API_TOKEN)
             }
             .body<GeniusResponse<GeniusTrackResponse>>()
             .response

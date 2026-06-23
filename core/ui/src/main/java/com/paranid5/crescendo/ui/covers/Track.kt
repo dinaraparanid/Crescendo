@@ -11,6 +11,7 @@ import com.paranid5.crescendo.core.media.images.ImageSize
 import com.paranid5.crescendo.core.media.images.getTrackCoverAsync
 import com.paranid5.crescendo.core.media.images.getTrackCoverWithPaletteAsync
 
+@Deprecated("Will be removed")
 suspend fun trackCoverModel(
     context: Context,
     trackPath: String?,
@@ -41,6 +42,7 @@ suspend fun trackCoverModel(
         .build()
 }
 
+@Deprecated("Will be removed")
 suspend fun trackCoverModelWithPalette(
     context: Context,
     trackPath: String?,

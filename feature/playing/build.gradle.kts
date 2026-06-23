@@ -39,6 +39,7 @@ dependencies {
     implementation(projects.core.resources)
 
     implementation(projects.domain.currentPlaylist)
+    implementation(projects.domain.image)
     implementation(projects.domain.metadata)
     implementation(projects.domain.playback)
     implementation(projects.domain.stream)
